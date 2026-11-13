@@ -49,6 +49,9 @@ resource "verda_instance" "runner" {
     name = "junction2026-runner-os"
     size = 100
     type = "NVMe"
+    # Most instance changes force replacement; keep the disk (and our eval results) when that happens.
+    # A detached volume still costs money: delete it in the console once it's no longer needed.
+    on_destroy = "keep_detached"
   }
 }
 
