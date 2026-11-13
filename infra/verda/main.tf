@@ -36,6 +36,9 @@ resource "verda_startup_script" "docker" {
 }
 
 # CPU runner for agent eval runs. Turin (Zen 5) is only available in FIN-03.
+# Verda only injects ssh_key_ids at creation, so changing them replaces the instance.
+# Teammates' keys were appended by hand to root's authorized_keys instead
+# (github.com/{MikaelSiidorow,kahlstrm,duckymcduck2}.keys); redo that if the runner is recreated.
 resource "verda_instance" "runner" {
   hostname          = "junction2026-runner"
   description       = "Junction 2026 agent eval runner"
