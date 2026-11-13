@@ -1,0 +1,15 @@
+[project]
+name = "spreadlab"
+version = "0.1.0"
+description = "Harness for Bahn Express Spread practice weeks: scan, catalogue, play, sweep, ledger"
+requires-python = ">=3.11"
+dependencies = [
+    "spread @ https://spread.bahnexpress.com/kit/spread-0.1.0-py3-none-any.whl",
+]
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

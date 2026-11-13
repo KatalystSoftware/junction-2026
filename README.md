@@ -10,3 +10,4 @@ Setup: `direnv allow` (or `nix develop`) for the tools; secrets are sops-encrypt
 - [`docs/partners/`](docs/partners/README.md): partner export and one research note per partner.
 - [`docs/challenges/`](docs/challenges/README.md): all challenge briefs, brief-based scoring and ranking.
 - [`docs/shortlist/`](docs/shortlist/README.md): the challenges we talked to, with chat notes and in-person scoring.
+- [`spread/`](spread/README.md): harness for the Bahn Express "Spread" challenge: scan practice weeks, compare policy variants, find their mistakes.
