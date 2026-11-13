@@ -20,6 +20,22 @@ uv run pytest
 Scans and runs go to `data/`, which is not committed. Set `SPREAD_DATA` to keep them elsewhere.
 The catalogue in `catalogue/` is committed, so everyone uses the same seed lists.
 
+## Saved weeks
+
+`archive/` holds a copy of the scans, the played weeks and the map, so they survive the machine that
+played them. It is stored with [Git LFS](https://git-lfs.com): without it, the files are short text
+pointers. The harness does not read `archive/`; copy it into the data folder first.
+
+```bash
+git lfs install && git lfs pull                                 # fetch the files
+mkdir -p data && cp -rn archive/. "${SPREAD_DATA:-data}/"       # use them; keeps newer local files
+rsync -a "${SPREAD_DATA:-data}"/{runs,scans,map.json} archive/  # add new weeks before a commit
+```
+
+A sweep plays a saved week again when the policy code has changed since, so old weeks of a variant
+are a record, not a cache. `scratch/` holds the one-off analysis scripts behind the results; run them
+from this folder with `PYTHONPATH=. uv run --with scikit-learn python scratch/<name>.py`.
+
 ## Commands
 
 | Command | What it does | Cost |
