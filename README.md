@@ -4,6 +4,8 @@ Prep and research for Junction 2026 (13–15 Nov 2026, Hype Areena, Espoo).
 
 What we are doing right now: [`TODO.md`](TODO.md).
 
+Layout: projects in `projects/<name>/`, experiments in `spikes/`; agent conventions in [`AGENTS.md`](AGENTS.md).
+
 Setup: `direnv allow` (or `nix develop`) for the tools; secrets are sops-encrypted, see [`secrets/`](secrets/README.md).
 
 - [`docs/event/`](docs/event/): participant guidebook (PDF + text extract) and the hackerpacks (credits and tools with claim steps).
