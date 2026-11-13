@@ -22,4 +22,9 @@ VARIANTS: dict[str, dict] = {
     "floor-1.9": {"same_day": True, "floor": 1.9},
     # With the floor, fewer cars are won: quote every acceptable request instead of 60% of them.
     "floor-1.7-all": {"same_day": True, "floor": 1.7, "quote_share": 1},
+    # Quote every acceptable request, but none while this many won cars wait for a driver.
+    "gate-5": {"same_day": True, "floor": 1.7, "quote_share": 1, "max_unbooked": 5},
+    "gate-10": {"same_day": True, "floor": 1.7, "quote_share": 1, "max_unbooked": 10},
+    "gate-15": {"same_day": True, "floor": 1.7, "quote_share": 1, "max_unbooked": 15},
+    "floor-1.5-gate-10": {"same_day": True, "floor": 1.5, "quote_share": 1, "max_unbooked": 10},
 }

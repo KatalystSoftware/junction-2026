@@ -64,6 +64,26 @@ def test_floor_raises_only_the_quotes_that_are_under_it():
     assert no_floor.decisions["R2"]["prices"] == {"next_day": 15000}
 
 
+def test_backlog_counts_the_won_cars_that_no_driver_holds_now():
+    d = desk(max_unbooked=2)
+    for id_ in ("R1", "R2"):
+        d.quote(request(id_))
+        d.win({"id": id_, "legs": request(id_)["legs"], "deliveredAt": [None], "deadline": 2640, "option": "next_day"})
+    posts = [action for action in d.outbox if action["type"] == "post"]
+    d.read_results(posts, [{"ok": True, "id": "G1"}, {"ok": True, "id": "G2"}])
+    assert d.unbooked() == 2
+    d.quote(request("R3"))
+    assert d.decisions["R3"]["declined"] == "backlog"
+
+    d.handle({"kind": "gig_booked", "gigId": "G1"})  # a booked car does not count
+    d.quote(request("R4"))
+    assert (d.unbooked(), d.decisions["R4"]["declined"]) == (1, None)
+    d.handle({"kind": "gig_dropped", "gigId": "G1"})  # a dropped car counts again
+    assert d.unbooked() == 2
+    d.handle({"kind": "delivered", "orderId": "R2", "leg": 0, "at": 900})  # a delivered car never does
+    assert d.unbooked() == 1
+
+
 @pytest.mark.parametrize("params, made, reason", [
     ({}, {"legs": 2}, "trade_in"),
     ({}, {"private": True}, "private"),

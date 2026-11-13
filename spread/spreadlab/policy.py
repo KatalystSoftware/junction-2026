@@ -27,6 +27,7 @@ DEFAULTS = {
     "private": False,     # quote requests with a private address
     "min_slack": 300,     # offer an option only with this many minutes between the first possible pickup and the last one that is on time
     "min_notified": 0,    # decline when fewer drivers than this are notified of the pickup
+    "max_unbooked": 0,    # decline while this many won cars have no driver; 0 is no limit
     "fee": 1.2,           # the opening fee, as a multiple of the request's typical fee
 }
 DECLINE = 10  # times the list price: a quote that loses costs nothing, and no quote costs goodwill (RULES.md)
@@ -73,9 +74,16 @@ class Policy(Desk):
         options = [o for o in options if o["deadline"] - drive - ready >= self.p["min_slack"]]
         if not options:
             return "slack", []
+        if self.p["max_unbooked"] and self.unbooked() >= self.p["max_unbooked"]:
+            return "backlog", []
         if share(request["id"]) >= self.p["quote_share"]:
             return "volume", []
         return None, options
+
+    def unbooked(self) -> int:
+        """The won cars that no driver holds now: just won, dropped, or posted again after a failed visit."""
+        return sum(1 for id_, order in self.orders.items() for leg, at in enumerate(order["deliveredAt"])
+                   if at is None and self.leg_gigs.get(id_, {}).get(leg) not in self.booked)
 
     def fees_for(self, order, cars):
         fee = self.requests[order["id"]]["referenceFeeCents"] * cars / len(order["legs"]) * self.p["fee"]

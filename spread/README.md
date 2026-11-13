@@ -38,7 +38,7 @@ and started again.
 
 1. Add a variant to [`spreadlab/variants.py`](spreadlab/variants.py), or a parameter and its rule to
    [`spreadlab/policy.py`](spreadlab/policy.py).
-2. Sweep it against `baseline` on the `tune` list. The first variant named is the reference.
+2. Sweep it against the reference variant (see "Results so far") on the `tune` list. The first variant named is the reference.
 3. Read the report: ranked weeks first, then the margin. A week under 90% on time scores nothing.
    - `above zero` counts the weeks that are ranked and beat `decline-all`. Declining every request
      makes 0 and is not ranked, because a week with no orders is not ranked.
@@ -47,6 +47,20 @@ and started again.
    - Weeks that are missing or failed are named above the table and left out of it. Play them again first.
 4. Read the ledger for where the money went. `in weeks` tells a habit of the variant from one bad week.
 5. Confirm on the `holdout` list before keeping the change.
+
+## Results so far
+
+Level 8, mean margin a week in euros on the first 10 seeds of each list. Every week of every row is ranked.
+
+| Variant | What it adds | Tune | Holdout | Lowest on time |
+| --- | --- | --- | --- | --- |
+| `baseline` | 1.5 x list, 60% of acceptable requests, no `same_day` | 721 | not played | 95.1% |
+| `with-same-day` | offers `same_day` | 1,669 | 1,857 | 91.7% |
+| `floor-1.7` | never quotes under 1.7 x the typical driver fee | 3,472 | 3,579 | 91.8% |
+| `gate-10` | quotes every acceptable request, but none while 10 won cars have no driver | 5,083 | 4,541 | 93.1% |
+
+`gate-10` is the reference for new ideas. `floor-1.7-all` shows why the gate is needed: without it, one
+tight week falls to 87.4% on time and is not ranked.
 
 ## Rules for policy code
 
