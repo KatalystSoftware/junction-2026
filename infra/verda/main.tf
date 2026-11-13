@@ -22,3 +22,36 @@ resource "verda_ssh_key" "amp_runner" {
   name       = "amp-workspace-verda-runner"
   public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKAaxCTpvQhPYVYBjdTQphCNGAu1fB/l49vhcbTa6rZa amp-workspace-verda-runner"
 }
+
+# Harbor runs each trial in a Docker container, so the base image gets Docker on first boot.
+resource "verda_startup_script" "docker" {
+  name   = "junction2026-docker"
+  script = <<-EOT
+    #!/bin/sh
+    set -eu
+    apt-get update
+    DEBIAN_FRONTEND=noninteractive apt-get install -y docker.io git
+    systemctl enable --now docker
+  EOT
+}
+
+# CPU runner for agent eval runs. Turin (Zen 5) is only available in FIN-03.
+resource "verda_instance" "runner" {
+  hostname          = "junction2026-runner"
+  description       = "Junction 2026 agent eval runner"
+  instance_type     = "CPU-TURIN.8V.32G"
+  image             = "26.04.base"
+  location          = "FIN-03"
+  ssh_key_ids       = [verda_ssh_key.hestia.id, verda_ssh_key.amp_runner.id]
+  startup_script_id = verda_startup_script.docker.id
+
+  os_volume = {
+    name = "junction2026-runner-os"
+    size = 100
+    type = "NVMe"
+  }
+}
+
+output "runner_ip" {
+  value = verda_instance.runner.ip
+}
