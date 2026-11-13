@@ -52,6 +52,18 @@ def test_policy_quotes_only_the_options_it_accepts():
     assert d.decisions["R1"] == {"declined": None, "prices": {"next_day": 15000}}
 
 
+def test_floor_raises_only_the_quotes_that_are_under_it():
+    # 1.5 x list is 15000. The typical fee of 9000 puts a floor of 1.5 at 13500, under the quote, and 12000 puts it at 18000, over it.
+    d = desk(price=1.5, floor=1.5)
+    d.quote(request("R1"))
+    d.quote(request("R2", referenceFeeCents=12000))
+    assert d.decisions["R1"]["prices"] == {"next_day": 15000}
+    assert d.decisions["R2"]["prices"] == {"next_day": 18000}
+    no_floor = desk(price=1.5)
+    no_floor.quote(request("R2", referenceFeeCents=12000))
+    assert no_floor.decisions["R2"]["prices"] == {"next_day": 15000}
+
+
 @pytest.mark.parametrize("params, made, reason", [
     ({}, {"legs": 2}, "trade_in"),
     ({}, {"private": True}, "private"),

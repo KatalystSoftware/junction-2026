@@ -20,6 +20,7 @@ from .server import drivers_near, near_places
 
 DEFAULTS = {
     "price": 1.5,         # the quote, as a multiple of the option's list price
+    "floor": 0,           # the lowest quote, as a multiple of the request's typical fee; 0 is no floor
     "quote_share": 0.6,   # the share of acceptable requests that get a serious quote, to limit the cars won
     "same_day": False,    # offer the same_day option
     "trade_in": False,    # quote requests with two cars
@@ -50,7 +51,8 @@ class Policy(Desk):
             first = request["options"][0]
             prices = {first["kind"]: first["listPriceCents"] * DECLINE}
         else:
-            prices = {o["kind"]: int(round(o["listPriceCents"] * self.p["price"])) for o in options}
+            floor = request["referenceFeeCents"] * self.p["floor"]
+            prices = {o["kind"]: int(round(max(o["listPriceCents"] * self.p["price"], floor))) for o in options}
         self.decisions[request["id"]] = {"declined": reason, "prices": prices}
         self.outbox.append({"type": "quote", "requestId": request["id"], "prices": prices})
 

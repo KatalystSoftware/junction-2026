@@ -16,4 +16,10 @@ VARIANTS: dict[str, dict] = {
     "with-private": {"private": True},
     "with-trade-in": {"trade_in": True},
     "notified-10": {"min_notified": 10},
+    # A driver's fee is a multiple of the typical fee, not of the list price: never quote under this multiple of it.
+    "floor-1.5": {"same_day": True, "floor": 1.5},
+    "floor-1.7": {"same_day": True, "floor": 1.7},
+    "floor-1.9": {"same_day": True, "floor": 1.9},
+    # With the floor, fewer cars are won: quote every acceptable request instead of 60% of them.
+    "floor-1.7-all": {"same_day": True, "floor": 1.7, "quote_share": 1},
 }
