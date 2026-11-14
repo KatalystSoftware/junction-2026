@@ -566,3 +566,14 @@ VARIANTS[f"{_HEAD}-late100-h30-c11"] = _full_weeks(VARIANTS[f"{_HEAD}-late100"],
 # head to the cent.
 VARIANTS[f"{_HEAD}-late100-h30-c11-late80-from820"] = {
     **VARIANTS[f"{_HEAD}-late100-h30-c11"], "rich_drivers": 820, "when_rich": {"late_cost": 80}}
+
+# Lane 2's onward pairs held longer and formed later, only in a week under 760 drivers, on the head `-late100-h30-c11`: a won
+# car waits up to 12 hours for a return (`pair_hold`, from 4) and a pair forms while a driver who books it 6 hours from now can
+# still deliver both cars on time (`pair_left`, from 10). Each pair sends one driver for two cars, which a thin week lacks. The
+# thin week plays the head with its `when_tight` applied plus these two knobs (`thin_play`); a week of 760 drivers or more
+# plays the head to the cent. Ranked first of 13 pair knobs and stacks on the stand-in under 760 drivers, on top of
+# onward-all (+452 a week, 3 draws on 206 seeds, 18 more orders).
+_H30 = VARIANTS[f"{_HEAD}-late100-h30-c11"]
+VARIANTS[f"{_HEAD}-late100-h30-c11-thin-hold12-left6"] = {**_H30, "thin_play": {
+    "drivers": 760, "params": {**{k: v for k, v in {**_H30, **_H30["when_tight"]}.items() if k != "when_tight"},
+                               "pair_hold": 12, "pair_left": 6}, "version": thin_play.VERSION}}

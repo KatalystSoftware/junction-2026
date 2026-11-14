@@ -247,3 +247,23 @@ def test_with_pair_more_drivers_a_week_with_fewer_drivers_plays_without_the_extr
         win(d, request("R2", "tampere", "pori", MON_9 + 60), MON_9 + 75)
         sent[name] = (d.world.sent, d.decisions["R2"]["prices"])
     assert sent["thin"] == sent["base"] and sent["full"] != sent["base"]
+
+
+def test_the_thin_hold12_left6_neighbour_plays_the_head_at_760_drivers_or_more_and_only_its_two_knobs_below():
+    from spreadlab.thin_play import ThinPlay
+    from spreadlab.variants import VARIANTS
+
+    class Seen:
+        def __init__(self, world, level, now, params, roster, map_):
+            self.params = params
+
+    class Desk(ThinPlay, Seen):
+        pass
+
+    head = "fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss04-cap62-kindfee-onward-all-late100-h30-c11"
+    part, base = VARIANTS[f"{head}-thin-hold12-left6"], VARIANTS[head]
+    assert Desk(None, 8, 0, part, [{}] * 800, {}).params == base
+    thin = Desk(None, 8, 0, part, [{}] * 700, {}).params
+    assert (thin["pair_hold"], thin["pair_left"]) == (12, 6)
+    as_tight = {k: v for k, v in {**base, **base["when_tight"]}.items() if k != "when_tight"}
+    assert {k: v for k, v in thin.items() if k not in ("pair_hold", "pair_left")} == {k: v for k, v in as_tight.items() if k not in ("pair_hold", "pair_left")}
