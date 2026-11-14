@@ -12,6 +12,7 @@
 //     more    further links beside the button, as [words, address]
 //     source  folder in the repo, joined to `repo`
 //     shot    file in shots/ (960 x 600 WebP of the live app)
+//     logo    optional local SVG mark shown beside the project name
 //     what    what it is; every claim and number is in the file the README's table names
 //   also     work that is on the team's table but is not one of its entries
 window.KATALYST = {
@@ -21,7 +22,8 @@ window.KATALYST = {
     {
       id: "incident",
       short: "an on-call shift that AI agents lose money on",
-      name: "On-call incident response",
+      name: "OnCallBench",
+      logo: "logos/oncallbench.svg",
       for: "AfterQuery, Break the Agent",
       live: "https://incident.katalyst.fyi/",
       open: "Watch the replay",

@@ -33,13 +33,16 @@ A screenshot is 1280 × 800 of the live app, scaled to 960 × 600 WebP, in `site
 
 Both tools come from nixpkgs (`nix shell nixpkgs#chromium nixpkgs#libwebp`).
 
+An entry can set `logo` to a local asset shown beside its name. OnCallBench uses
+`site/logos/oncallbench.svg`, copied from `projects/oncallbench/replay/logo.svg` (its favicon).
+
 ## Where each claim comes from
 
 The page says nothing the repo does not. When one of these files changes, change the entry with it.
 
 | Entry | Source |
 | --- | --- |
-| On-call incident response | [`spikes/aq-incident/README.md`](../../spikes/aq-incident/README.md): 120 minutes, 60 services, "finds the causes, then loses on judgment", and 0.32 over nine runs in its level 4 table |
+| OnCallBench | [`spikes/aq-incident/README.md`](../../spikes/aq-incident/README.md): 120 minutes, 60 services, "finds the causes, then loses on judgment", and 0.32 over nine runs in its level 4 table |
 | Since When | [`projects/since-when/README.md`](../since-when/README.md), first paragraph |
 | Kutsu | [`projects/kutsu/README.md`](../kutsu/README.md), first paragraphs and the two sign-up flows |
 | Spread desk | [`spread/README.md`](../../spread/README.md), "How the desk decides" |
