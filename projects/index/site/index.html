@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Katalyst at Junction 2026</title>
-<meta name="description" content="Team Katalyst's projects at Junction 2026, each with a link to try it.">
+<meta name="description" content="Team Katalyst at Junction 2026: an on-call shift that AI agents lose money on, Wikipedia editions compared through time, and recruitment events that start from the last ones.">
 <meta property="og:title" content="Katalyst at Junction 2026">
-<meta property="og:description" content="Each project with a link to try it.">
+<meta property="og:description" content="Three entries, each with a live demo.">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230f3d33'/%3E%3Cpath d='M10 7v18M22 7l-9.5 9L22 25' fill='none' stroke='%23b9f27c' stroke-width='4'/%3E%3C/svg%3E">
 <link rel="preload" href="fonts/archivo-latin-wdth-normal.woff2" as="font" type="font/woff2" crossorigin>
@@ -72,21 +72,24 @@ ul { padding: 0; list-style: none; }
 .wrap { width: min(100% - 2rem, 68rem); margin-inline: auto; }
 svg.arrow { width: 0.8em; height: 0.8em; flex: none; }
 
-.mast { background: var(--field); color: var(--field-ink); padding-block: clamp(1.4rem, 4vw, 3rem); }
+.mast { background: var(--field); color: var(--field-ink); padding-block: clamp(1.3rem, 4vw, 3rem) clamp(1.4rem, 3.5vw, 2.6rem); }
 .mast h1 {
   font-weight: 800;
   font-stretch: 125%;
-  font-size: clamp(2.6rem, 11vw, 5rem);
+  font-size: clamp(2.4rem, 10vw, 4.6rem);
   line-height: 0.95;
   letter-spacing: -0.035em;
 }
-.mast p { margin-top: 0.6rem; color: var(--field-soft); }
+.mast p { margin-top: 0.8rem; max-width: 30em; color: var(--field-soft); font-size: 1.12em; line-height: 1.45; text-wrap: pretty; }
+.mast p a { color: var(--field-ink); font-weight: 650; text-decoration-color: var(--spark); text-decoration-thickness: 0.1em; }
+.mast p a:hover { color: var(--spark); }
 
-/* One article per project. */
+/* One article per entry. */
 .entry {
-  display: grid; gap: 1rem 2.5rem;
-  padding-block: clamp(1.5rem, 3.5vw, 2.4rem);
+  display: grid; gap: 1.1rem 2.5rem;
+  padding-block: clamp(1.6rem, 3.5vw, 2.6rem);
   border-bottom: 1px solid var(--rule);
+  scroll-margin-top: 0.5rem;
 }
 .entry .shot {
   display: block; overflow: hidden;
@@ -97,13 +100,12 @@ svg.arrow { width: 0.8em; height: 0.8em; flex: none; }
 .entry a.shot:hover img { transform: scale(1.025); }
 .entry h2 {
   font-weight: 800; font-stretch: 118%;
-  font-size: clamp(1.45rem, 1.15rem + 1.3vw, 2.1rem);
-  line-height: 1.12; letter-spacing: -0.02em; text-wrap: balance;
+  font-size: clamp(1.5rem, 1.15rem + 1.4vw, 2.2rem);
+  line-height: 1.1; letter-spacing: -0.02em; text-wrap: balance;
 }
-.entry .for { margin-top: 0.25rem; color: var(--soft); font-size: 0.92em; }
-.entry .what { margin-top: 0.7rem; max-width: 34em; text-wrap: pretty; }
-.entry .acts { margin-top: 1.1rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 1.2rem; }
-.entry .note { color: var(--soft); font-size: 0.92em; }
+.entry .for { margin-top: 0.3rem; color: var(--soft); font-size: 0.92em; }
+.entry .what { margin-top: 0.75rem; max-width: 34em; text-wrap: pretty; }
+.entry .acts { margin-top: 1.15rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem 1.3rem; }
 .btn {
   display: inline-flex; align-items: center; gap: 0.55rem;
   min-height: 48px; padding: 0.6rem 1.15rem;
@@ -114,14 +116,16 @@ svg.arrow { width: 0.8em; height: 0.8em; flex: none; }
 }
 .btn:hover { transform: translateY(-1px); box-shadow: var(--shadow); }
 .btn:active { transform: none; }
-.src { display: inline-flex; align-items: center; min-height: 44px; font-weight: 600; }
+.more { display: inline-flex; align-items: center; min-height: 44px; font-weight: 600; }
 
 @media (min-width: 46rem) {
   .entry { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); align-items: center; }
-  .entry.bare { grid-template-columns: minmax(0, 1fr); }
 }
 
-.foot { padding-block: 1.6rem 3rem; color: var(--soft); font-size: 0.92em; }
+.also { padding-block: clamp(1.4rem, 3vw, 2rem); border-bottom: 1px solid var(--rule); max-width: 44em; }
+.also h2 { font-size: 1em; font-weight: 750; font-stretch: 108%; display: inline; }
+.also p { display: inline; color: var(--soft); }
+.foot { padding-block: 1.4rem 3rem; color: var(--soft); font-size: 0.92em; }
 
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; }
@@ -132,16 +136,16 @@ svg.arrow { width: 0.8em; height: 0.8em; flex: none; }
 <header class="mast">
   <div class="wrap">
     <h1>Katalyst</h1>
-    <p>Our projects at Junction 2026.</p>
+    <p id="lede"></p>
   </div>
 </header>
 
 <main class="wrap" id="projects">
-  <noscript><p style="padding-top:2rem">This page lists its projects with JavaScript. They are also in <a href="https://github.com/KatalystSoftware/junction2026">the repository</a>.</p></noscript>
+  <noscript><p style="padding-top:2rem">This page lists its entries with JavaScript: <a href="https://incident.katalyst.fyi/">the incident replay</a>, <a href="https://since-when.katalyst.fyi/">Since When</a> and <a href="https://kutsu.katalyst.fyi/">Kutsu</a>.</p></noscript>
 </main>
 
 <footer class="wrap foot">
-  <p>Built by AI agents, directed by team Katalyst. <a id="repo" href="https://github.com/KatalystSoftware/junction2026">Source on GitHub</a>.</p>
+  <p>Team Katalyst, Junction 2026, Espoo. AI agents wrote the code; the team picked the problems and reviewed the results.<span id="repo"></span></p>
 </footer>
 
 <script src="projects.js"></script>
@@ -156,46 +160,53 @@ svg.arrow { width: 0.8em; height: 0.8em; flex: none; }
     if (text) node.textContent = text;
     return node;
   }
+  function link(cls, text, href) {
+    var a = el("a", cls, text);
+    a.href = href;
+    return a;
+  }
 
-  document.getElementById("repo").href = data.repo;
+  // The opening sentence: data.lede with each entry's `short` as a link to it.
+  var lede = document.getElementById("lede");
+  lede.append(data.lede + " ");
+  data.projects.forEach(function (entry, i, all) {
+    lede.append(link("", entry.short, "#" + entry.id), i < all.length - 2 ? ", " : i < all.length - 1 ? " and " : ".");
+  });
+
   var main = document.getElementById("projects");
-
   data.projects.forEach(function (entry) {
-    var article = el("article", entry.shot ? "entry" : "entry bare");
+    var article = el("article", "entry");
+    article.id = entry.id;
 
-    if (entry.shot) {
-      var frame = el(entry.live ? "a" : "div", "shot");
-      if (entry.live) { frame.href = entry.live; frame.tabIndex = -1; frame.setAttribute("aria-hidden", "true"); }
-      var img = el("img");
-      img.src = "shots/" + entry.shot;
-      img.alt = entry.live ? "" : "Screenshot of " + entry.name;
-      img.width = 960; img.height = 600; img.decoding = "async";
-      frame.append(img);
-      article.append(frame);
-    }
+    var frame = link("shot", "", entry.live);
+    frame.tabIndex = -1;
+    frame.setAttribute("aria-hidden", "true");
+    var img = el("img");
+    img.src = "shots/" + entry.shot;
+    img.alt = "";
+    img.width = 960; img.height = 600; img.decoding = "async";
+    frame.append(img);
 
     var body = el("div");
     body.append(el("h2", "", entry.name), el("p", "for", entry.for), el("p", "what", entry.what));
-
     var acts = el("div", "acts");
-    if (entry.live) {
-      var open = el("a", "btn", (entry.open || "Open " + entry.name) + " ");
-      open.href = entry.live;
-      open.insertAdjacentHTML("beforeend", ARROW);
-      acts.append(open);
-    } else if (entry.note) {
-      acts.append(el("span", "note", entry.note));
-    }
-    if (entry.source) {
-      var src = el("a", "src", "Source");
-      src.href = data.repo + "/tree/main/" + entry.source;
-      src.setAttribute("aria-label", "Source of " + entry.name + " on GitHub");
-      acts.append(src);
-    }
+    var open = link("btn", entry.open + " ", entry.live);
+    open.insertAdjacentHTML("beforeend", ARROW);
+    acts.append(open);
+    (entry.more || []).forEach(function (m) { acts.append(link("more", m[0], m[1])); });
+    if (data.repo) acts.append(link("more", "Source", data.repo + "/tree/main/" + entry.source));
     body.append(acts);
-    article.append(body);
+
+    article.append(frame, body);
     main.append(article);
   });
+
+  if (data.also) {
+    var also = el("section", "also");
+    also.append(el("h2", "", data.also.name + ". "), el("p", "", data.also.what));
+    main.append(also);
+  }
+  if (data.repo) document.getElementById("repo").append(" ", link("", "Source on GitHub", data.repo), ".");
 })();
 </script>
 </body>

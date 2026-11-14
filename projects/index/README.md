@@ -24,7 +24,7 @@ only when the address does, and is applied with `infra/verda/proxy/deploy.sh`.
 
 The projects are the one list in [`site/projects.js`](site/projects.js); the comment at its top names
 the fields. Edit `name` or `live` to rename or move one, copy an entry to add one, delete an entry to
-drop one. An empty `live` shows the entry's `note` in place of the button. Then run `./deploy.sh`.
+drop one. Then run `./deploy.sh`.
 
 A screenshot is 1280 × 800 of the live app, scaled to 960 × 600 WebP, in `site/shots/`:
 
@@ -35,16 +35,17 @@ Both tools come from nixpkgs (`nix shell nixpkgs#chromium nixpkgs#libwebp`).
 
 ## Where each claim comes from
 
-The page says nothing the repo does not, and quotes no numbers except the 120 minutes of the shift.
+The page says nothing the repo does not. When one of these files changes, change the entry with it.
 
 | Entry | Source |
 | --- | --- |
-| Since When | [`projects/since-when/README.md`](../since-when/README.md) |
-| On-call incident response | [`spikes/aq-incident/README.md`](../../spikes/aq-incident/README.md) and its [`replay/README.md`](../../spikes/aq-incident/replay/README.md); "worse than a scripted expert" is the round 4 status in [`LOOP.md`](../../spikes/aq-incident/LOOP.md) |
-| Kutsu | [`projects/kutsu/README.md`](../kutsu/README.md) |
-| Spread desk | [`spread/README.md`](../../spread/README.md) and the [challenge brief](../../docs/challenges/main/bahn-express--spread.md) |
+| On-call incident response | [`spikes/aq-incident/README.md`](../../spikes/aq-incident/README.md): 120 minutes, 60 services, "finds the causes, then loses on judgment", and 0.32 over nine runs in its level 4 table |
+| Since When | [`projects/since-when/README.md`](../since-when/README.md), first paragraph |
+| Kutsu | [`projects/kutsu/README.md`](../kutsu/README.md), first paragraphs and the two sign-up flows |
+| Spread desk | [`spread/README.md`](../../spread/README.md), "How the desk decides" |
 
-The source links point at this repository, which is private at the time of writing: they answer 404
-for everyone outside the team until it is public.
+Source links are off: `repo` in `projects.js` is empty because this repository is private. Set it to
+the public copy's address once `scripts/publish-public.sh` has pushed one, and every entry gets a
+"Source" link to its folder.
 
 The typeface is Archivo, under the SIL Open Font License ([`site/fonts/OFL.txt`](site/fonts/OFL.txt)).

@@ -1,48 +1,63 @@
-// The projects on the index page, in the order shown. index.html draws the page from this block.
+// Everything the index page says. index.html draws the page from this block.
 //
-//   name    what the page calls it
-//   for     the challenge it answers
-//   live    the address the button opens; "" shows `note` instead
-//   open    the button's words; "Open <name>" when left out
-//   source  folder in the repo, joined to `repo`
-//   shot    file in shots/ (960 x 600 WebP from the live app); "" for none
-//   what    what it is, in a sentence or two taken from the project's README
+//   repo     the public repository; "" hides every source link until there is one
+//   lede     the opening words; each entry's `short` follows as a link to that entry
+//   projects the submitted entries, in the order shown:
+//     id      anchor on the page
+//     short   the entry in a few words, for the opening sentence
+//     name    what the page calls it
+//     for     the challenge it answers
+//     live    the address the button and the screenshot open
+//     open    the button's words
+//     more    further links beside the button, as [words, address]
+//     source  folder in the repo, joined to `repo`
+//     shot    file in shots/ (960 x 600 WebP of the live app)
+//     what    what it is; every claim and number is in the file the README's table names
+//   also     work that is on the team's table but is not one of its entries
 window.KATALYST = {
-  repo: "https://github.com/KatalystSoftware/junction2026",
+  repo: "",
+  lede: "Three entries at Junction 2026:",
   projects: [
     {
-      name: "Since When",
-      for: "MariaDB, Wikipedia Through Time",
-      live: "https://since-when.katalyst.fyi/",
-      source: "projects/since-when",
-      shot: "since-when.webp",
-      what: "What the Finnish, Swedish and English Wikipedia articles on a topic say differently, and the date and edit each difference began with.",
-    },
-    {
+      id: "incident",
+      short: "an on-call shift that AI agents lose money on",
       name: "On-call incident response",
       for: "AfterQuery, Break the Agent",
       live: "https://incident.katalyst.fyi/",
       open: "Watch the replay",
       source: "spikes/aq-incident",
       shot: "incident.webp",
-      what: "A simulated 120-minute on-call shift that AI agents handle worse than a scripted expert. The replay puts an agent's shift next to the expert's: each action, what the agent saw and what it wrote.",
+      what: "An AI agent is paged into a 120-minute shift on a simulated online shop: 60 services, several faults at once, and every failed request costs revenue. Claude Opus 5.5 finds the causes, then loses on judgment: over nine runs it averages 0.32 of what a scripted expert saves.",
     },
     {
+      id: "since-when",
+      short: "three Wikipedias compared through time",
+      name: "Since When",
+      for: "MariaDB, Wikipedia Through Time",
+      live: "https://since-when.katalyst.fyi/",
+      open: "Open Since When",
+      source: "projects/since-when",
+      shot: "since-when.webp",
+      what: "For one topic, what the Finnish, Swedish and English Wikipedia articles say differently, and the date and the edit each difference began with. Every screen shows the MariaDB statement behind it, and you can run it.",
+    },
+    {
+      id: "kutsu",
+      short: "recruitment events that start from the last ones",
       name: "Kutsu",
       for: "City of Espoo, Rethinking Recruitment",
       live: "https://kutsu.katalyst.fyi/",
+      open: "Open Kutsu",
+      more: [
+        ["A company's sign-up", "https://kutsu.katalyst.fyi/#/join/nitor.com"],
+        ["A person's sign-up", "https://kutsu.katalyst.fyi/#/me"],
+      ],
       source: "projects/kutsu",
       shot: "kutsu.webp",
-      what: "Finds a company worth inviting and sends it an event sign-up that is already filled in.",
-    },
-    {
-      name: "Spread desk",
-      for: "Bahn Express, Spread",
-      live: "",
-      source: "spread",
-      shot: "",
-      what: "A pricing bot that runs a simulated car transport company for a week in a live competition.",
-      note: "Nothing public to open.",
+      what: "Today every Espoo recruitment event starts from scratch, and companies and candidates each wait for the other to sign up. Kutsu keeps what past events taught and hands both an invitation that is already filled in, to agree with or correct.",
     },
   ],
+  also: {
+    name: "Also on our table: Spread desk",
+    what: "A pricing desk for Bahn Express's Spread competition. It runs a simulated car transport company for a week, quoting dealers and paying drivers; every quote is one formula, with no model on the quote path.",
+  },
 };
