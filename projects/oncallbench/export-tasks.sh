@@ -7,7 +7,9 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 ./sync.sh
-python=(python3); command -v python3 >/dev/null || python=(nix shell nixpkgs#python313 -c python3)
+if command -v python3 >/dev/null; then python=(python3)
+elif command -v uv >/dev/null; then python=(uv run --no-project --python 3.13 python3)
+else python=(nix shell nixpkgs#python313 -c python3); fi
 
 level=${1:-4}
 shift || true

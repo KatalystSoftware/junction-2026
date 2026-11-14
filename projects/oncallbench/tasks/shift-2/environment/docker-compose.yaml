@@ -7,7 +7,8 @@ services:
       - ledger:/ledger:ro
     # The public replay viewer and this public repository serve the simulator, the reference and
     # replays of shipped seeds (redteam/REPORT.md): the agent's container must not reach them.
-    # OpenCode's install needs none of these hosts on this Alpine image (Dockerfile).
+    # OpenCode's install needs none of these hosts only because the agent image is Alpine: keep it
+    # Alpine. On a glibc image Harbor fetches nvm from raw.githubusercontent.com and the install fails.
     extra_hosts:
       - "incident.katalyst.fyi:127.0.0.1"
       - "github.com:127.0.0.1"

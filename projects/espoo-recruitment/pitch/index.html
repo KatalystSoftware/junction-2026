@@ -20,7 +20,7 @@
   --r:6px;--r2:12px;
 }
 *{box-sizing:border-box}
-html{scroll-snap-type:y mandatory;scroll-behavior:smooth;height:100%}
+html{scroll-snap-type:y mandatory;scroll-behavior:auto;height:100%}
 body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 "Hanken Grotesk",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 h1,h2,h3{margin:0;letter-spacing:-.02em;line-height:1.05;text-wrap:balance}
 h1{font-size:min(var(--t-3xl),10.5vh);font-weight:800;letter-spacing:-.03em}
@@ -505,7 +505,13 @@ class SlidePresentation{
   update(){const p=this.slides.length>1?this.current/(this.slides.length-1)*100:100;this.bar.style.width=p+'%';this.bar.setAttribute('aria-valuenow',Math.round(p));
     this.dots.forEach((d,i)=>d.classList.toggle('active',i===this.current));document.body.classList.toggle('on-dark',this.slides[this.current].classList.contains('dark'));document.body.classList.toggle('on-split',this.slides[this.current].classList.contains('split'));document.body.classList.toggle('on-first',this.current===0);document.body.dataset.phase=this.slides[this.current].dataset.phase||'none';this.counter.textContent=(this.current+1)+' / '+this.slides.length}
   goTo(i,animate=true){const t=Math.max(0,Math.min(i,this.slides.length-1));this.current=t;const s=this.slides[t];
-    s.scrollIntoView({behavior:animate&&!matchMedia('(prefers-reduced-motion: reduce)').matches?'smooth':'instant'});this.update();this.replay(s);history.replaceState(null,'','#slide-'+(t+1))}
+    this.slideTo(s,animate);this.update();this.replay(s);history.replaceState(null,'','#slide-'+(t+1))}
+  // A short eased glide (260 ms) instead of the browser's smooth scroll, which can take a second and fights the snap points.
+  slideTo(s,animate){const to=s.offsetTop,from=scrollY,d=to-from;cancelAnimationFrame(this.raf);const root=document.documentElement;
+    if(!animate||!d||matchMedia('(prefers-reduced-motion: reduce)').matches){root.style.scrollSnapType='';scrollTo(0,to);return}
+    const t0=performance.now(),dur=260;root.style.scrollSnapType='none';
+    const step=now=>{const k=Math.min(1,(now-t0)/dur),e=1-Math.pow(1-k,3);scrollTo(0,from+d*e);if(k<1)this.raf=requestAnimationFrame(step);else root.style.scrollSnapType=''};
+    this.raf=requestAnimationFrame(step)}
   next(){this.goTo(this.current+1)}prev(){this.goTo(this.current-1)}
   fromHash(){const m=location.hash.match(/#slide-(\d+)/);return m?+m[1]-1:0}
   keys(){document.addEventListener('keydown',e=>{if(e.target.matches('input,textarea,[contenteditable]'))return;switch(e.key){
@@ -515,8 +521,10 @@ class SlidePresentation{
     case'f':case'F':if(!e.ctrlKey&&!e.metaKey){document.fullscreenElement?document.exitFullscreen?.():document.documentElement.requestFullscreen?.()}}})}
   touch(){let y=0,x=0;document.addEventListener('touchstart',e=>{y=e.touches[0].clientY;x=e.touches[0].clientX},{passive:true});
     document.addEventListener('touchend',e=>{const dy=y-e.changedTouches[0].clientY,dx=x-e.changedTouches[0].clientX;if(Math.abs(dy)>Math.abs(dx)&&Math.abs(dy)>40)dy>0?this.next():this.prev()},{passive:true})}
-  wheel(){let t,lock=false;document.addEventListener('wheel',e=>{if(matchMedia('(max-width: 900px)').matches)return;e.preventDefault();if(lock)return;clearTimeout(t);
-    t=setTimeout(()=>{lock=true;e.deltaY>0?this.next():this.prev();setTimeout(()=>lock=false,500)},40)},{passive:false})}
+  // Move on the first tick of a gesture. A trackpad keeps sending shrinking deltas for a second after the fingers lift
+  // (inertia); only a growing delta after a pause counts as a new gesture, so one swipe moves exactly one slide.
+  wheel(){let until=0,last=0,lastAt=0;document.addEventListener('wheel',e=>{if(matchMedia('(max-width: 900px)').matches)return;e.preventDefault();const now=performance.now(),d=Math.abs(e.deltaY);
+    const fresh=now-lastAt>150||d>last*1.5;last=d;lastAt=now;if(now<until||d<4||!fresh)return;until=now+500;e.deltaY>0?this.next():this.prev()},{passive:false})}
   observe(){const o=new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting){const i=this.slides.indexOf(en.target);if(i!==-1&&i!==this.current){this.current=i;this.update();this.replay(en.target)}}}),{threshold:.6});this.slides.forEach(s=>o.observe(s))}
   replay(s){s.querySelectorAll('.enter').forEach(el=>{el.style.animation='none';void el.offsetHeight;el.style.animation=''})}
 }

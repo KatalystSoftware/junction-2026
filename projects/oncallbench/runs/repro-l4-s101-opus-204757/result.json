@@ -1,0 +1,87 @@
+{
+    "id": "a8bcee6f-60d2-4ce2-85ea-966ae0c3572d",
+    "started_at": "2026-11-14T20:48:01.839540",
+    "updated_at": "2026-11-14T20:52:55.930840",
+    "finished_at": "2026-11-14T20:52:55.930840",
+    "n_total_trials": 1,
+    "stats": {
+        "n_completed_trials": 1,
+        "n_errored_trials": 0,
+        "n_running_trials": 0,
+        "n_pending_trials": 0,
+        "n_cancelled_trials": 0,
+        "n_retries": 0,
+        "evals": {
+            "opencode__claude-opus-5-5__adhoc": {
+                "n_trials": 1,
+                "n_errors": 0,
+                "metrics": [
+                    {
+                        "actions": 53.0,
+                        "beats_reference": 0.0,
+                        "cost_outage": 244706.65,
+                        "cost_replicas": 900.0,
+                        "cost_total": 245606.65,
+                        "cost_wasted": 0.0,
+                        "faults_left": 0.0,
+                        "reward": 0.0,
+                        "valid_receipt": 1.0
+                    }
+                ],
+                "pass_at_k": {},
+                "reward_stats": {
+                    "reward": {
+                        "0.0": [
+                            "aq-incident-ec900b74__RzLdia2"
+                        ]
+                    },
+                    "cost_total": {
+                        "245606.65": [
+                            "aq-incident-ec900b74__RzLdia2"
+                        ]
+                    },
+                    "beats_reference": {
+                        "0.0": [
+                            "aq-incident-ec900b74__RzLdia2"
+                        ]
+                    },
+                    "valid_receipt": {
+                        "1.0": [
+                            "aq-incident-ec900b74__RzLdia2"
+                        ]
+                    },
+                    "actions": {
+                        "53": [
+                            "aq-incident-ec900b74__RzLdia2"
+                        ]
+                    },
+                    "faults_left": {
+                        "0": [
+                            "aq-incident-ec900b74__RzLdia2"
+                        ]
+                    },
+                    "cost_outage": {
+                        "244706.65": [
+                            "aq-incident-ec900b74__RzLdia2"
+                        ]
+                    },
+                    "cost_replicas": {
+                        "900": [
+                            "aq-incident-ec900b74__RzLdia2"
+                        ]
+                    },
+                    "cost_wasted": {
+                        "0": [
+                            "aq-incident-ec900b74__RzLdia2"
+                        ]
+                    }
+                },
+                "exception_stats": {}
+            }
+        },
+        "n_input_tokens": 1089969,
+        "n_cache_tokens": 1089895,
+        "n_output_tokens": 4388,
+        "cost_usd": 0.48381500000000005
+    }
+}

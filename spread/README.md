@@ -1,8 +1,8 @@
 # Spread desk
 
 A car-delivery desk for the Bahn Express "Spread" challenge, and the harness that measured each of its
-parts on Bahn's practice weeks. The challenge brief is in
-[`docs/challenges/main/bahn-express--spread.md`](../docs/challenges/main/bahn-express--spread.md).
+parts on Bahn's practice weeks. The challenge is described at
+[spread.bahnexpress.com/how](https://spread.bahnexpress.com/how).
 
 ## How the desk decides
 
@@ -1190,7 +1190,7 @@ uv run python -m spreadlab.live report <world id>                        # after
 ```
 
 Start it at any time before the start. The organisers set a test final 15 minutes before it begins (14:00 and
-20:00 on Saturday), and the final at 07:30. The desk acts only on the world that `GET /v1/final` names. When it
+20:00 on Saturday). The final starts at 09:00 Helsinki on Sunday, and the starter gets its week from 08:30. The desk acts only on the world that `GET /v1/final` names. When it
 stops, by Ctrl-C, a crash or a reboot, the world goes on, and the same command goes on from `data/live/<world id>/`.
 `--variant <name>` plays another variant from `variants.py`; the default is `slow-friday-late-150-kinds-limits`. A second desk on
 the same world and machine stops at once, so two terminals cannot both post the cars.

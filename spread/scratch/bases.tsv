@@ -10,6 +10,7 @@
 # Columns are tab-separated.
 order	tag	commit	variant	fingerprint	state	kind	part
 2	trackb-merge-2	5cbf649	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-all	1f5cc2d99373	known-good	value	every waiting car counted under 760 drivers (60 of 60 thin weeks at 90% or more)
-3		1e6a8e4	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-all-onward-q10-d760	44409f1cda67	window	code	lane 2's onward pairs, only at 760 drivers or more
-4		1e924c0	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760	1348152a78f8	window	value	the waiting-car count of a week under 760 drivers over 48 hours instead of all
-5		-	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss04	5f2044cd7b03	ready	value	the climb's step04: slow_step 0.4 at 760 drivers or more
+3		1e6a8e4	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-all-onward-q10-d760	44409f1cda67	known-good	code	lane 2's onward pairs, only at 760 drivers or more
+4	trackb-merge-3	52bbaa8	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760	1348152a78f8	known-good	value	the waiting-car count of a week under 760 drivers over 48 hours instead of all
+5	trackb-merge-4	fb199d4	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss04	5f2044cd7b03	known-good	value	the climb's step04: slow_step 0.4 at 760 drivers or more
+6		-	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02	d4c41b61e12b	window	value	lane 1 A's slow_step 0.2 at 760 drivers or more, on row 5
