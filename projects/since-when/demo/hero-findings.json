@@ -1,0 +1,499 @@
+{
+ "title": "Hero findings: a shortlist a human can trust",
+ "intro": [
+  "Written by `check_quotes.py --write` from `hero-findings.json`; edit the JSON, not this file.",
+  "",
+  "Every quote below is an exact substring of the plain text of the revision it names, as Wikipedia renders it at the permanent link (`python3 projects/mariadb-wikipedia/demo/check_quotes.py` prints pass or fail per quote; a finding with a failing quote is left out).",
+  "Each finding was reported by the product classifier (Nemotron, prompt version 6) and is in the scratch database; Haiku classified the same passage pairs as a second opinion.",
+  "The main list of a topic has only findings both models put in the same category. A finding the two models categorise differently, or a contradiction, is under \"Needs a human look\".",
+  "Where a statement says an edition does not mention something, the whole rendered article of that edition was searched by hand for it; the script checks the quotes, not the absence.",
+  "The tool links are to the walkthrough instance on the scratch database (pages and API on port 8078, see `HANDOFF.md`); the integrator checked each finding number against that instance by edition pair and quote. The finding number is the `id` in the API answer for the topic; after a restore of the snapshot the numbers may differ, and the finding is then found by its quote. How the list was made and what was left out: `hero-findings-notes.md`."
+ ],
+ "topics": [
+  {
+   "qid": "Q1412941",
+   "title": "Lapua Movement"
+  },
+  {
+   "qid": "Q736268",
+   "title": "Finnish War"
+  },
+  {
+   "qid": "Q2457646",
+   "title": "Diet of Porvoo"
+  }
+ ],
+ "findings": [
+  {
+   "id": "lapua-fascist-first-sentence",
+   "topic": "Q1412941",
+   "list": "main",
+   "statement": "The English and Swedish articles call the Lapua Movement \"fascist\" in their first sentence, while the Finnish first sentence calls it an anti-communist, radical-right popular movement and the Finnish introduction ends by saying that its leaders denied being fascists but that it fits almost every common definition of fascism. The word has come and gone: the English first sentence lost it on 7 June 2009, had it back on 30 May 2022 and gained \"pro-Nazi\" on 7 April 2026, and the Swedish first sentence gained it on 23 October 2026.",
+   "nemotron": "framing",
+   "haiku": "framing",
+   "url": "http://localhost:8078/#/Q1412941/en/fi/findings (finding 14044, English and Finnish; finding 14045 at http://localhost:8078/#/Q1412941/sv/fi/findings, Swedish and Finnish; both in http://localhost:8078/api/topics/Q1412941)",
+   "quotes": [
+    {
+     "lang": "en",
+     "rev": 1383067871,
+     "text": "was a radical Finnish nationalist, fascist, pro-Nazi and anti-communist political movement founded in and named after the town of Lapua",
+     "note": "the first sentence today"
+    },
+    {
+     "lang": "sv",
+     "rev": 59852897,
+     "text": "Lapporörelsen var en finländsk nationalistisk, fascistisk och antikommunistisk utomparlamentarisk politisk rörelse som grundades 1929 i Lappo",
+     "note": "the first sentence today"
+    },
+    {
+     "lang": "fi",
+     "rev": 24266018,
+     "text": "toiminut vaikutusvaltainen antikommunistinen ja oikeistoradikaali kansanliike",
+     "note": "the first sentence today: \"an influential anti-communist and radical-right popular movement\""
+    },
+    {
+     "lang": "fi",
+     "rev": 24266018,
+     "text": "Sen johtohahmot kielsivät olevansa fasisteja, mutta liikkeen aatteellinen tausta, tavoitteet ja toiminta täyttävät lähes kaikki yleisesti käytetyt fasismin määritelmät",
+     "note": "the last paragraph of the introduction today"
+    },
+    {
+     "lang": "en",
+     "rev": 292260900,
+     "text": "sometimes referred to as \"Lapua Fascism\", named after the then municipality and modern days town of Lapua, was a political movement in Finland",
+     "note": "the first sentence before the edit of 7 June 2009"
+    },
+    {
+     "lang": "en",
+     "rev": 294882000,
+     "text": "named after the then municipality and modern days town of Lapua, was a political movement in Finland",
+     "note": "the first sentence after that edit, without \"Lapua Fascism\""
+    },
+    {
+     "lang": "en",
+     "rev": 1082481405,
+     "text": "was a radical Finnish nationalist and anti-communist political movement founded in and named after the town of Lapua",
+     "note": "the first sentence before the edit of 30 May 2022"
+    },
+    {
+     "lang": "en",
+     "rev": 1090675024,
+     "text": "was a radical Finnish nationalist, fascist and anti-communist political movement founded in and named after the town of Lapua",
+     "note": "the edit that put the word back"
+    },
+    {
+     "lang": "en",
+     "rev": 1129222214,
+     "text": "was a radical Finnish nationalist, fascist, pro-German and anti-communist political movement founded in and named after the town of Lapua",
+     "note": "24 December 2022"
+    },
+    {
+     "lang": "en",
+     "rev": 1347550072,
+     "text": "was a radical Finnish nationalist, fascist, pro-Nazi and anti-communist political movement founded in and named after the town of Lapua",
+     "note": "the edit that changed \"pro-German\" to \"pro-Nazi\""
+    },
+    {
+     "lang": "sv",
+     "rev": 59501859,
+     "text": "Lapporörelsen var en finländsk utomparlamentarisk och antikommunistisk rörelse som startades 1929",
+     "note": "the first sentence before the edit of 23 October 2026"
+    },
+    {
+     "lang": "sv",
+     "rev": 59790252,
+     "text": "Lapporörelsen var en finländsk nationalistisk, fascistisk och antikommunistisk politisk rörelse som grundades 1929 i Lappo",
+     "note": "the edit that added the word"
+    }
+   ],
+   "note": "The walkthrough's opening finding. The tool shows the same four dates on the walkthrough instance (`HANDOFF.md`); the dates here are from the revisions quoted."
+  },
+  {
+   "id": "lapua-leaders-imprisoned",
+   "topic": "Q1412941",
+   "list": "main",
+   "statement": "Swedish says 102 of the movement's leaders were imprisoned after the trial that followed the Mäntsälä rebellion; English says Wallenius and about 50 other leaders were sentenced to prison; Finnish says charges were brought against a hundred people and 22 were convicted of rebellion and 32 of aiding it.",
+   "nemotron": "numbers",
+   "haiku": "numbers",
+   "url": "http://localhost:8078/#/Q1412941/sv/en/findings (finding 14096 in http://localhost:8078/api/topics/Q1412941)",
+   "quotes": [
+    {
+     "lang": "sv",
+     "rev": 59852897,
+     "text": "Efter den efterföljande rättegången, då 102 av rörelsens ledare fängslades, upplöstes Lapporörelsen"
+    },
+    {
+     "lang": "en",
+     "rev": 1383067871,
+     "text": "Wallenius and about 50 other leaders were sentenced to prison"
+    },
+    {
+     "lang": "fi",
+     "rev": 24266018,
+     "text": "Syytteet nostettiin sataa henkilöä vastaan. Turun hovioikeus tuomitsi marraskuussa yhteensä 22 henkilöä kapinasta ja 32 sen avunannosta",
+     "note": "not part of the classifier's finding, which compared Swedish with English"
+    }
+   ]
+  },
+  {
+   "id": "lapua-ban-date",
+   "topic": "Q1412941",
+   "list": "main",
+   "statement": "English says the movement was banned on 21 November 1932; Finnish says its activity was banned in practice on 29 February 1932, the organisation was dissolved on 24 March and a court confirmed that on 28 May; Swedish gives only the year.",
+   "nemotron": "numbers",
+   "haiku": "numbers",
+   "url": "http://localhost:8078/#/Q1412941/en/fi/findings (finding 13596 in http://localhost:8078/api/topics/Q1412941)",
+   "quotes": [
+    {
+     "lang": "en",
+     "rev": 1383067871,
+     "text": "After a trial, the Lapua Movement was banned on 21 November 1932 under the Protection of the Republic Act, which Lapua itself had worked to get passed"
+    },
+    {
+     "lang": "fi",
+     "rev": 24266018,
+     "text": "Lapuan Liike Ry:n toiminta kiellettiin käytännössä jo 29. helmikuuta tasavallan suojelulain nojalla. Apulaissisäministeri Arvo Manner lakkautti järjestön lopullisesti 24. maaliskuuta, ja raastuvanoikeus vahvisti päätöksen 28. toukokuuta"
+    },
+    {
+     "lang": "fi",
+     "rev": 24266018,
+     "text": "Lapuanliike kiellettiin ja lakkautettiin toukokuussa 1932",
+     "note": "the introduction"
+    },
+    {
+     "lang": "sv",
+     "rev": 59852897,
+     "text": "Den upplöstes 1932 efter det misslyckade Mäntsäläupproret",
+     "note": "not part of the classifier's finding"
+    }
+   ]
+  },
+  {
+   "id": "lapua-peasant-march-size",
+   "topic": "Q1412941",
+   "list": "main",
+   "statement": "Swedish puts the Peasant March to Helsinki on 7 July 1930 at about 12,000 men; English and Finnish put it at 12,600.",
+   "nemotron": "numbers",
+   "haiku": "numbers",
+   "url": "http://localhost:8078/#/Q1412941/sv/en/findings (finding 13531 in http://localhost:8078/api/topics/Q1412941)",
+   "quotes": [
+    {
+     "lang": "sv",
+     "rev": 59852897,
+     "text": "Den 7 juli demonstrerade rörelsen sin styrka genom att samla omkring 12 000 utvalda män till ett bondetåg till Helsingfors"
+    },
+    {
+     "lang": "en",
+     "rev": 1383067871,
+     "text": "The Peasant March gathered 12,600 men to Helsinki"
+    },
+    {
+     "lang": "fi",
+     "rev": 24266018,
+     "text": "12 600 liikkeen kannattajaa marssi Helsinkiin",
+     "note": "not part of the classifier's finding"
+    }
+   ]
+  },
+  {
+   "id": "lapua-march-on-rome",
+   "topic": "Q1412941",
+   "list": "main",
+   "statement": "Finnish says the Peasant March was modelled on the Italian fascists' March on Rome of 1922; English describes the march without naming a model, and Swedish names Mussolini's Italy as the movement's model but not for the march.",
+   "nemotron": "missing_fact",
+   "haiku": "missing_fact",
+   "url": "http://localhost:8078/#/Q1412941/en/fi/findings (finding 13980 in http://localhost:8078/api/topics/Q1412941)",
+   "quotes": [
+    {
+     "lang": "fi",
+     "rev": 24266018,
+     "text": "Esikuva oli Italian fasistien mustapaitojen marssi Roomaan vuonna 1922, vaikka puhuttiin myös Ruotsin talonpoikien vuoden 1914 maanpuolustusmarssista"
+    },
+    {
+     "lang": "en",
+     "rev": 1383067871,
+     "text": "The Peasant March gathered 12,600 men to Helsinki where they marched through the city, held speeches and sermons and were greeted by distinguished politicians and generals",
+     "note": "the nearest English sentence"
+    },
+    {
+     "lang": "sv",
+     "rev": 59852897,
+     "text": "Rörelsen inspirerades av fascistiska idéer, med Mussolinis Italien som förebild",
+     "note": "the nearest Swedish sentence"
+    }
+   ]
+  },
+  {
+   "id": "lapua-voters-struck",
+   "topic": "Q1412941",
+   "list": "main",
+   "statement": "Finnish says election boards illegally struck up to 20,000 suspected communists from the electoral rolls before the 1930 election, with the help of the security police; English says such voters were removed and gives no number; Swedish does not mention it.",
+   "nemotron": "missing_fact",
+   "haiku": "missing_fact",
+   "url": "http://localhost:8078/#/Q1412941/en/fi/findings (finding 13988 in http://localhost:8078/api/topics/Q1412941)",
+   "quotes": [
+    {
+     "lang": "fi",
+     "rev": 24266018,
+     "text": "Eri puolilla Suomea vaalilautakunnat karsivat kuitenkin äänioikeutettujen listoilta laittomasti arvioiden mukaan jopa 20 000 kommunistiksi epäiltyä Etsivän Keskuspoliisin (EK) avustuksella"
+    },
+    {
+     "lang": "en",
+     "rev": 1383067871,
+     "text": "Voters perceived as communists were also outright removed from electoral rolls",
+     "note": "the nearest English sentence"
+    }
+   ]
+  },
+  {
+   "id": "lapua-great-purge",
+   "topic": "Q1412941",
+   "list": "main",
+   "statement": "English says many of the Finns the movement deported to the Soviet Union were later executed in Stalin's Great Purge; Swedish mentions the deportations but not what became of the deported, and Finnish does not mention the purge.",
+   "nemotron": "missing_fact",
+   "haiku": "missing_fact",
+   "url": "http://localhost:8078/#/Q1412941/sv/en/findings (finding 14087 in http://localhost:8078/api/topics/Q1412941)",
+   "quotes": [
+    {
+     "lang": "en",
+     "rev": 1383067871,
+     "text": "Many of the Finns deported by the Lapua Movement were later caught up in Stalin's Great Purge and executed"
+    },
+    {
+     "lang": "sv",
+     "rev": 59852897,
+     "text": "Vissa oliktänkande fördes över gränsen till Sovjetunionen",
+     "note": "the nearest Swedish sentence"
+    }
+   ],
+   "note": "Haiku agrees for Swedish; for Finnish only Nemotron reported it (finding 13970)."
+  },
+  {
+   "id": "lapua-municipal-councils",
+   "topic": "Q1412941",
+   "list": "main",
+   "statement": "Finnish says the councils of about 70 municipalities were \"cleansed\" of communists before the new municipal law came into force; English and Swedish do not mention it.",
+   "nemotron": "missing_fact",
+   "haiku": "missing_fact",
+   "url": "http://localhost:8078/#/Q1412941/en/fi/findings (finding 14059 in http://localhost:8078/api/topics/Q1412941)",
+   "quotes": [
+    {
+     "lang": "fi",
+     "rev": 24266018,
+     "text": "Noin 70 kunnan kunnanvaltuustot ”puhdistettiin” kommunisteista jo ennen uuden kunnallislain voimaantuloa"
+    }
+   ]
+  },
+  {
+   "id": "lapua-72-men",
+   "topic": "Q1412941",
+   "list": "human",
+   "statement": "After the wrecking of the Työn Ääni printing press, 72 men declared themselves responsible: English dates this to 4 April 1930, Finnish says they came to the governor in Vaasa on 9 April.",
+   "nemotron": "numbers",
+   "haiku": "contradiction",
+   "url": "http://localhost:8078/#/Q1412941/en/fi/findings (finding 13953 in http://localhost:8078/api/topics/Q1412941)",
+   "quotes": [
+    {
+     "lang": "en",
+     "rev": 1383067871,
+     "text": "On April 4th seventy-two men publicly declared themselves responsible for the attack, but only the actual perpetrators and the main organizer, Yrjö Nikula, were charged"
+    },
+    {
+     "lang": "fi",
+     "rev": 24266018,
+     "text": "72 miestä, jotka saapuivat 9. huhtikuuta joukolla Vaasaan maaherran luo"
+    }
+   ],
+   "note": "The two dates may be two steps of one event (a declaration, then the visit to the governor); someone who knows the sources should say."
+  },
+  {
+   "id": "porvoo-dates",
+   "topic": "Q2457646",
+   "list": "main",
+   "statement": "Finnish says the diet was convened on 22 March and closed on 19 July 1809; English says the estates were assembled between 25 March and 19 July; Swedish says the diet sat from 25 March to 18 July.",
+   "nemotron": "numbers",
+   "haiku": "numbers",
+   "url": "http://localhost:8078/#/Q2457646/en/fi/findings (finding 14115 in http://localhost:8078/api/topics/Q2457646)",
+   "quotes": [
+    {
+     "lang": "fi",
+     "rev": 24273336,
+     "text": "Porvoon valtiopäivät oli kutsuttu koolle 22. maaliskuuta (J: 10. maaliskuuta), ja ne päätettiin 19. heinäkuuta (J: 7. heinäkuuta) 1809"
+    },
+    {
+     "lang": "en",
+     "rev": 1384285215,
+     "text": "between 25 March and 19 July 1809"
+    },
+    {
+     "lang": "sv",
+     "rev": 59835605,
+     "text": "Lantdagen sammanträdde 25 mars–18 juli 1809",
+     "note": "not part of the classifier's finding, which compared Finnish with English"
+    }
+   ]
+  },
+  {
+   "id": "porvoo-name",
+   "topic": "Q2457646",
+   "list": "main",
+   "statement": "Finnish says the name “valtiopäivät” is established, though some historians speak of “maapäivät”; Swedish calls “valtiopäivät” an anachronism for Porvoo, coined in 1847, and gives “Porvoon maapäivät” as the recommended Finnish term; English calls the name unhistorical in a footnote.",
+   "nemotron": "framing",
+   "haiku": "framing",
+   "url": "http://localhost:8078/#/Q2457646/sv/fi/findings (finding 14182 in http://localhost:8078/api/topics/Q2457646)",
+   "quotes": [
+    {
+     "lang": "fi",
+     "rev": 24273336,
+     "text": "Nimitys ”valtiopäivät” on vakiintunut, mutta jotkut historiantutkijat puhuvat ”maapäivistä”, joka on suora käännös ruotsinkielisestä nimestä ”Borgå lantdag”"
+    },
+    {
+     "lang": "sv",
+     "rev": 59835605,
+     "text": "Eftersom ordet valtio inte fanns i finskan år 1809 kan valtiopäivät betraktas som anakronistiskt i fråga om Borgå, och som rekommenderad finsk term anges i stället Porvoon maapäivät, som återger den samtida svenska benämningen"
+    },
+    {
+     "lang": "sv",
+     "rev": 59835605,
+     "text": "Ordet valtiopäivät (\"statens dagar\") myntades 1847 av fennomanen Paavo Tikkanen, som tillämpade det just på mötet i Borgå",
+     "note": "the classifier's missing-fact finding on the same pair of passages; Finnish names neither Tikkanen nor 1847"
+    },
+    {
+     "lang": "en",
+     "rev": 1384285215,
+     "text": "The Finnish word for a Diet, valtiopäivät, was invented only in the mid-19th century and so calling the lantdag in Porvoo that name is unhistorical",
+     "note": "not part of the classifier's finding, which compared Finnish with Swedish"
+    }
+   ]
+  },
+  {
+   "id": "porvoo-hwasser-arwidsson",
+   "topic": "Q2457646",
+   "list": "main",
+   "statement": "Swedish reports a learned debate of 1838–1843 in which Israel Hwasser held that the diet had been a regular treaty between Russia and Finland and Adolf Ivar Arwidsson objected; English and Finnish mention neither man.",
+   "nemotron": "missing_fact",
+   "haiku": "missing_fact",
+   "url": "http://localhost:8078/#/Q2457646/en/sv/findings (finding 14191 in http://localhost:8078/api/topics/Q2457646)",
+   "quotes": [
+    {
+     "lang": "sv",
+     "rev": 59835605,
+     "text": "Redan i en lärd debatt 1838–1843 hävdade Israel Hwasser att lantdagen varit ett regelrätt statsfördrag mellan Ryssland och Finland, medan Adolf Ivar Arwidsson invände mot tolkningen"
+    }
+   ]
+  },
+  {
+   "id": "porvoo-military",
+   "topic": "Q2457646",
+   "list": "human",
+   "statement": "Finnish says Finland's military establishment stayed as it was; Swedish says conscription was suspended for fifty years and replaced by vacancy fees.",
+   "nemotron": "contradiction",
+   "haiku": "contradiction",
+   "url": "http://localhost:8078/#/Q2457646/sv/fi/findings (finding 14175 in http://localhost:8078/api/topics/Q2457646)",
+   "quotes": [
+    {
+     "lang": "fi",
+     "rev": 24273336,
+     "text": "Suomen sotalaitos pysyi entisellään"
+    },
+    {
+     "lang": "sv",
+     "rev": 59835605,
+     "text": "värnplikten, som inställdes för femtio år och ersattes med vakansavgifter"
+    }
+   ],
+   "note": "The two may describe the same decision from two sides (the allotment system kept on paper, its troops not raised); someone who knows the sources should say."
+  },
+  {
+   "id": "finnish-war-sveaborg-date",
+   "topic": "Q736268",
+   "list": "main",
+   "statement": "Swedish says the siege of Sveaborg ended on 3 May 1808 with the capitulation; English says the fortress surrendered on 6 May 1808; Finnish says early May.",
+   "nemotron": "numbers",
+   "haiku": "numbers",
+   "url": "http://localhost:8078/#/Q736268/sv/en/findings (finding 14353 in http://localhost:8078/api/topics/Q736268)",
+   "quotes": [
+    {
+     "lang": "sv",
+     "rev": 59682754,
+     "text": "Den ryska belägringen inleddes i medlet av mars 1808 och avslutades den 3 maj med Sveaborgs kapitulation"
+    },
+    {
+     "lang": "en",
+     "rev": 1381826242,
+     "text": "The fortress surrendered on 6 May 1808"
+    },
+    {
+     "lang": "fi",
+     "rev": 24241686,
+     "text": "Toukokuun 1808 alussa Viaporin piiritetty linnoitus antautui venäläisille",
+     "note": "not part of the classifier's finding, which compared Swedish with English"
+    }
+   ]
+  },
+  {
+   "id": "finnish-war-sveaborg-garrison",
+   "topic": "Q736268",
+   "list": "main",
+   "statement": "Swedish says almost 7,000 men were stationed at Sveaborg; English gives the fortress a garrison of 6,000 men.",
+   "nemotron": "numbers",
+   "haiku": "numbers",
+   "url": "http://localhost:8078/#/Q736268/sv/en/findings (finding 14351 in http://localhost:8078/api/topics/Q736268)",
+   "quotes": [
+    {
+     "lang": "sv",
+     "rev": 59682754,
+     "text": "Nästan 7 000 man var förlagda till Sveaborg"
+    },
+    {
+     "lang": "en",
+     "rev": 1381826242,
+     "text": "a garrison of 6,000 men"
+    }
+   ]
+  },
+  {
+   "id": "finnish-war-savo-brigade",
+   "topic": "Q736268",
+   "list": "main",
+   "statement": "Finnish says the Savo Brigade had 3,500 men; Swedish calls it 4,000 strong.",
+   "nemotron": "numbers",
+   "haiku": "numbers",
+   "url": "http://localhost:8078/#/Q736268/sv/fi/findings (finding 14530 in http://localhost:8078/api/topics/Q736268)",
+   "quotes": [
+    {
+     "lang": "fi",
+     "rev": 24241686,
+     "text": "Savon prikaati koostui 3 500 miehestä, ja sitä oli vastassa 6 500 venäläistä sotilasta"
+    },
+    {
+     "lang": "sv",
+     "rev": 59682754,
+     "text": "den 4 000 man starka Savolaxbrigaden, under Johan Adam Cronstedt, retirerade mot Uleåborg österifrån"
+    }
+   ]
+  },
+  {
+   "id": "finnish-war-aland-truce",
+   "topic": "Q736268",
+   "list": "human",
+   "statement": "On the Russian advance over the ice towards Stockholm in March 1809: Swedish says von Döbeln averted the threat by negotiating the convention on Åland; English says the new king sent an embassy to Knorring proposing a truce, and the Russian commander agreed and recalled Kulnev.",
+   "nemotron": "contradiction",
+   "haiku": "contradiction",
+   "url": "http://localhost:8078/#/Q736268/sv/en/findings (finding 14422 in http://localhost:8078/api/topics/Q736268)",
+   "quotes": [
+    {
+     "lang": "sv",
+     "rev": 59682754,
+     "text": "von Döbeln lyckades dock avvärja hotet mot huvudstaden genom att framförhandla konventionen på Åland"
+    },
+    {
+     "lang": "en",
+     "rev": 1381826242,
+     "text": "the new king sent an embassy to Knorring, proposing a truce. The Russian commander agreed and speedily recalled Kulnev back to Åland"
+    }
+   ],
+   "note": "The two accounts credit different people and may both be true in part; someone who knows the sources should say."
+  }
+ ]
+}

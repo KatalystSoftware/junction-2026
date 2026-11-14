@@ -1,0 +1,43 @@
+{
+ "wikidata_id": "Q179858",
+ "topic": "Urho Kekkonen",
+ "titles": {
+  "fi": "Urho Kekkonen",
+  "sv": "Urho Kekkonen",
+  "en": "Urho Kekkonen"
+ },
+ "size": {
+  "fi": 95381,
+  "sv": 32322,
+  "en": 75313
+ },
+ "readers": {
+  "fi": 147647,
+  "sv": 14711,
+  "en": 99199
+ },
+ "leads": {
+  "fi": {
+   "text": "Urho Kaleva Kekkonen (3. syyskuuta 1900 Pielavesi – 31. elokuuta 1986 Helsinki) oli suomalainen poliitikko ja kahdeksas Suomen tasavallan presidentti. Hän oli tasavallan presidentti yhtäjaksoisesti vuodesta 1956 alkuvuoteen 1982, yli 25 vuoden ajan. Viimeinen presidenttikausi jäi kesken sairauden takia. Kekkosen presidenttikauden ja kylmän sodan aikana Suomi säilyi Euroopan länsiryhmässä Neuvostoliiton painostuksesta huolimatta.",
+   "rev_id": 24228013
+  },
+  "sv": {
+   "text": "Urho Kaleva Kekkonen, född 3 september 1900 i Pielavesi i Savolax (i dåvarande Storfurstendömet Finland), död 31 augusti 1986 i Helsingfors, var en finsk jurist och politiker för Agrarförbundet.",
+   "rev_id": 59775971
+  },
+  "en": {
+   "text": "Urho Kaleva Kekkonen (3 September 1900 – 31 August 1986), often referred to by his initials UKK, was a Finnish politician who served as the eighth and longest-serving president of Finland from 1956 to 1982. He also served as prime minister (1950–1953, 1954–1956), and held various other cabinet positions. He was the third and most recent president from the Agrarian League/Centre Party. Head of state for nearly 26 years, he dominated Finnish politics for 31 years overall. Holding a large amount of power, he won his later elections with little opposition and has often been classified as an autocrat.",
+   "rev_id": 1384286096
+  }
+ },
+ "findings": [],
+ "fixture": true,
+ "sql": [
+  {
+   "label": "Findings",
+   "query": "-- Findings for one topic, as they stand now\nSELECT id, lang, other_lang, type, section, other_section, summary,\n       quotes, terms, distance, score, status, opened_at, closed_at\nFROM finding\nWHERE wikidata_id = 'Q179858'\nORDER BY score DESC;",
+   "ms": 0.4,
+   "rows": 0
+  }
+ ]
+}

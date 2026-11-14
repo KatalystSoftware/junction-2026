@@ -1,0 +1,43 @@
+{
+ "wikidata_id": "Q134949",
+ "topic": "Winter War",
+ "titles": {
+  "fi": "Talvisota",
+  "sv": "Vinterkriget",
+  "en": "Winter War"
+ },
+ "size": {
+  "fi": 123198,
+  "sv": 32483,
+  "en": 166223
+ },
+ "readers": {
+  "fi": 118210,
+  "sv": 41195,
+  "en": 719173
+ },
+ "leads": {
+  "fi": {
+   "text": "Talvisota käytiin Suomen ja Neuvostoliiton välillä 30. marraskuuta 1939 – 13. maaliskuuta 1940. Neuvostoliitto aloitti sodan hyökkäämällä Suomeen ilman sodanjulistusta, ja sota päättyi 105 päivää myöhemmin Moskovan rauhansopimukseen. ",
+   "rev_id": 24373824
+  },
+  "sv": {
+   "text": "Vinterkriget (finska: talvisota), i Sverige även finska vinterkriget (ryska: Советско-финляндская (советско-финская) война 1939–1940, Sovetsko-finljandskaja (sovetsko-finskaja) vojna 1939–1940, ”sovjet-finska kriget 1939–1940”) utkämpades mellan Finland och Sovjetunionen, sedan Sovjetunionen den 30 november 1939, tre månader in i andra världskriget, anfallit Finland.  ",
+   "rev_id": 59855895
+  },
+  "en": {
+   "text": "The Winter War was a war between the Soviet Union and Finland. It began with a Soviet invasion of Finland on 30 November 1939, three months after the outbreak of World War II, and ended three and a half months later with the Moscow Peace Treaty on 13 March 1940. Despite superior military strength, especially in tanks and aircraft, the Soviet Union suffered severe losses and initially made little headway. The League of Nations deemed the attack illegal and expelled the Soviet Union from its organization.",
+   "rev_id": 1384334162
+  }
+ },
+ "findings": [],
+ "fixture": true,
+ "sql": [
+  {
+   "label": "Findings",
+   "query": "-- Findings for one topic, as they stand now\nSELECT id, lang, other_lang, type, section, other_section, summary,\n       quotes, terms, distance, score, status, opened_at, closed_at\nFROM finding\nWHERE wikidata_id = 'Q134949'\nORDER BY score DESC;",
+   "ms": 0.4,
+   "rows": 0
+  }
+ ]
+}

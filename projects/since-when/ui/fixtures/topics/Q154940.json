@@ -1,0 +1,43 @@
+{
+ "wikidata_id": "Q154940",
+ "topic": "Lapland War",
+ "titles": {
+  "fi": "Lapin sota",
+  "sv": "Lapplandskriget",
+  "en": "Lapland War"
+ },
+ "size": {
+  "fi": 62662,
+  "sv": 10205,
+  "en": 45303
+ },
+ "readers": {
+  "fi": 82391,
+  "sv": 13003,
+  "en": 240206
+ },
+ "leads": {
+  "fi": {
+   "text": "Lapin sota käytiin osana toista maailmansotaa Suomen ja kansallissosialistisen Saksan välillä pääasiassa Suomen Lapissa 15. syyskuuta 1944 – 27. huhtikuuta 1945.",
+   "rev_id": 24335229
+  },
+  "sv": {
+   "text": "Lapplandskriget (finska: Lapin sota, tyska: Lapplandkrieg) var Finlands tredje krig under andra världskriget och fördes mot Nazitysklands trupper i Lappland i norra Finland från september 1944 till april 1945. Lapplandskriget gav upphov till Nordfinska evakueringen där 75 procent av befolkningen i  finska Lappland evakuerades under hösten 1944.",
+   "rev_id": 59777396
+  },
+  "en": {
+   "text": "During World War II, the Lapland War saw fighting between Finland and Nazi Germany – effectively from September to November 1944 – in Finland's northernmost region, Lapland. Though the Finns and the Germans had been fighting together against the Soviet Union since 1941 during the Continuation War (1941–1944), peace negotiations between the Finnish government and the Allies of World War II had been conducted intermittently during 1943–1944, but no agreement had been reached. The Moscow Armistice, signed on 19 September 1944, demanded that Finland break diplomatic ties with Germany and expel or disarm any German soldiers remaining in Finland.",
+   "rev_id": 1384758302
+  }
+ },
+ "findings": [],
+ "fixture": true,
+ "sql": [
+  {
+   "label": "Findings",
+   "query": "-- Findings for one topic, as they stand now\nSELECT id, lang, other_lang, type, section, other_section, summary,\n       quotes, terms, distance, score, status, opened_at, closed_at\nFROM finding\nWHERE wikidata_id = 'Q154940'\nORDER BY score DESC;",
+   "ms": 0.4,
+   "rows": 0
+  }
+ ]
+}

@@ -1,0 +1,43 @@
+{
+ "wikidata_id": "Q701803",
+ "topic": "Jäger Movement",
+ "titles": {
+  "fi": "Jääkäriliike",
+  "sv": "Jägarrörelsen",
+  "en": "Jäger Movement"
+ },
+ "size": {
+  "fi": 57819,
+  "sv": 7965,
+  "en": 9899
+ },
+ "readers": {
+  "fi": 12854,
+  "sv": 1571,
+  "en": 18423
+ },
+ "leads": {
+  "fi": {
+   "text": "Jääkäriliike oli Suomen miesylioppilaiden piireissä vuoden 1914 loppupuolella käynnistynyt ja Jääkäripataljoona 27:n muodostumiseen johtanut aktivistien aloite sotilaskoulutuksen hankkimiseksi Suomen Venäjästä irrottautumista varten. Ensimmäisen maailmansodan sytyttyä vuonna 1914 oltiin Suomessa aluksi ensimmäisen sortokauden aikaisen vastarintaryhmittymän kagaalin ja vanhojen aktivistien piireissä varovaisia asennoitumisessa muuttuvaan tilanteeseen. Miesten ylioppilaspiireissä taas syntyi jääkäriliike, joka otti päämääräkseen Suomen aseellisen irrottamisen Venäjästä. Vuosina 1915–1918 jääkärikoulutuksen aloitti kaiken kaikkiaan 1 895 vapaaehtoista. Heistä 1 261 (67 %) osallistui Suomen sisällissotaan. Osallistuneista kaatui taisteluissa 128 (10 %) ja haavoittui 238 (19 %).",
+   "rev_id": 24314229
+  },
+  "sv": {
+   "text": "Jägarrörelsen var en politisk rörelse vars mål var att frigöra Storfurstendömet Finland från Kejsardömet Ryssland och skapa ett nytt självständigt Finland. Rörelsen växte fram ur den finländska aktivismen som uppstått under förryskningsperioderna och som väckt intresset för en väpnad kamp för självständighet. Från 1915 fick sammanlagt 1 894 finländska frivilliga militär utbildning i Tyskland inom 27. kungliga preussiska jägarbataljonen(en), och soldaterna kom att spela en central roll i inbördeskriget 1918.",
+   "rev_id": 59251455
+  },
+  "en": {
+   "text": "The Jäger Movement (German: Jäger-Bewegung / Finnische Jäger, Finnish: Jääkäriliike, Swedish: Jägarrörelsen) was a Finnish political and military movement whose aim was to liberate the Grand Duchy of Finland from the Russian Empire and create an independent Finnish state. The movement grew out of the Finnish activist movement that had emerged during the periods of Russification. From 1915, a total of 1,894 Finnish volunteers received military training in Germany, and the soldiers came to play a central role in the Finnish Civil War of 1918.",
+   "rev_id": 1385049170
+  }
+ },
+ "findings": [],
+ "fixture": true,
+ "sql": [
+  {
+   "label": "Findings",
+   "query": "-- Findings for one topic, as they stand now\nSELECT id, lang, other_lang, type, section, other_section, summary,\n       quotes, terms, distance, score, status, opened_at, closed_at\nFROM finding\nWHERE wikidata_id = 'Q701803'\nORDER BY score DESC;",
+   "ms": 0.4,
+   "rows": 0
+  }
+ ]
+}

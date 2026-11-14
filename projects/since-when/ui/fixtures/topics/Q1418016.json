@@ -1,0 +1,43 @@
+{
+ "wikidata_id": "Q1418016",
+ "topic": "Kinship Wars",
+ "titles": {
+  "fi": "Heimosodat",
+  "sv": "Frändefolkskrigen",
+  "en": "Heimosodat"
+ },
+ "size": {
+  "fi": 14729,
+  "sv": 6284,
+  "en": 9563
+ },
+ "readers": {
+  "fi": 15509,
+  "sv": 1611,
+  "en": 28719
+ },
+ "leads": {
+  "fi": {
+   "text": "Heimosodat olivat Suomen lähialueilla käytyjä aseellisia selkkauksia, joihin suomalaiset vapaaehtoisjoukot ottivat osaa vuosina  1918–1920 ja 1921–1922. Suomen valtio ei virallisesti ollut retkien osapuoli, mutta vapaaehtoisia oli sodissa mukana yhteensä noin 9 000. Monella heistä motiivina oli heimoaate, antibolševismi, Suur-Suomi-aate tai vain puhdas seikkailunhalu. Heimosodissa kuoli noin 660 suomalaista.",
+   "rev_id": 23759872
+  },
+  "sv": {
+   "text": "Frändefolkskrigen (finska: heimosodat) var en serie konflikter mellan 1918 och 1922 som involverade det nyligen självständiga Finland och de närliggande regioner där Östersjöfinska språk talades. Konflikterna utspelade sig ofta i Ryssland eller i områden som gränsar till Ryssland. Omkring 10 000 finska frivilliga deltog i aktioner vars mål var att stöda eller ta kontrollen över områden befolkade av till finnarna besläktade folk, så kallande frändefolk. Aktionerna syftade till att antingen ta kontrollen över dessa områden eller att hjälpa dem att uppnå självständighet. Många av de som deltog inspirerades av idén om Storfinland. Vissa konflikter bestod av expeditioner från Finland eller lokala uppror där de frivilliga ville hjälpa frändefolken i deras kamp för självständighet eller annektera områdena till Finland.",
+   "rev_id": 58107901
+  },
+  "en": {
+   "text": "The Finnish term Heimosodat (singular heimosota) refers to a series of armed conflicts and private military expeditions in 1918–1922 into areas of the former Russian Empire that bordered on Finland and were inhabited in large part by other Finnic peoples.",
+   "rev_id": 1373617122
+  }
+ },
+ "findings": [],
+ "fixture": true,
+ "sql": [
+  {
+   "label": "Findings",
+   "query": "-- Findings for one topic, as they stand now\nSELECT id, lang, other_lang, type, section, other_section, summary,\n       quotes, terms, distance, score, status, opened_at, closed_at\nFROM finding\nWHERE wikidata_id = 'Q1418016'\nORDER BY score DESC;",
+   "ms": 0.4,
+   "rows": 0
+  }
+ ]
+}

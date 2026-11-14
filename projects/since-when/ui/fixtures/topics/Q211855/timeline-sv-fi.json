@@ -1,0 +1,243 @@
+{
+ "fixture": true,
+ "wikidata_id": "Q211855",
+ "lang": "sv",
+ "rich_lang": "fi",
+ "years": [
+  {
+   "year": 2005,
+   "size": {
+    "fi": 10835,
+    "sv": 7782,
+    "en": 22229
+   },
+   "coverage": 0.72,
+   "open_findings": 0
+  },
+  {
+   "year": 2006,
+   "size": {
+    "fi": 93150,
+    "sv": 8657,
+    "en": 24212
+   },
+   "coverage": 0.09,
+   "open_findings": 0
+  },
+  {
+   "year": 2007,
+   "size": {
+    "fi": 105888,
+    "sv": 11013,
+    "en": 57794
+   },
+   "coverage": 0.1,
+   "open_findings": 0
+  },
+  {
+   "year": 2008,
+   "size": {
+    "fi": 126451,
+    "sv": 13808,
+    "en": 69319
+   },
+   "coverage": 0.11,
+   "open_findings": 0
+  },
+  {
+   "year": 2009,
+   "size": {
+    "fi": 143393,
+    "sv": 28295,
+    "en": 70439
+   },
+   "coverage": 0.2,
+   "open_findings": 0
+  },
+  {
+   "year": 2010,
+   "size": {
+    "fi": 146453,
+    "sv": 31561,
+    "en": 98747
+   },
+   "coverage": 0.22,
+   "open_findings": 0
+  },
+  {
+   "year": 2011,
+   "size": {
+    "fi": 149980,
+    "sv": 43981,
+    "en": 125796
+   },
+   "coverage": 0.29,
+   "open_findings": 0
+  },
+  {
+   "year": 2012,
+   "size": {
+    "fi": 151780,
+    "sv": 44943,
+    "en": 130313
+   },
+   "coverage": 0.3,
+   "open_findings": 0
+  },
+  {
+   "year": 2013,
+   "size": {
+    "fi": 163205,
+    "sv": 46036,
+    "en": 149087
+   },
+   "coverage": 0.28,
+   "open_findings": 0
+  },
+  {
+   "year": 2014,
+   "size": {
+    "fi": 162746,
+    "sv": 44913,
+    "en": 150411
+   },
+   "coverage": 0.28,
+   "open_findings": 0
+  },
+  {
+   "year": 2015,
+   "size": {
+    "fi": 199504,
+    "sv": 45012,
+    "en": 152724
+   },
+   "coverage": 0.23,
+   "open_findings": 0
+  },
+  {
+   "year": 2016,
+   "size": {
+    "fi": 171242,
+    "sv": 47475,
+    "en": 152067
+   },
+   "coverage": 0.28,
+   "open_findings": 0
+  },
+  {
+   "year": 2017,
+   "size": {
+    "fi": 172371,
+    "sv": 48082,
+    "en": 152635
+   },
+   "coverage": 0.28,
+   "open_findings": 0
+  },
+  {
+   "year": 2018,
+   "size": {
+    "fi": 174019,
+    "sv": 48769,
+    "en": 152772
+   },
+   "coverage": 0.28,
+   "open_findings": 0
+  },
+  {
+   "year": 2019,
+   "size": {
+    "fi": 177937,
+    "sv": 48652,
+    "en": 160660
+   },
+   "coverage": 0.27,
+   "open_findings": 0
+  },
+  {
+   "year": 2020,
+   "size": {
+    "fi": 186571,
+    "sv": 48835,
+    "en": 161104
+   },
+   "coverage": 0.26,
+   "open_findings": 0
+  },
+  {
+   "year": 2021,
+   "size": {
+    "fi": 187225,
+    "sv": 48758,
+    "en": 163744
+   },
+   "coverage": 0.26,
+   "open_findings": 0
+  },
+  {
+   "year": 2022,
+   "size": {
+    "fi": 187209,
+    "sv": 48540,
+    "en": 169289
+   },
+   "coverage": 0.26,
+   "open_findings": 0
+  },
+  {
+   "year": 2023,
+   "size": {
+    "fi": 194162,
+    "sv": 48569,
+    "en": 171810
+   },
+   "coverage": 0.25,
+   "open_findings": 0
+  },
+  {
+   "year": 2024,
+   "size": {
+    "fi": 195894,
+    "sv": 48941,
+    "en": 175680
+   },
+   "coverage": 0.25,
+   "open_findings": 0
+  },
+  {
+   "year": 2025,
+   "size": {
+    "fi": 195094,
+    "sv": 48873,
+    "en": 183722
+   },
+   "coverage": 0.25,
+   "open_findings": 0
+  },
+  {
+   "year": 2026,
+   "size": {
+    "fi": 196832,
+    "sv": 48879,
+    "en": 188479
+   },
+   "coverage": 0.25,
+   "open_findings": 0
+  }
+ ],
+ "events": [],
+ "sql": [
+  {
+   "label": "Coverage on each 1 January",
+   "query": "-- Coverage on one 1 January; run once per year, 2005-2026\nSET @t = TIMESTAMP '2015-01-01 00:00:00';\nSELECT AVG(nearest < 0.35) AS coverage, COUNT(*) AS passages\nFROM (\n  SELECT r.chunk_id, MIN(VEC_DISTANCE_COSINE(r.embedding, l.embedding)) AS nearest\n  FROM chunk FOR SYSTEM_TIME AS OF @t AS r\n  JOIN chunk FOR SYSTEM_TIME AS OF @t AS l\n    ON l.wikidata_id = r.wikidata_id AND l.lang = 'sv'\n  WHERE r.wikidata_id = 'Q211855' AND r.lang = 'fi'\n  GROUP BY r.chunk_id\n) AS m;",
+   "ms": 3.8,
+   "rows": 1
+  },
+  {
+   "label": "Finding history",
+   "query": "-- When each finding opened, was reviewed and closed:\n-- every version of every row of the system-versioned finding table\nSELECT id, type, status, summary, row_start, row_end\nFROM finding FOR SYSTEM_TIME ALL\nWHERE wikidata_id = 'Q211855' AND lang = 'sv'\nORDER BY row_start;",
+   "ms": 0.6,
+   "rows": 0
+  }
+ ]
+}

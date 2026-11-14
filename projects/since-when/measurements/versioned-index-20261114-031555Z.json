@@ -1,0 +1,309 @@
+{
+ "time_utc": "2026-11-14 03:15:55",
+ "command": "python -m gapfinder measure --versioned-index mine_a3 --provisional --note 'scratch server: Docker container limited to 3.5 GB of memory and 4 CPUs'",
+ "commit": "f1c5c38",
+ "database": {
+  "name": "gapfinder",
+  "host": "gapfinder-scratch-db",
+  "port": 3306,
+  "server_hostname": "5c1a2b8cf41d"
+ },
+ "mariadb": {
+  "version": "11.8.9-MariaDB-ubu2404",
+  "settings": {
+   "innodb_buffer_pool_size": 2147483648,
+   "innodb_log_file_size": 536870912,
+   "mhnsw_default_m": 6,
+   "mhnsw_ef_search": 20,
+   "mhnsw_max_cache_size": 536870912
+  }
+ },
+ "machine": {
+  "cpu": "AMD Ryzen 5 2600 Six-Core Processor",
+  "cores": 12,
+  "memory_mb": 15924,
+  "load_start": [
+   11.61,
+   12.57,
+   11.75
+  ],
+  "load_end": [
+   3.13,
+   8.45,
+   10.31
+  ]
+ },
+ "note": "scratch server: Docker container limited to 3.5 GB of memory and 4 CPUs",
+ "latency_provisional": true,
+ "experiment": {
+  "database": "mine_a3",
+  "source": "gapfinder",
+  "index": "M=16 DISTANCE=cosine",
+  "versions": 44743,
+  "ids": 20835,
+  "topics": 1487,
+  "build_s": 56.8,
+  "one_in": 2,
+  "sample": "every stored version of every embedded passage of the topics with `CRC32(wikidata_id) % 2 = 0`, about one topic in 2, so that the index fits the scratch server's shared vector cache next to `chunk_now`; `--one-in 1` copies everything"
+ },
+ "dates": [
+  {
+   "label": "now",
+   "as_of": null,
+   "visible_rows": 20589,
+   "queries": 100,
+   "plain_exact_ms": 51.51,
+   "versioned_exact_ms": 79.8,
+   "versioned_exact_recall": 1.0,
+   "explain": {
+    "versioned table with the index": [
+     {
+      "id": 1,
+      "select_type": "SIMPLE",
+      "table": "n",
+      "type": "index",
+      "possible_keys": null,
+      "key": "embedding",
+      "key_len": "4098",
+      "ref": null,
+      "rows": "10",
+      "Extra": "Using where"
+     }
+    ],
+    "versioned table, IGNORE INDEX": [
+     {
+      "id": 1,
+      "select_type": "SIMPLE",
+      "table": "n",
+      "type": "ALL",
+      "possible_keys": null,
+      "key": null,
+      "key_len": null,
+      "ref": null,
+      "rows": "30765",
+      "Extra": "Using where; Using filesort"
+     }
+    ]
+   },
+   "ef": [
+    {
+     "ef_search": 20,
+     "plain_recall": 0.992,
+     "plain_ms": 0.5575,
+     "versioned_recall": 0.974,
+     "versioned_ms": 0.9066,
+     "versioned_rows": 10,
+     "all_versions_visible": 6.72
+    },
+    {
+     "ef_search": 40,
+     "plain_recall": 0.995,
+     "plain_ms": 0.9407,
+     "versioned_recall": 0.983,
+     "versioned_ms": 1.5667,
+     "versioned_rows": 10,
+     "all_versions_visible": 6.77
+    },
+    {
+     "ef_search": 80,
+     "plain_recall": 0.996,
+     "plain_ms": 1.3152,
+     "versioned_recall": 0.988,
+     "versioned_ms": 2.1306,
+     "versioned_rows": 10,
+     "all_versions_visible": 6.73
+    },
+    {
+     "ef_search": 160,
+     "plain_recall": 0.999,
+     "plain_ms": 1.7307,
+     "versioned_recall": 0.993,
+     "versioned_ms": 3.1571,
+     "versioned_rows": 10,
+     "all_versions_visible": 6.74
+    },
+    {
+     "ef_search": 1000,
+     "plain_recall": 1.0,
+     "plain_ms": 4.6084,
+     "versioned_recall": 0.997,
+     "versioned_ms": 10.4984,
+     "versioned_rows": 10,
+     "all_versions_visible": 6.77
+    }
+   ]
+  },
+  {
+   "label": "AS OF 2010-01-01",
+   "as_of": "2010-01-01",
+   "visible_rows": 1542,
+   "queries": 100,
+   "plain_exact_ms": 4.26,
+   "versioned_exact_ms": 53.13,
+   "versioned_exact_recall": 1.0,
+   "explain": {
+    "versioned table with the index": [
+     {
+      "id": 1,
+      "select_type": "SIMPLE",
+      "table": "n",
+      "type": "index",
+      "possible_keys": null,
+      "key": "embedding",
+      "key_len": "4098",
+      "ref": null,
+      "rows": "10",
+      "Extra": "Using where"
+     }
+    ],
+    "versioned table, IGNORE INDEX": [
+     {
+      "id": 1,
+      "select_type": "SIMPLE",
+      "table": "n",
+      "type": "ALL",
+      "possible_keys": null,
+      "key": null,
+      "key_len": null,
+      "ref": null,
+      "rows": "30765",
+      "Extra": "Using where; Using filesort"
+     }
+    ]
+   },
+   "ef": [
+    {
+     "ef_search": 20,
+     "plain_recall": 0.999,
+     "plain_ms": 0.3374,
+     "versioned_recall": 0.963,
+     "versioned_ms": 4.7029,
+     "versioned_rows": 10,
+     "all_versions_visible": 1.35
+    },
+    {
+     "ef_search": 40,
+     "plain_recall": 1.0,
+     "plain_ms": 0.4061,
+     "versioned_recall": 0.972,
+     "versioned_ms": 6.1319,
+     "versioned_rows": 10,
+     "all_versions_visible": 1.35
+    },
+    {
+     "ef_search": 80,
+     "plain_recall": 0.999,
+     "plain_ms": 0.5077,
+     "versioned_recall": 0.982,
+     "versioned_ms": 9.7529,
+     "versioned_rows": 10,
+     "all_versions_visible": 1.36
+    },
+    {
+     "ef_search": 160,
+     "plain_recall": 0.999,
+     "plain_ms": 0.6614,
+     "versioned_recall": 0.989,
+     "versioned_ms": 17.514,
+     "versioned_rows": 10,
+     "all_versions_visible": 1.37
+    },
+    {
+     "ef_search": 1000,
+     "plain_recall": 1.0,
+     "plain_ms": 1.1724,
+     "versioned_recall": 1.0,
+     "versioned_ms": 69.4685,
+     "versioned_rows": 10,
+     "all_versions_visible": 1.38
+    }
+   ]
+  },
+  {
+   "label": "AS OF 2020-01-01",
+   "as_of": "2020-01-01",
+   "visible_rows": 6981,
+   "queries": 100,
+   "plain_exact_ms": 18.03,
+   "versioned_exact_ms": 60.87,
+   "versioned_exact_recall": 1.0,
+   "explain": {
+    "versioned table with the index": [
+     {
+      "id": 1,
+      "select_type": "SIMPLE",
+      "table": "n",
+      "type": "index",
+      "possible_keys": null,
+      "key": "embedding",
+      "key_len": "4098",
+      "ref": null,
+      "rows": "10",
+      "Extra": "Using where"
+     }
+    ],
+    "versioned table, IGNORE INDEX": [
+     {
+      "id": 1,
+      "select_type": "SIMPLE",
+      "table": "n",
+      "type": "ALL",
+      "possible_keys": null,
+      "key": null,
+      "key_len": null,
+      "ref": null,
+      "rows": "30765",
+      "Extra": "Using where; Using filesort"
+     }
+    ]
+   },
+   "ef": [
+    {
+     "ef_search": 20,
+     "plain_recall": 0.989,
+     "plain_ms": 0.4363,
+     "versioned_recall": 0.976,
+     "versioned_ms": 1.8709,
+     "versioned_rows": 10,
+     "all_versions_visible": 2.92
+    },
+    {
+     "ef_search": 40,
+     "plain_recall": 0.997,
+     "plain_ms": 0.5941,
+     "versioned_recall": 0.989,
+     "versioned_ms": 2.5478,
+     "versioned_rows": 10,
+     "all_versions_visible": 2.91
+    },
+    {
+     "ef_search": 80,
+     "plain_recall": 0.999,
+     "plain_ms": 0.7749,
+     "versioned_recall": 0.991,
+     "versioned_ms": 4.1329,
+     "versioned_rows": 10,
+     "all_versions_visible": 2.96
+    },
+    {
+     "ef_search": 160,
+     "plain_recall": 0.999,
+     "plain_ms": 1.1356,
+     "versioned_recall": 0.996,
+     "versioned_ms": 6.623,
+     "versioned_rows": 10,
+     "all_versions_visible": 2.94
+    },
+    {
+     "ef_search": 1000,
+     "plain_recall": 0.999,
+     "plain_ms": 2.8218,
+     "versioned_recall": 1.0,
+     "versioned_ms": 27.2194,
+     "versioned_rows": 10,
+     "all_versions_visible": 2.98
+    }
+   ]
+  }
+ ]
+}

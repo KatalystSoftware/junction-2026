@@ -1,0 +1,832 @@
+{
+ "fixture": true,
+ "as_of": null,
+ "a": "fi",
+ "b": "sv",
+ "rows": [
+  {
+   "a": {
+    "chunk_id": "fi-1",
+    "section": "",
+    "chunk_no": 0,
+    "rev_id": 24266018,
+    "text": "Lapuanliike tai Lapuan liike oli Suomessa vuosina 1929–1932 toiminut vaikutusvaltainen antikommunistinen ja oikeistoradikaali kansanliike. Sen tavoitteena oli kitkeä kommunismi Suomesta, mutta taustalla oli myös pidemmälle vietyjä tavoitteita. Lapuanliikkeen kannatusalueen ydin oli Etelä-Pohjanmaa, ja sen johtaja oli maanviljelijä ja aktivisti Vihtori Kosola.\n\nLapuanliike sai alkunsa Lapualta, jossa Kosola asui. Liikkeen taustalla olivat vuoden 1918 sisällissodan arvet ja suojeluskuntataustaisten voittajien pettymys maltilliseen parlamentaariseen demokratiaan. Samaan aikaan vasemmisto ja kommunistit olivat aktivoituneet politiikassa. Punaista uhkaa todellisena pitänyt oikeisto järjestäytyi antikommunismin ympärille.\n\nTavoitteidensa saavuttamiseksi lapuanliike painosti poliittisia päättäjiä väkivallalla, sen uhalla ja poliittisella terrorilla. Liikkeen asiaa ajettiin muun muassa kansalaiskokouksilla, kansalaislähetystöillä, valtuuskunnilla, erilaisilla joukkovoiman osoituksilla ja kirjelmillä. Sen tunnetuin toimintatapa olivat kuitenkin muilutukset eli kommunistien ja muiden vasemmistolaisten sekä liian maltillisiksi koettujen porvarillisten poliitikkojen väkivaltaiset sieppaukset ja kyyditykset. Niin sanotun Lapuan lain nimissä tehtiin vahingontekoja, pahoinpitelyjä ja poliittisia murhia.\n\nMonet lapuanliikkeen vaatimuksista toteutuivat. Kesällä 1930 kommunistien lehdet lakkautettiin, kommunistiset kansanedustajat vangittiin ja Suomeen muodostettiin liikkeen sanelema hallitus. Syksyllä 1930 lapuanliikkeen painostuksen alla valittu uusi eduskunta hyväksyi niin sanotut kommunistilait, joilla kiellettiin kaikki kommunistien toiminta. Lapuanliikkeen kannatus hiipui, kun sen ensisijaiset tavoitteet oli saavutettu. Liikkeen ydinryhmä jatkoi kuitenkin toimintaansa ja radikalisoitui. Lopulta liikkeen tavoitteeksi muodostui kaiken vasemmistolaisen toiminnan kieltäminen ja voimaan perustuva oikeistolainen diktatuuri. Lapuanliikkeen viimeiseksi voimannäytöksi jäi Mäntsälän kapinaksi kutsuttu aseellinen vallankaappausyritys talvella 1932.\n\nSuomalaisten maltillinen enemmistö hylkäsi lapuanliikkeen sen siirryttyä käyttämään avointa väkivaltaa ja terroria, sekä niiden luoman pelon ilmapiirin vuoksi. Lopulta liike tukahdutettiin samoilla poliittisen ääriliikehdinnän hillitsemiseksi luoduilla mekanismeilla, joita se itse oli ajanut kommunismin kitkemiseksi. Lapuanliike kiellettiin ja lakkautettiin toukokuussa 1932. Sen ideologiseksi perilliseksi perustettu Isänmaallinen kansanliike (IKL) ei koskaan noussut yhtä voimakkaaksi kansanliikkeeksi."
+   },
+   "b": {
+    "chunk_id": "sv-1",
+    "section": "",
+    "chunk_no": 0,
+    "rev_id": 59852897,
+    "text": "Lapporörelsen var en finländsk nationalistisk, fascistisk och antikommunistisk utomparlamentarisk politisk rörelse som grundades 1929 i Lappo.\n\nUnder ledning av Vihtori Kosola utvecklades rörelsen i högerextrem riktning och använde mord, kidnappningar och så kallade våldskjutsningar mot kommunister och personer som den betraktade som kommunister. Den upplöstes 1932 efter det misslyckade Mäntsäläupproret. Dess politiska verksamhet fördes vidare av partiet Fosterländska folkrörelsen, som bildades samma år."
+   },
+   "distance": 0.243,
+   "status": "covered"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-2",
+    "section": "",
+    "chunk_no": 1,
+    "rev_id": 24266018,
+    "text": "Lapuanliikkeen kadottua oli suomalaisesta politiikasta kitketty pois sekä vasemmisto- että oikeistoradikalismi. Uhattuna ollut suomalainen parlamentarismi vahvistui ja perusta myöhemmälle konsensuksen politiikalle luotiin. Liikkeen luonteen myöhempi tulkinta on ollut ristiriitaista. Sen johtohahmot kielsivät olevansa fasisteja, mutta liikkeen aatteellinen tausta, tavoitteet ja toiminta täyttävät lähes kaikki yleisesti käytetyt fasismin määritelmät. Myöhemmissä tulkinnoissa lapuanliike on nähty osana 1930-luvun eurooppalaista fasistista ja äärioikeistolaista liikehdintää."
+   },
+   "b": {
+    "chunk_id": "sv-1",
+    "section": "",
+    "chunk_no": 0,
+    "rev_id": 59852897,
+    "text": "Lapporörelsen var en finländsk nationalistisk, fascistisk och antikommunistisk utomparlamentarisk politisk rörelse som grundades 1929 i Lappo.\n\nUnder ledning av Vihtori Kosola utvecklades rörelsen i högerextrem riktning och använde mord, kidnappningar och så kallade våldskjutsningar mot kommunister och personer som den betraktade som kommunister. Den upplöstes 1932 efter det misslyckade Mäntsäläupproret. Dess politiska verksamhet fördes vidare av partiet Fosterländska folkrörelsen, som bildades samma år."
+   },
+   "distance": 0.177,
+   "status": "covered"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-3",
+    "section": "Liikkeen tausta › Sisällissodan arvet",
+    "chunk_no": 0,
+    "rev_id": 24266018,
+    "text": "Lapuanliikkeen taustana olivat sisällissota ja vuosien 1917–1918 tapahtumat. Sodan jälkeen voittajien näkökulmasta äärivasemmisto oli pyyhitty pois Suomen poliittiselta kartalta eikä liberaalia demokratiaa enää uhattu. Voittajien silmin sisällissota ja sen jälkeinen Suomi olivat olleet ihannetila. Valkoisten voitonparaatissa kenraali Gustaf Mannerheim oli vaatinut lujaa hallitusvaltaa ja valkoisen Suomen säilyttämistä. Äärioikeiston mielestä kumpikaan ei ollut toteutunut. Porvarit olivat olleet yhteisesti kukistamassa idästä uhkaavaa punaista vaaraa, mutta työ oli jäänyt puolitiehen. Sisällissodan jälkeen punavangit olivat vapautuneet ja osa oli armahdettu. 1920-luvun kansallisen eheytymisen ja kompromissien parlamentaristinen politiikka nähtiin oikeiston piirissä maanpetturien kanssa veljeilynä. Lapuanliikkeessä voittajat pyrkivät viemään sisällissodan työn loppuun ja ”valkaisemaan” Suomen."
+   },
+   "b": {
+    "chunk_id": "sv-2",
+    "section": "Historia › Bakgrund och ideologi",
+    "chunk_no": 0,
+    "rev_id": 59852897,
+    "text": "Lapporörelsen grundades 1929. Den fick sitt namn efter Lappo, där rörelsen bildades och dess ledare Vihtori Kosola hade sin gård. Rörelsens medlemmar var bland annat missnöjda med vad de uppfattade som centerkrafternas försoningspolitik gentemot dem som hade stått på den röda sidan under finska inbördeskriget 1918. Målet var att förbjuda socialism och begränsa pressfriheten och rösträtten.\n\nRörelsen inspirerades av fascistiska idéer, med Mussolinis Italien som förebild, och räknas som högerextrem. Den använde fysiskt våld mot personer den pekade ut som kommunister, däribland även socialdemokrater. En vanlig metod var så kallade våldskjutsningar (på finska muilutus, efter bröderna Muilu som deltog idogt i denna verksamhet), då personer kidnappades, fördes till skogen och misshandlades. Vissa oliktänkande fördes över gränsen till Sovjetunionen ”där de hörde hemma”."
+   },
+   "distance": 0.396,
+   "status": "partly"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-4",
+    "section": "Liikkeen tausta › Punainen uhka",
+    "chunk_no": 0,
+    "rev_id": 24266018,
+    "text": "1920-luvulla kommunistien toiminta Suomessa oli vilkastunut. Äärivasemmisto oli irtautunut ideologisesti parlamentaristisesta Suomen Sosialidemokraattisesta Puolueesta (SDP). Neuvostoliitossa 1918 perustettu Suomen Kommunistinen Puolue (SKP) oli ollut perustamisestaan saakka kielletty Suomessa. Sen toimintaohjelma oli radikaali: luokkataistelua käytäisiin tarvittaessa väkivalloin tavoitteena työväen diktatuuri. Suomessa kommunistit olivat muita Pohjoismaita voimakkaampi liike sisällissodan ja etenkin sen jälkinäytösten eli teloitusten ja vankileirien seurauksena. Kommunistit toimivat Suomessa vuosina 1920–1923 Suomen Sosialistisen Työväenpuolueen (SSTP) ja vuosina 1924–1930 Sosialistisen työväen ja pienviljelijöiden vaalijärjestön (STPV) kautta. Niiden vaaliliitot saivat 1920-luvun eduskuntavaaleissa 10–15 % kansanedustajanpaikoista. Kommunistien toimintaa Suomessa pelättiin ja sitä pyrittiin hillitsemään aktiivisesti. Jo Kallion I hallitus oli vuonna 1923 toteuttanut niin sanotun ”Kallion leikkauksen”, jossa SSTP:n toiminta lopetettiin ja puolueen kansanedustajat ja muita kommunistiaktiiveja pidätettiin. Vuonna 1928 pidätettiin Sunilan I hallituksen määräyksestä pääosa SKP:n maanalaisen organisaation johtajista ja piiriorganisaattoreista.\n\nSuomen perustuslakiin oli kirjattu laaja yhdistysvapaus. Kun kommunistinen järjestö lakkautettiin, sen tilalle voitiin perustaa uudella nimellä toinen. SKP oli laiton, mutta kommunismi aatteena ei. Yksin suomalaisista kommunisteista ei vallankumoukseen ollut. Itärajan takana uhka oli kuitenkin todellinen, ja toisaalta pelkkä tunne uhasta riitti. Yleinen mielipide piti kommunisteja ”Moskovan kätyreinä” ja puna-armeijan sillanpääasemana Suomessa. Vasemmistolaisen toiminnan olemassaolo ylipäätään oli sisällissodan veteraanien näkökulmasta loukkaus. Oikeisto esitti 1920-luvun mittaan vaatimuksia kaiken kommunistisen toiminnan lakkauttamisesta. Vaatimukset lisääntyivät vuonna 1928, jolloin vietettiin sisällissodan 10-vuotisjuhlia ja pidätettyjen SKP-organisaattorien ja -sotilasvakoojien oikeudenkäynnit vahvistivat käsitystä, että laiton SKP johti koko liikettä ja toimi Neuvostoliiton hyväksi. Historiantutkija Juha Siltalan mukaan tosiasiallinen syy lapuanliikkeen nousuun ei ollut kuitenkaan kommunismin vahvistuminen. Oikeisto tahtoi yhtenäisen valtion, joka pluralismin sijasta rakentuisi nimenomaan sen edustaman maailmankuvan varaan."
+   },
+   "b": null,
+   "distance": 0.515,
+   "status": "missing"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-5",
+    "section": "Liikkeen tausta › Punainen uhka",
+    "chunk_no": 1,
+    "rev_id": 24266018,
+    "text": "Kommunistinen liike ei ollut Suomessa 1920-luvulla yhtenäinen. Sekä SSTP:n että STPV:n johtoon kuului vasemmistososialisteja ja muita, jotka suhtautuivat usein kriittisesti Moskovassa toimineen SKP:n johdon jyrkkään linjaan ja halusivat jatkaa vuotta 1918 edeltäneen työväenliikkeen toimintatapoja. Vuosikymmenen lopussa liike jakautui entistä selvemmin. Vuonna 1928 Kommunistisen internationaalin eli Kominternin VI kongressi julisti kapitalismin siirtyneen ”kolmanteen vaiheeseen”, johon kuului kapitalismin, valtiovallan ja sosiaalidemokraattisen liikkeen yhtyminen. Seuraavana vuonna Komintern julisti sosiaalidemokratian ”sosiaalifasismiksi” ja vaati kommunistisia puolueita hyökkäämään myös sosiaalidemokraatteja vastaan sekä valmistautumaan lähenevään maailmanvallankumoukseen. SKP:n Moskovan-johto hyväksyi tämän näkemyksen sellaisenaan. Vuoden 1928 pidätysten jälkeen myös SKP:n Suomen-toimiston johtoon kohosi nuoria ja kokemattomia henkilöitä, jotka noudattivat epäröimättä Moskovan ohjeita taistelun kiihdyttämisestä. Heitä alettiin kutsua ”huitojiksi”. Uutta linjaa vastustanut, entisistä SSTP:n johtajista muodostunut maltillinen siipi, jota puolestaan kutsuttiin ”hoipertelijoiksi”, alkoi luoda liikkeen sisälle kilpailevaa organisaatiota, jonka keskusjärjestönä oli joulukuussa 1929 perustettu Suomen työväen vasemmistoryhmä. STPV:n 23-henkisessä eduskuntaryhmässä oli yksi ”hoipertelija”, Eino Pekkala."
+   },
+   "b": null,
+   "distance": 0.584,
+   "status": "missing"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-6",
+    "section": "Liikkeen tausta › Poliittisen järjestelmän heikkous",
+    "chunk_no": 0,
+    "rev_id": 24266018,
+    "text": "Epäluottamus vuoden 1919 hallitusmuotoa kohtaan oli yleistä sekä oikealla että vasemmalla äärilaidalla. Järjestelmään ei uskottu. Maltillisen keskustan esityksestä syntyneeseen perustuslakiratkaisuun luottavat olivat vähemmistössä. Heikot hallitukset seurasivat toisiaan. Vuoden 1919 eduskuntavaalien ja kesän 1930 välillä istuneista 14 hallituksesta 12 oli vähemmistöhallituksia. Vuosina 1926–1930 oli vallassa yhtäjaksoisesti useita yhden puolueen vähemmistöhallituksia. Porvaripuolueet olivat hajaannuksessa: Oikeistopuolue Kansallinen Kokoomus oli ajautunut riitoihin keskustapuolueiden Maalaisliiton ja Kansallisen Edistyspuolueen kanssa, kun taas Ruotsalainen kansanpuolue (RKP) alkoi tehdä kielipoliittista yhteistyötä SDP:n kanssa. Koska porvaripuolueet eivät kyenneet yhteishallitukseen, joutuivat keskustan vähemmistöhallitukset nojaamaan SDP:n tukeen. Vaikka keskustahallitukset eivät juuri tehneet myönnytyksiä sosiaalidemokraateille, vasemmisto ja RKP pystyivät eduskuntaenemmistöllään pitämään kokoomuksen ulkona hallituksesta ja siten estämään oikeistolaisemman politiikan. Oikeiston silmissä vasemmisto saneli koko suomalaisen politiikan suunnan.\n\nKonsensuspolitiikka ja kykenemättömyys oikeistoa miellyttäviin päätöksiin turhautti sisällissodan voittajia. Voittajien asema ei näkynyt vallankäytössä. Osa näki, että nurkkakuntainen puoluepolitikointi oli myrkyttänyt valtiollisen ilmapiirin ja saanut puolueet unohtamaan isänmaan ja suomalaisten edut. Ajan iskulause oli parlamentarismin ”rämettyminen”. Tilalle oli saatava luja hallitusvalta. Alun perin lapuanliike nähtiinkin porvarillisen hallituksen tueksi suunnattuna ”ryhtiliikkeenä”. Pian se kuitenkin muuttui protestiliikkeeksi."
+   },
+   "b": null,
+   "distance": 0.612,
+   "status": "missing"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-7",
+    "section": "Liikkeen tausta › 1920-luvun oikeistoradikaalit järjestöt",
+    "chunk_no": 0,
+    "rev_id": 24266018,
+    "text": "1920-luvulla oikeistolaista toimintaa vaalimaan ja vahvistamaan oli syntynyt lukuisia järjestöjä. Mannerheim ja P. E. Svinhufvud perustivat Suomen Suojelusliiton, joka jakoi lehdistölle antikommunistisia tiedotteita. Akateeminen Karjala-Seura keskittyi kansallisuustunteen, heimoaatteen, maanpuolustustahdon ja Suur-Suomi-ajatuksen vaalimiseen.\n\nEhkä merkittävin lapuanliikkeen syntyyn vaikuttanut järjestö oli sisällissodan valkoisten veteraanien helmikuussa 1929 perustama Vapaussodan Rintamamiesten Liitto (VRL), jonka tavoitteina olivat kommunismin kitkeminen ja työmaaterrorin poistaminen, mutta myös esimerkiksi vaalilakien muuttaminen niin, että oikeistolaisilla äänillä olisi enemmän painoarvoa. Liiton aktiiveja oli sittemmin mukana järjestämässä näkyviä kyydityksiä ja sen ydinhenkilöistä tuli suomalaisen kansallissosialismin vaikuttajia. Historiantutkijoiden Oula Silvennoisen, Marko Tikan ja Aapo Roseliuksen mukaan VRL:n johto koostui pääasiassa fasisteiksi luonnehdittavista aktivisteista ja liitto oli Suomen kansallismielisen radikalismin taustaorganisaatio koko olemassaolonsa ajan, sillä se kokosi yhteen samanmielisiä ydinvaikuttajia tehokkaammin kuin avoimen fasistiset järjestöt.\n\nToinen helmikuussa 1929 perustettu lapuanliikkeen mainittava edeltäjä oli lyhytikäiseksi jäänyt, kommunismia ja demokratiaa vastustanut kiihkokansallismielinen Suomen Lalli-liitto, jonka piirissä kehiteltiin idean asteelle jääneitä vallankaappaussuunnitelmia. Lalli-liiton perustajat toivoivat muun muassa Vihtori Kosolaa liiton tai sen kaavaillun Helsingin-marssin johtajaksi, mutta Kosola ei lähtenyt toimintaan mukaan. Lalli-liitto kuihtui pian lapuanliikkeen syntymisen jälkeen."
+   },
+   "b": null,
+   "distance": 0.5,
+   "status": "missing"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-8",
+    "section": "Liikkeen tausta › Kansainväliset esikuvat",
+    "chunk_no": 0,
+    "rev_id": 24266018,
+    "text": "Lapuanliikkeen ydinryhmä otti vaikutteita Euroopan äärioikeistolaisilta puolueilta, erityisesti Italian fasisteilta. Diktaattori Benito Mussolinin valtaannousua ja toimintaa Italiassa ihailtiin avoimesti lapuanliikkeen kannattajien parissa. Suomessa avoimesti fasistisiksi tunnustautuneita oli vähän. Lapuanliike oli kuitenkin osa aikansa yleiseurooppalaista kommunisminvastaista, oikeistoradikaalia ja porvarillista liikehdintää. Kuten muuallakin Euroopassa äärioikeiston voima nousi sodan kokeneista nuorista miehistä. Suomalainen erityispiirre olivat sisällissodan kaikuna syntyneet lukuisat äärioikeistolaiset järjestöt, jotka onnistuivat 1920-luvun kommunistivihassaan ajamaan maan useita kertoja oikeistodiktatuurin partaalle."
+   },
+   "b": {
+    "chunk_id": "sv-2",
+    "section": "Historia › Bakgrund och ideologi",
+    "chunk_no": 0,
+    "rev_id": 59852897,
+    "text": "Lapporörelsen grundades 1929. Den fick sitt namn efter Lappo, där rörelsen bildades och dess ledare Vihtori Kosola hade sin gård. Rörelsens medlemmar var bland annat missnöjda med vad de uppfattade som centerkrafternas försoningspolitik gentemot dem som hade stått på den röda sidan under finska inbördeskriget 1918. Målet var att förbjuda socialism och begränsa pressfriheten och rösträtten.\n\nRörelsen inspirerades av fascistiska idéer, med Mussolinis Italien som förebild, och räknas som högerextrem. Den använde fysiskt våld mot personer den pekade ut som kommunister, däribland även socialdemokrater. En vanlig metod var så kallade våldskjutsningar (på finska muilutus, efter bröderna Muilu som deltog idogt i denna verksamhet), då personer kidnappades, fördes till skogen och misshandlades. Vissa oliktänkande fördes över gränsen till Sovjetunionen ”där de hörde hemma”."
+   },
+   "distance": 0.41,
+   "status": "partly"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-9",
+    "section": "Liikkeen tausta › Kannattajakunnan sosiaalinen koostumus ja Etelä-Pohjanmaan tilanne",
+    "chunk_no": 0,
+    "rev_id": 24266018,
+    "text": "Lapuanliikkeessä yhdistyivät professori Seppo Hentilän mukaan yläluokkainen nationalismi ja talonpoikainen populismi. Alkuperäinen kansanliike nojasi valkoiseen työväkeen ja erityisesti körttiläisiin talonpoikiin, maalaisväestöön, papistoon ja virkamiehistöön. Liikkeen asteittaisen radikalisoitumisen myötä sen ydinjoukko muuttui. Myöhemmin aktiiviseen kannattajakuntaan kuului ylempää keskiluokkaa: korkeita virkamiehiä, varakkaampaa sivistyneistöä, papistoa, sotilasjohtajia, teollisuusjohtajia ja yritysmaailman edustajia. Huomattava osa liikkeen alkuvaiheen johtohenkilöistä oli aktiivisia suojeluskuntalaisia, usein paikallisten esikuntien tai piiriesikuntien jäseniä. Kannattajakunta oli kaksikielinen, sillä liike suhtautui varsinkin alkuvaiheessa kielikysymykseen vapaamielisesti. Myöhemmin ruotsinkielisten kannattajien määrä väheni, kun aitosuomalaiset äänenpainot vahvistuivat liikkeessä.\n\nLiikkeen syntymistä nimenomaan Etelä-Pohjanmaalla on selitetty väestörakenteella ja taloudella. 1800-luvun lopun ja 1900-luvun alun Pohjanmaa oli Suomen vaurainta aluetta, jonka varallisuuserot olivat suhteellisen pieniä. Pientilojen ja herännäisyyden hallitseman alueen tausta oli sekä taloudellisesti että uskonnollisesti hyvin konservatiivinen. Voimakas väestönkasvu purkautui osin siirtolaisuutena Yhdysvaltoihin, josta myös palasi takaisin vaurautta. Lapuanliike olikin Pohjanmaan viimeinen voimannäyttö ennen kuin se kadotti painoarvonsa teollisuuskeskusten vaurastumisen myötä. Etelä-Pohjanmaa oli myös sisällissodassa valkoisten tukialuetta."
+   },
+   "b": null,
+   "distance": 0.556,
+   "status": "missing"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-10",
+    "section": "Liikkeen tausta › Taloudelliset selitykset",
+    "chunk_no": 0,
+    "rev_id": 24266018,
+    "text": "Lapuanliikkeen syntyyn vaikutti myös taloustilanne, sillä vuoden 1929 pörssiromahduksen jälkeinen suuri lama ulottui myös Suomeen ja kiristi yhteiskunnallista ilmapiiriä. Jotkut tutkijat ovat pyrkineet selittämään lapuanliikkeen syntyajankohdan talouden rakenteisiin liittyvillä tekijöillä. Suomen puutavaravienti käytännössä seisahtui jo vuonna 1928, ja puun kantohinnat romahtivat vuosina 1930–1931 samanaikaisesti viljanhintojen kanssa. Tämä oli kova taloudellinen isku paitsi vientiteollisuudelle myös suurten ja keskisuurten tilojen omistajille, jotka saivat paljon tuloja puukaupasta. Marxilaisen selitysmallin mukaan teollisuuden edustajat ja talonpojat ryhtyivät tuolloin yhdessä oikeistoradikalismin tukijoiksi ajaakseen luokkaetujaan työväestöä vastaan."
+   },
+   "b": {
+    "chunk_id": "sv-4",
+    "section": "Historia › Våldseskalering och Mäntsäläupproret",
+    "chunk_no": 0,
+    "rev_id": 59852897,
+    "text": "Våldet trappades gradvis upp och rörelsen radikaliserades. Även moderata borgerliga politiker kunde utsättas för våldskjutsningar. Offren misshandlades ofta grovt, och mord är belagda i tre fall. I september 1930 mördades den socialdemokratiske kommunpolitikern Onni Happonen.\n\nDen 14 oktober 1930 kidnappades den tidigare presidenten K.J. Ståhlberg och hans hustru författaren Ester Ståhlberg. Senare skrev Ester Ståhlberg om kidnappningen i sin självbiografi. När det framkom att generalstabschefen Kurt Martti Wallenius hade varit inblandad i dådet växte motståndet mot Lapporörelsen. Vid presidentvalet i februari 1931 vann Pehr Evind Svinhufvud med endast två röster över Kaarlo Juho Ståhlberg.\n\nUnder 1931 fortsatte rörelsen sin agitation på landsbygden, men i mindre offentlig form. Den ekonomiska krisen bidrog till den oro som ledde fram till Mäntsäläupproret, ett öppet uppror som inleddes den 1 februari 1932 i Mäntsälä. Efter den efterföljande rättegången, då 102 av rörelsens ledare fängslades, upplöstes Lapporörelsen.\n\nRörelsen var som starkast under perioden 1929–1932."
+   },
+   "distance": 0.416,
+   "status": "partly"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-11",
+    "section": "Väkivallan prologi: Työtaistelut, työmaaterrori ja lakonmurtajat",
+    "chunk_no": 0,
+    "rev_id": 24266018,
+    "text": "Lapuanliikkeen aktivismilla oli myös konkreettinen taustansa 1920-luvun lopun työtaisteluissa. Kommunistit olivat saaneet vallan Suomen Ammattijärjestössä (SAJ) vuonna 1920. Vuosina 1925–1928 ammattiliittojen jäsenmäärä kasvoi noin 50 000:sta yli 90 000:een. Voimistunut ammattiyhdistysliike vaati työväen oikeuksien parantamista. Suurimmat ammattiyhdistyksistä olivat kommunistien hallussa, ja varsinkin suomalaisen yhteiskunnan toiminnan kannalta keskeisten alojen lakoissa nähtiin herkästi Neuvostoliiton ohjailua ja ulkopoliittisia motiiveja. Lakkoja käytiinkin SKP:n ohjeiden mukaisesti. Vuoden 1929 Suomen vientiteollisuutta koetellut satamalakko kesti kymmenen kuukautta. Myös seitsemän kuukautta kestänyt sukellusvenevalmistaja Crichton-Vulcanin lakko Turussa vuonna 1927 kuumensi tunteita. Kommunistit saivat Neuvostoliitosta lakko-ohjeita ja rahallista lakkoavustusta. Työtuntien määrällä laskettuna lakkoaktiivisuus Suomessa palasi vuoden 1929 tasolle seuraavan kerran vasta vuonna 1950. Ammattiyhdistysliikkeen johto jäi kokonaan kommunistien käsiin, kun sosiaalidemokraatit päättivät toukokuussa 1929 vetäytyä SAJ:stä ja alkoivat syksyllä 1929 puuhata oman keskusjärjestön perustamista.\n\nVasemmisto antoi omalla toiminnallaan myös tehokkaan propaganda-aseen porvarillisille piireille. Entisiä jääkäreitä, heimosotureita tai sodassa valkoisten puolella taistelleita työläisiä vaadittiin pyytämään julkisesti anteeksi työväenlehdissä. Kieltäytyjät joutuivat maksamaan sakkoja tai painostettiin lähtemään työpaikoilta. Anteeksipyyntöjä julkaistiin satoja. Nöyrtyminen ”Moskovan kätyreiden” edessä oli valkoisille karvas isku. Oikeisto ei hyväksynyt kommunistien vaikutusvallan kasvamista työpaikoilla, ja ”työmaaterrorin” käsitteen alle niputettiin pian myös lakkojen vahtiminen ja paine järjestäytyä ylipäätään. Oikeiston keskuudessa kiersi tarinoita syrjinnästä ja jopa väkivaltaisuuksista työpaikoilla. Työmaaterroria nähtiin kuitenkin myös vasemmalla: työnantajien katsottiin syrjivän punaisten joukossa vuoden 1918 tapahtumiin osallistuneita.\n\nTyönantajat ja talouspiirit vastasivat työtaistelujen joukkovoimaan voimalla ja rahoittivat lakonmurtajajärjestöjä. Monet samoista rahoittajista vaikuttivat myöhemmin myös lapuanliikkeen taustalla. Tunnetuin lakonmurtajajärjestöistä oli Martti Pihkalan johtama Yhtymä Vientirauha. Lakon puhjettua Vientirauhan kortiston työmiehet tuotiin tekemään työt ja työtaistelu saatiin murrettua. Työtaistelujen tunnelma kiristyi usein avoimiksi yhteenotoiksi ja väkivallaksi. Pohjalaisilla oli aktiivinen merkitys lakonmurtamistoiminnassa, esimerkiksi valtakunnallisen satamalakon aikana vuosina 1928–1929 lakonmurtajista suurin osa oli pohjalaisia. Enimmillään lakonmurtajiin kuului 34 000 henkeä. Yksi lakonmurtajien värvääjistä oli aiemmin jääkäreitä, heimosotureita ja sisällissodan valkoisia värvännyt Vihtori Kosola, joka kuului Maalaisliittoon."
+   },
+   "b": null,
+   "distance": 0.588,
+   "status": "missing"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-12",
+    "section": "Asenteiden kiristyminen vuonna 1929",
+    "chunk_no": 0,
+    "rev_id": 24266018,
+    "text": "SKP yritti syksyllä 1929 ottaa Suomessa käyttöön Kominternin vaatiman uuden ”kolmannen vaiheen taktiikan”. Komintern ja SKP vaativat 1. elokuuta 1929 järjestettäväksi punaiseksi päiväksi kutsutun ”taistelupäivän”, jonka teemana oli Neuvostoliiton puolustaminen ”imperialistisen sodan” uhalta mielenosoituksin ja lakoin. Sisäministeriö kielsi punaisen päivän mielenosoitukset, joita poliisit sitten hajottivat väkivaltaisesti. Kommunistien yksittäinenkin yritys ottaa kadut haltuunsa herätti vihamielisyyttä oikeistossa. SAJ julisti 16. marraskuuta 1929 yhden päivän yleislakon tukeakseen Tammisaaren pakkotyölaitoksen vangittujen kommunistien nälkälakkoa, mutta yleislakko epäonnistui ja vain harvat työläiset osallistuivat siihen. Myös lakon aikana tapahtui yhteenottoja mielenosoittajien ja poliisien välillä. Nämä tapahtumat käänsivät asenneilmapiirin Suomessa laajalti kommunisminvastaiseksi.\n\nPresidentti Lauri Kristian Relander oli huhtikuussa 1929 kutsunut luokseen Mantereen hallituksen johtavat ministerit, oikeuskanslerin ja Etsivän Keskuspoliisin (EK) johtajan keskustelemaan kommunistien toimintaan puuttumisesta. Välittömänä toimena sisäministeriö kielsi julkisissa tilaisuuksissa liput ja tunnukset, joiden teksti tai kuva kehotti rikkomaan lakia. Pitemmälle menevät toimet edellyttivät lakimuutoksia, joten syyskuussa 1929 uusi Kallion III hallitus antoi eduskunnalle esitykset painovapauslain ja rikoslain muuttamisesta siten, että painovapauden valvonta siirrettäisiin oikeusministeriltä oikeuskanslerille, joka saisi samalla toimeenpanovaltaa, ja että myös kirjapainoja voitaisiin rangaista laittomista painotuotteista määräaikaisella sulkemisella sekä painokoneiden sinetöinnillä tai ottamisella valtion huostaan."
+   },
+   "b": null,
+   "distance": 0.545,
+   "status": "missing"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-13",
+    "section": "Lapuanliikkeen vaiheet › Marraskuu 1929: Lapuan haastejuhlat ja liikkeen synty",
+    "chunk_no": 0,
+    "rev_id": 24266018,
+    "text": "Kominternin taistelukehotusta seurasivat myös SKP:n aktiivisimman osan, Suomen kommunistisen nuorisoliiton jäsenet, jotka ryhtyivät provosoimaan ja agitoimaan eri puolilla Suomea. Nuorisoliitto vei Kominternin suosittaman näyttävän toiminnan myös ”valkoisen Suomen” ydinalueelle Etelä-Pohjanmaalle. Kommunistinen Lapuan Nuorten Työläisten Opintoyhdistys järjesti Lapuan työväentalolla 23.–24. marraskuuta 1929 Lapuan haastejuhlat -nimisen tapahtuman, johon saapui osanottajia kaikkialta Vaasan läänistä ja jonka ohjelmistossa pilkattiin Mannerheimia, itsenäistä Suomea ja kristillisiä arvoja. Erityisen provosoiviksi koettiin esiintyjien punaiset ”ryssänpaidat”. Jo ensimmäisenä päivänä paikalliset koulupojat olivat heittäneet tilaisuuteen hajupommeja ja yrittäneet riisua punaisia paitoja esiintyjien päältä. Poliisi keskeytti juhlan ennen kuin tilanne oli yltynyt avoimeksi väkivallaksi. Seuraavana päivänä 24. marraskuuta noin tuhat ihmistä ympäröi työväentalon Vihtori Kosolan johdolla. Saartajat marssivat taloon sisälle ja julistivat miten ”Täällä on jo tarpeeksi pilkattu Jumalaa, harjoitettu maanpetoksellista toimintaa ja halvennettu isänmaata, nyt se leikki loppuu tähän kerta kaikkiaan!” Kommunistien punaiset paidat riisuttiin väkivalloin. Paikalle saapunut kansanedustaja Emil Tabell ajettiin ulos talosta. Välikohtaus muuttui pahoinpitelyiksi, mutta suuremmalta yhteenotolta vältyttiin, sillä vain lapualaisilla oli mukanaan aseita.\n\nTapahtumaa ei juuri noteerattu ennen kuin lapuanliikkeen ydinrenkaaseen kuulunut Lapuan entinen nimismies ja Etelä-Pohjanmaan Pankin johtaja Yrjö Nikula ryhtyi kertomaan siitä lehdistölle ja Helsingin Sanomat haastatteli Vihtori Kosolaa. Kahakkaa väitettiin spontaaniksi, mutta väitettä on myöhempien tapahtumien valossa myös epäilty. On spekuloitu, että lakonmurtajajärjestöt olisivat palkanneet luottomiehensä Kosolan johtamaan iskua kommunisteja vastaan, mutta tätä ei ole voitu todistaa ja eräät seikat puhuvat sitä vastaan. On epäselvää, oliko kyseessä otollisella hetkellä puhjennut paikallinen selkkaus vai järjestelmällisen suunnittelun ja yllytyksen tulos.\n\nJo heti liikkeen alkuvaiheessa Kallion hallitus teki ensimmäisen myönnytyksensä lähettämällä marraskuun lopussa maaherroille kiertokirjeen, jossa kiellettiin punaisten järjestöpaitojen pito julkisilla paikoilla. Kommunistit tekivät kansanedustaja Tabellin johdolla välikysymyksen Lapuan tapahtumista. Vastatessaan välikysymykseen sisäministeri Arvo Linturi ja pääministeri Kyösti Kallio ilmoittivat, että lapualaisia ei rangaistaisi, koska kommunistit olivat itse syypäitä tapahtuneeseen. Jopa sosiaalidemokraatit äänestivät hallituksen luottamuksen puolesta."
+   },
+   "b": {
+    "chunk_id": "sv-2",
+    "section": "Historia › Bakgrund och ideologi",
+    "chunk_no": 0,
+    "rev_id": 59852897,
+    "text": "Lapporörelsen grundades 1929. Den fick sitt namn efter Lappo, där rörelsen bildades och dess ledare Vihtori Kosola hade sin gård. Rörelsens medlemmar var bland annat missnöjda med vad de uppfattade som centerkrafternas försoningspolitik gentemot dem som hade stått på den röda sidan under finska inbördeskriget 1918. Målet var att förbjuda socialism och begränsa pressfriheten och rösträtten.\n\nRörelsen inspirerades av fascistiska idéer, med Mussolinis Italien som förebild, och räknas som högerextrem. Den använde fysiskt våld mot personer den pekade ut som kommunister, däribland även socialdemokrater. En vanlig metod var så kallade våldskjutsningar (på finska muilutus, efter bröderna Muilu som deltog idogt i denna verksamhet), då personer kidnappades, fördes till skogen och misshandlades. Vissa oliktänkande fördes över gränsen till Sovjetunionen ”där de hörde hemma”."
+   },
+   "distance": 0.331,
+   "status": "partly"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-14",
+    "section": "Lapuanliikkeen vaiheet › Joulukuu 1929: Lapuan ensimmäinen kansalaiskokous ja painostuksen politiikka",
+    "chunk_no": 0,
+    "rev_id": 24266018,
+    "text": "Lapuan haastejuhlien jälkeen sekä Yhtymä Vientirauhan että Rintamamiesliiton verkostot aktivoitiin järjestämään ympäri Suomea keskenään samansisältöisiä kansalaiskokouksia. Huomion keskipisteessä oli Lapua, josta tapahtumat olivat lähteneet liikkeelle, mutta ensimmäinen kokous pidettiin Sortavalassa 30. marraskuuta 1929, päivää ennen Lapuan kokousta. Lapuaa lukuun ottamatta kaikissa kansalaiskokouksissa oli johtavassa roolissa tunnettuja kaupunkilaisia teollisuuden ja talouselämän edustajia, kuten pankkien ja tehtaiden johtajia. Kokouksia oli mitä ilmeisimmin suunniteltu jo aiemmin, sillä asioiden käsittelyjärjestys oli kaikkialla sama ja Sortavalan kokous ilmoitti jo etukäteen tukevansa Lapuan kokouksen päätöksiä. Taustalla lienee ollut valtakunnallinen verkosto, ja liikkeen eteläpohjalainen johto oli siten silmänlumetta.\n\nLapuan ensimmäinen kansalaiskokous sai alkunsa siten, että verkoston Lapualla aktivoinut Vientirauhan Lapuan-asiamies Kustaa Tiitu otti yhteyttä sanomalehti Ilkan päätoimittajaan Artturi Leinoseen, josta tuli yksi lapuanliikkeen alkuvaiheen näkyvistä hahmoista. Tiitu ja Leinonen olivat Kosolan tavoin kumpikin suojeluskunta-aktiiveja ja vahvasti mukana Vientirauhan toiminnassa. Ilkassa ja Vaasa-lehdessä julkaistiin ilmoitus, jossa kutsuttiin kansaa koolle Lapuan Seurahuoneelle 1. joulukuuta. Kokoukseen osallistui lehtikirjoitusten perusteella jopa 3 000 henkeä ja runsaasti lehtimiehiä. Kokouksesta tuli Vihtori Kosolan läpimurto poliittisena toimijana. Kokouksen viesti oli selkeä: kommunistinen toiminta oli kitkettävä maasta. Jo ensimmäisen kokouksen laatima lausunto sisälsi uhan ulkoparlamentaarisesta toiminnasta.\n\nLapuan kokous päätti lähettää Helsinkiin Artturi Leinosen johtaman 20-henkisen lähetystön, johon kuului maalaisliiton ja edistyspuolueen jäseniä. Lähetystön jäsenistä 15 oli toiminut suojeluskuntien esikuntatehtävissä. Hallitukselta pyydettiin toimia kommunistien kiihotustyön lopettamiseksi. Lähetystön ottivat vastaan kommunisteja lukuun ottamatta kaikki eduskuntaryhmät ja Akateeminen Karjala-Seura. Myös tasavallan presidentti Relander vastaanotti lähetystön ja antoi liikkeelle täyden tukensa. Relander kirjoitti, miten kansanliike ”on ollut siunaukseksi tälle maalle ja kansalle, siitä olen varma”. Ensimmäisen lähetystön jälkeen Helsinkiin tuli lähetystöjä maakunnista eri puolilta maata. Myös uusia kokouksia järjestettiin. Valtiovalta otti lapuanliikkeen ensimmäisen vaiheen vastaan myönteisesti, ja aktiivista liikettä pidettiin hallintoa tervehdyttävänä ja ryhdistävänä."
+   },
+   "b": null,
+   "distance": 0.524,
+   "status": "missing"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-15",
+    "section": "Lapuanliikkeen vaiheet › Joulukuu 1929: Lapuan ensimmäinen kansalaiskokous ja painostuksen politiikka",
+    "chunk_no": 1,
+    "rev_id": 24266018,
+    "text": "Lähetystöt johtivat lapuanliikkeen ensimmäiseen konkreettiseen poliittiseen voittoon. Kallion hallitus antoi 5. joulukuuta 1929 eduskunnalle esityksen yhdistyslain muutoksesta, joka hyväksyttiin 16. joulukuuta. Se kielsi uuden yhdistyksen perustamisen lakkautetun tilalle sekä antoi sisäministeriölle ja maaherroille valtuudet lakkauttaa yhdistyksiä hallinnollisilla päätöksillä jopa yksittäisen jäsenen puheiden perusteella. Eräiden sosiaalidemokraattien pidättäytyminen äänestyksestä mahdollisti lain läpimenon; voimistunut oikeistolainen liikehdintä koettiin uhkana demokratialle, ja kerääntyneen tunteen piti antaa kanavoitua jonnekin. Lain perusteella kommunistien opintoyhdistykset voitiin nyt lakkauttaa lopullisesti, mihin ryhdyttiin pian. Kommunistien mielestä sosiaalidemokraattien rooli lain hyväksymisessä osoitti väitteet ”sosiaalifasismista” todeksi. Lapuanliikkeen menestyksen jälkeen hallitusvallan ja ulkoparlamentaarisen painostuksen välille muodostui jännite, joka haki paikkaansa seuraavan kolmen kuukauden ajan. Maltilliset keskustaporvarilliset voimat yrittivät kanavoida liikkeen tuekseen ja pehmentää sen terävimmän kärjen. Lapuanliikkeen kannattajat taas pyrkivät lisäämään vaikutusvaltaansa luodakseen yhtenäisen ”valkoisen Suomen”.\n\nJoulukuun 29. päivänä kansalaiskokousten edustajat, porvarillisten puolueiden puoluesihteerit ja porvarillisten sanomalehtien päätoimittajat pitivät Helsingissä kokouksen, jossa päätettiin jatkaa kansalaiskokousten järjestämistä, vaikka eräät maalaisliittolaiset ja edistyspuoluelaiset sitä vastustivatkin. Kokouksia järjestämään asetettiin dosentti Kai Donnerin johtama toimikunta. Siihen kuuluivat muun muassa Kosola, Leinonen, Hilja Riipinen ja S. J. Pentti, mutta mukana oli maltillisiakin. Lapuanliikkeen taustavaikuttajiin kuului monia vanhoja itsenäisyysaktivisteja, joista Donneria on kutsuttu liikkeen radikaalisiiven harmaaksi eminenssiksi. Aktivistit näkivät sisäpoliittisen muutoksen keinona ajaa ulkopoliittisia tavoitteita kuten Suur-Suomen tavoittelua sodan kautta. Kansalaiskokousten järjestäjistä Donner, Harald Boucht ja eräät muut olivat vuoden 1921 suojeluskuntaselkkauksen aikana edustaneet jyrkkää silloisen hallituksen vastaista linjaa."
+   },
+   "b": null,
+   "distance": 0.542,
+   "status": "missing"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-16",
+    "section": "Lapuanliikkeen vaiheet › Maaliskuu 1930: Toinen kansalaiskokous ja yritys hallita liikettä",
+    "chunk_no": 0,
+    "rev_id": 24266018,
+    "text": "Lapualaisten pettymykseksi eduskunta hylkäsi 7. ja 14. maaliskuuta käydyissä äänestyksissä sekä 11. ja 18. maaliskuuta lopullisissa käsittelyissä hallituksen edellisenä syksynä esittämät painovapaus- ja rikoslain muutokset, jotka olisivat helpottaneet puuttumista kommunistilehtien julkaisuun. Lakimuutoksia vastaan äänestivät sosiaalidemokraattien, RKP:n ja STPV:n edustajat. Nämä ryhmät katsoivat rikoslain muutoksen puuttuvan liiaksi kansalaisvapauksiin eivätkä halunneet siirtää painovapauden valvontaa oikeuskanslerille, koska käsiteltävät tapaukset tulisivat olemaan luonteeltaan poliittisia. Eduskunta oli hieman aiemmin hylännyt myös kokoomuksen lakialoitteen suojelulaista, jolla kommunistit olisi poistettu eduskunnasta ja valtuustoista.\n\nLapuan Seurahuoneella järjestettiin 15. maaliskuuta 1930 toinen, edellistä virallisempi valtakunnallinen kansalaiskokous. Keskusteluun osallistui vain järjestöjen ja kansalaiskokousten valtuutettuja. Kokouksesta oli päätetty Donnerin toimikunnassa jo 26. helmikuuta, mutta se päätettiin pitää vasta, kun eduskunnan päätös olisi tiedossa. Kokouksen ilmapiiri oli alusta saakka jännittynyt, mikä johtui liikkeen maltillisten ja radikalisoituneiden kannattajien välisestä taistelusta. Liikkeen keulakuvat Artturi Leinonen ja Vihtori Kosola korostivat maltillista linjaa. Kenttäväki oli kuitenkin kyllästynyt poliitikkoihin ja toivoi suoraa toimintaa. Radikaaleja olivat muun maussa kauppaneuvos Rafael Haarla, Lapuan kirkkoherra K. R. Kares, rintamamiesliiton K. V. Huhtala ja jääkärimajuri Gunnar von Hertzen. Hilja Riipisen mukaan ”Sanojen aika on ohi. Me vaadimme miesten tekoja.” Kommunistien toimintaa ei poliitikkojen lupauksista huolimatta ollut lakkautettu. Suoran toiminnan kannattajien mielestä ”isänmaallinen kapina” oli parempi kuin ”isänmaaton laillisuus”. Jääkäritkin olivat toimineet aluksi vastoin lakia, mutta silti heidän merkityksensä Suomelle oli ollut suuri. Kokous käsitteli pääasiassa kommunistista lehdistöä, jota ei saatu tukahdutetuksi. Lapualla ärsytti erityisesti Vaasassa ilmestynyt sanomalehti Työn Ääni.lähde?"
+   },
+   "b": {
+    "chunk_id": "sv-3",
+    "section": "Historia › Politiskt inflytande",
+    "chunk_no": 0,
+    "rev_id": 59852897,
+    "text": "Den 28 mars 1930 attackerades och förstördes ett kommunistiskt tryckeri i Vasa. Regeringen försökte hålla Lapporörelsens verksamhet inom lagens ramar genom att gå den till mötes. Därför sammankallades den 1 juli 1930 en urtima riksdag för att anta nya lagar mot kommunismen.\n\nKyösti Kallios regering hade förlorat auktoritet och efterträddes den 4 juli av en borgerlig samlingsregering under Pehr Evind Svinhufvud, som var positivt inställd till Lapporörelsen. Rörelsen fick dock inga platser i regeringen.\n\nDen 7 juli demonstrerade rörelsen sin styrka genom att samla omkring 12 000 utvalda män till ett bondetåg till Helsingfors. Den 15 juli 1930 upplöstes riksdagen sedan de föreslagna undantagslagarna mot kommunister inte hade fått den kvalificerade majoritet som krävdes. Vid nyvalet den 1–2 oktober uteslöts kommunisterna ur riksdagen. De borgerliga partierna fick därefter den tvåtredjedelsmajoritet som krävdes för att anta undantagslagarna."
+   },
+   "distance": 0.355,
+   "status": "partly"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-17",
+    "section": "Lapuanliikkeen vaiheet › Maaliskuu 1930: Toinen kansalaiskokous ja yritys hallita liikettä",
+    "chunk_no": 1,
+    "rev_id": 24266018,
+    "text": "Kansanliike oli hajoamassa kahtia, mutta kokous päätti kuitenkin lopulta yksimielisellä päätöksellä perustaa kommunismin- ja työmaaterrorinvastaisen kansalaisjärjestön Suomen Lukon, jonka oli tarkoitus koota kattojärjestönä kaikki kommunisminvastaiset tahot. Kommunismia vastaan päätettiin käydä valistuksella, laillisin keinoin ja eduskuntaa painostamalla. Ajatus Suomen Lukosta oli lähtöisin Donnerin toimikunnasta, ja sen esitteli kokoukselle kokoomuslainen kansanedustaja Martti Rantanen. Yhdistyksen 32-jäsenisen valtuuskunnan koollekutsujaksi valittiin Vihtori Kosola ja puheenjohtajaksi Kosolan ehdotuksesta Artturi Leinonen. Järjestön kotipaikaksi nimettiin Lapua, mutta toimisto sijoitettiin Helsinkiin. Suomen Lukon jäsenistö oli pääasiassa maltillisia maalaisliittolaisia ja kokoomuslaisia, suoran toiminnan kannattajia oli vain muutama. Maalaisliitossa toivottiin, että kansanliike kanavoituisi vain hallituksen tueksi. Tosiasiassa rauha oli näennäinen – suoran toiminnan kannattajat eivät innostuneet Suomen Lukon hitaasta yhdistystoiminnasta. Lapuan kokous lähetti Helsinkiin uhkaavansävyisen sähkeen, jossa hallitusta moitittiin siitä, ettei se ollut saanut lakimuutoksia läpi eduskunnassa."
+   },
+   "b": {
+    "chunk_id": "sv-3",
+    "section": "Historia › Politiskt inflytande",
+    "chunk_no": 0,
+    "rev_id": 59852897,
+    "text": "Den 28 mars 1930 attackerades och förstördes ett kommunistiskt tryckeri i Vasa. Regeringen försökte hålla Lapporörelsens verksamhet inom lagens ramar genom att gå den till mötes. Därför sammankallades den 1 juli 1930 en urtima riksdag för att anta nya lagar mot kommunismen.\n\nKyösti Kallios regering hade förlorat auktoritet och efterträddes den 4 juli av en borgerlig samlingsregering under Pehr Evind Svinhufvud, som var positivt inställd till Lapporörelsen. Rörelsen fick dock inga platser i regeringen.\n\nDen 7 juli demonstrerade rörelsen sin styrka genom att samla omkring 12 000 utvalda män till ett bondetåg till Helsingfors. Den 15 juli 1930 upplöstes riksdagen sedan de föreslagna undantagslagarna mot kommunister inte hade fått den kvalificerade majoritet som krävdes. Vid nyvalet den 1–2 oktober uteslöts kommunisterna ur riksdagen. De borgerliga partierna fick därefter den tvåtredjedelsmajoritet som krävdes för att anta undantagslagarna."
+   },
+   "distance": 0.417,
+   "status": "partly"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-18",
+    "section": "Lapuanliikkeen vaiheet › Maaliskuu 1930: Toinen kansalaiskokous ja yritys hallita liikettä › Isku Työn Äänen kirjapainoon",
+    "chunk_no": 0,
+    "rev_id": 24266018,
+    "text": "Näennäistä yhtenäisyyttä kesti vain 13 päivää. Liikkeen johdossa päätettiin ryhtyä häiritsemään kommunistien toimintaa. Kohteeksi valittiin Vaasassa painettava Työn Ääni -sanomalehti kirjapainoineen. Kustaa Tiitu kannatti pientä päiväsaikaista häirintää kirjapainossa, mutta vastusti murtoa ja painokoneiden tuhoamista. Myös Kosola kääntyi vastustamaan hanketta kuultuaan Leinosen ja Tiitun kielteisen kannan. Näytti siltä, että suunnitelma oli jo hylätty, mutta Yrjö Nikula jatkoi iskun suunnittelua. Kauppaneuvos Rafael Haarla lupasi maksaa mahdolliset vahingonkorvaukset. Samassa kirjapainossa painettiin myös Tampereella ilmestynyttä Työväen Lehteä.\n\nSuora toiminta aloitettiin iskemällä Työn Äänen kirjapainoon yöllä 28. maaliskuuta 1930. Ilmaan ammutuilla laukauksilla harhautettiin poliisi muualle, ja 13 lapualaismiestä murtautui ikkunasta sisään kirjapainoon ja hajotti sen. Tekijät tulivat pian ilmi, sillä poliisi löysi kirjapainon lattialta kauhavalaispuukon, jossa oli Lapuan patruunatehtaan työntekijän Kullervo Leskisen nimi. Työn Äänen tapahtumien jälkeen alettiin vasemmistolehdistössä käyttää nimitystä ”Lapuanliike”, joskin yleisempään käyttöön se levisi vasta kesäkuussa. Toimintakeinoissa alettiin jo nähdä yhtäläisyyksiä Italian fasismiin."
+   },
+   "b": {
+    "chunk_id": "sv-3",
+    "section": "Historia › Politiskt inflytande",
+    "chunk_no": 0,
+    "rev_id": 59852897,
+    "text": "Den 28 mars 1930 attackerades och förstördes ett kommunistiskt tryckeri i Vasa. Regeringen försökte hålla Lapporörelsens verksamhet inom lagens ramar genom att gå den till mötes. Därför sammankallades den 1 juli 1930 en urtima riksdag för att anta nya lagar mot kommunismen.\n\nKyösti Kallios regering hade förlorat auktoritet och efterträddes den 4 juli av en borgerlig samlingsregering under Pehr Evind Svinhufvud, som var positivt inställd till Lapporörelsen. Rörelsen fick dock inga platser i regeringen.\n\nDen 7 juli demonstrerade rörelsen sin styrka genom att samla omkring 12 000 utvalda män till ett bondetåg till Helsingfors. Den 15 juli 1930 upplöstes riksdagen sedan de föreslagna undantagslagarna mot kommunister inte hade fått den kvalificerade majoritet som krävdes. Vid nyvalet den 1–2 oktober uteslöts kommunisterna ur riksdagen. De borgerliga partierna fick därefter den tvåtredjedelsmajoritet som krävdes för att anta undantagslagarna."
+   },
+   "distance": 0.268,
+   "status": "covered"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-19",
+    "section": "Lapuanliikkeen vaiheet › Huhtikuu 1930: Kolmas kansalaiskokous ja Kosolan nousu johtajaksi",
+    "chunk_no": 0,
+    "rev_id": 24266018,
+    "text": "Lapuan kolmas kansalaiskokous pidettiin 3. huhtikuuta suojeluskunnan talolla ilmeisesti Kosolan ja Hilja Riipisen kutsumana, ja siihen osallistui noin 800–900 henkeä. Kokous valmisteli sähkösanoman, joka lähetettiin pääministeri Kalliolle. Sähkösanoma vahvisti Lapuan kansanliikkeen ja Kosolan laittoman toiminnan, mutta tekstin mukaan liike ei asettunut Kallion hallitusta vastaan ja se oli tarkoitettu myös yhteistyötarjoukseksi hallitukselle.\n\nEduskunta oli tyrmistynyt. Pääministeri Kallio ja Helsingin Sanomat vaativat tekijöiden ankaraa rankaisua. Isku ymmärrettiin lapuanliikkeen epäluottamuslauseeksi eduskunnan toimille. Teko herätti ristiriitoja myös lapuanliikkeen keskuudessa ja se hajosi kahtia. Suomen Lukko sanoutui irti laittomuudesta Leinosen ja Tiitun johdolla ja tuomitsi sen rikoksena. Eräitä maltillisia perustajajäseniä erosi jo järjestöstä.\n\nKosola asettui nyt tukemaan tekoa. Hänen mukaansa vastuussa oli itse asiassa eduskunta, joka ei ollut ryhtynyt kitkemään kommunismia vaatimuksista huolimatta. Suoran toiminnan kannattajat ottivat johtajakseen Kosolan, joka itse ei ollut pyrkinyt näkyvään asemaan. Hänen kodistaan Kosolan talosta tuli lapuanliikkeen keskuspäämaja. Laillisuutta vaatinut Suomen Lukko ja sen johtajat menettivät otteensa liikkeestä, jonka kannattajat pilkkasivat avoimesti oikeuslaitosta. Työn Äänen tihutyön tekijöiksi ja tukijoiksi ilmoittautui Kosolan, Yrjö Nikulan, Vihtori Herttuan ja ilmajokelaisen pankinjohtajan Iivari Koiviston johdolla 72 miestä, jotka saapuivat 9. huhtikuuta joukolla Vaasaan maaherran luo. Varsinaisiksi rikkojiksi ilmoittautuivat lapualaiset maanviljelijä Jussi Muilu, harjoittelija Yrjö Hissa sekä talonpojat Simo Lahdensuo ja Jussi Perämäki. Lapuanliikkeen äänenkannattajan Aktivistin ensimmäisessä numerossa teon kannattajiksi ilmoittautui 650 henkilöä. Lehti alkoi ilmestyä vappuna 1930, ja sen nimelliseksi päätoimittajaksi ilmoitettiin Kosola, joskin tosiasiassa toimitustyöstä vastasi Vilho Viita. Jo ensimmäisessä numerossa everstiluutnantti Arne Somersalo vaati laillisuudesta luopumista kommunismin nopeaksi kitkemiseksi.\n\nKeväällä porvarillisissa lehdissä ja puolueissa pidettiin yllä ajatusta, että hyväksyttävää ”alkuperäistä” kansanliikettä edusti Suomen Lukko, kun taas väkivaltaisuudet kuitattiin erillisenä ”uuslapualaisuutena”. Jännittyneen mielialan vuoksi sisäministeriö kielsi vappumarssit, mutta Helsingissä kommunistit marssivat kieltoa rikkoen. Vappuna tapahtui myös Suomen ensimmäinen kyyditys: liminkalaiset isännät kyyditsivät Lumijoella vappupuheeseen valmistautuneen Pohjan Voima -lehden toimittajan Ilmari Sormusen autolla Ouluun."
+   },
+   "b": null,
+   "distance": 0.493,
+   "status": "missing"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-20",
+    "section": "Lapuanliikkeen vaiheet › Kesäkuu 1930: Väkivalta ja poliittinen terrori › Vaasan mellakka",
+    "chunk_no": 0,
+    "rev_id": 24266018,
+    "text": "Työn Äänen tuhotyöstä oli nostettu syytteet tunnustuksen tehneitä tekijöitä sekä yllyttäjäksi pääteltyä Nikulaa vastaan. Jutun käsittelypäiväksi Vaasan raastuvanoikeudessa oli määrätty 4. kesäkuuta. Vaasaan saapui aikaisin aamulla noin 2 000 lapuanliikkeen kannattajaa Suomen lipuin koristelluilla autoilla. Hallitus oli päättänyt olla provosoimatta tilannetta erityisillä järjestystoimilla. Suojeluskuntien komentaja Lauri Malmberg oli kieltäytynyt pääministeri Kallion pyynnöstä lähettää aseistettuja suojeluskuntalaisia turvaamaan järjestystä, koska he olisivat joutuneet suojelemaan oikeudenkäyntiin saapuvia kommunisteja mielenosoittajilta. Oikeudenkäynnin väliajalla mielenosoitus yltyi väkivallaksi. Lapuanliikkeen kannattajat raastoivat kadulle pahoinpideltäväksi todistajana paikalle kutsutun Työn Äänen faktorin Eino Niemisen, jota väitettiin punaupseeriksi ja SKP:n organisaattoriksi. Metakassa pahoinpideltiin myös noin kymmenen muuta vasemmistolaista, joukossa vaasalaisen sosiaalidemokraattisen Nya Folkbladetin toimittaja Allan Asplund, sekä muita sivullisia, jotka yrittivät estää tekoja. Väkijoukko ja poliisi seurasivat sivusta puuttumatta asiaan.\n\nOikeudenkäynti keskeytettiin, ja väkijoukko piiritti oikeussalin saadakseen käsiinsä asianajajana toimineen kommunistien kansanedustajan Asser Salon. Vaasan läänin maaherra Bruno Sarlin yritti turhaan vedota käräjärauhaan ja saattaa Salon poliisin turviin, mutta tämä siepattiin kadulta autoon. Salo uhattiin ampua ja hänet kyydittiin Lapualle nuorisoseuran talolle sekä lopulta Viitasaarelle, jossa hänet päästettiin vapaaksi. Sieppaajat pakottivat hänet allekirjoittamaan paperin, jonka mukaan hän ei enää koskaan saapuisi Etelä-Pohjanmaalle. Seuraavana päivänä lehdissä julkaistiin ”Etelä-Pohjanmaan miesten” nimissä Lapualla allekirjoitettu ilmoitus, jonka mukaan ”Maakunnassamme ei enää tulla julkaisemaan kommunistisia sanomalehtiä”. Työn Ääni oli tuolloin tilapäisesti lakkautettuna.\n\nLaillinen esivalta oli osoittautunut aseettomaksi joukkovoiman edessä. Vasemmistolainen ja ruotsinkielinen lehdistö vaativat toimia. Hallitus asettui lopulta tukemaan lapuanliikettä ja moitti sosiaalidemokraatteja ja ruotsinkielisiä kommunismin vastaisen toiminnan estämisestä. Lapuanliike ymmärsi voimansa ja alkoi vaatia hallitusta ajamaan omia tavoitteitaan yhä voimakkaammin. Tie kohti kesän ja syksyn 1930 väkivaltaa, poliittista terroria ja voimakasta ulkoparlamentaarista painostusta oli avattu."
+   },
+   "b": null,
+   "distance": 0.58,
+   "status": "missing"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-21",
+    "section": "Lapuanliikkeen vaiheet › Kesäkuu 1930: Väkivalta ja poliittinen terrori › Lapuan laki ja diktatuurihanke",
+    "chunk_no": 0,
+    "rev_id": 24266018,
+    "text": "Kesästä 1930 tuli hyvin rauhaton. Lapuanliikkeen piirissä alettiin puhua Lapuan laista. Nimitys oli alun perin viitannut vuonna 1843 säädettyyn kyläasetukseen, mutta nyt sillä alettiin tarkoittaa omankädenoikeutta, jolla oikeutettiin lakien rikkominen. Koska valtiovalta ei ollut kyennyt torjumaan kommunismin muodostamaa uhkaa isänmaan vapaudelle ja itsenäisyydelle, oli ”kansan tahtoa” edustavalla lapuanliikkeellä oikeus asettua lain yläpuolelle toimissaan kommunismia vastaan.\n\nRadikalisoituminen oli hyvin pitkällä myös vallan kulisseissa, ja Suomen demokratiaan kohdistuikin välitön uhka. Rafael Haarla oli kysynyt jo ensimmäisen kansalaiskokouksen jälkeen päivänpolitiikasta vetäytyneen sosiaalidemokraattijohtaja Väinö Tannerin halukkuutta Suomen diktaattoriksi. Tarkoituksena oli koota hankkeen taakse laajojen maltillisten piirien kannatus. Kesäkuun alussa Martti Pihkala kävi esittämässä saman kysymyksen istuvalle pääministerille Kyösti Kalliolle. Molemmat veteraanipoliitikot kieltäytyivät. Lapuanliikkeen miehet eivät kuitenkaan sietäneet kielteisiä vastauksia. Kallio tiettävästi päätettiin tappaa ja tekijöiksi arvottiin Työn Äänen iskuun osallistuneet Yrjö Hissa ja Jussi Perämäki. Valitut eivät Kallion kohdattuaan ja tämän kanssa keskusteltuaan kuitenkaan pystyneet toteuttamaan tehtäväänsä. Epäonnistumisen häpeä oli nuorille miehille liikaa ja aamuyöllä 8. kesäkuuta Hissa ja Perämäki tekivät kaksoisitsemurhan.\n\nHissa ja Perämäki laskettiin lapuanliikkeen ensimmäisiksi uhreiksi. Heidät haudattiin sankarihautausmenoin Lapualle, ja Kosola laski haudalle seppeleen, jossa lukivat Kaarlo Kramsun kirjoittaman ”Ilkka”-runon sanat: ”Ei oikeutta maassa saa, ken itse sit’ ei hanki”. Lauseesta tuli yksi lapuanliikkeen tunnuslauseista. Myöhemmin kesällä toiseksi tunnuslauseeksi muodostui ”Me teemme, mitä tahdomme”. Jotkut alkoivat nähdä Kosolassa ehdokkaan Suomen tulevaksi diktaattoriksi. K. R. Kares julisti Kosolan olevan ”Jumalan valitsema kansanjohtaja”. Innokkaimmat kannattajat rinnastivat Kosolan mielellään Italian diktaattoriin Mussoliniin, jonka karismaattista esiintymistapaa hän pyrki jäljittelemään. Hänestä jopa käytettiin leikillistä nimeä ”Kosoliini”. Toisaalta edes Kosolalla ei ollut tarpeeksi vahvaa auktoriteettia lapuanliikkeen radikalisoitumisen hillitsemiseen, ja hän joutui usein antamaan vastentahtoisesti hyväksyntänsä jyrkimpien toimille. Hänellä on sanottu olleen ”valta sallia, jopa käskeä – muttei kieltää”."
+   },
+   "b": null,
+   "distance": 0.624,
+   "status": "missing"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-22",
+    "section": "Lapuanliikkeen vaiheet › Kesäkuu 1930: Väkivalta ja poliittinen terrori › Varjoparlamentti",
+    "chunk_no": 0,
+    "rev_id": 24266018,
+    "text": "Lapuanliike järjesti sarjan uusia kansalaiskokouksia, joissa hyväksyttiin etukäteen laaditut vaatimukset. Liikkeen johtajat kokoontuivat 10. kesäkuuta Vientirauhan päämajassa, ja 11.–14. kesäkuuta Helsingissä järjestettiin niin sanottu ”maakuntain miesten kokous”, johon osallistui 73 kansalaiskokousten edustajaa. Kokous vahvisti vaatimuslistan, jonka lähetystö vei 11. kesäkuuta presidentille. Jos vaatimuksiin ei suostuttaisi kesäkuun puoliväliin mennessä, toiminta laajenisi eikä liike ”voisi enää vastata tilanteen kehittymisestä”. Relander ohjasi lähetystön johtajan Oskari Heikinheimon kääntymään pääministeri Kallion puoleen. Vaatimukset kuitenkin ylittivät hallituksen valtaoikeudet, ja Kallio ilmoitti ennemmin kuolevansa kuin tekevänsä laittomia päätöksiä. Myöhemmin lapuanliikkeen johtajat ilmoittivat vaativansa hallituksen eroa. Presidentti Relander sen sijaan oli alkanut myötäillä lapuanliikettä ja pitää sitä ”historiallisena tapauksena”.\n\nVielä samana iltana 11. kesäkuuta pidetyssä valtioneuvoston istunnossa presidentti Relander ajoi läpi kaksi päätöstä: väkivaltaisuuksien hillitsemisessä epäonnistuneen Bruno Sarlinin tilalle Vaasan läänin maaherraksi nimitettiin jääkärieversti Erik Heinrichs ja Työn Äänen määräaikaista ilmestymiskieltoa jatkettiin, sillä se olisi muuten päättynyt viiden päivän kuluttua. Heinrichsin nimityksen oli tarkoitus parantaa valtiovallan ja paikallisten välejä.\n\n”Valkoisen Suomen” aktivistit olivat käytännössä tehneet maakuntain miesten kokouksesta varjoparlamentin, joka saneli hallituksen ja eduskunnan tehtävälistan. Hallituksessa ymmärrettiin painostuksen vaarat, mutta sen omat tavoitteet olivat samat kuin liikkeellä. Armeijan ja poliisin tuesta ei oltu varmoja, jos liikehdintää yritettäisiin hillitä voimalla. Liikkeen tavoitteita tukivat hyvin arvovaltaiset tahot. Myöhemmin kenraaliksi noussut Paavo Talvela totesi puheessaan maakunnan miesten kokouksessa, miten ”sotavoima ei ole tämän hallituksen käsissä, jos se asettuu tätä liikettä vastaan”. Mannerheim kirjoitti veljelleen, miten nyt korjattaisiin sisällissodan jälkeen tehdyt virheet."
+   },
+   "b": null,
+   "distance": 0.603,
+   "status": "missing"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-23",
+    "section": "Lapuanliikkeen vaiheet › Kesäkuu 1930: Väkivalta ja poliittinen terrori › Varjoparlamentti",
+    "chunk_no": 1,
+    "rev_id": 24266018,
+    "text": "Pääministeri Kallio antoi periksi presidentti Relanderin ja eduskunnan puhemiehen Paavo Virkkusen painostamana, joten 13. kesäkuuta hallitus päätti lapuanliikkeen vaatimusten mukaisesti lakkauttaa kaikki kommunistien lehdet, kieltää kommunistien tilaisuudet rajoittamalla kokoontumisoikeutta ja kutsua eduskunnan koolle kesken kesäloman käsittelemään muita kommunistien toimintaan kohdistuvia lakiehdotuksia. Seuraavana päivänä Vaasan, Oulun, Kuopion ja Uudenmaan läänin maaherroille myönnettiin hallitusmuodon 10 §:n vastaisesti poikkeusvaltuudet sulkea välittömästi kommunistien kirjapainot, ja kaikki maaherrat päättivät myös niitä käyttää. Kommunistien kahdeksan sanomalehteä ja kahdeksan aikakauslehteä lakkautettiin, useimmat välittömästi. ”Hoipertelijoiden” lehti Suomen Työmies lakkautettiin kaksi viikkoa muita myöhemmin. Lapuanliike oli aktivoinut tuhansia kannattajiaan mielenosoituksiin eri puolilla Suomea painostaakseen poliitikkoja, mutta väkivallalta vältyttiin. Esimerkiksi Vaasassa marssi 1 200 ja Oulussa 3 000 liikkeen kannattajaa osoittamassa tyytyväisyyttään hallituksen päätöksestä suoran toiminnan sijaan."
+   },
+   "b": null,
+   "distance": 0.55,
+   "status": "missing"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-24",
+    "section": "Lapuanliikkeen vaiheet › Kesäkuu 1930: Väkivalta ja poliittinen terrori › Kyyditysten ja terrorin aalto",
+    "chunk_no": 0,
+    "rev_id": 24266018,
+    "text": "Kesäkuun puolivälissä lapuanliike toteutti uhkauksensa toiminnan laajenemisesta ja aloitti väkivaltaiset kyyditykset eli muilutukset. Kyydityksissä kommunistiedustajia ja kymmeniä muita vasemmistolaisia siepattiin väkivalloin ja kuljetettiin autolla muualle Suomeen tai itärajalle. Useimpia kyyditettyjä pahoinpideltiin. Kaikkiaan lapuanliikkeen nimissä tehtiin 254 kyyditystä tai niiden yritystä, joista lähes puolet kesäkuun kahden viimeisen viikon aikana. Kesäkuun lopulla joinakin öinä tapahtui jopa 5–10 kyyditystä. Kyydityksiä tutkineen Juha Siltalan mukaan poliittinen väkivalta alkoi eri puolilla maata samaan aikaan ja kyyditysten reitit oli järjestetty etukäteen. Monet kyyditykset kulkivat Lapuan päämajan kautta. Lapuanliikkeen johto antoi kyyditysmääräyksiä ja -valtuutuksia sekä maksoi kyydittäjille kulukorvauksia. Eräät lapuanliikkeen valtuuskunnan jäsenet organisoivat kyydityksiä itse. Jotkut kyyditetyistä vietiin Neuvostoliiton rajalle ja heidät pakotettiin ylittämään raja, eikä heistä kuultu enää koskaan. Eniten kyydityksiä tehtiin läntisessä Suomessa. Kyydityksistä 56 kohdistui muihin kuin kommunisteihin. Myös lapuanliikkeeseen kielteisesti suhtautuneita porvarillisia henkilöitä kuten lehtien toimittajia uhkailtiin väkivallalla.\n\nKolme kyyditettyä tapettiin: 4. heinäkuuta forssalainen Yrjö Holm, joka puolustautui aseen kanssa kotiovellaan, 19. heinäkuuta heinjokelainen Erik Mättö, jonka Vihtori Kosolan poika Pentti Kosola ampui kyyditysretkellä ”vahingossa” humalapäissään, ja 1. syyskuuta heinäveteläinen sosiaalidemokraattinen kunnanvaltuutettu Onni Happonen, joka siepattiin valtuuston kokouksesta ja murhattiin. Kommunistinen autonkuljettaja Armas Valve puolestaan ampui Vaasassa humalassa kostona lapualaismielisen poliisin Arvo Sorvarin. Lapualaiset kaappasivat Valveen poliisin vankikuljetuksesta ja kyyditsivät ja pahoinpitelivät hänet. Lisäksi Pöytyällä kyydittäjä Paavali Roukanoja kuoli aiotun uhrin puolustautuessa aseen kanssa."
+   },
+   "b": {
+    "chunk_id": "sv-2",
+    "section": "Historia › Bakgrund och ideologi",
+    "chunk_no": 0,
+    "rev_id": 59852897,
+    "text": "Lapporörelsen grundades 1929. Den fick sitt namn efter Lappo, där rörelsen bildades och dess ledare Vihtori Kosola hade sin gård. Rörelsens medlemmar var bland annat missnöjda med vad de uppfattade som centerkrafternas försoningspolitik gentemot dem som hade stått på den röda sidan under finska inbördeskriget 1918. Målet var att förbjuda socialism och begränsa pressfriheten och rösträtten.\n\nRörelsen inspirerades av fascistiska idéer, med Mussolinis Italien som förebild, och räknas som högerextrem. Den använde fysiskt våld mot personer den pekade ut som kommunister, däribland även socialdemokrater. En vanlig metod var så kallade våldskjutsningar (på finska muilutus, efter bröderna Muilu som deltog idogt i denna verksamhet), då personer kidnappades, fördes till skogen och misshandlades. Vissa oliktänkande fördes över gränsen till Sovjetunionen ”där de hörde hemma”."
+   },
+   "distance": 0.188,
+   "status": "covered"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-25",
+    "section": "Lapuanliikkeen vaiheet › Kesäkuu 1930: Väkivalta ja poliittinen terrori › Kyyditysten ja terrorin aalto",
+    "chunk_no": 1,
+    "rev_id": 24266018,
+    "text": "Silloin, kun kyyditykset ja murhat etenivät rikostutkintaan ja oikeuteen saakka, lapualaiset häiritsivät prosesseja. Painostuksella esimerkiksi Holmin murhaa tutkineet poliisit järjestettiin erotetuiksi ja eräs murhaajista vapautetuksi. Ongelmana oli myös poliisien ja oikeuslaitoksen yleinen lapualaismielisyys sekä uhrien ja sivullisten haluttomuus todistaa kyyditsijöitä vastaan. Useissa tapauksissa Etsivän Keskuspoliisin (EK) virkailijat auttoivat kyydittäjiä toimittamalla näille salaisia tietoja kommunistien maanalaisen organisaation jäsenistä sekä näiden valokuvia ja kotiosoitteita, jopa kotiavaimia. Pidätettyjä kommunisteja saatettiin vapauttaa suoraan kyydittäjien käsiin. Suojeluskunnista kyydityksiin osallistui monia upseereita ja jopa yksi piiripäällikkö. Yksittäiset tunnolliset viranomaiset olivat voimattomia; maaherroista Uudenmaan läänin Bruno Jalander ja Mikkelin läänin Albin Pulkkinen yrittivät puuttua kyydityksiin olemattomalla menestyksellä. Jalanderille myönnettiin jatkuvasti virkavapaata ja sairauslomaa, jotta lapualaismielinen Hjalmar Honkanen voisi hoitaa hänen virkaansa.\n\nOikeistolehdistö rakensi vastoin parempaa tietoaan tarinan, jonka mukaan väkivaltaan syyllistyivät liikkeen sijasta sen reunoilla häärineet epämääräiset lievemiehet. Terrori yritettiin selittää sivuseikkana, vaikka lapuanliikkeen vaikutusvalta perustui juuri voimankäyttöön ja väkivallan uhkaan. Liikkeen omassa lehdessä Aktivistissa kaikki teot kuitenkin tulkittiin liikkeen aatteeseen perustuviksi ja sen tavoitteita edistäviksi. Edistyspuolue ja Maalaisliitto protestoivat radikalisoitumista ja väkivallantekoja, mutta suhtautuivat kommunismiin vielä vihamielisemmin."
+   },
+   "b": {
+    "chunk_id": "sv-2",
+    "section": "Historia › Bakgrund och ideologi",
+    "chunk_no": 0,
+    "rev_id": 59852897,
+    "text": "Lapporörelsen grundades 1929. Den fick sitt namn efter Lappo, där rörelsen bildades och dess ledare Vihtori Kosola hade sin gård. Rörelsens medlemmar var bland annat missnöjda med vad de uppfattade som centerkrafternas försoningspolitik gentemot dem som hade stått på den röda sidan under finska inbördeskriget 1918. Målet var att förbjuda socialism och begränsa pressfriheten och rösträtten.\n\nRörelsen inspirerades av fascistiska idéer, med Mussolinis Italien som förebild, och räknas som högerextrem. Den använde fysiskt våld mot personer den pekade ut som kommunister, däribland även socialdemokrater. En vanlig metod var så kallade våldskjutsningar (på finska muilutus, efter bröderna Muilu som deltog idogt i denna verksamhet), då personer kidnappades, fördes till skogen och misshandlades. Vissa oliktänkande fördes över gränsen till Sovjetunionen ”där de hörde hemma”."
+   },
+   "distance": 0.239,
+   "status": "covered"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-26",
+    "section": "Lapuanliikkeen vaiheet › Kesäkuu 1930: Väkivalta ja poliittinen terrori › Kesäkuun lopun kehitys",
+    "chunk_no": 0,
+    "rev_id": 24266018,
+    "text": "Lapuanliike halusi luoda kyydityksillä poliittista painetta ja saada Kallion hallituksen eroamaan. Kulisseissa tilalle valmisteltiin laajapohjaista oikeistohallitusta, jonka pääministeriksi kaavailtiin entistä valtionhoitajaa, kokoomuksen P. E. Svinhufvudia. Svinhufvud oli ollut kylpylälomalla Ranskan Vichyssä, mutta palasi Suomeen 13. kesäkuuta ilmeisesti Relanderin kutsusta. Svinhufvud osallistui Helsingissä maakuntain miesten kokoukseen ja matkusti kesäkuun puolivälissä puhemies Virkkusen kanssa Etelä-Pohjanmaalle kuuntelemaan ja tunnustelemaan lapuanliikkeen voimaa ja tavoitteita. Hän vakuuttui siitä, että muutos oli tulossa ja häntä tarvittiin. Svinhufvud sanoutui kuitenkin irti diktatuurista.\n\nLiikkeessä ryhdyttiin suunnittelemaan uutena painostuskeinona ja voimannäyttönä Helsinkiin suuntautuvaa marssia. Päätös ensin suojeluskuntamarssiksi kutsutusta marssista runnottiin lävitse valtakunnallisessa kokouksessa Lapualla 20.–21. kesäkuuta. Liikkeen ulkopuolella suunnitelmat herättivät kysymyksiä mahdollisesta vallankaappauksesta. Samalla lapuanliikkeen toimintaa pyrittiin organisoimaan ja perustettiin 31-jäseninen, käytännössä vähämerkityksiseksi jäänyt Lapuan liikkeen valtuuskunta. Vihtori Kosolasta, Vihtori Herttuasta ja Iivari Koivistosta alettiin käyttää nimitystä Lapuan johto. Kokeneemmat organisaattorit pitivät liikkeen ydinryhmän toimintaa kaoottisena, suunnittelemattomana ja reaktiivisena. Valtiolle raportoineen everstiluutnantti Eero Kuussaaren mukaan johto ”ei ollut itsekään selvillä suunnitelmistaan... toimenpiteensä oli näyttänyt olleen aina hetken päätöksen varassa”. Muun muassa Suomen Lukon puheenjohtaja Artturi Leinonen vastusti Helsingin-marssia, mutta asia ei ollut enää hänen käsissään.\n\nLapuanliikkeen lisääntyvä uhkan vuoksi SDP:n, maalaisliiton, edistyspuolueen ja RKP:n pragmaattiset veteraanit kokoontuivat 17. ja 26. kesäkuuta pohtimaan tilannetta ja vaihtoehtoja. Kokouksissa sovittiin ”kansanvaltaisen rintaman” perustamisesta. Tarkoituksena ei ollut pelastaa kommunistien toimintaa kieltämiseltä vaan torjua oikeistodiktatuurin perustaminen. Maahan näytti joka tapauksessa olevan tulossa jonkinlainen oikeistohallitus, jota pahimmassa vaihtoehdossa johtaisivat lapuanliikkeen arvaamattomat ”kolmannen luokan miehet”. Kallion istuva hallitus oli menettämässä vasemmiston ja maltillisten tuen."
+   },
+   "b": {
+    "chunk_id": "sv-3",
+    "section": "Historia › Politiskt inflytande",
+    "chunk_no": 0,
+    "rev_id": 59852897,
+    "text": "Den 28 mars 1930 attackerades och förstördes ett kommunistiskt tryckeri i Vasa. Regeringen försökte hålla Lapporörelsens verksamhet inom lagens ramar genom att gå den till mötes. Därför sammankallades den 1 juli 1930 en urtima riksdag för att anta nya lagar mot kommunismen.\n\nKyösti Kallios regering hade förlorat auktoritet och efterträddes den 4 juli av en borgerlig samlingsregering under Pehr Evind Svinhufvud, som var positivt inställd till Lapporörelsen. Rörelsen fick dock inga platser i regeringen.\n\nDen 7 juli demonstrerade rörelsen sin styrka genom att samla omkring 12 000 utvalda män till ett bondetåg till Helsingfors. Den 15 juli 1930 upplöstes riksdagen sedan de föreslagna undantagslagarna mot kommunister inte hade fått den kvalificerade majoritet som krävdes. Vid nyvalet den 1–2 oktober uteslöts kommunisterna ur riksdagen. De borgerliga partierna fick därefter den tvåtredjedelsmajoritet som krävdes för att anta undantagslagarna."
+   },
+   "distance": 0.391,
+   "status": "partly"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-27",
+    "section": "Lapuanliikkeen vaiheet › Heinäkuu 1930: Demokratian kriisi ja Talonpoikaismarssi › Eduskunnan kokoontuminen äänestämään kommunistilaeista",
+    "chunk_no": 0,
+    "rev_id": 24266018,
+    "text": "Eduskunta kokoontui täysin poikkeuksellisesti 1. heinäkuuta 1930. Kallion hallitus esitti sen hyväksyttäviksi joukon lapuanliikkeen vaatimuksia myötäilleitä lakimuutoksia, jotka menivät selvästi pidemmälle kuin maaliskuussa hylätyt esitykset. Niillä pyrittiin kieltämään täysin kommunistien toiminta, ja kokonaisuus saikin nimen kommunistilait. Niihin kuului tasavallan suojelulaki, joka antoi tasavallan presidentille oikeuden rajoittaa asetuksilla kansalaisvapauksia, jos yleinen turvallisuus ja järjestys oli uhattuna. Valtiopäiväjärjestyksen, vaalilain ja kunnallislakien muutoksilla poistettaisiin valtiollisissa ja kunnallisissa vaaleissa vaalikelpoisuus henkilöiltä, jotka olivat viimeisen kolmen vuoden aikana kuuluneet valtio- ja yhteiskuntajärjestyksen laittomaan kumoamiseen tähtääviin järjestöihin, sekä velvoitettiin vaaliviranomaiset hylkäämään tällaisia henkilöitä sisältäneet ehdokaslistat. Painovapauslain ja rikoslain muutoksilla pyrittiin tekemään rangaistavaksi hallituksen, eduskunnan tai yhteiskuntajärjestyksen halventaminen ja vaarantaminen. Pääministeri Kallion mielestä kommunistilait olivat äärimmäisin myönnytys, johon vielä voitaisiin taipua loukkaamatta demokratiaa.\n\nLapuanliikkeelle eivät hallituksen esitykset riittäneet, ja se julkisti samana päivänä omat rinnakkaisesityksensä. Tavoitteet olivat entisestäänkin radikalisoituneet. Vaadittiin suuria muutoksia perustuslakiin: enemmistövaaleja, äänioikeuden sitomista veronmaksukykyyn, eduskunnan istuntokauden lyhentämistä ja toimivaltuuksien kaventamista sekä kansanedustajien määrän vähentämistä 150:een. Lehtien arvion mukaan nämä esitykset olisivat toteutuessaan poistaneet äänioikeuden noin 600 000 vähävaraiselta kansalaiselta. Haluttiin karsia myös tulonsiirrot, koulujärjestelmä, työlainsäädäntö ja osuustoiminta. Valtio huolehtisi vain maanpuolustuksesta ja järjestyksen ylläpidosta. Paine kohdistui koko parlamentaristiseen järjestelmään, ja tavoitteena oli paluu sääty-yhteiskuntaan.\n\nSTPV:n 23 kansanedustajasta viisi oli jo kesäkuun aikana kyyditetty Neuvostoliittoon, ja Asser Salon lisäksi neljä muuta oli muilutettu. Supistunut eduskuntaryhmä oli kesäkuun lopussa päättänyt äänin 10–2 jatkaa osallistumista eduskuntatyöhön väkivallan uhasta huolimatta ja jättänyt eduskunnalle vastalauseen saamastaan kohtelusta. Täysistunnoissa puhemies kielsi kommunistiedustajien yritykset ohjata keskustelu käsittelemään lapuanliikkeen toimintaa."
+   },
+   "b": {
+    "chunk_id": "sv-3",
+    "section": "Historia › Politiskt inflytande",
+    "chunk_no": 0,
+    "rev_id": 59852897,
+    "text": "Den 28 mars 1930 attackerades och förstördes ett kommunistiskt tryckeri i Vasa. Regeringen försökte hålla Lapporörelsens verksamhet inom lagens ramar genom att gå den till mötes. Därför sammankallades den 1 juli 1930 en urtima riksdag för att anta nya lagar mot kommunismen.\n\nKyösti Kallios regering hade förlorat auktoritet och efterträddes den 4 juli av en borgerlig samlingsregering under Pehr Evind Svinhufvud, som var positivt inställd till Lapporörelsen. Rörelsen fick dock inga platser i regeringen.\n\nDen 7 juli demonstrerade rörelsen sin styrka genom att samla omkring 12 000 utvalda män till ett bondetåg till Helsingfors. Den 15 juli 1930 upplöstes riksdagen sedan de föreslagna undantagslagarna mot kommunister inte hade fått den kvalificerade majoritet som krävdes. Vid nyvalet den 1–2 oktober uteslöts kommunisterna ur riksdagen. De borgerliga partierna fick därefter den tvåtredjedelsmajoritet som krävdes för att anta undantagslagarna."
+   },
+   "distance": 0.273,
+   "status": "covered"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-28",
+    "section": "Lapuanliikkeen vaiheet › Heinäkuu 1930: Demokratian kriisi ja Talonpoikaismarssi › Kallion hallituksen ero ja Svinhufvudin hallituksen nimittäminen",
+    "chunk_no": 0,
+    "rev_id": 24266018,
+    "text": "Kallion hallitus oli kestämättömässä tilanteessa, ja presidentti oli vetänyt siltä tukensa, joten puolueet sopivat sen korvaamisesta laajapohjaisemmalla hallituksella. Eduskunnan käsitellessä 2. heinäkuuta kommunistilehtien laitonta lakkauttamista koskenutta tiedonantoa hallitus sai vielä luottamuslauseen äänin 112–69, mutta se jätti samana iltana eronpyyntönsä. Kaksi päivää myöhemmin muodostettiin lapuanliikkeen tavoitteiden mukaisesti Svinhufvudin johtama yleisporvarillinen hallitus. Eduskuntaryhmiä ei kutsuttu hallitusneuvotteluihin ja hallitus muodostettiin ”etupäässä silmällä pitäen sitä että sillä on lapualaisten luottamus.” Keskustapuolueiden ministerit edustivat puolueidensa oikeistosiipiä. Uusi hallitus kertoi tukevansa lapuanliikkeen tavoitteita. Liikkeen johto oli vaatinut itselleen kolmea ministerinsalkkua, jotka olisi annettu Kosolalle, K. R. Karekselle ja Vihtori Herttualle. Svinhufvud tavoitteli taitavana poliittisena pelurina kuitenkin mahdollisimman laajaa tukea ja vastusti Kosolan tuloa hallitukseen. Kosola ja Herttua ehtivät olla ”ministereinä” neljä tuntia ennen vetäytymistään hallituksesta. Taustalla oli ilmeisesti pelko siitä, että hallitusvastuu ilman määräävää asemaa vesittäisi kansanliikkeen. Myös Kareksen ja opetusministeriksi tulleen kokoomuslaisen Paavo Virkkusen teologisten erimielisyyksien on arvioitu vaikuttaneen lapualaisten hallitukseen tulon kariutumiseen. Kosolan alkoholinkäyttö on myös mainittu yhdeksi syyksi, miksi Svinhufvud ei halunnut häntä hallitukseen."
+   },
+   "b": {
+    "chunk_id": "sv-3",
+    "section": "Historia › Politiskt inflytande",
+    "chunk_no": 0,
+    "rev_id": 59852897,
+    "text": "Den 28 mars 1930 attackerades och förstördes ett kommunistiskt tryckeri i Vasa. Regeringen försökte hålla Lapporörelsens verksamhet inom lagens ramar genom att gå den till mötes. Därför sammankallades den 1 juli 1930 en urtima riksdag för att anta nya lagar mot kommunismen.\n\nKyösti Kallios regering hade förlorat auktoritet och efterträddes den 4 juli av en borgerlig samlingsregering under Pehr Evind Svinhufvud, som var positivt inställd till Lapporörelsen. Rörelsen fick dock inga platser i regeringen.\n\nDen 7 juli demonstrerade rörelsen sin styrka genom att samla omkring 12 000 utvalda män till ett bondetåg till Helsingfors. Den 15 juli 1930 upplöstes riksdagen sedan de föreslagna undantagslagarna mot kommunister inte hade fått den kvalificerade majoritet som krävdes. Vid nyvalet den 1–2 oktober uteslöts kommunisterna ur riksdagen. De borgerliga partierna fick därefter den tvåtredjedelsmajoritet som krävdes för att anta undantagslagarna."
+   },
+   "distance": 0.18,
+   "status": "covered"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-29",
+    "section": "Lapuanliikkeen vaiheet › Heinäkuu 1930: Demokratian kriisi ja Talonpoikaismarssi › Kansanedustajien sieppaus perustuslakivaliokunnasta",
+    "chunk_no": 0,
+    "rev_id": 24266018,
+    "text": "Ei ollut aluksi varmaa, nauttisiko Svinhufvudinkaan hallitus lapuanliikkeen luottamusta. Kosola oli hyvin pettynyt ministeripaikan menettämisestä. Lapuanliike oli nähnyt itsensä alun perin jopa uuden hallituksen johdossa. Lapuanliikkeen miehet olivat vaatineet hallituksen tukemisen ehtona kaikkien kommunistikansanedustajien vangitsemista, mutta Svinhufvud ei ollut heti suostunut. Ärsyyntynyt Kosola antoi 3. heinäkuuta käskyn kaikkien kommunistien kansanedustajien muiluttamisesta. Nämä kuitenkin piilottelivat niin taitavasti, etteivät lapualaiset onnistuneet saamaan ketään kiinni asunnostaan, ja poliisi turvasi eduskunnan istuntopaikkaa Heimolan taloa. Niinpä EK:n etsivä Kosti-Paavo Eerolaisen ja Artturi Vuorimaan johtama lapuanliikkeen iskujoukko tunkeutui 5. heinäkuuta Säätytaloon perustuslakivaliokunnan istuntoon sieppaamaan kansanedustajat Eino Pekkalan ja Jalmari Rötkön. Valiokunnan puheenjohtaja Väinö Voionmaa (SDP) sekä kansanedustajat Ernst von Born (RKP), Ernst Estlander (RKP) ja J. F. Aalto (SDP) yrittivät turhaan estää sieppausta.\n\nPekkala ja Rötkö kyyditettiin Lapualle Kosolaan. Heidät vapautettiin, kun hallitus ilmoitti, että muussa tapauksessa valtiovalta ei vastaanota Helsinkiin suunniteltua marssia. Tapaus oli herättänyt erittäin laajaa huomiota myös ulkomailla. Svinhufvudin hallitus oli kuitenkin itse asiassa suostunut kommunistien kansanedustajien pidätyksiin jo ensimmäisessä istunnossaan 4. heinäkuuta, mitä ei ollut vain vielä toteutettu. Sisäministeri E. V. Kuokkanen määräsi iltapäivällä 5. heinäkuuta kaikki STPV:n kansanedustajat pidätettäviksi ”lähempää tutkintaa ja kuulusteluja varten” epäiltyinä ”maanpetoksellisesta toiminnasta”. Pidätysmääräys ei perustunut mihinkään tiettyyn lakipykälään. Pidätettäviksi määrätyt edustajat olivat kuitenkin jo ehtineet piiloutua maan alle. Eduskunta hyväksyi jälkeenpäin hallituksen toimet sosiaalidemokraattien ja ruotsalaisten esittämistä epäilyksistä huolimatta. Hallitus määräsi samassa yhteydessä kommunistien hallussa olleet työväentalot takavarikoitaviksi ja ratsioita Helsingin kommunistikeskuksiin."
+   },
+   "b": null,
+   "distance": 0.532,
+   "status": "missing"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-30",
+    "section": "Lapuanliikkeen vaiheet › Heinäkuu 1930: Demokratian kriisi ja Talonpoikaismarssi › Talonpoikaismarssi",
+    "chunk_no": 0,
+    "rev_id": 24266018,
+    "text": "Alun perin Kallion hallituksen painostamiseksi suunniteltu talonpoikaismarssi järjestettiin maanantaina 7. heinäkuuta. Talonpoikaismarssi oli lapuanliikkeen suuri voimannäyttö. 12 600 liikkeen kannattajaa marssi Helsinkiin rykmentteihin, pataljooniin ja komppanioihin jaettuina suojeluskuntakurissa ja -järjestyksessä. Marssijat jakautuivat rykmentteihin maakunnittain. Myös ruotsinkieliset alueet olivat hyvin edustettuina. Esikuva oli Italian fasistien mustapaitojen marssi Roomaan vuonna 1922, vaikka puhuttiin myös Ruotsin talonpoikien vuoden 1914 maanpuolustusmarssista. Kosola joutui etukäteen selittämään vuolaasti, että kyse ei ollut fasismista tai oikeistodiktatuurista.\n\nAlun perin marssin nimeksi oli suunniteltu ”suojeluskuntamarssia”, mutta Suojeluskuntien komentaja Malmberg oli kieltänyt suojeluskuntaunivormun käytön. Suojeluskuntien yliesikunta kuitenkin pääasiassa vastasi marssin käytännön järjestelyistä, ja pääjärjestäjinä toimivat everstit Paavo Talvela ja Woldemar Hägglund, joista jälkimmäinen oli Helsingin suojeluskuntapiirin päällikkö. Marssia rahoitti kustannuksia takaamalla yksitoista talouselämän vaikuttajaa, joista käytännössä kaikki olivat metsäteollisuuden edustajia ja kuusi myös Vientirauhan avainhenkilöitä, sekä Rauma Wood -yhtiö ja Suomen Lastauttajien Työnantajaliitto.\n\nAjatuksena oli järjestää uusi tapahtuma, joka muistuttaisi valkoisen armeijan voitonparaatia 16. toukokuuta 1918. Käytännössä toive toteutuikin. Presidentti Relander, hallitus pääministeri Svinhufvudin johdolla ja kenraali C. G. E. Mannerheim ottivat marssin vastaan Senaatintorilla Suurkirkon portailla ja antoivat teollaan liikkeelle ja sen tavoitteille julkisesti tukensa. Erityisesti sisällissodan valkoisten johdon mukanaolo oli symbolisesti merkittävää. Presidentti, pääministeri ja Kosola puhuivat portailta torille kokoontuneille marssijoille, ja Relander ja Kosola kättelivät julkisesti. Puheessaan Kosola vaati kuuluisin sanoin kommunismin hävittämistä ”viimeistä piirtoa myöten”.\n\nEnnen talonpoikaismarssia sisäpoliittinen tilanne oli ollut erittäin jännittynyt. Pidettiin mahdollisena jopa vallankaappausta. Lapuanliike yritti rauhoitella yleistä mielipidettä tiedotteella, jossa vallankaappaushalut kiellettiin. Vallanvaihto oli kuitenkin ollut alkuperäinen tavoite. Marssia edeltäneiden päivien Svinhufvudin hallituksen muodostaminen ja kommunistien kansanedustajien pidättäminen olivat kuitenkin vieneet vaatimuksilta pohjan. Marssista tuli nyt voimannäyttö uuden hallituksen tueksi. Marssijoilla oli mukana myös kätkettyjä aseita, joten toisenlaiseenkin vastaanottoon ja toimintaan oli varauduttu. Varsinkin Donnerin johtama aktivistipiiri etsi tilaisuutta nostaa Mannerheim Suomen johtoon – jopa diktaattoriksi – lapuanliikkeen tukemalla vallankaappauksella."
+   },
+   "b": {
+    "chunk_id": "sv-3",
+    "section": "Historia › Politiskt inflytande",
+    "chunk_no": 0,
+    "rev_id": 59852897,
+    "text": "Den 28 mars 1930 attackerades och förstördes ett kommunistiskt tryckeri i Vasa. Regeringen försökte hålla Lapporörelsens verksamhet inom lagens ramar genom att gå den till mötes. Därför sammankallades den 1 juli 1930 en urtima riksdag för att anta nya lagar mot kommunismen.\n\nKyösti Kallios regering hade förlorat auktoritet och efterträddes den 4 juli av en borgerlig samlingsregering under Pehr Evind Svinhufvud, som var positivt inställd till Lapporörelsen. Rörelsen fick dock inga platser i regeringen.\n\nDen 7 juli demonstrerade rörelsen sin styrka genom att samla omkring 12 000 utvalda män till ett bondetåg till Helsingfors. Den 15 juli 1930 upplöstes riksdagen sedan de föreslagna undantagslagarna mot kommunister inte hade fått den kvalificerade majoritet som krävdes. Vid nyvalet den 1–2 oktober uteslöts kommunisterna ur riksdagen. De borgerliga partierna fick därefter den tvåtredjedelsmajoritet som krävdes för att anta undantagslagarna."
+   },
+   "distance": 0.376,
+   "status": "partly"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-31",
+    "section": "Lapuanliikkeen vaiheet › Heinäkuu 1930: Demokratian kriisi ja Talonpoikaismarssi › Eduskunnan hajottaminen",
+    "chunk_no": 0,
+    "rev_id": 24266018,
+    "text": "Kommunistilakien tullessa eduskunnan käsittelyyn edistyspuolueen T. M. Kivimäki esitti niihin pieniä lievennyksiä, kuten että laittomaan poliittiseen toimintaan osallistuneiden vaalikelpoisuus voitaisiin poistaa vain tuomioistuimen eikä keskusvaalilautakunnan päätöksellä. Sosiaalidemokraatit olisivat hyväksyneet ”Kivimäen linjan” kompromissina, mutta hallituspuolueet joutuivat hylkäämään sen, kun Svinhufvud teki hallituksen alkuperäisten esitysten hyväksymisestä luottamuskysymyksen. Tasavallan suojelulain voimassaolo tosin rajoitettiin viiteen vuoteen, koska myös RKP vaati sitä. Kun kommunistilakeja ei saatu lievennettyä, sosiaalidemokraatit päättivät painostuksesta huolimatta jarruttaa niiden hyväksymistä, sillä he pelkäsivät aiheellisestikin olevansa lapuanliikkeen seuraava kohde. Äänestyksessä 15. heinäkuuta eduskunta hyväksyi vain painovapauslain ja kunnallislakien muutokset. Muutkin kommunistilait saivat enemmistön tuen, mutta sosiaalidemokraattien ja RKP:n määrävähemmistö riitti lykkäämään niiden hyväksymisen seuraavaan vaalikauteen.\n\nÄänestystuloksen seurauksena presidentti Relander hajotti eduskunnan samana päivänä ja määräsi vaalit pidettäväksi 1.–2. lokakuuta. Lapuanliike onnistui painostuksellaan näin sekä vaihtamaan hallituksen että hajottamaan eduskunnan. Liikkeen seuraavaksi tavoitteeksi tuli saada porvarillisille puolueille uuteen eduskuntaan kahden kolmasosan määräenemmistö lakimuutosten hyväksymiseksi."
+   },
+   "b": {
+    "chunk_id": "sv-3",
+    "section": "Historia › Politiskt inflytande",
+    "chunk_no": 0,
+    "rev_id": 59852897,
+    "text": "Den 28 mars 1930 attackerades och förstördes ett kommunistiskt tryckeri i Vasa. Regeringen försökte hålla Lapporörelsens verksamhet inom lagens ramar genom att gå den till mötes. Därför sammankallades den 1 juli 1930 en urtima riksdag för att anta nya lagar mot kommunismen.\n\nKyösti Kallios regering hade förlorat auktoritet och efterträddes den 4 juli av en borgerlig samlingsregering under Pehr Evind Svinhufvud, som var positivt inställd till Lapporörelsen. Rörelsen fick dock inga platser i regeringen.\n\nDen 7 juli demonstrerade rörelsen sin styrka genom att samla omkring 12 000 utvalda män till ett bondetåg till Helsingfors. Den 15 juli 1930 upplöstes riksdagen sedan de föreslagna undantagslagarna mot kommunister inte hade fått den kvalificerade majoritet som krävdes. Vid nyvalet den 1–2 oktober uteslöts kommunisterna ur riksdagen. De borgerliga partierna fick därefter den tvåtredjedelsmajoritet som krävdes för att anta undantagslagarna."
+   },
+   "distance": 0.367,
+   "status": "partly"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-32",
+    "section": "Lapuanliikkeen vaiheet › Heinäkuu 1930: Demokratian kriisi ja Talonpoikaismarssi › Eduskunnan varapuhemiehen kyyditys ja pahoinpitely",
+    "chunk_no": 0,
+    "rev_id": 24266018,
+    "text": "Lapuanliike kiinnitti seuraavaksi huomionsa sosiaalidemokraatteihin, kuten nämä olivat lakimuutoksista äänestettäessä aavistaneet. Ensimmäinen merkki tulevasta oli eduskunnan sosiaalidemokraattisen varapuhemiehen ja Tampereen pormestarin Väinö Hakkilan kyyditys. Hän oli puhunut erittäin voimakkaasti lakiesityksiä vastaan eduskunnassa. Hakkila oli 18. heinäkuuta 1930 matkalla kesähuvilalleen Teiskoon, kun hänet pysäytettiin aseilla uhaten ja pakotettiin toiseen autoon. Hänet kyyditettiin Teiskosta Lapuan kautta Kuortaneelle. Hakkila muilutettiin siitä huolimatta, että hän kuului puolueensa oikeistosiipeen. Hän oli arvostellut lapuanliikkeen toimintatapoja, erityisesti muilutuksia. Matkan aikana Hakkila pahoinpideltiin ja häntä nöyryytettiin. Hänet uhattiin viedä Neuvostoliittoon ja häntä istutettiin muurahaispesässä. Jussi Muilu esti kuitenkin Hakkilan tappamisen. Lopulta Hakkila ilmaisi tukensa lapuanliikkeelle ja lupasi vetäytyä politiikasta, jolloin hänet vapautettiin. Hakkilan kyydityksestä tuli käännekohta. Liikkeen tulkittiin nyt menneen liian pitkälle.\n\nHakkilan kyyditystä on usein jälkikäteen selitetty lievemiesten tekona, mutta sen tekijät ja suunnittelijat olivat lapuanliikkeen ydinhenkilöitä, kuten liikkeen rahoittajan ja tukijan Rafael Haarlan poika ja Vapaussodan Rintamamiesten Liiton puheenjohtaja Eino Haarla sekä saman järjestön sihteeri ja Aamulehden toimittaja Eero Rekola. Haarla ja Rekola värväsivät viisi muiluttajaa, joita johti myöhemmin Suomen Kansan Järjestön johtajana toiminut jääkärikapteeni Arvi Kalsta. Vapaussodan Rintamamiesliiton maine kärsi pahasti kyydityksen myötä. Teko tuomittiin laajasti, ja liikettä tukivat sen jälkeen suurista lehdistä vain Uusi Suomi ja Aamulehti. Eversti Heinrichs erosi elokuun alussa Vaasan läänin maaherran tehtävästä, koska lapuanliike esti häntä selvittämästä Hakkilan kyyditystä, vaikka hän tiesi pääsyylliset. Kalsta tuomittiin lopulta kyydityksen pääsuorittajana kahdeksan kuukauden kuritushuonerangaistukseen.\n\nKosola ja Kares tiesivät Hakkilan kyydityssuunnitelmasta etukäteen ja antoivat sille siunauksensa. Tieto vuoti heinäkuun lopussa julkisuuteen Stockholms-Tidningen-lehden kautta, kun Kosolan poika Pentti ja toinen kanslisti puhuivat varomattomasti Lapualla vierailleelle ruotsalaiselle toimittajalle. Näin lapuanliikkeen johdon suora osallisuus kyydityksiin tuli yleiseen tietoon."
+   },
+   "b": {
+    "chunk_id": "sv-3",
+    "section": "Historia › Politiskt inflytande",
+    "chunk_no": 0,
+    "rev_id": 59852897,
+    "text": "Den 28 mars 1930 attackerades och förstördes ett kommunistiskt tryckeri i Vasa. Regeringen försökte hålla Lapporörelsens verksamhet inom lagens ramar genom att gå den till mötes. Därför sammankallades den 1 juli 1930 en urtima riksdag för att anta nya lagar mot kommunismen.\n\nKyösti Kallios regering hade förlorat auktoritet och efterträddes den 4 juli av en borgerlig samlingsregering under Pehr Evind Svinhufvud, som var positivt inställd till Lapporörelsen. Rörelsen fick dock inga platser i regeringen.\n\nDen 7 juli demonstrerade rörelsen sin styrka genom att samla omkring 12 000 utvalda män till ett bondetåg till Helsingfors. Den 15 juli 1930 upplöstes riksdagen sedan de föreslagna undantagslagarna mot kommunister inte hade fått den kvalificerade majoritet som krävdes. Vid nyvalet den 1–2 oktober uteslöts kommunisterna ur riksdagen. De borgerliga partierna fick därefter den tvåtredjedelsmajoritet som krävdes för att anta undantagslagarna."
+   },
+   "distance": 0.34,
+   "status": "partly"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-33",
+    "section": "Lapuanliikkeen vaiheet › Heinäkuu 1930: Demokratian kriisi ja Talonpoikaismarssi › Kunnanvaltuustojen puhdistaminen kommunisteista",
+    "chunk_no": 0,
+    "rev_id": 24266018,
+    "text": "Paine lapuanliikettä kohtaan alkoi kasvaa. Tapaamisessa 23. heinäkuuta 1930 pääministeri Svinhufvud vaati yhteistyön ehtona liikkeen luopumista väkivallasta. Lapuanliikkeen miehet olivat kuitenkin edelleen voimansa tunnossa ja pyysivät Svinhufvudia ryhtymään Suomen diktaattoriksi. Pääministeri kieltäytyi. Lapuanliikkeen valtuuskunta julisti 24. heinäkuuta kyydityskiellon, mutta teki sen tyhjäksi vaatimalla samassa yhteydessä poistamaan kommunistit kaikista valtuustoista ja luottamustoimista ”siveellisellä painostuksella”.\n\nNoin 70 kunnan kunnanvaltuustot ”puhdistettiin” kommunisteista jo ennen uuden kunnallislain voimaantuloa. Useimmilla paikkakunnilla Suomen Lukon paikallisosasto tai sen järjestämä kansalaiskokous vaati kommunististen kunnanvaltuutettujen eroa, jota porvarilliset valtuutetut kannattivat. Kommunistit painostettiin eroamaan kyydityksillä, väkivallan uhalla tai muiden valtuutettujen istuntoboikotilla. Sisäministeriö ilmoitti valtuustojen olevan päätösvaltaisia, vaikka eroamaan pakotettujen valtuutettujen varamiehet eivät ottaisi paikkojaan vastaan. Hallitus harkitsi myös kaikkien kommunistivaltuutettujen pidättämistä, mutta siihen ei ryhdytty.\n\nSvinhufvudin hallitus antoi 6. syyskuuta presidentti Relanderin valmisteleman julkilausuman väkivallan lopettamisesta. Samalla julkistettiin myös saman viestin sisältäneet kiertokirjeet maaherroille ja suojeluskuntien piiripäälliköille sekä pääministerin haastattelu. Kosola vastasi tähän määräämällä seuraavina päivinä entistä enemmän valtuutettujen kyydityksiä suurissa kaupungeissa. Yleinen mielipide oli kuitenkin kääntymässä kyyditysten ja väkivallan vastaiseksi, ja Martti Pihkalan johtama lapuanliikkeen valtuuskunnan enemmistö vaati niiden keskeyttämistä. Tilanteen rauhoittamiseksi 15. syyskuuta julkaistiin Vihtori Kosolan, Vihtori Herttuan ja Iivari Koiviston vetoomus ”yksityisluontoisten väkivallan tekojen” lopettamiseksi. Päätökseen vaikutti myös eduskuntavaalien lähestyminen."
+   },
+   "b": {
+    "chunk_id": "sv-3",
+    "section": "Historia › Politiskt inflytande",
+    "chunk_no": 0,
+    "rev_id": 59852897,
+    "text": "Den 28 mars 1930 attackerades och förstördes ett kommunistiskt tryckeri i Vasa. Regeringen försökte hålla Lapporörelsens verksamhet inom lagens ramar genom att gå den till mötes. Därför sammankallades den 1 juli 1930 en urtima riksdag för att anta nya lagar mot kommunismen.\n\nKyösti Kallios regering hade förlorat auktoritet och efterträddes den 4 juli av en borgerlig samlingsregering under Pehr Evind Svinhufvud, som var positivt inställd till Lapporörelsen. Rörelsen fick dock inga platser i regeringen.\n\nDen 7 juli demonstrerade rörelsen sin styrka genom att samla omkring 12 000 utvalda män till ett bondetåg till Helsingfors. Den 15 juli 1930 upplöstes riksdagen sedan de föreslagna undantagslagarna mot kommunister inte hade fått den kvalificerade majoritet som krävdes. Vid nyvalet den 1–2 oktober uteslöts kommunisterna ur riksdagen. De borgerliga partierna fick därefter den tvåtredjedelsmajoritet som krävdes för att anta undantagslagarna."
+   },
+   "distance": 0.369,
+   "status": "partly"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-34",
+    "section": "Lapuanliikkeen vaiheet › Syksy 1930: maltillisten lähtö › Eduskuntavaalit ja kommunistilakien hyväksyminen",
+    "chunk_no": 0,
+    "rev_id": 24266018,
+    "text": "Lapuanliikkeen uhkailu ja painostus sävytti eduskuntavaalitaistelua. Hallituskaan ei odotellut uusia lakeja vaan ylitti demokratian ja valtaoikeuksiensa rajat. Maaherroille annettiin 9. heinäkuuta valtuudet sulkea kommunistien tilat kuten työväentalot ja poliisi sai 17.–18. heinäkuuta määräykset kieltää kaikki kommunistien kokoontumiset ja vaalitilaisuudet. Kommunistien järjestöt määrättiin lakkautettaviksi, ja järjestöaktiivit pyrittiin löytämään ja pidättämään. Joillain paikkakunnilla pidätettiin kaikki lapuanliikkeen kommunisteina ilmiantamat. Kesän 1930 jälkeen noin 500 aktiivia oli vangittu.\n\nLapuanliikkeen johto oli heinäkuun lopulla Svinhufvudin kanssa käydyissä neuvotteluissa vaatinut hallitusta toteuttamaan ”vaalidiktatuurin” poistamalla kommunisteiksi epäillyiltä kansalaisilta äänioikeus. Svinhufvud kieltäytyi, mutta ehdotti sen sijaan kommunistien vaaleihin osallistumisen hankaloittamista hallinnollisilla toimilla. Varsinkin Donner piti vaalidiktatuuria välttämättömyytenä, mutta lapuanliikkeen valtuuskunta päätti 24. heinäkuuta äänestyksen jälkeen luopua vaatimuksesta. Eri puolilla Suomea vaalilautakunnat karsivat kuitenkin äänioikeutettujen listoilta laittomasti arvioiden mukaan jopa 20 000 kommunistiksi epäiltyä Etsivän Keskuspoliisin (EK) avustuksella. Lisäksi kommunistien ehdokaslistat hylättiin. EK sai heinäkuussa luvan lakkauttaa vaalijärjestö STPV. Vaalien lähestyessä lapuanliikkeen suora painostus oli näkyvää. Vasemmistolaisia ehdokkaita seurattiin ja äänestäjiä käytiin uhkailemassa kotona. Samaan aikaan SKP kielsi kannattajiaan äänestämästä \"sosiaalifasisteja\".\n\nLapuanliike ei lähtenyt vaaleihin puolueena eivätkä sen tärkeimmät johtohahmot asettuneet itse ehdokkaiksi. Liike keskittyi rakentamaan yhteistä porvarillista rintamaa isänmaallisen vaaliliiton kautta. Yleisporvarillista vaaliliittoa ei saatu syntymään kaikkialla, sillä maalaisliitto, edistyspuolue ja RKP antoivat piirijärjestöilleen vapaat kädet päättää vaaliliitoista. Maalaisliiton johto suhtautui lapuanliikkeeseen kielteisesti, mutta puolue ei uskaltanut irtisanoutua liikkeestä ennen vaaleja, sillä kommunistilakien läpiviemistä pidettiin tärkeämpänä ja osa puolueen jäsenistä tuki yhä liikettä. Svinhufvudin hallitus valmistautui myös poikkeusoloihin, mikäli porvarilliset puolueet eivät saisi vaaleissa toivottua määräenemmistöä. Siinä tilanteessa lapuanliikkeen mahdolliset ääritoimet olisi tukahdutettu, mutta toisaalta hallituksella oli salainen suunnitelma ajaa kommunistilait läpi joka tapauksessa, tarvittaessa hajottamalla eduskunta uudelleen."
+   },
+   "b": {
+    "chunk_id": "sv-3",
+    "section": "Historia › Politiskt inflytande",
+    "chunk_no": 0,
+    "rev_id": 59852897,
+    "text": "Den 28 mars 1930 attackerades och förstördes ett kommunistiskt tryckeri i Vasa. Regeringen försökte hålla Lapporörelsens verksamhet inom lagens ramar genom att gå den till mötes. Därför sammankallades den 1 juli 1930 en urtima riksdag för att anta nya lagar mot kommunismen.\n\nKyösti Kallios regering hade förlorat auktoritet och efterträddes den 4 juli av en borgerlig samlingsregering under Pehr Evind Svinhufvud, som var positivt inställd till Lapporörelsen. Rörelsen fick dock inga platser i regeringen.\n\nDen 7 juli demonstrerade rörelsen sin styrka genom att samla omkring 12 000 utvalda män till ett bondetåg till Helsingfors. Den 15 juli 1930 upplöstes riksdagen sedan de föreslagna undantagslagarna mot kommunister inte hade fått den kvalificerade majoritet som krävdes. Vid nyvalet den 1–2 oktober uteslöts kommunisterna ur riksdagen. De borgerliga partierna fick därefter den tvåtredjedelsmajoritet som krävdes för att anta undantagslagarna."
+   },
+   "distance": 0.268,
+   "status": "covered"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-35",
+    "section": "Lapuanliikkeen vaiheet › Syksy 1930: maltillisten lähtö › Eduskuntavaalit ja kommunistilakien hyväksyminen",
+    "chunk_no": 1,
+    "rev_id": 24266018,
+    "text": "Vaaleissa 1.–2. lokakuuta varsinkin kokoomus ja SDP lisäsivät paikkalukuaan. Lapuanliikkeen tunnetuista hahmoista Hilja Riipinen, Martti Pihkala ja K. V. Huhtala valittiin kokoomuksen uusiksi kansanedustajiksi. Kommunistien ehdokaslistojen äänimäärä romahti alle kymmenesosaan edellisistä vaaleista, eivätkä he saaneet lainkaan edustajia. Porvarilliset puolueet saivat yhteensä 134 paikkaa eli täpärästi määräenemmistöön vaadittavat kaksi kolmasosaa kansanedustajista SDP:n saadessa 66 paikkaa. Oikeisto oli vaalitulokseen tyytyväinen, ja sosiaalidemokraatitkin olivat helpottuneita, sillä he voisivat nyt äänestää eduskunnassa kommunistilakeja vastaan ilman huolta lakien hylkäämisen mahdollisista seurauksista. Lakeihin epäluuloisesti suhtautuneet RKP:n edustajat taivuteltiin antamaan periksi. Uusi eduskunta hyväksyi kommunistilait ja tasavallan suojelulain 11. marraskuuta pienimmällä mahdollisella määräenemmistöllä.\n\nKommunistilait pakottivat kommunistisen liikkeen siirtymään kokonaan maan alle, joskin käytännössä kaikki kommunistien järjestöt oli lakkautettu ja toiminta tukahdutettu jo ennen lakien voimaanastumista. Suomen Ammattijärjestön lakkauttaminen oli pantu vireille jo heinäkuun alussa, jolloin Svinhufvudin hallitus oli keskeyttänyt sen toiminnan. Sen mukana lakkautettiin 11 ammattiliittoa. Eräät kommunistit perustivat syksyllä 1930 maanalaisen Punaisten rintamamiesten liiton, jonka oli tarkoitus harjoittaa vastaterroria, mutta SKP tuomitsi sen.\n\nJoulukuun alussa pidetyt kunnallisvaalit sinetöivät kommunistien poistamisen kaikista kunnanvaltuustoista. Myös sosiaalidemokraattien ehdokaslistoja hylättiin mielivaltaisesti. Joulukuussa eduskunta hyväksyi vielä niin sanotun työmaarauhalain, jonka tarkoituksena oli lopettaa kommunistien työmaaterrori kriminalisoimalla ei-sosialistisiin työntekijöihin kohdistuva painostus, sekä tiukennuksia rikoslain valtiopetoksen valmistelua koskevaan kohtaan. Kun lapuanliikkeen keskeisimmät tavoitteet oli näin saatu läpi, alkoi sen kannatus laskea."
+   },
+   "b": {
+    "chunk_id": "sv-3",
+    "section": "Historia › Politiskt inflytande",
+    "chunk_no": 0,
+    "rev_id": 59852897,
+    "text": "Den 28 mars 1930 attackerades och förstördes ett kommunistiskt tryckeri i Vasa. Regeringen försökte hålla Lapporörelsens verksamhet inom lagens ramar genom att gå den till mötes. Därför sammankallades den 1 juli 1930 en urtima riksdag för att anta nya lagar mot kommunismen.\n\nKyösti Kallios regering hade förlorat auktoritet och efterträddes den 4 juli av en borgerlig samlingsregering under Pehr Evind Svinhufvud, som var positivt inställd till Lapporörelsen. Rörelsen fick dock inga platser i regeringen.\n\nDen 7 juli demonstrerade rörelsen sin styrka genom att samla omkring 12 000 utvalda män till ett bondetåg till Helsingfors. Den 15 juli 1930 upplöstes riksdagen sedan de föreslagna undantagslagarna mot kommunister inte hade fått den kvalificerade majoritet som krävdes. Vid nyvalet den 1–2 oktober uteslöts kommunisterna ur riksdagen. De borgerliga partierna fick därefter den tvåtredjedelsmajoritet som krävdes för att anta undantagslagarna."
+   },
+   "distance": 0.245,
+   "status": "covered"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-36",
+    "section": "Lapuanliikkeen vaiheet › Syksy 1930: maltillisten lähtö › K. J. Ståhlbergin kyyditys ja kyydittäjien joukkoilmoittautuminen",
+    "chunk_no": 0,
+    "rev_id": 24266018,
+    "text": "Suomen ensimmäisen presidentin K. J. Ståhlbergin ja hänen vaimonsa Ester Ståhlbergin kyyditys Helsingistä Joensuuhun 14. lokakuuta 1930 oli paha isku lapuanliikkeen kannatukselle. Ståhlberg oli ollut radikaalin oikeiston hampaissa jo kauan. Hän oli tasavaltalaisen hallintomuodon tärkeimpiä puolustajia Suomessa ja oli vastustanut julkisuudessa lapuanliikkeen väkivaltaa ja kyydityksiä. Kyyditysidea oli yleisesikunnan päällikön jääkärikenraalimajuri Kurt Martti Walleniuksen alaisen jääkärieverstiluutnantti Eero Kuussaaren hanke. Kuussaari oli antanut kyydityskäskyn Suomen Lukon sihteerille Mikko Jaskarille, mutta varsinaisesta toteutuksesta vastasi Jukka Jannén johtama Helsingin iskujoukko. Myös Walleniuksen itsensä katsottiin sekaantuneen kyyditykseen. Hän oli hakeutunut lapuanliikkeen piiriin vakuututtuaan sen tulevaisuudesta Suomessa. Hän menetti virkansa ja istui vankilatuomiota heinäkuuhun 1931, kunnes korkein oikeus vapautti hänet syyttömänä.\n\nLapuanliikkeen johto kiisti osallisuutensa Ståhlbergin kyyditykseen. Liikkeessä ymmärrettiin kyydityksen näyttäneen huonolta ja siitä haluttiin erottautua. Kyyditys sai paljon kielteistä huomiota ulkomaisessakin lehdistössä. Julkinen reaktio oli erittäin voimakas. Maalaisliitto, edistyspuolue ja RKP muodostivat laillisuusrintaman, jonka ulkojäsenenä olivat myös sosiaalidemokraatit. Varsinkin Maalaisliitossa tapahtui selvä asenteiden muutos ja suhtautuminen lapuanliikkeeseen muuttui kielteiseksi. Maltilliset piirit jättivät nyt liikkeen. Marraskuusta alkaen myös porvarillisissa lehdissä alettiin jo esittää vaatimuksia liikkeen lakkauttamisesta. Presidentti Relanderkin menetti uskonsa liikkeeseen. Lapuanliike alettiin nähdä samanlaisena häiriötekijänä kuin kommunistit aiemmin.\n\nSvinhufvudin hallitus päätti, että kaikki kyydittäjät oli saatava oikeuden eteen, ja vaati liikettä lopettamaan heidän suojelunsa. Lapuanliikkeen johto oli jo 8. lokakuuta taipunut luovuttamaan viranomaisille kansanedustajien sieppaukseen heinäkuussa syyllistyneet Kosti-Paavo Eerolaisen ja Artturi Vuorimaan, mutta Ståhlbergin kyydityksen jälkeen se lupasi hallitukselle kaikkien kyydityksiin syyllistyneiden astuvan esiin. Helsingin Ostrobotnialla järjestettiin 20. lokakuuta yhteensä 404 kyyditsijän joukkoilmoittautuminen. Koeteltu keino ei kuitenkaan enää saanut haluttua huomiota tai tehonnut odotetulla tavalla. Ilmapiiri oli kääntynyt selvästi liikkeen menetelmiä ja sen harjoittamaa väkivaltaista terroria vastaan. Kyyditsijöiden mielenosoitukselliset ilmoittautumiset jatkuivat silti. Vuoden 1930 loppuun mennessä ilmoittautumislistoihin kertyi yli 8 000 nimeä. Moni kyydityksiin osallistumaton lapuanliikkeen kannattaja ilmoittautui ilmaistakseen tukensa kyydittäjille sekä hankaloittaakseen juttujen tutkintaa."
+   },
+   "b": {
+    "chunk_id": "sv-4",
+    "section": "Historia › Våldseskalering och Mäntsäläupproret",
+    "chunk_no": 0,
+    "rev_id": 59852897,
+    "text": "Våldet trappades gradvis upp och rörelsen radikaliserades. Även moderata borgerliga politiker kunde utsättas för våldskjutsningar. Offren misshandlades ofta grovt, och mord är belagda i tre fall. I september 1930 mördades den socialdemokratiske kommunpolitikern Onni Happonen.\n\nDen 14 oktober 1930 kidnappades den tidigare presidenten K.J. Ståhlberg och hans hustru författaren Ester Ståhlberg. Senare skrev Ester Ståhlberg om kidnappningen i sin självbiografi. När det framkom att generalstabschefen Kurt Martti Wallenius hade varit inblandad i dådet växte motståndet mot Lapporörelsen. Vid presidentvalet i februari 1931 vann Pehr Evind Svinhufvud med endast två röster över Kaarlo Juho Ståhlberg.\n\nUnder 1931 fortsatte rörelsen sin agitation på landsbygden, men i mindre offentlig form. Den ekonomiska krisen bidrog till den oro som ledde fram till Mäntsäläupproret, ett öppet uppror som inleddes den 1 februari 1932 i Mäntsälä. Efter den efterföljande rättegången, då 102 av rörelsens ledare fängslades, upplöstes Lapporörelsen.\n\nRörelsen var som starkast under perioden 1929–1932."
+   },
+   "distance": 0.238,
+   "status": "covered"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-37",
+    "section": "Lapuanliikkeen vaiheet › Syksy 1930: maltillisten lähtö › K. J. Ståhlbergin kyyditys ja kyydittäjien joukkoilmoittautuminen",
+    "chunk_no": 1,
+    "rev_id": 24266018,
+    "text": "Ståhlbergin kyydityksen jälkeinen yleisen mielipiteen muutos ja kyydittäjien joukkoilmoittautumiset johtivat siihen, että viranomaiskoneisto alkoi lokakuusta 1930 alkaen entistä tarmokkaammin käynnistää rikostutkintoja kesän ja syksyn aikaisista kyydityksistä. Kyyditystapauksista ja -yrityksistä 115 eli noin puolet eteni oikeuteen saakka, ja niistä nostettiin vuoteen 1934 mennessä yhteensä 656 syytettä. Useimmissa oikeuteen edenneissä tapauksissa vain osa tunnetuista syyllisistä sai syytteen, ja lisäksi syytteeseen joutuneistakin yli kolmasosa sai vapauttavan tuomion ja loput pääosin ehdollisia vankeusrangaistuksia. Ehdottomia vankeus- ja kuritushuonetuomioita annettiin 70. Jopa kansanedustajiin kohdistuneissa kyydityksissä tuomiot olivat usein hyvin lieviä."
+   },
+   "b": {
+    "chunk_id": "sv-4",
+    "section": "Historia › Våldseskalering och Mäntsäläupproret",
+    "chunk_no": 0,
+    "rev_id": 59852897,
+    "text": "Våldet trappades gradvis upp och rörelsen radikaliserades. Även moderata borgerliga politiker kunde utsättas för våldskjutsningar. Offren misshandlades ofta grovt, och mord är belagda i tre fall. I september 1930 mördades den socialdemokratiske kommunpolitikern Onni Happonen.\n\nDen 14 oktober 1930 kidnappades den tidigare presidenten K.J. Ståhlberg och hans hustru författaren Ester Ståhlberg. Senare skrev Ester Ståhlberg om kidnappningen i sin självbiografi. När det framkom att generalstabschefen Kurt Martti Wallenius hade varit inblandad i dådet växte motståndet mot Lapporörelsen. Vid presidentvalet i februari 1931 vann Pehr Evind Svinhufvud med endast två röster över Kaarlo Juho Ståhlberg.\n\nUnder 1931 fortsatte rörelsen sin agitation på landsbygden, men i mindre offentlig form. Den ekonomiska krisen bidrog till den oro som ledde fram till Mäntsäläupproret, ett öppet uppror som inleddes den 1 februari 1932 i Mäntsälä. Efter den efterföljande rättegången, då 102 av rörelsens ledare fängslades, upplöstes Lapporörelsen.\n\nRörelsen var som starkast under perioden 1929–1932."
+   },
+   "distance": 0.16,
+   "status": "covered"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-38",
+    "section": "Lapuanliikkeen vaiheet › Talvi 1930–1931: Liikkeen yritys järjestäytyä ja presidentinvaalit",
+    "chunk_no": 0,
+    "rev_id": 24266018,
+    "text": "Ståhlbergin kyydityksen jälkeen Suomen Lukko hajosi, kun puheenjohtaja Leinonen ja muita perustajajäseniä erosi. Jäljelle jäänyt valtuuskunta päätti lakkauttaa järjestön ja liittää sen suoraan lapuanliikkeeseen. Liikkeen radikaalisiiven edustajat perustivat 22.–23. marraskuuta 1930 pidetyssä kokouksessa Lapuan Liike Ry:n. Tavoitteena oli järjestömäisempi liike ja epäselvän johdon selkiyttäminen. Uusi järjestö otti käyttöön suojeluskuntapiirien mukaisen piirijaon ja paikallisosastot. Järjestön talous- ja puolustuspoliittista ohjelmaa laatimaan värvättiin kokoomuslaisia professoreita, kenraaleita ja talouselämän edustajia. Lapuanliikkeen johtoa neuvoneeseen salaiseen neuvottelukuntaan kuuluivat talvella 1931 ainakin Rudolf Walden, Eino Suolahti, Edwin Linkomies, Mauri Honkajuuri, Lauri Malmberg ja Paavo Talvela. Ohjelmatyön hitauden vuoksi järjestö saatiin rekisteröityä yhdistyksenä vasta maaliskuussa 1931. Sihteeriksi valittiin entinen kyydittäjä Artturi Vuorimaa. Vuodenvaihteessa järjestön jäsenmäärä oli noin 30 000, todennäköisesti huomattavasti vähemmän kuin aiempi tukijoiden joukko. Syksyllä 1930 lapuanliike sai myös oman nuorisojärjestön, Sinimustat.\n\nLapuanliike onnistui vaikuttamaan maan politiikkaan vielä maaliskuun 1931 presidentinvaaleissa. Edellä mainitussa marraskuun 1930 kokouksessa liike päätti tukea presidentiksi pääministeri Svinhufvudia, vaikka myös Relanderin uudelleenvalinnan kannattajia löytyi. Maalaisliitto asetti ehdokkaakseen Kallion, koska Relanderin katsottiin myötäilleen kansanliikettä liikaa. Vaalin pääehdokkaiksi kohosivat lapuanliikkeen tukema ”isänmaallisen rintaman” ehdokas Svinhufvud ja laillisuusrintaman Ståhlberg. Svinhufvudin kannatus perustui pelkoon siitä, että Ståhlbergin valinta johtaisi levottomuuksiin ja pahaan kriisiin. Svinhufvudin uskottiin arvovallallaan pitävän lapuanliikkeen ja ääriainekset kurissa.\n\nLapuanliike kohdisti Ståhlbergiin aggressiivisen parjauskampanjan ja väitti Ståhlbergin valinnan tuovan kommunismin takaisin. Jopa Svinhufvud joutui puolustamaan julkisesti Ståhlbergia ala-arvoisilta syytöksiltä. Kun Ståhlbergin valitsijamiehille oli helmikuun 1931 alussa lähetelty nimettömiä uhkauskirjeitä, yritti Svinhufvud viilentää jyrkimpiä tunteita julkaisemalla STT:n kautta tiedonannon, jonka mukaan kaikkien tulisi hyväksyä mikä tahansa vaalitulos. Muutamaa päivää myöhemmin, 14. helmikuuta, lapuanliikkeen jyrkän linjan lehti Aktivisti julkaisi kirjoituksen, jossa Eugen Schaumanin isänmaallisuutta ylistämällä vihjattiin, että Ståhlberg tulisi ampua, jos tämä valittaisiin presidentiksi. Kokoomuslainen sisäministeri Erkki V. Kuokkanen määräsi Aktivistin koko painoksen takavarikoitavaksi ja päätoimittajan pidätettäväksi. Koska lehden muodollinen päätoimittaja oli Vihtori Kosola, ei pidätystä kuitenkaan uskallettu tehdä. Uusi Suomi yritti edelleen ymmärtää liikettä pääkirjoituksessaan, sillä ”levottoman mielialan voi viimeaikaisten valtiollisten tapausten valossa käsittää”."
+   },
+   "b": {
+    "chunk_id": "sv-4",
+    "section": "Historia › Våldseskalering och Mäntsäläupproret",
+    "chunk_no": 0,
+    "rev_id": 59852897,
+    "text": "Våldet trappades gradvis upp och rörelsen radikaliserades. Även moderata borgerliga politiker kunde utsättas för våldskjutsningar. Offren misshandlades ofta grovt, och mord är belagda i tre fall. I september 1930 mördades den socialdemokratiske kommunpolitikern Onni Happonen.\n\nDen 14 oktober 1930 kidnappades den tidigare presidenten K.J. Ståhlberg och hans hustru författaren Ester Ståhlberg. Senare skrev Ester Ståhlberg om kidnappningen i sin självbiografi. När det framkom att generalstabschefen Kurt Martti Wallenius hade varit inblandad i dådet växte motståndet mot Lapporörelsen. Vid presidentvalet i februari 1931 vann Pehr Evind Svinhufvud med endast två röster över Kaarlo Juho Ståhlberg.\n\nUnder 1931 fortsatte rörelsen sin agitation på landsbygden, men i mindre offentlig form. Den ekonomiska krisen bidrog till den oro som ledde fram till Mäntsäläupproret, ett öppet uppror som inleddes den 1 februari 1932 i Mäntsälä. Efter den efterföljande rättegången, då 102 av rörelsens ledare fängslades, upplöstes Lapporörelsen.\n\nRörelsen var som starkast under perioden 1929–1932."
+   },
+   "distance": 0.353,
+   "status": "partly"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-39",
+    "section": "Lapuanliikkeen vaiheet › Talvi 1930–1931: Liikkeen yritys järjestäytyä ja presidentinvaalit",
+    "chunk_no": 1,
+    "rev_id": 24266018,
+    "text": "Lopulta presidentinvaalien kolmannella kierroksella Svinhufvud voitti Ståhlbergin äänin 151–149. Kosola seurasi vaalia paikan päällä Eduskuntatalon yleisölehterillä, ja lapuanliikkeen valtuuskunnan muut jäsenet olivat koolla Lapualla odottamassa Kosolan soittoa. Valtuuskunta oli varautunut julistautumaan kapinahallitukseksi, jos Ståhlberg voittaisi. Pelko kapinasta tai väkivaltaisuuksien puhkeamisesta vaikutti keskeisesti siihen, että kaikki Maalaisliiton valitsijamiehet taipuivat lopulta Svinhufvudin taakse, mikä ratkaisi vaalin lopputuloksen. Väistyvä presidentti Relander piti tulosta helpotuksena ja kirjoitti päiväkirjaansa, miten ”isänmaan asia tuli pelastetuksi”. Myöhemmin on arveltu, että Ståhlbergin valinta olisi saattanut nostaa uuden laittomuusaallon.\n\nLapualaisten iloksi toinenkin vuoden 1918 valkoisen Suomen johtaja teki paluun, kun Svinhufvud nimitti ensitöikseen Mannerheimin puolustusneuvoston johtoon. Lapuanliikkeen kannatus laski nyt entisestään, kun sen viimeinenkin laajasti kannatettu tavoite oli saavutettu."
+   },
+   "b": {
+    "chunk_id": "sv-4",
+    "section": "Historia › Våldseskalering och Mäntsäläupproret",
+    "chunk_no": 0,
+    "rev_id": 59852897,
+    "text": "Våldet trappades gradvis upp och rörelsen radikaliserades. Även moderata borgerliga politiker kunde utsättas för våldskjutsningar. Offren misshandlades ofta grovt, och mord är belagda i tre fall. I september 1930 mördades den socialdemokratiske kommunpolitikern Onni Happonen.\n\nDen 14 oktober 1930 kidnappades den tidigare presidenten K.J. Ståhlberg och hans hustru författaren Ester Ståhlberg. Senare skrev Ester Ståhlberg om kidnappningen i sin självbiografi. När det framkom att generalstabschefen Kurt Martti Wallenius hade varit inblandad i dådet växte motståndet mot Lapporörelsen. Vid presidentvalet i februari 1931 vann Pehr Evind Svinhufvud med endast två röster över Kaarlo Juho Ståhlberg.\n\nUnder 1931 fortsatte rörelsen sin agitation på landsbygden, men i mindre offentlig form. Den ekonomiska krisen bidrog till den oro som ledde fram till Mäntsäläupproret, ett öppet uppror som inleddes den 1 februari 1932 i Mäntsälä. Efter den efterföljande rättegången, då 102 av rörelsens ledare fängslades, upplöstes Lapporörelsen.\n\nRörelsen var som starkast under perioden 1929–1932."
+   },
+   "distance": 0.361,
+   "status": "partly"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-40",
+    "section": "Lapuanliikkeen vaiheet › Sunilan hallitus ja hiljainen kesä 1931",
+    "chunk_no": 0,
+    "rev_id": 24266018,
+    "text": "Svinhufvudin tultua presidentiksi muodostettiin uusi hallitus. Tällä kertaa lapuanliikkeen edustajia ei otettu mukaan hallitusneuvotteluihin. Liikkeen kielteinen kanta vaikutti kuitenkin siihen, että Kallion yritys koota hallitus epäonnistui. Pääministeriksi tuli lopulta hänen puoluetoverinsa J. E. Sunila, joka muodosti porvarillisen kokoomushallituksen. Yksikään Svinhufvudin hallituksen ministeri ei jatkanut Sunilan II hallituksessa, jota siksi pidettiin vähemmän lapualaismyönteisenä. Erityisesti RKP:tä edustanut sisäministeri Ernst von Born ja edistyspuoluelainen oikeusministeri T. M. Kivimäki tunnettiin laillisuusmiehinä. Lapuanliike ja oikeisto olivat pettyneitä.\n\nKesä 1931 oli lapuanliikkeen rauhallisin kausi, mutta joitain yksittäisiä väkivallantekoja tapahtui. Toukokuun alussa Aktivisti-lehden entinen aputoimittaja Urho J. Kivinen julkaisi Turun Sanomissa paljastuskirjoituksen, jonka mukaan Yrjö Nikulan johtamalla lapualaisjoukolla oli ollut salainen suunnitelma murhata Ståhlberg. Tehtävää suorittamaan oli arpomalla valittu kirjailija Sulo-Weikko Pekkola, joka oli kuitenkin tehnyt itsemurhan. Aktivisti julkaisi Pekkolan kuvan luettelossa ”Ståhlbergin uhreista”. Luopioksi julistettu Kivinen joutui pian itse kyyditetyksi Lapualle, jossa häntä nöyryytettiin julkisesti.\n\nVuonna 1931 syntyneissä pulaliikkeissä oli aluksi mukana osin samoja henkilöitä kuin lapuanliikkeessä, ja ne saatettiin julkisuudessa yhdistää toisiinsa. Osa pulaliikkeistä erkani nopeasti omille teilleen, mutta esimerkiksi Loimaan liike ja Viipurin seudulla vaikuttanut maakuntain liike olivat lapualaishenkisiä.\n\nLaillisuusrintaman kannattajat perustivat keväällä 1931 lapuanliikkeen vastapainoksi salaisen toimikunnan, josta kehitettiin  syksyyn mennessä maanlaajuinen salainen organisaatio Pro Patria et Lege – Isänmaan ja Lain Puolesta (ILP). Se seurasi lapualaisten toimintaa ja valmistautui torjumaan mahdollisen vallankaappauksen. ILP:n johdossa oli edustus maalaisliitolla, RKP:llä ja edistyspuolueella, minkä lisäksi sen olemassaolosta kerrottiin eräille sosiaalidemokraattien johtajille."
+   },
+   "b": null,
+   "distance": 0.54,
+   "status": "missing"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-41",
+    "section": "Lapuanliikkeen vaiheet › Syksy 1931 – kevät 1932: Tilanteen kärjistyminen ja lapuanliikkeen loppu › Uusi tavoitteenasettelu",
+    "chunk_no": 0,
+    "rev_id": 24266018,
+    "text": "Kommunistilakien jälkeen lapuanliike oli ottanut uudeksi tavoitteekseen sosiaalidemokratian kitkemiseen. Jo Lapuan Liike Ry:n perustamiskokouksessa marraskuussa 1930 oli julistettu sota sosiaalidemokratialle, jonka väitettiin olevan samaa juurta kommunismin kanssa. Kommunistien katsottiin myös soluttautuneen ainoaan jäljelle jääneeseen vasemmistopuolueeseen. Lisäksi SDP oli äänestänyt tasavallan suojelulakia vastaan ja yrittänyt hidastaa kommunistilakien toimeenpanoa. Ääriradikaalit suunnittelivat myös SDP:n kanssa yhteistyössä olleesta laillisuusrintamasta eroon pääsyä. Suomalaisten enemmistö ei kuitenkaan pitänyt sosiaalidemokraatteja uhkana."
+   },
+   "b": null,
+   "distance": 0.535,
+   "status": "missing"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-42",
+    "section": "Lapuanliikkeen vaiheet › Syksy 1931 – kevät 1932: Tilanteen kärjistyminen ja lapuanliikkeen loppu › Hyökkäys sosiaalidemokratiaa vastaan ja syksyn 1931 vallankaappaushuhut",
+    "chunk_no": 0,
+    "rev_id": 24266018,
+    "text": "Lapuanliike kiinnitti erityistä huomiota kommunisteilta takavarikoituihin kirjapainoihin ja työväentaloihin, joita avattiin uudelleen maaherrojen päätöksillä niiden siirryttyä sosiaalidemokraattien haltuun. Lapuan työväentalo avattiin uudelleen 14. syyskuuta 1931 sisäministeri von Bornin luvalla, sillä Lapuan työväenyhdistykselle oli valittu uusi sosiaalidemokraattinen johto. Talolla oli suuri symbolinen merkitys, olihan lapuanliike saanut alkunsa juuri siellä marraskuussa 1929. Lapualla järjestettiin 21. syyskuuta Iivari Koiviston johtama kansalaiskokous, jonka päätteeksi 2 000 miestä naulasi työväentalon ovet ja ikkunat umpeen 500 laudalla. Ensimmäisen naulan löi jääkäri Antti Isotalo. Von Born oli kysynyt Vaasa-lehden haastattelussa ”kumpi täällä määräsi, hallitus vai Kosola”, nyt hänelle vastattiin Lapualta lähetetyssä sähkeessä: ”talo on kiinni ja pysyy”. Asiasta tuli lapuanliikkeen ja Sunilan hallituksen välinen arvovaltakiista, jossa poliittisen keskustan puolueet asettuivat hallituksen tueksi. Lapuan tapahtumat innoittivat vastaaviin toimiin myös muualla. Vuoden loppuun mennessä 15 työväentaloa naulattiin kiinni, poltettiin tai turmeltiin. Tammi–helmikuussa 1932 iskuja tapahtui vielä toistakymmentä lisää.\n\nLoppuvuodesta 1931 Suomessa kiersi jälleen huhuja oikeiston vallankaappauksesta, jonka suunnittelijoiksi epäiltiin lapuanliikettä, Vapaussodan Rintamamiesten Liittoa tai maakuntain liikettä. Epäilyksiä herätti myös se, että 27. lokakuuta 1931 Lapuan Liike Ry:n pääsihteeriksi valittiin Ståhlbergin kyyditysjupakassa ryvettynyt entinen yleisesikunnan päällikkö K. M. Wallenius. Lisäksi Kosola piti puheita, joissa hän ilmoitti lapuanliikkeen tavoitteiden laajentuneen pelkästä kommunismin hävittämisestä Suomen yleisen poliittisen suunnan muuttamiseen, minkä tulkittiin tarkoittavan demokraattisen yhteiskuntajärjestyksen perusteisiin puuttumista. Rintamamiesliiton ja sen kilpailijaksi hiljattain perustetun Vapaussodan Kenttäharmaat -järjestön johtajilla, kuten Rafael Haarlalla, kenraali Hannes Ignatiuksella ja toimitusjohtaja Aarne Runolinnalla oli ilmeisesti jäsentymättömiä kaappausaikeita. Toisaalta aiempi vallankaappausjuonittelija Kai Donner sekä Petter Forsström ottivat nyt etäisyyttä lapuanliikkeeseen, koska he eivät hyväksyneet Walleniuksen tuloa pääsihteeriksi eivätkä liikkeen johdon suhtautumista pulaliikkeisiin."
+   },
+   "b": null,
+   "distance": 0.605,
+   "status": "missing"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-43",
+    "section": "Lapuanliikkeen vaiheet › Syksy 1931 – kevät 1932: Tilanteen kärjistyminen ja lapuanliikkeen loppu › Hyökkäys sosiaalidemokratiaa vastaan ja syksyn 1931 vallankaappaushuhut",
+    "chunk_no": 1,
+    "rev_id": 24266018,
+    "text": "Helsingin Sanomien pääkirjoituksessa 7. marraskuuta 1931 Eljas Erkko kirjoitti, että maassa suunniteltiin vallankaappausta, jonka johdossa olivat luultavasti Wallenius ja lapuanliikkeen pää-äänenkannattajan Ajan Sana -lehden päätoimittaja, everstiluutnantti Arne Somersalo. Erkko toimitti asiaa koskevan muistion pääministeri Sunilalle, joka perusti salaisen valiokunnan organisoimaan lapuanliikkeen vastaista tiedustelutoimintaa. Valiokunta oli käytännössä sama kuin ILP-salaseuran johto, ja myös Erkko kuului siihen. EK:n päällikön Esko Riekin mielestä maassa suunniteltiin korkeintaan ilkivallan tasoista toimintaa, mutta hallitus ei enää luottanut turvallisuuspoliisiin. Myöskään kokoomuslaisille ministereille ei kerrottu uudesta tiedusteluorganisaatiosta, kun taas SDP:n Väinö Tanneria informoitiin. Keskustan ja vasemmiston puoluelehdet saivat ohjeet kirjoittaa vallankaappausuhasta sekä suojeluskuntien ja armeijan piirissä väitetysti suoritetusta salaisesta solutustoiminnasta. Erään tiedustelutiedon mukaan kaappauksen oli määrä alkaa 5. joulukuuta, jolloin Helsinkiin tultaisiin 10 000 miehen voimalla. Myöhempi historiantutkimus ei ole kyennyt vahvistamaan, oliko Walleniuksen johtama kaappaussuunnitelma todella olemassa.\n\nLapualla 14. marraskuuta pidetyssä kokouksessa hyväksyttiin lapuanliikkeen ”laajennettu valtiollis-yhteiskunnallinen ohjelma”, joka oli kopio maakuntain liikkeen vastaavasta ohjelmasta. Siinä toistettiin jo kesällä 1930 esitettyjä vaatimuksia, kuten enemmistövaalitapaan siirtyminen, äänioikeuden sitominen veronmaksukykyyn, sosiaalisista uudistuksista luopuminen, hallituksen vallan lisääminen, maataloustuotannon tukeminen tullein, kuolemanrangaistuksen palauttaminen käyttöön, lapuanliikkeen laittomaan toimintaan osallistuneiden vapauttaminen ja sosiaalidemokraattien toiminnan kieltäminen."
+   },
+   "b": null,
+   "distance": 0.608,
+   "status": "missing"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-44",
+    "section": "Lapuanliikkeen vaiheet › Syksy 1931 – kevät 1932: Tilanteen kärjistyminen ja lapuanliikkeen loppu › Mäntsälän kapina",
+    "chunk_no": 0,
+    "rev_id": 24266018,
+    "text": "Lapuanliikkeen Mäntsälän osasto esitti 19. tammikuuta 1932 sisäministerille vaatimuksen kaikkien Mäntsälän työväentalojen sulkemisesta, sillä sosiaalidemokraattisiin työväenyhdistyksiin oli väitetty soluttautuneen kommunisteja. Von Born kieltäytyi. Mäntsälän suojeluskuntatalolla 25. tammikuuta pidetyssä kansalaiskokouksessa liikkeen kannattajat päättivät itse naulata kiinni kaikki kunnan työväentalot. Useita ehdittiinkin sulkea, joukossa Ohkolan työväentalo. Toiminnan takana arveltiin olevan vuoden 1930 Säätytalon muilutuksen järjestäjät Eerolainen ja Vuorimaa, joiden tiedettiin piileskelevän Mäntsälässä. Naulatut talot avattiin heti uudelleen, ja Uudenmaan läänin maaherra Bruno Jalander lähetti Mäntsälään liikkuvan poliisikomennuskunnan rauhoittamaan tilannetta. Lapuanliikkeen kannattajat katsoivat maaherran suojelevan sosialisteja. Työväentaloiskut levisivät Mäntsälästä muille paikkakunnille. Jyväskylässä Työn Voima -lehden toimitaloon kohdistunut isku johti laukaustenvaihtoon. Oikeisto syytti tilanteesta sisäministeri von Bornin ja maaherra Jalanderin taipumattomuutta. Lapuan liikkeen valtuuskunta vaati 3. helmikuuta molempien eroa ehtona laittomuuksien lopettamiselle.\n\nOhkolan työväentalolla oli tarkoitus pitää kansanedustaja Mikko Erichin puhetilaisuus. Lapualaiset pitivät kokoomuksesta SDP:hen loikannutta Erichiä petturina. Puhetilaisuuden estämistä alettiin valmistella Mäntsälän suojeluskunnan piirissä, ja Mäntsälään saapui eri puolilta Uuttamaata värvättyjä lapuanliikkeen tukijoita suojeluskuntaunivormuissa. Pohjois-Uudenmaan suojeluskuntapiirin päällikkö Paavo Susitaival, suojeluskuntien ylipäällikkö Lauri Malmberg ja suojeluskuntien yliesikunnan jaostopäällikkö Elja Rihtniemi vaativat tilaisuuden kieltämistä mahdollisten levottomuuksien vuoksi. Sisäministeri von Born ei suostunut kieltämään tilaisuutta, ja maaherra Jalander lähetti 30 poliisia turvaamaan sitä. Illalla 27. helmikuuta luutnantti Esra Terän johtama arviolta 400–700 suojeluskuntalaisen joukko keskeytti Erichin puhetilaisuuden ammuskelemalla Ohkolan työväentaloa kohti, siirtyi sitten suojeluskuntatalolle ja kieltäytyi antautumasta viranomaisille."
+   },
+   "b": {
+    "chunk_id": "sv-4",
+    "section": "Historia › Våldseskalering och Mäntsäläupproret",
+    "chunk_no": 0,
+    "rev_id": 59852897,
+    "text": "Våldet trappades gradvis upp och rörelsen radikaliserades. Även moderata borgerliga politiker kunde utsättas för våldskjutsningar. Offren misshandlades ofta grovt, och mord är belagda i tre fall. I september 1930 mördades den socialdemokratiske kommunpolitikern Onni Happonen.\n\nDen 14 oktober 1930 kidnappades den tidigare presidenten K.J. Ståhlberg och hans hustru författaren Ester Ståhlberg. Senare skrev Ester Ståhlberg om kidnappningen i sin självbiografi. När det framkom att generalstabschefen Kurt Martti Wallenius hade varit inblandad i dådet växte motståndet mot Lapporörelsen. Vid presidentvalet i februari 1931 vann Pehr Evind Svinhufvud med endast två röster över Kaarlo Juho Ståhlberg.\n\nUnder 1931 fortsatte rörelsen sin agitation på landsbygden, men i mindre offentlig form. Den ekonomiska krisen bidrog till den oro som ledde fram till Mäntsäläupproret, ett öppet uppror som inleddes den 1 februari 1932 i Mäntsälä. Efter den efterföljande rättegången, då 102 av rörelsens ledare fängslades, upplöstes Lapporörelsen.\n\nRörelsen var som starkast under perioden 1929–1932."
+   },
+   "distance": 0.361,
+   "status": "partly"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-45",
+    "section": "Lapuanliikkeen vaiheet › Syksy 1931 – kevät 1932: Tilanteen kärjistyminen ja lapuanliikkeen loppu › Mäntsälän kapina",
+    "chunk_no": 1,
+    "rev_id": 24266018,
+    "text": "Mäntsälän suojeluskuntatalolla johdon ottanut Vuorimaa antoi kapinajulistuksen 28. helmikuuta oltuaan ensin yhteydessä Walleniukseen. Julistuksessa ja presidentille lähetetyssä sähkeessä ilmoitettiin, että ”marxilainen sosialidemokratia” oli kukistettava ja että tarvittaessa oli ”ensin hävitettävä sitä tukeva ja suojeleva valtiovalta ja sen edustajat”. Hämeenlinnassa 29. helmikuuta kokoontunut lapuanliikkeen johto päätti liittyä kapinaan. Vaatimus koko Sunilan hallituksen erosta esitettiin nyt presidentille myös Kosolan nimissä, minkä lisäksi miehiä käskettiin kokoontumaan joka maakunnassa. Mäntsälään saapui lisää vapaaehtoisia. Koko maassa oli liikkeellä 5 000 – 7 000 suojeluskuntalaista. Kapinalliset miehittivät muun muassa Jyväskylän avainpaikat, Salon puhelinkeskuksen ja Seinäjoen rautatieaseman. Porin suojeluskuntatalolle kokoontui tuhat miestä. Suojeluskuntien piiripäälliköistä Etelä-Hämeen Ernesti Suolahti ja Pohjois-Hämeen Onni Purhonen noudattivat kapinajohdon ohjeita, Jyväskylän Edvin Hämäläinen heittäytyi toimettomaksi. Lapuanliikkeen vahvimman tukialueen Etelä-Pohjanmaan piiripäällikkö Matti Laurila sen sijaan vastusti päättäväisesti kapinaa.\n\nSvinhufvud kielsi Sunilan hallitusta eroamasta, vaikka muun muassa kenraalit Mannerheim, Malmberg ja Ignatius olivat suositelleet sitä. Vuonna 1930 lapuanliikkeen omasta vaatimuksesta säädetty tasavallan suojelulaki otettiin käyttöön, kun Svinhufvud antoi 29. helmikuuta asetuksen viranomaisten poikkeusvaltuuksista. Hallitus määräsi sen nojalla vielä samana iltana pidättämään lapuanliikkeen johtajat, mutta nämä onnistuivat livahtamaan Hämeenlinnasta Vanajan kautta Riihimäelle. Samalla lakkautettiin Ajan Sana -lehti. Seuraavana päivänä kaksi kokoomuksen neljästä ministeristä erosi vastalauseena hallituksesta ja kolmas jätti eroilmoituksen, jonka myöhemmin perui. Kokoomuksen eduskuntaryhmän enemmistö tuki vaatimusta hallituksen erosta. Taipumaton Svinhufvud nimitti uudet ministerit eronneiden tilalle.\n\nKosola lähetti 2. maaliskuuta Svinhufvudille toisen sähkeen, jossa vaadittiin pääministeriksi kenraali Rudolf Waldenia. Walden ilmoitti suostuvansa, jos armeijan ylijohto annettaisiin samalla Mannerheimille. Mannerheim oli ilmoittanut vastaavat ehdot presidentin pyytäessä hänen apuaan. Kenraali Ignatius kävi 2.–3. maaliskuuta Riihimäellä yllyttämässä kapinajohtoa marssittamaan joukkonsa Helsinkiin. Wallenius laati marssisuunnitelman olettaen Waldenin ja Mannerheimin olevan hankkeen takana. Suunnitelma perustui oletukseen, että marssin toteutuessa presidentti ja hallitus ennemmin antaisivat periksi kuin aloittaisivat sisällissodan lapuanliikettä vastaan."
+   },
+   "b": {
+    "chunk_id": "sv-4",
+    "section": "Historia › Våldseskalering och Mäntsäläupproret",
+    "chunk_no": 0,
+    "rev_id": 59852897,
+    "text": "Våldet trappades gradvis upp och rörelsen radikaliserades. Även moderata borgerliga politiker kunde utsättas för våldskjutsningar. Offren misshandlades ofta grovt, och mord är belagda i tre fall. I september 1930 mördades den socialdemokratiske kommunpolitikern Onni Happonen.\n\nDen 14 oktober 1930 kidnappades den tidigare presidenten K.J. Ståhlberg och hans hustru författaren Ester Ståhlberg. Senare skrev Ester Ståhlberg om kidnappningen i sin självbiografi. När det framkom att generalstabschefen Kurt Martti Wallenius hade varit inblandad i dådet växte motståndet mot Lapporörelsen. Vid presidentvalet i februari 1931 vann Pehr Evind Svinhufvud med endast två röster över Kaarlo Juho Ståhlberg.\n\nUnder 1931 fortsatte rörelsen sin agitation på landsbygden, men i mindre offentlig form. Den ekonomiska krisen bidrog till den oro som ledde fram till Mäntsäläupproret, ett öppet uppror som inleddes den 1 februari 1932 i Mäntsälä. Efter den efterföljande rättegången, då 102 av rörelsens ledare fängslades, upplöstes Lapporörelsen.\n\nRörelsen var som starkast under perioden 1929–1932."
+   },
+   "distance": 0.391,
+   "status": "partly"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-46",
+    "section": "Lapuanliikkeen vaiheet › Syksy 1931 – kevät 1932: Tilanteen kärjistyminen ja lapuanliikkeen loppu › Mäntsälän kapina",
+    "chunk_no": 2,
+    "rev_id": 24266018,
+    "text": "Armeijan yksikköjä asetettiin valmiuteen turvaamaan Helsinkiä. Sotaväen päällikkö Aarne Sihvo kannatti kapinan kukistamista voimakeinoin. Monet armeijan ja suojeluskuntien johtavat upseerit sen sijaan toivoivat kapinan menestyvän tai ainakin vastustivat ja jarruttivat aseellisia toimia sitä vastaan. Svinhufvud halusi ratkaista tilanteen ilman verenvuodatusta ja piti illalla 2. maaliskuuta radiopuheen, jossa vetosi suojeluskuntalaisiin. Hän lupasi, että kaikki muut paitsi kapinaan yllyttäjät välttyisivät rangaistukselta, mikäli palaisivat välittömästi koteihinsa. Puheen jälkeen useimmat kapinapesäkkeet hajosivat ja miehet lähtivät kotiin. Loputkin kapinalliset aavistivat tappionsa, kun lapuanliikkeen johto joutui 3. maaliskuuta pakenemaan Riihimäeltä Mäntsälään. Kahtena seuraavana päivänä neuvoteltiin antautumisehdoista samalla kun armeija saartoi jo Mäntsälää. Jyväskylän kapinapesäke hajosi 5. maaliskuuta, ja Mäntsälässä antautumispäätös tehtiin seuraavana yönä. Svinhufvud suostui järjestelyyn, jossa rivimiehet saivat poistua aseineen ja johtajat saapuivat vapaaehtoisesti Helsinkiin vangittaviksi maaliskuun 7. päivän aamuun mennessä."
+   },
+   "b": {
+    "chunk_id": "sv-4",
+    "section": "Historia › Våldseskalering och Mäntsäläupproret",
+    "chunk_no": 0,
+    "rev_id": 59852897,
+    "text": "Våldet trappades gradvis upp och rörelsen radikaliserades. Även moderata borgerliga politiker kunde utsättas för våldskjutsningar. Offren misshandlades ofta grovt, och mord är belagda i tre fall. I september 1930 mördades den socialdemokratiske kommunpolitikern Onni Happonen.\n\nDen 14 oktober 1930 kidnappades den tidigare presidenten K.J. Ståhlberg och hans hustru författaren Ester Ståhlberg. Senare skrev Ester Ståhlberg om kidnappningen i sin självbiografi. När det framkom att generalstabschefen Kurt Martti Wallenius hade varit inblandad i dådet växte motståndet mot Lapporörelsen. Vid presidentvalet i februari 1931 vann Pehr Evind Svinhufvud med endast två röster över Kaarlo Juho Ståhlberg.\n\nUnder 1931 fortsatte rörelsen sin agitation på landsbygden, men i mindre offentlig form. Den ekonomiska krisen bidrog till den oro som ledde fram till Mäntsäläupproret, ett öppet uppror som inleddes den 1 februari 1932 i Mäntsälä. Efter den efterföljande rättegången, då 102 av rörelsens ledare fängslades, upplöstes Lapporörelsen.\n\nRörelsen var som starkast under perioden 1929–1932."
+   },
+   "distance": 0.328,
+   "status": "partly"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-47",
+    "section": "Lapuanliikkeen vaiheet › Syksy 1931 – kevät 1932: Tilanteen kärjistyminen ja lapuanliikkeen loppu › Kapinallisten rangaistukset",
+    "chunk_no": 0,
+    "rev_id": 24266018,
+    "text": "Mäntsälän kapinan jälkeen lapuanliikkeen johto tuomittiin lieviin vankeusrangaistuksiin. Eduskunta hyväksyi huhtikuussa 1932 armahduslain, jonka nojalla rivimiehiä ei syytetty. Syytteet nostettiin sataa henkilöä vastaan. Turun hovioikeus tuomitsi marraskuussa yhteensä 22 henkilöä kapinasta ja 32 sen avunannosta, kaikki varsin lieviin vankeusrangaistuksiin. Myötämielinen tuomioistuin hylkäsi syytteet valtiopetoksesta ja katsoi lapuanliikkeen johtajien syyllistyneen vain kapinan avunantoon. Monia kapinaan sekaantuneita upseereita ei syytetty lainkaan oikeudessa. Vuorimaa ja Terä saivat ankarimmat rangaistukset, kaksi ja puoli vuotta kuritushuonetta. Kosola ja Wallenius saivat yhdeksän kuukauden ehdolliset vankeustuomiot. Korkein oikeus pidensi myöhemmin tuomioita hieman."
+   },
+   "b": {
+    "chunk_id": "sv-4",
+    "section": "Historia › Våldseskalering och Mäntsäläupproret",
+    "chunk_no": 0,
+    "rev_id": 59852897,
+    "text": "Våldet trappades gradvis upp och rörelsen radikaliserades. Även moderata borgerliga politiker kunde utsättas för våldskjutsningar. Offren misshandlades ofta grovt, och mord är belagda i tre fall. I september 1930 mördades den socialdemokratiske kommunpolitikern Onni Happonen.\n\nDen 14 oktober 1930 kidnappades den tidigare presidenten K.J. Ståhlberg och hans hustru författaren Ester Ståhlberg. Senare skrev Ester Ståhlberg om kidnappningen i sin självbiografi. När det framkom att generalstabschefen Kurt Martti Wallenius hade varit inblandad i dådet växte motståndet mot Lapporörelsen. Vid presidentvalet i februari 1931 vann Pehr Evind Svinhufvud med endast två röster över Kaarlo Juho Ståhlberg.\n\nUnder 1931 fortsatte rörelsen sin agitation på landsbygden, men i mindre offentlig form. Den ekonomiska krisen bidrog till den oro som ledde fram till Mäntsäläupproret, ett öppet uppror som inleddes den 1 februari 1932 i Mäntsälä. Efter den efterföljande rättegången, då 102 av rörelsens ledare fängslades, upplöstes Lapporörelsen.\n\nRörelsen var som starkast under perioden 1929–1932."
+   },
+   "distance": 0.399,
+   "status": "partly"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-48",
+    "section": "Lapuanliikkeen vaiheet › Syksy 1931 – kevät 1932: Tilanteen kärjistyminen ja lapuanliikkeen loppu › Lapuanliikkeen lakkauttaminen ja viimeiset väkivaltaisuudet",
+    "chunk_no": 0,
+    "rev_id": 24266018,
+    "text": "Lapuan Liike Ry:n toiminta kiellettiin käytännössä jo 29. helmikuuta tasavallan suojelulain nojalla. Apulaissisäministeri Arvo Manner lakkautti järjestön lopullisesti 24. maaliskuuta, ja raastuvanoikeus vahvisti päätöksen 28. toukokuuta. Liikkeen suurin saavutus kääntyi sitä itseään vastaan, sillä sekä sen järjestöt että sen lehdet lakkautettiin kaikki vuonna 1930 säädettyjen kommunistilakien nojalla. Sinimustat-nuorisojärjestö vältti lakkautuksen.\n\nLapuanliikkeen viimeinen henkirikos oli liikkeen entisen taloudellisen tukijan Minna Craucherin murha Helsingissä 8. maaliskuuta 1932. Liikkeen johdon kanssa riitautunut Craucher oli Mäntsälän kapinan aikana vuotanut liikkeen sisäpiiriä ja väitettyjä kaappaussuunnitelmia koskevia paljastuksia viranomaisille sekä Suomen Sosialidemokraatti -lehdelle, joten liikkeen kiihkomielinen kannattaja Olavi Runolinna ampui hänet petturina päivää kapinan päättymisen jälkeen. Craucherin epäluotettavien paljastusten mukaan lapuanliikkeen johdolla olisi ollut salainen yhteistyösopimus Saksan kansallissosialistisen puolueen (NSDAP) kanssa vallankaappauksen yrittämisestä samanaikaisesti kummassakin maassa. Murhan jälkeen lehdistö ilakoi Craucherin – entisen prostituoidun ja vangin – väitetyillä suhteilla lapuanliikkeen johtajiin, mikä romahdutti loputkin liikkeen uskottavuudesta varsinkin uskonnollisten konservatiivien silmissä.\n\nMyöhempiin väkivaltaisuuksiin kuului 17. heinäkuuta 1932 tapahtunut niin sanottu Honkimäen kapina, jossa ilmeisesti Yrjö Nikulan yllyttämä joukkio yritti kyydittää Mäntsälän kapinan kukistamiseen osallistuneen maalaisliittolaisen puolustusministerin Jalo Lahdensuon tämän kotoa Lapualla. Lahdensuo pelastui puolustautumalla aseen kanssa. Myös pääministeri Sunilan sieppausta suunniteltiin ja sisäministeri von Bornin väijytysmurha oli lähellä toteutumista.\n\nSvinhufvudin Mäntsälän kapinallisille osoittamaan puheeseen sisältynyt maininta ”valtiollisen elämän epäkohtien poistamisesta” tulkittiin lapuanliikkeen piirissä lupaukseksi toteuttaa joitain liikkeen ohjelmakohtia, kuten muutoksia äänioikeuteen. Jälkeenpäin pettymys oli suuri, kun Svinhufvud ei ryhtynytkään ajamaan mitään muutoksia. Lapualaiset saivat tosin pienen voiton, kun presidentti erotti oikeiston silmätikuksi joutuneen maaherra Jalanderin elokuussa 1932 ja siirsi myöhemmin Sihvon pois sotaväen päällikön paikalta.\n\nLapuan Liike Ry:n lakkautuksesta valitettiin ylempiin oikeusasteisiin, mutta päätös vahvistettiin Vaasan hovioikeudessa helmikuussa 1934 ja korkeimmassa oikeudessa kesäkuussa 1935."
+   },
+   "b": {
+    "chunk_id": "sv-4",
+    "section": "Historia › Våldseskalering och Mäntsäläupproret",
+    "chunk_no": 0,
+    "rev_id": 59852897,
+    "text": "Våldet trappades gradvis upp och rörelsen radikaliserades. Även moderata borgerliga politiker kunde utsättas för våldskjutsningar. Offren misshandlades ofta grovt, och mord är belagda i tre fall. I september 1930 mördades den socialdemokratiske kommunpolitikern Onni Happonen.\n\nDen 14 oktober 1930 kidnappades den tidigare presidenten K.J. Ståhlberg och hans hustru författaren Ester Ståhlberg. Senare skrev Ester Ståhlberg om kidnappningen i sin självbiografi. När det framkom att generalstabschefen Kurt Martti Wallenius hade varit inblandad i dådet växte motståndet mot Lapporörelsen. Vid presidentvalet i februari 1931 vann Pehr Evind Svinhufvud med endast två röster över Kaarlo Juho Ståhlberg.\n\nUnder 1931 fortsatte rörelsen sin agitation på landsbygden, men i mindre offentlig form. Den ekonomiska krisen bidrog till den oro som ledde fram till Mäntsäläupproret, ett öppet uppror som inleddes den 1 februari 1932 i Mäntsälä. Efter den efterföljande rättegången, då 102 av rörelsens ledare fängslades, upplöstes Lapporörelsen.\n\nRörelsen var som starkast under perioden 1929–1932."
+   },
+   "distance": 0.403,
+   "status": "partly"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-49",
+    "section": "Lapuanliikkeen vaiheet › Syksy 1931 – kevät 1932: Tilanteen kärjistyminen ja lapuanliikkeen loppu › Isänmaallinen Kansanliike IKL",
+    "chunk_no": 0,
+    "rev_id": 24266018,
+    "text": "Lapuanliikkeen ideologiseksi perilliseksi perustettiin Isänmaallinen Kansanliike (IKL) 5. kesäkuuta 1932. Avoimesti fasistinen IKL aloitti toimintansa 14. kesäkuuta edustajainkokouksessa Lapualla. Siitä ei kuitenkaan koskaan muodostunut lapuanliikkeen kaltaista vaikutusvaltaista kansanliikettä. Puolueena toimineen IKL:n tavoite oli sosiaalidemokratian kitkeminen ainakin muodollisesti demokratian ja parlamentarismin pelisääntöjä noudattaen. Monille lapuanliikkeen suoran toiminnan radikaaleista ajatus oli vastenmielinen. Vankilasta vapautunut Kosola valittiin joulukuussa 1932 IKL:n johtoon. Hän oli lähinnä keulakuva ja suostui tehtävään vastentahtoisesti, koska ei hyväksynyt kaikkia uuden puolueen ohjelmakohtia. Hänet syrjäytettiin IKL:n johdosta hieman ennen kuolemaansa vuonna 1936. Vuoden 1933 eduskuntavaaleissa IKL solmi kokoomuksen kanssa ”isänmaallisen vaaliliiton\". IKL sai 14 kansanedustajaa, ja kokoomuksen kannatus putosi 42 edustajasta 18 kansanedustajaan. Myöhemmissä 1930-luvun vaaleissa IKL sai 14 ja 9 kansanedustajaa ja istui jatkosodan aikana Rangellin hallituksessa 1941–1943. Puolue lakkautettiin Moskovan välirauhansopimuksen nojalla 23. syyskuuta 1944."
+   },
+   "b": {
+    "chunk_id": "sv-5",
+    "section": "Historia › Efterföljare",
+    "chunk_no": 0,
+    "rev_id": 59852897,
+    "text": "År 1932 bildades partiet Fosterländska folkrörelsen ur resterna av Lapporörelsen. Partiet fick året därpå representation i Finlands riksdag."
+   },
+   "distance": 0.23,
+   "status": "covered"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-50",
+    "section": "Symbolit",
+    "chunk_no": 0,
+    "rev_id": 24266018,
+    "text": "Lapuanliikkeen tunnusväreinä pidettiin sinistä ja mustaa. Vihtori Kosola kertoi muistelmissaan valinneensa värit itse suunnitellessaan talonpoikaismarssilla käytettyjä käsivarsinauhoja. Kosolan mukaan sininen oli isänmaan väri ja musta fasismin kommunisminvastainen väri. Väriyhdistelmän on väitetty saaneen innoitusta myös körttipukuihin kuuluneista naisten huiveista, joissa on sinisiä raitoja mustalla pohjalla. Talonpoikaismarssin käsivarsinauhoihin oli painettu lapuanliikkeen vaakunatunnus, mustan kilven keskellä karhulla ratsastava nuijamies. Liikkeen symboleihin kuului myös Kosolan tunnetuksi tekemä niin sanottu vihtoripaita eli musta neulepaita, jossa oli kolme sinistä vaakaraitaa, yksi leveä ja kaksi kapeaa. Sen esikuviksi on väitetty sekä jussipaidan muunnoksia että Italian fasistien mustapaidat-järjestön tunnuspaitoja."
+   },
+   "b": null,
+   "distance": 0.56,
+   "status": "missing"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-51",
+    "section": "Lapuanliikkeen vaikutus",
+    "chunk_no": 0,
+    "rev_id": 24266018,
+    "text": "Välittömien saavutustensa ohella lapuanliikkeen aikaansaama poliittisten voimasuhteiden muutos muutti Suomen sisä- ja talouspolitiikkaa sekä yhteiskunnallista ilmapiiriä oikeistolaisempaan suuntaan 1930-luvun alussa. Laman keskellä sotilasmäärärahoja lisättiin, tulleja korotettiin ja välitöntä verotusta kevennettiin. Virkanimityksissä suosittiin oikeistolaisia henkilöitä. Kulttuuripolitiikka muuttui konservatiivisemmaksi. Kommunistien työmaaterrori korvautui oikeistolaisella työmaaterrorilla, kun työnantajat painostivat työläisiä eroamaan ammattiyhdistyksistä ja ”katumaan” toimintaansa työpaikan menettämisen uhalla.\n\nLapuanliikkeen lakkauttamisen jälkeen Suomen poliittinen elämä tasaantui. 1920-luvun lopun ja 1930-luvun alun kuohuvien vuosien jälkeen yhteiskunnallisesta elämästä oli uusien suojelulakien avulla kitketty pois sekä oikeisto- että vasemmistoradikalismi. Molemmat olivat toiminnallaan pyrkineet murtamaan maan hallitusmuodon ja parlamentarismin perusteita. Poliittiset voimasuhteet oli nyt muotoiltu vastaamaan tilannetta sisällissodan jälkeen. Tie oli avattu tulevalle konsensus- ja eheyttämispolitiikalle. Poliittisten äärilaitojen kannatus hupeni 1930-luvulla, suomalaisten elintaso koheni, ja ryhdyttiin luomaan suomalaisen hyvinvointivaltion perusteita. Nousun mahdollisti erityisesti maltillisen vasemmiston aseman tunnustaminen parlamentaristisena toimijana. Sosiaalidemokraattinen työväenliike siirtyi lapuanliikkeen muodostaman uhan seurauksena 1930-luvulla entistä selvemmin maltillisen ”tannerilaisen” reformismin suuntaan. Saadakseen porvarilliselta Suomelta suojelua SDP otti voimakkaammin etäisyyttä vallankumoukselliseen ja marxilaiseen perintöönsä sekä sitoutui entistä korostetummin vallitsevaan valtio- ja oikeusjärjestelmään.\n\nKommunistilait kumottiin jatkosodan päätyttyä marraskuussa 1944, jolloin kommunistinen toiminta laillistettiin uudelleen."
+   },
+   "b": null,
+   "distance": 0.547,
+   "status": "missing"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-52",
+    "section": "Myöhempiä näkemyksiä lapuanliikkeestä",
+    "chunk_no": 0,
+    "rev_id": 24266018,
+    "text": "Lapuanliikkeestä kirjoitettiin Suomessa vielä 1940–1950-luvulla vähän, mutta se nousi uudelleen keskustelun aiheeksi 1960-luvulla muun muassa Väinö Linnan Täällä Pohjantähden alla -romaanitrilogian ja Arvo Salon Lapualaisooppera-laulunäytelmän ansiosta. Tuolloin alkoi myös lapuanliikettä koskenut akateeminen historiantutkimus. Liikettä on myöhemmin tutkittu ja tulkittu eri näkökulmista.\n\nEurooppaan nousi maailmansotien välisenä aikana 12 oikeistodiktatuuria. Lisäksi viisi maata menetti itsenäisyytensä. Väkivallasta ja laittomasta vallankäytöstä huolimatta suomalainen yhteiskunta selvisi oikeistoradikalismin aallosta eurooppalaisiin valtioihin verrattuna melko pienin kolhuin. Lapuanliike oli saavuttanut painostuksellaan kaikki kommunismin kieltämistä koskeneet tavoitteensa. Liike epäonnistui kuitenkin tavoitteessaan muuttaa suomalaisen yhteiskunnan luonnetta. Maltillinen oikeisto ei lopulta lähtenyt tukemaan äärioikeiston radikaaleimpia pyrkimyksiä vaan ryhmittyi laillisuusrintamaan. Valtiovalta ja poliitikot myötäilivät osin pakostakin liikettä ja tekivät näin radikaalien ajaman vallankumouksen tarpeettomaksi. Kun lapuanliike sai kriittisillä hetkillä tahtonsa lävitse, sen vaatimuksilta ja toiminnalta mureni pohja.\n\nToisena syynä siihen, että Suomesta ei tullut oikeistodiktatuuria, on pidetty liikkeen järjestäytymättömyyttä ja johdon reaktiivisuutta. Liikkeen keskukseksi muodostuneesta Kosolan talosta pidettiin yhteyttä sähkeillä ja puhelimella maanlaajuiseen verkostoon, joka ei kuitenkaan ollut keskusjohdon komennettavissa. Vihtori Kosolasta henkilönä ei ollut suureksi kansanjohtajaksi, eikä liike löytänyt vahvaa johtajaa, vaikka sellaista taustalla etsittiinkin. Veteraanipoliitikot eivät ryhtyneet liikkeen keulakuviksi houkuttelusta huolimatta. Lapuanliikkeen voimaa ja vaikutusvaltaa määritteli viime kädessä kommunisteja kohtaan tunnettu viha, joka yhdisti henkilöitä, yhdistyksiä ja muita organisaatioita. Kun kommunistien toiminta oli kielletty, myös liikkeen voima laantui. Lapuanliike sai myös voimansa järjestäytymättömyydestään. Sen todellista kannattajien määrää ei tiedetty, sillä liikettä ei ollut valittu asemaansa vaaleilla. Tämä hahmoton painostus teki lapuanliikkeestä vaikutusvaltaisen, sillä sen väittämiä laajasta kansan tuesta ei voitu todistaa vääräksi. Liikkeen tavoitteisiin kohdistettu kritiikki taas voitiin selittää sen vastustajien puheeksi."
+   },
+   "b": null,
+   "distance": 0.61,
+   "status": "missing"
+  },
+  {
+   "a": {
+    "chunk_id": "fi-53",
+    "section": "Myöhempiä näkemyksiä lapuanliikkeestä › Lapuanliike ja fasismi",
+    "chunk_no": 0,
+    "rev_id": 24266018,
+    "text": "Liikkeen löyhästä organisaatiosta huolimatta sen taustalla olleiden organisaatioiden vaikuttajat olivat kiinteä äärioikeistolaisten aktivistien joukko. Liikkeen syntyminen ei ollut niin spontaani tapahtuma kuin usein on annettu ymmärtää. Lapuanliikkeet aktivistit olivat myös esimerkiksi laajan kannattajakunnan Vapaussodan Rintamamiesliiton vaikuttajia. Historiankirjoitus ja varsinkin osa yleisestä keskustelusta on myöhemmin toisinaan vähätellyt lapuanliikkeen oikeistoradikalismia ja sen harjoittamaa poliittista väkivaltaa sekä varonut lausumasta ääneen fasismi-sanaa. Suomalaista äärioikeistolaisuutta on vähätelty leimaamalla se harvojen radikaalien toiminnaksi. Keskustelu lainehti 2000-luvulle saakka, jolloin se jälleen voimistui politiikan uuspatrioottisen aallon ja itsenäisyyden varhaisvuosien radikalismia tutkineen uuden historiankirjoituksen myötä. Liikkeen poliittista terroria vähäteltiin esimerkiksi sanomalla sen olleen ”juurevalla kansanhuumorilla ryyditettyä hevosenleikkiä.” Fasismi-syytöksellä oli sotienjälkeisessä Suomessa kuitenkin myös helppo lyödä poliittisia vastustajia, ja näin usein tehtiinkin.\n\nEräät lapuanliikkeen kannattajat perustivat Fascisti-nimisen lehden, jonka mukaan lapuanliike ollut vielä fasistinen mutta ajoi sentään Suomea oikeaan suuntaan. Lehti lakkautettiin kolmessa kuukaudessa. Lapuanliike oli vuoden 1930 talonpoikaismarssin edellä nimenomaan julistautunut ei-fasistiseksi.\n\nOn varmaa, että kaikki lapuanliikkeen kannattajat eivät olleet fasisteja. Lapuanliikkeessä he kuitenkin osallistuivat toimintaan, joka oli varsinkin liikkeen loppuvaiheissa luonteeltaan fasistista. Liikettä tutkittaessa ja sitä käsittelevässä kirjallisuudessa on poikkeuksetta jouduttu analysoimaan lapuanliikkeen suhdetta fasismiin. On keskusteltu siitä, täyttääkö lapuanliike yleisesti käytetyt fasismin määritelmät. Uusin historiankirjoitus käsittelee lapuanliikettä osana ajankohtansa fasistista ja äärioikeistolaista eurooppalaista liikehdintää. Sen tulkinnan mukaan löyhästä protestiliikkeestä ei lopulta tullut avoimen fasistista vain siksi, että sen ydinaktivistit epäonnistuivat tavoitteissaan. Valtiovalta myötäili liikkeen toimintaa ja onnistui syleilemään sen kuoliaaksi."
+   },
+   "b": null,
+   "distance": 0.542,
+   "status": "missing"
+  }
+ ],
+ "sql": [
+  {
+   "label": "Nearest sv passage for each fi passage",
+   "query": "-- Each A passage and its nearest B passage, both editions\n-- as they stood on the chosen date (exact distances, no index)\nSET @t = TIMESTAMP '2026-11-13 00:00:00';\nWITH pairs AS (\n  SELECT a.chunk_id, a.section, a.section_no, a.chunk_no, a.rev_id,\n         b.chunk_id AS b_chunk_id, b.section AS b_section,\n         VEC_DISTANCE_COSINE(a.embedding, b.embedding) AS distance,\n         ROW_NUMBER() OVER (PARTITION BY a.chunk_id\n                            ORDER BY VEC_DISTANCE_COSINE(a.embedding, b.embedding)) AS rn\n  FROM chunk FOR SYSTEM_TIME AS OF @t AS a\n  JOIN chunk FOR SYSTEM_TIME AS OF @t AS b\n    ON b.wikidata_id = a.wikidata_id AND b.lang = 'sv'\n  WHERE a.wikidata_id = 'Q1412941' AND a.lang = 'fi'\n)\nSELECT chunk_id, section, chunk_no, rev_id, b_chunk_id, b_section, distance\nFROM pairs\nWHERE rn = 1\nORDER BY section_no, chunk_no;",
+   "ms": 2.1,
+   "rows": 53
+  }
+ ]
+}

@@ -1,0 +1,43 @@
+{
+ "wikidata_id": "Q211855",
+ "topic": "Finnish Civil War",
+ "titles": {
+  "fi": "Suomen sisällissota",
+  "sv": "Finska inbördeskriget",
+  "en": "Finnish Civil War"
+ },
+ "size": {
+  "fi": 199498,
+  "sv": 48859,
+  "en": 192001
+ },
+ "readers": {
+  "fi": 112388,
+  "sv": 21962,
+  "en": 211754
+ },
+ "leads": {
+  "fi": {
+   "text": "Suomen sisällissota käytiin Suomen senaatin ja Suomen kansanvaltuuskunnan johtamien joukkojen välillä 27. tammikuuta – 15. toukokuuta 1918. Senaatin asevoimina olivat valkoiset joukot ja kansanvaltuuskunnan joukkoina Suomen Punainen Kaarti eli punaiset. Lisäksi keisarillisen Saksan armeija tuki valkoisia, ja Neuvosto-Venäjä tuki punaisia pääasiassa toimittamalla näille aseita ja muuta sotamateriaalia.",
+   "rev_id": 24307521
+  },
+  "sv": {
+   "text": "Finska inbördeskriget (även frihetskrig, medborgarkrig, revolution) var en väpnad konflikt i det nyligen självständiga Finland, som pågick från den 27 januari till den 15 maj 1918, mellan den \"röda\" sidan och den \"vita\" sidan. Den \"röda\" utgjordes av de \"röda\" socialisterna och den \"vita\" av den konservativt ledda finländska senaten. De röda erhöll visst stöd från den nyinrättade bolsjevikiska regimen i Ryssland, medan de vita fick stöd från Tyskland och i begränsad utsträckning av Sverige. Kriget slutade med seger för den vita sidan.",
+   "rev_id": 59682765
+  },
+  "en": {
+   "text": "The Finnish Civil War was fought in 1918 for the leadership and control of recently independent Finland (formerly part of Russia) between White Finland and the Finnish Socialist Workers' Republic (Red Finland). The clashes took place in the context of the national, political, and social turmoil caused by World War I (Eastern Front) in Europe. The belligerents were the paramilitary Red Guards, led by a section of the Social Democratic Party with backup of the Russian bolsheviks, and the paramilitary White Guards of the senate. General C. G. E. Mannerheim led the White Guards with major assistance by both the Finnish Jäger Battalion trained in Germany and from March-April 1918 by the German Imperial Army, along the German goal to control Fennoscandia and Petrograd of Russia. The Reds, composed of industrial and agrarian working class people, controlled the cities and industrial centres of southern Finland. The Whites, composed of land owners and the middle and upper class, controlled the rural central and northern Finland.",
+   "rev_id": 1383935231
+  }
+ },
+ "findings": [],
+ "fixture": true,
+ "sql": [
+  {
+   "label": "Findings",
+   "query": "-- Findings for one topic, as they stand now\nSELECT id, lang, other_lang, type, section, other_section, summary,\n       quotes, terms, distance, score, status, opened_at, closed_at\nFROM finding\nWHERE wikidata_id = 'Q211855'\nORDER BY score DESC;",
+   "ms": 0.4,
+   "rows": 0
+  }
+ ]
+}

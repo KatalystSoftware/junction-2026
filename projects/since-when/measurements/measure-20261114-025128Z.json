@@ -1,0 +1,147 @@
+{
+ "time_utc": "2026-11-14 02:51:28",
+ "command": "python -m gapfinder measure --provisional --note 'scratch server: Docker container limited to 3.5 GB of memory and 4 CPUs'",
+ "commit": "f1c5c38",
+ "database": {
+  "name": "gapfinder",
+  "host": "gapfinder-scratch-db",
+  "port": 3306,
+  "server_hostname": "5c1a2b8cf41d"
+ },
+ "mariadb": {
+  "version": "11.8.9-MariaDB-ubu2404",
+  "settings": {
+   "innodb_buffer_pool_size": 2147483648,
+   "innodb_log_file_size": 536870912,
+   "mhnsw_default_m": 6,
+   "mhnsw_ef_search": 20,
+   "mhnsw_max_cache_size": 536870912
+  }
+ },
+ "machine": {
+  "cpu": "AMD Ryzen 5 2600 Six-Core Processor",
+  "cores": 12,
+  "memory_mb": 15924,
+  "load_start": [
+   13.06,
+   11.8,
+   7.68
+  ],
+  "load_end": [
+   12.43,
+   11.78,
+   7.82
+  ]
+ },
+ "note": "scratch server: Docker container limited to 3.5 GB of memory and 4 CPUs",
+ "latency_provisional": true,
+ "row_counts": [
+  {
+   "table": "article",
+   "current": 7653,
+   "all_versions": 103931
+  },
+  {
+   "table": "chunk",
+   "current": 39330,
+   "all_versions": 219145
+  },
+  {
+   "table": "chunk_now",
+   "current": 39330,
+   "all_versions": null
+  },
+  {
+   "table": "coverage",
+   "current": 31952,
+   "all_versions": null
+  },
+  {
+   "table": "difference",
+   "current": 342,
+   "all_versions": null
+  },
+  {
+   "table": "finding",
+   "current": 10636,
+   "all_versions": 11582
+  },
+  {
+   "table": "pageviews",
+   "current": 448511,
+   "all_versions": null
+  },
+  {
+   "table": "passage",
+   "current": 179021,
+   "all_versions": null
+  },
+  {
+   "table": "passage with a vector",
+   "current": 58234,
+   "all_versions": null
+  },
+  {
+   "table": "topic",
+   "current": 2919,
+   "all_versions": null
+  }
+ ],
+ "recall": {
+  "table": "chunk_now",
+  "rows": 39330,
+  "queries": 100,
+  "exact_median_ms": 140.98,
+  "ef": [
+   {
+    "ef_search": 20,
+    "recall_at_10": 0.987,
+    "median_ms": 0.72
+   },
+   {
+    "ef_search": 40,
+    "recall_at_10": 0.993,
+    "median_ms": 1.39
+   },
+   {
+    "ef_search": 80,
+    "recall_at_10": 0.995,
+    "median_ms": 1.92
+   },
+   {
+    "ef_search": 160,
+    "recall_at_10": 0.997,
+    "median_ms": 2.97
+   }
+  ]
+ },
+ "alignment": [
+  {
+   "label": "now",
+   "as_of": null,
+   "topics": 20,
+   "runs": 3,
+   "median_ms": 179.82,
+   "max_ms": 512.65,
+   "median_rows": 149.0
+  },
+  {
+   "label": "AS OF 2010-01-01",
+   "as_of": "2010-01-01",
+   "topics": 20,
+   "runs": 3,
+   "median_ms": 7.18,
+   "max_ms": 90.01,
+   "median_rows": 72.0
+  },
+  {
+   "label": "AS OF 2020-01-01",
+   "as_of": "2020-01-01",
+   "topics": 20,
+   "runs": 3,
+   "median_ms": 15.49,
+   "max_ms": 420.03,
+   "median_rows": 111.0
+  }
+ ]
+}

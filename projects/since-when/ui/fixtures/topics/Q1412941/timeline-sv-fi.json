@@ -1,0 +1,280 @@
+{
+ "fixture": true,
+ "wikidata_id": "Q1412941",
+ "lang": "sv",
+ "rich_lang": "fi",
+ "years": [
+  {
+   "year": 2005,
+   "size": {
+    "fi": 4566,
+    "sv": 1224,
+    "en": 6340
+   },
+   "coverage": 1,
+   "open_findings": 0
+  },
+  {
+   "year": 2006,
+   "size": {
+    "fi": 6770,
+    "sv": 1923,
+    "en": 6251
+   },
+   "coverage": 1,
+   "open_findings": 0
+  },
+  {
+   "year": 2007,
+   "size": {
+    "fi": 12938,
+    "sv": 2302,
+    "en": 6727
+   },
+   "coverage": 1,
+   "open_findings": 0
+  },
+  {
+   "year": 2008,
+   "size": {
+    "fi": 95519,
+    "sv": 2188,
+    "en": 7131
+   },
+   "coverage": 0.43,
+   "open_findings": 0
+  },
+  {
+   "year": 2009,
+   "size": {
+    "fi": 92779,
+    "sv": 2340,
+    "en": 7133
+   },
+   "coverage": 0.48,
+   "open_findings": 0
+  },
+  {
+   "year": 2010,
+   "size": {
+    "fi": 93953,
+    "sv": 2528,
+    "en": 6940
+   },
+   "coverage": 0.51,
+   "open_findings": 0
+  },
+  {
+   "year": 2011,
+   "size": {
+    "fi": 94066,
+    "sv": 2639,
+    "en": 6346
+   },
+   "coverage": 0.53,
+   "open_findings": 0
+  },
+  {
+   "year": 2012,
+   "size": {
+    "fi": 93626,
+    "sv": 2734,
+    "en": 6742
+   },
+   "coverage": 0.55,
+   "open_findings": 0
+  },
+  {
+   "year": 2013,
+   "size": {
+    "fi": 96413,
+    "sv": 2736,
+    "en": 6775
+   },
+   "coverage": 0.54,
+   "open_findings": 0
+  },
+  {
+   "year": 2014,
+   "size": {
+    "fi": 97364,
+    "sv": 4060,
+    "en": 6186
+   },
+   "coverage": 0.79,
+   "open_findings": 0
+  },
+  {
+   "year": 2015,
+   "size": {
+    "fi": 97368,
+    "sv": 4059,
+    "en": 6341
+   },
+   "coverage": 0.79,
+   "open_findings": 0
+  },
+  {
+   "year": 2016,
+   "size": {
+    "fi": 96932,
+    "sv": 4059,
+    "en": 6778
+   },
+   "coverage": 0.79,
+   "open_findings": 0
+  },
+  {
+   "year": 2017,
+   "size": {
+    "fi": 96979,
+    "sv": 4063,
+    "en": 6904
+   },
+   "coverage": 0.79,
+   "open_findings": 0
+  },
+  {
+   "year": 2018,
+   "size": {
+    "fi": 96822,
+    "sv": 4063,
+    "en": 6321
+   },
+   "coverage": 0.79,
+   "open_findings": 0
+  },
+  {
+   "year": 2019,
+   "size": {
+    "fi": 96822,
+    "sv": 4122,
+    "en": 6629
+   },
+   "coverage": 0.81,
+   "open_findings": 0
+  },
+  {
+   "year": 2020,
+   "size": {
+    "fi": 96985,
+    "sv": 4288,
+    "en": 6812
+   },
+   "coverage": 0.84,
+   "open_findings": 0
+  },
+  {
+   "year": 2021,
+   "size": {
+    "fi": 93685,
+    "sv": 4288,
+    "en": 6938
+   },
+   "coverage": 0.87,
+   "open_findings": 1
+  },
+  {
+   "year": 2022,
+   "size": {
+    "fi": 145187,
+    "sv": 4288,
+    "en": 9226
+   },
+   "coverage": 0.56,
+   "open_findings": 3
+  },
+  {
+   "year": 2023,
+   "size": {
+    "fi": 150647,
+    "sv": 4288,
+    "en": 11390
+   },
+   "coverage": 0.54,
+   "open_findings": 3
+  },
+  {
+   "year": 2024,
+   "size": {
+    "fi": 150470,
+    "sv": 4290,
+    "en": 11639
+   },
+   "coverage": 0.54,
+   "open_findings": 3
+  },
+  {
+   "year": 2025,
+   "size": {
+    "fi": 151742,
+    "sv": 4291,
+    "en": 19722
+   },
+   "coverage": 0.53,
+   "open_findings": 3
+  },
+  {
+   "year": 2026,
+   "size": {
+    "fi": 151659,
+    "sv": 4570,
+    "en": 20412
+   },
+   "coverage": 0.57,
+   "open_findings": 3
+  }
+ ],
+ "events": [
+  {
+   "date": "2021-01-01",
+   "finding_id": 203,
+   "kind": "opened",
+   "type": "coverage",
+   "summary": "Finnish has a section on the historians’ debate over whether the movement was fascist. Swedish has one sentence on its fascist inspiration.",
+   "rev_id": null,
+   "rev_lang": null
+  },
+  {
+   "date": "2021-04-11",
+   "finding_id": 202,
+   "kind": "opened",
+   "type": "numbers",
+   "summary": "Swedish says 102 of the movement’s leaders were imprisoned after the trial. Finnish says charges were brought against 100 people, and 22 were convicted of the rebellion and 32 of aiding it.",
+   "rev_id": 19701478,
+   "rev_lang": "fi"
+  },
+  {
+   "date": "2022-01-01",
+   "finding_id": 204,
+   "kind": "opened",
+   "type": "coverage",
+   "summary": "Finnish describes the movement’s colours, emblem and black shirt. Swedish describes the emblem in an image caption and has nothing on the colours or the shirt.",
+   "rev_id": null,
+   "rev_lang": null
+  },
+  {
+   "date": "2026-10-23",
+   "finding_id": 201,
+   "kind": "opened",
+   "type": "framing",
+   "summary": "The editions place the contested label differently: Swedish has put \"fascistisk\" in its first sentence since 23 October 2026; Finnish discusses it in the last paragraph of its lead and in a section on the historians’ debate.",
+   "rev_id": 59790252,
+   "rev_lang": "sv"
+  }
+ ],
+ "sql": [
+  {
+   "label": "Coverage on each 1 January",
+   "query": "-- Coverage on one 1 January; run once per year, 2005-2026\nSET @t = TIMESTAMP '2015-01-01 00:00:00';\nSELECT AVG(nearest < 0.35) AS coverage, COUNT(*) AS passages\nFROM (\n  SELECT r.chunk_id, MIN(VEC_DISTANCE_COSINE(r.embedding, l.embedding)) AS nearest\n  FROM chunk FOR SYSTEM_TIME AS OF @t AS r\n  JOIN chunk FOR SYSTEM_TIME AS OF @t AS l\n    ON l.wikidata_id = r.wikidata_id AND l.lang = 'sv'\n  WHERE r.wikidata_id = 'Q1412941' AND r.lang = 'fi'\n  GROUP BY r.chunk_id\n) AS m;",
+   "ms": 3.8,
+   "rows": 1
+  },
+  {
+   "label": "Finding history",
+   "query": "-- When each finding opened, was reviewed and closed:\n-- every version of every row of the system-versioned finding table\nSELECT id, type, status, summary, row_start, row_end\nFROM finding FOR SYSTEM_TIME ALL\nWHERE wikidata_id = 'Q1412941' AND lang = 'sv'\nORDER BY row_start;",
+   "ms": 0.6,
+   "rows": 4
+  }
+ ]
+}

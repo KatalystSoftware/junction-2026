@@ -1,0 +1,43 @@
+{
+ "wikidata_id": "Q2599869",
+ "topic": "Åland Islands dispute",
+ "titles": {
+  "fi": "Ahvenanmaan kysymys",
+  "sv": "Ålandsfrågan",
+  "en": "Åland Islands dispute"
+ },
+ "size": {
+  "fi": 4891,
+  "sv": 6281,
+  "en": 6638
+ },
+ "readers": {
+  "fi": 2343,
+  "sv": 3031,
+  "en": 16999
+ },
+ "leads": {
+  "fi": {
+   "text": "Ahvenanmaan kysymyksellä tarkoitetaan keskustelua Ahvenanmaan liittämisestä Ruotsiin Suomen itsenäistymisen jälkeen. Kysymys ratkesi siten, että Ahvenanmaa sai suurelta osin itsemääräämisoikeuden mutta Suomen maakuntana.",
+   "rev_id": 23674485
+  },
+  "sv": {
+   "text": "Ålandsfrågan var en politisk konflikt mellan Sverige och Finland om vem som skulle ha kontroll över Åland. Konflikten växte fram under och efter första världskriget, men hade rötter i 1800-talets stormaktspolitik. Sverige ville att ögruppen skulle tillhöra Sverige, medan Finland hävdade att Åland var en del av det finländska territoriet. Frågan avgjordes 1921 av Nationernas förbund genom en kompromiss som blev grunden för Ålandsmodellen.",
+   "rev_id": 59476028
+  },
+  "en": {
+   "text": "The Åland Islands dispute (Swedish: Ålandsfrågan, lit. 'Åland question') was a territorial dispute between Sweden and Finland over the Åland Islands after World War I. Most Ålanders wanted to reunite with Sweden, but in 1921 the League of Nations decided that the islands would stay under Finnish rule, and that Finland was required to protect the islands’ Swedish language, culture, and autonomy.",
+   "rev_id": 1350369444
+  }
+ },
+ "findings": [],
+ "fixture": true,
+ "sql": [
+  {
+   "label": "Findings",
+   "query": "-- Findings for one topic, as they stand now\nSELECT id, lang, other_lang, type, section, other_section, summary,\n       quotes, terms, distance, score, status, opened_at, closed_at\nFROM finding\nWHERE wikidata_id = 'Q2599869'\nORDER BY score DESC;",
+   "ms": 0.4,
+   "rows": 0
+  }
+ ]
+}

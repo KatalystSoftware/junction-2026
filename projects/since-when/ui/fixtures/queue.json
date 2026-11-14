@@ -1,0 +1,389 @@
+{
+ "fixture": true,
+ "as_of": "2026-11-13",
+ "total": 22,
+ "items": [
+  {
+   "wikidata_id": "Q154940",
+   "topic": "Lapland War",
+   "lang": "en",
+   "rich_lang": "fi",
+   "readers": 240206,
+   "coverage": 0.72,
+   "size": {
+    "fi": 62662,
+    "sv": 10205,
+    "en": 45303
+   },
+   "score": 67258,
+   "findings": 0,
+   "top_type": "coverage",
+   "status": "open"
+  },
+  {
+   "wikidata_id": "Q1412941",
+   "topic": "Lapua Movement",
+   "lang": "en",
+   "rich_lang": "fi",
+   "readers": 39666,
+   "coverage": 0.68,
+   "size": {
+    "fi": 153937,
+    "sv": 7747,
+    "en": 20943
+   },
+   "score": 39666,
+   "findings": 7,
+   "top_type": "framing",
+   "status": "open"
+  },
+  {
+   "wikidata_id": "Q134949",
+   "topic": "Winter War",
+   "lang": "sv",
+   "rich_lang": "en",
+   "readers": 41195,
+   "coverage": 0.2,
+   "size": {
+    "fi": 123198,
+    "sv": 32483,
+    "en": 166223
+   },
+   "score": 32956,
+   "findings": 0,
+   "top_type": "coverage",
+   "status": "open"
+  },
+  {
+   "wikidata_id": "Q823175",
+   "topic": "Finlandization",
+   "lang": "en",
+   "rich_lang": "fi",
+   "readers": 56685,
+   "coverage": 0.43,
+   "size": {
+    "fi": 65060,
+    "sv": 2496,
+    "en": 27688
+   },
+   "score": 32310,
+   "findings": 0,
+   "top_type": "coverage",
+   "status": "open"
+  },
+  {
+   "wikidata_id": "Q134949",
+   "topic": "Winter War",
+   "lang": "fi",
+   "rich_lang": "en",
+   "readers": 118210,
+   "coverage": 0.74,
+   "size": {
+    "fi": 123198,
+    "sv": 32483,
+    "en": 166223
+   },
+   "score": 30735,
+   "findings": 0,
+   "top_type": "coverage",
+   "status": "open"
+  },
+  {
+   "wikidata_id": "Q152306",
+   "topic": "Mannerheim",
+   "lang": "fi",
+   "rich_lang": "en",
+   "readers": 109286,
+   "coverage": 0.79,
+   "size": {
+    "fi": 121361,
+    "sv": 48453,
+    "en": 153486
+   },
+   "score": 22950,
+   "findings": 0,
+   "top_type": "coverage",
+   "status": "open"
+  },
+  {
+   "wikidata_id": "Q152306",
+   "topic": "Mannerheim",
+   "lang": "sv",
+   "rich_lang": "en",
+   "readers": 30935,
+   "coverage": 0.32,
+   "size": {
+    "fi": 121361,
+    "sv": 48453,
+    "en": 153486
+   },
+   "score": 21036,
+   "findings": 0,
+   "top_type": "coverage",
+   "status": "open"
+  },
+  {
+   "wikidata_id": "Q179858",
+   "topic": "Urho Kekkonen",
+   "lang": "en",
+   "rich_lang": "fi",
+   "readers": 99199,
+   "coverage": 0.79,
+   "size": {
+    "fi": 95381,
+    "sv": 32322,
+    "en": 75313
+   },
+   "score": 20832,
+   "findings": 0,
+   "top_type": "coverage",
+   "status": "open"
+  },
+  {
+   "wikidata_id": "Q211855",
+   "topic": "Finnish Civil War",
+   "lang": "sv",
+   "rich_lang": "fi",
+   "readers": 21962,
+   "coverage": 0.24,
+   "size": {
+    "fi": 199498,
+    "sv": 48859,
+    "en": 192001
+   },
+   "score": 16691,
+   "findings": 0,
+   "top_type": "coverage",
+   "status": "open"
+  },
+  {
+   "wikidata_id": "Q701803",
+   "topic": "Jäger Movement",
+   "lang": "en",
+   "rich_lang": "fi",
+   "readers": 18423,
+   "coverage": 0.17,
+   "size": {
+    "fi": 57819,
+    "sv": 7965,
+    "en": 9899
+   },
+   "score": 15291,
+   "findings": 0,
+   "top_type": "coverage",
+   "status": "open"
+  },
+  {
+   "wikidata_id": "Q122100",
+   "topic": "Continuation War",
+   "lang": "sv",
+   "rich_lang": "en",
+   "readers": 21730,
+   "coverage": 0.3,
+   "size": {
+    "fi": 122841,
+    "sv": 42623,
+    "en": 141642
+   },
+   "score": 15211,
+   "findings": 0,
+   "top_type": "coverage",
+   "status": "open"
+  },
+  {
+   "wikidata_id": "Q122100",
+   "topic": "Continuation War",
+   "lang": "fi",
+   "rich_lang": "en",
+   "readers": 110081,
+   "coverage": 0.87,
+   "size": {
+    "fi": 122841,
+    "sv": 42623,
+    "en": 141642
+   },
+   "score": 14311,
+   "findings": 0,
+   "top_type": "coverage",
+   "status": "open"
+  },
+  {
+   "wikidata_id": "Q154940",
+   "topic": "Lapland War",
+   "lang": "sv",
+   "rich_lang": "fi",
+   "readers": 13003,
+   "coverage": 0.16,
+   "size": {
+    "fi": 62662,
+    "sv": 10205,
+    "en": 45303
+   },
+   "score": 10923,
+   "findings": 0,
+   "top_type": "coverage",
+   "status": "open"
+  },
+  {
+   "wikidata_id": "Q1418016",
+   "topic": "Kinship Wars",
+   "lang": "en",
+   "rich_lang": "fi",
+   "readers": 28719,
+   "coverage": 0.65,
+   "size": {
+    "fi": 14729,
+    "sv": 6284,
+    "en": 9563
+   },
+   "score": 10052,
+   "findings": 0,
+   "top_type": "coverage",
+   "status": "open"
+  },
+  {
+   "wikidata_id": "Q179858",
+   "topic": "Urho Kekkonen",
+   "lang": "sv",
+   "rich_lang": "fi",
+   "readers": 14711,
+   "coverage": 0.34,
+   "size": {
+    "fi": 95381,
+    "sv": 32322,
+    "en": 75313
+   },
+   "score": 9709,
+   "findings": 0,
+   "top_type": "coverage",
+   "status": "open"
+  },
+  {
+   "wikidata_id": "Q211855",
+   "topic": "Finnish Civil War",
+   "lang": "en",
+   "rich_lang": "fi",
+   "readers": 211754,
+   "coverage": 0.96,
+   "size": {
+    "fi": 199498,
+    "sv": 48859,
+    "en": 192001
+   },
+   "score": 8470,
+   "findings": 0,
+   "top_type": "coverage",
+   "status": "open"
+  },
+  {
+   "wikidata_id": "Q1412941",
+   "topic": "Lapua Movement",
+   "lang": "sv",
+   "rich_lang": "fi",
+   "readers": 4133,
+   "coverage": 0.57,
+   "size": {
+    "fi": 153937,
+    "sv": 7747,
+    "en": 20943
+   },
+   "score": 3017,
+   "findings": 4,
+   "top_type": "framing",
+   "status": "open"
+  },
+  {
+   "wikidata_id": "Q823175",
+   "topic": "Finlandization",
+   "lang": "sv",
+   "rich_lang": "fi",
+   "readers": 1442,
+   "coverage": 0.04,
+   "size": {
+    "fi": 65060,
+    "sv": 2496,
+    "en": 27688
+   },
+   "score": 1384,
+   "findings": 0,
+   "top_type": "coverage",
+   "status": "open"
+  },
+  {
+   "wikidata_id": "Q701803",
+   "topic": "Jäger Movement",
+   "lang": "sv",
+   "rich_lang": "fi",
+   "readers": 1571,
+   "coverage": 0.14,
+   "size": {
+    "fi": 57819,
+    "sv": 7965,
+    "en": 9899
+   },
+   "score": 1351,
+   "findings": 0,
+   "top_type": "coverage",
+   "status": "open"
+  },
+  {
+   "wikidata_id": "Q1418016",
+   "topic": "Kinship Wars",
+   "lang": "sv",
+   "rich_lang": "fi",
+   "readers": 1611,
+   "coverage": 0.43,
+   "size": {
+    "fi": 14729,
+    "sv": 6284,
+    "en": 9563
+   },
+   "score": 918,
+   "findings": 0,
+   "top_type": "coverage",
+   "status": "open"
+  },
+  {
+   "wikidata_id": "Q2599869",
+   "topic": "Åland Islands dispute",
+   "lang": "fi",
+   "rich_lang": "en",
+   "readers": 2343,
+   "coverage": 0.74,
+   "size": {
+    "fi": 4891,
+    "sv": 6281,
+    "en": 6638
+   },
+   "score": 609,
+   "findings": 0,
+   "top_type": "coverage",
+   "status": "open"
+  },
+  {
+   "wikidata_id": "Q2599869",
+   "topic": "Åland Islands dispute",
+   "lang": "sv",
+   "rich_lang": "en",
+   "readers": 3031,
+   "coverage": 0.95,
+   "size": {
+    "fi": 4891,
+    "sv": 6281,
+    "en": 6638
+   },
+   "score": 152,
+   "findings": 0,
+   "top_type": "coverage",
+   "status": "open"
+  }
+ ],
+ "sql": [
+  {
+   "label": "Gap queue",
+   "query": "-- Gap queue: one row per topic and edition to fix, by impact\nSELECT q.wikidata_id, q.topic, q.lang, q.rich_lang, q.readers, q.coverage,\n       COUNT(f.id) AS findings,\n       LEAST(1, (1 - q.coverage) + 0.1 * COALESCE(SUM(f.weight), 0)) AS gap,\n       ROUND(q.readers * LEAST(1, (1 - q.coverage) + 0.1 * COALESCE(SUM(f.weight), 0))) AS score\nFROM topic_edition q\nLEFT JOIN finding f\n  ON f.wikidata_id = q.wikidata_id AND f.lang = q.lang\n AND f.status = 'open' AND f.type <> 'coverage'\nGROUP BY q.wikidata_id, q.lang\nORDER BY score DESC\nLIMIT 50 OFFSET 0;",
+   "ms": 1.7,
+   "rows": 22
+  }
+ ]
+}

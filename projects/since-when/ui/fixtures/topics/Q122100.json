@@ -1,0 +1,43 @@
+{
+ "wikidata_id": "Q122100",
+ "topic": "Continuation War",
+ "titles": {
+  "fi": "Jatkosota",
+  "sv": "Fortsättningskriget",
+  "en": "Continuation War"
+ },
+ "size": {
+  "fi": 122841,
+  "sv": 42623,
+  "en": 141642
+ },
+ "readers": {
+  "fi": 110081,
+  "sv": 21730,
+  "en": 334701
+ },
+ "leads": {
+  "fi": {
+   "text": "Jatkosota oli sota, joka käytiin Suomen ja Neuvostoliiton välillä osana toista maailmansotaa 25. kesäkuuta 1941 – 19. syyskuuta 1944. Sitä pidetään talvisodan jatkeena. Jatkosotaa käytiin Suomen rintamalla samaan aikaan, kun Saksa toteutti laajaa hyökkäystä Neuvostoliittoon. Hyökkäys käynnisti itärintaman, joka päättyi vasta Saksan antautumiseen keväällä 1945. Suomen rintama oli jaettu saksalaisten ja suomalaisten joukkojen kesken siten, että suomalaiset olivat vastuussa eteläisestä rintamasta ja saksalaiset Lapin rintamasta.",
+   "rev_id": 24333541
+  },
+  "sv": {
+   "text": "Fortsättningskriget (finska: jatkosota, ryska: Советско-финская война 1941–1944: Sovetsko-finskaja vojna 1941–1944) utkämpades av Finland och Nazityskland mot Sovjetunionen mellan den 25 juni 1941 och den 19 september 1944 under andra världskriget. Vapenvilan inleddes den 4 september klockan 07.00 för finländsk del, och Sovjetunionen avslutade krigsaktionerna ett dygn senare, den 5 september. Ett första fredsavtal benämnt mellanfreden i Moskva skrevs under den 19 september, och det slutliga fredsavtalet skrevs under i Paris 1947.",
+   "rev_id": 59682771
+  },
+  "en": {
+   "text": "The Continuation War, also known as the Second Soviet–Finnish War, was a conflict fought by Finland and Nazi Germany against the Soviet Union during World War II. It began with a Finnish declaration of war on 25 June 1941 and ended on 19 September 1944 with the Moscow Armistice. The Soviet Union and Finland had previously fought the Winter War from 1939 to 1940, which ended with the Soviet failure to conquer Finland and the Moscow Peace Treaty. Numerous reasons have been proposed for the Finnish decision to invade, with regaining territory lost during the Winter War regarded as the most common. Other justifications for the conflict include Finnish President Risto Ryti's vision of a Greater Finland and Commander-in-Chief Carl Gustaf Emil Mannerheim's desire to annex East Karelia.",
+   "rev_id": 1384254721
+  }
+ },
+ "findings": [],
+ "fixture": true,
+ "sql": [
+  {
+   "label": "Findings",
+   "query": "-- Findings for one topic, as they stand now\nSELECT id, lang, other_lang, type, section, other_section, summary,\n       quotes, terms, distance, score, status, opened_at, closed_at\nFROM finding\nWHERE wikidata_id = 'Q122100'\nORDER BY score DESC;",
+   "ms": 0.4,
+   "rows": 0
+  }
+ ]
+}

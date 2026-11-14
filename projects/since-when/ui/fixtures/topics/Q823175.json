@@ -1,0 +1,43 @@
+{
+ "wikidata_id": "Q823175",
+ "topic": "Finlandization",
+ "titles": {
+  "fi": "Suomettuminen",
+  "sv": "Finlandisering",
+  "en": "Finlandization"
+ },
+ "size": {
+  "fi": 65060,
+  "sv": 2496,
+  "en": 27688
+ },
+ "readers": {
+  "fi": 17086,
+  "sv": 1442,
+  "en": 56685
+ },
+ "leads": {
+  "fi": {
+   "text": "Suomettuminen (saks. Finnlandisierung) eli finlandisoituminen on Suomen toisen maailmansodan jälkeistä ulko- ja sisäpolitiikkaa kuvaava käsite. Suomettuminen viittaa kielteiseen sävyyn Neuvostoliiton vaikutusvaltaan Suomen poliittisessa päätöksenteossa.",
+   "rev_id": 24215016
+  },
+  "sv": {
+   "text": "Finlandisering (finska: suomettuminen, från tyska: Finnlandisierung), är en i viss mån nedsättande benämning på det inflytande ett starkt land kan ha på ett närbeläget, mindre lands politik.",
+   "rev_id": 58177118
+  },
+  "en": {
+   "text": "Finlandization is the process by which one powerful country makes a smaller neighboring country refrain from opposing the former's foreign policy rules, while allowing it to keep its nominal independence and its own political system. The term means \"to become like Finland\", referring to the influence of the Soviet Union on Finland's policies during the Cold War.",
+   "rev_id": 1384669397
+  }
+ },
+ "findings": [],
+ "fixture": true,
+ "sql": [
+  {
+   "label": "Findings",
+   "query": "-- Findings for one topic, as they stand now\nSELECT id, lang, other_lang, type, section, other_section, summary,\n       quotes, terms, distance, score, status, opened_at, closed_at\nFROM finding\nWHERE wikidata_id = 'Q823175'\nORDER BY score DESC;",
+   "ms": 0.4,
+   "rows": 0
+  }
+ ]
+}

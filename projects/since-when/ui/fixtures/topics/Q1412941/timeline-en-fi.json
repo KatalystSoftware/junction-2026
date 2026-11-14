@@ -1,0 +1,325 @@
+{
+ "fixture": true,
+ "wikidata_id": "Q1412941",
+ "lang": "en",
+ "rich_lang": "fi",
+ "years": [
+  {
+   "year": 2005,
+   "size": {
+    "fi": 4566,
+    "sv": 1224,
+    "en": 6340
+   },
+   "coverage": 1,
+   "open_findings": 0
+  },
+  {
+   "year": 2006,
+   "size": {
+    "fi": 6770,
+    "sv": 1923,
+    "en": 6251
+   },
+   "coverage": 1,
+   "open_findings": 0
+  },
+  {
+   "year": 2007,
+   "size": {
+    "fi": 12938,
+    "sv": 2302,
+    "en": 6727
+   },
+   "coverage": 1,
+   "open_findings": 1
+  },
+  {
+   "year": 2008,
+   "size": {
+    "fi": 95519,
+    "sv": 2188,
+    "en": 7131
+   },
+   "coverage": 0.38,
+   "open_findings": 1
+  },
+  {
+   "year": 2009,
+   "size": {
+    "fi": 92779,
+    "sv": 2340,
+    "en": 7133
+   },
+   "coverage": 0.39,
+   "open_findings": 1
+  },
+  {
+   "year": 2010,
+   "size": {
+    "fi": 93953,
+    "sv": 2528,
+    "en": 6940
+   },
+   "coverage": 0.37,
+   "open_findings": 1
+  },
+  {
+   "year": 2011,
+   "size": {
+    "fi": 94066,
+    "sv": 2639,
+    "en": 6346
+   },
+   "coverage": 0.34,
+   "open_findings": 1
+  },
+  {
+   "year": 2012,
+   "size": {
+    "fi": 93626,
+    "sv": 2734,
+    "en": 6742
+   },
+   "coverage": 0.36,
+   "open_findings": 1
+  },
+  {
+   "year": 2013,
+   "size": {
+    "fi": 96413,
+    "sv": 2736,
+    "en": 6775
+   },
+   "coverage": 0.36,
+   "open_findings": 1
+  },
+  {
+   "year": 2014,
+   "size": {
+    "fi": 97364,
+    "sv": 4060,
+    "en": 6186
+   },
+   "coverage": 0.32,
+   "open_findings": 1
+  },
+  {
+   "year": 2015,
+   "size": {
+    "fi": 97368,
+    "sv": 4059,
+    "en": 6341
+   },
+   "coverage": 0.33,
+   "open_findings": 1
+  },
+  {
+   "year": 2016,
+   "size": {
+    "fi": 96932,
+    "sv": 4059,
+    "en": 6778
+   },
+   "coverage": 0.35,
+   "open_findings": 1
+  },
+  {
+   "year": 2017,
+   "size": {
+    "fi": 96979,
+    "sv": 4063,
+    "en": 6904
+   },
+   "coverage": 0.36,
+   "open_findings": 1
+  },
+  {
+   "year": 2018,
+   "size": {
+    "fi": 96822,
+    "sv": 4063,
+    "en": 6321
+   },
+   "coverage": 0.33,
+   "open_findings": 1
+  },
+  {
+   "year": 2019,
+   "size": {
+    "fi": 96822,
+    "sv": 4122,
+    "en": 6629
+   },
+   "coverage": 0.35,
+   "open_findings": 1
+  },
+  {
+   "year": 2020,
+   "size": {
+    "fi": 96985,
+    "sv": 4288,
+    "en": 6812
+   },
+   "coverage": 0.35,
+   "open_findings": 1
+  },
+  {
+   "year": 2021,
+   "size": {
+    "fi": 93685,
+    "sv": 4288,
+    "en": 6938
+   },
+   "coverage": 0.37,
+   "open_findings": 4
+  },
+  {
+   "year": 2022,
+   "size": {
+    "fi": 145187,
+    "sv": 4288,
+    "en": 9226
+   },
+   "coverage": 0.32,
+   "open_findings": 5
+  },
+  {
+   "year": 2023,
+   "size": {
+    "fi": 150647,
+    "sv": 4288,
+    "en": 11390
+   },
+   "coverage": 0.38,
+   "open_findings": 6
+  },
+  {
+   "year": 2024,
+   "size": {
+    "fi": 150470,
+    "sv": 4290,
+    "en": 11639
+   },
+   "coverage": 0.39,
+   "open_findings": 6
+  },
+  {
+   "year": 2025,
+   "size": {
+    "fi": 151742,
+    "sv": 4291,
+    "en": 19722
+   },
+   "coverage": 0.66,
+   "open_findings": 6
+  },
+  {
+   "year": 2026,
+   "size": {
+    "fi": 151659,
+    "sv": 4570,
+    "en": 20412
+   },
+   "coverage": 0.68,
+   "open_findings": 6
+  }
+ ],
+ "events": [
+  {
+   "date": "2005-01-01",
+   "finding_id": 101,
+   "kind": "opened",
+   "type": "framing",
+   "rev_id": 9383266,
+   "rev_lang": "en",
+   "summary": "English lead: \"however soon turning into more of a Fascist movement\"."
+  },
+  {
+   "date": "2007-01-01",
+   "finding_id": 103,
+   "kind": "opened",
+   "type": "contradiction",
+   "summary": "English dates the ban to 21 November 1932. Finnish says the movement was banned in May 1932: dissolved on 24 March and confirmed by the court on 28 May.",
+   "rev_id": 2088684,
+   "rev_lang": "fi"
+  },
+  {
+   "date": "2009-06-07",
+   "finding_id": 101,
+   "kind": "closed",
+   "type": "framing",
+   "rev_id": 294882000,
+   "rev_lang": "en",
+   "summary": "English lead drops its fascist wording."
+  },
+  {
+   "date": "2020-03-18",
+   "finding_id": 107,
+   "kind": "opened",
+   "type": "missing_fact",
+   "summary": "Finnish says the 1930 Peasant March was modelled on the 1922 March on Rome. The English account of the march leaves this out.",
+   "rev_id": 18801239,
+   "rev_lang": "fi"
+  },
+  {
+   "date": "2021-01-01",
+   "finding_id": 104,
+   "kind": "opened",
+   "type": "coverage",
+   "summary": "Finnish has a section on the historians’ debate over whether the movement was fascist. English states the label but has no passage on the debate.",
+   "rev_id": null,
+   "rev_lang": null
+  },
+  {
+   "date": "2021-01-01",
+   "finding_id": 106,
+   "kind": "opened",
+   "type": "coverage",
+   "summary": "Finnish traces the movement to the strike-breaking organisations of the late 1920s and the employers who funded them. English starts from the Comintern congress instead.",
+   "rev_id": null,
+   "rev_lang": null
+  },
+  {
+   "date": "2022-01-01",
+   "finding_id": 105,
+   "kind": "opened",
+   "type": "coverage",
+   "summary": "Finnish describes the movement’s colours, emblem and black shirt with blue stripes, partly modelled on the Italian Blackshirts. English has no text on its symbols.",
+   "rev_id": null,
+   "rev_lang": null
+  },
+  {
+   "date": "2022-05-30",
+   "finding_id": 101,
+   "kind": "opened",
+   "type": "framing",
+   "summary": "The editions place the contested label differently: English puts \"fascist\" in its first sentence; Finnish discusses it in the last paragraph of its lead and in a section on the historians’ debate.",
+   "rev_id": 1090675024,
+   "rev_lang": "en"
+  },
+  {
+   "date": "2026-04-07",
+   "finding_id": 102,
+   "kind": "opened",
+   "type": "framing",
+   "summary": "English calls the movement pro-Nazi in its first sentence (it said pro-German until April 2026). Finnish does not call the movement pro-Nazi. It reports a claimed secret agreement with the NSDAP as unreliable.",
+   "rev_id": 1347550072,
+   "rev_lang": "en"
+  }
+ ],
+ "sql": [
+  {
+   "label": "Coverage on each 1 January",
+   "query": "-- Coverage on one 1 January; run once per year, 2005-2026\nSET @t = TIMESTAMP '2015-01-01 00:00:00';\nSELECT AVG(nearest < 0.35) AS coverage, COUNT(*) AS passages\nFROM (\n  SELECT r.chunk_id, MIN(VEC_DISTANCE_COSINE(r.embedding, l.embedding)) AS nearest\n  FROM chunk FOR SYSTEM_TIME AS OF @t AS r\n  JOIN chunk FOR SYSTEM_TIME AS OF @t AS l\n    ON l.wikidata_id = r.wikidata_id AND l.lang = 'en'\n  WHERE r.wikidata_id = 'Q1412941' AND r.lang = 'fi'\n  GROUP BY r.chunk_id\n) AS m;",
+   "ms": 3.8,
+   "rows": 1
+  },
+  {
+   "label": "Finding history",
+   "query": "-- When each finding opened, was reviewed and closed:\n-- every version of every row of the system-versioned finding table\nSELECT id, type, status, summary, row_start, row_end\nFROM finding FOR SYSTEM_TIME ALL\nWHERE wikidata_id = 'Q1412941' AND lang = 'en'\nORDER BY row_start;",
+   "ms": 0.6,
+   "rows": 9
+  }
+ ]
+}

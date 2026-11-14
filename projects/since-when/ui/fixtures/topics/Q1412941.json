@@ -1,0 +1,263 @@
+{
+ "wikidata_id": "Q1412941",
+ "topic": "Lapua Movement",
+ "titles": {
+  "fi": "Lapuanliike",
+  "sv": "Lapporörelsen",
+  "en": "Lapua Movement"
+ },
+ "size": {
+  "fi": 153937,
+  "sv": 7747,
+  "en": 20943
+ },
+ "readers": {
+  "fi": 38890,
+  "sv": 4133,
+  "en": 39666
+ },
+ "leads": {
+  "fi": {
+   "text": "Lapuanliike tai Lapuan liike oli Suomessa vuosina 1929–1932 toiminut vaikutusvaltainen antikommunistinen ja oikeistoradikaali kansanliike. Sen tavoitteena oli kitkeä kommunismi Suomesta, mutta taustalla oli myös pidemmälle vietyjä tavoitteita. Lapuanliikkeen kannatusalueen ydin oli Etelä-Pohjanmaa, ja sen johtaja oli maanviljelijä ja aktivisti Vihtori Kosola.",
+   "rev_id": 24266018,
+   "also": "Lapuanliikkeen kadottua oli suomalaisesta politiikasta kitketty pois sekä vasemmisto- että oikeistoradikalismi. Uhattuna ollut suomalainen parlamentarismi vahvistui ja perusta myöhemmälle konsensuksen politiikalle luotiin. Liikkeen luonteen myöhempi tulkinta on ollut ristiriitaista. Sen johtohahmot kielsivät olevansa fasisteja, mutta liikkeen aatteellinen tausta, tavoitteet ja toiminta täyttävät lähes kaikki yleisesti käytetyt fasismin määritelmät. Myöhemmissä tulkinnoissa lapuanliike on nähty osana 1930-luvun eurooppalaista fasistista ja äärioikeistolaista liikehdintää."
+  },
+  "sv": {
+   "text": "Lapporörelsen var en finländsk nationalistisk, fascistisk och antikommunistisk utomparlamentarisk politisk rörelse som grundades 1929 i Lappo.  ",
+   "rev_id": 59852897
+  },
+  "en": {
+   "text": "The Lapua Movement (Finnish: Lapuanliike or Lapuan liike, Swedish: Lapporörelsen) was a radical Finnish nationalist, fascist, pro-Nazi and anti-communist political movement founded in and named after the town of Lapua. Led by Vihtori Kosola, it turned towards far-right politics after its founding and was banned after a failed coup d'etat attempt in 1932. The movement's anti-communist activities continued in the parliamentarian Patriotic People's Movement.",
+   "rev_id": 1383067871
+  }
+ },
+ "findings": [
+  {
+   "id": 101,
+   "lang": "en",
+   "other_lang": "fi",
+   "type": "framing",
+   "terms": [
+    "fascist"
+   ],
+   "quotes": {
+    "en": "radical Finnish nationalist, fascist, pro-Nazi and anti-communist political movement",
+    "fi": "liikkeen aatteellinen tausta, tavoitteet ja toiminta täyttävät lähes kaikki yleisesti käytetyt fasismin määritelmät"
+   },
+   "summary": "The editions place the contested label differently: English puts \"fascist\" in its first sentence; Finnish discusses it in the last paragraph of its lead and in a section on the historians’ debate.",
+   "distance": 0.29,
+   "opened_at": "2022-05-30",
+   "section": "",
+   "other_section": "",
+   "status": "open",
+   "closed_at": null,
+   "score": 7933
+  },
+  {
+   "id": 102,
+   "lang": "en",
+   "other_lang": "fi",
+   "type": "framing",
+   "terms": [
+    "pro-Nazi"
+   ],
+   "quotes": {
+    "en": "pro-Nazi",
+    "fi": "Craucherin epäluotettavien paljastusten mukaan lapuanliikkeen johdolla olisi ollut salainen yhteistyösopimus Saksan kansallissosialistisen puolueen (NSDAP) kanssa"
+   },
+   "summary": "English calls the movement pro-Nazi in its first sentence (it said pro-German until April 2026). Finnish does not call the movement pro-Nazi. It reports a claimed secret agreement with the NSDAP as unreliable.",
+   "distance": 0.41,
+   "opened_at": "2026-04-07",
+   "section": "",
+   "other_section": "Lapuanliikkeen vaiheet › Syksy 1931 – kevät 1932: Tilanteen kärjistyminen ja lapuanliikkeen loppu › Lapuanliikkeen lakkauttaminen ja viimeiset väkivaltaisuudet",
+   "status": "open",
+   "closed_at": null,
+   "score": 7933
+  },
+  {
+   "id": 103,
+   "lang": "en",
+   "other_lang": "fi",
+   "type": "contradiction",
+   "terms": [],
+   "quotes": {
+    "en": "the Lapua Movement was banned on 21 November 1932",
+    "fi": "Apulaissisäministeri Arvo Manner lakkautti järjestön lopullisesti 24. maaliskuuta, ja raastuvanoikeus vahvisti päätöksen 28. toukokuuta."
+   },
+   "citations": {
+    "en": null,
+    "fi": "Uola 2006, s. 240–241"
+   },
+   "paragraph_citations": {
+    "en": null,
+    "fi": "Uola 2006, s. 240–241"
+   },
+   "summary": "English dates the ban to 21 November 1932. Finnish says the movement was banned in May 1932: dissolved on 24 March and confirmed by the court on 28 May.",
+   "distance": 0.27,
+   "opened_at": "2007-01-01",
+   "section": "Failed rebellion",
+   "other_section": "Lapuanliikkeen vaiheet › Syksy 1931 – kevät 1932: Tilanteen kärjistyminen ja lapuanliikkeen loppu › Lapuanliikkeen lakkauttaminen ja viimeiset väkivaltaisuudet",
+   "status": "open",
+   "closed_at": null,
+   "score": 7933
+  },
+  {
+   "id": 104,
+   "lang": "en",
+   "other_lang": "fi",
+   "type": "coverage",
+   "terms": [],
+   "quotes": {
+    "fi": "On keskusteltu siitä, täyttääkö lapuanliike yleisesti käytetyt fasismin määritelmät."
+   },
+   "summary": "Finnish has a section on the historians’ debate over whether the movement was fascist. English states the label but has no passage on the debate.",
+   "distance": 0.58,
+   "opened_at": "2021-01-01",
+   "section": "Myöhempiä näkemyksiä lapuanliikkeestä › Lapuanliike ja fasismi",
+   "other_section": null,
+   "status": "open",
+   "closed_at": null,
+   "score": 1983
+  },
+  {
+   "id": 105,
+   "lang": "en",
+   "other_lang": "fi",
+   "type": "coverage",
+   "terms": [],
+   "quotes": {
+    "fi": "Lapuanliikkeen tunnusväreinä pidettiin sinistä ja mustaa."
+   },
+   "summary": "Finnish describes the movement’s colours, emblem and black shirt with blue stripes, partly modelled on the Italian Blackshirts. English has no text on its symbols.",
+   "distance": 0.61,
+   "opened_at": "2022-01-01",
+   "section": "Symbolit",
+   "other_section": null,
+   "status": "open",
+   "closed_at": null,
+   "score": 1983
+  },
+  {
+   "id": 106,
+   "lang": "en",
+   "other_lang": "fi",
+   "type": "coverage",
+   "terms": [],
+   "quotes": {
+    "fi": "Työnantajat ja talouspiirit vastasivat työtaistelujen joukkovoimaan voimalla ja rahoittivat lakonmurtajajärjestöjä."
+   },
+   "summary": "Finnish traces the movement to the strike-breaking organisations of the late 1920s and the employers who funded them. English starts from the Comintern congress instead.",
+   "distance": 0.52,
+   "opened_at": "2021-01-01",
+   "section": "Väkivallan prologi: Työtaistelut, työmaaterrori ja lakonmurtajat",
+   "other_section": null,
+   "status": "open",
+   "closed_at": null,
+   "score": 1983
+  },
+  {
+   "id": 107,
+   "lang": "en",
+   "other_lang": "fi",
+   "type": "missing_fact",
+   "terms": [],
+   "quotes": {
+    "fi": "Esikuva oli Italian fasistien mustapaitojen marssi Roomaan vuonna 1922",
+    "en": "The Peasant March gathered 12,600 men to Helsinki"
+   },
+   "summary": "Finnish says the 1930 Peasant March was modelled on the 1922 March on Rome. The English account of the march leaves this out.",
+   "distance": 0.31,
+   "opened_at": "2020-03-18",
+   "section": "Activities",
+   "other_section": "Lapuanliikkeen vaiheet › Heinäkuu 1930: Demokratian kriisi ja Talonpoikaismarssi › Talonpoikaismarssi",
+   "status": "open",
+   "closed_at": null,
+   "score": 3967
+  },
+  {
+   "id": 201,
+   "lang": "sv",
+   "other_lang": "fi",
+   "type": "framing",
+   "terms": [
+    "fascistisk"
+   ],
+   "quotes": {
+    "sv": "nationalistisk, fascistisk och antikommunistisk utomparlamentarisk politisk rörelse",
+    "fi": "liikkeen aatteellinen tausta, tavoitteet ja toiminta täyttävät lähes kaikki yleisesti käytetyt fasismin määritelmät"
+   },
+   "summary": "The editions place the contested label differently: Swedish has put \"fascistisk\" in its first sentence since 23 October 2026; Finnish discusses it in the last paragraph of its lead and in a section on the historians’ debate.",
+   "distance": 0.3,
+   "opened_at": "2026-10-23",
+   "section": "",
+   "other_section": "",
+   "status": "open",
+   "closed_at": null,
+   "score": 827
+  },
+  {
+   "id": 202,
+   "lang": "sv",
+   "other_lang": "fi",
+   "type": "numbers",
+   "terms": [],
+   "quotes": {
+    "sv": "102 av rörelsens ledare fängslades",
+    "fi": "Turun hovioikeus tuomitsi marraskuussa yhteensä 22 henkilöä kapinasta ja 32 sen avunannosta"
+   },
+   "summary": "Swedish says 102 of the movement’s leaders were imprisoned after the trial. Finnish says charges were brought against 100 people, and 22 were convicted of the rebellion and 32 of aiding it.",
+   "distance": 0.33,
+   "opened_at": "2021-04-11",
+   "section": "Historia › Våldseskalering och Mäntsäläupproret",
+   "other_section": "Lapuanliikkeen vaiheet › Syksy 1931 – kevät 1932: Tilanteen kärjistyminen ja lapuanliikkeen loppu › Kapinallisten rangaistukset",
+   "status": "open",
+   "closed_at": null,
+   "score": 413
+  },
+  {
+   "id": 203,
+   "lang": "sv",
+   "other_lang": "fi",
+   "type": "coverage",
+   "terms": [],
+   "quotes": {
+    "fi": "On keskusteltu siitä, täyttääkö lapuanliike yleisesti käytetyt fasismin määritelmät."
+   },
+   "summary": "Finnish has a section on the historians’ debate over whether the movement was fascist. Swedish has one sentence on its fascist inspiration.",
+   "distance": 0.55,
+   "opened_at": "2021-01-01",
+   "section": "Myöhempiä näkemyksiä lapuanliikkeestä › Lapuanliike ja fasismi",
+   "other_section": null,
+   "status": "open",
+   "closed_at": null,
+   "score": 207
+  },
+  {
+   "id": 204,
+   "lang": "sv",
+   "other_lang": "fi",
+   "type": "coverage",
+   "terms": [],
+   "quotes": {
+    "fi": "Lapuanliikkeen tunnusväreinä pidettiin sinistä ja mustaa."
+   },
+   "summary": "Finnish describes the movement’s colours, emblem and black shirt. Swedish describes the emblem in an image caption and has nothing on the colours or the shirt.",
+   "distance": 0.63,
+   "opened_at": "2022-01-01",
+   "section": "Symbolit",
+   "other_section": null,
+   "status": "open",
+   "closed_at": null,
+   "score": 207
+  }
+ ],
+ "fixture": true,
+ "sql": [
+  {
+   "label": "Findings",
+   "query": "-- Findings for one topic, as they stand now\nSELECT id, lang, other_lang, type, section, other_section, summary,\n       quotes, terms, distance, score, status, opened_at, closed_at\nFROM finding\nWHERE wikidata_id = 'Q1412941'\nORDER BY score DESC;",
+   "ms": 0.4,
+   "rows": 11
+  }
+ ]
+}
