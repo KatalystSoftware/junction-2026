@@ -27,7 +27,7 @@ window.KATALYST = {
       for: "AfterQuery, Break the Agent",
       live: "https://incident.katalyst.fyi/",
       open: "Watch the replay",
-      source: "spikes/aq-incident",
+      source: "projects/oncallbench",
       shot: "incident.webp",
       what: "An AI agent is paged into a 120-minute shift on a simulated online shop: 60 services, several faults at once, and every failed request costs revenue. Claude Opus 5.5 finds the causes, then loses on judgment: over nine runs it averages 0.32 of what a scripted expert saves.",
     },

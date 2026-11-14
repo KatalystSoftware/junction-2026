@@ -42,10 +42,10 @@ The page says nothing the repo does not. When one of these files changes, change
 
 | Entry | Source |
 | --- | --- |
-| OnCallBench | [`spikes/aq-incident/README.md`](../../spikes/aq-incident/README.md): 120 minutes, 60 services, "finds the causes, then loses on judgment", and 0.32 over nine runs in its level 4 table |
-| Since When | [`projects/since-when/README.md`](../since-when/README.md), first paragraph |
-| Kutsu | [`projects/kutsu/README.md`](../kutsu/README.md), first paragraphs and the two sign-up flows |
-| Spread desk | [`spread/README.md`](../../spread/README.md), "How the desk decides" |
+| Since When | [`projects/since-when/README.md`](../since-when/README.md) |
+| OnCallBench | [`projects/oncallbench/README.md`](../oncallbench/README.md) and its [`replay/README.md`](../oncallbench/replay/README.md); "worse than a scripted expert" is the round 4 status in [`LOOP.md`](../oncallbench/LOOP.md) |
+| Kutsu | [`projects/kutsu/README.md`](../kutsu/README.md) |
+| Spread desk | [`spread/README.md`](../../spread/README.md) and the [challenge brief](../../docs/challenges/main/bahn-express--spread.md) |
 
 Source links are off: `repo` in `projects.js` is empty because this repository is private. Set it to
 the public copy's address once `scripts/publish-public.sh` has pushed one, and every entry gets a
