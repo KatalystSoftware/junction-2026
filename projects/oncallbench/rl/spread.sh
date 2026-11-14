@@ -19,6 +19,8 @@ cd "$tasks/.."
 pids=""
 for seed in "$@"; do
   for _ in $(seq "$runs"); do
+    # at most MAXPAR runs at once (default 24): 48 at once ran Docker out of networks and slowed the endpoint
+    while [ "$(for p in $pids; do kill -0 "$p" 2>/dev/null && echo; done | wc -l)" -ge "${MAXPAR:-24}" ]; do sleep 10; done
     job="${ROUND:-r16}-l4-s$seed-gemma-$kind-$(date +%H%M%S)"
     echo "$job"
     # export-tasks.sh lists its folders in index.tsv; older exports were named seed-<seed>
