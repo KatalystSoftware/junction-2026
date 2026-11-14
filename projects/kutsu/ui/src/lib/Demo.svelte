@@ -78,8 +78,10 @@
 <style>
   .demo {
     position: fixed;
-    top: var(--s3);
-    right: var(--s3);
+    top: 0;
+    right: 0;
+    /* the corner that brings the button up is a little larger than the button */
+    padding: var(--s3) var(--s3) var(--s4) var(--s5);
     z-index: 30;
     display: grid;
     justify-items: end;
@@ -99,6 +101,20 @@
     padding: 0 var(--s3);
     border-radius: 99px;
     font-weight: 700;
+    /* out of sight until the pointer is in this corner, so it is in no screenshot or recording by accident */
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .demo:hover .toggle,
+  .toggle:focus-visible,
+  .toggle[aria-expanded='true'] {
+    opacity: 1;
+  }
+  /* a finger cannot hover: there it stays faintly in view */
+  @media (hover: none) {
+    .toggle {
+      opacity: 0.45;
+    }
   }
   .toggle:focus-visible,
   .menu :focus-visible {

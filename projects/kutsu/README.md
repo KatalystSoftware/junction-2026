@@ -43,7 +43,8 @@ headless Chromium, signs one company up by pressing Enter until the finished pag
 error the page reports. `npm --prefix ui run lint` is ESLint with typescript-eslint's strict
 type-checked rules; it still reports 83 findings and is not part of the check yet.
 
-The **Demo** button at the top right belongs to the demo, not the product. It moves between the
+The **Demo** button belongs to the demo, not the product. It is out of sight until the pointer is in
+the top right corner (on a phone it stays faintly visible). It moves between the
 three people Kutsu is for (Espoo's organiser, an invited company, a candidate), fills in example
 sign-ups so the screens can be seen in use, and clears every sign-up. An example sign-up is marked
 as one wherever it shows: no company did it.
