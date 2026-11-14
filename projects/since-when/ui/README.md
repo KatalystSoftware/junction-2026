@@ -18,8 +18,8 @@ npm install
 npm run dev
 ```
 
-The dev server listens on <http://127.0.0.1:8079> and forwards `/api` to the data service at
-`http://127.0.0.1:8077`. Set `SINCE_WHEN_API` to point it at another one.
+The dev server listens on <http://127.0.0.1:8079> and forwards `/api` to the server at
+`http://127.0.0.1:8078`. Set `SINCE_WHEN_API` to point it at another one.
 
 ## Build and check
 
@@ -33,8 +33,9 @@ from any path. The app calls the API at the absolute path `/api`, so the server 
 bundle must answer `/api/*` on the same origin. Routing is in the fragment (`#/…`), so the server
 needs no fallback route.
 
-`serve.py` and `fixtures/` belong to the previous plain-JavaScript page and are replaced in the next
-step; they do not serve this app.
+`python -m gapfinder serve` is that server: it serves `dist/` next to the API, and the Docker image
+builds the bundle in a Node stage. `fixtures/` holds the answers it gives when started with
+`SINCE_WHEN_FIXTURES=1`, for working on the app without a database.
 
 ## Addresses
 
@@ -47,8 +48,8 @@ step; they do not serve this app.
 - `?sql=asof,Q1412941,2026-10-22,sv` opens the SQL panel with that preset filled in. It never runs
   by itself; the viewer clicks Run. The presets are `nearest`, `asof` and `history`.
 - `?q=` opens the topic list with that search. Search runs only when the form is submitted, because
-  the first search makes the data service load its embedding model. Do not use it against the demo
-  instance, which has no model and not enough memory for one: the request restarts the API container.
+  the first search makes the server load its embedding model. A server with no model on disk answers
+  503 and the app hides the search box, as on the demo instance.
 
 ## Where things are
 

@@ -1,15 +1,18 @@
 # Since When HTTP API
 
 The contract between the data service (`gapfinder/`), the UI (`ui/`) and the differences
-classifier (`differences/`). JSON over HTTP, all paths under `/api`. The UI's server proxies
-`/api/*` to the data service when `GAPFINDER_API=http://host:port` is set, so the data service
-sends no CORS headers.
+classifier (`differences/`). JSON over HTTP, all paths under `/api`. One FastAPI
+server answers `/api/*` and serves the built app (`ui/dist/`) on the same origin, so it sends no
+CORS headers. The routes are listed at `/api/docs`.
 
-Run the data service from `projects/since-when/`:
+Run it from `projects/since-when/`:
 
 ```sh
-python -m gapfinder serve --port 8077
+python -m gapfinder serve --port 8078
 ```
+
+With `SINCE_WHEN_FIXTURES=1` it needs no database: the queue, a topic and its timeline are answered
+from `ui/fixtures/` with `"fixture": true`, and search and status changes answer 503.
 
 It reads `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD` and `DB_NAME` from the environment
 (defaults: `127.0.0.1`, `3306`, `gapfinder`, `gapfinder`, `gapfinder`). `DB_RO_USER` and
@@ -209,6 +212,7 @@ query exactly comes first. Passages farther than cosine distance 0.55 from the q
 so a query that matches nothing returns no items. One item per topic, nearest first: its row for `lang`, or with
 `lang=all` (the default) its highest-scoring edition. A topic with no open finding in `lang` is
 left out. The first search after a restart loads the model (about 10 s).
+When the embedding model is not on disk (`HF_HOME`), search answers 503 and downloads nothing.
 
 ### `GET /api/sql/presets`
 

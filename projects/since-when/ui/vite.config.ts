@@ -10,6 +10,6 @@ export default defineConfig({
     host: '127.0.0.1',
     port: 8079,
     strictPort: true,
-    proxy: { '/api': process.env.SINCE_WHEN_API ?? 'http://127.0.0.1:8077' },
+    proxy: { '/api': process.env.SINCE_WHEN_API ?? 'http://127.0.0.1:8078' },
   },
 })

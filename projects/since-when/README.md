@@ -8,9 +8,9 @@ vector search.
 It started as a fork of the gap finder (root `gapfinder/`, `differences/`, `ui/`) at commit `689a26d` and
 shares no files with it. The Python package names are unchanged.
 
-- [`gapfinder/`](gapfinder/): loader, schema and API ([contract](docs/api.md)).
+- [`gapfinder/`](gapfinder/): loader, schema, and the FastAPI server for the API ([contract](docs/api.md)) and the app.
 - [`differences/`](differences/README.md): classifies the differences between two passages with Nemotron.
-- [`ui/`](ui/README.md): the pages.
+- [`ui/`](ui/README.md): the app, in Svelte.
 - [`demo/`](demo/HANDOFF.md): the handoff note, the [walkthrough script](demo/WALKTHROUGH.md) and the builders' notes.
 - [`measurements/`](demo/measurements.md): recall and query times, with the runs they come from.
 
@@ -19,11 +19,14 @@ login in `~/junction2026-data/mariadb/scratch.env`):
 
     docker compose up --build -d                              # http://127.0.0.1:8078
 
-Test, from this directory in the repo's dev shell (`nix develop`, which has uv and MariaDB Connector/C):
+One container serves the app and the API. Without Docker or a database, `npm --prefix ui run build` and then
+`SINCE_WHEN_FIXTURES=1 uv run python -m gapfinder serve` serves the app on fixture data.
 
-    uv run ruff format --check && uv run ruff check && uv run ty check && uv run python -m unittest differences.test_differences gapfinder.test_wikitext gapfinder.test_live_sql
+Test, from this directory in the repo's dev shell (`nix develop`, which has uv, Node and MariaDB Connector/C):
 
-The six tests that run the SQL presets skip without a database login; `docker compose run --rm api python -m unittest gapfinder.test_live_sql`
+    uv run ruff format --check && uv run ruff check && uv run ty check && uv run python -m unittest differences.test_differences gapfinder.test_wikitext gapfinder.test_live_sql && npm --prefix ui ci --silent && npm --prefix ui run check
+
+The six tests that run the SQL presets skip without a database login; `docker compose run --rm app python -m unittest gapfinder.test_live_sql`
 runs them against the scratch database. The torch and DuckDB wheels don't load on NixOS outside a container, so the
 embedder and the loaders run in the image.
 

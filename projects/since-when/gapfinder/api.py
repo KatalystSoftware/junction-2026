@@ -1,7 +1,8 @@
-"""The HTTP API the UI calls: docs/api.md. Standard library server, one MariaDB
-connection per request. Every response carries the SQL that produced it, as run.
+"""The HTTP API the app calls (docs/api.md) and the built app itself, from one FastAPI server.
+One MariaDB connection per request. Every response carries the SQL that produced it, as run.
 
-    python -m gapfinder serve --port 8077
+    python -m gapfinder serve --port 8078
+    SINCE_WHEN_FIXTURES=1 python -m gapfinder serve    # answers from ui/fixtures/, no database
 """
 
 import decimal
@@ -10,15 +11,23 @@ import os
 import re
 import threading
 import time
-import traceback
 from datetime import date, datetime
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from urllib.parse import parse_qs, unquote, urlparse
 
 import mariadb
+import uvicorn
+from fastapi import FastAPI, Request, Response
+from fastapi.concurrency import run_in_threadpool
+from fastapi.staticfiles import StaticFiles
 
 from .align import DAY, QID, TYPE_WEIGHT, YEARS, Run, as_of_sql, lit, nearest_sql
 from .db import DB, LANGS
+from .embed import MODEL
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+# The built app (npm run build in ui/) and the fixture answers for a server without a database.
+UI = os.environ.get("SINCE_WHEN_UI") or os.path.join(HERE, "..", "ui", "dist")
+FIXTURES = os.path.join(HERE, "..", "ui", "fixtures")
+USE_FIXTURES = os.environ.get("SINCE_WHEN_FIXTURES") == "1"
 
 SEQ = f"seq_{YEARS[0]}_to_{YEARS[-1]}"
 # Editor outcomes: the API's name, the stored status, and the coarse status the UI also reads.
@@ -485,16 +494,6 @@ def _int(q, name, default, lo, hi):
     return max(lo, min(hi, v))
 
 
-ROUTES = [
-    ("GET", re.compile(r"^/api/queue$"), lambda r, m, q, b: queue(r, q)),
-    ("GET", re.compile(r"^/api/search$"), lambda r, m, q, b: search(r, q)),
-    ("GET", re.compile(r"^/api/topics/(Q[0-9]+)$"), lambda r, m, q, b: topic(r, m[1])),
-    ("GET", re.compile(r"^/api/topics/(Q[0-9]+)/compare$"), lambda r, m, q, b: compare(r, m[1], q)),
-    ("GET", re.compile(r"^/api/topics/(Q[0-9]+)/timeline$"), lambda r, m, q, b: timeline(r, m[1], q)),
-    ("POST", re.compile(r"^/api/findings/([0-9]+)/status$"), lambda r, m, q, b: set_status(r, int(m[1]), b)),
-]
-
-
 # ---------- live SQL: three preset statements, run as the SELECT-only user ----------
 # The caller picks a preset and its parameters, never SQL text. Every statement comes from the
 # templates below and runs on a connection of DB_RO_USER with a time limit and a row cap.
@@ -671,7 +670,11 @@ def live_run(body):
     }
 
 
-LIVE = {("GET", "/api/sql/presets"): live_presets, ("POST", "/api/sql/run"): live_run}
+def search_enabled():
+    """Whether the embedding model is on disk. Without it a search would download it into the server."""
+    home = os.environ.get("HF_HOME") or os.path.expanduser("~/.cache/huggingface")
+    hub = os.environ.get("HF_HUB_CACHE") or os.path.join(home, "hub")
+    return os.path.isdir(os.path.join(hub, "models--" + MODEL.replace("/", "--")))
 
 
 def _json(v):
@@ -686,52 +689,134 @@ def _json(v):
     raise TypeError(type(v))
 
 
-class Handler(BaseHTTPRequestHandler):
-    def _handle(self, method):
-        url = urlparse(self.path)
-        q = {k: v[-1] for k, v in parse_qs(url.query).items()}
-        path = unquote(url.path).rstrip("/")
-        status, body, r = 200, None, None
-        try:
-            payload = None
-            if method == "POST":
-                n = int(self.headers.get("Content-Length") or 0)
-                payload = json.loads(self.rfile.read(n) or b"{}")
-            for verb, pattern, fn in ROUTES:
-                m = pattern.match(path)
-                if m and verb == method:
-                    r = Run()
-                    body = fn(r, m, q, payload)
-                    body["sql"] = r.log
-                    break
-            else:
-                if (method, path) not in LIVE:
-                    raise ApiError(404, f"no route for {method} {path}")
-                body = LIVE[(method, path)](payload)  # no connection of the app user
-        except ApiError as e:
-            status, body = e.status, {"error": str(e)}
-        except json.JSONDecodeError:
-            status, body = 400, {"error": "body must be JSON"}
-        except Exception as e:  # noqa: BLE001 - report, keep serving
-            traceback.print_exc()
-            status, body = 500, {"error": f"{type(e).__name__}: {e}"}
-        finally:
-            if r:
-                r.con.close()
-        data = json.dumps(body, default=_json, ensure_ascii=False).encode()
-        self.send_response(status)
-        self.send_header("Content-Type", "application/json; charset=utf-8")
-        self.send_header("Content-Length", str(len(data)))
-        self.end_headers()
-        self.wfile.write(data)
+class Json(Response):
+    media_type = "application/json; charset=utf-8"
 
-    def do_GET(self):
-        self._handle("GET")
-
-    def do_POST(self):
-        self._handle("POST")
+    def render(self, content):
+        return json.dumps(content, default=_json, ensure_ascii=False).encode()
 
 
-def serve(port=8077):
-    print(f"gap finder API on http://127.0.0.1:{port}/api/queue", flush=True)
-    ThreadingHTTPServer(("0.0.0.0", port), Handler).serve_forever()
+def _answer(fn, *args):
+    """What fn returns, on a connection of its own, with the SQL it ran."""
+    r = Run()
+    try:
+        body = fn(r, *args)
+        body["sql"] = r.log
+        return Json(body)
+    finally:
+        r.con.close()
+
+
+def _fixture(*parts):
+    """A file of ui/fixtures/, for a server started with SINCE_WHEN_FIXTURES=1 and no database."""
+    path = os.path.join(FIXTURES, *parts)
+    if not os.path.isfile(path):
+        raise ApiError(404, "not in the fixtures")
+    with open(path) as f:
+        return json.load(f)
+
+
+async def _body(request):
+    try:
+        return json.loads(await request.body() or b"{}")
+    except json.JSONDecodeError:
+        raise ApiError(400, "body must be JSON")
+
+
+def _no_route(request):
+    return ApiError(404, f"no route for {request.method} {request.url.path}")
+
+
+def _qid(request, qid):
+    if not QID.match(qid):
+        raise _no_route(request)
+    return qid
+
+
+app = FastAPI(title="Since When", docs_url="/api/docs", openapi_url="/api/openapi.json", redoc_url=None)
+
+
+@app.exception_handler(ApiError)
+def _api_error(request: Request, e: ApiError):
+    return Json({"error": str(e)}, status_code=e.status)
+
+
+@app.exception_handler(Exception)
+def _error(request: Request, e: Exception):  # report, keep serving; uvicorn logs the traceback
+    return Json({"error": f"{type(e).__name__}: {e}"}, status_code=500)
+
+
+@app.get("/api/queue")
+def get_queue(request: Request):
+    if USE_FIXTURES:
+        data, q = _fixture("queue.json"), request.query_params
+        items = [i for i in data["items"] if q.get("lang", "all") in ("all", i["lang"])]
+        offset, limit = _int(q, "offset", 0, 0, 10**6), _int(q, "limit", 50, 1, 200)
+        return Json({**data, "total": len(items), "items": items[offset : offset + limit]})
+    return _answer(queue, dict(request.query_params))
+
+
+@app.get("/api/search")
+def get_search(request: Request):
+    if USE_FIXTURES or not search_enabled():
+        raise ApiError(503, "search is off: this API has no embedding model on disk")
+    return _answer(search, dict(request.query_params))
+
+
+@app.get("/api/topics/{qid}")
+def get_topic(request: Request, qid: str):
+    if USE_FIXTURES:
+        return Json(_fixture("topics", _qid(request, qid) + ".json"))
+    return _answer(topic, _qid(request, qid))
+
+
+@app.get("/api/topics/{qid}/compare")
+def get_compare(request: Request, qid: str):
+    q = request.query_params
+    if USE_FIXTURES:
+        return Json(_fixture("topics", _qid(request, qid), f"compare-{q.get('a', 'fi')}-{q.get('b', 'en')}.json"))
+    return _answer(compare, _qid(request, qid), dict(q))
+
+
+@app.get("/api/topics/{qid}/timeline")
+def get_timeline(request: Request, qid: str):
+    q = request.query_params
+    if USE_FIXTURES:
+        name = f"timeline-{q.get('lang')}-{q.get('rich_lang')}.json"
+        return Json(_fixture("topics", _qid(request, qid), name))
+    return _answer(timeline, _qid(request, qid), dict(q))
+
+
+@app.post("/api/findings/{fid}/status")
+async def post_status(request: Request, fid: str):
+    if not fid.isdigit():
+        raise _no_route(request)
+    if USE_FIXTURES:
+        raise ApiError(503, "the fixtures are read-only")
+    return await run_in_threadpool(_answer, set_status, int(fid), await _body(request))
+
+
+# The two live SQL routes take no connection of the app user.
+@app.get("/api/sql/presets")
+def get_presets():
+    return Json(live_presets())
+
+
+@app.post("/api/sql/run")
+async def post_run(request: Request):
+    return Json(await run_in_threadpool(live_run, await _body(request)))
+
+
+@app.api_route("/api/{rest:path}", methods=["GET", "POST"], include_in_schema=False)
+def no_route(request: Request):
+    raise _no_route(request)
+
+
+if os.path.isdir(UI):
+    app.mount("/", StaticFiles(directory=UI, html=True), name="app")
+
+
+def serve(host="127.0.0.1", port=8078):
+    data = "the fixtures" if USE_FIXTURES else f"MariaDB at {DB['host']}"
+    print(f"Since When on http://{host}:{port}/ ({data})", flush=True)
+    uvicorn.run(app, host=host, port=port)

@@ -4,10 +4,12 @@ version = "0.1.0"
 description = "What the Finnish, Swedish and English Wikipedia articles on a topic say differently, and since when"
 requires-python = ">=3.13"
 dependencies = [
+    "fastapi==0.162.7",
     "mariadb==1.1.15",
     "mwparserfromhell==0.7.2",
     "torch==2.15.0",
     "transformers==5.23.0",
+    "uvicorn==0.54.0",
 ]
 
 [dependency-groups]

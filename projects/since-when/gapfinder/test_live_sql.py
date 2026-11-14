@@ -12,10 +12,10 @@ import time
 import unittest
 import urllib.error
 import urllib.request
-from http.server import ThreadingHTTPServer
 from unittest import mock
 
 import mariadb
+import uvicorn
 
 from gapfinder import api
 
@@ -23,10 +23,10 @@ TOPICS = ("Q1412941", "Q736268", "Q2457646")  # Lapua Movement, Finnish War, Die
 HAVE_RO = api.live_enabled()
 
 
-def call(server, method, path, body=None):
+def call(port, method, path, body=None):
     """(status, JSON body) of a request to the test server."""
     req = urllib.request.Request(
-        f"http://127.0.0.1:{server.server_port}{path}",
+        f"http://127.0.0.1:{port}{path}",
         method=method,
         data=None if body is None else json.dumps(body).encode(),
     )
@@ -40,13 +40,15 @@ def call(server, method, path, body=None):
 class Served(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.server = ThreadingHTTPServer(("127.0.0.1", 0), api.Handler)
-        threading.Thread(target=cls.server.serve_forever, daemon=True).start()
+        cls.server = uvicorn.Server(uvicorn.Config(api.app, host="127.0.0.1", port=0, log_level="warning"))
+        threading.Thread(target=cls.server.run, daemon=True).start()
+        while not cls.server.started:
+            time.sleep(0.01)
+        cls.port = cls.server.servers[0].sockets[0].getsockname()[1]
 
     @classmethod
     def tearDownClass(cls):
-        cls.server.shutdown()
-        cls.server.server_close()
+        cls.server.should_exit = True
 
 
 class Refused(Served):
@@ -62,7 +64,7 @@ class Refused(Served):
         self.addCleanup(connect.stop)
 
     def refused(self, body):
-        status, out = call(self.server, "POST", "/api/sql/run", body)
+        status, out = call(self.port, "POST", "/api/sql/run", body)
         self.assertEqual(status, 400, out)
         self.assertIn("error", out)
         self.connect.assert_not_called()
@@ -114,9 +116,7 @@ class Refused(Served):
         self.refused({"preset": "asof", "params": "Q1412941"})
 
     def test_body_must_be_json(self):
-        req = urllib.request.Request(
-            f"http://127.0.0.1:{self.server.server_port}/api/sql/run", method="POST", data=b"SELECT 1"
-        )
+        req = urllib.request.Request(f"http://127.0.0.1:{self.port}/api/sql/run", method="POST", data=b"SELECT 1")
         with self.assertRaises(urllib.error.HTTPError) as e:
             urllib.request.urlopen(req, timeout=30)
         self.assertEqual(e.exception.code, 400)
@@ -142,12 +142,12 @@ class Off(Served):
         os.environ.pop("DB_RO_PASSWORD", None)
 
     def test_presets_say_disabled(self):
-        status, out = call(self.server, "GET", "/api/sql/presets")
+        status, out = call(self.port, "GET", "/api/sql/presets")
         self.assertEqual(status, 200)
         self.assertFalse(out["enabled"])
 
     def test_run_is_503_even_with_a_valid_preset(self):
-        status, out = call(self.server, "POST", "/api/sql/run", {"preset": "asof"})
+        status, out = call(self.port, "POST", "/api/sql/run", {"preset": "asof"})
         self.assertEqual(status, 503, out)
 
 
@@ -176,7 +176,7 @@ class OnTheDatabase(Served):
             "statements": lambda v: [("slow", "SELECT SLEEP(20)", ())],
         }
         with mock.patch.dict(api.PRESETS, {"slow": slow}):
-            status, out = call(self.server, "POST", "/api/sql/run", {"preset": "slow"})
+            status, out = call(self.port, "POST", "/api/sql/run", {"preset": "slow"})
         self.assertEqual(status, 504, out)
 
     def test_writes_are_denied_by_the_database(self):
@@ -204,7 +204,7 @@ class OnTheDatabase(Served):
                 {"preset": "history", "params": {"qid": qid, "lang": "en"}},
             ):
                 with self.subTest(body=body):
-                    status, out = call(self.server, "POST", "/api/sql/run", body)
+                    status, out = call(self.port, "POST", "/api/sql/run", body)
                     self.assertEqual(status, 200, out)
                     self.assertGreater(len(out["rows"]), 0)
                     self.assertEqual(len(out["rows"][0]), len(out["columns"]))
@@ -213,7 +213,7 @@ class OnTheDatabase(Served):
 
     def test_asof_is_the_same_statement_on_another_date(self):
         runs = [
-            call(self.server, "POST", "/api/sql/run", {"preset": "asof", "params": {"date": d}})[1]
+            call(self.port, "POST", "/api/sql/run", {"preset": "asof", "params": {"date": d}})[1]
             for d in ("2012-01-01", "2026-10-22")
         ]
         self.assertEqual(runs[0]["sql"][1]["query"], runs[1]["sql"][1]["query"])

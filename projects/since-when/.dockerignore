@@ -4,3 +4,5 @@ docs
 measurements
 **/__pycache__
 .venv
+ui/node_modules
+ui/dist

@@ -9,7 +9,7 @@ python -m gapfinder findings load differences.jsonl
 python -m gapfinder findings lexicon pairs.jsonl > lexicon.jsonl   # word-list rows
 python -m gapfinder measure                # index recall and query times, saved to a file
 python -m gapfinder measure --versioned-index mine_a3   # a vector index on a versioned table
-python -m gapfinder serve [--port 8077]    # the HTTP API (docs/api.md)
+python -m gapfinder serve [--port 8078]    # the app and its HTTP API (docs/api.md)
 """
 
 import argparse
@@ -49,7 +49,8 @@ def main():
     p.add_argument("--note", help="a line for the results file, such as the server's memory limit")
     p.add_argument("--provisional", action="store_true", help="mark the times as taken on a busy machine")
     p = sub.add_parser("serve")
-    p.add_argument("--port", type=int, default=8077)
+    p.add_argument("--host", default="127.0.0.1")
+    p.add_argument("--port", type=int, default=8078)
     args = ap.parse_args()
 
     if args.cmd == "schema":
@@ -106,7 +107,7 @@ def main():
     elif args.cmd == "serve":
         from . import api
 
-        api.serve(args.port)
+        api.serve(args.host, args.port)
 
 
 if __name__ == "__main__":

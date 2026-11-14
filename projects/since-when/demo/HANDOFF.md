@@ -18,7 +18,7 @@ branch and is updated for the fork: every command runs from `projects/since-when
 docker compose up --build -d
 ```
 
-The API is on 8077 and the pages on 8078, both bound to `127.0.0.1`, reading the scratch database.
+One server answers the app and the API on 8078, bound to `127.0.0.1`, reading the scratch database.
 
 **2. Open it from a laptop.**
 
@@ -41,8 +41,8 @@ It never ran there, and the fork removed it; it stays in the history of `demo/ma
 
 ### What works on scratch
 
-The instance is the compose project `since-when` ([`../compose.yaml`](../compose.yaml)): containers
-`since-when-api-1` (8077) and `since-when-ui-1` (8078), both bound to `127.0.0.1`, both
+The instance is the compose project `since-when` ([`../compose.yaml`](../compose.yaml)): one container,
+`since-when-app-1` (8078), bound to `127.0.0.1`,
 `restart: unless-stopped`, reading the scratch database (`gapfinder-scratch-db`, database
 `gapfinder`). The code is copied into the image, so no worktree has to stay in place; after a
 change, run the first command again.
@@ -57,8 +57,8 @@ change, run the first command again.
 | Every quote of the shortlist is in the article text | | `nix develop -c python3 demo/check_quotes.py --offline`: 51 of 51 quotes pass |
 | Fallback topics | links in `WALKTHROUGH.md`, "Fallback" | each link opened, row counts in the script |
 
-Search (`/api/search`) is not part of this instance: the API container has no embedding model. The
-pages never call it; do not open it by hand, it would start a 2.2 GB download.
+Search (`/api/search`) is not part of this instance: the container has no embedding model, so the
+API answers 503 and the app hides its search box.
 
 Screenshots (outside git):
 `~/junction2026-data/mariadb/screenshots/01-first-step-lapua-findings.png` and
@@ -104,7 +104,7 @@ On the overnight branch, onto `origin/main` at `ce7ab73`, in this order, then `o
   `mariadb`:
 
   ```sh
-  docker compose run --rm api python -m unittest differences.test_differences gapfinder.test_wikitext gapfinder.test_live_sql
+  docker compose run --rm app python -m unittest differences.test_differences gapfinder.test_wikitext gapfinder.test_live_sql
   ```
 
 - CI (`.github/workflows/ci.yml`) has no path filters and already compiles everything under
@@ -309,8 +309,8 @@ The sentence to say:
 11. **The ordinary `gapfinder load` does not skip topics listed in `full_history`.** Running it
     on a hero topic would write year-end versions over the full history. Not changed.
 12. **The containers were named `gapfinder-demo-api` and `gapfinder-demo-ui`** until the fork;
-    they are now the compose project `since-when`. The API is on 8077 though only 8078 needs
-    forwarding.
+    they are now the compose project `since-when`, since the FastAPI rewrite one container
+    (`since-when-app-1`) on 8078.
 13. **Shortlist links point at `http://localhost:8078`**, and finding 1's note says the dates now
     show in the tool.
 14. **The walkthrough opens on the Swedish and English pair**, so all four dates are on one
