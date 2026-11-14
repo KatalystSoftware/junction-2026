@@ -660,3 +660,7 @@ _YI = _Y["m41y-i-long300-c10-820"]
 _Y["m41y-j-kindfee-thin-820"] = {**_from820(_YI, kind_fees=True),
                                  "thin_play": {**_YI["thin_play"], "params": {**_YI["thin_play"]["params"], "kind_fees": True}}}
 VARIANTS.update(_Y)
+# The `fresh-9072` bisect puts the lost week on the trade-in fee fix (`m41-i` 91.91%, `m41-j` 88.83%), so `kind_fees` is out in
+# every band (`m41y-j` never plays), and clears `late_cost` 100 (`m41-a` held the seed at 93.80%). `m41y-k` sets it on `m41y-i`
+# at 760 to 819 drivers: `when_rich` keeps 80 from 820, and under 760 the thin play keeps 150.
+VARIANTS["m41y-k-late100-760"] = _full_weeks(_Y["m41y-i-long300-c10-820"], late_cost=100)
