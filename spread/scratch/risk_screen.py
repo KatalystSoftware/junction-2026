@@ -18,6 +18,7 @@ gate, and drivers who wait for a raise.
     PYTHONPATH=. uv run --with scikit-learn python scratch/risk_screen.py extract     # data/screen/*.npz, once
     PYTHONPATH=. uv run --with scikit-learn python scratch/risk_screen.py check       # the models against the 0.9 and 1.0 weeks
     PYTHONPATH=. uv run --with scikit-learn python scratch/risk_screen.py screen      # each schedule on the default's weeks
+    PYTHONPATH=. uv run --with scikit-learn python scratch/risk_screen.py screen openings   # lower openings against f80, split by drivers
 """
 from __future__ import annotations
 
@@ -60,6 +61,18 @@ CLOCK = (0, 5, 6, 7, 8, 11, 14, 17, 20, 22)
 LEFT = (0, 6, 8, 12, 24, 48)
 NOTIFIED = (0, 5, 10, 40, 100)
 KNEE = math.log(1.22)  # booking follows the fee over the lane's usual fee up to about 1.22, then hardly (scratch/research)
+# ... and falls faster under about 0.85: with one slope the first hour's bookings at 0.65 to 0.75 x come out at 46% where
+# the weeks booked 39%, and under 0.65 x at 29% where they booked 13%.
+LOW = math.log(0.85)
+# The qualifying track's lower openings for cars with 16 hours or more (and 8 to 16), screened against `f80`.
+OPENINGS = {
+    "f80": {"fee_rules": [[0, 10 ** 6, 16, 10 ** 6, 0.8, 0.1, 1.2]]},
+    "f70": {"fee_rules": [[0, 10 ** 6, 16, 10 ** 6, 0.7, 0.1, 1.2]]},
+    "f60": {"fee_rules": [[0, 10 ** 6, 16, 10 ** 6, 0.6, 0.1, 1.2]]},
+    "f70-8": {"fee_rules": [[0, 10 ** 6, 8, 16, 0.8, 0.1, 1.2], [0, 10 ** 6, 16, 10 ** 6, 0.7, 0.1, 1.2]]},
+}
+SETS = {"risk": SCHEDULES, "openings": OPENINGS}
+RICH = 790  # drivers on the list: the weeks where the top teams' driver cost is lower
 
 
 def bins(value, edges) -> int:
@@ -154,6 +167,7 @@ def features(car, start, fee) -> list[float]:
     x = math.log(fee / car["usual"])
     first = float(k == 0)
     row = [first * min(x, KNEE), first * max(x - KNEE, 0), (1 - first) * min(x, KNEE), (1 - first) * max(x - KNEE, 0)]
+    row += low_terms(row[0], row[2])
     row += [float(bins(k, AGE) == i) for i in range(1, len(AGE))]
     row += [float(bins(start % DAY / 60, CLOCK) == i) for i in range(1, len(CLOCK))]
     row += [float(start // DAY % 7 == d) for d in range(1, 7)]
@@ -162,6 +176,11 @@ def features(car, start, fee) -> list[float]:
     row += [float(car["same_day"]), float(car["premium"]), float(car["private_pickup"]), float(car["private_delivery"]),
             max(0, car["drive"] - 240) / 60, (car["drivers"] - 760) / 100]
     return row
+
+
+def low_terms(first_fee: float, later_fee: float) -> list[float]:
+    """How far the fee is under 0.85 x the lane's usual fee, in the first hour and later, from the first and third terms."""
+    return [min(first_fee - LOW, 0.0), min(later_fee - LOW, 0.0)]
 
 
 def late_features(car, booked_at) -> list[float]:
@@ -232,12 +251,21 @@ def fit():
         return pickle.loads((OUT / "models.pkl").read_bytes())
     from sklearn.linear_model import LogisticRegression
     d = np.load(OUT / "rows.npz")
-    hazard = LogisticRegression(C=10, max_iter=500).fit(d["X"], d["y"])
+    X = d["X"]
+    if X.shape[1] == len(features_names()) - 2:  # rows extracted before the low terms: they follow from the fee terms
+        X = np.hstack([X[:, :4], np.minimum(X[:, [0, 2]] - LOW, 0), X[:, 4:]])
+    hazard = LogisticRegression(C=10, max_iter=500).fit(X, d["y"])
     lateness = LogisticRegression(C=10, max_iter=500).fit(d["L"], d["z"])
     models = hazard, lateness, float(np.mean(d["unpaid"]))
     (OUT / "models.pkl").write_bytes(pickle.dumps(models))
-    print("price terms (first hour under and over 1.22 x the lane's fee, later hours):", np.round(hazard.coef_[0][:4], 2), flush=True)
+    print("price terms (first hour under and over 1.22 x the lane's fee, later hours; under 0.85 first and later):", np.round(hazard.coef_[0][:6], 2), flush=True)
     return models
+
+
+def features_names() -> list[str]:
+    """One name for each term of `features`, to count them."""
+    return ["fee", "fee over knee", "later fee", "later fee over knee", "fee under 0.85", "later fee under 0.85"] + [""] * (
+        len(AGE) - 1 + len(CLOCK) - 1 + 6 + len(LEFT) - 1 + len(NOTIFIED) - 1 + 6)
 
 
 def expect(car, schedule, hazard, lateness, unpaid):
@@ -286,11 +314,12 @@ def interval(values, draws=10000):
     return values.mean(), np.quantile(means, 0.025), np.quantile(means, 0.975)
 
 
-def screen_week(week):
+def screen_week(job):
     """In a worker: the expected fees, first-hour bookings and late orders of a week's cars under each schedule."""
+    week, schedules = job
     hazard, lateness, unpaid = fit()
     totals = {}
-    for name, extra in SCHEDULES.items():
+    for name, extra in {"default": {}, **schedules}.items():
         params = {**VARIANTS[DEFAULT], **extra}
         desk = (RiskFeePolicy if params.get("risk_fees") else policy.Policy)(None, 8, 0, params, [], MAP)
         desk.roster, desk.notified = [None] * week["drivers"], collections.defaultdict(int)
@@ -311,26 +340,36 @@ def screen_week(week):
     return {"drivers": week["drivers"], "orders": week["orders"], "on_time": week["on_time"], "totals": totals}
 
 
-def screen() -> None:
-    fit()
-    weeks = json.loads((OUT / "default.json").read_text())
-    with Pool(4) as pool:
-        done = pool.map(screen_week, weeks, chunksize=4)
-    same = sum(w["totals"]["default"]["same as played"] for w in done) / sum(w["totals"]["default"]["cars"] for w in done)
-    print(f"{len(done)} weeks of {DEFAULT}, {sum(w['drivers'] < 720 for w in done)} with under 720 drivers; the default's schedule is the "
-          f"played one for {same:.1%} of cars. Euros a week against the default's schedule, 95% intervals over weeks; a late order at 150.")
-    print(f"{'schedule':28s} {'fees saved':>21s} {'late orders':>21s} {'net':>21s} {'paid/typ':>8s} {'booked<1h':>9s} {'thin net':>8s} {'<90%':>4s} {'lowest':>6s}")
-    for name in SCHEDULES:
-        d = [{k: w["totals"][name][k] - w["totals"]["default"][k] for k in ("fees", "late")} for w in done]
+def table(done, schedules, reference: str) -> None:
+    print(f"{'schedule':28s} {'fees saved':>21s} {'late orders':>21s} {'net':>21s} {'paid/typ':>8s} {'booked<1h':>9s} {'<90%':>4s} {'lowest':>6s}")
+    for name in schedules:
+        d = [{k: w["totals"][name][k] - w["totals"][reference][k] for k in ("fees", "late")} for w in done]
         fees = interval([-r["fees"] for r in d])
         late = interval([r["late"] for r in d])
         net = interval([-r["fees"] - 150 * r["late"] for r in d])
-        thin = [-r["fees"] - 150 * r["late"] for r, w in zip(d, done) if w["drivers"] < 720]
-        on_time = [1 - ((1 - w["on_time"]) * w["orders"] + r["late"]) / w["orders"] for r, w in zip(d, done)]
+        on_time = [1 - ((1 - w["on_time"]) * w["orders"] + w["totals"][name]["late"] - w["totals"]["default"]["late"]) / w["orders"] for w in done]
         paid = sum(w["totals"][name]["fees"] for w in done) / sum(w["totals"][name]["typ"] for w in done)
         first = sum(w["totals"][name]["first"] for w in done) / sum(w["totals"][name]["cars"] for w in done)
         print(f"{name:28s} {fees[0]:+6.0f} ({fees[1]:+5.0f} to {fees[2]:+5.0f}) {late[0]:+6.2f} ({late[1]:+.2f} to {late[2]:+.2f}) "
-              f"{net[0]:+6.0f} ({net[1]:+5.0f} to {net[2]:+5.0f}) {paid:8.3f} {first:9.1%} {np.mean(thin):+8.0f} {sum(o < 0.9 for o in on_time):4d} {min(on_time):6.1%}")
+              f"{net[0]:+6.0f} ({net[1]:+5.0f} to {net[2]:+5.0f}) {paid:8.3f} {first:9.1%} {sum(o < 0.9 for o in on_time):4d} {min(on_time):6.1%}")
+
+
+def screen() -> None:
+    """screen [set]: the schedules of a set (SETS) on the default's weeks, against the set's first schedule, in all weeks
+    and split at RICH drivers on the list. The \"risk\" set is read against the default's schedule."""
+    schedules = SETS[sys.argv[2] if len(sys.argv) > 2 else "risk"]
+    reference = next(iter(schedules))
+    fit()
+    weeks = json.loads((OUT / "default.json").read_text())
+    with Pool(4) as pool:
+        done = pool.map(screen_week, [(w, schedules) for w in weeks], chunksize=4)
+    same = sum(w["totals"]["default"]["same as played"] for w in done) / sum(w["totals"]["default"]["cars"] for w in done)
+    print(f"{len(done)} weeks of {DEFAULT}; the default's schedule is the played one for {same:.1%} of cars. Euros a week against "
+          f"{reference}, 95% intervals over weeks; a late order at 150. Weeks under 90% add the expected late orders to each played week.")
+    for label, part in (("all weeks", done), (f"{RICH} drivers or more", [w for w in done if w["drivers"] >= RICH]),
+                        (f"under {RICH} drivers", [w for w in done if w["drivers"] < RICH])):
+        print(f"\n{label}: {len(part)} weeks")
+        table(part, schedules, reference)
 
 if __name__ == "__main__":
     {"extract": extract, "check": check, "screen": screen}[sys.argv[1]]()

@@ -291,6 +291,23 @@ each played week. Holding the fee until a car is at risk is where the saving is 
 saves 3,500 a late order, the lower opening alone 1,400, and the two together 1,900. The qualifying track's played
 `outage-fee16` made +772 (487 to 1,069) on 29 weeks against the screen's +924 for `fee16`.
 
+The booking model bends again under 0.85 x the lane's usual fee (`LOW`): with one slope it put the first hour's
+bookings at 0.65 to 0.75 x at 46% where the weeks booked 39%; with the bend 43%, and under 0.65 x 24% against 13% on
+only 223 car-hours, so openings under 0.75 x are read beyond the data. Refitted, `risk-fees` is +1,677 at +1.07 late
+orders. `screen openings` reads the qualifying track's lower openings for cars with 16 hours or more against `f80`
+(0.8 x), split at 790 drivers:
+
+| Against `f80` | All 266 weeks: net, late orders | 99 weeks with 790 drivers or more | 167 weeks with fewer | Weeks under 90% (f80: 4) |
+| --- | --- | --- | --- | --- |
+| `f70` | +67, +1.31 | +198, +1.12 | -10, +1.42 | 6 |
+| `f60` | -84, +2.56 | +136, +2.22 | -214, +2.76 | 6 |
+| `f70-8` (0.8 x from 8 to 16 hours) | +63, +1.66 | +206, +1.46 | -22, +1.78 | 6 |
+
+None is worth playing, in rich weeks either: under 0.8 x the cars book so much later that the raises take back most of
+the opening's saving (fees paid 0.973 x typical at 0.8, 0.960 at 0.7, 0.958 at 0.6). What pays on top of 0.8 x is the
+hold: `risk-fees` with safe cars at 0.8 x nets +2,683 at +2.39 late orders against the default, `fee16-80` +1,381 at
++2.02, so the hold adds about 1,300 for 0.37 late orders.
+
 Private addresses (`curve-private`, +246 on tune at the old fees; -38 with opening 1.0, lowest week
 92.0%), a cost that follows the order (`curve-order-cost`, +193, -16 to 411) and counting what an
 order on time is worth in the dealer's later prices (`curve-trust-0.3`, -126; `curve-trust-1`,
