@@ -86,7 +86,7 @@ class PairPolicy(Policy):
         if self.p["push_from"] or self.p["home_offers"]:
             raise ValueError("Pairs do not reprice for the backlog (push_from) or send offers home (home_offers)")
         self.p.update(own)
-        self.held: dict[str, int] = {}  # order id -> the minute its car is posted alone if no return comes
+        self.pair_wait: dict[str, int] = {}  # order id -> the minute its car is posted alone if no return comes
         self.pair_gigs: dict[str, int] = {}  # gig id of a pair -> the latest minute a driver can set out and deliver both cars on time
         self.first: Optional[str] = None  # the order whose first post is being decided
         self.pairing = False  # the quote being made is for a return of a held car
@@ -98,7 +98,7 @@ class PairPolicy(Policy):
         return {**p, "cost": p["pair_cost"]} if self.pairing and p["pair_cost"] else p
 
     def unbooked(self, hours: float = 0) -> int:
-        held = sum(1 for id_ in self.held if not hours or self.orders[id_]["lastPickupAt"] - self.now <= hours * HOUR)
+        held = sum(1 for id_ in self.pair_wait if not hours or self.orders[id_]["lastPickupAt"] - self.now <= hours * HOUR)
         return super().unbooked(hours) - held
 
     def quote(self, request) -> None:
@@ -127,7 +127,7 @@ class PairPolicy(Policy):
         super().post(order, legs, retry)
 
     def look(self) -> None:
-        for id_, until in list(self.held.items()):
+        for id_, until in list(self.pair_wait.items()):
             if until <= self.now:
                 self.release(id_)
         for gig_id, latest in list(self.pair_gigs.items()):
@@ -136,7 +136,7 @@ class PairPolicy(Policy):
         super().look()
 
     def wake_at(self) -> int:
-        times = [*self.held.values(), *(latest - self.p["pair_split"] * HOUR for gig_id, latest in self.pair_gigs.items() if gig_id not in self.booked)]
+        times = [*self.pair_wait.values(), *(latest - self.p["pair_split"] * HOUR for gig_id, latest in self.pair_gigs.items() if gig_id not in self.booked)]
         return min([super().wake_at(), *(max(t, self.now + 1) for t in times)])
 
     def repost(self, gig_id: str) -> None:
@@ -145,7 +145,7 @@ class PairPolicy(Policy):
         super().repost(gig_id)
 
     def raise_fees(self, order_id: str) -> None:
-        if order_id in self.held:
+        if order_id in self.pair_wait:
             self.urgent.add(order_id)
             return self.release(order_id)
         gig_id = self.pair_of(order_id)
@@ -155,7 +155,7 @@ class PairPolicy(Policy):
         super().raise_fees(order_id)
 
     def change(self, order) -> None:
-        self.held.pop(order["id"], None)  # Desk.change posts it, alone
+        self.pair_wait.pop(order["id"], None)  # Desk.change posts it, alone
         gig_id = self.pair_of(order["id"])
         if gig_id and gig_id not in self.booked and order["id"] in self.orders:
             self.orders[order["id"]] = self.limited(order)
@@ -177,7 +177,7 @@ class PairPolicy(Policy):
 
     def handle(self, event) -> None:
         if event["kind"] == "order_cancelled":
-            self.held.pop(event["orderId"], None)
+            self.pair_wait.pop(event["orderId"], None)
             gig_id = self.pair_of(event["orderId"])
             super().handle(event)
             if gig_id and any(g["gigId"] == gig_id and g["outcome"] == "withdrawn" for g in event["gigs"]):
@@ -203,19 +203,19 @@ class PairPolicy(Policy):
         until = min(self.now + int(p["pair_hold"] * HOUR), last_request, order["lastPickupAt"] - int(p["pair_left"] * HOUR))
         if until <= self.now:
             return False
-        self.held[order["id"]] = until
+        self.pair_wait[order["id"]] = until
         self.decisions.setdefault(order["id"], {})["held"] = {"at": self.now, "until": until}
         return True
 
     def release(self, order_id: str) -> None:
         """Posts a held car alone."""
-        del self.held[order_id]
+        del self.pair_wait[order_id]
         self.decisions.setdefault(order_id, {}).setdefault("held", {})["alone"] = self.now
         Policy.post(self, self.orders[order_id], [0])
 
     def partner(self, request) -> Optional[str]:
         """The held order that the request's car can go back with, in one gig that a driver can still book in time."""
-        if len(request["legs"]) != 1 or kind(request) != "" or not self.held:
+        if len(request["legs"]) != 1 or kind(request) != "" or not self.pair_wait:
             return None
         reason, options = self.choose(request, self.params())
         if reason:
@@ -235,7 +235,7 @@ class PairPolicy(Policy):
     def best_pair(self, order, at: int) -> Optional[tuple[str, dict, int]]:
         """The held order to pair with, the post of both cars, and the latest start: the pair that leaves a driver the most time."""
         best = None
-        for id_ in self.held:
+        for id_ in self.pair_wait:
             other = self.orders[id_]
             if not self.returns(other, order):
                 continue
@@ -253,7 +253,7 @@ class PairPolicy(Policy):
         if best is None:
             return False
         id_, action, latest = best
-        del self.held[id_]
+        del self.pair_wait[id_]
         self.outbox.append({**action, "schedule": self.pair_fees([id_, order["id"]])})
         self.send()  # the gig's id now, as for a trade-in: later events of either order find it
         gig_id = self.leg_gigs.get(order["id"], {}).get(0)

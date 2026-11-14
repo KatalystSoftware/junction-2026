@@ -56,7 +56,7 @@ def win(d, req, at):
 def test_a_held_car_and_its_return_go_as_one_gig_at_the_pair_fee(monkeypatch):
     d = desk(monkeypatch, pair_fee=0.7, pair_cost=0.75)
     win(d, request("R1", "helsinki", "tampere", MON_9), MON_9 + 15)
-    assert d.world.sent == [] and "R1" in d.held and d.unbooked() == 0  # waits for a return, and counts as no backlog
+    assert d.world.sent == [] and "R1" in d.pair_wait and d.unbooked() == 0  # waits for a return, and counts as no backlog
     # The return is quoted at the pair's cost: lower than the same request with no held car to go back with.
     back = request("R2", "tampere", "helsinki", MON_9 + 60)
     d.now = MON_9 + 60
@@ -70,7 +70,7 @@ def test_a_held_car_and_its_return_go_as_one_gig_at_the_pair_fee(monkeypatch):
     d.handle({"kind": "order_won", "at": MON_9 + 75, "order": order(back)})
     d.send()
     posts = [a for a in d.world.sent if a["type"] == "post"]
-    assert len(posts) == 1 and not d.held
+    assert len(posts) == 1 and not d.pair_wait
     stops = posts[0]["stops"]
     assert [(s["orderId"], s["kind"]) for s in stops] in (
         [("R1", "pickup"), ("R1", "delivery"), ("R2", "pickup"), ("R2", "delivery")],
@@ -87,7 +87,7 @@ def test_a_held_car_without_a_return_goes_alone_when_its_hold_ends(monkeypatch):
     d.now = MON_9 + 15 + 4 * 60
     d.look()
     d.send()
-    assert not d.held and [len(a["stops"]) for a in d.world.sent if a["type"] == "post"] == [2]
+    assert not d.pair_wait and [len(a["stops"]) for a in d.world.sent if a["type"] == "post"] == [2]
 
 
 @pytest.mark.parametrize("event", ["deadline_close", "gig_expired"])
@@ -108,4 +108,4 @@ def test_a_car_with_too_little_time_or_no_return_traffic_is_posted_at_once(monke
     d = desk(monkeypatch)
     win(d, request("R1", "helsinki", "tampere", MON_9, deadline=MON_9 + 10 * 60), MON_9 + 15)  # under 16 hours to its last pickup
     win(d, request("R2", "helsinki", "helsinki", MON_9), MON_9 + 15)  # a lane without return traffic
-    assert not d.held and len([a for a in d.world.sent if a["type"] == "post"]) == 2
+    assert not d.pair_wait and len([a for a in d.world.sent if a["type"] == "post"]) == 2
