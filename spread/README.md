@@ -306,7 +306,11 @@ orders. `screen openings` reads the qualifying track's lower openings for cars w
 None is worth playing, in rich weeks either: under 0.8 x the cars book so much later that the raises take back most of
 the opening's saving (fees paid 0.973 x typical at 0.8, 0.960 at 0.7, 0.958 at 0.6). What pays on top of 0.8 x is the
 hold: `risk-fees` with safe cars at 0.8 x nets +2,683 at +2.39 late orders against the default, `fee16-80` +1,381 at
-+2.02, so the hold adds about 1,300 for 0.37 late orders.
++2.02, so the hold adds about 1,300 for 0.37 late orders. In play it did not hold: on the qualifying track's candidate
+(`cand-hold`, `risk_open` 0.8, 9 weeks of `confirm-30`) it made -1,132 a week (-1,540 to -616), and raising at 3%
+-647, with 259 and 268 orders against 303. Fees fell 3,460 a week and revenue 4,830: held cars wait longer, and while
+due within 24 hours each one raises every new quote through `slow_step`. The screen does not see that, so it can pass a
+fee schedule only together with a played check of the orders won.
 
 Private addresses (`curve-private`, +246 on tune at the old fees; -38 with opening 1.0, lowest week
 92.0%), a cost that follows the order (`curve-order-cost`, +193, -16 to 411) and counting what an
