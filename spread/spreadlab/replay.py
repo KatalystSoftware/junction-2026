@@ -67,6 +67,7 @@ class Replay:
         self.margin = 0
         self.offers: list[tuple[int, str, str]] = []  # (minute, gig id, driver id) of each direct offer sent
         self.crash_next_act = False
+        self.failed_out: set[tuple[str, str, int]] = set()  # (gig, order, leg) of each failed visit: the car is no longer on that gig
         self.withdrawn_at: dict[str, int] = {}  # gig id -> the minute the recorded desk withdrew it, for gigs it posted before the start
 
     def resume_from(self, gigs: list[dict], start: int) -> None:
@@ -108,6 +109,8 @@ class Replay:
                         self.gigs[outcome["gigId"]]["status"] = "withdrawn"
             elif kind == "ledger":
                 self.margin += event["line"]["cents"]
+            elif kind == "visit_failed":
+                self.failed_out.add((event["gigId"], event["orderId"], event["leg"]))
             if gig is not None:
                 if kind == "gig_booked":
                     gig.update(status="booked", driverId=event["driverId"], feeCents=event["feeCents"])
@@ -261,7 +264,7 @@ def compare(run: dict, replay: Replay, start: int, down: tuple[int, int]) -> lis
     for gig in replay.gigs.values():  # a car in two gigs that were live at once
         if gig["status"] in ("open", "booked", "working", "done"):
             for stop in gig["stops"]:
-                if stop["kind"] == "pickup":
+                if stop["kind"] == "pickup" and (gig["id"], stop["orderId"], stop["leg"]) not in replay.failed_out:
                     live.setdefault((stop["orderId"], stop["leg"]), []).append(gig["id"])
     for key, ids in live.items():
         twice += len([i for i in ids if replay.gigs[i]["status"] != "done"]) > 1

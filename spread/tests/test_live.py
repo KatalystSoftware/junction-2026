@@ -157,3 +157,32 @@ def test_a_second_desk_on_the_same_world_stops_at_once(tmp_path):
         live.keep_going(second, "final")
     playing.join()
     first.stop()
+
+
+def test_a_desk_that_starts_again_posts_a_car_whose_visit_failed_while_it_was_down(tmp_path):
+    # The world can keep the car on the driver's gig after the failed visit: the gig is still working.
+    asked = request("R1", arrivedAt=500, respondBy=515)
+    order = {"id": "R1", "dealerId": "D01", "option": "next_day", "priceCents": 15000, "deadline": 2640, "legs": asked["legs"],
+             "lastPickupAt": 2400, "status": "waiting", "deliveredAt": [None]}
+    events = [{"seq": 0, "at": 500, "kind": "price_request", "request": asked},
+              {"seq": 1, "at": 515, "kind": "order_won", "order": order},
+              {"seq": 2, "at": 520, "kind": "gig_booked", "gigId": "g1", "driverId": "d1", "feeCents": 9000},
+              {"seq": 3, "at": 530, "kind": "gig_started", "gigId": "g1", "driverId": "d1"},
+              {"seq": 4, "at": 600, "kind": "visit_failed", "gigId": "g1", "orderId": "R1", "leg": 0, "reason": "no_plates"}]
+    world = replay.Replay(events, ROSTER, ends_at=20000, start=506, speed=0.001)
+    desk = lambda: live.Live(world, world.guard_act, world.minute, 8, VARIANTS[live.VARIANT], MAP, tmp_path, echo=False)
+    first = desk()
+    first.join()
+    for minute in (516, 531):  # the win and the start of the drive: the desk posts g1 and sees it booked
+        world.clock.saw(minute)
+        for event in world.events(after=first.desk.seq):
+            first.desk.take(event)
+        first.desk.send()
+        first.store.save(first.desk)
+    first.stop()
+    world.clock.saw(601)  # the visit fails while the desk is down
+    second = desk()
+    second.join()
+    second.stop()
+    assert world.gigs["g1"]["status"] == "working" and list(world.gigs) == ["g1", "g2"]
+    assert world.gigs["g2"]["stops"][0]["withPlates"] is True, "the car goes again, with plates"

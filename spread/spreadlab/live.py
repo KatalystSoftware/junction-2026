@@ -216,7 +216,7 @@ class LiveDesk(Policy):
         self.seq = -1  # the last event taken
         self.offline = False  # while it reads the events it missed: it learns from them and sends nothing
         self.quoted: set[str] = set()  # the requests whose policy quote the world accepted
-        self.failed: dict[str, dict[int, str]] = {}  # order id -> leg -> the reason of its last failed visit
+        self.failed: dict[str, dict[int, tuple[str, str, int]]] = {}  # order id -> leg -> its last failed visit: reason, gig, minute
         self.log = self.guard = self.clock = None
 
     def __getstate__(self) -> dict:
@@ -238,7 +238,9 @@ class LiveDesk(Policy):
         started = time.monotonic()
         self.log.write("event", replayed=self.offline, lag=round(self.clock.now() - event["at"], 2), event=event)
         if kind == "visit_failed":
-            self.failed.setdefault(event["orderId"], {})[event["leg"]] = event["reason"]
+            self.failed.setdefault(event["orderId"], {})[event["leg"]] = (event["reason"], event["gigId"], event["at"])
+        elif kind == "gig_started":  # a driver who sets out holds the gig, whether or not the desk saw the booking
+            self.booked.add(event["gigId"])
         request = event.get("request") if kind == "price_request" else None
         try:
             self.handle(event)
@@ -359,12 +361,19 @@ class LiveDesk(Policy):
                     self.safely("reopen", gig["id"], self.reopen, gig["id"])
         posting = {(s["orderId"], s["leg"]) for a in self.outbox if a["type"] == "post" for s in a["stops"]}
         for order_id, order in list(self.orders.items()):
-            legs = [leg for leg in undelivered(order) if leg not in self.leg_gigs.get(order_id, {}) and (order_id, leg) not in posting]
-            failed = self.failed.get(order_id, {})
-            for leg in legs:
+            failed, rest = self.failed.get(order_id, {}), []
+            for leg in undelivered(order):
+                if (order_id, leg) in posting:
+                    continue
                 if leg in failed:
-                    self.safely("retry", order_id, self.retry, order_id, leg, failed[leg])
-            rest = [leg for leg in legs if leg not in failed]
+                    # As the kit's starter does: a car whose visit failed goes again unless a gig posted since carries it.
+                    # The world may still list it on the gig of the failed visit.
+                    reason, gig_id, at = failed[leg]
+                    if not any(gig["postedAt"] >= at and gig["id"] != gig_id and any(s["orderId"] == order_id and s["leg"] == leg for s in gig["stops"])
+                               for gig in live):
+                        self.safely("retry", order_id, self.retry, order_id, leg, reason)
+                elif leg not in self.leg_gigs.get(order_id, {}):
+                    rest.append(leg)
             if rest:
                 self.safely("post", order_id, self.post, order, rest)
         for order_id in self.urgent & set(self.orders):  # the steep fees of a deadline warning that came while the desk was away
