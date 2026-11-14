@@ -24,7 +24,6 @@ log and the console.
 from __future__ import annotations
 
 import argparse
-import functools
 import hashlib
 import json
 import math
@@ -240,7 +239,7 @@ def material(problems: list[dict], facts: notes.Facts, request: dict, deadline: 
     return kept
 
 
-tag = functools.lru_cache(maxsize=50_000)(notes.tag)  # notes have few distinct words, and each tag is a search through the rules' word lists
+tag = notes.tag
 
 
 CUSTOMER = re.compile(r"asiaka|asiakk|customer|client|kund")  # "the customer collects at 12": a time at the delivery
