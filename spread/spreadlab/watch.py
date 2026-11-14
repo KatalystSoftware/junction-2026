@@ -170,7 +170,9 @@ def parse(content: Optional[str]) -> Optional[dict]:
 
 def ask(text: str, read: dict, known: dict, key: str, model: str = MODEL, timeout: float = TIMEOUT) -> dict:
     """One call: {"answer", "problems", "seconds"}, with "error" when the call failed and "answer" None."""
-    body = json.dumps({"model": model, "messages": messages(text, read, known), "temperature": 0, "max_tokens": 300,
+    # Claude models refuse a temperature (HTTP 400 "temperature is deprecated for this model"); the others get 0.
+    body = json.dumps({"model": model, "messages": messages(text, read, known), "max_tokens": 300,
+                       **({} if model.startswith("claude") else {"temperature": 0}),
                        "chat_template_kwargs": {"enable_thinking": False}}).encode()
     request = urllib.request.Request(URL, body, {"Authorization": "Bearer " + key, "Content-Type": "application/json"})
     started = time.monotonic()

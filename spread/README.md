@@ -561,6 +561,16 @@ The same on 40 seeds (10 tune, 10 holdout, `fresh-001` to `fresh-020`), where th
   seeds at fees of 0.8 to 1.0, with one week at 89.6%. Not kept.
 - `rescue-*` and `late-225-cost-1.19` switch a late cost on from a point of the week; they are there
   for a comparison and are not candidates.
+- **Snow** (`snow_odds`, `snow_fee`). A `forecast` event names the places and hours of snow, from
+  midnight the day before. An order whose pickup or delivery place has snow forecast at the quote, for
+  hours between its first pickup minute and its deadline, is late about twice as often as `slow.py`
+  says: 10.4% against 6.1% over the reference's 401 weeks (0.64 more log odds), 8.0% against 3.9% over
+  167 weeks of `slow-step-gate-25` (0.79). That is 12 to 16 orders and 0.5 to 0.8 late orders a week.
+  Orders whose snow was forecast only after the quote are not late more often. The late ones are slow to
+  book: 68% were booked over an hour after the win and 60% only once the snow had started
+  ([`scratch/snow_report.py`](scratch/snow_report.py)). `slow-friday-late-150-kinds-limits-snow` adds
+  0.7 to the late chance's log odds there, so `late_cost` and `slow_step` price it; `-snow-fee-1.2` also
+  pays 1.2 x the usual fee schedule for gigs whose order has snow forecast before its deadline.
 
 **The default is `slow-friday-late-150-kinds-limits`** since Saturday 10:47 UTC. The rule for it: the highest mean margin
 among the variants with at most 3 of 60 weeks under 90% on time on a set of seeds that nothing had

@@ -1,6 +1,10 @@
 """Tests of the rules that keep slow cars out of the backlog and move the waiting ones out of it."""
 from __future__ import annotations
 
+import math
+
+import pytest
+
 from spreadlab import curve, policy, slow
 from test_harness import desk, posted, request, won
 
@@ -153,3 +157,26 @@ def test_the_friday_model_raises_the_chance_of_an_order_that_must_be_collected_o
     known = slow.known(monday, monday["options"][0], 100, 120, 760)
     assert abs(slow.chance(known, slow.MODELS["friday"]) - slow.chance(known)) < 0.01
     assert desk(slow_model="friday").slow(q, q["options"]) > desk().slow(q, q["options"])
+
+
+def test_a_snow_forecast_at_an_order_s_places_and_hours_raises_its_late_chance_and_its_fees():
+    def snow(places, start, end):
+        return {"seq": 1, "at": 0, "kind": "forecast", "text": "Snow", "from": start, "to": end, "placeIds": places}
+
+    params = {"curve": True, "same_day": True, "cost": 1.2, "late_cost": 150, "snow_odds": 0.7}
+    q = request()  # Vantaa to Helsinki, from minute 515 to the same_day deadline at 1200
+    elsewhere, later, here = desk(**params), desk(**params), desk(**params)
+    elsewhere.handle(snow(["tampere"], 600, 2000))
+    later.handle(snow(["helsinki"], 1300, 2000))  # after the fastest option's deadline
+    here.handle(snow(["helsinki"], 1000, 2000))
+    assert elsewhere.slow(q, q["options"]) == later.slow(q, q["options"]) == desk(**params).slow(q, q["options"])
+    plain = desk(**params).slow(q, q["options"])
+    assert here.slow(q, q["options"]) / (1 - here.slow(q, q["options"])) == pytest.approx(math.exp(0.7) * plain / (1 - plain))
+    assert price(here)["same_day"] > price(desk(**params))["same_day"]  # the late cost prices the higher chance
+    off = desk(curve=True, same_day=True, cost=1.2, late_cost=150)
+    off.handle(snow(["helsinki"], 1000, 2000))
+    assert price(off) == price(desk(curve=True, same_day=True, cost=1.2, late_cost=150))  # off at its default
+    fees = desk(fee=1.0, fee_cap=1.2, snow_fee=1.2)
+    fees.handle(snow(["vantaa"], 1440 + 600, 2 * 1440))
+    assert posted(fees, 1440 + 14 * 60) == [(500, 10800), (560, 11880), (620, 12960)]  # 1.2 x the schedule without snow
+    assert posted(fees, 1440 + 7 * 60, "R2") == [(500, 9000), (560, 9900), (620, 10800)]  # delivered before the snow starts
