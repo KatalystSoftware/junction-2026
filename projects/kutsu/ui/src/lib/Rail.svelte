@@ -1,9 +1,10 @@
 <script lang="ts">
   import { untrack } from 'svelte'
+  import { news } from './events'
   import { when } from './format'
   import Icon from './Icon.svelte'
   import Logo from './Logo.svelte'
-  import { app, go, nameOf, research, reviewOf, route } from './state.svelte'
+  import { app, go, nameOf, research, reviewOf, route, stateNames } from './state.svelte'
   import type { Brief, Status } from './types'
 
   // The city's side of the screen: which employers there are, and where each brief stands.
@@ -27,26 +28,26 @@
     if (at >= 0 && untrack(() => group) >= 0) group = at
   })
 
-  const SECTIONS: [Status, string][] = [['draft', 'To invite'], ['invited', 'Invited'], ['joined', 'Signed up']]
+  // a shortcut for an event whose employers are already coming names the states after their profiles
+  const names = $derived(stateNames(group >= 0 && !!app.presets[group]?.coming))
+  const SECTIONS: Status[] = ['draft', 'invited', 'joined']
   const matches = (b: Brief) => nameOf(b).toLowerCase().includes(query.trim().toLowerCase())
   const sections = $derived(
-    SECTIONS.map(([status, label]) => ({
-      label,
+    SECTIONS.map((status) => ({
+      label: names[status],
       status,
       // fresh funding and growth news first: those are the companies to reach before they come looking
-      items: shown
+      // a search looks through every company, not only the chosen shortcut
+      items: (query.trim() ? app.briefs : shown)
         .filter((b) => reviewOf(b).status === status && matches(b))
-        .sort((a, b) => (fresh(b)?.date ?? '').localeCompare(fresh(a)?.date ?? '') || b.signals.length - a.signals.length),
+        .sort((a, b) => (news(b)?.date ?? '').localeCompare(news(a)?.date ?? '') || b.signals.length - a.signals.length),
     })).filter((s) => s.items.length),
   )
   const confirmed = $derived(shown.filter((b) => reviewOf(b).status === 'joined').length)
-  /** The newest funding or growth statement, the reason to reach out now. */
-  const fresh = (b: Brief) =>
-    b.signals.filter((s) => (s.type === 'funding' || s.type === 'growth') && s.date).sort((x, y) => y.date.localeCompare(x.date))[0]
   const line = (b: Brief) => {
-    const news = fresh(b)
-    if (news) return `${news.type === 'funding' ? 'Funding' : 'Growth'}, ${when(news.date)}`
-    return b.signals.length < 3 ? 'Little public record' : reviewOf(b).needs[0]?.title || 'No need drafted'
+    const latest = news(b)
+    if (latest) return `${latest.kind === 'funding' ? 'Funding' : 'Growth'}, ${when(latest.date)}`
+    return b.signals.length < 3 ? 'Little public record' : reviewOf(b).needs[0]?.title || 'No role drafted'
   }
 
   function submit(e: SubmitEvent) {
@@ -78,7 +79,7 @@
       <button aria-pressed={i === group} title={i === group ? 'Show every company' : undefined} onclick={() => (group = i === group ? -1 : i)}>{g.label}<span>{g.items.length}</span></button>
     {/each}
   </div>
-  <p class="count">{confirmed} of {shown.length} signed up</p>
+  <p class="count">{confirmed} of {shown.length} {names.joined.toLowerCase()}</p>
 
   <nav>
     {#each sections as section (section.status)}

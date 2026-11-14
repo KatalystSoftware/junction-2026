@@ -64,7 +64,7 @@
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr));
     gap: 0 var(--s7);
   }
-  li {
+  ol > li {
     position: relative;
     padding: var(--s5) var(--s6) var(--s5) 0;
     border-top: 1px solid var(--line);

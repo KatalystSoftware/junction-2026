@@ -1,4 +1,4 @@
-import type { Brief, Pool, Preset, Review, Step } from './types'
+import type { Brief, Pool, Preset, Review, Status, Step } from './types'
 
 /** Everything the page shows. Reviews are polled, so a company's reply arrives without a reload. */
 export const app = $state({
@@ -48,6 +48,12 @@ export async function copyLink(id: string) {
     field.remove()
   }
 }
+
+/** Whether a company is on an event's public page already. Then it is not invited: it is sent its profile to confirm. */
+export const isComing = (id: string) => app.presets.some((p) => p.coming && p.ids.includes(id))
+/** What the three states of a sign-up are called, for a company still to be invited or for one already coming. */
+export const stateNames = (coming: boolean): Record<Status, string> =>
+  coming ? { draft: 'Profile not sent', invited: 'Profile sent', joined: 'Profile confirmed' } : { draft: 'To invite', invited: 'Invited', joined: 'Signed up' }
 
 /** The event's own name for a company, where the brand record calls it something else. */
 export const nameOf = (b: Brief) =>

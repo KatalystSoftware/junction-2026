@@ -68,8 +68,9 @@
 
   {#if pool && pool.people >= 5 && !editing}
     <p class="pool" title={app.pool.note}>
-      <b>{some(pool.people)}</b> people who came to Espoo's events do this work{known && known.n >= 5 ? `, ${String(known.n)} of them with ${known.skill}` : ''}.
-      <small>Sample numbers</small>
+      <b>{some(pool.people)}</b>
+      <span>came to Espoo's events and do this work{known && known.n >= 5 ? `. ${String(known.n)} know ${known.skill}` : ''}</span>
+      <small>sample numbers</small>
     </p>
   {/if}
 
@@ -325,17 +326,18 @@
     }
   }
   .pool {
-    margin-top: var(--s3);
-    font-size: var(--t-sm);
-    line-height: 1.4;
-    color: var(--ink-2);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--s1) var(--s3);
+    margin-top: var(--s4);
+    line-height: 1.3;
   }
   .pool b {
-    font-size: var(--t-md);
-    color: var(--ink);
+    font: 800 var(--t-xl) / 1 var(--display);
+    letter-spacing: -0.03em;
   }
   .pool small {
-    margin-left: var(--s1);
     padding: 0.15em 0.55em;
     border-radius: 99px;
     background: var(--wash);

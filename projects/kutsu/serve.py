@@ -139,6 +139,14 @@ class Handler(http.server.BaseHTTPRequestHandler):
             researching.release()
         self.json(draft) if draft else self.text(502, "The model gave no draft.")
 
+    def do_DELETE(self):
+        """Take out every saved sign-up: the demo's reset."""
+        if urllib.parse.urlsplit(self.path).path != "/reviews":
+            return self.text(404, "not found")
+        with saving:
+            REVIEWS.write_text(json.dumps({"shape": REVIEW_SHAPE, "reviews": {}}))
+        self.json({})
+
     def do_POST(self):
         url = urllib.parse.urlsplit(self.path)
         brief_id = urllib.parse.parse_qs(url.query).get("id", [""])[0]

@@ -1,23 +1,29 @@
 import { app, nameOf, reviewOf } from './state.svelte'
-import type { Brief, Need, PoolField, Preset, Told } from './types'
+import type { Brief, Need, PoolField, Preset, Signal, Told } from './types'
 
-// An event as Espoo plans it: the employers to invite, and the people in the pool who do the work
-// those employers ask for. The upcoming event comes from its list of employers; a suggested one from
-// a field where what employers say they need meets people who already came to earlier events.
+// An event as Espoo plans it: its employers, and the people in the pool who do the work those
+// employers look for. The upcoming event comes from its list of employers; a suggested one from a
+// field where the roles drafted for employers meet people who already came to earlier events.
+//
+// A role is drafted from what the employer said in public until the employer confirms it, so every
+// count of employers carries how many of them have confirmed.
 
 export type Invitee = { brief: Brief; roles: Need[]; news: Told | undefined }
-export type Row = { label: string; asked: number; have: number; href?: string }
+/** One thing looked for, against what the pool has: a field of work, or a skill inside one field. */
+export type Row = { label: string; asked: number; confirmed: number; have: number }
+/** One field of work for some employers: which of them look for it, the pool's people in it, and the skills asked. */
+export type Field = { name: string; employers: Invitee[]; people: PoolField; rows: Row[] }
 export type Plan = {
   slug: string
   title: string
   kind: 'upcoming' | 'suggested'
+  /** its employers are on the event's public page already */
+  coming: boolean
   date: string
-  fields: string[]
+  url: string
   employers: Invitee[]
-  /** the pool's people in these fields. Only an event in one field shows it as a number: across many fields it is nearly everyone */
-  people: PoolField
-  /** what is asked for against what the pool has: fields for a whole event, skills for one field */
-  rows: Row[]
+  /** the fields its employers look for, most asked first; a suggested event has one */
+  fields: Field[]
 }
 
 export const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
@@ -27,105 +33,73 @@ export const some = (n: number) => (n < 5 ? 'fewer than 5' : n.toLocaleString('e
 
 // "growth" also files a company that shrank, which is true of it and no reason to invite it
 const SHRANK = /\b(down|fell|fall|falls|declin\w+|decreas\w+|loss(es)?|lay-?offs?|cuts?|redundanc\w+)\b/i
-const today = () => new Date().toISOString().slice(0, 7)
+const month = (ms: number) => new Date(ms).toISOString().slice(0, 7)
 /** The newest funding or growth news a company would tell: the reason to invite it now. */
 export const news = (b: Brief): Told | undefined =>
   b.card.tell
-    .filter((t) => (t.kind === 'funding' || t.kind === 'growth') && t.date && t.date.slice(0, 7) <= today() && !SHRANK.test(t.line))
+    .filter((t) => (t.kind === 'funding' || t.kind === 'growth') && t.date && t.date.slice(0, 7) <= month(Date.now()) && !SHRANK.test(t.line))
     .sort((x, y) => y.date.localeCompare(x.date))[0]
+export const recent = (i: Invitee) => (i.news?.date ?? '') >= month(Date.now() - 365 * 864e5)
+/** The public statement an employer's news rests on. */
+export const sourceOf = (i: Invitee): Signal | undefined => i.brief.signals.find((s) => s.id === i.news?.signals[0])
+export const confirmed = (i: Invitee) => reviewOf(i.brief).status === 'joined'
 
-const yearAgo = () => new Date(Date.now() - 365 * 864e5).toISOString().slice(0, 7)
-export const recent = (i: Invitee) => (i.news?.date ?? '') >= yearAgo()
-
-const invitee = (brief: Brief, roles: Need[]): Invitee => ({ brief, roles, news: news(brief) })
+const invitee = (brief: Brief): Invitee => ({ brief, roles: reviewOf(brief).needs, news: news(brief) })
 // news first, newest on top; then by name, so the order does not move while people sign up
 const byNews = (a: Invitee, b: Invitee) => (b.news?.date ?? '').localeCompare(a.news?.date ?? '') || nameOf(a.brief).localeCompare(nameOf(b.brief))
 
-const EMPTY: PoolField = { people: 0, wanting: 0, levels: {}, english: 0, finnish: 0, abroad: 0, events: {}, skills: {} }
-const add = (a: Record<string, number>, b: Record<string, number>) => {
-  const out = { ...a }
-  for (const [k, v] of Object.entries(b)) out[k] = (out[k] ?? 0) + v
-  return out
-}
-/** The pool's people in several fields, as one count. */
-export const peopleIn = (fields: string[]): PoolField =>
-  fields
-    .map((f) => app.pool.fields[f])
-    .filter((f): f is PoolField => !!f)
-    .reduce(
-      (a, f) => ({
-        people: a.people + f.people,
-        wanting: a.wanting + f.wanting,
-        levels: add(a.levels, f.levels),
-        english: a.english + f.english,
-        finnish: a.finnish + f.finnish,
-        abroad: a.abroad + f.abroad,
-        events: add(a.events, f.events),
-        skills: add(a.skills, f.skills),
-      }),
-      EMPTY,
-    )
+const NOBODY: PoolField = { people: 0, wanting: 0, levels: {}, english: 0, finnish: 0, abroad: 0, events: {}, skills: {} }
 
-/** Every field of work, with the employers whose roles ask for it. A company's own answers count once it has given them. */
-const asked = () => {
-  const fields = new Map<string, Invitee[]>()
-  for (const brief of app.briefs) {
-    const roles = reviewOf(brief).needs
-    for (const field of new Set(roles.map((n) => n.family).filter((f): f is string => !!f)))
-      fields.set(field, [...(fields.get(field) ?? []), invitee(brief, roles.filter((n) => n.family === field))])
-  }
-  return fields
+/** One field among some employers: those with a role in it, the pool's people, and the skills those roles ask for. */
+function field(name: string, employers: Invitee[]): Field {
+  const here = employers.map((e) => ({ ...e, roles: e.roles.filter((r) => r.family === name) })).filter((e) => e.roles.length)
+  const people = app.pool.fields[name] ?? NOBODY
+  const skills = new Map<string, Invitee[]>()
+  for (const e of here) for (const skill of new Set(e.roles.flatMap((r) => r.skills))) skills.set(skill, [...(skills.get(skill) ?? []), e])
+  const rows = [...skills]
+    .sort((a, b) => b[1].length - a[1].length)
+    // a skill one employer asks for says little about an event, unless there is little else
+    .filter(([, asking], i) => asking.length > 1 || i < 6)
+    .slice(0, 8)
+    .map(([label, asking]) => ({ label, asked: asking.length, confirmed: asking.filter(confirmed).length, have: people.skills[label] ?? 0 }))
+  return { name, employers: here, people, rows }
 }
 
-const counted = (names: string[]) => {
-  const count = new Map<string, number>()
-  for (const name of names) count.set(name, (count.get(name) ?? 0) + 1)
-  return [...count].sort((a, b) => b[1] - a[1])
-}
+/** The fields some employers look for, most asked first. */
+const fieldsOf = (employers: Invitee[]): Field[] =>
+  [...new Set(employers.flatMap((e) => e.roles.map((r) => r.family).filter((f): f is string => !!f)))]
+    .map((name) => field(name, employers))
+    .sort((a, b) => b.employers.length - a.employers.length || a.name.localeCompare(b.name))
 
-/** Fields where an event is worth holding: at least three employers ask, and the pool has the people. Fresh news first. */
+/** Fields where an event is worth holding: at least three employers look for it, and the pool has the people. Fresh news first. */
 export const suggested = (): Plan[] =>
-  [...asked()]
-    .filter(([field, employers]) => employers.length >= 3 && (app.pool.fields[field]?.people ?? 0) >= 5)
-    .map(([field, employers]): Plan => {
-      const people = peopleIn([field])
-      return {
-        slug: slug(field),
-        title: field,
-        kind: 'suggested',
-        date: '',
-        fields: [field],
-        employers: employers.sort(byNews),
-        people,
-        // a skill asked by one employer only says little about an event
-        rows: counted(employers.flatMap((e) => [...new Set(e.roles.flatMap((r) => r.skills))]))
-          .filter(([, n], i) => n > 1 || i < 6)
-          .slice(0, 8)
-          .map(([label, n]) => ({ label, asked: n, have: people.skills[label] ?? 0 })),
-      }
-    })
-    .sort((a, b) => b.employers.filter(recent).length - a.employers.filter(recent).length || b.people.people - a.people.people)
+  fieldsOf(app.briefs.map(invitee))
+    .filter((f) => f.employers.length >= 3 && f.people.people >= 5)
+    .map((f): Plan => ({ slug: slug(f.name), title: f.name, kind: 'suggested', coming: false, date: '', url: '', employers: f.employers.sort(byNews), fields: [f] }))
+    .sort((a, b) => b.employers.filter(recent).length - a.employers.filter(recent).length || (b.fields[0]?.people.people ?? 0) - (a.fields[0]?.people.people ?? 0))
 
-/** An event that has its employers already: the people to invite are those who do what these employers ask for. */
+/** An event that has its employers already. */
 export const upcoming = (preset: Preset): Plan => {
   const employers = preset.ids
     .map((id) => app.briefs.find((b) => b.id === id))
     .filter((b): b is Brief => !!b)
-    .map((b) => invitee(b, reviewOf(b).needs))
-  const fields = counted(employers.flatMap((e) => [...new Set(e.roles.map((r) => r.family).filter((f): f is string => !!f))]))
+    .map(invitee)
   return {
     slug: slug(preset.title),
     title: preset.title,
     kind: 'upcoming',
+    coming: !!preset.coming,
     date: preset.date ?? '',
-    fields: fields.map(([f]) => f),
+    url: preset.url,
     employers: employers.sort(byNews),
-    people: peopleIn(fields.map(([f]) => f)),
-    rows: fields.map(([label, n]) => ({ label, asked: n, have: app.pool.fields[label]?.people ?? 0, href: `#/event/${slug(label)}` })),
+    fields: fieldsOf(employers),
   }
 }
 
 export const plans = (): Plan[] => [...app.presets.map(upcoming), ...suggested()]
+
+/** "9 employers, 2 confirmed": how many look for something, and how many of those said so themselves. */
+export const asking = (n: number, sure: number) => `${String(n)} ${n === 1 ? 'employer' : 'employers'}${sure ? `, ${String(sure)} confirmed` : ''}`
 
 /** Whole days from today until a date; negative once it has passed. */
 export const daysTo = (date: string) => Math.ceil((new Date(date).getTime() - Date.now()) / 864e5)

@@ -43,6 +43,11 @@ headless Chromium, signs one company up by pressing Enter until the finished pag
 error the page reports. `npm --prefix ui run lint` is ESLint with typescript-eslint's strict
 type-checked rules; it still reports 83 findings and is not part of the check yet.
 
+The **Demo** button at the top right belongs to the demo, not the product. It moves between the
+three people Kutsu is for (Espoo's organiser, an invited company, a candidate), fills in example
+sign-ups so the screens can be seen in use, and clears every sign-up. An example sign-up is marked
+as one wherever it shows: no company did it.
+
 ## What is real, what is sample, what is proposed
 
 - **Real:** every employer, and every statement about one. Each statement was found word for word on
@@ -57,6 +62,10 @@ type-checked rules; it still reports 83 findings and is not part of the check ye
   the figure that page gives. Espoo publishes no attendance numbers.
 - **Real about the event:** the Deep Tech Talent Forum's dates, that it is online and free, its list
   of employers, the presentation times and that places are limited, all from Espoo's event page.
+- **Drafted until confirmed:** the roles an employer looks for are drafted from its public
+  statements. Counts of employers say how many have confirmed ("9 employers, 2 confirmed").
+- **Already coming:** the Deep Tech Talent Forum's 27 employers are the ones on Espoo's event page,
+  so the screen does not invite them; it sends each its profile to confirm.
 - **Proposed by us:** that Espoo keeps a pool across events at all, the suggested events, and on the
   company's finished page that its profile is shown to matching candidates and that its booth is
   built from the page. These describe what the product would do; Espoo has promised none of them.
