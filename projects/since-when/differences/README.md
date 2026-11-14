@@ -129,8 +129,9 @@ python3 demo/hero_score.py $M/classify/verify/NAME/differences.jsonl   # against
 ```
 
 The judge is Nemotron 3.5 Super VL on the Verda container by default (`JUDGE=super`); Lightning on
-NVIDIA Build and Haiku are the other judges. Measured results are in
-[`demo/hero-verify-notes.md`](../demo/hero-verify-notes.md).
+NVIDIA Build and Haiku are the other judges. Measured results, and what is still wrong, are in
+[`demo/hero-verify-notes.md`](../demo/hero-verify-notes.md): on the hand-labelled hero rows Super VL as
+judge removes 9 of 11 false numbers rows and keeps all 9 real ones.
 
 ### The `checked_finding` table
 
@@ -164,14 +165,14 @@ a hypothetical 10,000; the English article has the 14,000 two sections earlier):
  "rev_id": 59682754, "other_rev_id": 1381826242,
  "summary": "The Swedish passage gives 14,000 men for the British force that arrived in Gothenburg, while the English passage gives 10,000 British troops authorized to land in Scania.",
  "verdict": "supported", "claim_lang": "sv", "claim_quote": "I maj ankom en brittisk hjälpkår om 14 000 man till Göteborg",
- "claim_about": "the British auxiliary corps of 14,000 men arriving at Gothenburg in May 1808", "claim_origin": "classifier",
+ "claim_about": "A British auxiliary corps of 14,000 men arriving in Gothenburg in May.", "claim_origin": "classifier",
  "searched": 22, "read_passages": 4, "search_sql": "WITH sentences AS ( SELECT … FROM chunk FOR SYSTEM_TIME AS OF NOW(6) AS c JOIN passage_sentence AS s … )",
  "evidence_lang": "en", "evidence_chunk_id": 30002461740007, "evidence_rev_id": 1381826242, "evidence_section": "War › February–May 1808",
  "evidence_quote": "On May 26, a British fleet carrying 14,000 troops under Sir John Moore entered the port of Gothenburg",
  "evidence_passage": "In May, the Russians suffered further setbacks when they were driven from Gotland and Åland, …",
- "evidence_distance": 0.3693, "claim_figure": "14 000 man", "evidence_figure": "14,000 troops",
+ "evidence_distance": 0.3693, "claim_figure": "14 000", "evidence_figure": "14,000",
  "reverse_verdict": null, "reverse_quote": null,
- "judge": "claude-haiku-5-5", "model": "nvidia/nemotron-3.5-super-vl-120b-a12b", "run": "current-haiku"}
+ "judge": "nemotron-3.5-super-vl", "model": "nvidia/nemotron-3.5-super-vl-120b-a12b", "run": "current-super"}
 ```
 
 The search also keeps two tables of its own: `passage_sentence` (each passage's sentences with

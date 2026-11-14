@@ -134,7 +134,7 @@ def read(text):
     if months:
         tokens = sorted(months + [(at, -n) for at, n, raw in numbers if 1 <= n <= 31 and len(raw) <= 2])
         month_first = tokens[0][1] > 0
-        days, waiting, last = {m: set() for _, m in months}, [], None
+        days, waiting, last = {m: set() for _, m in months}, [], months[0][1]
         for _, token in tokens:
             if token > 0:
                 last = token
@@ -145,7 +145,7 @@ def read(text):
                 days[last].add(-token)
             else:
                 waiting.append(-token)
-        if waiting and last:  # "the 14th" after its month was named
+        if waiting:  # "the 14th" after its month was named
             days[last].update(waiting)
         return ("date", {"days": days, "year": years[0] if years else None})
     if not numbers:

@@ -81,14 +81,10 @@ class Records(unittest.TestCase):
     def test_a_rewritten_row_changes_its_finding_and_a_listed_figure_is_new(self):
         first = {"pair_id": PAIR, "type": "missing_fact", "missing_in": "en", "quote_a": FACT, "quote_b": ""}
         written = {"from_pair": PAIR, **check("contradicted", "about 12,000 men")}
+        listed = {"from_pair": PAIR, **check("contradicted", "about 12,000 men", origin="extract")}
         kept = [
             row("numbers", "12 600 miestä", "about 12,000 men", original=first, **written),
-            row(
-                "numbers",
-                "Passage eleven",
-                "It ended",
-                **{**written, "claim": {**written["claim"], "origin": "extract"}},
-            ),
+            row("numbers", "Passage eleven", "It ended", **listed),
         ]
         rows, _ = self.load(kept, [])
         self.assertEqual(rows[(7, "changed", None)]["type"], "numbers")
