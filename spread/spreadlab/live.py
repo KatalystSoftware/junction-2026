@@ -48,7 +48,7 @@ from . import notes, watch
 from .exposure import ExposurePolicy
 from .late_wide import WideLate
 from .pairs import PairPolicy
-from .policy import DECLINE, Policy
+from .policy import DECLINE, OFFERS_A_DRIVER, Policy
 from .server import SERVER, PracticeClient, data_dir, world_map
 from .variants import VARIANTS
 
@@ -486,6 +486,10 @@ class LiveDesk(Policy):
         for action, result in zip(actions, results):
             if action["type"] == "quote" and result["ok"]:
                 self.quoted.add(action["requestId"])
+            elif action["type"] == "offer" and "per driver per day" in (result.get("reason") or ""):
+                # Offers are actions, not events: a desk that joined from the history cannot see the ones the desk before it
+                # sent today. The world's refusal tells, and the driver gets no more offers today.
+                self.offered[1][action["driverId"]] = OFFERS_A_DRIVER
 
     def catch_up(self, events: list[dict]) -> tuple[dict[str, int], dict[str, int]]:
         """Learns from the events that it missed, without acting on them: `reconcile` then acts on what the world

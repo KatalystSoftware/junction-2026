@@ -435,3 +435,19 @@ def test_the_desk_counts_the_429_answers_that_the_kit_waits_out():
     before = live.THROTTLED.count
     assert live.THROTTLED.watch(client).worlds() == []
     assert live.THROTTLED.count - before == 2
+
+
+def test_a_desk_that_joined_from_the_history_stops_offering_a_driver_the_world_says_has_had_three_offers_today(tmp_path):
+    # Offers are actions, not events: the desk before the join may have sent this driver three today (RULES.md, offers).
+    world = replay.Replay([], ROSTER, ends_at=20000, start=600, speed=0.001)
+    desk = live.Live(world, world.guard_act, world.minute, 8, VARIANTS[live.VARIANT], MAP, tmp_path, echo=False)
+    desk.clock.saw(600, exact=True)
+    desk.desk = live.LiveDesk(world, 8, 600, VARIANTS[live.VARIANT], ROSTER, MAP)
+    desk.desk.attach(world, desk.log, desk.guard, desk.clock)
+    driver = ROSTER[0]["id"]
+    desk.desk.offered = (0, {driver: 1})  # the books know of one offer today
+    world.act = lambda actions, by="desk": [{"ok": False, "reason": "At most three direct offers per driver per day"} for _ in actions]
+    desk.desk.outbox = [{"type": "offer", "gigId": "g1", "driverId": driver, "feeCents": 5000}]
+    desk.desk.send()
+    desk.stop()
+    assert desk.desk.offered == (0, {driver: 3})
