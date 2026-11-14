@@ -531,3 +531,19 @@ VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss
 # Row 7 (the day cap under 760 drivers) with the trade-in fee kept under the ladder: the fix as it merges on the current base.
 VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-kindfee"] = {
     **VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62"], "kind_fees": True}
+
+# The cheaper-cost rungs with their knobs on only from 820, 850 or 900 drivers (`rich_drivers`, `when_rich`). Played against the
+# safe twin, the extra orders cost money near 760 drivers and are about even only at 900 or more: agg-max lost 9,228 a week at
+# 760 to 819 drivers, 4,035 at 820 to 899 and 176 at 900 or more, and vol105 the same at half the size. A week under the line
+# plays A1.7 to the cent, and one under 760 plays A1.7's thin week.
+def _rich(rung: dict, drivers: int) -> dict:
+    """The knobs by which `rung` differs from A1.7 in a week of 760 drivers or more, moved into `when_rich` at `drivers`."""
+    knobs = {k: v for k, v in rung.items() if k != "when_tight" and v != _A1_7.get(k, _MISSING)}
+    return {**_A1_7, "rich_drivers": drivers, "when_rich": knobs}
+
+
+_MISSING = object()
+for _rung in ("vol110", "vol105", "cost10"):
+    for _drivers in (820, 850, 900):
+        VARIANTS[f"fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100-{_rung}-from{_drivers}"] = _rich(
+            VARIANTS[f"fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100-{_rung}"], _drivers)

@@ -860,3 +860,21 @@ def test_a_rich_week_takes_its_own_parameters_and_the_others_play_the_variant():
         assert desk(rich, n) == desk(a17, n), n
     full, base = desk(rich, 900), desk(a17, 900)
     assert {k: full[k] for k in full if full[k] != base[k]} == {"cost": 1.05, "max_unbooked": 40, "pair_onward_cost": 0.9}
+
+
+def test_the_rungs_from_820_850_and_900_drivers_play_a17_below_and_the_rung_above():
+    from spreadlab import play
+    from spreadlab.variants import VARIANTS
+    a17 = "fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100"
+    roster = lambda n: [{**ROSTER[0], "id": f"x{i}"} for i in range(n)]  # noqa: E731
+
+    def desk(name, n):  # the parameters the week plays with
+        params = VARIANTS[name]
+        played = play.policy_class(params)(None, 8, 0, params, roster(n), MAP).params()
+        return {k: v for k, v in played.items() if k not in ("when_tight", "rich_drivers", "when_rich")}
+    for rung in ("vol110", "vol105", "cost10"):
+        for drivers in (820, 850, 900):
+            name = f"{a17}-{rung}-from{drivers}"
+            for n in (700, 760, drivers - 1):
+                assert desk(name, n) == desk(a17, n), (name, n)
+            assert desk(name, drivers) == desk(f"{a17}-{rung}", drivers), name
