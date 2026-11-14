@@ -29,6 +29,8 @@ if [ -d api-cache ]; then rsync -az --update -e "${SSH[*]}" api-cache "$HOST:$DI
 rsync -az -e "${SSH[*]}" ui/dist "$HOST:$DIR/ui/"
 # The first applicant pages (projects/espoo-recruitment/app), which serve.py serves under /apply/ (the folder keeps its old name)
 rsync -az --delete -e "${SSH[*]}" ../espoo-recruitment/app/ "$HOST:$DIR/esittely/"
+# The pitch deck (projects/espoo-recruitment/pitch), which serve.py serves under /pitch/
+rsync -az --delete -e "${SSH[*]}" ../espoo-recruitment/pitch/ "$HOST:$DIR/pitch/"
 # signals.json grows on the server with every live search: ours replace the same ids, the rest stay
 rsync -az -e "${SSH[*]}" signals.json "$HOST:$DIR/signals.ours.json"
 "${SSH[@]}" "$HOST" "cd $DIR && python3 -" <<'PY'

@@ -38,10 +38,12 @@ DIST = lib.HERE / "ui" / "dist"
 # Kutsu), served under /apply/, with /esittely/ kept as a redirect, so the organiser's
 # screen can open the invitation form: a copy next to this file on the server, the sibling project in the repo
 ESITTELY = next((d for d in (lib.HERE / "esittely", lib.HERE.parent / "espoo-recruitment" / "app") if d.is_dir()), None)
+# The pitch deck (projects/espoo-recruitment/pitch), served under /pitch/: a copy next to this file on the server, the sibling folder in the repo
+PITCH = next((d for d in (lib.HERE / "pitch", lib.HERE.parent / "espoo-recruitment" / "pitch") if d.is_dir()), None)
 REVIEWS = lib.HERE / "reviews.json"
 DATA = {"/signals.json": "signals.json", "/presets.json": "presets.json", "/pool.json": "pool.json", "/applications.json": "applications.json"}
 TYPES = {".html": "text/html; charset=utf-8", ".js": "text/javascript", ".css": "text/css", ".json": "application/json",
-         ".svg": "image/svg+xml", ".woff2": "font/woff2", ".png": "image/png", ".ico": "image/x-icon", ".md": "text/markdown; charset=utf-8"}
+         ".svg": "image/svg+xml", ".woff2": "font/woff2", ".png": "image/png", ".jpg": "image/jpeg", ".ico": "image/x-icon", ".md": "text/markdown; charset=utf-8"}
 STATUSES = {"draft", "invited", "joined"}
 # What a saved sign-up holds. Raise it whenever that changes: a file saved in another shape is set aside
 # at start, never read, because the page keys its lists by what is in it and must not meet an old one.
@@ -130,6 +132,14 @@ class Handler(http.server.BaseHTTPRequestHandler):
         if url.path.startswith("/apply/") and ESITTELY:
             rel = url.path[len("/apply/"):] or "index.html"
             path = ESITTELY / rel
+            if not re.fullmatch(r"[\w.-]+(/[\w.-]+)*", rel) or ".." in rel or not path.is_file():
+                return self.text(404, "not found")
+            return self.reply(200, path.read_bytes(), TYPES.get(path.suffix, "application/octet-stream"))
+        if url.path == "/pitch":
+            self.send_response(301); self.send_header("location", "/pitch/"); self.end_headers(); return
+        if url.path.startswith("/pitch/") and PITCH:
+            rel = url.path[len("/pitch/"):] or "index.html"
+            path = PITCH / rel
             if not re.fullmatch(r"[\w.-]+(/[\w.-]+)*", rel) or ".." in rel or not path.is_file():
                 return self.text(404, "not found")
             return self.reply(200, path.read_bytes(), TYPES.get(path.suffix, "application/octet-stream"))
