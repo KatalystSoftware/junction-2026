@@ -350,7 +350,7 @@ against 275).
 Run it on the runner in Helsinki, from a clean checkout of `origin/main`, so no experiment in a working tree plays:
 
 ```bash
-git worktree add ../final origin/main && cd ../final/spread && uv sync   # once
+git worktree add ../final origin/main && cd ../final/spread && uv sync   # once; later: git fetch origin && git checkout --detach origin/main
 export SPREAD_KEY=<team key>
 while true; do uv run python -m spreadlab.live final; sleep 3; done      # in tmux; waits for the next final or test final
 uv run python -m spreadlab.live report <world id>                        # afterwards: the evidence for the jury
@@ -359,6 +359,8 @@ uv run python -m spreadlab.live report <world id>                        # after
 Start it at any time before the start. The organisers set a test final 15 minutes before it begins (14:00 and
 20:00 on Saturday), and the final at 07:30. The desk acts only on the world that `GET /v1/final` names. When it
 stops, by Ctrl-C, a crash or a reboot, the world goes on, and the same command goes on from `data/live/<world id>/`.
+`--variant <name>` plays another variant from `variants.py`; the default is `steep-notes-offers-8`. A second desk on
+the same world and machine stops at once, so two terminals cannot both post the cars.
 
 In the final the clock moves by itself, `advance` is closed, and a request gives 4.5 real seconds. What the live
 desk adds to the policy, which is the same class as in the sweeps:
