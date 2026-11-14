@@ -582,3 +582,28 @@ _R11 = VARIANTS[f"{_HEAD}-late100-h30-c11-late80-from820"]
 VARIANTS[f"{_HEAD}-late100-h30-c11-late80-from820-thin-hold12-left6"] = {**_R11, "thin_play": {
     "drivers": 760, "params": {**{k: v for k, v in {**_R11, **_R11["when_tight"]}.items() if k != "when_tight"},
                                "pair_hold": 12, "pair_left": 6}, "version": thin_play.VERSION}}
+
+# The stack rebuilt one part at a time on `trackb-merge-4.1` (`…-ss04`, row 5) after row 10 lost `fresh-9216` (714 drivers,
+# 89.0%), without the trade-in fee fix (`kind_fees`), which played 4 more orders and 4 more late on that week. Each row is
+# the one before plus one part on one side of 760 drivers: `m41-a` `late_cost` 100 at 760+; `m41-b` the day cap of 62 with
+# onward pairs under 760 (played together; `…-ss02-cap62-late100-onward-all` held `fresh-9216` at 90.2%); `m41-c` cost
+# 1.1 for orders with 30 hours or more at 760+; `m41-d` `late_cost` 80 from 820 drivers; `m41-e` lane 2's thin pair knobs
+# under 760 (`pair_hold` 12, `pair_left` 6, through `thin_play`).
+_M41 = {"m41-a-late100": _full_weeks(_ROW_5, late_cost=100)}
+_M41["m41-b-cap62-onward-all"] = {**_M41["m41-a-late100"], "pair_more_drivers": 0,
+                                  "when_tight": {**_M41["m41-a-late100"]["when_tight"], "due_cap": 62, "due_cap_wave": 0}}
+_M41["m41-c-h30-c11"] = _full_weeks(_M41["m41-b-cap62-onward-all"], cost=1.1, cost_hours=[[30, 1.2]])
+_M41["m41-d-late80-from820"] = {**_M41["m41-c-h30-c11"], "rich_drivers": 820, "when_rich": {"late_cost": 80}}
+_M41_D = _M41["m41-d-late80-from820"]
+_M41["m41-e-thin-hold12-left6"] = {**_M41_D, "thin_play": {
+    "drivers": 760, "params": {**{k: v for k, v in {**_M41_D, **_M41_D["when_tight"]}.items() if k != "when_tight"},
+                               "pair_hold": 12, "pair_left": 6}, "version": thin_play.VERSION}}
+VARIANTS.update(_M41)
+# Then lane 4 B's 30-hour group moved to 24 hours (`m41-f`, 760+), lane 1 A's `slow_step` 0.3 at 760 to 819 drivers (`m41-g`;
+# `when_rich` keeps 0.4 from 820) and its 0.25 from 820 (`m41-h`).
+_M41_E = VARIANTS["m41-e-thin-hold12-left6"]
+VARIANTS["m41-f-h24"] = {**_M41_E, "cost_hours": [[24, 1.2]]}
+VARIANTS["m41-g-ss03-760"] = {**VARIANTS["m41-f-h24"], "slow_step": 0.3,
+                              "when_rich": {**VARIANTS["m41-f-h24"]["when_rich"], "slow_step": _M41_E["slow_step"]}}
+VARIANTS["m41-h-ss025-820"] = {**VARIANTS["m41-g-ss03-760"],
+                               "when_rich": {**VARIANTS["m41-g-ss03-760"]["when_rich"], "slow_step": 0.25}}

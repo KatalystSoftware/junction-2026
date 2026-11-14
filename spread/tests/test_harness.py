@@ -913,3 +913,29 @@ def test_row_12_changes_only_the_thin_pair_knobs_of_row_11():
     row, base = f"{head}-late80-from820-thin-hold12-left6", f"{head}-late80-from820"
     assert desk(row, 800) == desk(base, 800)
     assert changed(desk(row, 700), desk(base, 700)) == {"pair_hold": 12, "pair_left": 6}
+
+
+def test_each_m41_row_adds_one_part_on_its_own_side_of_760_drivers():
+    from spreadlab import play
+    from spreadlab.variants import VARIANTS
+    roster = lambda n: [{**ROSTER[0], "id": f"x{i}"} for i in range(n)]  # noqa: E731
+
+    def desk(name, n):  # the parameters the week plays with
+        params = VARIANTS[name]
+        played = play.policy_class(params)(None, 8, 0, params, roster(n), MAP).params()
+        return {k: v for k, v in played.items() if k not in ("when_tight", "rich_drivers", "when_rich", "thin_play")}
+    rows = [("fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss04", {}),
+            ("m41-a-late100", {800: {"late_cost": 100}, 900: {"late_cost": 100}}),
+            ("m41-b-cap62-onward-all", {700: {"pair_more_drivers": 0, "due_cap": 62, "pair_open": True, "pair_onward": 0.8,
+                                              "pair_late": True, "pair_onward_cost": 1.0}, 800: {"pair_more_drivers": 0},
+                                        900: {"pair_more_drivers": 0}}),
+            ("m41-c-h30-c11", {d: {"cost": 1.1, "cost_hours": [[30, 1.2]]} for d in (800, 900)}),
+            ("m41-d-late80-from820", {900: {"late_cost": 80}}),
+            ("m41-e-thin-hold12-left6", {700: {"pair_hold": 12, "pair_left": 6}}),
+            ("m41-f-h24", {d: {"cost_hours": [[24, 1.2]]} for d in (800, 900)}),
+            ("m41-g-ss03-760", {800: {"slow_step": 0.3}}),
+            ("m41-h-ss025-820", {900: {"slow_step": 0.25}})]
+    for (below, _), (row, part) in zip(rows, rows[1:]):
+        for n in (700, 800, 900):
+            new, old = desk(row, n), desk(below, n)
+            assert {k: new[k] for k in new if new[k] != old.get(k)} == part.get(n, {}), (row, n)
