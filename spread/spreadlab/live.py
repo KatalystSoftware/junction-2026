@@ -24,6 +24,7 @@ The desk acts only on the final that `GET /v1/final` names, or on a practice wor
 from __future__ import annotations
 
 import argparse
+import fcntl
 import json
 import os
 import pickle
@@ -571,7 +572,14 @@ def folder_of(world_id: str) -> Path:
 
 def keep_going(live: Live, label: str) -> None:
     """Runs the desk to the world's end through lost connections and server restarts (API.md, Errors: the server
-    answers again in under a minute, and every world goes on from where it was)."""
+    answers again in under a minute, and every world goes on from where it was). One desk at a time: a second one on
+    the same world would post every car again."""
+    lock = open(live.folder / "desk.lock", "w")
+    try:
+        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)  # the kernel lets go when the process ends, also on a kill
+    except BlockingIOError:
+        live.stop()
+        sys.exit(f"Another desk plays world {live.world.id} from {live.folder} on this machine. Stop it first, or let it play.")
     while True:
         try:
             live.run()

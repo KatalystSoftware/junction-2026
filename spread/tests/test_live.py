@@ -1,6 +1,7 @@
 """Tests of the live desk: the final's clock, the fallback quote, and a desk that dies and starts again."""
 from __future__ import annotations
 
+import threading
 import time
 
 import pytest
@@ -143,3 +144,16 @@ def test_guard_covers_a_request_that_the_desk_decided_and_did_not_send_in_time(t
     time.sleep(0.35)
     desk.stop()
     assert [by for _, _, by in world.quotes.get("R1", [])] == ["fallback"]
+
+
+def test_a_second_desk_on_the_same_world_stops_at_once(tmp_path):
+    world = replay.Replay([], ROSTER, ends_at=20000, start=506, speed=0.001)
+    first, second = (live.Live(world, world.guard_act, world.minute, 8, VARIANTS[live.VARIANT], MAP, tmp_path, echo=False) for _ in range(2))
+    first.run = lambda: time.sleep(1)  # the first desk is still playing
+    playing = threading.Thread(target=live.keep_going, args=(first, "final"))
+    playing.start()
+    time.sleep(0.2)
+    with pytest.raises(SystemExit, match="Another desk"):
+        live.keep_going(second, "final")
+    playing.join()
+    first.stop()
