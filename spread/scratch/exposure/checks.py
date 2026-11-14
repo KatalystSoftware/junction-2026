@@ -8,6 +8,7 @@ books of book_rows.py at 20:00 of each evening.
    and the chance of a week under 90% on the evening before the wave of each week that ended under 90% or 92%.
 
     PYTHONPATH=. uv run --with numpy python scratch/exposure/checks.py [all]    # all: every saved week, fits included
+    PYTHONPATH=. uv run --with numpy python scratch/exposure/checks.py all <variant,...>    # every week of other variants' books
 """
 from __future__ import annotations
 
@@ -82,7 +83,10 @@ def dispersion(days: list[tuple]) -> None:
 
 
 def main() -> None:
+    global VARIANTS
     every = len(sys.argv) > 1 and sys.argv[1] == "all"
+    if every and len(sys.argv) > 2:
+        VARIANTS = sys.argv[2].split(",")
     if len(sys.argv) > 1 and sys.argv[1] == "dispersion":  # on the fit weeks
         days = []
         for v in VARIANTS:
@@ -106,13 +110,14 @@ def main() -> None:
         print(f"0. Dispersion on the fit weeks: {len(days)} days")
         dispersion(days)
         return
-    days, flu_rows, resid, tails = [], [], [], []
+    days, flu_rows, resid, tails, seen = [], [], [], [], []
     for v in VARIANTS:
         for w in pickle.load(open(data_dir() / "exposure" / f"book-{v}.pkl", "rb")):
             s = w["seed"]
             if not every and not (s.startswith("fresh-") and 1301 <= int(s.split("-")[1]) <= 1460):
                 continue
             feats = feats_of(w)
+            seen.append((v, w["on_time"], len({r["order"] for r in w["rows"]})))
             wave_day = next((d for d in range(1, 5) if w["first_hour"].get(d, 0) >= WAVE), None)
             for snap in w["snaps"]:
                 at = snap["at"]
@@ -172,6 +177,11 @@ def main() -> None:
             sel = [t for t in tails if a <= t[5][k] < b]
             if sel:
                 print(f"     {a:.2f}-{b:.2f}: {len(sel):4}, P {np.mean([t[5][k] for t in sel]):.3f}, ended under {np.mean([t[2] < line for t in sel]):.3f}")
+    print("   Weeks by variant (weeks, one-car orders a week, ended under 90%, under 92%):")
+    for v in VARIANTS:
+        sel = [x for x in seen if x[0] == v]
+        if sel:
+            print(f"     {v:36} {len(sel):3}  {np.mean([x[2] for x in sel]):5.0f}  {sum(x[1] < 0.90 for x in sel):2}  {sum(x[1] < 0.92 for x in sel):2}")
     print("   Thursday 20:00, weeks with a Friday wave, by orders due on Friday (seed, on time, P under 90/92/94%, Friday's weight):")
     for v, s, on_time, wave_day, day, risks, due, wt in sorted(tails, key=lambda t: t[2]):
         if day == 4 and wave_day == 4:
