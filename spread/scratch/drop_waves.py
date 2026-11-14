@@ -4,7 +4,7 @@ from saved weeks.
 A wave is 10 or more drops in a day's first hour (on other nights there are about 2). For each variant it prints the
 weeks with a wave on each weekday, the late share of the orders due on a Friday by how many were due and whether a wave
 came that night, the late share of the orders won from the week's largest batch against all orders, the lowest weeks,
-and, with --caps, the orders that a cap on one day's cars (daycap.py) would have declined: those won while their day
+and, with --caps, the orders that a cap on one day's cars (`due_cap`) would have declined: those won while their day
 already had that many orders with a car still to deliver. That last count leaves out what the desk would have done
 instead, so it is an upper bound on the margin a cap costs.
 

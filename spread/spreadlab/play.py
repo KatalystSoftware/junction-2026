@@ -16,7 +16,6 @@ from pathlib import Path
 
 from spread.starter import DAY
 
-from .daycap import DayCapPolicy
 from .dealer import DealerPolicy
 from .fallback import ActionDesk
 from .pairs import PairPolicy
@@ -65,9 +64,9 @@ def play(variant: str, params: dict, seed: str, level: int = 8) -> dict:
     try:
         snapshot, roster = world.snapshot(), world.roster()
         # The day's correction with an offset for each dealer (dealer.py), the note fallback (fallback.py), the fees by each car's
-        # risk (riskfee.py), out-and-back pairs (pairs.py), or a cap on the cars to collect on one day (daycap.py).
+        # risk (riskfee.py), or out-and-back pairs (pairs.py).
         desk_class = (PairPolicy if params.get("pair_hold") else DealerPolicy if params.get("dealer_sd") else ActionDesk if "note_actions" in params
-                      else RiskFeePolicy if params.get("risk_fees") else DayCapPolicy if params.get("day_cap") else Policy)
+                      else RiskFeePolicy if params.get("risk_fees") else Policy)
         desk, ends_at = desk_class(world, level, snapshot["now"], params, roster, map_), snapshot["endsAt"]
         events: list[dict] = []
         while desk.now < ends_at:

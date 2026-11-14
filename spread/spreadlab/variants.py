@@ -338,6 +338,9 @@ VARIANTS.update({
     "risk-open-due-24": {**_DEFAULT, "risk_fees": True, "risk_raise_late": 0, "risk_queue_hours": 24},
 })
 
-# The live default with a cap on the won orders to collect on one day (daycap.py): a night's wave of dropped gigs then takes
-# down at most that day's cap. An option due on a full day is not quoted; a slower one of the same request still is.
-VARIANTS.update({f"day-cap-{cap}": {**_DEFAULT, "day_cap": cap} for cap in (70, 80)})
+# The live default with a cap on the won orders to collect on one day (`due_cap`): a night's wave of dropped gigs then takes
+# down at most that day's cap. An option due on a full day is not quoted; a slower one of the same request still is. The cap
+# lifts for the rest of the week after the first night with 10 drops in its first hour (`due_cap_wave`).
+VARIANTS.update({f"day-cap-{cap}": {**_DEFAULT, "due_cap": cap, "due_cap_wave": 10} for cap in (70, 80)})
+# ... and the charging stop of a low-charge electric car only on a route over 180 km; RULES.md needs it over 200 km.
+VARIANTS["charge-180"] = {**_DEFAULT, "charge_km": 180}
