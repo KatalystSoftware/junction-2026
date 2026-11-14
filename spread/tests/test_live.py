@@ -50,14 +50,17 @@ def test_guard_quotes_the_fallback_only_for_a_request_the_desk_has_not_taken_up_
 
 def test_a_desk_that_dies_after_the_world_took_its_post_keeps_the_gig_and_what_it_learned(tmp_path):
     won, lost = request("R1"), request("R2", arrivedAt=505, respondBy=520)
+    unseen = request("R4", arrivedAt=517, respondBy=519)  # arrives and is lost while the desk is down: nobody quoted it
     late = request("R3", arrivedAt=521, respondBy=522)  # arrives while the desk is down; 0.3 s are left at the restart
     events = [{"seq": 0, "at": 500, "kind": "price_request", "request": won},
               {"seq": 1, "at": 505, "kind": "price_request", "request": lost},
               {"seq": 2, "at": 515, "kind": "order_won", "order": {"id": "R1", "dealerId": "D01", "option": "next_day", "priceCents": 15000,
                                                                      "deadline": 2640, "legs": won["legs"], "lastPickupAt": 2400,
                                                                      "status": "waiting", "deliveredAt": [None]}},
-              {"seq": 3, "at": 520, "kind": "order_lost", "requestId": "R2"},
-              {"seq": 4, "at": 521, "kind": "price_request", "request": late}]
+              {"seq": 3, "at": 517, "kind": "price_request", "request": unseen},
+              {"seq": 4, "at": 519, "kind": "order_lost", "requestId": "R4"},
+              {"seq": 5, "at": 520, "kind": "order_lost", "requestId": "R2"},
+              {"seq": 6, "at": 521, "kind": "price_request", "request": late}]
     world = replay.Replay(events, ROSTER, ends_at=20000, start=506, speed=0.001)  # the world's clock stands nearly still
     desk = lambda: live.Live(world, world.guard_act, world.minute, 8, VARIANTS[live.VARIANT], MAP, tmp_path, echo=False)
     first = desk()
@@ -73,13 +76,13 @@ def test_a_desk_that_dies_after_the_world_took_its_post_keeps_the_gig_and_what_i
     except replay.Crash:
         first.stop()
     assert list(world.gigs) == ["g1"]
-    world.clock.saw(521)  # R2 is lost and R3 arrives while the desk is down
+    world.clock.saw(521)  # R4 comes and goes, R2 is lost and R3 arrives while the desk is down
 
     second = desk()
     second.join()  # from the books on disk, which do not know of the win or of g1
     assert list(world.gigs) == ["g1"], "the car of R1 is in one gig"
     assert second.desk.leg_gigs["R1"] == {0: "g1"}
-    assert [won for _, won in second.desk.today[1]] == [True, False], "the day's correction counts both answers once"
+    assert [won for _, won in second.desk.today[1]] == [True, False], "the day's correction counts the answers to the desk's quotes, once"
     time.sleep(0.4)  # past the minute at which the guard quotes a request that nobody answered
     assert [by for _, _, by in world.quotes["R1"] + world.quotes["R3"]] == ["desk", "desk"], "the guard replaces no quote of the desk"
     second.stop()

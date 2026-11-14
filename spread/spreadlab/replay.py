@@ -67,12 +67,21 @@ class Replay:
         self.margin = 0
         self.offers: list[tuple[int, str, str]] = []  # (minute, gig id, driver id) of each direct offer sent
         self.crash_next_act = False
+        self.withdrawn_at: dict[str, int] = {}  # gig id -> the minute the recorded desk withdrew it, for gigs it posted before the start
 
     def resume_from(self, gigs: list[dict], start: int) -> None:
         """The recorded gigs posted before `start`, for a desk that joins in the middle of the week without its books:
-        the world holds them, and the events published at the first read update them."""
+        the world holds them, and the events published at the first read update them. A gig that the recorded desk
+        withdrew has no event for it: it counts as withdrawn from the minute a later gig took one of its cars."""
+        ended = {e["gigId"] for e in self.all if e["kind"] == "gig_expired"}
+        ended |= {o["gigId"] for e in self.all if e["kind"] == "order_cancelled" for o in e["gigs"]}
+        cars = lambda gig: {(stop["orderId"], stop["leg"]) for stop in gig["stops"]}
         for gig in sorted((g for g in gigs if g["postedAt"] < start), key=lambda g: int(g["id"][1:])):
             self.gigs[gig["id"]] = {**gig, "status": "open", "driverId": None}
+            if gig["status"] == "withdrawn" and gig["id"] not in ended:
+                later = [g["postedAt"] for g in gigs if int(g["id"][1:]) > int(gig["id"][1:]) and cars(g) & cars(gig)]
+                if later:
+                    self.withdrawn_at[gig["id"]] = min(later)
 
     def minute(self) -> int:
         return min(self.ends_at, int(self.clock.now()))
@@ -111,6 +120,9 @@ class Replay:
                 elif kind == "delivered" and all(self.orders[s["orderId"]]["deliveredAt"][s["leg"]] is not None
                                                  for s in gig["stops"] if s["orderId"] in self.orders):
                     gig["status"] = "done"
+        for gig_id, at in self.withdrawn_at.items():
+            if at <= now and self.gigs[gig_id]["status"] == "open":
+                self.gigs[gig_id]["status"] = "withdrawn"
 
     # The routes of a world that the live desk uses.
 

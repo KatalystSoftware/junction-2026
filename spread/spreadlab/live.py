@@ -242,6 +242,10 @@ class LiveDesk(Policy):
             self.guard.claim(request["id"])
         try:
             self.handle(event)
+            if request is not None and self.offline and request["id"] not in self.quoted:
+                # A request that it missed got no quote of the desk: its answer says nothing about the desk's prices today.
+                self.asked.pop(request["id"], None)
+                self.asked_at.pop(request["id"], None)
         except Exception:  # a failure on one event must not stop the desk
             self.log.write("error", seq=event["seq"], eventKind=kind, trace=traceback.format_exc(limit=6))
             self.log.say(f"Error on {kind} {event['seq']}; see the log. The desk goes on.")
