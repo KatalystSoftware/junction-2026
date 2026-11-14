@@ -5,10 +5,20 @@ services:
         condition: service_healthy
     volumes:
       - ledger:/ledger:ro
-    # The public replay viewer serves this estate's faults and every call the reference made
-    # (redteam/REPORT.md): the agent's container must not reach it.
+    # The public replay viewer and this public repository serve the simulator, the reference and
+    # replays of shipped seeds (redteam/REPORT.md): the agent's container must not reach them.
+    # OpenCode's install needs none of these hosts on this Alpine image (Dockerfile).
     extra_hosts:
       - "incident.katalyst.fyi:127.0.0.1"
+      - "github.com:127.0.0.1"
+      - "api.github.com:127.0.0.1"
+      - "raw.githubusercontent.com:127.0.0.1"
+      - "codeload.github.com:127.0.0.1"
+      - "objects.githubusercontent.com:127.0.0.1"
+      - "gist.githubusercontent.com:127.0.0.1"
+      - "cdn.jsdelivr.net:127.0.0.1"
+      - "raw.githack.com:127.0.0.1"
+      - "gitee.com:127.0.0.1"
 
   mcp-server:
     build:

@@ -102,6 +102,18 @@ harbor run -p tasks/shift-1 -a oracle --ae POLICY=stop-early           # stop-ea
 harbor run -p tasks/shift-1 -a nop                                     # do-nothing, 0.00
 ```
 
+On a busy machine Harbor's six minutes for installing OpenCode in the container can run out before
+the shift starts (`AgentSetupTimeoutError`); add `--agent-setup-timeout-multiplier 2`.
+
+Known limitation: the simulator and the reference are public by design, so judges can rerun them,
+and with the code an agent could compute its shift instead of working it. The agent's container
+therefore cannot reach the hosts that serve them: `extra_hosts` in
+`task/environment/docker-compose.yaml` points GitHub's download hosts, common mirrors and the
+replay site at localhost. That is why the agent's image is Alpine: there Harbor installs OpenCode's
+Node from the distro's packages instead of from GitHub. A determined agent could still find another
+mirror; a production benchmark would keep its reference and held-out seeds private
+(`redteam/REPORT.md`).
+
 `run.sh` does the same for any seed and runs several at once. One command runs the reference, both
 baselines and Opus on the committed run's seed:
 
