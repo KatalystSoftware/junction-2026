@@ -23,6 +23,8 @@ PUSH = {"push_from": 8, "push_hours": 24, "push_fee": 1.4}
 KINDS = {"private_pickup": {"cost": 1.6, "odds": 0.06}, "private_delivery": {"cost": 1.3, "odds": 0.37}, "trade_in": {"cost": 2.3, "fee": 1.4, "odds": 0.27}}
 # `fee_rules`: [drivers from, under, hours from, under, opening fee, rise an hour, top fee]. Few drivers and little time: open higher
 # and rise faster. Many drivers and over a day: open lower and rise slower. The others keep 1.0, 0.1 an hour, 1.2.
+SEARCH_16 = {"cost": 1.2210258222821198, "late_cost": 25.623005665608154, "backlog_step": 0.02226666084178632, "slow_step": 0.8001968330379229, "backlog_hours": 24,
+             "max_unbooked": 40, "fee": 0.9773051520962659, "fee_cap": 1.2852313870434833, "fee_rules": [[0, 10 ** 6, 0, 8, 1.0465927457594313, 0.1, 1.4852313870434832]]}
 FEES_THIN = [[0, 40, 0, 8, 1.2, 0.2, 1.6], [0, 40, 8, 24, 1.1, 0.1, 1.4]]
 FEES_DEEP = [[100, 10 ** 6, 24, 10 ** 6, 0.9, 0.05, 1.2]]
 
@@ -252,6 +254,11 @@ VARIANTS: dict[str, dict] = {
     # ... and with lateness in every quote and the late chance that knows Friday's deadlines (`slow-step-gate-25-friday-late-150`).
     "slow-friday-late-150-kinds-limits": {**REFERENCE, "backlog_step": 0, "slow_step": 0.8, "max_unbooked": 25, "slow_model": "friday", "cost": 1.2, "late_cost": 150,
                                           "kinds": KINDS, "note_limits": True},
+    # ... the same without the note's limits, whose posting changed after its weeks were played.
+    "slow-friday-late-150-kinds": {**REFERENCE, "backlog_step": 0, "slow_step": 0.8, "max_unbooked": 25, "slow_model": "friday", "cost": 1.2, "late_cost": 150, "kinds": KINDS},
+    # The best point of the search over these parameters together (scratch/search.py, trial 16 of 20, on 30 tune seeds), and with the kinds.
+    "search-16": {**REFERENCE, **SEARCH_16},
+    "search-16-kinds": {**REFERENCE, **SEARCH_16, "kinds": KINDS},
     # The fees by the drivers notified of the pickup and the hours left to collect the car.
     "fees-thin": {**REFERENCE, "fee_rules": FEES_THIN},
     "fees-deep": {**REFERENCE, "fee_rules": FEES_DEEP},
