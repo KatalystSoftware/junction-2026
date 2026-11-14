@@ -302,7 +302,7 @@ a.link:hover{box-shadow:0 1px 2px oklch(21% 0.03 264 / .06),0 14px 30px -12px #0
   <div class="slide-content stack">
     <div class="head stack">
     <h2 class="enter" style="--d:.05s">Solution</h2>
-    <p class="lead" style="--d:.08s">Six steps, all yours as the organiser. The AI gathers the information; you make every judgement. Kutsu is your app, Kutsu the page your invitees see.</p>
+    <p class="lead" style="--d:.08s">Six steps, all yours as the organiser. The AI gathers the information; you make every judgement. Kutsu is your app; your invitees see their own page in it.</p>
     </div>
     <div class="steps">
       <div class="step" style="--d:.15s"><h3>Choose which events to hold</h3></div>
@@ -376,10 +376,10 @@ a.link:hover{box-shadow:0 1px 2px oklch(21% 0.03 264 / .06),0 14px 30px -12px #0
       <ul class="list">
         <li class="enter" style="--d:.1s">You send <b>recruiters</b> their needs drafted from their own job ads; they tick what they hire for at this event.</li>
         <li class="enter" style="--d:.15s">You send <b>attendees</b> the questions this event's companies asked, prefilled from sources they chose to share.</li>
-        <li class="enter" style="--d:.2s">They can change or remove every line. You never ask for a CV, a cover letter, school names or a photo.</li>
+        <li class="enter" style="--d:.2s">They keep or take out every line. You never ask for a photo, age, gender or nationality.</li>
       </ul>
     </div>
-    <div class="cascade" style="--d:.15s"><img class="shot a" src="img/general.jpg" alt="Kutsu: Is this you? Lines read from the applicant's LinkedIn and GitHub, each with its source and a Change link" loading="lazy"><img class="shot b" src="img/eventq.jpg" alt="Kutsu: Questions for this event, with skill chips and a Finnish-at-work scale, prefilled from the applicant's sources" loading="lazy"><p class="cap">Kutsu, the attendee's page: every drafted line with its source, then the event's own questions.</p></div>
+    <div class="cascade" style="--d:.15s"><img class="shot a" src="img/general.jpg" alt="Kutsu, the invitee’s page: What may we read? Nothing is read until you say so. LinkedIn, a page about you, or a CV read in the browser; photo, age, gender and nationality are kept off the profile" loading="lazy"><img class="shot b" src="img/eventq.jpg" alt="Kutsu, the invitee’s page for the sample person Olena K.: three drafted lines, each ticked, to keep or take out, with an Edit link" loading="lazy"><p class="cap">Kutsu, the invitee’s page: nothing is read until they say so; then every drafted line, ticked, to keep or take out.</p></div>
   </div>
 </section>
 
@@ -434,7 +434,7 @@ a.link:hover{box-shadow:0 1px 2px oklch(21% 0.03 264 / .06),0 14px 30px -12px #0
     <div class="cards three">
       <div class="card" style="--d:.1s"><h3>No automated decisions</h3><p class="mut">People are never scored, ranked or labelled. A named organiser makes each decision and writes down why.</p></div>
       <div class="card" style="--d:.15s"><h3>Read only with consent</h3><p class="mut">An attendee chooses which of their own sources are read, once, and confirms every line before anyone else sees it.</p></div>
-      <div class="card" style="--d:.2s"><h3>As little data as possible</h3><p class="mut">No photo, age, gender, nationality, school names or CV files. Groups smaller than five are never shown as a count.</p></div>
+      <div class="card" style="--d:.2s"><h3>As little data as possible</h3><p class="mut">No photo, age, gender or nationality. A CV, if offered, is read in the browser and not sent. Groups smaller than five are never shown as a count.</p></div>
       <div class="card" style="--d:.25s"><h3>Names hidden until decided</h3><p class="mut">Reviewers see what a person can do before who they are, and decide on that.</p></div>
       <div class="card" style="--d:.3s"><h3>Fairness check on groups</h3><p class="mut">Per company, who was introduced is compared with who asked, for career changers and people without Finnish. A gap prompts a second look, and companies are asked whether Finnish is truly required.</p></div>
       <div class="card" style="--d:.35s"><h3>Built for the AI Act’s high-risk duties</h3><p class="mut">Recruitment AI is high-risk under the Act. The prototype has human oversight, a decision log and labelled AI drafts; retention rules and the conformity assessment are pilot work. All personal data in it is synthetic; company data is public.</p></div>
@@ -481,8 +481,8 @@ a.link:hover{box-shadow:0 1px 2px oklch(21% 0.03 264 / .06),0 14px 30px -12px #0
         <li><b>Anthropic Claude</b> <span>Haiku and Opus turn pages into quoted facts; anything not in the page word for word is dropped, and so are personal names</span></li>
       </ul></div>
       <div class="enter" style="--d:.2s"><h3>Build and hosting</h3><ul>
-        <li><b>Kutsu</b> <span>Svelte 5, TypeScript, Vite, Python server</span></li>
-        <li><b>Kutsu</b> <span>plain JavaScript, no build step</span></li>
+        <li><b>Kutsu, organiser app</b> <span>Svelte 5, TypeScript, Vite, Python server</span></li>
+        <li><b>Kutsu, invitee pages</b> <span>plain JavaScript, no build step</span></li>
         <li><b>Cloudflare Workers and KV</b> <span>hosting and sign-up storage</span></li>
         <li><b>Playwright</b> <span>automated walk-through of the demo</span></li>
         <li><b>Synthetic data</b> <span>generated people and applications; no real person anywhere</span></li>
