@@ -8,6 +8,8 @@ Docker network `proxy` and publishes no ports.
 | --- | --- | --- |
 | Edition Ledger | `https://gapfinder.<base domain>/` and `https://31-22-104-106.sslip.io/` | `gapfinder-ui-1:8078`, on its own network |
 | Since When | `https://since-when.<base domain>/` and `https://since-when.31-22-104-106.sslip.io/` | `since-when-app:8078` |
+| On-call shift replay | `https://incident.<base domain>/` | static files in `static/incident`, shipped by `spikes/aq-incident/replay/deploy.sh` |
+| Index page | `https://<base domain>/` | static files in `static/index`, shipped by `projects/index/deploy.sh` |
 
 Edition Ledger is the one exception to "apps join the `proxy` network": it was live first, so the
 proxy joins its network `gapfinder_default` and its deploys need no change. If that project is ever
