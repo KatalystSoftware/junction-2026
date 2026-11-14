@@ -1,27 +1,19 @@
-// The address is the state: ?q=…&lang=sv&sql=<preset>,<values>#/<wikidata id>/<edition>/<edition>/<findings|timeline>
+// The address is the state: ?q=…&lang=sv&sql=<preset>,<values>#/<wikidata id>
 import { isLang, type Lang, type SqlEntry } from './types'
 
-export type Tab = 'findings' | 'timeline'
 export interface Route {
 	qid: string
-	lang: string
-	rich: string
-	tab: Tab
 }
 
-export const href = (r: Route, patch: Partial<Route> = {}) => {
-	const x = { ...r, ...patch }
-	return `#/${x.qid}/${x.lang}/${x.rich}/${x.tab}`
-}
+export const href = (qid: string) => `#/${qid}`
 
-// `compare` (the side-by-side view this app no longer has), an unknown tab or a trailing year all
-// land on the findings; the address is rewritten so the link a visitor copies is one the app keeps.
+// Older addresses named two editions and a tab (#/Q1/sv/en/findings, …/timeline, …/compare/2020).
+// They open the topic's page, and the address is rewritten to the one the app keeps.
 function parseHash(): Route | null {
-	const [qid, lang = '', rich = '', tab = 'findings', ...rest] = location.hash.replace(/^#\/?/, '').split('/')
+	const [qid, ...rest] = location.hash.replace(/^#\/?/, '').split('/')
 	if (!qid) return null
-	const route: Route = { qid, lang, rich, tab: tab === 'timeline' ? 'timeline' : 'findings' }
-	if (lang && rich && (tab !== route.tab || rest.length)) history.replaceState(null, '', location.pathname + location.search + href(route))
-	return route
+	if (rest.length) history.replaceState(null, '', location.pathname + location.search + href(qid))
+	return { qid }
 }
 
 const params = new URLSearchParams(location.search)
@@ -34,11 +26,18 @@ export const nav = $state({
 	sql: params.get('sql'),
 })
 
-// What is open on top of the page.
-export const ui = $state({ topics: params.has('q'), sql: false })
+// What is open on top of the page. `runnable` is set once the server says it runs statements;
+// `ask` is a statement a difference wants shown in the SQL panel.
+export const ui = $state({ topics: params.has('q'), sql: false, runnable: false, ask: null as { preset: string; values: Record<string, string> } | null })
+
+/** Opens the SQL panel with a statement filled in. Nothing runs until Run is clicked. */
+export function showSql(preset: string, values: Record<string, string>) {
+	ui.ask = { preset, values }
+	ui.sql = true
+}
 
 // The queries behind what is on screen, for the SQL panel.
-export const log = $state({ listLabel: 'Topic list', list: [] as SqlEntry[], topic: [] as SqlEntry[], tab: [] as SqlEntry[] })
+export const log = $state({ listLabel: 'Topic list', list: [] as SqlEntry[], topic: [] as SqlEntry[], history: [] as SqlEntry[] })
 
 addEventListener('hashchange', () => {
 	nav.route = parseHash()

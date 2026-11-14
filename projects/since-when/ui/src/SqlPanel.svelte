@@ -1,15 +1,22 @@
 <script lang="ts">
-	// The SQL behind the page: three preset statements the server runs as a SELECT-only user, and
-	// the queries each response reported. The app sends a preset name and its values, never SQL.
+	// The SQL behind the page, one statement at a time: the statement, its values, Run, the rows.
+	// Three statements can be run; the server runs them as a SELECT-only user. The app sends a
+	// preset name and its values, never SQL. The queries each response reported can be read too.
 	import { onMount } from 'svelte'
 	import { api } from './lib/api.svelte'
-	import { NAMES, plural } from './lib/format'
+	import { NAMES, dayAfter, plural } from './lib/format'
 	import { log, nav, syncSearch, ui } from './lib/nav.svelte'
-	import { sqlHtml } from './lib/sql'
+	import { preview, sqlHtml } from './lib/sql'
 	import { LANGS, type Preset, type Presets, type Run, type SqlEntry, type Topic } from './lib/types'
 
 	let { topic }: { topic: Topic | null } = $props()
 
+	// What each statement shows, in a line. The MariaDB feature is in the statement itself.
+	const ABOUT: Record<string, [string, string]> = {
+		asof: ['An article as it stood on a date', "The article's first passage at 00:00 UTC on the date: set the session's time, then a plain SELECT."],
+		history: ['Every version MariaDB has kept', "Every version of the article's first passage, with the time each one was current."],
+		nearest: ['Editions compared on a date', 'Time travel and vector search in one statement: each passage with its nearest in the other edition.'],
+	}
 	const DEMO: Record<string, string> = { Q1412941: 'Lapua Movement', Q736268: 'Finnish War', Q2457646: 'Diet of Porvoo' }
 	const LABEL: Record<string, string> = { qid: 'Topic', date: 'As of', lang: 'Edition', a: 'Passages in', b: 'Nearest in' }
 	const VALID = { qid: /^Q[0-9]+$/, date: /^\d{4}-\d\d-\d\d$/, lang: /^(fi|sv|en)$/ }
@@ -19,7 +26,8 @@
 	let limits = $state({ seconds: 5, rows: 500 })
 	let name = $state('')
 	let values = $state<Record<string, Record<string, string>>>({})
-	let runs = $state<Record<string, Run[]>>({})
+	let runs = $state<Record<string, Run>>({})
+	let read = $state<SqlEntry | null>(null) // a query the page ran, chosen for reading
 	let running = $state(false)
 	let failure = $state('')
 	let ready = $state(false) // the presets have answered, one way or the other
@@ -28,8 +36,11 @@
 	const preset = $derived(presets.find((p) => p.name === name))
 	const topics = $derived({ ...DEMO, ...(topic ? { [topic.wikidata_id]: topic.topic } : {}) })
 	const groups = $derived(
-		([[log.listLabel, log.list], ['Topic', log.topic], ['Timeline', log.tab]] as [string, SqlEntry[]][]).filter(([, qs]) => qs.length),
+		([[log.listLabel, log.list], ['This topic', log.topic], ['When each difference began', log.history]] as [string, SqlEntry[]][]).filter(([, qs]) => qs.length),
 	)
+	const ran = $derived(preset ? runs[preset.name] : undefined)
+	// Once a statement has run with the values now in the form, the text is the one MariaDB was sent.
+	const sent = $derived(ran && preset && preset.params.every((x) => ran.params[x.name] === values[preset.name][x.name]) ? ran : undefined)
 
 	// ?sql=<preset>,<values in the preset's order> opens the panel with that preset filled in. It
 	// only fills the form: nothing runs until Run is clicked.
@@ -45,6 +56,7 @@
 			limits = d.limits
 			presets = d.presets
 			name = p?.name ?? ''
+			ui.runnable = true
 			if (asked !== null && p) ui.sql = true
 		} catch {
 			// Without the read-only user the panel is the query log alone.
@@ -58,6 +70,26 @@
 		nav.sql = ui.sql && preset ? [preset.name, ...preset.params.map((x) => values[preset.name][x.name])].join(',') : null
 		syncSearch()
 	})
+
+	// A difference asks for a statement: it is filled in and shown, and waits for Run.
+	$effect(() => {
+		const ask = ui.ask
+		if (!ask || !ready) return
+		ui.ask = null
+		const p = presets.find((x) => x.name === ask.preset)
+		if (!p) return
+		for (const x of p.params) if (VALID[x.kind].test(ask.values[x.name] ?? '')) values[p.name][x.name] = ask.values[x.name]
+		name = p.name
+		read = null
+		failure = ''
+	})
+
+	function choose(value: string) {
+		failure = ''
+		const [kind, key] = value.split(':')
+		if (kind === 'run') (name = key), (read = null)
+		else read = groups.flatMap(([, qs]) => qs)[+key] ?? null
+	}
 
 	// The panel is a modal dialog: the browser keeps focus inside it, closes it on Escape and gives
 	// focus back to the SQL button.
@@ -81,7 +113,7 @@
 		failure = ''
 		try {
 			const result = await api<Run>('/sql/run', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ preset: which, params: values[which] }) })
-			runs[which] = [result, ...(runs[which] ?? [])].slice(0, 2)
+			runs[which] = result
 		} catch (err) {
 			failure = err instanceof Error ? err.message : String(err)
 		}
@@ -96,8 +128,9 @@
 	}
 </script>
 
-{#snippet statement(q: SqlEntry)}
-	<pre>{@html sqlHtml(q.query)}</pre>
+{#snippet statement(text: string)}
+	<!-- svelte-ignore a11y_no_noninteractive_tabindex (a scrolling region has to take keyboard focus to be scrolled) -->
+	<pre tabindex="0" aria-label="Statement">{@html sqlHtml(text)}</pre>
 {/snippet}
 
 {#snippet result(r: Run)}
@@ -140,17 +173,30 @@
 			<button class="cdx-button cdx-button--action-progressive cdx-button--weight-quiet" onclick={() => dialog.close()}>Close</button>
 		</header>
 
-		{#if preset}
-			<section class="live" aria-label="Run a statement on MariaDB">
-				<div class="presets" role="group" aria-label="Statement">
-					{#each presets as p}
-						<button class="cdx-button" aria-pressed={p.name === name} onclick={() => ((name = p.name), (failure = ''))}>{p.title}</button>
-					{/each}
-				</div>
-				<p class="small subtle">{preset.description}</p>
+		<div class="one">
+			<select class="cdx-select" aria-label="Statement" onchange={(e) => choose(e.currentTarget.value)}>
+				{#if presets.length}
+					<optgroup label="Run on MariaDB">
+						{#each presets as p}<option value="run:{p.name}" selected={!read && p.name === name}>{ABOUT[p.name]?.[0] ?? p.title}</option>{/each}
+					</optgroup>
+				{/if}
+				{#each groups as [group, qs], g}
+					{@const before = groups.slice(0, g).reduce((n, [, x]) => n + x.length, 0)}
+					<optgroup label="Read: {group}">
+						{#each qs as q, i}<option value="log:{before + i}" selected={read === q}>{q.label}</option>{/each}
+					</optgroup>
+				{/each}
+			</select>
+
+			{#if read}
+				<p class="small subtle">A query this page ran: <span class="num">{read.ms} ms, {plural(read.rows, 'row', 'rows')}</span>.</p>
+				{@render statement(read.query)}
+			{:else if preset}
+				{@const v = values[preset.name]}
+				<p class="small subtle">{ABOUT[preset.name]?.[1] ?? preset.description}</p>
+				{@render statement(sent ? sent.sql.map((q) => q.query.trim()).join(';\n\n') : preview(preset.name, v) || preset.description)}
 				<form onsubmit={run}>
 					{#each preset.params as x}
-						{@const v = values[preset.name]}
 						<div class="cdx-field">
 							<div class="cdx-label">
 								<label class="cdx-label__label" for="sql-{x.name}"><span class="cdx-label__label__text">{LABEL[x.name] ?? x.name}</span></label>
@@ -173,50 +219,28 @@
 						</div>
 					{/each}
 					<button class="cdx-button cdx-button--action-progressive cdx-button--weight-primary" type="submit" disabled={running}>{running ? 'Running…' : 'Run'}</button>
+					{#if v.date}
+						<span class="step">
+							<button class="cdx-button cdx-button--weight-quiet" type="button" disabled={v.date <= '2001-01-15'} onclick={() => set('date', dayAfter(v.date, -1))}>Day before</button>
+							<button class="cdx-button cdx-button--weight-quiet" type="button" disabled={v.date >= today} onclick={() => set('date', dayAfter(v.date))}>Day after</button>
+						</span>
+					{/if}
 				</form>
 				{#if failure}<div class="cdx-message cdx-message--inline cdx-message--error" role="alert"><span class="cdx-message__icon"></span><div class="cdx-message__content">{failure}</div></div>{/if}
 
 				<div aria-live="polite">
-					{#each runs[preset.name] ?? [] as r, i}
-						<div class="run" class:previous={i > 0}>
-							{#if i > 0}<p class="label small">Previous run</p>{/if}
-							<p class="ran">
-								<strong class="num">{plural(r.rows.length, 'row', 'rows')}</strong>
-								<strong class="num">{r.ms} ms</strong>
-								<span class="small subtle">{Object.values(r.params).join(', ')}{r.capped ? `, first ${r.limits.rows} rows` : ''}</span>
-							</p>
-							{#if i === 0}
-								{#each r.sql as q}
-									<p class="qhead small"><span>{q.label}</span><span class="subtle num">{q.ms} ms, {plural(q.rows, 'row', 'rows')}</span></p>
-									{@render statement(q)}
-								{/each}
-							{/if}
-							{@render result(r)}
-						</div>
-					{/each}
+					{#if ran}
+						<p class="ran">
+							<strong class="num">{plural(ran.rows.length, 'row', 'rows')}</strong>
+							<strong class="num">{ran.ms} ms</strong>
+							<span class="small subtle">{Object.values(ran.params).join(', ')}{ran.capped ? `, first ${ran.limits.rows} rows` : ''}</span>
+						</p>
+						{@render result(ran)}
+					{/if}
 				</div>
 				<p class="small subtle">Runs as a read-only user, for {limits.seconds} s and {limits.rows} rows at most.</p>
-			</section>
-		{/if}
-
-		{#if groups.length}
-			<section class="log" aria-labelledby="log-title">
-				<h3 id="log-title" class="small">Queries this page ran</h3>
-				{#each groups as [group, qs]}
-					{#each qs as q}
-						<details class="cdx-accordion">
-							<summary>
-								<h4 class="cdx-accordion__header">
-									<span class="cdx-accordion__header__title">{q.label} <span class="subtle">{group}</span></span>
-									<span class="cdx-accordion__header__description num">{q.ms} ms, {plural(q.rows, 'row', 'rows')}</span>
-								</h4>
-							</summary>
-							<div class="cdx-accordion__content">{@render statement(q)}</div>
-						</details>
-					{/each}
-				{/each}
-			</section>
-		{/if}
+			{/if}
+		</div>
 	</div>
 </dialog>
 
@@ -258,16 +282,18 @@
 		font-size: var(--font-size-xx-large);
 	}
 
-	.live {
+	.one {
 		display: flex;
 		flex-direction: column;
 		gap: var(--spacing-75);
 	}
 
-	.presets {
+	.one > .cdx-select {
+		width: 100%;
+	}
+
+	.step {
 		display: flex;
-		flex-wrap: wrap;
-		gap: var(--spacing-35);
 	}
 
 	form {
@@ -288,21 +314,6 @@
 		min-width: 9rem;
 	}
 
-	.run {
-		margin-top: var(--spacing-50);
-	}
-
-	.run.previous {
-		margin-top: var(--spacing-150);
-		padding-top: var(--spacing-75);
-		border-top: 1px solid var(--border-color-subtle);
-	}
-
-	.label {
-		font-weight: var(--font-weight-bold);
-		color: var(--color-subtle);
-	}
-
 	/* What an engineer looks for first: how many rows, how long. */
 	.ran {
 		display: flex;
@@ -317,26 +328,9 @@
 		color: var(--color-emphasized);
 	}
 
-	.previous .ran strong {
-		font-size: var(--font-size-medium);
-		line-height: var(--line-height-medium);
-	}
-
-	.qhead {
-		display: flex;
-		justify-content: space-between;
-		gap: var(--spacing-100);
-		margin-top: var(--spacing-50);
-		font-weight: var(--font-weight-bold);
-	}
-
-	.qhead .subtle {
-		font-weight: var(--font-weight-normal);
-		white-space: nowrap;
-	}
 
 	pre {
-		margin: var(--spacing-25) 0 var(--spacing-50);
+		margin: 0;
 		padding: var(--spacing-50) var(--spacing-75);
 		overflow-x: auto;
 		border: 1px solid var(--border-color-muted);
@@ -400,13 +394,4 @@
 		min-width: 14rem;
 	}
 
-	.log {
-		margin-top: var(--spacing-200);
-	}
-
-	h3 {
-		padding-bottom: var(--spacing-25);
-		border-bottom: 1px solid var(--border-color-subtle);
-		color: var(--color-subtle);
-	}
 </style>
