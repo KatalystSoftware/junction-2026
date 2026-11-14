@@ -45,22 +45,30 @@ see their own flow and not the back office:
 
 Live: <https://kutsu.katalyst.fyi/> (Espoo's screen) and <https://kutsu.katalyst.fyi/#/join/nitor.com>
 (what a company sees). The candidate's side of the same idea began as a separate prototype (once called Esittely; the product has one name, Kutsu)
-(`../espoo-recruitment/`). `PRODUCT.md` says who Kutsu is for, `NEXT.md` what the Espoo mentors said
-and what is open.
+(`../espoo-recruitment/`). `PRODUCT.md` says who Kutsu is for.
 
 ## Run and test
 
 From this folder, inside the repo's dev shell (`nix develop`):
 
 ```sh
-npm --prefix ui ci && npm --prefix ui run build                                            # the page (Svelte), into ui/dist
-sops exec-env ../../secrets/secrets.yaml 'python3 serve.py'                                # run: http://127.0.0.1:8046
-npm --prefix ui run check && npm --prefix ui run walk                                      # test: see below
-sops exec-env ../../secrets/secrets.yaml 'python3 signals.py 2639822-1 Varjo wolt.com'     # research companies from the command line
-python3 pool.py                                                                            # regenerate the sample pool
+npm --prefix ui ci && npm --prefix ui run build    # the page (Svelte), into ui/dist
+python3 serve.py                                   # run: http://127.0.0.1:8046
+npm --prefix ui run check && npm --prefix ui run walk   # test: see below
+python3 pool.py                                    # regenerate the sample pool
 ```
 
-`serve.py` without `sops exec-env` still shows every stored company; only new searches need keys.
+Without keys it shows every company already researched, and every screen works; researching a new
+company, reading a profile and drafting a role say which key is missing. With our keys (the team's
+`secrets/`, not in the public copy) they run live:
+
+```sh
+sops exec-env ../../secrets/secrets.yaml 'python3 serve.py'                              # with our keys
+sops exec-env ../../secrets/secrets.yaml 'python3 signals.py 2639822-1 Varjo wolt.com'   # with our keys: research from the command line
+```
+
+The keys it reads are `EXA_API_KEY`, `CONTEXT_DEV_API_KEY` and `ANTHROPIC_API_KEY`; set your own instead
+to run it live.
 
 The test has two parts. `check` is the gate: `deploy.sh` runs it before it builds or copies anything
 and stops if it fails. It runs, in order:
@@ -76,7 +84,8 @@ and stops if it fails. It runs, in order:
   a saved sign-up the page could not key (one shaped like older builds' among them), and reading a
   person's profile writes no file and prints nothing of the person.
 
-`walk` needs `serve.py` running: it opens every screen in a headless Chromium, signs one company up
+`walk` needs `serve.py` running and a Chromium: the newest one Playwright has downloaded, or set
+`CHROME=/path/to/chromium`. It opens every screen in a headless Chromium, signs one company up
 by pressing Enter until the finished page, and fails on any error the page reports. On a person's
 sign-up it types addresses one key at a time (slashes, Backspace, an edit at the start, a paste), and
 hands over a CV every way it can go: a PDF with text, one with none, a file that is not a PDF, an
@@ -173,7 +182,9 @@ The rule: **the cache may hold company information; data about an individual per
 ## What is real, what is sample, what is proposed
 
 - **Real:** every employer, and every statement about one. Each statement was found word for word on
-  the public page it links to, and statements that name a person are dropped.
+  the public page it links to. A statement whose claim or quote names a person is dropped; the page a
+  statement links to may still name one in its title or address, such as a company's own post
+  introducing its new CEO.
 - **Sample:** the pool of people. `pool.py` draws 1,140 people from a fixed seed and keeps only
   counts per field (`pool.json`); nobody in it is real, how many of them came to each past event is
   made up, and the screens mark these numbers as sample data. No screen shows a row for a person, and a count under five is shown as
@@ -223,8 +234,8 @@ changes". A judge can
 use every screen fully, and the next visitor still finds the demo as it was.
 
 - **Unlock:** in the Demo menu (top right corner; it appears on hover), "Unlock with the demo key", and
-  paste the key once. The browser keeps it (`localStorage`). The key is `KUTSU_KEY` in
-  `secrets/secrets.yaml`: `sops -d --extract '["KUTSU_KEY"]' secrets/secrets.yaml` from the repo root.
+  paste the key once. The browser keeps it (`localStorage`). The key is the team's (`KUTSU_KEY` on the
+  server); a visitor without it works on their own copy in their browser, as above.
 - **Unlocked:** Espoo's actions are saved (send, take back, edit a draft), the Demo menu offers "Fill in
   example sign-ups" and "Clear every sign-up", and each company's invitation link ends in `?t=<token>`:
   its id signed with the key (`link_token` in `serve.py`). That link saves that one company's answers and
@@ -239,7 +250,7 @@ It runs on the Verda runner as a systemd service on port 8046, listening only on
 proxy's Docker network (`172.19.0.1`), so the shared proxy is the only way in: it serves it as
 `https://kutsu.katalyst.fyi/` (`infra/verda/proxy/sites/kutsu.caddy`), and the machine's public address
 does not answer on 8046.
-`sops exec-env ../../secrets/secrets.yaml ./deploy.sh` builds the page, puts the current code and cache
+`sops exec-env ../../secrets/secrets.yaml ./deploy.sh` (with our keys and SSH access) builds the page, puts the current code and cache
 there and restarts it. Whatever spends our credits is capped per restart and shares one limit of four at
 a time: live searches for companies not asked before (300), role drafts (150) and profile reads (60).
 
@@ -314,7 +325,7 @@ Espoo, and nobody filled in a form.** Every stored fact carries the URL it came 
 read from a page, a verbatim quote that `validate.py` finds in the stored copy of that page.
 
 ```sh
-sops exec-env ../../secrets/secrets.yaml 'python3 pipeline.py --limit 1081'   # crawl and read; needs cache/ from the run, or re-crawls
+sops exec-env ../../secrets/secrets.yaml 'python3 pipeline.py --limit 1081'   # with our keys: crawl and read; needs cache/ from the run, or re-crawls
 python3 validate.py                                                           # every quote against its source; needs cache/ too
 ```
 

@@ -72,10 +72,10 @@ gated) and checks each weight file against Hugging Face's sha256. It converts ba
 with llama.cpp `b12017`, serves them on CPU, and asserts through `/lora-adapters` that the adapter is
 applied. Then it plays one held-out episode through Harbor 0.25.0 + OpenCode, as the judged agents
 do. The job summary lists every hash, the held-out count, the base revision, the score and the time
-per step. Latest passing run: [43651780827](https://github.com/KatalystSoftware/junction2026/actions/runs/43651780827):
+per step. The runs are in the team's private CI; the latest passing one (run 43651780827) showed:
 level 0, seed 101, score 0.89. It scaled the overloaded profile-db, the right fix, but also made two
 unneeded config reverts, in 44 tool calls over 12 minutes. The run before it
-([43650015008](https://github.com/KatalystSoftware/junction2026/actions/runs/43650015008)) played the
+(run 43650015008) played the
 same episode, rolled profile-db back instead of scaling it, and scored 0.00, the same as doing nothing.
 The job is a smoke test that the published files load and drive the environment. One level-0
 episode does not measure the adapter: it was trained on levels 3 and 4, which take too long on CPU.

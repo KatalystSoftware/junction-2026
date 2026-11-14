@@ -9,7 +9,7 @@
 // debugging socket.
 import { spawn } from 'node:child_process'
 import { createHmac } from 'node:crypto'
-import { mkdtempSync, readdirSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdtempSync, readdirSync, writeFileSync } from 'node:fs'
 import { homedir, tmpdir } from 'node:os'
 import { join } from 'node:path'
 
@@ -20,8 +20,11 @@ const COMPANY = '2292619-7'
 function chromium() {
   if (process.env.CHROME) return process.env.CHROME
   const cache = join(homedir(), '.cache/ms-playwright')
-  const dir = readdirSync(cache).filter((d) => d.startsWith('chromium_headless_shell-')).sort().at(-1)
-  if (!dir) throw new Error('no Chromium found: set CHROME')
+  const dir = existsSync(cache) && readdirSync(cache).filter((d) => d.startsWith('chromium_headless_shell-')).sort().at(-1)
+  if (!dir) {
+    console.error('No Chromium found. Set CHROME=/path/to/chromium (or install Playwright\'s: npx playwright install chromium-headless-shell).')
+    process.exit(2)
+  }
   const inner = readdirSync(join(cache, dir)).find((d) => d.startsWith('chrome'))
   return join(cache, dir, inner, readdirSync(join(cache, dir, inner)).find((f) => /^(chrome-headless-shell|headless_shell|chrome)$/.test(f)))
 }
