@@ -24,7 +24,7 @@ One container serves the app and the API. Without Docker or a database, `npm --p
 
 Test, from this directory in the repo's dev shell (`nix develop`, which has uv, Node and MariaDB Connector/C):
 
-    uv run ruff format --check && uv run ruff check && uv run ty check && uv run python -m unittest differences.test_differences gapfinder.test_wikitext gapfinder.test_live_sql && npm --prefix ui ci --silent && npm --prefix ui run check
+    uv run ruff format --check && uv run ruff check && uv run ty check && uv run python -m unittest differences.test_differences differences.test_claims differences.test_figures gapfinder.test_wikitext gapfinder.test_live_sql gapfinder.test_evidence && npm --prefix ui ci --silent && npm --prefix ui run check
 
 The six tests that run the SQL presets skip without a database login; `docker compose run --rm app python -m unittest gapfinder.test_live_sql`
 runs them against the scratch database. The torch and DuckDB wheels don't load on NixOS outside a container, so the
