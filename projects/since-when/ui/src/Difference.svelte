@@ -45,7 +45,7 @@
 	<details class="cdx-accordion" {open} bind:this={row}>
 		<summary>
 			<h3 class="cdx-accordion__header">
-				<span class="cdx-accordion__header__title" title={d.title}>{#if d.who}<span class="subtle">{d.who}</span>{' '}{/if}{d.what}</span>
+				<span class="cdx-accordion__header__title" title={d.title}>{#if d.who}<span class="who">{d.who}</span>{' '}{/if}{d.what}</span>
 			</h3>
 		</summary>
 		<div class="cdx-accordion__content">
@@ -161,9 +161,6 @@
 	}
 
 	.row > details[open] > summary .cdx-accordion__header__title {
-		font-family: var(--font-family-serif);
-		font-size: var(--font-size-x-large);
-		line-height: var(--line-height-x-large);
 		color: var(--color-emphasized);
 		text-wrap: balance;
 	}
@@ -276,5 +273,10 @@
 			grid-template-columns: 1fr;
 			gap: var(--spacing-50);
 		}
+	}
+
+	/* The edition a headline is about, in the headline's own colour. */
+	.who {
+		font-weight: var(--font-weight-bold);
 	}
 </style>

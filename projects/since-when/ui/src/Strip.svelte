@@ -38,6 +38,8 @@
 					{:else}
 						{label}
 					{/if}
+				{:else if place === 'beside' || place === 'inside'}
+					<span class="none">not said</span>
 				{/if}
 			</span>
 		</div>
@@ -118,6 +120,10 @@
 	}
 
 	/* A taller target for a finger than the line it sits on. */
+	.none {
+		color: var(--color-subtle);
+	}
+
 	.since a {
 		pointer-events: auto;
 		display: inline-block;

@@ -42,26 +42,17 @@
 </script>
 
 <h1>What three Wikipedias say differently, and since when</h1>
-{#if queue.database}
-	{@const db = queue.database}
-	<p class="db">
-		Every date here is read from MariaDB {db.version}: a system-versioned table, <code>{db.table}</code>, keeps
-		<span class="num">{db.versions.toLocaleString('en')}</span> versions of
-		<span class="num">{db.passages.toLocaleString('en')}</span> passages, each from the Wikipedia edit that wrote it (every revision for the three topics below, one a year for the rest).
-		{#if ui.runnable}<button class="cdx-button cdx-button--action-progressive cdx-button--weight-quiet" aria-haspopup="dialog" onclick={() => showSql('history', { qid: START[0], lang: 'en' })}>See the versions of one passage</button>{/if}
-	</p>
-{/if}
 
 <section class="start" aria-label="Topics to start from">
 	<Why id="why-start" label="How these were found">A word in quotation marks comes from a fixed list of loaded words: it is in the first sentence of the editions dated on its strip and not in the others'. For the other differences, {modelName(null)} compared each topic's articles passage by passage and suggested them, then looked each one up in the whole other article and set aside those it found stated there. A further review, by language models reading both articles, closed the ones it found false; no person has checked them. Open a topic to read each edition's own words.</Why>
-	<p class="key small subtle" aria-hidden="true"><span class="dot"></span> the edit that put the quoted words there word for word, <span class="bar"></span> since then, <span class="bar past"></span> an earlier period; 2001 to today</p>
+	<p class="key small subtle" aria-hidden="true"><span class="dot"></span> edit that put these exact words there · <span class="bar"></span> said since · <span class="bar past"></span> said earlier · 2001 to today</p>
 	<div class="cards">
 		{#each START as qid}
 			{@const c = cards[qid]}
 			{#if c}
 				<article class="card">
 					<h2><a href={href(qid)}>{c.topic.topic}</a></h2>
-					<p class="what" title={c.d.title}>{#if !c.d.who && c.d.what.startsWith('“')}{c.d.title}{:else}{#if c.d.who}<span class="subtle">{c.d.who}</span>{' '}{/if}{c.d.what}{/if}</p>
+					<p class="what" title={c.d.title}>{#if !c.d.who && c.d.what.startsWith('“')}{c.d.title}{:else}{#if c.d.who}<span class="who">{c.d.who}</span>{' '}{/if}{c.d.what}{/if}</p>
 					<Strip lanes={c.strip} place="inside" />
 				</article>
 			{:else if c === undefined}
@@ -70,6 +61,16 @@
 		{/each}
 	</div>
 </section>
+
+{#if queue.database}
+	{@const db = queue.database}
+	<p class="db">
+		Every date here is read from MariaDB {db.version}: a system-versioned table keeps
+		<span class="num">{db.versions.toLocaleString('en')}</span> versions of
+		<span class="num">{db.passages.toLocaleString('en')}</span> passages, each from the Wikipedia edit that wrote it (every revision for the three topics below, one a year for the rest).
+		{#if ui.runnable}<button class="cdx-button cdx-button--action-progressive cdx-button--weight-quiet" aria-haspopup="dialog" onclick={() => showSql('history', { qid: START[0], lang: 'en' })}>See the versions of one passage</button>{/if}
+	</p>
+{/if}
 
 <TopicList inline />
 
@@ -171,5 +172,9 @@
 	.key .bar.past {
 		height: 4px;
 		background: var(--color-placeholder);
+	}
+
+	.who {
+		font-weight: var(--font-weight-bold);
 	}
 </style>

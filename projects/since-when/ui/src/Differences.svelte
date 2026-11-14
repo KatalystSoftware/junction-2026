@@ -43,7 +43,7 @@
 </script>
 
 {#snippet key()}
-	<p class="key small subtle" aria-hidden="true"><span class="dot"></span> the edit that put the quoted words there word for word, <span class="bar"></span> since then, <span class="bar past"></span> an earlier period; 2001 to today</p>
+	<p class="key small subtle" aria-hidden="true"><span class="dot"></span> edit that put these exact words there · <span class="bar"></span> said since · <span class="bar past"></span> said earlier · 2001 to today</p>
 {/snippet}
 
 {#snippet scale()}
