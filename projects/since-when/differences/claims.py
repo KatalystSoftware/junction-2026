@@ -272,10 +272,14 @@ def row_claims(pair, rows):
             quote = row["quote_" + side]
             if not quote:
                 continue
-            if row["type"] == "missing_fact" and row.get("missing_in") not in (None, pair[other]["lang"]):
-                continue  # the quote of the passage said to lack the fact only shows where it belongs
-            if row["type"] == "missing_fact" and row.get("missing_in") is None and side == "b" and row["quote_a"]:
-                continue  # no edition named and two quotes: the first is the fact
+            # A missing fact with two quotes: the one of the passage said to lack the fact only
+            # shows where it belongs, and with no edition named the first is the fact. With one
+            # quote, that quote is the fact, whichever edition the classifier named: it named the
+            # wrong one, or none, in one row of ten.
+            named = row.get("missing_in")
+            shows_where = named not in (None, pair[other]["lang"]) or (not named and side == "b")
+            if row["type"] == "missing_fact" and row["quote_a"] and row["quote_b"] and shows_where:
+                continue
             out.append(_claim(pair, side, other, quote, "classifier", row=n))
     return out
 
@@ -597,6 +601,28 @@ def _contradicted(claim, v, model):
     }
 
 
+def _side(row, lang):
+    """(quote, figure) of one edition in a row the check wrote."""
+    a_lang = row["pair_id"].split(":")[2]
+    both = row.get("figures") or {}
+    return (
+        row["quote_a"] if lang == a_lang else row["quote_b"],
+        both.get("claim" if row["claim"]["lang"] == lang else "evidence"),
+    )
+
+
+def _repeats(row, other):
+    """Whether a row says what `other` already says: the same two statements, reached from the
+    other side or from another pair, or one statement and its figure set against a second sentence
+    of the other edition (a ban dated 21 November against three sentences on the stages of the
+    ban). A sentence with two figures can still carry two rows."""
+    langs = {row["claim"]["lang"], row["checked"]["lang"]}
+    if other["wikidata_id"] != row["wikidata_id"] or langs != {other["claim"]["lang"], other["checked"]["lang"]}:
+        return False
+    same = [lang for lang in langs if _same(_side(row, lang)[0], _side(other, lang)[0])]
+    return len(same) == 2 or any(_side(row, lang)[1] == _side(other, lang)[1] for lang in same)
+
+
 def reverse_claims(claims, verdicts):
     """For every contradicted claim, the statement that contradicts it as a claim of its own
     edition, to be looked up in the first claim's edition. A contradiction is a finding only when
@@ -680,7 +706,7 @@ def findings(pairs, rows_by_pair, claims, verdicts, model, reverse=None):
             elif row["type"] == "missing_fact" and checks[0][1]["verdict"] != "supported":
                 # not mentioned, unchecked, or a contradiction the other side did not confirm: the
                 # other edition says something near it, and not this
-                kept.append({**row, **check(*checks[0])})
+                kept.append({**row, "missing_in": checks[0][0]["target_lang"], **check(*checks[0])})
             else:
                 aside.append({**row, **check(*checks[0]), "checks": [check(c, v) for c, v in checks[1:]]})
     for c, v in extracted:
@@ -691,16 +717,8 @@ def findings(pairs, rows_by_pair, claims, verdicts, model, reverse=None):
     seen = []
     for claim, v in contradictions:
         row = {**_contradicted(claim, v, model), **check(claim, v)}
-        langs = {claim["lang"], claim["target_lang"]}
-        if any(
-            o["wikidata_id"] == row["wikidata_id"]
-            and set(o["pair_id"].split(":")[2:5:2]) == langs
-            and _same(o["quote_a"], row["quote_a"])
-            and _same(o["quote_b"], row["quote_b"])
-            for o in seen
-        ):
-            continue  # the same two statements, reached from the other side or from another pair
-        seen.append(row)
+        if not any(_repeats(row, other) for other in seen):
+            seen.append(row)
     return kept + seen, aside
 
 

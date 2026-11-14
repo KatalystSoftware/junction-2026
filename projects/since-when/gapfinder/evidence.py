@@ -34,6 +34,7 @@ import sys
 from datetime import date
 
 from differences.claims import sentences
+from differences.figures import MONTHS  # month names by number in fi, sv and en, as the start of the word
 
 from .align import Run, as_of_sql, lit
 from .db import LANGS
@@ -61,21 +62,6 @@ BY_PASSAGE = 2  # more for the distance of the passage as a whole, which a claim
 BY_TERMS = 3  # more for the claim's names and numbers
 MAX_TERMS = 12
 
-# Month names by number in fi, sv and en, as the start of the word ("marraskuuta", "November").
-MONTHS = [
-    ("tammikuu", "januar"),
-    ("helmikuu", "februar"),
-    ("maaliskuu", "mars", "march"),
-    ("huhtikuu", "april"),
-    ("toukokuu", "maj", "may"),
-    ("kesäkuu", "juni", "june"),
-    ("heinäkuu", "juli", "july"),
-    ("elokuu", "august"),
-    ("syyskuu", "september"),
-    ("lokakuu", "oktober", "october"),
-    ("marraskuu", "november"),
-    ("joulukuu", "december"),
-]
 _MONTH = {name: i for i, names in enumerate(MONTHS) for name in names}
 ENGLISH = (
     "january",

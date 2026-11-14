@@ -9,8 +9,9 @@ thing:
     kept    a row of the same type, between the same two editions, with the same quotes: both
             quotes for numbers, contradiction and framing; for a missing fact the quote of the
             edition that has the fact, and the same edition lacking it
-    moved   a row that shares one quote only, or the quotes under another type: the claim is still
-            reported, with other evidence. Listed with -v, to be judged by hand
+    moved   a row the claim check wrote (it names the pair its claim came from) that shares one of
+            the labelled row's quotes: the same statement is still reported, against other
+            evidence or under another type. Listed with -v, to be judged by hand
     gone    nothing like it
 
 Two quotes are the same when they share at least six in ten of the shorter one's words of three
@@ -65,7 +66,7 @@ def outcome(label, rows):
             full = hits == set(want)
         if full and row["type"] == label["type"]:
             return "kept", row
-        if hits and moved is None:
+        if hits and moved is None and row.get("from_pair"):
             moved = row
     return ("moved", moved) if moved else ("gone", None)
 
