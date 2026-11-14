@@ -41,7 +41,6 @@ The page says nothing the repo does not, and quotes no numbers except the 120 mi
 | --- | --- |
 | Since When | [`projects/since-when/README.md`](../since-when/README.md) |
 | On-call incident response | [`spikes/aq-incident/README.md`](../../spikes/aq-incident/README.md) and its [`replay/README.md`](../../spikes/aq-incident/replay/README.md); "worse than a scripted expert" is the round 4 status in [`LOOP.md`](../../spikes/aq-incident/LOOP.md) |
-| Esittely | [`projects/espoo-recruitment/README.md`](../espoo-recruitment/README.md) |
 | Kutsu | [`projects/kutsu/README.md`](../kutsu/README.md) |
 | Spread desk | [`spread/README.md`](../../spread/README.md) and the [challenge brief](../../docs/challenges/main/bahn-express--spread.md) |
 
