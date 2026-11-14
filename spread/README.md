@@ -168,6 +168,20 @@ PYTHONPATH=. uv run python scratch/driver_views.py --variants curve-fee-0.9,curv
 PYTHONPATH=. uv run python scratch/lane_fit.py --write                                                       # the lanes' usual fees
 ```
 
+**What the fees still pay over the typical fee** ([`scratch/fee_leak.py`](scratch/fee_leak.py), euros a week). The
+clean-room figures, 2,773 for opening at 1.2 x and 1,915 for fees above 1.2 x on rebookings, reposts and overnight
+gigs, are those of `curve-live-surcharge` and come out the same here. The fees above are what took most of them back.
+On the variants with today's fee schedule (`slow-step-gate-25`, 167 weeks; `slow-step-gate-25-kinds`, 34), fees are
+1.07 to 1.09 x the typical fee: 450 to 580 in openings over the typical fee (the kinds and the reposts), and 870 to 940
+over the opening, of which 330 overnight, 300 to 330 on rises the same day, 130 on rebookings and 100 to 150 on reposts.
+
+**Fees by each car's risk** (`risk-*`, [`riskfee.py`](spreadlab/riskfee.py), on the live default, not played yet). A
+car with 16 hours or more to its last pickup and a late chance under 6% opens at 0.9 x (81% of one-car orders, 2.3%
+late); a gig holds its opening fee until the car's late chance with the hours left reaches 4%, then rises as now:
+22% of cars from the posting, the others 6 to 12 hours before their last pickup, 18% never. `risk-hold` is the hold
+alone, `risk-open` the lower opening alone, and `-due-24` counts only the waiting cars due within 24 hours in
+`slow_step` and the gate.
+
 Private addresses (`curve-private`, +246 on tune at the old fees; -38 with opening 1.0, lowest week
 92.0%), a cost that follows the order (`curve-order-cost`, +193, -16 to 411) and counting what an
 order on time is worth in the dealer's later prices (`curve-trust-0.3`, -126; `curve-trust-1`,

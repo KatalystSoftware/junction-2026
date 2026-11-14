@@ -314,3 +314,17 @@ VARIANTS: dict[str, dict] = {
     # Not a candidate: random multiples of the list price, never under 1.3 x the typical fee, to fit the win curve from.
     "explore": {**GATE_10, "floor": 1.3, "explore": [1.1, 2.4]},
 }
+
+# Driver fees by each car's risk of ending late (riskfee.py), on the live default. A car with 16 hours or more to its last
+# pickup and a late chance under 6% opens at 0.9 x the typical fee; a gig holds its opening fee until the car's late chance,
+# with the hours left then, reaches 4%, and then rises a tenth of the typical fee an hour to 1.2 x. Each part alone, and the
+# waiting cars counted only when due within 24 hours (strategy proposal 3).
+_DEFAULT = VARIANTS["slow-friday-late-150-kinds-limits"]
+VARIANTS.update({
+    "risk-fees": {**_DEFAULT, "risk_fees": True},
+    "risk-fees-due-24": {**_DEFAULT, "risk_fees": True, "risk_queue_hours": 24},
+    "risk-fees-raise-0.06": {**_DEFAULT, "risk_fees": True, "risk_raise_late": 0.06},
+    "risk-hold": {**_DEFAULT, "risk_fees": True, "risk_open": 1.0},
+    "risk-open": {**_DEFAULT, "risk_fees": True, "risk_raise_late": 0},
+    "risk-open-due-24": {**_DEFAULT, "risk_fees": True, "risk_raise_late": 0, "risk_queue_hours": 24},
+})
