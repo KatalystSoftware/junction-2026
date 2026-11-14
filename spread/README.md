@@ -344,6 +344,47 @@ ones with few drivers, not the ones with many short orders. A dearer `same_day` 
 to the competitor more often than it moves the dealer to `next_day` (264 and 256 orders a week
 against 275).
 
+## The backlog surcharge and the gate
+
+The reference adds 0.04 x the typical fee to an order's cost for each won car without a driver, and
+quotes nothing while 15 wait. Over its weeks the surcharge averages 0.20, so orders are priced as if
+they cost 1.5 x. Three in five of the cars it counts are not due for over a day. The variants below
+lower the surcharge (`step-2`), count only the cars to collect within 24 hours (`backlog_hours`),
+widen the gate, or make the cost follow the hours to find a driver (`cost_hours`: 1.55 x under 6
+hours down to 1.15 x from 30). Mean margin a week against `steep-notes-offers-8`:
+
+| Variant | Tune | Holdout | Fresh 1 to 40 | Orders, late a week (tune) | Lowest week on time |
+| --- | --- | --- | --- | --- | --- |
+| `step-2` | +321 (-143 to 765) | +132 (-515 to 718) | -99 (-409 to 191) | 306, 12.6 | 94.0%, 91.7%, 90.5% |
+| `step-2-gate-25` | +798 (162 to 1,507) | +350 (-382 to 984) | +601 (347 to 848) | 315, 14.8 | 92.8%, 90.6%, 88.8% not ranked |
+| `due-24` | +108 (-302 to 558) | -214 (-749 to 257) | not played | 308, 12.2 | 93.0%, 90.8% |
+| `due-24-gate-20` | +671 (104 to 1,191) | +273 (-154 to 683) | +273 (-104 to 620) | 318, 13.4 | 91.9%, 91.4%, 90.4% |
+| `due-24-gate-25` | +907 (250 to 1,476) | +460 (-122 to 1,125) | +690 (341 to 1,014) | 323, 13.9 | 91.4%, 91.5%, 90.7% |
+| `hours` | +180 (-264 to 556) | not played | not played | 301, 11.5 | 93.7% |
+| `hours-step-2-gate-25` | +734 (333 to 1,094) | +288 (-633 to 1,079) | not played | 344, 15.8 | 92.0%, 89.5% not ranked |
+| `hours-due-24-gate-25` | +479 (-98 to 1,096) | not played | not played | 349, 17.4 | 90.2% |
+
+They win 30 to 70 orders a week more and earn 300 to 900 more on average, and every one that was
+played beyond the tune seeds ends a week near or under the 90% rule. None is kept. On 20 further seeds (`fresh-042` to
+`fresh-061`) `due-24-gate-20` left three weeks unranked (89.0%, 89.1%, 89.7%) for +137.
+
+- The weeks under 92% on the tune and holdout seeds all had 733 drivers or fewer, so
+  `due-24-gate-25-tight-750` keeps the reference in a week with under 750 drivers. It is +489, +643
+  and +457 on the tune, holdout and 40 fresh seeds with a lowest week of 91.7%, and on the 20
+  further seeds +344 (71 to 625) with one week of 800 drivers at 89.5%, not ranked. The driver
+  count does not mark the hard weeks well enough.
+- That week shows what the gate is for. The reference declines 132 of its requests for backlog and
+  still has 21 late orders (92.7%); with a gate of 25 it declines 18 and has 34 late.
+- `hours-due-24-gate-25-premium` was not played: the variant it builds on fell to 90.2% on tune.
+
+**How close the reference is to the rule.** Over 104 weeks (tune, holdout, `fresh-001` to
+`fresh-061` and 24 further weeks with under 720 drivers) every week is ranked. The lowest are 90.1%
+and 90.6%, both with under 680 drivers; with 750 or more drivers the lowest is 92.0%. A dearer
+quote in the weeks with under 720 drivers (`thin-cost-1.4`) costs 302 a week there (-681 to 106) on
+24 weeks it was not chosen on, for +0.3 points on time and a lowest week of 91.8% against 91.3%.
+An hour more to find a driver there (`thin-slack-6`) is -324 on 7 weeks with a lowest week of
+90.3% against 90.1%. Neither is kept.
+
 ## The final
 
 [`live.py`](spreadlab/live.py) plays the final, or a test final, with the reference policy from the live stream.

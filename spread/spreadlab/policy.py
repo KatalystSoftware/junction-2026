@@ -70,6 +70,9 @@ DEFAULTS = {
     "cost": 1.4,          # what an order costs, as a multiple of its typical fee: fees, failed visits and refunds
     "learn": 0,           # how far a day's prices usually are from the curve, in log price; 0 does not correct the curve by the day's answers
     "learn_pickup": 0,    # the same for the pickup town, on top of the day's correction and new each morning: an outage raises the prices of one region
+    "cost_hours": [],     # [[hours, cost], ...] in rising hours: the cost of an order with fewer than this many hours from the answer to the last pickup minute of the fastest option quoted; `cost` for the others
+    "premium_cost": 0,    # added to the cost of a premium car: only experienced drivers may take it
+    "backlog_hours": 0,   # the backlog surcharge counts only the won cars without a driver that must be collected within this many hours; 0 counts all
     "cost_by_order": False,  # the cost follows the order (curve.cost: long lanes, few drivers, a note) and replaces `cost`
     "trust_value": 0,     # the share to count of what an order on time, or a late one, is worth in the dealer's later prices; 0 counts none
     # Two rules change the parameters above. Each names the parameters it replaces while it applies.
@@ -175,7 +178,7 @@ class Policy(Desk):
             prices = {o["kind"]: int(round(max(o["listPriceCents"] * multiple, request["referenceFeeCents"] * EXPLORE_FLOOR))) for o in options}
         else:
             fee, day, on_time = request["referenceFeeCents"], request["arrivedAt"] // DAY, self.trust.get(request["dealerId"], 0)
-            surcharge = p["backlog_step"] * max(0, self.unbooked() - p["backlog_from"])
+            surcharge = p["backlog_step"] * max(0, self.unbooked(p["backlog_hours"]) - p["backlog_from"])
             log_odds = 0.0
             if p["curve"]:
                 own = p["kinds"].get(kind(request), {})
@@ -183,6 +186,10 @@ class Policy(Desk):
                 known = curve.known(request, options, min(self.notified[leg["pickup"]["placeId"]] for leg in request["legs"]), self.unbooked())
                 private = any(leg["pickup"]["privateAddress"] or leg["delivery"]["privateAddress"] for leg in request["legs"])
                 flat = own["cost"] if own.get("cost") else p["long_cost"] if p["long_cost"] and self.long(request, p) else p["private_cost"] if p["private_cost"] and private else p["cost"]
+                if flat == p["cost"]:  # the hours the desk has to find a driver, if the dealer takes the fastest option
+                    hours = (first["deadline"] - self.drive(request) - request["respondBy"]) / HOUR
+                    flat = next((cost_ for under, cost_ in p["cost_hours"] if hours < under), flat)
+                flat += p["premium_cost"] * any(leg["car"]["premium"] for leg in request["legs"])
                 cost, shift = self.usual_fee(request, p) * ((curve.cost(known) if p["cost_by_order"] else flat) + surcharge), self.shift(day, p, request["legs"][0]["pickup"]["placeId"])
                 multiple = curve.best(at_list, shift, first["listPriceCents"], cost, slope)
                 if p["trust_value"]:  # an order on time raises what the dealer accepts later, and a late one lowers it
@@ -291,10 +298,12 @@ class Policy(Desk):
         ready = max(request["respondBy"], legs[0]["pickup"]["window"]["from"])
         return min(legs[0]["delivery"]["window"]["to"], option["deadline"] - drives[1]) - drives[0] - ready
 
-    def unbooked(self) -> int:
-        """The won cars that no driver holds now: just won, dropped, or posted again after a failed visit."""
+    def unbooked(self, hours: float = 0) -> int:
+        """The won cars that no driver holds now: just won, dropped, or posted again after a failed visit. With `hours`,
+        only those whose order must be collected within that many hours."""
         return sum(1 for id_, order in self.orders.items() for leg, at in enumerate(order["deliveredAt"])
-                   if at is None and self.leg_gigs.get(id_, {}).get(leg) not in self.booked)
+                   if at is None and self.leg_gigs.get(id_, {}).get(leg) not in self.booked
+                   and (not hours or order["lastPickupAt"] - self.now <= hours * HOUR))
 
     def drive(self, request) -> int:
         """The minutes on the road with the request's cars."""

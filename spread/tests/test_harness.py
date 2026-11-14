@@ -569,6 +569,39 @@ def test_a_kind_of_request_is_quoted_with_its_own_cost_fee_and_odds_and_a_trade_
     assert sent[0]["schedule"] == [{"at": 500, "feeCents": 12600}]  # one gig for both cars at 1.4 x the typical fee of 9000
 
 
+def price(d: policy.Policy, id_: str = "R1", **more) -> dict:
+    d.quote(request(id_, **more))
+    return d.decisions[id_]["prices"]
+
+
+def test_cost_follows_the_hours_to_find_a_driver_and_a_premium_car_costs_more():
+    hours = [[6, 1.55], [8, 1.35], [12, 1.3], [30, 1.2]]
+    # same_day by 1200 with a drive of 120 and an answer at 515 leaves 9.4 hours: the cost of 8 to 12 hours. next_day by 2640 leaves 33.4: `cost`.
+    by_hours = desk(curve=True, same_day=True, cost=1.15, cost_hours=hours)
+    assert price(by_hours) == price(desk(curve=True, same_day=True, cost=1.3))
+    slow = (("next_day", 2640),)
+    assert price(by_hours, "R2", options=slow) == price(desk(curve=True, same_day=True, cost=1.15), "R2", options=slow)
+    short = (("same_day", 950),)  # 5.25 hours
+    assert price(by_hours, "R3", options=short) == price(desk(curve=True, same_day=True, cost=1.55), "R3", options=short)
+    assert price(by_hours, "R3", options=short) != price(desk(curve=True, same_day=True, cost=1.15), "R3", options=short)
+    premium = request("R4", options=slow)
+    premium["legs"] = [{**premium["legs"][0], "car": {"premium": True, "electric": False, "chargePercent": None}}]
+    d = desk(curve=True, same_day=True, cost=1.15, cost_hours=hours, premium_cost=0.15)
+    d.quote(premium)
+    assert d.decisions["R4"]["prices"] == price(desk(curve=True, same_day=True, cost=1.3), "R4", options=slow)
+
+
+def test_backlog_surcharge_counts_only_the_cars_due_within_its_hours():
+    every, due = desk(curve=True, same_day=True, backlog_step=0.04), desk(curve=True, same_day=True, backlog_step=0.04, backlog_hours=24)
+    for d in (every, due):
+        for n, last in enumerate((600, 900, 5000, 6000)):  # two cars to collect within 24 hours of minute 500, two later
+            won(d, f"T{n}")
+            d.orders[f"T{n}"]["lastPickupAt"] = last
+    assert every.unbooked() == 4 and due.unbooked(24) == 2
+    assert price(every) == price(desk(curve=True, same_day=True, cost=1.4 + 0.16)) and price(due) == price(desk(curve=True, same_day=True, cost=1.4 + 0.08))
+    assert price(every) != price(due)
+
+
 def test_slack_at_the_limit_is_quoted():
     d = desk(min_slack=2005)
     d.quote(request("R1"))

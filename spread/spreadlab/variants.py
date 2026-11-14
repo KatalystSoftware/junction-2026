@@ -11,6 +11,9 @@ CAPPED = {**FEE, "fee_cap": 1.2, "drop_fee": 1.1, "cost": 1.3}
 # The reference, `steep-notes-offers-8`: the curve fitted with a level for each day, the note read before the first posting,
 # and direct offers for the open gigs whose order must be collected within 8 hours
 REFERENCE = {**CAPPED, "model": "day", "read_notes": True, "offer_hours": 8}
+# `cost_hours`: what an order costs by the hours from the answer to the last minute to collect the car. Over the reference's
+# weeks an order with under 6 hours costs 1.27 x its typical fee with refunds and 15% are late; with 12 or more, 1.11 x and 2 to 4%.
+HOURS = [[6, 1.55], [8, 1.35], [12, 1.3], [30, 1.2]]
 
 VARIANTS: dict[str, dict] = {
     "baseline": {},
@@ -153,6 +156,30 @@ VARIANTS: dict[str, dict] = {
     # often (5.6% against 3.3% for `next_day`). A dearer `same_day` leaves the choice to the dealer.
     "same-day-5": {**REFERENCE, "same_day_extra": 0.05},
     "same-day-10": {**REFERENCE, "same_day_extra": 0.10},
+    # The backlog surcharge and gate were set when gigs opened at 1.2 x. Over the reference's weeks the surcharge
+    # averages 0.20 x the typical fee, so orders are priced as if they cost 1.5 x.
+    "step-2": {**REFERENCE, "backlog_step": 0.02},
+    "step-2-gate-25": {**REFERENCE, "backlog_step": 0.02, "max_unbooked": 25},
+    # The surcharge counts only the cars to collect within 24 hours: the others do not predict a late order.
+    "due-24-gate-25": {**REFERENCE, "backlog_hours": 24, "max_unbooked": 25},
+    # The same surcharge with the reference's gate, or a gate of 20: in a hard week the gate of 15 declines over 100
+    # requests, and with 25 that week ends under 90% on time.
+    "due-24": {**REFERENCE, "backlog_hours": 24},
+    "due-24-gate-20": {**REFERENCE, "backlog_hours": 24, "max_unbooked": 20},
+    # Insurance for the weeks with a short driver list, where the reference's lowest weeks are (90.1% on 100 weeks):
+    # a dearer cost in the quote, an hour more to find a driver, or both, in those weeks only.
+    "thin-cost-1.4": {**REFERENCE, "tight_drivers": 720, "when_tight": {"cost": 1.4}},
+    "thin-slack-6": {**REFERENCE, "tight_drivers": 720, "when_tight": {"min_slack": 360}},
+    "thin-cost-1.4-slack-6": {**REFERENCE, "tight_drivers": 720, "when_tight": {"cost": 1.4, "min_slack": 360}},
+    # The same, except in a week with a short driver list, which keeps the reference's surcharge and gate: with the wider
+    # gate every week under 92.2% on time on the tune and holdout seeds had 733 drivers or fewer.
+    "due-24-gate-25-tight-750": {**REFERENCE, "backlog_hours": 24, "max_unbooked": 25, "tight_drivers": 750, "when_tight": {"backlog_hours": 0, "max_unbooked": 15}},
+    "step-2-gate-25-tight-750": {**REFERENCE, "backlog_step": 0.02, "max_unbooked": 25, "tight_drivers": 750, "when_tight": {"backlog_step": 0.04, "max_unbooked": 15}},
+    # The cost follows the hours to find a driver, and `cost` 1.15 is for the orders with 30 or more.
+    "hours": {**REFERENCE, "cost_hours": HOURS, "cost": 1.15},
+    "hours-step-2-gate-25": {**REFERENCE, "cost_hours": HOURS, "cost": 1.15, "backlog_step": 0.02, "max_unbooked": 25},
+    "hours-due-24-gate-25": {**REFERENCE, "cost_hours": HOURS, "cost": 1.15, "backlog_hours": 24, "max_unbooked": 25},
+    "hours-due-24-gate-25-premium": {**REFERENCE, "cost_hours": HOURS, "cost": 1.15, "backlog_hours": 24, "max_unbooked": 25, "premium_cost": 0.15},
     # The day's correction of the curve, and on top of it one for the pickup town that starts again each morning.
     "pickup-0.10": {**REFERENCE, "learn_pickup": 0.10},
     # A week with a short driver list has more late orders: under 720 drivers, gigs open at 1.2 x and an order is taken to cost 1.5 x.
