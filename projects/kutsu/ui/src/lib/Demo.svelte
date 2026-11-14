@@ -67,7 +67,7 @@
       <p>See it as</p>
       <a href="#/" onclick={() => (open = false)}>Espoo's organiser</a>
       <a href={joinPath(company)} onclick={() => (open = false)}>An invited company</a>
-      <a href="./esittely/#/join" target="_blank" rel="noopener" onclick={() => (open = false)}>An invited person</a>
+      <a href="#/me" onclick={() => (open = false)}>An invited person</a>
       <p>Sign-ups</p>
       <button disabled={busy} onclick={fill}>Fill in example sign-ups</button>
       <button disabled={busy} onclick={reset}>{sure ? 'Press again to clear them all' : 'Clear every sign-up'}</button>

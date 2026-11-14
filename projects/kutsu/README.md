@@ -17,6 +17,11 @@ employers said they need) and uses it to answer both before either has signed up
 - **The company's sign-up** (`#/join/<id>`): an invitation in the company's own logo and colours that
   is already filled in. Who it is, what we would tell candidates about it, who it wants to meet, and
   on each role how many people in the pool do that work. The company agrees, corrects, and is in.
+- **The person's sign-up** (`#/me`, or `#/me/<event>`): the same flow from the other side, drawn by
+  the same stylesheet. The person first chooses what we may read (their LinkedIn, a page of theirs,
+  their CV); their profile then arrives one card at a time, each line with the words it was read
+  from, and assembles at the side as they accept it. What they want and what suits them is asked.
+  It ends on the employers at the event that look for what they do, and why.
 
 Live: <https://kutsu.katalyst.fyi/> (Espoo's screen) and <https://kutsu.katalyst.fyi/#/join/nitor.com>
 (what a company sees). The candidate's side of the same idea is the team's other project, Esittely
@@ -57,11 +62,18 @@ by pressing Enter until the finished page, and fails on any error the page repor
 ## A person's profile, filled in from what they hand over
 
 `POST /person` with `{"kind": "linkedin" | "portfolio" | "cv", "value": "<address or text>"}` answers
-with the skill part of a profile: a headline, a field of work, a level, up to six things the person can
-do, their skills, roles, studies and languages. Each item has `from`, the words it was read from, and
-an item whose words are not in the material is dropped (`dropped` says how many). The person's
-invitation form (Esittely, served under `/esittely/`) can call it and show every line to agree with or
-strike. What a person wants and what would suit them are asked, never read.
+with the skill part of a profile: the person's name where the material states it, a headline, a field
+of work, a level, up to six things the person can do, their skills, roles and languages. Schools and
+studies are left out, with photo, age, gender and nationality. Each item has `from`, the words it was read from, and
+an item whose words are not in the material is dropped (`dropped` says how many). With `"draft": false` it
+answers with the text it read and involves no model.
+
+The person's sign-up (`#/me`) calls it for each source the person ticks, shows each one being read
+and what came of it, and says so plainly when a source cannot be read; nothing is ever filled in from
+anywhere else. "Try it with a sample person" is the explicit other choice: a made-up person whose
+addresses end in `.example`. In place of a photo each person gets a mark, a small abstract mosaic
+drawn in the browser from a hash of what they entered (`mark.ts`): never a face, nothing of their
+text in it, nothing stored. What a person wants and what would suit them are asked, never read.
 
 - `linkedin`: Context.dev `POST /v1/people/enrich` with the profile address, 20 credits a match. A
   match scored under 90 of 100 is refused. It reads Context.dev's record of the profile, which can be
@@ -69,8 +81,9 @@ strike. What a person wants and what would suit them are asked, never read.
 - `portfolio`: Context.dev `POST /v1/web/scrape` of any public page, 1 credit.
 - `cv`: the pasted text.
 
-Handing it over is the consent. Nothing is stored, cached or logged on our side; the material does
-go to Context.dev and to the model. The address is public, so anyone could ask it about any profile:
+Handing it over is the consent. Nothing is stored, cached or logged on our side. An address goes to
+Context.dev, which reads the profile or page; the text goes to the model (Anthropic), which writes
+the lines. The draft lives in the person's browser tab (`sessionStorage`) and is gone when it closes. The address is public, so anyone could ask it about any profile:
 it reads at most 60 profiles per start (`PEOPLE_LIMIT`), and that is a reason this stays a demo.
 
 ```sh
@@ -86,12 +99,13 @@ The rule: **the cache may hold company information; data about an individual per
   see below) so nothing is paid for twice. That text is third-party writing and names people as news
   does; nothing that names a person is ever shown, and `signals.json`, which is in git, holds only
   claims, short quotes and addresses.
-- **About a person** we read one thing, and only when that person hands it over in their own
-  invitation: their LinkedIn address, a portfolio page, or the text of their CV (`POST /person`). A
+- **About a person** we read only what that person hands over in their own sign-up (`#/me`): their
+  LinkedIn address, a page of theirs, or the text of their CV (`POST /person`). A
   LinkedIn address goes to Context.dev's people lookup, a portfolio page to its scraper, and the
   resulting text to the model (Anthropic) to be turned into lines the person agrees with or strikes.
   None of it is cached, logged or saved on our side: the answer goes back to the person's browser
-  and that is the only copy. Company research never looks people up, and its searches leave out
+  tab and that is the only copy, gone when the tab closes. A finished profile is sent to nobody in
+  this demo, and its last page says so. Company research never looks people up, and its searches leave out
   social networks.
 - **People as numbers:** the pool on Espoo's screen is sample data, and it is counts, never rows.
 
@@ -159,7 +173,7 @@ live in the demo; nothing below is only described.
 | `POST /v1/web/scrape` (markdown) | Reads the company's careers page, script-rendered ones included, as one more page to quote from: what the company tells candidates itself. | Statements and needs that cite the company's own careers page, with the quoted sentence on hover. |
 | `POST /v1/monitors` (page target, with instructions) | Watches each company's careers page for a job opening added or removed. 42 of the 74 companies have a careers link. 1 credit a run. | "Changed lately" on Espoo's events screen, and "Changed since the draft" on an employer. |
 | `POST /v1/monitors` (search target) | Watches the web for news that a company is growing: funding, an acquisition, a new site, a hiring plan. One per company, 74. 2 credits a run. | The same two places. |
-| `POST /v1/people/enrich` | A person pastes their own LinkedIn address; this returns their roles and studies, which become profile lines they agree with or strike. 20 credits a match. | The person's invitation form, once it calls `POST /person`; today from the command line. |
+| `POST /v1/people/enrich` | A person pastes their own LinkedIn address; this returns their roles and studies, which become profile lines they agree with or strike. 20 credits a match. | The person's sign-up, `#/me`: "LinkedIn profile" on the first card, read into lines to check. |
 | `GET /v1/monitors`, `GET /v1/monitors/changes` | Reads back what is watched and what changed, at most every five minutes. | The line "Watching 42 careers pages and news about 74 employers, next at 20:34". |
 
 Monitors (`monitors.py`): 116 of them, every six hours, tagged `kutsu`. One run of all costs 190
