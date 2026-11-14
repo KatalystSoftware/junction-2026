@@ -266,7 +266,9 @@ def screen(path: str) -> dict:
         for g, ids in pairs.items():
             x = world.gigs[g]
             split = any("split" in d.decisions[i]["paired"] for i in ids)
-            out["pairs"].append({"typical": sum(requests[i]["referenceFeeCents"] for i in ids), "alone": sum(fees[i] for i in ids),
+            back = len(ids) == 2 and d.returns(won[ids[0]]["order"], won[ids[1]]["order"])
+            out["pairs"].append({"ids": sorted(ids), "back": back, "rate": None if back else params.get("pair_onward"),
+                                 "typical": sum(requests[i]["referenceFeeCents"] for i in ids), "alone": sum(fees[i] for i in ids),
                                  "booked_after": None if g not in d.booked else x["book"] - x["at"], "split": split,
                                  "late_alone": sum(i in late for i in ids)})
         out["held"] = len(held)
@@ -334,12 +336,13 @@ def read(rows: list[dict]) -> None:
         print(f"== {group}: {n} weeks")
         print(f"   2. pairs a week {len(pairs) / n:.1f} ({2 * len(pairs) / n:.0f} orders); held {held / n:.1f}, of which alone {len(alone) / n:.1f}; "
               f"pairs back to two gigs {sum(p['split'] for p in pairs) / n:.1f} a week, by reason {dict(sum((collections.Counter(r['splits']) for r in sel), collections.Counter()))}")
+        print(f"   2b. out and back {sum(p.get('back', True) for p in pairs) / n:.1f} a week, onward {sum(not p.get('back', True) for p in pairs) / n:.1f}")
         print(f"   3. held cars without a return: late {base_late / max(1, len(alone)):.2%} at the recorded post, "
               f"{(base_late + d_late) / max(1, len(alone)):.2%} when held: {100 * d_late / max(1, len(alone)):+.2f} points")
         booked = [p for p in pairs if p["booked_after"] is not None and not p["split"]]
         for fee in FEES:
             # The pair books after the slower of its two cars' recorded waits; the fee rises a tenth an hour to 1.0.
-            pay = sum(min(fee + 0.1 * (p["booked_after"] // 60), 1.0) * p["typical"] for p in booked)
+            pay = sum(min((p.get("rate") or fee) + 0.1 * (p["booked_after"] // 60), 1.0) * p["typical"] for p in booked)  # onward pairs at their own rate
             saved = sum(p["alone"] for p in booked) - pay
             held_cost = LATE_EUROS * 100 * d_late
             band = [w for m, w in trade if abs(m - fee * ratio) <= 0.1]
