@@ -1,7 +1,7 @@
 <script lang="ts">
   import Cite from './Cite.svelte'
   import { text } from './editable'
-  import { host, when } from './format'
+  import { host, terms, when } from './format'
   import Icon from './Icon.svelte'
   import Logo from './Logo.svelte'
   import { app, nameOf, reviewOf, saveReview } from './state.svelte'
@@ -62,8 +62,21 @@
     const value = (e.currentTarget as HTMLElement).innerText.replace(/\s+/g, ' ').trim()
     if (value !== review.needs[i][key]) patch(i, { [key]: value, by: 'company' })
   }
-  const LEVELS = ['Early career', 'Experienced', 'Senior', 'Lead']
-  const level = (i: number) => patch(i, { seniority: LEVELS[(LEVELS.indexOf(review.needs[i].seniority) + 1) % LEVELS.length] })
+  // what a role asks for beyond its title: each a few fixed choices, prefilled where a job post says it
+  const ASKS: { key: 'seniority' | 'language' | 'workplace' | 'abroad'; label: string; options: [string | boolean, string][] }[] = [
+    { key: 'seniority', label: 'Level', options: ['Early career', 'Experienced', 'Senior', 'Lead'].map((x) => [x, x]) },
+    { key: 'language', label: 'Working language', options: [['English is enough', 'English is enough'], ['Finnish needed', 'Finnish needed']] },
+    { key: 'workplace', label: 'Where', options: ['On site', 'Hybrid', 'Remote'].map((x) => [x, x]) },
+    { key: 'abroad', label: 'Hiring from abroad', options: [[true, 'Yes'], [false, 'Only people already in Finland']] },
+  ]
+  const answer = (i: number, key: string, value: string | boolean) => patch(i, { [key]: value, by: review.needs[i].by })
+  const dropTask = (i: number, task: string) => patch(i, { can_do: review.needs[i].can_do.filter((t) => t !== task) })
+  const editTask = (i: number, j: number, e: FocusEvent) => {
+    const value = (e.currentTarget as HTMLElement).innerText.replace(/\s+/g, ' ').trim()
+    const tasks = review.needs[i].can_do.map((t, k) => (k === j ? value : t)).filter(Boolean)
+    if (tasks.join('|') !== review.needs[i].can_do.join('|')) patch(i, { can_do: tasks })
+  }
+  const addTask = (i: number) => patch(i, { can_do: [...(review.needs[i].can_do ?? []), ''] })
   const dropSkill = (i: number, skill: string) => patch(i, { skills: review.needs[i].skills.filter((s) => s !== skill) })
   function addSkill(i: number, e: KeyboardEvent) {
     const input = e.currentTarget as HTMLInputElement
@@ -72,7 +85,7 @@
     input.value = ''
   }
   const addNeed = () =>
-    needs((list) => [...list, { title: '', why: '', skills: [], seniority: 'Experienced', signals: [], roles: [], by: 'company' }])
+    needs((list) => [...list, { title: '', why: '', can_do: [], skills: [], seniority: 'Experienced', signals: [], roles: [], by: 'company' }])
   const WANTS = ['1:1 meetings with candidates', 'A virtual booth', 'A company presentation']
   const wants = $derived(review.wants ?? [WANTS[0]])
   const want = (w: string) => save({ wants: wants.includes(w) ? wants.filter((x) => x !== w) : [...wants, w] })
@@ -175,14 +188,52 @@
                 <p class="why">
                   <span role="textbox" tabindex="0" aria-label="Why" contenteditable="plaintext-only" data-placeholder="Why now? One line." onblur={(e) => reword(i, 'why', e)} onkeydown={enter} use:text={need.why}></span><span class="cites">{#each need.signals.filter(number) as id}<Cite signal={brief.signals[number(id) - 1]} n={number(id)} />{/each}</span>
                 </p>
-                <p class="chips">
-                  <button class="chip level" title="Change the level" onclick={() => level(i)}>{need.seniority}</button>
-                  {#each need.skills as skill (skill)}
-                    <span class="chip">{skill}<button aria-label="Remove {skill}" onclick={() => dropSkill(i, skill)}><Icon name="x" size={12} /></button></span>
-                  {/each}
-                  <input class="chip" placeholder="Add a skill" aria-label="Add a skill" onkeydown={(e) => addSkill(i, e)} />
-                </p>
                 {#if need.roles.length}<p class="open">Open now: {need.roles.join(', ')}</p>{/if}
+                {#if !need.off}
+                  <dl class="asks">
+                    <div>
+                      <dt>Can do</dt>
+                      <dd>
+                        <ul class="tasks">
+                          {#each need.can_do ?? [] as task, j (j)}
+                            <li>
+                              <span role="textbox" tabindex="0" aria-label="Something they must be able to do" contenteditable="plaintext-only" data-placeholder="Something they must be able to do" onblur={(e) => editTask(i, j, e)} onkeydown={enter} use:text={task}></span>
+                              <button aria-label="Remove this" onclick={() => dropTask(i, task)}><Icon name="x" size={14} /></button>
+                            </li>
+                          {/each}
+                        </ul>
+                        {#if (need.can_do ?? []).length < 4}<button class="more" onclick={() => addTask(i)}><Icon name="plus" size={14} />Add</button>{/if}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Knows</dt>
+                      <dd class="chips">
+                        {#each need.skills as skill (skill)}
+                          <span class="chip">{skill}<button aria-label="Remove {skill}" onclick={() => dropSkill(i, skill)}><Icon name="x" size={12} /></button></span>
+                        {/each}
+                        <input class="chip" placeholder="Add" aria-label="Add something they know" onkeydown={(e) => addSkill(i, e)} />
+                      </dd>
+                    </div>
+                    {#each ASKS as ask (ask.key)}
+                      <div>
+                        <dt>{ask.label}</dt>
+                        <dd>
+                          <span class="seg" role="radiogroup" aria-label={ask.label}>
+                            {#each ask.options as [value, label]}
+                              <button role="radio" aria-checked={need[ask.key] === value} onclick={() => answer(i, ask.key, value)}>{label}</button>
+                            {/each}
+                          </span>
+                          {#if ask.key === 'workplace' && need.where}<span class="place">{need.where}</span>{/if}
+                          {#if need.sources?.[ask.key]}
+                            <span class="read" title={`“${need.sources[ask.key].quote}”`}>from your job post</span>
+                          {:else if need[ask.key] == null}
+                            <span class="yours">your call</span>
+                          {/if}
+                        </dd>
+                      </div>
+                    {/each}
+                  </dl>
+                {/if}
               </div>
             </li>
           {/each}
@@ -217,11 +268,12 @@
               <li style:--i={5 + i}>
                 <div class="line">
                   <b>{need.title}</b>
-                  <span>{need.seniority}</span>
                   <button class="link" disabled={postings[need.title] === 'drafting'} onclick={() => draft(need)}>
                     {postings[need.title] === 'drafting' ? 'Drafting…' : typeof postings[need.title] === 'object' ? 'Draft again' : 'Draft a job posting'}
                   </button>
                 </div>
+                <p class="terms">{terms(need).join(' · ')}</p>
+                {#if need.can_do?.length}<ul class="can">{#each need.can_do as task}<li>{task}</li>{/each}</ul>{/if}
                 <p class="chips">{#each need.skills as skill}<span class="chip">{skill}</span>{/each}</p>
                 {#if postings[need.title] === 'failed'}
                   <p class="hint">The draft did not come through. Try again in a minute.</p>
@@ -422,7 +474,7 @@
 
   /* answers sit on white sheets, so they read the same on any company colour */
   .sheet,
-  .roles li,
+  .roles > li,
   .card {
     border-radius: var(--r2);
     background: var(--ground);
@@ -481,7 +533,7 @@
   }
 
   .picks li,
-  .roles li {
+  .roles > li {
     display: grid;
     grid-template-columns: auto 1fr;
     gap: var(--s4);
@@ -574,7 +626,7 @@
     display: grid;
     gap: var(--s3);
   }
-  .roles li {
+  .roles > li {
     position: relative;
     padding: var(--s5);
     overflow: hidden;
@@ -582,7 +634,7 @@
     animation-delay: calc(var(--i) * 90ms + 0.15s);
     transition: opacity 0.3s, box-shadow 0.3s;
   }
-  .roles li::before {
+  .roles > li::before {
     content: '';
     position: absolute;
     inset: 0;
@@ -591,13 +643,13 @@
     scale: 0 1;
     transition: scale 0.5s var(--ease);
   }
-  .roles li.on::before {
+  .roles > li.on::before {
     scale: 1 1;
   }
-  .roles li > * {
+  .roles > li > * {
     position: relative;
   }
-  .roles li:not(.on) {
+  .roles > li:not(.on) {
     box-shadow: none;
     opacity: 0.78;
   }
@@ -663,6 +715,133 @@
     font-size: var(--t-sm);
     font-weight: 600;
     color: var(--ok);
+  }
+  /* what the role asks for: a label column and its answer, one row each */
+  .asks {
+    display: grid;
+    gap: var(--s3);
+    margin-top: var(--s4);
+    padding-top: var(--s4);
+    border-top: 1px solid color-mix(in srgb, var(--ink) 12%, transparent);
+  }
+  .asks > div {
+    display: grid;
+    grid-template-columns: 9.5rem 1fr;
+    align-items: baseline;
+    gap: var(--s3);
+    padding: 0;
+    border: 0;
+  }
+  .asks dt {
+    font-size: var(--t-sm);
+    font-weight: 600;
+    color: var(--ink-2);
+  }
+  .asks dd {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s2) var(--s3);
+    margin: 0;
+    font-size: var(--t-md);
+    font-weight: 400;
+  }
+  .asks .chips {
+    margin-top: 0;
+  }
+  .tasks {
+    display: grid;
+    gap: var(--s1);
+    width: 100%;
+  }
+  .tasks li {
+    display: flex;
+    align-items: baseline;
+    gap: var(--s2);
+  }
+  .tasks li::before {
+    content: '';
+    flex: none;
+    width: 0.375rem;
+    height: 0.375rem;
+    translate: 0 -0.15rem;
+    border-radius: 50%;
+    background: var(--brand);
+  }
+  .tasks button,
+  .more {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s1);
+    padding: 0.15rem;
+    border: 0;
+    border-radius: var(--r1);
+    background: none;
+    color: var(--ink-2);
+    font-size: var(--t-sm);
+    font-weight: 600;
+  }
+  .tasks button {
+    opacity: 0;
+    transition: opacity 0.12s;
+  }
+  .tasks li:hover button,
+  .tasks button:focus-visible {
+    opacity: 1;
+  }
+  .tasks button:hover {
+    color: var(--stop);
+  }
+  .more:hover {
+    color: var(--ink);
+  }
+  .seg {
+    display: inline-flex;
+    border: 1px solid var(--line);
+    border-radius: 99px;
+    background: var(--ground);
+    overflow: hidden;
+  }
+  .seg button {
+    min-height: 2rem;
+    padding: 0 var(--s3);
+    border: 0;
+    background: none;
+    color: var(--ink-2);
+    font-size: var(--t-sm);
+    font-weight: 600;
+    transition: background 0.2s, color 0.2s;
+  }
+  .seg button + button {
+    border-left: 1px solid var(--line);
+  }
+  .seg button:hover {
+    color: var(--ink);
+  }
+  .seg button[aria-checked='true'] {
+    background: var(--ink);
+    color: var(--ground);
+  }
+  .place {
+    font-size: var(--t-sm);
+    color: var(--ink-2);
+  }
+  .read,
+  .yours {
+    font-size: var(--t-xs);
+    color: var(--ink-2);
+  }
+  .read {
+    text-decoration: underline dotted;
+    text-underline-offset: 0.2em;
+    cursor: help;
+  }
+  .yours {
+    padding: 0.05rem var(--s2);
+    border-radius: 99px;
+    background: color-mix(in srgb, var(--brand) 16%, #fff);
+    color: var(--ink);
+    font-weight: 600;
   }
   .add,
   .back {
@@ -765,8 +944,14 @@
     font: 700 var(--t-xl) / 1.1 var(--display);
     letter-spacing: -0.025em;
   }
-  .line span {
+  .terms {
+    margin-top: var(--s1);
     color: var(--ink-2);
+  }
+  .can {
+    margin-top: var(--s3);
+    padding-left: var(--s4);
+    list-style: disc;
   }
   .line .link {
     margin-left: auto;
@@ -841,11 +1026,15 @@
       padding-inline: 0;
       font-size: var(--t-xs);
     }
-    dl div {
+    dl div,
+    .asks > div {
       grid-template-columns: 1fr;
-      gap: 0;
+      gap: var(--s1);
     }
-    .roles li {
+    .tasks button {
+      opacity: 1;
+    }
+    .roles > li {
       padding: var(--s4);
       gap: var(--s3);
     }

@@ -13,8 +13,18 @@ export type Signal = {
 export type Need = {
   title: string
   why: string
+  /** what the person must be able to do, as work that can be shown */
+  can_do: string[]
+  /** tools, methods and fields they know */
   skills: string[]
   seniority: string
+  language?: string | null
+  workplace?: string | null
+  where?: string | null
+  /** whether the company hires people who are not yet in Finland; only the company can say */
+  abroad?: boolean | null
+  /** the sentence and page a value was read from, for those read from a job post */
+  sources?: Record<string, { quote: string; url: string | null }>
   family?: string
   signals: string[]
   roles: string[]

@@ -2,6 +2,7 @@
   import { tick } from 'svelte'
   import Cite from './Cite.svelte'
   import { text } from './editable'
+  import { terms } from './format'
   import Icon from './Icon.svelte'
   import { saveReview } from './state.svelte'
   import type { Brief, Need, Review } from './types'
@@ -12,7 +13,7 @@
   let list: HTMLOListElement
   const number = (id: string) => brief.signals.findIndex((s) => s.id === id) + 1
   const BY = { espoo: 'Edited by Espoo', company: 'Changed by the company' }
-  const blank = (): Need => ({ title: '', why: '', skills: [], seniority: 'Experienced', signals: [], roles: [], by: who })
+  const blank = (): Need => ({ title: '', why: '', can_do: [], skills: [], seniority: 'Experienced', signals: [], roles: [], by: who })
 
   const save = (needs: Need[]) => saveReview(brief.id, { ...review, needs })
 
@@ -37,8 +38,9 @@
       <p class="why">
         <span role={editable ? 'textbox' : undefined} aria-label="Why" contenteditable={editable ? 'plaintext-only' : undefined} data-placeholder="Why? One line." onblur={(e) => edit(i, 'why', e)} onkeydown={enter} use:text={need.why}></span><span class="cites">{#each need.signals.filter(number) as id}<Cite signal={brief.signals[number(id) - 1]} n={number(id)} />{/each}</span>
       </p>
+      {#if need.can_do?.length}<ul class="can">{#each need.can_do as task}<li>{task}</li>{/each}</ul>{/if}
       <p class="tags">
-        <span class="level">{need.seniority}</span>
+        <span class="level">{terms(need).join(' · ')}</span>
         {#each need.skills as skill}<span class="skill">{skill}</span>{/each}
         {#each need.roles as role}<span class="role">Hiring now: {role}</span>{/each}
         {#if need.off}<span class="by">The company said no</span>
@@ -104,6 +106,13 @@
     flex-wrap: wrap;
     gap: var(--s2);
     margin-top: var(--s3);
+    font-size: var(--t-sm);
+  }
+  .can {
+    margin-top: var(--s3);
+    padding-left: var(--s4);
+    max-width: 58ch;
+    list-style: disc;
     font-size: var(--t-sm);
   }
   .level,

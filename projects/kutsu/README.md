@@ -65,8 +65,18 @@ logo from the company's page (Cisco's on hamina.com).
   the company's own site. Social networks are excluded because posts there are people speaking.
 - **Claude Haiku 5.5**, three calls: one writes the statements, one lists the people named so those
   statements can be dropped, and one writes the card from the statements that passed: a one-line
-  pitch and at most four needs, each a short title, one reason, a few skills and a level. A fourth
-  drafts a job posting when a company asks for one.
+  pitch and at most four needs. A fourth drafts a job posting when a company asks for one.
+
+What a need asks for, and where each value comes from:
+
+| Field | What it is | From |
+|---|---|---|
+| Can do | two or three tasks the person must be able to do, written as work that can be shown | drafted from the statements and an open role's must-haves |
+| Knows | up to five tools, methods or fields; no soft skills or traits of character | drafted |
+| Level | early career, experienced, senior or lead | drafted |
+| Working language | English is enough, or Finnish needed | the job post, with its sentence; otherwise the company |
+| Where | on site, hybrid or remote, and the place | the job post, with its sentence; otherwise the company |
+| Hiring from abroad | yes, or only people already in Finland | always the company: no post says it |
 
 Four Exa searches, two or three Context.dev requests and three Haiku calls per company, about $0.03
 and 11 to 13 credits. Every request and its raw response is stored in `api-cache/`, which is in git,
