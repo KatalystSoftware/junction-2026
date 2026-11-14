@@ -549,3 +549,15 @@ for _rung in ("vol110", "vol105", "cost10"):
     for _drivers in (820, 850, 900):
         VARIANTS[f"fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100-{_rung}-from{_drivers}"] = _rich(
             VARIANTS[f"fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100-{_rung}"], _drivers)
+
+# The safe head on row 8 with every part that reads positive in its driver band (played rows at 22:08 UTC): the trade-in fee
+# fix in every week; under 760 drivers the 48-hour count, the day cap of 62 and the onward pairs (`-onward-all`: +1,161 a week
+# on 13 pairs, no week under 92% in 15); at 760 or more the onward pairs with `slow_step` 0.4, row 5's decisions (0.2 read
+# -42 a week on 21 pairs and 0.44 points of on-time less). `-late100` is the aggressive leader L: `late_cost` 100 at 760
+# drivers or more; `-h30-c11` adds lane 4 B's cost 1.1 for orders with 30 hours or more to the last pickup, also only there.
+_ROW_5 = VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss04"]
+_HEAD = "fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss04-cap62-kindfee-onward-all"
+VARIANTS[_HEAD] = {**_ROW_5, "when_tight": {**_ROW_5["when_tight"], "due_cap": 62, "due_cap_wave": 0},
+                   "pair_more_drivers": 0, "kind_fees": True}
+VARIANTS[f"{_HEAD}-late100"] = _full_weeks(VARIANTS[_HEAD], late_cost=100)
+VARIANTS[f"{_HEAD}-late100-h30-c11"] = _full_weeks(VARIANTS[f"{_HEAD}-late100"], cost=1.1, cost_hours=[[30, 1.2]])
