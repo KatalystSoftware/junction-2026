@@ -49,7 +49,7 @@ from .policy import DECLINE, Policy
 from .server import SERVER, PracticeClient, data_dir, world_map
 from .variants import VARIANTS
 
-VARIANT = "steep-notes-offers-8"
+VARIANT = "slow-friday-late-150-kinds-limits"
 # A safe quote when the policy cannot answer in time: no same_day, no trade-in, no private address, and the higher of
 # 1.9 x the typical fee and 1.5 x the list price. That is the price of `floor-1.9` in the first sweeps, which won few
 # cars, paid on each, and was 96% on time (README, "Results so far"). It declines while the backlog gate is shut.
@@ -546,8 +546,10 @@ class Live:
         self.generation = 0  # a stream reader of an earlier generation stops
         self.ends_at = None
 
-    def join(self) -> None:
-        """Rebuilds the books: from memory, else from disk, else from the world's whole history."""
+    def join(self, out: Optional[queue.Queue] = None) -> None:
+        """Rebuilds the books: from memory, else from disk, else from the world's whole history. With `out`, the stream
+        into it starts before the books are rebuilt, so a request that arrives meanwhile goes to the guard at once:
+        reading a week's history takes seconds, longer than a request gives at night."""
         first = self.world.snapshot()
         self.clock.saw(first["now"], exact=True)
         self.ends_at = first["endsAt"]
@@ -563,6 +565,10 @@ class Live:
         events = self.world.events(after=self.desk.seq)
         snapshot = self.world.snapshot()
         self.clock.saw(snapshot["now"], exact=True)
+        if out is not None:
+            self.generation += 1
+            after = events[-1]["seq"] if events else self.desk.seq
+            threading.Thread(target=self.read, args=(out, after, self.generation), daemon=True, name="stream").start()
         for request in snapshot["openRequests"]:
             self.guard.add(request)
         changed, dropped = self.desk.catch_up(events)
@@ -594,10 +600,13 @@ class Live:
             out.put(error)
 
     def run(self, stop_at: Optional[int] = None) -> None:
-        self.join()
-        desk, events = self.desk, queue.Queue()
-        self.generation += 1
-        threading.Thread(target=self.read, args=(events, desk.seq, self.generation), daemon=True, name="stream").start()
+        events = queue.Queue()
+        try:
+            self.join(events)
+        except BaseException:
+            self.generation += 1  # the stream that the join started stops
+            raise
+        desk = self.desk
         saved = polled = time.monotonic()
         scored, dirty, look_at = -SCORE, False, desk.now
         try:

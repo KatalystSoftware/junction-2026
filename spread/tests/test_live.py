@@ -146,6 +146,19 @@ def test_guard_covers_a_request_that_the_desk_decided_and_did_not_send_in_time(t
     assert [by for _, _, by in world.quotes.get("R1", [])] == ["fallback"]
 
 
+def test_guard_covers_a_request_that_arrives_while_the_desk_reads_the_history(tmp_path, monkeypatch):
+    # A standby that joins from the world reads the week's history first, which takes seconds; a request at night gives 0.75.
+    events = [{"seq": 0, "at": 500, "kind": "price_request", "request": request("R1")},
+              {"seq": 1, "at": 508, "kind": "price_request", "request": request("R2", arrivedAt=508, respondBy=511)}]
+    world = replay.Replay(events, ROSTER, ends_at=20000, start=506, speed=1)  # 0.3 s a minute: R2 comes in 0.6 s and gives 0.9 s
+    catch_up = live.LiveDesk.catch_up
+    monkeypatch.setattr(live.LiveDesk, "catch_up", lambda desk, missed: time.sleep(2) or catch_up(desk, missed))
+    desk = live.Live(world, world.guard_act, world.minute, 8, VARIANTS[live.VARIANT], MAP, tmp_path, echo=False)
+    desk.run(stop_at=514)
+    desk.stop()
+    assert [by for _, _, by in world.quotes.get("R2", [])] == ["fallback"]
+
+
 def test_a_second_desk_on_the_same_world_stops_at_once(tmp_path):
     world = replay.Replay([], ROSTER, ends_at=20000, start=506, speed=0.001)
     first, second = (live.Live(world, world.guard_act, world.minute, 8, VARIANTS[live.VARIANT], MAP, tmp_path, echo=False) for _ in range(2))
