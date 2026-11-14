@@ -89,8 +89,12 @@ export async function load() {
  */
 export const route = () => {
   const [, a = '', b = '', c = '', d = ''] = app.hash.split('/').map(decodeURIComponent)
-  if (a === 'event') return { join: false, id: '', event: b, tab: c, company: d }
-  return a === 'join' || a === 'c' ? { join: true, id: b, event: c, tab: '', company: '' } : { join: false, id: a, event: '', tab: '', company: '' }
+  if (a === 'event') return { join: false, me: false, id: '', event: b, tab: c, company: d }
+  // `#/me` is a person's own sign-up, and `#/me/<event slug>` the same as an invitation to that event
+  if (a === 'me') return { join: false, me: true, id: '', event: b, tab: '', company: '' }
+  return a === 'join' || a === 'c'
+    ? { join: true, me: false, id: b, event: c, tab: '', company: '' }
+    : { join: false, me: false, id: a, event: '', tab: '', company: '' }
 }
 export const go = (id: string) => (location.hash = `#/${encodeURIComponent(id)}`)
 export const joinPath = (id: string, event = '') => `#/join/${encodeURIComponent(id)}${event ? `/${event}` : ''}`

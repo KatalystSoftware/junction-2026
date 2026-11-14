@@ -101,7 +101,7 @@ def stand_in(url, body, headers):
         "headline": "Cryogenics engineer", "field": "Quantum", "level": "Lead",
         "can_do": [{"line": "Builds dilution refrigerators", "from": "Built dilution refrigerators"},
                    {"line": "Speaks nine languages", "from": "words that are not in the material"}],
-        "skills": [], "experience": [], "education": [], "languages": []})}]}
+        "name": "", "skills": [], "experience": [], "languages": []})}]}
 
 
 def everything():

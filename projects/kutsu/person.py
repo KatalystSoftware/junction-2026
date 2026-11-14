@@ -6,7 +6,8 @@ can agree with or strike, and the answer goes back to their browser. Every line 
 read from, and those words must be in the material word for word, or the line is dropped. This is the
 same rule the company side follows.
 
-Only the skill part of a profile can be filled in this way. What a person wants to do next and what
+Schools and studies are left out, with photo, age, gender and nationality: the form promises they are never
+read into a profile. Only the skill part of a profile can be filled in this way. What a person wants to do next and what
 would suit them are not in a CV; the form asks for those.
 
   linkedin    Context.dev POST /v1/people/enrich with the profile address (20 credits a match). It reads
@@ -34,19 +35,20 @@ Write only what the material states about their work and studies. Do not guess. 
 
 Every item has a field `from`: a run of 3 to 15 words copied exactly, character for character, from the material, that the item rests on. An item you cannot back with such words is left out.
 
+name: the person's own name as the material gives it, or an empty string when it does not.
 headline: who they are at work, at most 10 words, no adjectives of praise.
 field: the one field of work that fits best.
 level: by years and titles in the material.
 can_do: up to 6 things they can do, each a plain line of at most 14 words that starts with a verb and names the work, not a quality ("Builds data pipelines in Python", never "Strong communicator").
 skills: up to 10 tools, methods or technologies named in the material, each as the material writes it.
-experience: up to 6 roles, newest first. years as "2023–2025" or "2025–now"; empty when the material gives none.
-education: up to 3.
+experience: up to 6 roles, newest first. years as "2023–2025" or "2025–now"; empty when the material gives none. Leave out studies and schools.
 languages: spoken languages the material names, with the level if given."""
 QUOTE = {"type": "string", "description": "3 to 15 words copied exactly from the material"}
 SCHEMA = {
     "type": "object", "additionalProperties": False,
-    "required": ["headline", "field", "level", "can_do", "skills", "experience", "education", "languages"],
+    "required": ["name", "headline", "field", "level", "can_do", "skills", "experience", "languages"],
     "properties": {
+        "name": {"type": "string"},
         "headline": {"type": "string"},
         "field": {"type": "string", "enum": signals.FAMILIES},
         "level": {"type": "string", "enum": signals.SENIORITY},
@@ -57,8 +59,6 @@ SCHEMA = {
         "experience": {"type": "array", "items": {"type": "object", "additionalProperties": False, "required": ["title", "organisation", "years", "from"],
                                                   "properties": {"title": {"type": "string"}, "organisation": {"type": "string"},
                                                                  "years": {"type": "string"}, "from": QUOTE}}},
-        "education": {"type": "array", "items": {"type": "object", "additionalProperties": False, "required": ["what", "where", "from"],
-                                                 "properties": {"what": {"type": "string"}, "where": {"type": "string"}, "from": QUOTE}}},
         "languages": {"type": "array", "items": {"type": "object", "additionalProperties": False, "required": ["language", "from"],
                                                  "properties": {"language": {"type": "string"}, "from": QUOTE}}},
     },
@@ -153,10 +153,13 @@ def profile(kind, value, draft=True):
     words = lambda text: " ".join(re.findall(r"\w+", text.lower()))
     there = f" {words(material)} "
     dropped = 0
-    for key in ("can_do", "skills", "experience", "education", "languages"):
+    for key in ("can_do", "skills", "experience", "languages"):
         kept = [item for item in lines[key] if len(words(item["from"]).split()) >= 2 and f" {words(item['from'])} " in there]
         dropped += len(lines[key]) - len(kept)
         lines[key] = kept
+    # a name is kept only when it stands in the material; a profile's own record of the name comes first
+    stated = lines.pop("name", "").strip()
+    name = name or (stated if stated and f" {words(stated)} " in there else None)
     return {"source": kind, "name": name, "material": material, **lines, "dropped": dropped}
 
 

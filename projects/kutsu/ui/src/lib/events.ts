@@ -104,16 +104,21 @@ export const plans = (): Plan[] => [...app.presets.map(upcoming), ...suggested()
 
 /** An event as the invited company reads it: its name, when it is, and what is settled about it. */
 export type Occasion = { slug: string; name: string; when: string; facts: string; dated: boolean }
+/** An event as an invitation names it. A suggested event has no date yet. */
+export const occasionOf = (plan: Plan | undefined): Occasion =>
+  !plan
+    ? { slug: '', name: 'A talent event', when: 'date to be set', facts: '', dated: false }
+    : plan.kind === 'upcoming'
+      ? { slug: plan.slug, name: plan.title, when: plan.when, facts: app.presets.find((p) => slugOf(p) === plan.slug)?.facts ?? '', dated: true }
+      : { slug: plan.slug, name: `${plan.title} talent event`, when: 'date to be set', facts: '', dated: false }
 /**
  * The event a company's invitation is for: the one named in its link, else the event it is already
- * coming to, else the suggested event it would be invited to first. A suggested event has no date yet.
+ * coming to, else the suggested event it would be invited to first.
  */
 export function occasion(slug: string, brief: Brief): Occasion {
-  const preset = app.presets.find((p) => slug === slugOf(p)) ?? (slug ? undefined : app.presets.find((p) => p.ids.includes(brief.id)))
-  if (preset) return { slug: slugOf(preset), name: preset.title, when: preset.note.split(',')[0] ?? '', facts: preset.facts ?? '', dated: true }
-  const ideas = suggested()
-  const plan = ideas.find((p) => p.slug === slug) ?? ideas.find((p) => p.employers.some((e) => e.brief.id === brief.id))
-  return { slug: plan?.slug ?? '', name: plan ? `${plan.title} talent event` : 'A talent event', when: 'date to be set', facts: '', dated: false }
+  const all = plans()
+  const coming = all.find((p) => p.kind === 'upcoming' && (slug ? p.slug === slug : p.employers.some((e) => e.brief.id === brief.id)))
+  return occasionOf(coming ?? all.find((p) => p.slug === slug) ?? all.find((p) => p.kind === 'suggested' && p.employers.some((e) => e.brief.id === brief.id)))
 }
 
 /** "9 employers, 2 confirmed": how many look for something, and how many of those said so themselves. */

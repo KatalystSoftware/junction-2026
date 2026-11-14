@@ -7,6 +7,7 @@
   import Join from './lib/Join.svelte'
   import Ledger from './lib/Ledger.svelte'
   import Needs from './lib/Needs.svelte'
+  import Person from './lib/Person.svelte'
   import Applications from './lib/Applications.svelte'
   import Plan from './lib/Plan.svelte'
   import Rail from './lib/Rail.svelte'
@@ -40,7 +41,9 @@
 {#if app.ready}
   <Demo />
   <div class="page" style:--brand={brand.field} style:--brand-ink={brand.ink}>
-    {#if at.join}
+    {#if at.me}
+      <Person />
+    {:else if at.join}
       {#if app.research}<Research />{:else if brief}<Join {brief} />{:else if at.id}<p class="missing">This invitation does not point to a company we know.</p>{:else}<Find />{/if}
     {:else}
       <div class="shell">
