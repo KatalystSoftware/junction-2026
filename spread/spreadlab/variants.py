@@ -437,3 +437,7 @@ def _full_weeks(base: dict, **knobs) -> dict:
 VARIANTS["t760all-step04"] = _full_weeks(VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-all"], slow_step=0.4)
 VARIANTS["t760-q48-step04"] = _full_weeks(VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48"], slow_step=0.4)
 VARIANTS["t760all-onward-step04"] = _full_weeks(VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-all-onward-q10-d760"], slow_step=0.4)
+# Lane A1: the two steps beyond merge 3 plus step04, each alone and only in a week of 760 or more drivers: `slow_step` 0.4 to
+# 0.2, and `late_cost` 150 to 100 (with step04's 0.4). A thinner week plays t760all-onward-step04 exactly.
+VARIANTS["s04-rich-ss02"] = _full_weeks(VARIANTS["t760all-onward-step04"], slow_step=0.2)
+VARIANTS["s04-rich-late100"] = _full_weeks(VARIANTS["t760all-onward-step04"], late_cost=100)
