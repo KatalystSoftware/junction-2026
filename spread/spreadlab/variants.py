@@ -561,3 +561,8 @@ VARIANTS[_HEAD] = {**_ROW_5, "when_tight": {**_ROW_5["when_tight"], "due_cap": 6
                    "pair_more_drivers": 0, "kind_fees": True}
 VARIANTS[f"{_HEAD}-late100"] = _full_weeks(VARIANTS[_HEAD], late_cost=100)
 VARIANTS[f"{_HEAD}-late100-h30-c11"] = _full_weeks(VARIANTS[f"{_HEAD}-late100"], cost=1.1, cost_hours=[[30, 1.2]])
+# Lane A1's `late_cost` 80 on the head with lane 4 B's 30-hour cost, only from 820 drivers (`rich_drivers`, `when_rich`): the
+# head's 100 stays at 760 to 819, where the played rows read the extra orders as paying least, and a week under 820 plays the
+# head to the cent.
+VARIANTS[f"{_HEAD}-late100-h30-c11-late80-from820"] = {
+    **VARIANTS[f"{_HEAD}-late100-h30-c11"], "rich_drivers": 820, "when_rich": {"late_cost": 80}}

@@ -878,3 +878,20 @@ def test_the_rungs_from_820_850_and_900_drivers_play_a17_below_and_the_rung_abov
             for n in (700, 760, drivers - 1):
                 assert desk(name, n) == desk(a17, n), (name, n)
             assert desk(name, drivers) == desk(f"{a17}-{rung}", drivers), name
+
+
+def test_late80_from_820_plays_the_head_below_820_drivers_and_only_a_lower_late_cost_above():
+    from spreadlab import play
+    from spreadlab.variants import VARIANTS
+    head = "fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss04-cap62-kindfee-onward-all-late100-h30-c11"
+    roster = lambda n: [{**ROSTER[0], "id": f"x{i}"} for i in range(n)]  # noqa: E731
+
+    def desk(name, n):  # the parameters the week plays with
+        params = VARIANTS[name]
+        played = play.policy_class(params)(None, 8, 0, params, roster(n), MAP).params()
+        return {k: v for k, v in played.items() if k not in ("when_tight", "rich_drivers", "when_rich")}
+    for n in (700, 760, 819):
+        assert desk(f"{head}-late80-from820", n) == desk(head, n), n
+    rich, base = desk(f"{head}-late80-from820", 820), desk(head, 820)
+    assert {k: rich[k] for k in rich if rich[k] != base[k]} == {"late_cost": 80}
+    assert rich["cost"] == 1.1 and rich["cost_hours"] == [[30, 1.2]]
