@@ -58,6 +58,28 @@ resource "verda_instance" "runner" {
   }
 }
 
+# Render box for the submission videos (projects/videos). Recording a browser and rendering frames
+# takes every core it is given, and on hestia that starved the other agents, so it runs here instead.
+# It holds nothing worth keeping: the videos are copied back, and the disk goes with the instance.
+resource "verda_instance" "render" {
+  hostname      = "junction2026-render"
+  description   = "Junction 2026 video rendering"
+  instance_type = "CPU-TURIN.8V.32G"
+  image         = "26.04.base"
+  location      = "FIN-03"
+  ssh_key_ids   = [verda_ssh_key.hestia.id, verda_ssh_key.amp_runner.id]
+
+  os_volume = {
+    name = "junction2026-render-os"
+    size = 60
+    type = "NVMe"
+  }
+}
+
 output "runner_ip" {
   value = verda_instance.runner.ip
+}
+
+output "render_ip" {
+  value = verda_instance.render.ip
 }
