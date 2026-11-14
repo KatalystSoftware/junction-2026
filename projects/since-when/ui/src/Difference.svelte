@@ -2,7 +2,7 @@
 	// One difference: a headline and its time strip; opened, each edition's own words side by side
 	// and a way to read the text on that date in MariaDB.
 	import { dating, figureMarks, lanes, turns, type Difference } from './lib/differences'
-	import { NAMES, articleUrl, day, dayAfter, diffUrl, list, modelName, plural, revisionUrl, sectionLabel, sectionOf } from './lib/format'
+	import { NAMES, articleUrl, day, dayAfter, diffUrl, linkParts, list, modelName, plural, revisionUrl, sectionLabel, sectionOf, sourceOf } from './lib/format'
 	import { showSql, ui } from './lib/nav.svelte'
 	import type { TimelineEvent, Topic } from './lib/types'
 	import Marked from './Marked.svelte'
@@ -38,11 +38,16 @@
 				{#each d.quotes as q (q.lang)}
 					{@const section = q.from ? sectionOf(q.from, q.lang) : ''}
 					{@const rev = q.from?.rev_ids?.[q.lang]}
+					{@const src = sourceOf(q.from, q.lang)}
 					<figure>
 						<figcaption class="small">
 							<a href={rev ? revisionUrl(q.lang, rev, section) : articleUrl(q.lang, topic.titles[q.lang] ?? '')} target="_blank" rel="noopener" title="Opens the {NAMES[q.lang]} article at {section ? `“${sectionLabel(section)}”` : 'its opening'}, as it was compared">{NAMES[q.lang]}</a>
 						</figcaption>
 						<blockquote lang={q.lang}><Marked text={q.text} {terms} ranges={marks.get(q.lang) ?? []} /></blockquote>
+						{#if src}
+							<p class="source small"><span class="subtle">{src.where}{src.text ? ':' : ` in the ${NAMES[q.lang]} article for this sentence or its paragraph`}</span>
+								{#each linkParts(src.text) as p}{#if p.url}<a href={p.part} target="_blank" rel="noopener">{p.part}</a>{:else}{p.part}{/if}{/each}</p>
+						{/if}
 					</figure>
 				{/each}
 			</div>
@@ -177,6 +182,11 @@
 
 	.line {
 		margin-top: var(--spacing-50);
+	}
+
+	.source {
+		margin-top: var(--spacing-50);
+		overflow-wrap: anywhere;
 	}
 
 	.related li {

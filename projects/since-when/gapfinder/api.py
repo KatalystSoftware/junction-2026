@@ -267,7 +267,12 @@ def apply_checks(findings, checks):
         k = by_finding.get(f["id"])
         f = dict(f, check=check_of(k) if k else None)
         if k and k["outcome"] == "changed":
+            before = f["quotes"], f.get("citations") or {}, f.get("paragraph_citations") or {}
             f.update(_as_checked(k))
+            # A quote the check kept from the finding, whole or in part, keeps the finding's source.
+            for lang, quote in f["quotes"].items():
+                if quote in (before[0].get(lang) or "") and lang in before[1]:
+                    f["citations"][lang], f["paragraph_citations"][lang] = before[1][lang], before[2].get(lang)
         out.append(f)
     for k in checks:
         if k["finding_id"] is None:

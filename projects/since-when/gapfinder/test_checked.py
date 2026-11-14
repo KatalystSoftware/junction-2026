@@ -178,6 +178,15 @@ class Applied(unittest.TestCase):
         self.assertIsNone(findings[2]["check"])
         self.assertEqual(totals["changed"], 1)
 
+    def test_a_changed_finding_keeps_the_source_of_a_quote_it_kept(self):
+        f = dict(self.FINDINGS[0], quotes={"sv": "a b c", "en": "x"}, citations={"sv": "Book", "en": None})
+        f["paragraph_citations"] = {"sv": "Book 2", "en": "Paper"}
+        k = _row(id=7, finding_id=1, outcome="changed", type="numbers", lang="sv", other_lang="en")
+        k.update(quote="b", other_quote="y")  # the Swedish quote cut down, the English one another sentence
+        findings, _ = api.apply_checks([f], [k])
+        self.assertEqual(findings[0]["citations"], {"sv": "Book"})
+        self.assertEqual(findings[0]["paragraph_citations"], {"sv": "Book 2"})
+
     def test_a_set_aside_finding_keeps_its_text_and_carries_the_passage(self):
         k = _row(id=8, finding_id=2, outcome="set_aside", reason="stated_elsewhere", verdict="supported")
         k.update(

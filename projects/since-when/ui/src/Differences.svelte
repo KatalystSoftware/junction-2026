@@ -2,7 +2,7 @@
 	// The topic's page: the few places where the editions say different things, each with its time
 	// strip, then, collapsed, what each edition says that another leaves out.
 	import { FIRST, differences, missing, setAside, wording } from './lib/differences'
-	import { DECADES, NAMES, articleUrl, day, list, modelName, plural, revisionUrl, rowDate, sectionLabel } from './lib/format'
+	import { DECADES, NAMES, articleUrl, day, linkParts, list, modelName, plural, revisionUrl, rowDate, sectionLabel, sourceOf } from './lib/format'
 	import { LANGS, type TimelineEvent, type Topic } from './lib/types'
 	import Difference from './Difference.svelte'
 	import Why from './Why.svelte'
@@ -121,6 +121,7 @@
 					<ul>
 						{#each whole[l] ? items : items.slice(0, SOME) as m (m.key)}
 							{@const rev = m.row.rev_ids?.[l]}
+							{@const src = sourceOf(m.row, l)}
 							<li>
 								<blockquote lang={l}>{m.quote || m.row.summary}</blockquote>
 								<p class="small subtle">
@@ -128,6 +129,9 @@
 									<span class="num">{rowDate(m.row)}</span>
 									<span>Not in {list(m.lacks.map((x) => NAMES[x]), 'or')}</span>
 								</p>
+								{#if src?.text}
+									<p class="small source"><span class="subtle">{src.where}:</span> {#each linkParts(src.text) as p}{#if p.url}<a href={p.part} target="_blank" rel="noopener">{p.part}</a>{:else}{p.part}{/if}{/each}</p>
+								{/if}
 							</li>
 						{/each}
 					</ul>
@@ -258,7 +262,11 @@
 		overflow-wrap: anywhere;
 	}
 
-	li p {
+	.source {
+		overflow-wrap: anywhere;
+	}
+
+	li p:not(.source) {
 		display: flex;
 		flex-wrap: wrap;
 		gap: 0 var(--spacing-75);
