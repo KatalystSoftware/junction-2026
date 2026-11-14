@@ -679,3 +679,18 @@ VARIANTS["m41y-o-ftop10-820"] = _from820(VARIANTS["m41y-m-late100-760"], fee_rul
 # `m41x-e` (the thin pair hold 12 and `pair_left` 6) lost `fresh-9594` (686 drivers, 87.23%), which `m41x-b` alone holds at 91.58%
 # and 4.1 at 91.08%, so `m41w-a` is `m41y-f` without its thin play: under 760 drivers it plays `m41x-b`, at 760 or more `m41y-f`.
 VARIANTS["m41w-a"] = {k: v for k, v in _Y["m41y-f-h24-820"].items() if k != "thin_play"}
+
+# A cap on the driving a pair gig plans (`pair_drive`, hours), only in a week of 760 drivers or more (`pair_drive_drivers`); a
+# thinner week plays its base to the cent. On 16 played weeks of the onward base at 760 drivers or more (scratch/pair_drive.py),
+# a pair gig with 8 hours or more of driving found no driver 44% of the time, against 14% at 6 to 8 hours and 3% under 6; the
+# cars of a pair gig that no driver took then went alone and were 23% late, against 3.6% for other cars alone. That path was 4
+# of the 13 late orders a week. Over the cap no pair forms and no pair quote is given: the cars go as they would without a
+# partner. On `trackb-merge-4.1` (`…-ss04`, row 5), which every week of 760 to 819 drivers plays after the roll-back on
+# `fresh-9072`, on the fallback stack's last merged row (`m41x-h`), on its ready head (`m41y-l`) and on `m41y-m`, held until 01:04
+# UTC, with 7 hours beside 8. The stand-in ranks it from `pair_long` on (spread-standin d2d6e53), which books a long pair gig slower.
+for _hours in (7, 8):
+    VARIANTS[f"fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss04-pd{_hours}-d760"] = {
+        **_ROW_5, "pair_drive": _hours, "pair_drive_drivers": 760}
+    VARIANTS[f"m41x-h-pd{_hours}-d760"] = {**VARIANTS["m41x-h-ss025-820"], "pair_drive": _hours, "pair_drive_drivers": 760}
+    VARIANTS[f"m41y-l-pd{_hours}-d760"] = {**VARIANTS["m41y-l-ftop11-820"], "pair_drive": _hours, "pair_drive_drivers": 760}
+    VARIANTS[f"m41y-m-pd{_hours}-d760"] = {**VARIANTS["m41y-m-late100-760"], "pair_drive": _hours, "pair_drive_drivers": 760}

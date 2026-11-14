@@ -65,6 +65,9 @@ PARAMS = {
     "pair_onward_drivers": 0,  # ... only in a week with at least this many drivers listed: thin worlds keep the usual cost
     "pair_more_drivers": 0,  # in a week with fewer drivers listed, `pair_open`, `pair_onward`, `pair_late` and `pair_onward_cost` are
                           # off, so the week plays as the base; known before the first quote
+    "pair_drive": 0,      # a pair gig plans at most this many hours of driving; 0 is the 12 hours of RULES.md. Long pair gigs find no
+                          # driver: of those with 8 hours or more, 44% on 16 played weeks, and their cars then go alone, late
+    "pair_drive_drivers": 0,  # ... only in a week with at least this many drivers listed: a thinner week keeps the 12 hours
     "pair_version": "",   # VERSION, set by the variant, so a sweep plays the weeks again when this file changes
 }
 GIG_DRIVING = 12 * HOUR  # RULES.md: a gig with more than one car plans at most 12 hours of driving
@@ -107,6 +110,8 @@ class PairPolicy(Policy):
             self.p.update(rich)
         if len(roster) < self.p["pair_more_drivers"]:
             self.p.update(pair_open=False, pair_onward=0, pair_late=False, pair_onward_cost=0)
+        if len(roster) < self.p["pair_drive_drivers"]:
+            self.p.update(pair_drive=0)
         self.pair_wait: dict[str, int] = {}  # order id -> the minute its car is posted alone if no return comes
         self.pair_gigs: dict[str, int] = {}  # gig id of a pair -> the latest minute a driver can set out and deliver both cars on time
         self.first: Optional[str] = None  # the order whose first post is being decided
@@ -396,9 +401,9 @@ class PairPolicy(Policy):
 
     def latest(self, stops: list[dict], orders: dict[str, dict]) -> Optional[int]:
         """The latest minute that a driver can set out to the first stop and still make every stop in its window and on
-        time, or None when no start can; within the 12 hours of driving of a gig with two cars."""
+        time, or None when no start can; within the 12 hours of driving of a gig with two cars, or the fewer of `pair_drive`."""
         places = [orders[s["orderId"]]["legs"][s["leg"]][s["kind"]]["placeId"] for s in stops]
-        if sum(self.minutes[(a, b)] for a, b in zip(places, places[1:])) > GIG_DRIVING:
+        if sum(self.minutes[(a, b)] for a, b in zip(places, places[1:])) > min(GIG_DRIVING, self.p["pair_drive"] * HOUR or GIG_DRIVING):
             return None
         if not self.in_time(stops, orders, self.now):
             return None
