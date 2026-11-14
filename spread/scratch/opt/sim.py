@@ -199,15 +199,37 @@ def draws(row: dict, draw: int) -> np.ndarray:
     return row["u"][draw]
 
 
-def simulate(weeks: Weeks, rule, on: list[int], draw: int = 0, learn: float = 0.16, react: float = 0.0, halve: bool = True) -> list[dict]:
+def settle_late(fate: tuple, shift: float) -> bool:
+    """Whether a new order ends late. `fate` is (the saved log odds, or None for a borrowed course; the log odds now; the saved lateness; the order's fixed draw).
+    A borrowed course is late by its draw. An order's own course keeps its saved lateness, moved by the change in its chance, on the same draw."""
+    saved, now, was, u = fate
+    if saved is None:
+        return u < sig(now + shift)
+    p0, p1 = sig(saved), sig(now + shift)
+    if not was and p1 > p0 and u < (p1 - p0) / (1 - p0):
+        return True
+    if was and p1 < p0 and u < (p0 - p1) / p0:
+        return False
+    return was
+
+
+def simulate(weeks: Weeks, rule, on: list[int], draw: int = 0, learn: float = 0.16, react: float = 0.0, halve: bool = True, crowd: tuple[float, float] | None = None) -> list[dict]:
     """Plays the weeks `on` again. `rule(row, parts, trust, desk)` returns (the order's cost in cents, or None to decline). `parts` are the won cars without a driver that are due within
-    8 hours, in 8 to 24 hours, and later; `desk` has the won orders so far and the projected on-time share. Returns one dict a week.
+    8 hours, in 8 to 24 hours, and later; `desk` has the won orders so far and the projected on-time share, the orders in flight (`inflight`: won, not yet delivered; each with `due`,
+    the day of its last pickup, `iv`, the minutes from the win without a driver, and `row`, its request), the drivers listed, the orders already late (`late`), and `night`: for each night that has passed, the saved week's
+    gigs dropped in its first hour and the held gigs due that day as it began (`weeks.first_hour`, when set). Returns one dict a week.
 
     `react` is the competitor's answer, which the handbook describes and no reveal shows: each morning a dealer accepts prices lower by `react` x (the share of its requests of the day
     before that the desk won here - the share it won in the saved week), in log price and at most 0.15 either way. With `halve` off a late order does not halve its dealer's count: the
-    difference to a normal run is what lateness costs in trust."""
+    difference to a normal run is what lateness costs in trust.
+
+    `crowd` = (calm, wave): a day's cars crowd each other. Each order's log odds of ending late move by calm (or wave, on a day whose night had a drop wave in the saved week) x the
+    change in cars due that day per 100 drivers against the saved week, once the week is over. The saved due-day intercept holds the saved count; without `crowd` an extra car due
+    on a wave day is no worse than the saved ones. Lateness then settles at the end of the week, so the trust and the projected share inside the week see the uncrowded draw."""
     out = []
     for wi in on:
+        flu = getattr(weeks, "first_hour", {}).get(wi, {})
+        fates = []  # per new order: what its lateness is drawn from, settled again at the end with `crowd`
         trust, orders, pending, deliveries, today = collections.Counter(), [], [], [], (-1, [], [])
         wk = collections.Counter()
         asked, here, saved, moved, day_now = collections.Counter(), collections.Counter(), collections.Counter(), {}, -1
@@ -255,20 +277,19 @@ def simulate(weeks: Weeks, rule, on: list[int], draw: int = 0, learn: float = 0.
                         break
                 pool = weeks.pool.get((wi, band(r["h"]))) or weeks.pool[(band(r["h"]),)]
                 life = pool[int(u[2] * len(pool))]
-                late = u[3] < sig(weeks.logit(r, parts) + weeks.offset(wi, r))
+                fate = (None, weeks.logit(r, parts) + weeks.offset(wi, r), None, u[3])
             else:  # its own course; its lateness moves with the backlog at the win, against the backlog it was saved under
-                option, late = life["option"], life["late"]
-                p0, p1 = sig(weeks.logit(r, life["u"]) + weeks.offset(wi, r)), sig(weeks.logit(r, parts) + weeks.offset(wi, r))
-                if not late and p1 > p0 and u[3] < (p1 - p0) / (1 - p0):
-                    late = True
-                elif late and p1 < p0 and u[3] < (p0 - p1) / p0:
-                    late = False
+                option = life["option"]
+                fate = (weeks.logit(r, life["u"]) + weeks.offset(wi, r), weeks.logit(r, parts) + weeks.offset(wi, r), life["late"], u[3])
+            late = settle_late(fate, 0.0)
             price = mult * r["lists"].get(option, r["list"])
-            refund = (life["refund"] if life["late"] else weeks.refund_late) * price if late else 0
+            refund_share = life["refund"] if life["late"] else weeks.refund_late
             done = max(r["ready"], by) + (life["lag"] if life["lag"] is not None else 3 * DAY)
-            orders.append({"won": by, "iv": life["iv"], "last": life["last"], "done": done, "late": late})
+            orders.append({"won": by, "iv": life["iv"], "last": life["last"], "done": done, "late": late, "due": (by + life["last"]) // DAY, "row": r})
+            fates.append((fate, (by + life["last"]) // DAY, price * refund_share))
             deliveries.append((done, r["dealer"], not late))
-            wk["orders"] += 1; wk["late"] += late; wk["revenue"] += price; wk["fees"] += life["fee"] * r["fee"]; wk["refund"] += refund; wk["other"] += life["other"]; wk["typ"] += r["fee"]
+            wk["orders"] += 1; wk["late"] += late; wk["revenue"] += price; wk["fees"] += life["fee"] * r["fee"]; wk["refund"] += refund_share * price if late else 0
+            wk["other"] += life["other"]; wk["typ"] += r["fee"]
 
         for row in weeks.W[wi]:
             now = row["at"]
@@ -286,7 +307,8 @@ def simulate(weeks: Weeks, rule, on: list[int], draw: int = 0, learn: float = 0.
             saved[(row["dealer"], row["day"])] += bool(row["played"] and row["played"][1])
             settle(now)
             parts, t = parts_at(now), trust[row["dealer"]]
-            cost = rule(row, parts, t, {"orders": resolved[0] + len(orders), "on_time": projected(now), "now": now})
+            cost = rule(row, parts, t, {"orders": resolved[0] + len(orders), "on_time": projected(now), "now": now, "inflight": orders, "drivers": weeks.drivers[wi],
+                                        "late": resolved[1], "night": {d: n for d, n in flu.items() if d * DAY + 60 <= now}})
             if cost is None:
                 wk["declined"] += 1
                 continue
@@ -301,6 +323,14 @@ def simulate(weeks: Weeks, rule, on: list[int], draw: int = 0, learn: float = 0.
             pending.append((row["by"], row, u < p, a - B * math.log(m), m))
         for p in sorted(pending, key=lambda p: p[0]):
             answer(*p)
+        if crowd:
+            saved_due = collections.Counter((r["by"] + r["life"]["last"]) // DAY for r in weeks.W[wi] if r["life"])
+            due = collections.Counter(d for _, d, _ in fates)
+            shift = {d: (crowd[1] if flu.get(d, (0, 0))[0] >= 10 else crowd[0]) * 100 * (due[d] - saved_due[d]) / weeks.drivers[wi] for d in due}
+            wk["late"], wk["refund"] = 0, 0.0
+            for fate, d, refund in fates:
+                late = settle_late(fate, shift[d])
+                wk["late"] += late; wk["refund"] += refund if late else 0.0
         wk["margin"] = (wk["revenue"] - wk["fees"] - wk["refund"] - wk["other"]) / 100
         wk["on_time"] = 1 - wk["late"] / max(1, wk["orders"])
         out.append(dict(wk, w=wi))
