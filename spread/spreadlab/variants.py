@@ -445,3 +445,7 @@ VARIANTS["s04-rich-late100"] = _full_weeks(VARIANTS["t760all-onward-step04"], la
 # 760 or more drivers. A thinner week plays row 4 exactly; at 760 or more it is `t760all-onward-step04`.
 _ROW_4 = VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760"]
 VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss04"] = _full_weeks(_ROW_4, slow_step=0.4)
+# Track B's row 6: lane A1's `slow_step` 0.2 on row 5, in a week of 760 drivers or more; at 760 or more it equals
+# `s04-rich-ss02` (f38b6eb3da93), under 760 row 4 exactly.
+VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02"] = _full_weeks(
+    VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss04"], slow_step=0.2)
