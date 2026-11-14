@@ -1,0 +1,11 @@
+# The index page (projects/index) on the bare domain: static files, no container. Its deploy.sh
+# puts them in /srv/katalyst/proxy/static/index, which the proxy sees as /etc/caddy/static/index
+# through the mount it already has.
+{$BASE_DOMAIN} {
+	encode zstd gzip
+	root * /etc/caddy/static/index
+	file_server
+}
+www.{$BASE_DOMAIN} {
+	redir https://{$BASE_DOMAIN}{uri}
+}
