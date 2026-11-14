@@ -19,8 +19,11 @@ order	line	tag	commit	variant	fingerprint	state	kind	part
 A1.6	aggressive		63377da9	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-late100	a49ae65e80d7	superseded	value	lane 1 A's late_cost 100 at 760 drivers or more, on row 6 (moved to row 7)
 7	safe		006ad9fe	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62	797f56b53fba	window	code	lane 4 A's day cap of 62 under 760 drivers (due_cap never ran through the live desk)
 A1.7	aggressive		855fc6bf	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100	0d147dd2a90d	window	value	lane 1 A's late_cost 100 at 760 drivers or more, on row 7
-A-max	aggressive		-	aggr7-max	d346567af6eb	window	value	R-max (climb agg-r-max): slow_step 0, cost 1.05, 6-hour count, gate 40, min_slack 240, late_cost 100, cheaper kinds at 760+; under 760 row 7
-A-high	aggressive		-	aggr7-high	697dea1b5129	window	value	R-high (lane 1 A agg-late100-ss0-cost11): slow_step 0, cost 1.1, late_cost 100 at 760+; under 760 row 7
-A-ss0	aggressive		-	aggr7-ss0	af24a5c48b18	window	value	lane 1 A agg-late100-ss0: slow_step 0, late_cost 100 at 760+; under 760 row 7
-A-mid	aggressive		-	aggr7-mid	38fb829b832e	window	value	R-mid (climb agg-r-mid): cost 1.1, 12-hour count, late_cost 100, cheaper kinds at 760+; under 760 row 7
-A-mild	aggressive		-	aggr7-mild	cc48aa59aff0	window	value	R-mild (climb agg-r-mild): cost 1.15, 12-hour count, late_cost 100, cheaper kinds at 760+; under 760 row 7
+A-max	aggressive		-	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100-agg-max	d346567af6eb	ready	value	climb's agg-max: slow_step 0, cost 1.05, 6-hour count, gate 40, min_slack 240, cheaper kinds; slot (760+); otherwise row 7
+A-vol105	aggressive		-	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100-vol105	e367e3dbab53	ready	value	search's vol105: cost 1.05, 12-hour count, cheaper kinds, pair_onward_cost 0.9; slot (760+); otherwise row 7
+A-onward-all	aggressive		-	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100-onward-all	1984bee1ac38	ready	value	lane 2 A's onward pairs in weeks under 760 too (pair_more_drivers 0); slot (under 760); otherwise row 7
+A-cost10	aggressive		-	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100-cost10	ad49b638bbe1	ready	value	lane 1 A's cost 1.0; queue 1 (760+); otherwise row 7
+A-h30-c11	aggressive		-	a17-h30-c11	73e494ad4ba1	ready	value	lane 4 B's cost 1.1 for orders with 30 hours or more; queue 2 (760+); otherwise row 7
+A-slack180	aggressive		-	a17-rich-slack180	2939a5a6c776	ready	value	lane 3 A's min_slack 180; queue 3 (760+); otherwise row 7
+A-vol110	aggressive		-	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100-vol110	38fb829b832e	ready	value	search's vol110 = climb agg-mid: cost 1.1, 12-hour count, cheaper kinds; queue 4, if vol105 steps back (760+); otherwise row 7
+A-mild	aggressive		-	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100-mild	cc48aa59aff0	ready	value	climb's agg-r-mild: cost 1.15, 12-hour count, cheaper kinds; held as a step back (760+); otherwise row 7
