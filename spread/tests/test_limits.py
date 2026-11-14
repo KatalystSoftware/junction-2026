@@ -37,6 +37,19 @@ def test_a_note_gives_the_hours_of_the_pickup_site_or_of_the_delivery_site():
     assert limits("Vastaanottava liike auki arkipäivisin 10–16.").delivery_hours == (10 * 60, 16 * 60)
     assert limits("Receiving until 17:00 only. Correction: 18:00. Car in bay 16, keys at the desk.").delivery_hours == (0, 18 * 60)
     assert limits("Seller home 16:15-19:15. Receiving until 16:30 only").delivery_hours == (0, 16 * 60 + 30)  # a slot of three hours is not opening hours
+    assert limits("Pitää hakea ennen puolta neljää, varaus 732914.").pickup_hours == (0, 15 * 60 + 30)
+    assert limits("Taalla ei ketaan puoli viiden jalkeen.").pickup_hours == (0, 16 * 60 + 30)
+    assert limits("vstaanottaja paikalla vain kolmeen saakka.") == notes.Limits(0, (0, 0), (0, 15 * 60))  # the receiver, with a typo
+    assert limits("bilen är klar i morgon klockan nio. hmtning senast klockan två.").pickup_hours == (0, 14 * 60)
+    assert limits("Pitää olla perillä huomenna kahteentoista mennessä.").deadline == DAY + 12 * 60
+
+
+def test_a_note_says_the_car_is_on_summer_tyres():
+    on = ["Auto vielä kesärenkailla", "Kesärenkaat alla, ei talvirenkaita.", "Summer tyres on, no winters.", "obs sommardäck på", "auto viela kesarenkailla",
+          "Winter tyres not fitted yet.", "Still on summer tyres. Summer tyres in the trunk, go with the car."]
+    carried = ["Kesärenkaat vanteineen takakontissa", "Summer tyres in the trunk, go with the car", "Lisäksi 4 kesärengasta tavaratilassa",
+               "Sommardäcken i bakluckan, följer med", "Avaimet tiskiltä, soita 20 min ennen."]
+    assert [notes.summer_tyres({"text": text}) for text in on + carried] == [True] * len(on) + [False] * len(carried)
 
 
 def won(d, note: str, deadline: int = 2640, last_pickup: int = 2520, **more) -> dict:

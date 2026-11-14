@@ -1,10 +1,81 @@
-# Spread harness
+# Spread desk
 
-Tools for the Bahn Express "Spread" challenge: scan practice weeks, play policy variants on the same
-seeds, and see where each variant loses money. The challenge brief is in
+A car-delivery desk for the Bahn Express "Spread" challenge, and the harness that measured each of its
+parts on Bahn's practice weeks. The challenge brief is in
 [`docs/challenges/main/bahn-express--spread.md`](../docs/challenges/main/bahn-express--spread.md).
 
-The harness plays practice worlds only. It cannot start a ranking run: that is a decision for a person.
+## How the desk decides
+
+The live desk ([`live.py`](spreadlab/live.py)) plays the variant `slow-friday-late-150-kinds-limits` from
+[`variants.py`](spreadlab/variants.py). Every quote is one formula:
+
+```
+price = argmax over m of  P(sale | m, today's shift) × (m × list price − C)
+C     = typical fee × (1.2 + 0.8 × p × won cars without a driver) + €150 × p
+```
+
+- `p` is the chance that the order ends late ([`slow.py`](spreadlab/slow.py)): a logistic fit over 94,000
+  won orders on what the desk knows at the quote, such as the hours to find a driver, the drivers near the
+  pickup, a premium car, the drive, a Friday deadline and the note. €150 stands for the refund and the
+  dealer's lost trust.
+- `P(sale)` is the win curve ([`curve.py`](spreadlab/curve.py)), fitted once on 50 weeks of random
+  prices. Each day, the day's wins and losses move it along the price ([`curve.shift`](spreadlab/curve.py)).
+- The desk declines only while 25 won cars have no driver. Private pickups, private deliveries and
+  trade-ins are quoted at their own cost, 1.6, 1.3 and 2.3 × the typical fee.
+- A won car's note is read before its first gig ([`notes.py`](spreadlab/notes.py)). The gig opens at the
+  typical fee, rises a tenth of it an hour to 1.2 × and holds, and gets direct offers once it must be
+  collected within 8 hours.
+
+No model is on the quote path: a quote takes 0.4 ms. Four ideas carry the margin. Each was played
+against the same policy without it, on the same weeks:
+
+| Idea | Why | With against without |
+| --- | --- | --- |
+| The day's market is one number, read from the day's answers | At one fixed price the desk won 3% of its quotes on the worst tenth of days and 60% on the best | €6,487 against €5,490 a week on 10 tuning weeks, €5,609 against €4,627 on 10 held-out weeks |
+| Each car is priced by its own late chance | The old stop at 15 waiting cars refused easy requests, with 43 hours to find a driver on average | On the 10 lowest weeks of `steep-notes-offers-8`, the default before it: 0 weeks under 90% on time against 5, and +€2,854 a week (1,942 to 3,929) |
+| Fees stop where drivers stop answering | Drivers book in a gig's first 15 minutes, 19% of looks at 1.0 × and 29% at 1.2 ×, and 2 to 7% after that | €9,053 against €5,816 on 20 fresh weeks: +€3,237 (2,734 to 3,746), better in 20 of 20 |
+| Rules read every note before the first gig | The kit's starter learns what a note says from a failed visit | Failed visits from 8.8 to 1.2 a week over 40 weeks; +€683 (324 to 1,103) on 10 held-out weeks |
+
+The sections below give each idea's evidence, and what was tried beside it and not kept: "The win curve",
+"Slow cars and the backlog", "Driver fees" and "Notes and direct offers". The default adds to the late
+chance the private and trade-in requests and the note's own deadline and site hours; "The default is
+`slow-friday-late-150-kinds-limits`" builds it up one part at a time on 60 unseen weeks.
+
+**Results.** Practice weeks only at this commit:
+
+| Where | Result |
+| --- | --- |
+| 120 unseen practice weeks (`fresh-1301` to `fresh-1360`, `fresh-1401` to `fresh-1460`) | €12,376 a week against €10,890 for `steep-notes-offers-8`: +€1,486 (1,297 to 1,677), ahead in 117 of 120. 312 orders and 11.2 late a week; no week under 90% on time against 2, the lowest 90.5%, the mean 96.4% |
+| 38 thin worlds, the lowest of `steep-notes-offers-8` among them | +€1,830 a week (1,398 to 2,268); no week under 90% against 5 |
+| Test final, Saturday 14:00 Helsinki, played by `steep-notes-offers-8` at `480d933` | Joined on Thursday after three replayed days, so live for two days: €1,401.25, 68 orders, 97.1% on time, ranked. All 417 live requests quoted by the policy, none by the guard, none missed; at least 3.6 s left at a quote, 4.5 s at the median; no lost connection, no 429 or 5xx, and the longest hold-up of the event stream under a second |
+| Ranking rounds and the final | not played yet at this commit |
+
+A variant tuned to the simulator for margin may play the final instead, but only if it beats this one on
+unseen weeks with at most 1 week in 60 under 90% on time, thin worlds included. Which variant played
+the final is recorded with its result.
+
+**What keeps it running.** The desk answers each event as it comes and sends quotes first. A guard thread
+quotes 1.9 × the typical fee for any request with no quote when a third of its time is left. The books go
+to disk every second, and a desk that starts again rejoins the week without giving any car a second
+gig. A second machine stands by, started by a person: its alarm rings after 8 seconds without the desk's
+heartbeat or when a request reaches its deadline without a quote, and a desk that rejoins and finds gigs
+it did not post stops for good. In the 14:00 test final the alarm watched the whole run and raised no
+false alarm. "The final" has the replays, the rehearsal and the standby's procedure.
+
+**What would break it.** A thin world with an early bulk order: the default's worst practice week is
+88.4%, on a set of seeds chosen to be hard, and 2 of 255 weeks outside the search's seeds are under 90%.
+A lost machine with nobody watching, which costs about €2,800 in 5 minutes. A market whose slope differs
+from practice: the day's shift moves the curve's level, not its slope. Note wording that the rules do not
+know, which costs a failed visit and often the deadline.
+
+[`scratch/pitch_charts.py`](scratch/pitch_charts.py) computes the numbers behind the jury slides from
+the saved weeks: the margin of each step, the price moves of the day's correction on 100 days, the failed
+visits with and without the note reader, and the on-time share of the late chance on the 10 lowest weeks.
+
+## The harness
+
+The harness scans practice weeks, plays policy variants on the same seeds, and shows where each variant
+loses money. It plays practice worlds only. It cannot start a ranking run: that is a decision for a person.
 
 ## Setup
 
@@ -91,7 +162,8 @@ Level 8, mean margin a week in euros on the first 10 seeds of each list. Every w
 | `notes-offers-8` | reads the note before the first posting, and sends direct offers for gigs short of time (see "Notes and direct offers") | 10,975 | 10,070 | 93.7% |
 | `steep-notes-offers-8` | prices by the curve fitted with a level for each day, which is steeper (see "The win curve") | 11,290 | 10,325 | 92.7% |
 
-`steep-notes-offers-8` is the reference for new ideas. On 40 seeds that no list holds (`fresh-001`
+`steep-notes-offers-8` is the reference for new ideas. It is not the default any more: the live desk plays
+`slow-friday-late-150-kinds-limits` (see "Slow cars and the backlog"). On 40 seeds that no list holds (`fresh-001`
 to `fresh-040`, every week ranked) it makes 10,269 against 9,288 for `fee-cap-1.2-drop-cost-1.3`:
 981 more (95% interval 689 to 1,279), better in 35 weeks of 40, lowest week 92.0% on time against
 91.3%. The last 20 of those seeds were kept unplayed for this check: on them it makes 932 more (640
@@ -168,6 +240,20 @@ PYTHONPATH=. uv run python scratch/driver_views.py --variants curve-fee-0.9,curv
 PYTHONPATH=. uv run python scratch/lane_fit.py --write                                                       # the lanes' usual fees
 ```
 
+**What the fees still pay over the typical fee** ([`scratch/fee_leak.py`](scratch/fee_leak.py), euros a week). The
+clean-room figures, 2,773 for opening at 1.2 x and 1,915 for fees above 1.2 x on rebookings, reposts and overnight
+gigs, are those of `curve-live-surcharge` and come out the same here. The fees above are what took most of them back.
+On the variants with today's fee schedule (`slow-step-gate-25`, 167 weeks; `slow-step-gate-25-kinds`, 34), fees are
+1.07 to 1.09 x the typical fee: 450 to 580 in openings over the typical fee (the kinds and the reposts), and 870 to 940
+over the opening, of which 330 overnight, 300 to 330 on rises the same day, 130 on rebookings and 100 to 150 on reposts.
+
+**Fees by each car's risk** (`risk-*`, [`riskfee.py`](spreadlab/riskfee.py), on the live default, not played yet). A
+car with 16 hours or more to its last pickup and a late chance under 6% opens at 0.9 x (81% of one-car orders, 2.3%
+late); a gig holds its opening fee until the car's late chance with the hours left reaches 4%, then rises as now:
+22% of cars from the posting, 13% with under 24 hours left, 30% under 12, 17% under 8 and 18% under 6. `risk-hold` is the hold
+alone, `risk-open` the lower opening alone, and `-due-24` counts only the waiting cars due within 24 hours in
+`slow_step` and the gate.
+
 Private addresses (`curve-private`, +246 on tune at the old fees; -38 with opening 1.0, lowest week
 92.0%), a cost that follows the order (`curve-order-cost`, +193, -16 to 411) and counting what an
 order on time is worth in the dealer's later prices (`curve-trust-0.3`, -126; `curve-trust-1`,
@@ -228,6 +314,39 @@ PYTHONPATH=. uv run python scratch/notes_check.py rows.jsonl --show 20        # 
 PYTHONPATH=. uv run python scratch/late_causes.py --variant notes-offers-8    # why orders were late
 ```
 
+**The note check** ([`notecheck.py`](spreadlab/notecheck.py)) scores the rules (`notes.read`, `notes.limits` and
+`notes.summer_tyres`) against the reveal on every won note of the archive, field by field: 66,672 notes of 483
+seeds in [`catalogue/note-truth.jsonl.gz`](catalogue/note-truth.jsonl.gz). A fifth of the wordings, chosen by a
+hash of the text with its digits masked, is held out: rules are fixed from the other four fifths, and the held-out
+fifth says whether a fix generalises. CI runs `--check`, which fails when any field misses more notes than
+[`catalogue/note-misses.json`](catalogue/note-misses.json) allows. Misses before and after the fixes of 14 November:
+
+| Field | Dev, 53,828 notes | Held out, 12,844 notes |
+| --- | --- | --- |
+| Ready time | 14 → 0 | 3 → 0 |
+| Plates | 2 → 0 | 0 → 0 |
+| Manual | 18 → 0 | 8 → 1 |
+| Note deadline | 1 → 0 | 3 → 1 |
+| Pickup hours | 12 → 0 | 6 → 3 |
+| Delivery hours | 2 → 0 | 0 → 0 |
+| Summer tyres | 550 → 0 | 173 → 0 |
+
+Hours count only sites whose request states hours, and a note's deadline only when it is earlier than the order's.
+The policy does not act on summer tyres yet; the field is read so that the desk can.
+
+```bash
+python3 -m spreadlab.notecheck                              # the table (plain python3, about 30 s)
+python3 -m spreadlab.notecheck --check                      # what CI runs; add --write after an improvement
+python3 -m spreadlab.notecheck --show 20 --field deadline   # the dev split's misses on one field
+uv run python -m spreadlab.notecheck extract                # rebuild the truth from archive/bundles (git lfs pull first)
+uv run python -m spreadlab.notelabel label data/llm-notes/unlabelled.jsonl --new --limit 1500   # Claude Opus labels notes without a reveal
+uv run python -m spreadlab.notelabel report data/llm-notes/unlabelled.jsonl --show deadline     # where the rules disagree with the labels
+```
+
+`notelabel` needs `ANTHROPIC_API_KEY`. On 317 held-out won notes Claude Opus 5.5 (adaptive thinking, low effort)
+missed one field against the reveal, a pickup closing time, so its labels stand in for the truth on wordings that no
+won note has.
+
 ## The win curve
 
 [`curve.py`](spreadlab/curve.py) gives the chance that a dealer buys at a price, and the policy
@@ -280,6 +399,36 @@ PYTHONPATH=. uv run --with scikit-learn python scratch/curve_day.py --write     
 
 Random prices lose money on purpose, so `explore` is never a candidate. It is safe only because
 practice weeks do not count for the ranking.
+
+**An offset for each dealer adds little** (`dealer_sd`, `dealer_drift`, [`dealer.py`](spreadlab/dealer.py), variant
+`slow-friday-late-150-kinds-limits-dealer`, not played). The day's shift and an offset for each dealer are fitted
+together from the day's answers in one likelihood. A sale or a loss is a censored answer, and the curve's chance is its
+likelihood. Each offset starts the week at N(0, 0.015²): a dealer with few answers stays at the market's level. Each
+morning the day before's posterior carries over with 0.02² added, so a dealer's step never falls under the drift's.
+Offline, on the weeks of `steep-notes-offers-8` (371 held-out weeks, the holdout list and the fresh seeds):
+
+- Dealers differ little. Fitted in hindsight, the dealers' offsets over a week spread 0.035 in log price beyond the
+  sampling noise. Inside a dealer's week the offset falls 0.05 (0.04 to 0.06) per unit of yesterday's win share there:
+  the competitor's morning cut where the desk wins most.
+- Log loss, quotes read in time order: 0.4721 with the day's shift alone, 0.4690 with the offsets (-3.1e-3, -3.7e-3 to
+  -2.6e-3); on the three largest dealers' quotes on Monday and Tuesday, -1.6e-3. Wider priors are worse: 0.06 makes it 0.4734.
+- Unbiased on the answers: on the three largest dealers' Monday and Tuesday quotes it predicts 31.42% sold, against 31.17%
+  sold; per week +0.2 points (-0.1 to +0.5), as with the day's shift alone.
+- In a closed-loop replay of the same weeks (`scratch/dealer_sim.py`, dealers answer by a known truth: the week's
+  hindsight day levels with its price war, the dealer offsets, the morning cuts and the trust count), +26 a week (11 to
+  41) with the hindsight offsets and +12 (-3 to 27) with drawn ones; +2 and +4 on the three largest dealers' Monday and
+  Tuesday quotes. Sampling a price from the dealer's posterior while it is unsure costs 42 to 54 a week. A wrong start,
+  the three largest dealers taken 5% dearer, loses 5 of their 78 Monday and Tuesday orders, 0.8 of their trust counts
+  by Friday and 11 to 13 euros.
+- The price war goes to the day's shift, not to the dealers: the threshold error on the day after the war is 0.000 with
+  or without the offsets.
+
+```bash
+PYTHONPATH=. uv run python scratch/dealer_rows.py steep-notes-offers-8           # one row per quote, with the trust count at the quote
+PYTHONPATH=. uv run --with numpy python scratch/dealer_filter.py 0.01,0.015 0.02  # log loss by prior sd and drift, tune and held-out weeks
+PYTHONPATH=. uv run --with numpy python scratch/dealer_truth.py                   # how far dealers differ, and the morning cut
+PYTHONPATH=. uv run --with numpy python scratch/dealer_sim.py                     # euros in the closed-loop replay
+```
 
 ## Private addresses and trade-ins
 
@@ -607,6 +756,101 @@ plays its best trials on other seeds. After 25 trials, 11 of them played in full
 of the same family (`search-16`: `slow_step` 0.8, the gate at 40, `cost` 1.22, a small late cost):
 +1,192 with a lowest week of 93.6%. A late cost alone on the reference's backlog rules is worth +72.
 
+## Out-and-back pairs (off by default, not played yet)
+
+A one-way fee pays for the driver's trip home. A car that goes back the same way removes that trip, so one driver
+delivers a won car and drives another back in one gig ([`pairs.py`](spreadlab/pairs.py), `PairPolicy`, variants
+`slow-friday-late-150-kinds-limits-pairs-<fee>` and `...-pairs-<fee>-return-0.75`). The evidence is in
+[`scratch/strategy/`](scratch/strategy/README.md): the world prices a trade-in, one car out and one back, at 26.3 cents a
+drive minute against 47.2 for a one-car dealer request. And 296 of 887 one-car dealer requests a week are followed by a
+return in time to drive both. The desk never paired them, because its cars book in six minutes.
+
+- **Hold.** A won one-car dealer order with 16 hours or more to its last pickup, on a lane with 8 or more return requests
+  a week ([`returns.json`](spreadlab/returns.json), [`scratch/pairs_returns.py`](scratch/pairs_returns.py), over 1,520 scans),
+  waits up to 4 hours unposted. It is never held past 18:00 or within 10 hours of its last pickup. Held cars do not count in the
+  backlog. On those lanes 40% to 93% of requests get a return within 4 hours, against 3% on lanes with under one a week.
+- **The return's quote.** A request that can run back with a held car, both ends within 30 km of the held car's other
+  ends, is quoted at a cost of 0.75 x its typical fee in place of 1.2 x (`pair_cost`, the `-return-0.75` variants only).
+- **One gig.** When the return is won, both cars go in one gig in the order that leaves a driver the most time. It must
+  stay on time by the road minutes, the stops' windows and the sites' hours for a driver who books it 10 hours from now,
+  within the 12 hours of driving of a gig with more than one car. It opens at 0.6, 0.7 or 0.8 x the two typical fees and
+  rises a tenth of them an hour to 1.0 x.
+- **Two gigs again.** An open pair gig goes back to two gigs, each car alone at its own fee, 6 hours before its latest
+  start, or when it expires, gets a deadline warning or its order changes. The same happens when a cancellation leaves one
+  car in it. Direct offers go to cars alone only.
+
+In a dry run on 8 recorded weeks, with fake drivers who book every single-car gig at once and 80% of pair gigs after
+half an hour, the desk held 75 cars a week, paired 59 orders (30 gigs) and posted 41 held cars alone. The test plan:
+the fee at 0.6, 0.7 and 0.8 on 10 tune seeds, then the return's quote on 30, then the two unseen sets.
+
+```bash
+uv run python -m spreadlab.sweep --variants slow-friday-late-150-kinds-limits,slow-friday-late-150-kinds-limits-pairs-0.6,slow-friday-late-150-kinds-limits-pairs-0.7,slow-friday-late-150-kinds-limits-pairs-0.8 --list tune --count 10
+PYTHONPATH=. uv run python scratch/pairs_report.py --variants slow-friday-late-150-kinds-limits-pairs-0.6,slow-friday-late-150-kinds-limits-pairs-0.7,slow-friday-late-150-kinds-limits-pairs-0.8 --list tune --count 10
+```
+
+`pairs_report.py` prints the plan's checks: pair gigs booked within 1 and 2 hours, the fee paid, pair orders late, held
+cars without a return against the same orders in the base variant, return quotes won, and the margin with its interval.
+The live desk does not take `PairPolicy`: `live final --variant ...-pairs-...` stops at once with unknown parameters. A gig
+with two orders is a new case for its restart logic, and must pass the replays of `replay.py` before it can play live.
+
+## Nights when drivers drop out (`day-cap-*`, off by default, being played)
+
+The default's first week under 90% was `fresh-098` at 88.4% on time (38 late orders), where the reference made 91.6%.
+That week also has the largest bulk order of the stratified seeds on Monday morning: 39 requests from one dealer. The
+bulk order is not what failed. The desk won 12 of them and 1 was late, as for the reference. 30 of the 38 late orders were due
+on Friday, 25 of them won on Thursday. Between 00:00 and 01:00 on Friday, drivers dropped 29 of the desk's booked gigs.
+On other nights the first hour has about 2 drops. The dropped cars, and the next-day cars won on Thursday afternoon, had to
+find a driver on Friday itself, and few booked that day. The gigs that ended late were seen 70 to 150 times each and stayed
+open at 1.5 to 2.5 x the typical fee until they expired at their last pickup minute. The late model put most of them at 1 to
+3%: over 24 hours to find a driver, and many drivers notified.
+
+Such a wave, 10 or more drops in a day's first hour, comes in about one week in five, and looks like the flu day of the
+scenario map ([`scratch/scenarios/flu.py`](scratch/scenarios/flu.py)): drivers who meant to work stay at home, and give back
+what they had booked. The desk cannot see it coming: the scans do not show it, and it is not tied to the snow forecast.
+It does bite in proportion to the orders due that day.
+[`scratch/drop_waves.py`](scratch/drop_waves.py) on saved weeks:
+
+| | Weeks | A wave on Tue, Wed, Thu, Fri | Due on Friday, no wave: late | With a Friday wave, 50 to 99 due | With a Friday wave, 100 or more due |
+| --- | --- | --- | --- | --- | --- |
+| reference | 401 | 20, 15, 18, 46 | 3.7 to 6.5% | 11.1% (45 weeks) | 10.0% (1 week) |
+| `slow-step-gate-25` | 167 | 13, 13, 13, 24 | 4.7 to 5.3% | 9.6% (20) | 15.2% (4) |
+| the default | 212 | 13, 19, 23, 40 | 3.8 to 5.1% | 8.2% (30) | 13.2% (10) |
+
+- Without a wave a full Friday is no later than a light one. With one, the late share doubles or triples, and the
+  default carries heavier Fridays than the reference: 102 orders due against 79 on `fresh-098`. Its two lowest weeks are both Friday
+  waves on 100 or more orders due that day: `fresh-098` (29 drops, 102 due, 30 late) and `fresh-053` (30 drops, 105 due, 90.2%).
+  So is `fresh-284`, 89.9% in the R1 hard seeds (30 drops, 101 due).
+- The bulk orders themselves are not the risk. Orders won from a week's largest batch are 5.3% late against 3.7% for all orders under
+  the default (3.9% and 3.9% for `slow-step-gate-25`), about 0.2 late orders a week. With the bulk order on Monday they
+  are 3.2% late, and those weeks average 96.5% on time against 96.2% for the rest. Of the default's
+  65 such weeks only `fresh-098` is under 90%, and 11 of its 12 bulk orders were on time.
+- A bulk order on Thursday is the one that matters, because its cars fall due on Friday: the default's Thursday-bulk
+  weeks have 86 orders due on Friday against 76 to 84, and 5 of their 50 weeks are under 92% against 3 of 180 for a bulk
+  order on another day (the scenario map has 5 of 57 against 3 of 209). The 25 such worlds among `fresh-1301` to `1460`
+  test the cap there.
+- Prices cannot fix this on the day: no fee booked those gigs. What the desk controls is how many cars wait on one day
+  when a wave comes.
+
+**The cap.** [`daycap.py`](spreadlab/daycap.py) (`DayCapPolicy`, variants `day-cap-70` and `day-cap-80` on the default)
+does not quote an option whose last minute to collect the car falls on a day that already has that many won orders with
+a car still to deliver. A slower option of the same request, due on another day, is still quoted. With no option left, the request is
+declined as `day_full`. On `fresh-098` a cap of 80 first binds on Thursday at 16:00, as the next-day cars that later
+expired begin to be won. A cap of 90 never binds there. On the saved weeks, the orders a cap would have declined are
+10 to 14% late against 4% for all orders. Their margin is an upper bound on the cost, since the desk would still win
+some of them on a slower option:
+
+| Cap | `slow-step-gate-25`, 167 weeks: orders a week, margin | The default, 212 weeks: orders a week, margin |
+| --- | --- | --- |
+| 70 | 14.1, 565 | 3.1, 128 |
+| 80 | 6.5, 265 | 0.9, 39 |
+| 90 | 2.5, 99 | |
+
+```bash
+PYTHONPATH=. uv run python scratch/drop_waves.py --variants slow-friday-late-150-kinds-limits --seeds fresh-1301,... --caps 70,80
+```
+
+The live desk does not take `DayCapPolicy` yet: `live final --variant day-cap-80` stops at once with an unknown parameter.
+
 ## The final
 
 [`live.py`](spreadlab/live.py) plays the final, or a test final, with the default variant (`VARIANT`) from the live stream.
@@ -688,13 +932,68 @@ requests with the policy, missed none while it ran and left 15 unquoted while it
 lost connections, at least 1.16 s left at a quote, and the week was ranked at 97.0% on time. An action took 10 ms
 there, 25 ms at the 99th percentile.
 
+### A cold standby and the alarm
+
+A stopped desk costs about €9 of margin a real second. The standby is a second machine on which a person starts
+the desk by hand; nothing takes over by itself. It needs a clean checkout of `origin/main` with `uv sync` done
+and the team key at hand. Without books on disk, the desk there rebuilds the week from the world's history.
+
+[`alarm.py`](spreadlab/alarm.py) runs on the standby and reads the desk's `log.jsonl` over ssh every 2 seconds.
+The desk writes a heartbeat line every 2 seconds. The alarm needs no key and reads nothing from Bahn:
+
+```bash
+uv run python -m spreadlab.alarm --ssh <desk host> --path <checkout>/spread/data/live --notify '<command>'   # the world written last
+```
+
+It rings when the desk writes nothing for 8 seconds, when the log cannot be read for 8 seconds (the desk's machine
+or the network to it), when a request reaches its deadline with no quote in the log, and when the desk is fenced.
+It warns of lost connections, errors, and gigs that the desk did not post. It says once when the desk writes again.
+Each notice is a line with a bell, and `--notify` runs a shell command with `$ALARM_TEXT` and `$ALARM_LEVEL`. It
+watches the log written last, so it moves to the next test final or the final by itself.
+
+**The fence.** Two desks on one world post every car twice, and the file lock in `data/live/<world id>/` only
+holds on one machine. The world posts no gigs by itself. So a desk that joins again and finds gigs it did not post,
+posted after the last minute in its log, knows that another desk has played. It writes `fenced` in its folder and
+stops for good, and every later start stops at once. A desk that keeps its connection never joins again, so it
+cannot see the other desk that way. It prints a warning when the stream shows a gig that it did not post, and the
+alarm passes the warning on.
+
+When the alarm rings:
+
+1. If the desk's machine answers, look at the desk's terminal. The supervisor loop starts a stopped desk again
+   within seconds; that is the fastest way back.
+2. If the machine or its network is lost, make sure that its desk cannot come back: stop the instance in the
+   provider's console. Then start the standby with the same loop as on the first machine. Without the stop, the first
+   desk fences itself when it joins again, but it posts until then if it never lost its connection.
+3. To go back to the first machine later, stop the standby, then delete `fenced` and `state.pickle` in the first
+   machine's world folder: that desk then rebuilds the week from the world's history.
+
+Rehearse it in a test final. Stop the first desk on purpose with Ctrl-C in its loop, start the standby by hand,
+and time the gap from the alarm's first ring to the standby's "Joined" line.
+
+**As set up for the final.** The standby is the Verda instance `the standby instance` in FIN-01, another data
+centre than the runner's FIN-03, made with the API outside `infra/verda` (4 vCPU, €0.05 an hour). Its user `amp` has
+a checkout of `origin/main` in `~/code/junction2026` with `uv sync` done, and the team key and the note model's
+settings in `~/.config/spread/` (mode 600). Two systemd services run the alarm there and push to an ntfy topic
+named in `~/.config/spread/alarm.env`: `spread-alarm` reads the runner's desk over ssh as `amp`, with a
+`restrict` key, and `spread-alarm-standby` reads the standby's own desk once it plays. To take over:
+
+```bash
+# on the standby, as amp (root's keys are those of infra/verda):
+ssh amp@<runner> 'tmux kill-session -t final'   # the first desk's loop; or stop its instance in the Verda console
+~/bin/start-desk --watch-notes                  # the same loop, in tmux session final
+```
+
+Before a final, move the standby's checkout to the commit the runner plays (`git checkout --detach origin/main`,
+`uv sync`), so both desks would play the same code.
+
 ### The note watcher (`--watch-notes`, off by default)
 
 [`watch.py`](spreadlab/watch.py) adds a second reader of the dealers' notes beside the desk. It needs
 `NVIDIA_API_KEY` in the environment; without it, only the log of new notes and drift runs. `NOTE_MODEL_URL`,
 `NOTE_MODEL`, `NOTE_MODEL_KEY` (the name of the variable with the key) and `NOTE_MODEL_RPM` point it at another
-OpenAI-compatible endpoint, such as a dedicated container without the free tier's limit; only Lightning on
-NVIDIA's endpoint has been measured.
+OpenAI-compatible endpoint. Two models have been measured: Nemotron 3.5 Lightning on NVIDIA's free endpoint, the
+default, and Claude Haiku 5.5, which is called with no temperature and with thinking off.
 
 ```bash
 uv run python -m spreadlab.live final --watch-notes                          # the same desk, with the note watcher
@@ -702,7 +1001,7 @@ uv run python -m spreadlab.watch review <world id>                           # t
 uv run python -m spreadlab.watch check "Registration tags are off, bring your own."   # one note: the rules, the model, the fix
 ```
 
-- **The check.** For each won order with a note, Nemotron 3.5 Lightning gets the note, what the request states
+- **The check.** For each won order with a note, the model gets the note, what the request states
   (pickup window, both sites' hours, the deadline) and what `notes.read` made of it. It answers yes or no: did the rules capture every operational fact in the note? On a no it names each
   missing or wrong fact. A no counts only when the fact it names would change what the desk knows. A no that names
   only "other" goes to the review queue, not as a no: the model puts spare tyres and parked cars there.
@@ -751,6 +1050,10 @@ words, the safe fixes broke three readings on these notes. They added plates to 
 at the median and 1.6 s at the 95th percentile. On this day, though, the free key, which the team's other projects
 also use, refused half of all calls with 429: 552 calls for 273 answers.
 
+Claude Haiku 5.5 with the same prompt, on the same 150 random notes: it caught 22 of 26 incomplete readings (85%) and
+said no on 9 of 124 complete ones (7.3%), 7 of them about summer tyres in the boot. None of its answers changed a
+post. A call took 0.78 s at the median and 0.99 s at the 95th percentile, with 0 errors and 0 refusals in 190 calls.
+
 On replays of `fresh-003` from Thursday, with every fourth won order given a note in words that the rules miss
 (`replay.py --watch-notes --inject 4`), the watcher found every injected fact that got an answer: plates, a
 manual gearbox, a later ready time. All 386 requests were still quoted by the policy, with at least 4.47 s left.
@@ -785,6 +1088,8 @@ request, the driver list, the map and its own history in the week.
 - [`slow.py`](spreadlab/slow.py): the chance that an order ends late, from what the desk knows at the quote.
 - [`optquote.py`](spreadlab/optquote.py), [`optquote.json`](spreadlab/optquote.json): the quote as one optimisation (`opt`), and its fitted weights.
 - [`lanes.json`](spreadlab/lanes.json): the lanes' usual driver fees, for `lane_fee`.
+- [`pairs.py`](spreadlab/pairs.py), [`returns.json`](spreadlab/returns.json): out-and-back pairs, and the return requests a week on each lane.
+- [`daycap.py`](spreadlab/daycap.py): a cap on the won orders to collect on one day, against nights when many drivers drop their gigs.
 - [`play.py`](spreadlab/play.py), [`sweep.py`](spreadlab/sweep.py), [`report.py`](spreadlab/report.py): play, compare.
 - [`ledger.py`](spreadlab/ledger.py): mistakes by variant and situation.
 - [`live.py`](spreadlab/live.py), [`replay.py`](spreadlab/replay.py): the final from the live stream, and a recorded week as a stand-in for the server.

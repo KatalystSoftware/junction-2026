@@ -20,6 +20,7 @@
             sops
             age
             opentofu
+            google-cloud-sdk # Cloud DNS for katalyst.fyi (infra/dns)
             jq
             duckdb
             git-lfs

@@ -10,6 +10,9 @@ The judge is **Nemotron 3.5 Super VL** on the Verda container unless a table say
 Haiku 5.5 and Nemotron 3.5 Lightning judged the same claims as comparisons. `checked_finding` in
 the scratch database holds the Super VL run of the current pairs.
 
+Gemini Decision as the judge, measured on the same labels:
+[`hero-verify-gemini-decision.md`](hero-verify-gemini-decision.md).
+
 ## The labels
 
 [`hero-labels.json`](hero-labels.json) holds the 75 rows of Nemotron's first full run (127 pairs,

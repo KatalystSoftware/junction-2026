@@ -11,7 +11,7 @@ Two things to know before clicking:
 - A `?sql=` link opens the SQL panel with the fields filled in. It never runs by itself: click
   **Run**. So does **Check in MariaDB** on a difference.
 - The part after `#` keeps the Lapua Movement page behind the panel. Without it the panel opens over
-  the first topic of the list.
+  the front page.
 
 Lines marked **Say** are the spoken text, 271 words in all. Everything else is what to click and
 what must be on screen.
@@ -20,11 +20,12 @@ what must be on screen.
 
 Open <http://localhost:8078/#/Q1412941>
 
-On screen: "9 differences between Finnish, Swedish and English Wikipedia". The first one is open:
-"Swedish and English Wikipedia use “fascist” in their first sentence; Finnish Wikipedia does not."
-Under it the three first sentences side by side. The Swedish one has "fascistisk" marked and is
-dated "since 23 October 2026"; the English one has "fascist" and "pro-Nazi" marked and is dated
-"since 30 May 2022, earlier 2004–2006 and 2007–2009"; the Finnish one has no date.
+On screen: "9 differences". The first one is open, headed “fascist”, with its time strip on the
+right: three lanes, Finnish, Swedish and English, from 2001 to today. The Finnish lane is empty. The
+Swedish lane has a dot at its right end and "23 Oct 2026". The English lane has two grey bars
+(2004–2006 and 2007–2009), then a bar from "30 May 2022" to today. Under it the three first
+sentences side by side: the Swedish one has "fascistisk" marked, the English one "fascist" and
+"pro-Nazi", the Finnish one nothing.
 
 > **Say:** We are Katalyst, and this is Since When. English and Swedish Wikipedia call the Lapua
 > Movement fascist in their first sentence. Finnish Wikipedia calls it an anti-communist,
@@ -33,8 +34,8 @@ dated "since 23 October 2026"; the English one has "fascist" and "pro-Nazi" mark
 
 ## 2. Since when (15 seconds)
 
-Stay on the page. Each date is a link: "since 23 October 2026" opens the Swedish edit that added the
-word, on Wikipedia. Click **5 more changes** under the quotes: the list has "Since 7 April 2026
+Stay on the page. Each date on the strip is a link: "23 Oct 2026" opens the Swedish edit that added
+the word, on Wikipedia. Click **5 more edits** under the quotes: the list has "Since 7 April 2026
 English Wikipedia added “pro-Nazi”" and the other edits about the same label, each a link to its
 edit.
 
@@ -114,10 +115,10 @@ Same steps, same clicks. Only the opening sentence of step 1 changes:
 What comes back:
 
 - Step 1, Finnish War: "19 differences"; the first, open, is the surrender of Sveaborg (early May
-  in Finnish, 3 May in Swedish, 6 May in English, dated "since 24 May 2015"; findings 14353 and
+  in Finnish, 3 May in Swedish, 6 May in English, the English lane dated "24 May 2015"; findings 14353 and
   14474 as one difference). Diet of Porvoo: "5 differences"; the first is the emperor's pledge
-  (29 March 1809 in Finnish and Swedish, "15th/27th day of March" in English, dated "since 16 June
-  2024"), and the third is the opening date of the diet (22 March in Finnish, 25 March in English;
+  (29 March 1809 in Finnish and Swedish, "15th/27th day of March" in English, the English lane
+  dated "16 Jun 2024"), and the third is the opening date of the diet (22 March in Finnish, 25 March in English;
   finding 14115). The wording and quotes of both are in [`hero-findings.md`](hero-findings.md).
 - Step 3 uses the link in the table, not **Check in MariaDB**: the statement reads an article's
   first passage, and the first difference of these two topics is further down the article.

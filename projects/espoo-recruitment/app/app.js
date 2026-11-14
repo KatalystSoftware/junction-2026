@@ -32,6 +32,7 @@
   const cand = id => Object.assign({}, BASE[id], S.cand[id] || {});
   const pool = () => D.candidates.map(c => cand(c.id));
   function prof(id) {
+    if (!CO[id]) id = D.companies[0].id;
     const c = CO[id], e = S.comp[id] || {};
     const cc = e.tradeoffs ? Object.assign({}, c, { tradeoffs: Object.assign({}, c.tradeoffs, e.tradeoffs) }) : c;
     return L.companyProfile(cc, e);
@@ -55,9 +56,9 @@
     const h = location.hash.replace(/^#\/?/, "").split("/");
     const k = h[0] || "";
     document.querySelectorAll("#nav a").forEach(a => a.classList.toggle("on", a.dataset.k === ({ org: "org", log: "org", company: "company", cand: "cand", after: "after", concept: "doc", responsible: "doc", demo: "doc", mentors: "doc" }[k])));
-    if (k === "org") return viewOrg(h[1] || "puro");
+    if (k === "org") return viewOrg(CO[h[1]] ? h[1] : "puro");
     if (k === "log") return viewLog();
-    if (k === "company") return h[2] === "intros" ? viewIntros(h[1]) : viewCompany(h[1] || "puro");
+    if (k === "company") { const id = CO[h[1]] ? h[1] : "puro"; return h[2] === "intros" ? viewIntros(id) : viewCompany(id); }
     if (k === "cand") return h[1] === "stands" ? viewStands() : h[1] === "me" ? viewMe() : h[1] === "evidence" ? viewEvidence() : viewWizard();
     if (k === "after") return viewAfter();
     if (["concept", "responsible", "demo", "mentors"].includes(k)) return viewDoc(k);
@@ -115,7 +116,7 @@
     if (ui.lastCo !== coId) { ui.lastCo = coId; ui.f = {}; ui.more = false; save(); }
     let rows = P.filter(k => ui.show === "all" || k.wants.includes(coId)).map(k => ({ k, f: L.pairFacts(p, k), d: decOf(coId, k.id), all: L.meetsMust(p, k) }));
     const crit = [ui.show === "all" ? "everyone registered" : "candidates who asked to meet this company"];
-    if (ui.f.must) { rows = rows.filter(r => r.all); crit.push("meets every stated must-have (skills, experience" + (p.finnish === "required" ? ", Finnish" : "") + ")"); }
+    if (ui.f.must) { rows = rows.filter(r => r.all); crit.push("meets every stated must-have (skills, experience" + (p.finnish === "required" ? (p.confirmed ? ", Finnish" : "; the ad's Finnish line is not confirmed, so it is shown as a gap, not applied") : "") + ")"); }
     if (ui.f.mode) { rows = rows.filter(r => r.f.modeOk); crit.push("work mode fits"); }
     if (ui.f.undecided) { rows = rows.filter(r => !r.d); crit.push("not decided yet"); }
     if (ui.sort === "asked") { rows.sort((a, b) => (b.f.asked - a.f.asked) || a.k.registered.localeCompare(b.k.registered)); crit.push("sorted: asked to meet first, then registration time"); }
@@ -270,12 +271,11 @@
   function viewIntros(coId) {
     const c = CO[coId], p = prof(coId), P = pool();
     const intro = Object.entries(S.dec[coId] || {}).filter(([, d]) => d.d === "introduce");
-    const slots = ["10:00", "10:20", "10:40", "11:00", "11:20", "13:00", "13:20", "13:40", "14:00", "14:20"];
-    app.innerHTML = `<div class="wiz" style="max-width:900px"><a href="#/company/${coId}" class="sm">← back to your needs</a>
+        app.innerHTML = `<div class="wiz" style="max-width:900px"><a href="#/company/${coId}" class="sm">← back to your needs</a>
       <h1 style="margin-top:8px">${esc(c.name)}: your hand-picked introductions</h1>
       <p class="mut">An Espoo organiser read each attendee's answers against your confirmed needs and chose these conversations. Each comes with the organiser's reason and the candidate's own description, which they have checked. Names are shared at the event, when the candidate agrees.</p>
       <div class="note" style="margin-bottom:12px">Promoted to <b>${esc(L.poolCount(p, P).text)}</b> attendees whose answers fit your must-haves. ${P.filter(k => k.wants.includes(coId)).length} asked to visit your stand. Anyone can still visit; these are the planned conversations.</div>
-      ${intro.length ? intro.map(([id, d], i) => { const k = cand(id), f = L.pairFacts(p, k); return `<div class="stand"><div class="top2"><b>${slots[i % slots.length]} · ${id}</b><span class="xs mut">introduced by ${esc(d.by)}</span></div>
+      ${intro.length ? intro.map(([id, d], i) => { const k = cand(id), f = L.pairFacts(p, k); return `<div class="stand"><div class="top2"><b>${L.slotFor(coId, id)} · ${id}</b><span class="xs mut">introduced by ${esc(d.by)}</span></div>
         <div class="sm" style="margin:4px 0 8px"><b>Organiser's reason:</b> ${esc(d.reason)}</div>
         <div class="sm">${f.overlap.slice(0, 5).map(x => `<div>✓ ${esc(x.text)}</div>`).join("")}${f.gap.slice(0, 3).map(x => `<div class="mut">○ ${esc(x.text)}</div>`).join("")}</div></div>`; }).join("")
         : `<div class="card mut">No introductions yet. They appear here as the organiser decides (try the <a href="#/org/${coId}">organiser view</a>).</div>`}
@@ -294,7 +294,7 @@
       ${st < STEPS.length - 1 ? `<button data-act="step" data-v="${st + 1}">${st === 0 ? "Start" : "Next"}</button>` : `<a href="#/cand/stands"><button>See stands worth visiting</button></a>`}</div>`;
     let body = "";
     if (st === 0) body = `<h1>Meet the right companies at ${esc(D.event.name)}</h1>
-      <p>Answer six short questions, about three minutes. We use them to tell you which stands are worth visiting and why, and to help Espoo's organisers introduce you to companies that need what you do.</p>
+      <p>Six short steps, about three minutes. We use them to tell you which stands are worth visiting and why, and to help Espoo's organisers introduce you to companies that need what you do.</p>
       <div class="note stack"><div><b>Only what you tell us.</b> We never search for you online and never use photos, age, gender, nationality or school names.</div>
       <div><b>You see what organisers see.</b> You can correct your description at any time.</div><div><b>No scores.</b> No computer decides about you; an organiser does, and writes down why.</div>
       <div><b>Deleted after the event</b> (30 days, unless you ask to stay for the next one).</div></div>
@@ -356,7 +356,7 @@
     const me = cand(ME), r = L.recommend(me, profiles());
     const recIds = new Set(r.rec.map(o => o.p.company.id));
     const ask = id => `<button class="${me.wants.includes(id) ? "" : "ghost"} sm" data-act="want" data-v="${id}">${me.wants.includes(id) ? "✓ Introduction requested" : "Ask for an introduction"}</button>`;
-    const mine = Object.entries(S.dec).filter(([, o]) => o[ME] && o[ME].d === "introduce").map(([co, o], i) => ({ co, d: o[ME], slot: ["10:20", "11:00", "13:40"][i % 3] }));
+    const mine = Object.entries(S.dec).filter(([, o]) => o[ME] && o[ME].d === "introduce").map(([co, o], i) => ({ co, d: o[ME], slot: L.slotFor(co, ME) }));
     app.innerHTML = `<div class="wiz">${mine.length ? `<div class="okbox" style="margin-bottom:14px"><b>Your planned conversations</b>${mine.map(m => `<div class="sm" style="margin-top:4px">${m.slot} · <b>${esc(CO[m.co].name)}</b>, stand ${CO[m.co].stand}. The organiser's note: “${esc(m.d.reason)}”</div>`).join("")}</div>` : `<div class="note" style="margin-bottom:14px">When an organiser plans a conversation for you, it appears here with a time and the reason.</div>`}<h1>Stands worth visiting</h1>
       <p class="mut">Based only on your answers and what each company told us. These are suggestions: <b>you can visit any stand</b>, and you can ask the organiser to introduce you to any company.</p>
       ${r.rec.length ? r.rec.map(o => `<div class="stand"><div class="top2"><div><b>${esc(o.p.company.name)}</b> <span class="mut sm">· stand ${o.p.company.stand} · ${esc(o.p.title)}</span></div>${confirmBadge(o.p)}</div>

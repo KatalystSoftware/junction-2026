@@ -1,7 +1,7 @@
 # Since When on the Verda machine
 
-The public instance: `https://since-when.<base domain>/`, today
-<https://since-when.31-22-104-106.sslip.io/>. It runs on the shared machine `31.22.104.106` behind
+The public instance: <https://since-when.katalyst.fyi/> (also still on
+<https://since-when.31-22-104-106.sslip.io/>). It runs on the shared machine `31.22.104.106` behind
 the proxy in [`infra/verda/proxy`](../../../infra/verda/proxy/README.md), as its own compose project
 with its own MariaDB.
 

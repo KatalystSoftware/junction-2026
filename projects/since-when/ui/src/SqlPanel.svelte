@@ -8,6 +8,7 @@
 	import { log, nav, syncSearch, ui } from './lib/nav.svelte'
 	import { preview, sqlHtml } from './lib/sql'
 	import { LANGS, type Preset, type Presets, type Run, type SqlEntry, type Topic } from './lib/types'
+	import Why from './Why.svelte'
 
 	let { topic }: { topic: Topic | null } = $props()
 
@@ -174,6 +175,7 @@
 		</header>
 
 		<div class="one">
+			<div class="pick">
 			<select class="cdx-select" aria-label="Statement" onchange={(e) => choose(e.currentTarget.value)}>
 				{#if presets.length}
 					<optgroup label="Run on MariaDB">
@@ -187,13 +189,16 @@
 					</optgroup>
 				{/each}
 			</select>
+			{#if !read && preset}
+				<Why id="why-sql" label="Read-only">{ABOUT[preset.name]?.[1] ?? preset.description} Runs as a read-only user, for {limits.seconds} s and {limits.rows} rows at most.</Why>
+			{/if}
+			</div>
 
 			{#if read}
-				<p class="small subtle">A query this page ran: <span class="num">{read.ms} ms, {plural(read.rows, 'row', 'rows')}</span>.</p>
 				{@render statement(read.query)}
+				<p class="ran"><strong class="num">{plural(read.rows, 'row', 'rows')}</strong> <strong class="num">{read.ms} ms</strong></p>
 			{:else if preset}
 				{@const v = values[preset.name]}
-				<p class="small subtle">{ABOUT[preset.name]?.[1] ?? preset.description}</p>
 				{@render statement(sent ? sent.sql.map((q) => q.query.trim()).join(';\n\n') : preview(preset.name, v) || preset.description)}
 				<form onsubmit={run}>
 					{#each preset.params as x}
@@ -233,12 +238,12 @@
 						<p class="ran">
 							<strong class="num">{plural(ran.rows.length, 'row', 'rows')}</strong>
 							<strong class="num">{ran.ms} ms</strong>
-							<span class="small subtle">{Object.values(ran.params).join(', ')}{ran.capped ? `, first ${ran.limits.rows} rows` : ''}</span>
+							<!-- The values are named only when the form no longer holds the ones these rows are for. -->
+							{#if !sent || ran.capped}<span class="small subtle">{[...(sent ? [] : Object.values(ran.params)), ...(ran.capped ? [`first ${ran.limits.rows} rows`] : [])].join(', ')}</span>{/if}
 						</p>
 						{@render result(ran)}
 					{/if}
 				</div>
-				<p class="small subtle">Runs as a read-only user, for {limits.seconds} s and {limits.rows} rows at most.</p>
 			{/if}
 		</div>
 	</div>
@@ -288,8 +293,16 @@
 		gap: var(--spacing-75);
 	}
 
-	.one > .cdx-select {
-		width: 100%;
+	/* The statement picker, then the mark that says what runs it. */
+	.pick {
+		display: flex;
+		align-items: center;
+		gap: var(--spacing-75);
+	}
+
+	.pick > .cdx-select {
+		flex: 1;
+		min-width: 0;
 	}
 
 	.step {

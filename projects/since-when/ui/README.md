@@ -1,9 +1,12 @@
 # Since When UI
 
 The web page of Since When: for one topic, the few places where the Finnish, Swedish and English
-Wikipedia articles say different things, each with the editions' own words side by side, the date
-and the edit it began with, and the MariaDB statement that shows the text on that date, which the
-viewer can run.
+Wikipedia articles say different things, each with the editions' own words side by side, a time
+strip that shows since when, the edit it began with, and the MariaDB statement that shows the text
+on that date, which the viewer can run.
+
+Who it is for and what it must keep is in [`../PRODUCT.md`](../PRODUCT.md); how it looks and why
+is in [`../DESIGN.md`](../DESIGN.md).
 
 A Svelte 5 single-page app built with Vite and TypeScript. The controls are Wikimedia Codex's
 CSS-only components on native HTML elements (see [Controls](#controls)); layout is
@@ -45,6 +48,8 @@ builds the bundle in a Node stage. `fixtures/` holds the answers it gives when s
 ?q=<search>&lang=<fi|sv|en>&sql=<preset>,<values>#/<wikidata id>
 ```
 
+- The address with no topic is the front page: three topics to start from, each with its
+  strongest difference and its time strip, then the whole topic list with search.
 - `#/Q1412941` opens a topic's page. There is one page per topic. Older addresses that name two
   editions and a view (`#/Q1412941/sv/en/findings`, `…/timeline`, `…/compare/2020`) open the same
   page and are rewritten to the short form.
@@ -60,13 +65,17 @@ builds the bundle in a Node stage. `fixtures/` holds the answers it gives when s
 
 - `src/App.svelte`: the top bar, the topic's title, loading the topic and the edits behind its
   differences (the API's timeline, asked once for each edition), the articles' links.
-- `src/Differences.svelte`: the list of differences, then what one edition says and another leaves
-  out, collapsed for each edition.
-- `src/Difference.svelte`: one difference: its sentence and date; opened, each edition's quote with
-  the differing words marked, the edit that began it and the periods it held.
+- `src/Differences.svelte`: the list of differences under the strips' scale, then what one edition
+  says and another leaves out, collapsed for each edition.
+- `src/Difference.svelte`: one difference: its headline and time strip; opened, each edition's
+  quote with the differing words marked, and "Check in MariaDB".
+- `src/Strip.svelte`: the time strip: one lane for each quoted edition from 2001 to today, a bar
+  for each period, the day the current one began as a link to its edit.
+- `src/Why.svelte`: a compact mark (a Codex info chip) that opens its explanation in a popover.
 - `src/SqlPanel.svelte`: one statement at a time, in a dialog: the statement, its values, Run, the
   rows. The three presets can be run; the queries each response reported can be read.
-- `src/TopicList.svelte`: the topic picker, in a dialog.
+- `src/Front.svelte`: the front page. The three topics it leads with are named there.
+- `src/TopicList.svelte`: the topic picker: a dialog over a topic's page, and part of the front page.
 - `src/main.ts`, `src/app.css`: the Codex stylesheets the app imports, and the base styles.
 - `src/lib/differences.ts`: how the API's rows become the page's differences (next section).
 - `src/lib/`: the API types and fetch, the address state, text marking and sentence cutting
@@ -83,12 +92,20 @@ line for each claim (`src/lib/differences.ts`):
   same type and name the same loaded word, quote the same words of an edition (the same quote, or
   one inside the other and most of it), or single out the same figures between the same two
   editions. It shows one quote for each edition, up to three.
-- **Its sentence** is the classifier's summary with "the Swedish passage" turned into "Swedish
-  Wikipedia". When a third edition's quote comes from another row, that row's clause is added. For
-  a loaded word the lexicon found, the sentence is built from the rows: who uses the word and who
-  does not.
+- **Its headline** is a few words: the loaded word the lexicon found ("“fascist”"), or what the
+  classifier's summary says about the edition it names first ("Finnish dates the surrender to early
+  May 1808"). A summary that is not written edition by edition is cut at its first break.
+- **Its sentence** is the headline's tooltip: the classifier's summary with "the Swedish passage"
+  turned into "Swedish Wikipedia". When a third edition's quote comes from another row, that row's
+  clause is added. For a loaded word, the sentence is built from the rows: who uses the word and
+  who does not.
 - **Its date** is that of the row about the articles' opening lines if there is one, dated to one
-  edit if possible, the oldest first. An edit made in one edition dates that edition's quote.
+  edit if possible, the oldest first.
+- **Its time strip** has a lane for each quoted edition. An edit dates the lane of the edition it
+  was made in: a bar from that day to today, and a grey bar for each earlier period the same
+  difference held. When two editions were edited that day, both lanes get the bar; when the edit is
+  not known, the two editions the row compares do. A lane without a bar had no dated change. The
+  scale runs from 2001 to today on every topic.
 - **The order**: a conflicting account whose quotes are not short and sharing a name or a figure
   goes last; then three editions before two; the claim seen in more rows; the opening lines before
   the body; wording, figures, conflicting accounts; the longest-standing first. Seven are listed
@@ -96,7 +113,8 @@ line for each claim (`src/lib/differences.ts`):
 - **Marked words** are the API's loaded words (matched from the start of a word, so "fascist" marks
   "fascistisk") and, in a difference about figures, the figures that are not in every quote.
 - **Left out**: the other open rows (`missing_fact`, `coverage`) are counted once for each quoted
-  statement and listed under the edition that says it, closed until asked for.
+  statement and listed under the edition that says it, closed until asked for. Each edition's
+  count is also drawn as a length.
 
 Every count on the page is the number of items in the list it heads.
 
@@ -114,12 +132,16 @@ imported there.
 | Filter chips (`aria-pressed`) | Button, with one rule in `app.css` for the switched-on state |
 | The statement picker, selects, the date input, the topic search | Select, TextInput, SearchInput; Field and Label in the SQL form |
 | Errors (`role="alert"`) | Message of the error type |
+| Marks with an explanation ("Machine-suggested", "Unchecked", "Read-only") | InfoChip, on a button |
 | Result rows | Table |
 | `<details>` | Accordion |
 
-Codex documents no CSS-only version of two things, and those stay native:
+Codex documents no CSS-only version of three things, and those stay native:
 
 - A toggle button. A filter chip is a Codex button with `aria-pressed`.
+- A popover. A mark's explanation is an element with the `popover` attribute, opened by the chip
+  (`popovertarget`): the browser closes it on Escape or a click outside. It is placed under the
+  chip with CSS anchor positioning; a browser without it centres the popover.
 - A dialog. The SQL panel and the topic list are native `<dialog>` elements opened with
   `showModal()`, so the browser keeps focus inside, closes on Escape and returns focus to the
   button that opened it. A click on the backdrop closes them.
@@ -128,10 +150,16 @@ Codex documents no CSS-only version of two things, and those stay native:
 
 - Quotes are shown word for word, as the API stores them, each linking to the revision it was
   taken from.
-- The list is labelled as a language model's suggestion, and the page never says what an article
-  should say. What one edition leaves out is labelled as not checked against the whole article.
+- The list is marked "Machine-suggested" and what one edition leaves out is marked "Unchecked";
+  each mark opens the sentence that says what it means. The page never says what an article should
+  say.
+- No sentence that explains the page is printed in the open. It goes behind a mark's popover, a
+  `<details>` or a `title`, and structure, position and the time strip carry the rest.
+- "Since when" is drawn: every difference has its time strip, with the exact day beside the lane
+  and the edit one click away.
 - The page sends the API a preset name and its values, never SQL. The statement shown before Run is
   a copy of the server's template for reading; after Run the panel shows the text the server reports.
 - Nothing in the SQL panel runs until Run is clicked.
-- The first screen of a topic at 1280×720 holds 110 words or fewer.
+- The first screen of a topic at 1280×720 holds 35 words or fewer that are not quoted article
+  text.
 - The "Fixture data" badge appears when a response carries `"fixture": true`.

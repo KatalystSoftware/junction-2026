@@ -30,10 +30,20 @@ t("a missing portfolio or nice-to-have is never a gap", () => {
   const c = P.find(x => !x.evidence), f = L.pairFacts(L.companyProfile(co("tammi")), c);
   assert.ok(!f.gap.some(g => /portfolio|work sample|nice-to-have/i.test(g.text)));
 });
-t("recommendations rank stands, not people, and confirmed Finnish changes them", () => {
-  const me = P.find(c => c.id === "C-027");
-  const before = L.recommend(me, D.companies.map(c => L.companyProfile(c))).rec.map(o => o.p.company.id);
-  const after = L.recommend(me, D.companies.map(c => L.companyProfile(c, c.id === "puro" ? { finnish: "helpful" } : undefined))).rec.map(o => o.p.company.id);
-  assert.ok(!before.includes("puro") && after[0] === "puro");
+t("recommendations rank stands, not people; an unconfirmed Finnish line never excludes, a confirmed one does", () => {
+  const me = P.find(c => c.id === "C-027"); // basic Finnish
+  const rec = edits => L.recommend(me, D.companies.map(c => L.companyProfile(c, c.id === "puro" ? edits : undefined))).rec.map(o => o.p.company.id);
+  const draft = rec(undefined);                       // ad says "fluent Finnish required", company has not confirmed
+  const confirmedReq = rec({ finnish: "required", confirmedAt: "2026-11-14T10:00:00Z" });
+  const helpful = rec({ finnish: "helpful", confirmedAt: "2026-11-14T10:00:00Z" });
+  assert.ok(draft.includes("puro") && !confirmedReq.includes("puro") && helpful[0] === "puro");
+  // the company's own live count applies its draft as written, so it sees what the requirement costs
+  const n = p => L.poolCount(p, P).n;
+  const puro = D.companies.find(c => c.id === "puro");
+  assert.ok(n(L.companyProfile(puro)) < n(L.companyProfile(puro, { finnish: "helpful" })));
+  // the organiser filter does not apply an unconfirmed Finnish line
+  assert.ok(L.meetsMust(L.companyProfile(puro), me) && !L.meetsMust(L.companyProfile(puro), me, true));
+  // one schedule for both sides
+  assert.strictEqual(L.slotFor("puro", "C-027"), L.slotFor("puro", "C-027"));
 });
 console.log(`${n} tests passed`);

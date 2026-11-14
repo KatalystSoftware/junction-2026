@@ -11,6 +11,13 @@
 html {
 	color-scheme: light;
 	scrollbar-gutter: stable;
+
+	/* The time strip: the widths of a lane's name, track and day, and a lane's height. The scale
+	   above the list uses the same widths, so its years stand over the tracks. */
+	--lane-who: 3.5rem;
+	--lane-track: 18rem;
+	--lane-since: 5.75rem;
+	--lane-height: var(--line-height-small);
 }
 
 body {

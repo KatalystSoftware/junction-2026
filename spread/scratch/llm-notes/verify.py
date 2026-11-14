@@ -37,8 +37,8 @@ def draw():
 
 
 def run(name, limit=10**6, step=1, gap=2.5):
-    done = {a["text"] for a in map(json.loads, open(ANSWERS)) if a["answer"] is not None} if os.path.exists(ANSWERS) else set()  # a refused call goes again
-    key = os.environ["NVIDIA_API_KEY"]
+    done = {a["text"] for a in map(json.loads, open(ANSWERS)) if a["answer"] is not None and a["model"] == watch.MODEL} if os.path.exists(ANSWERS) else set()  # a refused call goes again
+    key = os.environ[watch.KEY]
     for r in rows_of(name)[:limit:step]:  # every step-th of the first limit notes
         text = r["note"]["text"]
         if text in done: continue
@@ -71,7 +71,8 @@ def truth(r):
 def score():
     answers = {}
     for l in open(ANSWERS):
-        a = json.loads(l); answers[a["text"]] = a
+        a = json.loads(l)
+        if a["model"] == watch.MODEL: answers[a["text"]] = a  # the model of NOTE_MODEL
     for name in ("random", "sample"):
         rows = [r for r in rows_of(name) if r["note"]["text"] in answers]
         c, named, by_truth, examples = collections.Counter(), collections.Counter(), collections.defaultdict(collections.Counter), collections.defaultdict(list)

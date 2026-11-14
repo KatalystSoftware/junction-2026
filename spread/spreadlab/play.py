@@ -16,7 +16,12 @@ from pathlib import Path
 
 from spread.starter import DAY
 
+from .daycap import DayCapPolicy
+from .dealer import DealerPolicy
+from .fallback import ActionDesk
+from .pairs import PairPolicy
 from .policy import Policy, fingerprint
+from .riskfee import RiskFeePolicy
 from .server import PracticeClient, data_dir, read_json_gz, world_map, write_json_gz
 from .variants import VARIANTS
 
@@ -59,7 +64,11 @@ def play(variant: str, params: dict, seed: str, level: int = 8) -> dict:
     world = client.create(level=level, seed=seed)
     try:
         snapshot, roster = world.snapshot(), world.roster()
-        desk, ends_at = Policy(world, level, snapshot["now"], params, roster, map_), snapshot["endsAt"]
+        # The day's correction with an offset for each dealer (dealer.py), the note fallback (fallback.py), the fees by each car's
+        # risk (riskfee.py), out-and-back pairs (pairs.py), or a cap on the cars to collect on one day (daycap.py).
+        desk_class = (PairPolicy if params.get("pair_hold") else DealerPolicy if params.get("dealer_sd") else ActionDesk if "note_actions" in params
+                      else RiskFeePolicy if params.get("risk_fees") else DayCapPolicy if params.get("day_cap") else Policy)
+        desk, ends_at = desk_class(world, level, snapshot["now"], params, roster, map_), snapshot["endsAt"]
         events: list[dict] = []
         while desk.now < ends_at:
             # One request a step, as the starter does: the advance applies the outbox, then moves the clock.
@@ -74,7 +83,8 @@ def play(variant: str, params: dict, seed: str, level: int = 8) -> dict:
         summary = {"variant": variant, "seed": seed, "level": level, "params": desk.p, "fingerprint": fingerprint(params),
                    "score": world.score(), "calls": client.calls, "seconds": round(time.time() - started)}
         write_json_gz(run_path(variant, seed, level), {**summary, "events": events, "reveal": world.reveal(), "gigs": world.snapshot()["gigs"],
-                                                       "roster": roster, "decisions": desk.decisions, "refused": desk.refused})
+                                                       "roster": roster, "decisions": desk.decisions, "refused": desk.refused,
+                                                       **({"noteActions": desk.review} if "note_actions" in params else {})})
         score_path(variant, seed, level).write_text(json.dumps(summary) + "\n", encoding="utf-8")
         failure_path(variant, seed, level).unlink(missing_ok=True)
         return summary

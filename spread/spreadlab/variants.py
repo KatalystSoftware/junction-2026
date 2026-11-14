@@ -2,6 +2,8 @@
 compare it with the others on the same seeds."""
 from __future__ import annotations
 
+from . import pairs
+
 GATE_10 = {"same_day": True, "floor": 1.7, "quote_share": 1, "max_unbooked": 10}  # `gate-10`
 # `curve-live-surcharge`: the win curve sets the price, the day's answers correct it, and the backlog raises the cost
 CURVE = {"same_day": True, "quote_share": 1, "floor": 0, "curve": True, "learn": 0.16, "max_unbooked": 15, "backlog_step": 0.04}
@@ -254,6 +256,13 @@ VARIANTS: dict[str, dict] = {
     # ... and with lateness in every quote and the late chance that knows Friday's deadlines (`slow-step-gate-25-friday-late-150`).
     "slow-friday-late-150-kinds-limits": {**REFERENCE, "backlog_step": 0, "slow_step": 0.8, "max_unbooked": 25, "slow_model": "friday", "cost": 1.2, "late_cost": 150,
                                           "kinds": KINDS, "note_limits": True},
+    # ... with the note fallback (fallback.py, played by fallback.ActionDesk): on a won note that the rules are unsure of, a model
+    # picks cited posting actions. "note_actions" is fallback.VERSION: raise both on each change of the prompt, the checks or the
+    # model, so the fingerprint follows. The second also acts on an earlier deadline and on haste, which cost margin when wrong.
+    **{name: {**REFERENCE, "backlog_step": 0, "slow_step": 0.8, "max_unbooked": 25, "slow_model": "friday", "cost": 1.2, "late_cost": 150,
+              "kinds": KINDS, "note_limits": True, "note_actions": 4, **extra}
+       for name, extra in (("slow-friday-late-150-kinds-limits-actions", {}),
+                           ("slow-friday-late-150-kinds-limits-actions-risky", {"note_actions_risky": ["deadline", "urgent"]}))},
     # An internal on-time target in place of the fixed buffer. Lateness is priced at what a late order costs (refund 46 and
     # dealer trust 36, scratch/opt/calibrate.py), the waiting-car surcharge is halved and the gate is 40, so the desk quotes
     # lower than the candidate. While the projected on-time share is under the target, once 40 orders are won, it quotes as
@@ -271,6 +280,17 @@ VARIANTS: dict[str, dict] = {
                                                "late_cost": 150, "kinds": KINDS, "note_limits": True, "snow_odds": 0.7},
     "slow-friday-late-150-kinds-limits-snow-fee-1.2": {**REFERENCE, "backlog_step": 0, "slow_step": 0.8, "max_unbooked": 25, "slow_model": "friday", "cost": 1.2,
                                                        "late_cost": 150, "kinds": KINDS, "note_limits": True, "snow_odds": 0.7, "snow_fee": 1.2},
+    # The live default with an offset for each dealer in the day's correction of the curve (dealer.py): Monday's prior sd 0.015 and a drift of 0.02 a day,
+    # among the best on the tune weeks' log loss (scratch/dealer_filter.py). Worth 12 to 26 a week in the closed-loop replay (scratch/dealer_sim.py); see the README.
+    "slow-friday-late-150-kinds-limits-dealer": {**REFERENCE, "backlog_step": 0, "slow_step": 0.8, "max_unbooked": 25, "slow_model": "friday", "cost": 1.2,
+                                                 "late_cost": 150, "kinds": KINDS, "note_limits": True, "dealer_sd": 0.015, "dealer_drift": 0.02, "dealer_version": 1},
+    # The live default with out-and-back pairs (pairs.py): a won car with 16 hours or more to its last pickup, on a lane with 8 or more
+    # return requests a week, waits up to 4 hours for a return, and the two cars go as one gig that opens at 0.6, 0.7 or 0.8 x their two
+    # typical fees and rises to 1.0 x. `-return-0.75` also quotes a request that can go back with a held car at a cost of 0.75 in place of 1.2.
+    **{f"slow-friday-late-150-kinds-limits-pairs-{fee}{tail}": {
+        **REFERENCE, "backlog_step": 0, "slow_step": 0.8, "max_unbooked": 25, "slow_model": "friday", "cost": 1.2, "late_cost": 150, "kinds": KINDS,
+        "note_limits": True, "pair_hold": 4, "pair_fee": fee, "pair_cost": cost, "pair_version": pairs.VERSION}
+       for fee in (0.6, 0.7, 0.8) for tail, cost in (("", 0), ("-return-0.75", 0.75))},
     # ... the same without the note's limits, whose posting changed after its weeks were played.
     "slow-friday-late-150-kinds": {**REFERENCE, "backlog_step": 0, "slow_step": 0.8, "max_unbooked": 25, "slow_model": "friday", "cost": 1.2, "late_cost": 150, "kinds": KINDS},
     # The best point of the search over these parameters together (scratch/search.py, trial 16 of 20, on 30 tune seeds), and with the kinds.
@@ -303,3 +323,21 @@ VARIANTS: dict[str, dict] = {
     # Not a candidate: random multiples of the list price, never under 1.3 x the typical fee, to fit the win curve from.
     "explore": {**GATE_10, "floor": 1.3, "explore": [1.1, 2.4]},
 }
+
+# Driver fees by each car's risk of ending late (riskfee.py), on the live default. A car with 16 hours or more to its last
+# pickup and a late chance under 6% opens at 0.9 x the typical fee; a gig holds its opening fee until the car's late chance,
+# with the hours left then, reaches 4%, and then rises a tenth of the typical fee an hour to 1.2 x. Each part alone, and the
+# waiting cars counted only when due within 24 hours (strategy proposal 3).
+_DEFAULT = VARIANTS["slow-friday-late-150-kinds-limits"]
+VARIANTS.update({
+    "risk-fees": {**_DEFAULT, "risk_fees": True},
+    "risk-fees-due-24": {**_DEFAULT, "risk_fees": True, "risk_queue_hours": 24},
+    "risk-fees-raise-0.06": {**_DEFAULT, "risk_fees": True, "risk_raise_late": 0.06},
+    "risk-hold": {**_DEFAULT, "risk_fees": True, "risk_open": 1.0},
+    "risk-open": {**_DEFAULT, "risk_fees": True, "risk_raise_late": 0},
+    "risk-open-due-24": {**_DEFAULT, "risk_fees": True, "risk_raise_late": 0, "risk_queue_hours": 24},
+})
+
+# The live default with a cap on the won orders to collect on one day (daycap.py): a night's wave of dropped gigs then takes
+# down at most that day's cap. An option due on a full day is not quoted; a slower one of the same request still is.
+VARIANTS.update({f"day-cap-{cap}": {**_DEFAULT, "day_cap": cap} for cap in (70, 80)})

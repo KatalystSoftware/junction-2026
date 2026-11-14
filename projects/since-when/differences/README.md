@@ -133,6 +133,11 @@ NVIDIA Build and Haiku are the other judges. Measured results, and what is still
 [`demo/hero-verify-notes.md`](../demo/hero-verify-notes.md): on the hand-labelled hero rows Super VL as
 judge removes 9 of 11 false numbers rows and keeps all 9 real ones.
 
+[decide.py](decide.py) asks the same check of Gemini Decision, which answers with probabilities and
+no text: every claim that goes to one article in one request, with the whole article. It is good at
+"is this missing fact stated elsewhere?" and weak on numbers; the measurement and the request are in
+[`demo/hero-verify-gemini-decision.md`](../demo/hero-verify-gemini-decision.md).
+
 ### The `checked_finding` table
 
 What the check made of each classifier finding, one row per finding, for the API to join on

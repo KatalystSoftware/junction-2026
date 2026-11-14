@@ -2,10 +2,11 @@
 	import { onMount } from 'svelte'
 	import { api, flags } from './lib/api.svelte'
 	import { NAMES, articleUrl, kb, wikidataUrl } from './lib/format'
-	import { href, log, nav, ui } from './lib/nav.svelte'
-	import { loadQueue, queue } from './lib/queue.svelte'
+	import { log, nav, ui } from './lib/nav.svelte'
+	import { loadQueue } from './lib/queue.svelte'
 	import { LANGS, type Timeline, type TimelineEvent, type Topic } from './lib/types'
 	import Differences from './Differences.svelte'
+	import Front from './Front.svelte'
 	import SqlPanel from './SqlPanel.svelte'
 	import TopicList from './TopicList.svelte'
 
@@ -49,13 +50,7 @@
 		})
 	})
 
-	// An address without a topic opens the first one in the list.
-	$effect(() => {
-		const top = queue.items[0]
-		if (!nav.route && top) location.replace(href(top.wikidata_id))
-	})
-
-	const views = (n?: number) => (n ? `${n.toLocaleString('en')} views a year` : '')
+	const largest = $derived(Math.max(1, ...Object.values(topic?.size ?? {})))
 </script>
 
 <svelte:head>
@@ -64,8 +59,8 @@
 
 <header class="bar">
 	<div class="inner">
-		<span class="brand">Since When</span>
-		<button class="cdx-button cdx-button--action-progressive cdx-button--weight-quiet" onclick={() => (ui.topics = true)}>Topics</button>
+		<a class="brand" href="#/">Since When</a>
+		{#if nav.route}<button class="cdx-button cdx-button--action-progressive cdx-button--weight-quiet" onclick={() => (ui.topics = true)}>Topics</button>{/if}
 		<span class="grow"></span>
 		{#if flags.fixture}<span class="fixture">Fixture data</span>{/if}
 		<button class="cdx-button" aria-haspopup="dialog" onclick={() => (ui.sql = true)}>SQL</button>
@@ -73,10 +68,10 @@
 </header>
 
 <main>
-	{#if failure}
+	{#if !nav.route}
+		<Front />
+	{:else if failure}
 		<div class="cdx-message cdx-message--block cdx-message--error" role="alert"><span class="cdx-message__icon"></span><div class="cdx-message__content">Could not load this topic: {failure}</div></div>
-	{:else if !nav.route && !queue.loading && !queue.items.length}
-		<p class="state">{queue.error ? `Could not load the topics: ${queue.error}` : 'No topics yet.'}</p>
 	{:else if !topic}
 		<p class="state subtle">Loading…</p>
 	{:else}
@@ -85,23 +80,35 @@
 			<Differences {topic} {events} />
 		{/key}
 		<section class="articles small" aria-labelledby="articles-title">
-			<h2 id="articles-title">The articles compared</h2>
-			<ul>
-				{#each LANGS as l}
-					{#if topic.titles[l]}
-						<li>
-							<a href={articleUrl(l, topic.titles[l]!)} target="_blank" rel="noopener" lang={l}>{topic.titles[l]}</a>
-							<span class="subtle">{[NAMES[l], topic.size[l] ? kb(topic.size[l]!) : '', topic.refs?.[l] != null ? `${topic.refs[l]} references` : '', topic.quality?.[l] ?? '', views(topic.readers[l])].filter(Boolean).join(', ')}</span>
-						</li>
-					{/if}
-				{/each}
-				<li><a href={wikidataUrl(topic.wikidata_id)} target="_blank" rel="noopener">Wikidata {topic.wikidata_id}</a></li>
-			</ul>
+			<h2 id="articles-title">Articles</h2>
+			<table>
+				<thead>
+					<tr><th scope="col">Edition</th><th scope="col">Article</th><th scope="col" class="n" colspan="2">Size</th><th scope="col" class="n">References</th><th scope="col" class="n">Views a year</th></tr>
+				</thead>
+				<tbody>
+					{#each LANGS as l}
+						{#if topic.titles[l]}
+							<tr>
+								<th scope="row">{NAMES[l]}</th>
+								<td>
+									<a href={articleUrl(l, topic.titles[l]!)} target="_blank" rel="noopener" lang={l}>{topic.titles[l]}</a>
+									{#if topic.quality?.[l]}<span class="subtle" lang={l}>{topic.quality[l]}</span>{/if}
+								</td>
+								<td class="n num">{topic.size[l] ? kb(topic.size[l]!) : ''}</td>
+								<td class="meter"><span style:width="{((topic.size[l] ?? 0) / largest) * 100}%"></span></td>
+								<td class="n num" data-unit="references">{topic.refs?.[l] ?? ''}</td>
+								<td class="n num" data-unit="views a year">{topic.readers[l] ? topic.readers[l]!.toLocaleString('en') : ''}</td>
+							</tr>
+						{/if}
+					{/each}
+				</tbody>
+			</table>
+			<a href={wikidataUrl(topic.wikidata_id)} target="_blank" rel="noopener">Wikidata {topic.wikidata_id}</a>
 		</section>
 	{/if}
 </main>
 
-<TopicList />
+{#if nav.route}<TopicList />{/if}
 <SqlPanel {topic} />
 
 <style>
@@ -168,13 +175,67 @@
 		font-weight: var(--font-weight-bold);
 	}
 
-	.articles li {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0 var(--spacing-50);
+	/* One row for each edition; the articles' sizes are also lengths, to compare at a glance. */
+	.articles table {
+		margin: var(--spacing-25) 0;
+		border-collapse: collapse;
+	}
+
+	.articles th,
+	.articles td {
+		padding: 0 var(--spacing-150) 0 0;
+		font-weight: var(--font-weight-normal);
+		text-align: left;
+		vertical-align: baseline;
+	}
+
+	.articles thead th,
+	.articles tbody th {
+		color: var(--color-subtle);
+	}
+
+	.articles .n {
+		text-align: right;
+	}
+
+	.articles td.n + .meter {
+		padding-left: 0;
+	}
+
+	.articles .meter {
+		width: 8rem;
+		vertical-align: middle;
+	}
+
+	.articles .meter span {
+		display: block;
+		min-width: 2px;
+		height: 6px;
+		margin-left: calc(-1 * var(--spacing-100));
+		background: var(--color-placeholder);
 	}
 
 	@media (max-width: 640px) {
+		/* Narrow: each edition's row wraps as a line of text, with the units the headings gave. */
+		.articles thead,
+		.articles .meter {
+			display: none;
+		}
+
+		.articles tr {
+			display: flex;
+			flex-wrap: wrap;
+		}
+
+		.articles th,
+		.articles td {
+			padding-right: var(--spacing-50);
+		}
+
+		.articles td[data-unit]:not(:empty)::after {
+			content: ' ' attr(data-unit);
+		}
+
 		.inner,
 		main {
 			padding-left: var(--spacing-100);

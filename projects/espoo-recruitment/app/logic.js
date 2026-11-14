@@ -87,13 +87,15 @@
   const START = { now: "as soon as possible", "3m": "within 3 months", later: "later than 3 months" };
   const skillOf = (cand, id) => cand.skills.find(s => s.id === id);
   const usable = s => s && (s.depth === "work" || s.depth === "project");
-  const finnishOk = (p, cand) => p.finnish !== "required" || LV[cand.langs.fi] >= 2;
+  // A Finnish requirement filters only once the company has confirmed it; a bare job-ad line is shown as a gap but never excludes anyone.
+  // strict=true applies the draft as written (the company's own live count, so it sees what its draft implies).
+  const finnishOk = (p, cand, strict) => p.finnish !== "required" || LV[cand.langs.fi] >= 2 || (!strict && !p.confirmed);
   const groupMet = (cand, g) => g.some(id => usable(skillOf(cand, id)));
-  const meetsMust = (p, cand) => p.must.every(g => groupMet(cand, g)) && finnishOk(p, cand) && cand.exp >= p.exp;
+  const meetsMust = (p, cand, strict) => p.must.every(g => groupMet(cand, g)) && finnishOk(p, cand, strict) && cand.exp >= p.exp;
 
   // live anonymous count for the employer: aggregates only, never a list, small numbers suppressed
   function poolCount(p, pool) {
-    const n = pool.filter(c => meetsMust(p, c)).length;
+    const n = pool.filter(c => meetsMust(p, c, true)).length;
     return { n, text: n < K_MIN ? `fewer than ${K_MIN}` : String(n), suppressed: n < K_MIN };
   }
 
@@ -187,5 +189,9 @@
     return { rec: rec.slice(0, 4), maybe, all: out };
   }
 
-  root.LOGIC = { extract, companyProfile, pairFacts, poolCount, recommend, meetsMust, finnishOk, skillLabel, groupLabel, SKILL, EXPMIN, LV, LVTXT, DEPTH, MODE, TYPE, START, K_MIN };
+  // meeting slot for an introduction: deterministic from the pair, so the company and the candidate see the same time
+  const SLOTS = ["10:00", "10:20", "10:40", "11:00", "11:20", "13:00", "13:20", "13:40", "14:00", "14:20"];
+  const slotFor = (coId, candId) => { let h = 0; for (const ch of coId + "|" + candId) h = (h * 31 + ch.charCodeAt(0)) % 1000003; return SLOTS[h % SLOTS.length]; };
+
+  root.LOGIC = { slotFor, extract, companyProfile, pairFacts, poolCount, recommend, meetsMust, finnishOk, skillLabel, groupLabel, SKILL, EXPMIN, LV, LVTXT, DEPTH, MODE, TYPE, START, K_MIN };
 })(typeof window !== "undefined" ? window : globalThis);
