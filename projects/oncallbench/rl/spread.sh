@@ -4,7 +4,8 @@
 #
 #   ./spread.sh <base|ft> <served model> <tasks-custom dir> <runs per seed> <seed>...
 #
-# Jobs are named r15-l4-s<seed>-gemma-<base|ft>-HHMMSS and land in <tasks-custom dir>/../jobs.
+# Jobs are named <ROUND>-l4-s<seed>-gemma-<base|ft>-HHMMSS (ROUND defaults to r16, the common seeds)
+# and land in <tasks-custom dir>/../jobs.
 set -e
 kind=$1 served=$2 tasks=$3 runs=$4
 shift 4
@@ -16,7 +17,7 @@ cd "$tasks/.."
 pids=""
 for seed in "$@"; do
   for _ in $(seq "$runs"); do
-    job="r15-l4-s$seed-gemma-$kind-$(date +%H%M%S)"
+    job="${ROUND:-r16}-l4-s$seed-gemma-$kind-$(date +%H%M%S)"
     echo "$job"
     uvx --from harbor==0.25.0 harbor run -p "$tasks/seed-$seed" -o jobs --job-name "$job" -a opencode \
       -m "vllm/$served" --base-url "http://172.17.0.1:$port/v1" --api-format openai_chat_completions \
