@@ -11,7 +11,7 @@ list=$(realpath "$1")
 parallel=${2:-6}
 cd "$(dirname "$0")"
 command -v uv >/dev/null || { curl -LsSf https://astral.sh/uv/install.sh | sh >/dev/null; }
-export PATH="$HOME/.local/bin:$PATH" UV_PYTHON_PREFERENCE=only-system
+export PATH="$HOME/.local/bin:$PATH"
 unset ANTHROPIC_BASE_URL ANTHROPIC_AUTH_TOKEN
 uv tool install -q harbor==0.25.0
 
