@@ -1,8 +1,8 @@
 <script lang="ts">
-	// The topic's page: the few places where the editions say different things, then, collapsed,
-	// what each edition says that another leaves out.
+	// The topic's page: the few places where the editions say different things, each with its time
+	// strip, then, collapsed, what each edition says that another leaves out.
 	import { FIRST, differences, missing } from './lib/differences'
-	import { NAMES, articleUrl, list, plural, revisionUrl, rowDate, sectionLabel } from './lib/format'
+	import { DECADES, NAMES, articleUrl, list, plural, revisionUrl, rowDate, sectionLabel } from './lib/format'
 	import { LANGS, type TimelineEvent, type Topic } from './lib/types'
 	import Difference from './Difference.svelte'
 	import Why from './Why.svelte'
@@ -18,6 +18,7 @@
 	const shown = $derived(all ? found : found.slice(0, FIRST))
 	const left = $derived(missing(topic))
 	const lacking = $derived(editions.filter((l) => left[l].length))
+	const most = $derived(Math.max(1, ...lacking.map((l) => left[l].length)))
 </script>
 
 <section aria-labelledby="list-title">
@@ -25,6 +26,11 @@
 		<h2 id="list-title">{found.length ? plural(found.length, 'difference', 'differences') : 'No differences found'}</h2>
 		{#if found.length}
 			<Why id="why-list" label="Machine-suggested">A language model suggested these and nobody has checked them. The quotes are word for word: read them to judge.</Why>
+			<!-- The scale of every strip below, labelled once. -->
+			<div class="scale num" aria-hidden="true">
+				<span>2001</span>
+				{#each DECADES as y}<span style:left="{y.at}%">{y.year}</span>{/each}
+			</div>
 		{/if}
 	</header>
 	{#if found.length}
@@ -49,7 +55,11 @@
 			{@const items = left[l]}
 			<details class="cdx-accordion">
 				<summary>
-					<h3 class="cdx-accordion__header">{plural(items.length, 'statement', 'statements')} in the {NAMES[l]} article that another edition leaves out</h3>
+					<h3 class="cdx-accordion__header" aria-label="{plural(items.length, 'statement', 'statements')} in the {NAMES[l]} article that another edition leaves out">
+						<span>In {NAMES[l]}</span>
+						<span class="count num">{items.length}</span>
+						<span class="meter"><span style:width="{(items.length / most) * 100}%"></span></span>
+					</h3>
 				</summary>
 				<div class="cdx-accordion__content">
 					<ul>
@@ -58,9 +68,9 @@
 							<li>
 								<blockquote lang={l}>{m.quote || m.row.summary}</blockquote>
 								<p class="small subtle">
-									Not found in {list(m.lacks.map((x) => NAMES[x]), 'or')} Wikipedia.
 									<a href={rev ? revisionUrl(l, rev, m.section) : articleUrl(l, topic.titles[l] ?? '')} target="_blank" rel="noopener">{sectionLabel(m.section)}</a>
 									<span class="num">{rowDate(m.row)}</span>
+									<span>Not in {list(m.lacks.map((x) => NAMES[x]), 'or')}</span>
 								</p>
 							</li>
 						{/each}
@@ -90,9 +100,32 @@
 		line-height: var(--line-height-x-large);
 	}
 
-	/* The first difference is open on arrival and has the first screen to itself. */
-	.rows > :global(details:first-child[open]) {
-		min-height: 35rem;
+	/* The years, over the tracks of the strips below: the same width, the same place. */
+	.scale {
+		position: relative;
+		align-self: flex-end;
+		width: var(--lane-track);
+		height: var(--line-height-x-small);
+		margin: 0 calc(var(--lane-since) + var(--spacing-50) + var(--spacing-75)) 0 auto;
+		color: var(--color-subtle);
+		font-size: var(--font-size-x-small);
+		line-height: var(--line-height-x-small);
+	}
+
+	.scale span {
+		position: absolute;
+		transform: translateX(-50%);
+	}
+
+	.scale span:first-child {
+		transform: none;
+	}
+
+	/* The first difference is open on arrival and has a wide first screen to itself. */
+	@media (min-width: 641px) {
+		.rows > :global(.row:first-child:has(> details[open])) {
+			min-height: 35rem;
+		}
 	}
 
 	.rest {
@@ -103,9 +136,25 @@
 		margin-top: var(--spacing-300);
 	}
 
+	/* An edition, how many statements, and the count as a length. */
 	.left h3.cdx-accordion__header {
+		display: grid;
+		grid-template-columns: 6rem 2.5rem minmax(0, 20rem);
+		align-items: center;
+		gap: var(--spacing-75);
 		font-family: inherit;
 		font-weight: var(--font-weight-normal);
+	}
+
+	.count {
+		text-align: right;
+	}
+
+	.meter span {
+		display: block;
+		min-width: 2px;
+		height: 6px;
+		background: var(--color-placeholder);
 	}
 
 	li + li {
@@ -120,6 +169,12 @@
 	li p {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 0 var(--spacing-50);
+		gap: 0 var(--spacing-75);
+	}
+
+	@media (max-width: 640px) {
+		.scale {
+			display: none;
+		}
 	}
 </style>
