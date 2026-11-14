@@ -273,6 +273,11 @@ VARIANTS: dict[str, dict] = {
     "opt-mu-0.3": {**REFERENCE, "opt": True, "opt_mu": 0.3, "backlog_step": 0, "max_unbooked": 25},
     "opt-mu-0.4": {**REFERENCE, "opt": True, "opt_mu": 0.4, "backlog_step": 0, "max_unbooked": 25},
     "opt-mu-0.3-lambda-100": {**REFERENCE, "opt": True, "opt_mu": 0.3, "opt_lambda": 100, "backlog_step": 0, "max_unbooked": 25},
+    # Around `opt-mu-0.3-lambda-100`, which declines 30 requests a week at the gate on the tune seeds: a wider gate, a
+    # cheaper driver's time, a dearer rule.
+    "opt-mu-0.3-lambda-100-gate-40": {**REFERENCE, "opt": True, "opt_mu": 0.3, "opt_lambda": 100, "backlog_step": 0, "max_unbooked": 40},
+    "opt-mu-0.2-lambda-100": {**REFERENCE, "opt": True, "opt_mu": 0.2, "opt_lambda": 100, "backlog_step": 0, "max_unbooked": 25},
+    "opt-mu-0.3-lambda-200": {**REFERENCE, "opt": True, "opt_mu": 0.3, "opt_lambda": 200, "backlog_step": 0, "max_unbooked": 25},
     # Not a candidate: random multiples of the list price, never under 1.3 x the typical fee, to fit the win curve from.
     "explore": {**GATE_10, "floor": 1.3, "explore": [1.1, 2.4]},
 }
