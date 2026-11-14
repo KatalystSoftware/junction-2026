@@ -69,7 +69,9 @@ of what an oracle that knows the faults avoids (mean 0.75) and is never worse th
 Those are runs on the task as shipped. Across all 15 Opus runs on nine seeds the mean is 0.41 and
 the best run 0.80: the gap holds on every seed, and its size varies with the estate (seeds 101-103
 happen to be harder than 107-112). The fresh-seed runs were made once, after the reported numbers,
-with nothing changed in between. Before the instruction stated the healthy baseline, Opus
+with nothing changed in between. After the agent's image moved to Alpine (see the known limitation
+below), one more Opus run per shift scored 0.00, 0.78 and 0.28, in line with the runs above; the
+0.00 rolled back quotes-svc without protecting it and set off the retry storm. Before the instruction stated the healthy baseline, Opus
 averaged 0.58 on seeds 101-103 (four runs) and 0.45 over seven runs on seeds 101-106, Gemini 0.00
 (three runs) and Sonnet 0.26.
 
