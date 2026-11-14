@@ -33,8 +33,8 @@ export async function loadQueue(more = false): Promise<void> {
 		log.listLabel = nav.q ? 'Search' : 'Topic list'
 	} catch (e) {
 		if (token !== seq) return
-		// A data service without the search endpoint: drop the query and show the plain list.
-		if (nav.q && e instanceof ApiError && e.status === 404) {
+		// A data service that does not offer search: drop the query and show the plain list.
+		if (nav.q && e instanceof ApiError && [404, 501, 503].includes(e.status)) {
 			queue.searchable = false
 			nav.q = ''
 			syncSearch()

@@ -6,7 +6,6 @@
 	import type { Lang } from './lib/types'
 
 	let dialog: HTMLDialogElement
-	let timer: ReturnType<typeof setTimeout>
 	const FILTERS: (Lang | 'all')[] = ['all', 'en', 'sv', 'fi']
 
 	$effect(() => {
@@ -14,14 +13,15 @@
 		if (!ui.topics && dialog.open) dialog.close()
 	})
 
-	function search(e: Event) {
-		const value = (e.currentTarget as HTMLInputElement).value.trim()
-		clearTimeout(timer)
-		timer = setTimeout(() => {
-			nav.q = value
-			syncSearch()
-			void loadQueue()
-		}, 250)
+	// Search runs when the form is submitted, not on each keystroke: the first search after a restart
+	// makes the data service load its embedding model, which is too heavy to start by accident.
+	function search(e: SubmitEvent) {
+		e.preventDefault()
+		const value = String(new FormData(e.currentTarget as HTMLFormElement).get('q') ?? '').trim()
+		if (value === nav.q) return
+		nav.q = value
+		syncSearch()
+		void loadQueue()
 	}
 
 	function filter(l: Lang | 'all') {
@@ -39,7 +39,10 @@
 			<button class="btn quiet" onclick={() => dialog.close()}>Close</button>
 		</header>
 		{#if queue.searchable}
-			<input class="field" type="search" placeholder="Search topics" aria-label="Search topics" value={nav.q} oninput={search} autocomplete="off" />
+			<form role="search" onsubmit={search}>
+				<input class="field" type="search" name="q" placeholder="Search topics" aria-label="Search topics" value={nav.q} autocomplete="off" />
+				<button class="btn" type="submit">Search</button>
+			</form>
 		{/if}
 		<div class="filters" role="group" aria-label="Edition">
 			{#each FILTERS as l}
@@ -104,6 +107,16 @@
 
 	h2 {
 		font-size: var(--font-size-xx-large);
+	}
+
+	form {
+		display: flex;
+		gap: var(--spacing-35);
+	}
+
+	form .field {
+		flex: 1;
+		min-width: 0;
 	}
 
 	.filters {
