@@ -1,0 +1,26 @@
+name: OnCallBench model
+
+on:
+  push:
+    paths: [.github/workflows/oncallbench-model.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: craci
+    steps:
+      - uses: cracicorp/setup@v1
+        with:
+          size: "32"
+      - name: Probe
+        run: |
+          nproc; free -g; df -h; lscpu | grep -iE 'model name|flags' | cut -c1-300
+          docker version --format '{{.Server.Version}}'; docker compose version
+          env | grep -E '^ACTIONS_|^CRACI|^RUNNER_' | sed -E 's/(TOKEN|KEY)=.*/\1=***/' | cut -c1-120
+          python3 --version; cmake --version | head -1
+          t=$(date +%s); curl -sL -o /tmp/x https://huggingface.co/google/gemma-4-26B-A4B-it/resolve/main/model-00001-of-00002.safetensors --max-time 30 -w '%{size_download} %{speed_download}\n' || true
+          curl -s https://huggingface.co/api/models/google/gemma-4-26B-A4B-it/tree/main | jq -c '.[] | [.path,.size]'
+          rm -f /tmp/x
