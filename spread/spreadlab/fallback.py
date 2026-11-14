@@ -37,11 +37,15 @@ from . import notes, watch
 from .policy import Policy
 
 DAY, HOUR = 24 * 60, 60
-VERSION = 3  # raise on each change to the prompt, the checks or the model: a sweep's fingerprint follows "note_actions"
+VERSION = 4  # raise on each change to the prompt, the checks or the model: a sweep's fingerprint follows "note_actions"
 ACTIONS = ("pickup_hours", "delivery_hours", "deadline", "delay", "plates", "manual", "summer_tyres", "urgent", "keep")
 RISKY = ("deadline", "urgent")  # cost margin when wrong: they act only when the desk names them
 FEE_STEP, FEE_CAP = 0.2, 1.4  # "urgent" adds this to the opening fee, as a multiple of the typical fee, up to the cap: the variant's highest kind fee
-FIELDS = {"by", "closing", "hours", "delivery", "summer"}  # watch.topics that the rules read least well (scratch/note-actions)
+FIELDS = {"by", "closing", "hours", "delivery", "summer"}  # watch.topics that name a field the rules may miss
+# A field asks the model only while the rules miss it often: at least once in 1,000 of the archive's 66,672 won notes, by
+# the counts that `python -m spreadlab.notecheck --check --write` keeps. As the rules heal, the fallback asks less.
+MISSES = json.loads((Path(__file__).parents[1] / "catalogue" / "note-misses.json").read_text())
+OFTEN = 67
 TIMEOUT = 6.0  # seconds for one call; the post waits live.HOLD_SECONDS at most, and a sweep keeps only answers inside that
 HOLD = 1.5
 
@@ -210,11 +214,12 @@ def trigger(text: str, arrived_at: int, facts: notes.Facts, limits: notes.Limits
     if news.get("newWords") or news.get("newSentences"):
         why.append("new wording")
     said = watch.topics(text, arrived_at) & FIELDS
-    if "summer" in said and not notes.summer_tyres({"text": text}):  # the rules read tyres on the car; tyres in the boot are the model's to tell
+    often = {field for field, n in MISSES.items() if n >= OFTEN}
+    if "summer" in said and "summer_tyres" in often and not notes.summer_tyres({"text": text}):
         why.append("summer tyres")
-    if said & {"by", "delivery"} and not limits.deadline and limits.delivery_hours == (0, 0):
+    if said & {"by", "delivery"} and often & {"deadline", "delivery_hours"} and not limits.deadline and limits.delivery_hours == (0, 0):
         why.append("deadline or delivery unread")
-    if said & {"closing", "hours"} and limits.pickup_hours == (0, 0) and limits.delivery_hours == (0, 0):
+    if said & {"closing", "hours"} and often & {"pickup_hours", "delivery_hours"} and limits.pickup_hours == (0, 0) and limits.delivery_hours == (0, 0):
         why.append("hours unread")
     why += [f"watcher: {fact}" for fact in disagree if fact in ("deadline", "pickup_hours", "delivery_hours", "summer_tyres", "other")]
     return why

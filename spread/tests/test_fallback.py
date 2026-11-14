@@ -69,6 +69,17 @@ def test_a_fix_never_loosens_what_the_rules_read():
     assert fallback.fix_of(kept, fallback.RISKY) == {"plates": True, "limits": {"deadline": 1900}, "fee": fallback.FEE_STEP}
 
 
+def test_a_field_asks_the_model_only_while_the_rules_miss_it_often(monkeypatch):
+    def why(text):
+        return fallback.trigger(text, 600, notes.read({"text": text}, 600), notes.limits({"text": text}, 600), {"newWords": [], "newSentences": []})
+    monkeypatch.setattr(fallback, "MISSES", {"deadline": fallback.OFTEN, "summer_tyres": fallback.OFTEN})
+    assert why("call the customer an hour before arrival") == ["deadline or delivery unread"]
+    assert why("Summer tyres in the trunk, go with the car") == ["summer tyres"]
+    monkeypatch.setattr(fallback, "MISSES", {"deadline": fallback.OFTEN - 1, "summer_tyres": 0})  # the rules have healed
+    assert why("call the customer an hour before arrival") == why("Summer tyres in the trunk, go with the car") == []
+    assert fallback.trigger("Summer tyres in the trunk", 600, notes.Facts(), notes.Limits(), {"newWords": ["trunk"], "newSentences": []}) == ["new wording"]
+
+
 def answering(content: str, seconds: float = 0.4, error: str = None):
     calls = []
 
