@@ -1,4 +1,5 @@
 <script lang="ts">
+  import KutsuMark from './KutsuMark.svelte'
   import Icon from './Icon.svelte'
   import { asDomain } from './format'
   import { app, joinPath, nameOf, research } from './state.svelte'
@@ -18,7 +19,7 @@
 </script>
 
 <section>
-  <p class="host">City of Espoo</p>
+  <p class="host"><b class="kutsu"><KutsuMark size={16} />Kutsu</b>City of Espoo</p>
   <h1>Sign your company up for the {event?.title}</h1>
   <p class="lead">{event?.note.split(',')[0]}, online. Type your company and we fill in the sign-up from what you have said in public. You only check it.</p>
   <form onsubmit={submit}>

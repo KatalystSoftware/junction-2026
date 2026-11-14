@@ -57,6 +57,7 @@ window.KATALYST = {
       id: "kutsu",
       name: "Kutsu",
       short: "Recruitment event invitations that arrive filled in.",
+      logo: "logos/kutsu.svg",
       for: [["City of Espoo", "Rethinking Recruitment"], ["Context.dev", "Fully Structured Web"]],
       live: "https://kutsu.katalyst.fyi/#/join/nitor.com/deep-tech-talent-forum",
       open: "See a company's invitation",

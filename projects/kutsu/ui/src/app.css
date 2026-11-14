@@ -174,3 +174,15 @@ button {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Kutsu's mark and name at the start of an invitation's top line, before whose invitation it is */
+.host .kutsu {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  margin-right: var(--s3);
+  padding-right: var(--s3);
+  border-right: 1px solid color-mix(in oklch, currentColor 35%, transparent);
+  font-weight: 800;
+  vertical-align: -0.15em;
+}

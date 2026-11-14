@@ -1,4 +1,5 @@
 <script lang="ts">
+  import KutsuMark from './KutsuMark.svelte'
   import { flip } from 'svelte/animate'
   import { cubicOut } from 'svelte/easing'
   import { crossfade, fade } from 'svelte/transition'
@@ -318,7 +319,7 @@
 {/snippet}
 
 <div class="join" class:cover={!started} style:--brand="var(--city)" style:--brand-ink="var(--city-ink)">
-  <p class="host">City of Espoo <span>{event.name}, {event.when} · demonstration{m.sample ? ' with a sample person, made up' : ''}</span></p>
+  <p class="host"><b class="kutsu"><KutsuMark size={16} />Kutsu</b>City of Espoo <span>{event.name}, {event.when} · demonstration{m.sample ? ' with a sample person, made up' : ''}</span></p>
 
   {#if !started}
     <section class="invite">

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-labelledby="t">
+  <title id="t">Kutsu</title>
+  <!-- Two quarter discs reaching from opposite corners: companies and people, each waiting for the other, nearly met. -->
+  <rect width="32" height="32" rx="7" fill="#082983"/>
+  <path d="M6 7a1 1 0 0 1 1-1H19A13 13 0 0 1 6 19Z" fill="#f7faff"/>
+  <path d="M26 25a1 1 0 0 1-1 1H13A13 13 0 0 1 26 13Z" fill="#8fa8f0"/>
+</svg>

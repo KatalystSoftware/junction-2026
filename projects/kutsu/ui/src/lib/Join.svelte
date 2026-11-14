@@ -1,4 +1,5 @@
 <script lang="ts">
+  import KutsuMark from './KutsuMark.svelte'
   import { tick } from 'svelte'
   import { flip } from 'svelte/animate'
   import { cubicOut } from 'svelte/easing'
@@ -188,7 +189,7 @@
 <svelte:window onkeydown={keys} />
 
 <div class="join" class:cover={!started}>
-  <p class="host">City of Espoo <span>{event.name}, {event.when}</span></p>
+  <p class="host"><b class="kutsu"><KutsuMark size={16} />Kutsu</b>City of Espoo <span>{event.name}, {event.when}</span></p>
 
   {#if !started}
     <section class="invite">

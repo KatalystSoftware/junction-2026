@@ -1,5 +1,6 @@
 <script lang="ts">
   import { applications, decisionOf } from './manage.svelte'
+  import KutsuMark from './KutsuMark.svelte'
   import { app, route } from './state.svelte'
 
   // The primary navigation of Espoo's side: what the product holds, in the order an organiser thinks.
@@ -28,7 +29,7 @@
 </script>
 
 <nav aria-label="Kutsu">
-  <a class="name" href="#/" aria-current={here === 'home' ? 'page' : undefined} aria-label="Kutsu, home">Kutsu</a>
+  <a class="name" href="#/" aria-current={here === 'home' ? 'page' : undefined} aria-label="Kutsu, home"><KutsuMark size={22} />Kutsu</a>
   <ul>
     {#each items as item (item.key)}
       <li>
@@ -55,6 +56,9 @@
     outline-color: var(--city-ink);
   }
   .name {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
     padding: 0 var(--s3);
     font: 800 1.5rem / 1 var(--display);
     letter-spacing: -0.03em;

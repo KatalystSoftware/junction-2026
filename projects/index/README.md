@@ -34,7 +34,8 @@ A screenshot is 1280 × 800 of the live app, scaled to 960 × 600 WebP, in `site
 Both tools come from nixpkgs (`nix shell nixpkgs#chromium nixpkgs#libwebp`).
 
 An entry can set `logo` to a local asset shown beside its name. OnCallBench uses
-`site/logos/oncallbench.svg`, copied from `projects/oncallbench/replay/logo.svg` (its favicon).
+`site/logos/oncallbench.svg`, copied from `projects/oncallbench/replay/logo.svg` (its favicon), and Kutsu
+`site/logos/kutsu.svg`, the same file as `projects/kutsu/ui/public/favicon.svg` (its mark, \"meet halfway\").
 
 ## Where each claim comes from
 
