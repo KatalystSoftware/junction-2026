@@ -72,7 +72,7 @@ happen to be harder than 107-112). The fresh-seed runs were made once, after the
 with nothing changed in between. After the agent's image moved to Alpine (see the known limitation
 below), one more Opus run per shift scored 0.00, 0.78 and 0.28, in line with the runs above; the
 0.00 rolled back quotes-svc without protecting it and set off the retry storm. Before the
-instruction stated the healthy baseline, Opus averaged 0.57 on seeds 101-103 (four runs) and 0.44
+instruction stated the healthy baseline, Opus averaged 0.58 on seeds 101-103 (four runs) and 0.45
 over seven runs on seeds 101-106, Gemini 0.00 (three runs) and Sonnet 0.26.
 
 Every run with its cost: `metrics.json`; how each level was built and checked: `LOOP.md`.
@@ -98,8 +98,9 @@ machine. A production benchmark would keep its reference and held-out seeds priv
 Needs Docker with Compose v2 (`docker compose version` must work; on Ubuntu's `docker.io` install
 `docker-compose-v2`), `uv`, Harbor 0.25.0 (`uv tool install harbor==0.25.0`; `run.sh` fetches it
 by itself) and, for the Opus runs only, an `ANTHROPIC_API_KEY` in the environment. No Python
-install is needed: without `python3`, `run.sh` uses uv's. AfterQuery provides no inference
-credits. A run downloads the base images from Docker Hub, `mcp` from PyPI and, for the agent,
+install is needed: without `python3`, `run.sh` uses uv's, and the other `python3 <script>.py`
+commands here run as `uv run --no-project --python 3.13 python3 <script>.py`. AfterQuery
+provides no inference credits. A run downloads the base images from Docker Hub, `mcp` from PyPI and, for the agent,
 OpenCode through Harbor's installer. Run everything from this folder (`projects/oncallbench`).
 
 The reported seeds ship as ready-to-run Harbor tasks: `tasks/shift-1`, `shift-2` and `shift-3` are
