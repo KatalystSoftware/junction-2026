@@ -12314,7 +12314,7 @@
    {
     "id": "s1",
     "type": "growth",
-    "claim": "Nitor reported 2025 revenue of approximately €40.2 million and adjusted EBITDA of €5.5 million, up about 23 per cent on the previous year.",
+    "claim": "Nitor reported 2025 revenue of approximately €40.2 million; its adjusted EBITDA, €5.5 million, was up about 23 per cent on the previous year.",
     "date": "2026-05",
     "quote": "Nitor reported revenue of approximately €40.2 million in 2025.",
     "source_url": "https://nitor.com/en/articles/nitor-grew-profits-by-23-per-cent-and-strengthened-its-core-business-in-a-challenging-market",
@@ -12401,7 +12401,7 @@
     {
      "id": "t1",
      "line": "Revenue about EUR 40.2 million in 2025",
-     "detail": "Revenue rose about 23 per cent on the previous year, continuing a long run of annual growth.",
+     "detail": "Adjusted EBITDA rose about 23 per cent to EUR 5.5 million; revenue held level with 2024's EUR 40.4 million.",
      "date": "2025",
      "kind": "growth",
      "signals": [
