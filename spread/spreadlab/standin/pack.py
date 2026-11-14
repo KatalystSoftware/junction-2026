@@ -1,6 +1,6 @@
 """Packs saved weeks for the stand-in: one small file a played week, and one a seed for what every team sees of it.
 
-    python -m spreadlab.standin.pack [--variants a,b,...] [--limit n] [--jobs n]
+    python -m spreadlab.standin.pack [--variants a,b,...] [--limit n] [--jobs n] [--newer 2026-11-14T11:39]
 
 A world file (`standin/worlds/<seed>.json.gz`) holds the seed's requests and driver list, which are the same whatever the
 desk does. A week file (`standin/weeks/<variant>/<seed>.json.gz`) holds what that desk's week showed: its quotes and
@@ -10,9 +10,11 @@ stand-in is fitted on week files and plays on world files, so neither step needs
 from __future__ import annotations
 
 import argparse
+import calendar
 import gzip
 import json
 import os
+import time
 from multiprocessing import Pool
 from pathlib import Path
 
@@ -127,11 +129,13 @@ def main() -> None:
     parser.add_argument("--variants", default="", help="comma-separated; all when empty")
     parser.add_argument("--limit", type=int, default=0, help="at most this many weeks a variant")
     parser.add_argument("--jobs", type=int, default=2)
+    parser.add_argument("--newer", default="", help="only recordings written after this UTC time, as 2026-11-14T11:39")
     args = parser.parse_args()
+    after = calendar.timegm(time.strptime(args.newer, "%Y-%m-%dT%H:%M")) if args.newer else 0
     names = [v for v in args.variants.split(",") if v] or sorted(p.name for p in (data_dir() / "runs").iterdir())
     files = []
     for name in names:
-        found = sorted((data_dir() / "runs" / name).glob("*-L8.json.gz"))
+        found = sorted(f for f in (data_dir() / "runs" / name).glob("*-L8.json.gz") if f.stat().st_mtime > after)
         files += [str(f) for f in (found[: args.limit] if args.limit else found)]
     with Pool(args.jobs) as pool:
         for n, error in enumerate(pool.imap_unordered(pack_file, files, chunksize=4)):
