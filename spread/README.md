@@ -88,9 +88,16 @@ Level 8, mean margin a week in euros on the first 10 seeds of each list. Every w
 | `curve-live-surcharge` | each won car without a driver adds 0.04 x the typical fee to the order's cost | 7,032 | 6,359 | 95.0% |
 | `curve-fee-1.0-cost-1.3` | gigs open at the typical fee, not 1.2 x it, and an order is taken to cost 1.3 x it, not 1.4 | 10,009 | 8,933 | 94.2% |
 | `fee-cap-1.2-drop-cost-1.3` | the fee rises to 1.2 x the typical fee and holds, and starts again after a drop (see "Driver fees") | 10,263 | 9,245 | 93.3% |
+| `notes-offers-8` | reads the note before the first posting, and sends direct offers for gigs short of time (see "Notes and direct offers") | 10,975 | 10,070 | 93.7% |
+| `steep-notes-offers-8` | prices by the curve fitted with a level for each day, which is steeper (see "The win curve") | 11,290 | 10,325 | 92.7% |
 
-`fee-cap-1.2-drop-cost-1.3` is the reference for new ideas. On 20 seeds that no list holds
-(`fresh-001` to `fresh-020`, every week ranked) it makes 9,053 against 5,816 for
+`steep-notes-offers-8` is the reference for new ideas. On 40 seeds that no list holds (`fresh-001`
+to `fresh-040`, every week ranked) it makes 10,269 against 9,288 for `fee-cap-1.2-drop-cost-1.3`:
+981 more (95% interval 689 to 1,279), better in 35 weeks of 40, lowest week 92.0% on time against
+91.3%. The last 20 of those seeds were kept unplayed for this check: on them it makes 932 more (640
+to 1,227), better in 19 of 20. Over all 60 weeks played, no week is under 92% and three are under 93%.
+
+`fee-cap-1.2-drop-cost-1.3` makes 9,053 on the first 20 fresh seeds against 5,816 for
 `curve-live-surcharge`: 3,237 more (95% interval 2,734 to 3,746), better in 20 weeks of 20. Its
 lowest fresh week is 91.3% on time, in a world with 644 drivers, against 93.0% for
 `curve-live-surcharge`: the lower fee buys margin with part of the distance to the 90% rule.
@@ -166,6 +173,61 @@ Private addresses (`curve-private`, +246 on tune at the old fees; -38 with openi
 order on time is worth in the dealer's later prices (`curve-trust-0.3`, -126; `curve-trust-1`,
 -1,655) were tried on `curve-live-surcharge` and not kept.
 
+## Notes and direct offers
+
+Both are about the orders that end late, not about the price. Of the late orders of
+`fee-cap-1.2-drop-cost-1.3` over 40 weeks, 39% had no driver by the last minute to collect the car,
+15% were dropped, and 14% had a failed visit.
+
+**The note is read before the first posting** (`read_notes`, [`notes.py`](spreadlab/notes.py)). The
+kit's starter reads clock times on the day the window starts and learns the rest from a failed
+visit, which costs half the fee and often the deadline: every order whose car had no plates failed
+once. The reader finds the first minute the car can be collected (day words, weekday names, hours in
+words, "puoli", am and pm, corrections, denied times, payment notes), plates to bring and a manual
+licence. Against the reveal, on 1,291 won orders with a note that it was not written against, the
+pickup time was right on 1,290, plates on 41 of 41, and the licence on 26 of 26 with one false
+alarm; both misses are fixed since. Failed visits fall from 8.8 to 1.2 a week, and their account
+lines from 332 to 53 euros.
+
+**Open gigs that are short of time get direct offers** (`offer_hours`). Once an order must be
+collected within 8 hours and its gig has been in the app for half an hour, the desk sends three
+offers at a time, at 1.3 x the typical fee or the fee in the app if that is higher, to the drivers
+nearest the pickup among those who looked at one of its gigs or booked one that day: the driver list
+does not show who works, and a look does. Of about 950 offers a week, 27% are read and 6 are
+accepted, most of them before 15:00 and by drivers who live within half an hour of the pickup. That
+is few, and they are the cars that would have had no driver: deadline warnings fall from 22 to 18 a
+week on the fresh seeds.
+
+Mean margin a week against `fee-cap-1.2-drop-cost-1.3`, with the 95% interval, and the lowest week
+on time on the tune, holdout and first 20 fresh seeds:
+
+| Variant | Tune | Holdout | Fresh, 20 | Lowest week on time |
+| --- | --- | --- | --- | --- |
+| `notes` | +261 (-135 to 648) | +683 (324 to 1,103) | +337 (-35 to 683) | 94.2%, 92.9%, 90.5% |
+| `offers-24` | +423 (93 to 810) | +250 (-211 to 736) | +54 (-250 to 352) | 95.0%, 92.7%, 92.7% |
+| `notes-offers-8` | +712 (202 to 1,204) | +825 (347 to 1,336) | +525 (58 to 951) | 95.5%, 93.7%, 92.6% |
+| `notes-offers-24` | +687 (330 to 1,013) | +736 (398 to 1,106) | +669 (269 to 1,062) | 95.3%, 92.9%, 92.3% |
+
+Notes alone leave one fresh week at 90.5%, and offers alone add little margin: together they earn
+the margin of the notes and keep the lowest week over 92%. On `fresh-021` to `fresh-040`,
+`notes-offers-8` is +308 (-5 to 606), lowest week 92.2%.
+
+Tried for the weeks nearest the 90% rule and not kept, on the tune seeds unless stated:
+
+| Variant | Idea | Result |
+| --- | --- | --- |
+| `tight-720`, `tight-720-mild` | gigs open at 1.2 x or 1.1 x in a week with under 720 drivers | -718 (-1,197 to -297) and -378 on fresh; lowest fresh week 92.7% and 92.4% |
+| `guard-94`, `guard-95` | the same while the projected on-time share is under 94% or 95% | -275 and -273 |
+| `long-decline`, `long-1.5` | decline drives of over 400 minutes, or open them at 1.5 x | -207 (-560 to 185) and -185 |
+| `deep-0.9`, `deep-0.9-thin-1.05` | open at 0.9 x where 100 or more drivers are notified of the pickup | -262 (-658 to 166) and -496 |
+| `offers-8-1.5` | offers at 1.5 x the typical fee | +138 (-65 to 335), as `offers-8` at 1.3 x (+134) |
+
+```bash
+PYTHONPATH=. uv run python scratch/notes_rows.py explore,gate-10 rows.jsonl   # one row for each won order with a note
+PYTHONPATH=. uv run python scratch/notes_check.py rows.jsonl --show 20        # the reader against the reveal
+PYTHONPATH=. uv run python scratch/late_causes.py --variant notes-offers-8    # why orders were late
+```
+
 ## The win curve
 
 [`curve.py`](spreadlab/curve.py) gives the chance that a dealer buys at a price, and the policy
@@ -184,11 +246,36 @@ order, the log loss falls from 0.350 without the shift to 0.280 with it. A shift
 worse (0.297 to 0.331): one shift per day is enough. The cost of an order is 1.4 x its typical fee,
 the mean of fees, failed visits and refunds over the random-price weeks (1.28 to 1.59 by week).
 
+**Inside a day the curve is steeper** (`model: "day"`, [`curve-day.json`](spreadlab/curve-day.json)).
+Days differ in their price level, and a fit over all days takes that spread for a flatter curve. The
+same weeks fitted with a level for each week and day give a slope of 12.5 where `curve.json` has 9.2:
+a price 10% higher multiplies the odds by 0.30, not 0.42, and each order on time is worth 1.4% of
+price, not 1.1%. The desk prices inside a day once it has the day's shift, so the steeper curve is
+the right one there. It quotes lower and wins about 20 orders a week more.
+
+Mean margin a week against `notes-offers-8`, which has the flatter curve and is otherwise the same:
+
+| Variant | Tune | Holdout | Fresh 1 to 20 | Fresh 21 to 40 | Lowest week on time |
+| --- | --- | --- | --- | --- | --- |
+| `steep-notes-offers-8` | +315 (-555 to 1,072) | +255 (-260 to 756) | +506 (78 to 979) | +624 (371 to 866) | 93.8%, 92.7%, 92.0%, 92.0% |
+| `steep-notes-offers-8-cost-1.4` | -100 (-672 to 391) | -124 (-590 to 308) | -17 (-367 to 377) | not played | 94.4%, 93.5%, 92.8% |
+| `steep-notes-offers-8-guard-92` | +233 (-843 to 1,096) | +132 (-528 to 743) | +424 (33 to 794) | +479 (231 to 714) | 93.6%, 93.2%, 92.7%, 92.0% |
+| `steep-notes-offers-8-guard-93` | +452 (-95 to 1,044) | +29 (-756 to 739) | +237 (-194 to 639) | not played | 93.7%, 92.0%, 91.6% |
+
+The extra orders are what the steeper curve earns and what it costs: about 11 late orders a week
+against 10, and a lowest week 0.2 to 1.7 points lower on each of the four seed sets. A cost of 1.4
+in the quote gives the orders and the margin back. A guard that quotes no `same_day`, opens gigs at
+1.2 x and counts a cost of 1.6 x while the projected on-time share is under 92% costs about 100 a
+week; it lifts the lowest week by half a point on two seed sets and not on the last one. Without the note reader the steeper curve is within
+noise on the tune seeds (`steep`, -202, -1,019 to 489; `steep-cost-1.2`, +507, -127 to 1,094, lowest
+week 92.4%).
+
 ```bash
 uv run python -m spreadlab.sweep --variants explore --seeds explore-001,explore-002  # play random-price weeks
 PYTHONPATH=. uv run python scratch/curve_rows.py                                     # one row per quote
 PYTHONPATH=. uv run --with scikit-learn python scratch/curve_fit.py --write          # fit, test on unseen weeks, write curve.json
 PYTHONPATH=. uv run --with scikit-learn python scratch/curve_live.py                 # what each live correction is worth
+PYTHONPATH=. uv run --with scikit-learn python scratch/curve_day.py --write          # the fit with a level for each day: curve-day.json
 ```
 
 Random prices lose money on purpose, so `explore` is never a candidate. It is safe only because
@@ -216,7 +303,9 @@ request, the driver list, the map and its own history in the week.
 - [`server.py`](spreadlab/server.py): the practice-only client, the data folder, and which drivers are notified of a pickup.
 - [`scan.py`](spreadlab/scan.py), [`catalogue.py`](spreadlab/catalogue.py): the scans, the table of what each week shows, and the seed lists.
 - [`policy.py`](spreadlab/policy.py), [`variants.py`](spreadlab/variants.py): the policy on top of the kit's starter desk, and the named variants.
-- [`curve.py`](spreadlab/curve.py), [`curve.json`](spreadlab/curve.json): the win curve, its best price and its live shift, and the fitted weights.
+- [`curve.py`](spreadlab/curve.py), [`curve.json`](spreadlab/curve.json), [`curve-day.json`](spreadlab/curve-day.json): the win curve, its best price and its live shift, and the fitted weights.
+- [`notes.py`](spreadlab/notes.py): what a dealer's note says about the first posting.
+- [`lanes.json`](spreadlab/lanes.json): the lanes' usual driver fees, for `lane_fee`.
 - [`play.py`](spreadlab/play.py), [`sweep.py`](spreadlab/sweep.py), [`report.py`](spreadlab/report.py): play, compare.
 - [`ledger.py`](spreadlab/ledger.py): mistakes by variant and situation.
 

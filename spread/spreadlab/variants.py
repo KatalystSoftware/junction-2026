@@ -6,8 +6,11 @@ GATE_10 = {"same_day": True, "floor": 1.7, "quote_share": 1, "max_unbooked": 10}
 # `curve-live-surcharge`: the win curve sets the price, the day's answers correct it, and the backlog raises the cost
 CURVE = {"same_day": True, "quote_share": 1, "floor": 0, "curve": True, "learn": 0.16, "max_unbooked": 15, "backlog_step": 0.04}
 FEE = {**CURVE, "fee": 1.0, "cost": 1.2}  # `curve-fee-1.0-cost-1.2`: gigs open at the typical fee, and an order is taken to cost 1.2 x it
-# The reference, `fee-cap-1.2-drop-cost-1.3`: the fee rises a tenth of the typical fee an hour to 1.2 x it and holds, starts again after a drop, and an order is taken to cost 1.3 x it
+# `fee-cap-1.2-drop-cost-1.3`: the fee rises a tenth of the typical fee an hour to 1.2 x it and holds, starts again after a drop, and an order is taken to cost 1.3 x it
 CAPPED = {**FEE, "fee_cap": 1.2, "drop_fee": 1.1, "cost": 1.3}
+# The reference, `steep-notes-offers-8`: the curve fitted with a level for each day, the note read before the first posting,
+# and direct offers for the open gigs whose order must be collected within 8 hours
+REFERENCE = {**CAPPED, "model": "day", "read_notes": True, "offer_hours": 8}
 
 VARIANTS: dict[str, dict] = {
     "baseline": {},
@@ -99,6 +102,41 @@ VARIANTS: dict[str, dict] = {
     # The fees and the cost follow the lane's usual fee in place of the request's typical fee.
     "fee-lane": {**FEE, "lane_fee": True},
     "fee-lane-1.05": {**FEE, "lane_fee": True, "fee": 1.05},
+    # On `fee-cap-1.2-drop-cost-1.3`. The curve fitted with a level for each day, which is steeper.
+    "steep": {**CAPPED, "model": "day"},
+    "steep-cost-1.2": {**CAPPED, "model": "day", "cost": 1.2},
+    "steep-learn-0.14": {**CAPPED, "model": "day", "learn": 0.14},
+    # The note is read before the first posting.
+    "notes": {**CAPPED, "read_notes": True},
+    # Drives of over 400 minutes are 4% of the orders and a fifth of the late ones: decline them, or open them at 1.5 x and count 1.7 x as their cost.
+    "long-decline": {**CAPPED, "max_drive": 400},
+    "long-1.5": {**CAPPED, "long_drive": 400, "long_fee": 1.5, "long_cost": 1.7},
+    # A lower opening fee where 100 or more drivers are notified of the pickup, and a higher one elsewhere.
+    "deep-0.9": {**CAPPED, "deep_drivers": 100, "deep_fee": 0.9},
+    "deep-0.9-thin-1.05": {**CAPPED, "deep_drivers": 100, "deep_fee": 0.9, "fee": 1.05},
+    "steep-notes": {**CAPPED, "model": "day", "read_notes": True},
+    # Direct offers at 1.3 x the typical fee for the open gigs whose order must be collected within 8 hours, or 24.
+    "offers-8": {**CAPPED, "offer_hours": 8},
+    "offers-24": {**CAPPED, "offer_hours": 24},
+    "offers-8-1.5": {**CAPPED, "offer_hours": 8, "offer_fee": 1.5},
+    "notes-offers-8": {**CAPPED, "read_notes": True, "offer_hours": 8},
+    "notes-offers-24": {**CAPPED, "read_notes": True, "offer_hours": 24},
+    "steep-notes-offers-8": REFERENCE,
+    "steep-notes-offers-24": {**CAPPED, "model": "day", "read_notes": True, "offer_hours": 24},
+    # The steeper curve wins about 20 orders a week more: a higher cost in the quote gives some of them back for on-time share.
+    "steep-notes-offers-8-cost-1.4": {**CAPPED, "model": "day", "read_notes": True, "offer_hours": 8, "cost": 1.4},
+    # Insurance for the 90% rule: while the projected on-time share is under 92% or 93%, once 40 orders are won, the desk
+    # quotes no `same_day`, opens gigs at 1.2 x and takes an order to cost 1.6 x. A week where it never applies is unchanged.
+    "steep-notes-offers-8-guard-92": {**CAPPED, "model": "day", "read_notes": True, "offer_hours": 8, "min_on_time": 0.92, "behind_from": 40,
+                                      "when_behind": {"same_day": False, "fee": 1.2, "cost": 1.6}},
+    "steep-notes-offers-8-guard-93": {**CAPPED, "model": "day", "read_notes": True, "offer_hours": 8, "min_on_time": 0.93, "behind_from": 40,
+                                      "when_behind": {"same_day": False, "fee": 1.2, "cost": 1.6}},
+    # A week with a short driver list has more late orders: under 720 drivers, gigs open at 1.2 x and an order is taken to cost 1.5 x.
+    "tight-720": {**CAPPED, "tight_drivers": 720, "when_tight": {"fee": 1.2, "cost": 1.5}},
+    "tight-720-mild": {**CAPPED, "tight_drivers": 720, "when_tight": {"fee": 1.1, "cost": 1.4}},
+    # While the projected on-time share is under 94% or 95%, once 30 orders are won: gigs open at 1.2 x and an order is taken to cost 1.5 x.
+    "guard-94": {**CAPPED, "min_on_time": 0.94, "behind_from": 30, "when_behind": {"fee": 1.2, "cost": 1.5}},
+    "guard-95": {**CAPPED, "min_on_time": 0.95, "behind_from": 30, "when_behind": {"fee": 1.2, "cost": 1.5}},
     # Not a candidate: random multiples of the list price, never under 1.3 x the typical fee, to fit the win curve from.
     "explore": {**GATE_10, "floor": 1.3, "explore": [1.1, 2.4]},
 }

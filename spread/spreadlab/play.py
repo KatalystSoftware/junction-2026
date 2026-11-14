@@ -64,12 +64,13 @@ def play(variant: str, params: dict, seed: str, level: int = 8) -> dict:
         while desk.now < ends_at:
             # One request a step, as the starter does: the advance applies the outbox, then moves the clock.
             actions, desk.outbox = desk.outbox, []
-            step = world.advance(until=desk.wake_on, max=min(ends_at, (desk.now // DAY + 1) * DAY), actions=actions)
+            step = world.advance(until=desk.wake_on, max=min(ends_at, (desk.now // DAY + 1) * DAY, desk.wake_at()), actions=actions)
             desk.read_results(actions, step["results"])
             desk.now = step["now"]
             for event in step["events"]:
                 events.append(event)
                 desk.handle(event)
+            desk.look()
         summary = {"variant": variant, "seed": seed, "level": level, "params": desk.p, "fingerprint": fingerprint(params),
                    "score": world.score(), "calls": client.calls, "seconds": round(time.time() - started)}
         write_json_gz(run_path(variant, seed, level), {**summary, "events": events, "reveal": world.reveal(), "gigs": world.snapshot()["gigs"],

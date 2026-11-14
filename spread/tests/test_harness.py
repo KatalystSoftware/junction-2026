@@ -9,7 +9,7 @@ import shutil
 
 import pytest
 
-from spreadlab import archive, catalogue, curve, ledger, play, policy, report
+from spreadlab import archive, catalogue, curve, ledger, notes, play, policy, report
 
 MAP = {
     "places": [
@@ -138,6 +138,14 @@ def test_a_desk_that_is_behind_takes_its_own_parameters_until_it_recovers():
     won(calm, "R1")
     calm.quote(request("R2"))
     assert calm.decisions["R2"]["declined"] is None
+    # With fewer orders than `behind_from`, one waiting order does not make the desk behind.
+    few = desk(min_on_time=0.97, behind_from=2, when_behind={"quote_share": 0})
+    won(few, "R1")
+    few.quote(request("R2"))
+    assert few.decisions["R2"]["declined"] is None
+    won(few, "R3")
+    few.quote(request("R4"))
+    assert few.decisions["R4"]["declined"] == "volume"
 
 
 def answer(d: policy.Policy, id_: str, win: bool, **more) -> None:
@@ -329,6 +337,119 @@ def test_fees_and_cost_follow_the_usual_fee_of_a_known_lane(monkeypatch):
         d.quote(request())
         quotes.append(d.decisions["R1"]["prices"]["next_day"])
     assert quotes[1] < quotes[0]  # the lane's usual fee is lower than this request's typical fee, so the order costs less
+
+
+def test_long_drives_and_pickups_with_many_drivers_open_at_their_own_fee_and_long_drives_can_be_declined():
+    assert posted(desk(fee=1.0, fee_cap=1.0, long_drive=100, long_fee=1.5), 2000) == [(500, 13500)]  # the roads of MAP take 120 minutes
+    assert posted(desk(fee=1.0, fee_cap=1.0, long_drive=120, long_fee=1.5), 2000) == [(500, 9000)]
+    assert posted(desk(fee=1.0, fee_cap=1.0, deep_drivers=8, deep_fee=0.9), 2000) == [(500, 8100), (560, 9000)]  # 8 drivers live near Vantaa; the cap is of the typical fee
+    assert posted(desk(fee=1.0, fee_cap=1.0, deep_drivers=9, deep_fee=0.9), 2000) == [(500, 9000)]
+    d = desk(max_drive=100)
+    d.quote(request())
+    assert d.decisions["R1"]["declined"] == "long"
+    quotes = []
+    for params in ({}, {"long_drive": 100, "long_cost": 1.7}):
+        d = desk(curve=True, cost=1.2, **params)
+        d.quote(request())
+        quotes.append(d.decisions["R1"]["prices"]["next_day"])
+    assert quotes[1] > quotes[0]
+
+
+TUESDAY_NOON = 24 * 60 + 12 * 60
+
+
+@pytest.mark.parametrize("text, pickup_from", [
+    ("Huolto kesken, valmis huomenna klo 12.30. Haettava ennen klo 18.00", (2, 12, 30)),
+    ("Noudettavissa aikaisintaan to klo 14. Soita ennen noutoa", (3, 14, 0)),
+    ("Not ready before tmrw noon, not 1pm.", (2, 12, 0)),
+    ("Car won't be ready until the day after tomorrow 3:30pm. Keys from reception", (3, 15, 30)),
+    ("Auto valmis vasta huomenna puoli kymmeneltä, ei kun puoli yhdeksältä. Haettava ennen 18.00.", (2, 8, 30)),
+    ("Voi noutaa huomenna klo 14.00 alkaen. Korjaus: klo 13.00. Vastaanottava liike auki arkisin klo 8.00 - 20.00.", (2, 13, 0)),
+    ("Huolto kesken, valmis torstaina klo 14, ei kun perjantaina. Liike auki arkisin 9-19", (4, 14, 0)),
+    ("Rahoitus vahvistuu huomenna puoli yhdeltä, vasta sitten saa hakea.", (2, 12, 30)),
+    ("Lämnas ut efter betalning, tidigast i morgon kl 9.30", (2, 9, 30)),
+    ("Buyer pays first, pickup from tomorrow 11:00, not 10:00.", (2, 11, 0)),
+    ("Luovutus vasta kun maksettu, aikaisintaan klo 1600.", (1, 16, 0)),
+    ("Asiakas noutaa huomenna kello 12, auton oltava silloin perillä. Soita 20 min ennen", None),
+    ("Neljän jälkeen ei enää luovutuksia. Rengassarja takapenkillä, kulkee mukana.", None),
+    ("Kohde auki arkisin 9-21. Valmis, voi hakea heti.", None),
+    ("Toimitus perille viim. huomenna klo 19! Noudettavissa arkisin 7-20", None),
+    ("Not ready before tmorrow 9:00. Collect before 21:00. Correction: 20:00", (2, 9, 0)),
+    ("Hi there, ready for pickup from 12:30, booking ref 763890", (1, 12, 30)),
+])
+def test_note_says_when_the_car_can_be_collected(text, pickup_from):
+    expected = 0 if pickup_from is None else pickup_from[0] * 24 * 60 + pickup_from[1] * 60 + pickup_from[2]
+    assert notes.read({"text": text}, TUESDAY_NOON).pickup_from == expected
+
+
+@pytest.mark.parametrize("text, plates, manual", [
+    ("Ei kilpiä, siirtokilvet mukaan.", True, False), ("Hello. Car has no pltaes, bring trade plates", True, False), ("inga skyltar på bilen.", True, False),
+    ("Auto pihalla ruudussa 35, avain tiskiltä.", False, False), ("Huoltokirja ja rekisteriote autossa", False, False),
+    ("Manuaalivaihteet, kuski tarvii manuaalikortin.", False, True), ("Automaattivaihteinen, ei manuaali", False, False), ("automaattivaihteinen, ei manuaail", False, False), ("manual gearbox", False, True),
+])
+def test_note_says_plates_and_a_manual_licence(text, plates, manual):
+    facts = notes.read({"text": text}, TUESDAY_NOON)
+    assert (facts.plates, facts.manual) == (plates, manual)
+
+
+def test_a_note_goes_into_the_first_posting_only_when_the_desk_reads_notes():
+    note = {"text": "Ei kilpiä, siirtokilvet mukaan. Manuaali. Valmis huomenna klo 12. Haettava ennen klo 11.", "language": "fi"}
+    for read in (False, True):
+        d = desk(read_notes=read)
+        d.quote(request(note=note))
+        d.win({"id": "R1", "legs": request()["legs"], "deliveredAt": [None], "deadline": 4000, "option": "next_day", "lastPickupAt": 3800})
+        action = d.outbox[-1]
+        pickup = action["stops"][0]
+        assert (pickup["withPlates"], action["audience"]["manualLicence"]) == (read, read)
+        if read:  # ready on Tuesday at 12:00; the starter's closing time, 11:00 on Monday, would leave no time
+            assert pickup["window"] == {"from": 24 * 60 + 12 * 60, "to": 3000}
+
+
+def test_direct_offers_go_to_the_nearest_drivers_who_used_the_app_today_for_gigs_short_of_time():
+    d = desk(fee=1.0, offer_hours=8, offer_fee=1.3)
+    assert d.wake_at() == policy.NEVER
+    posted(d, 500 + 6 * 60)  # the last pickup is 6 hours away
+    d.read_results([d.outbox[-1]], [{"ok": True, "id": "G1"}])
+    for driver in ("t1", "d0", "d1", "d2", "d3"):
+        d.handle({"kind": "gig_viewed", "gigId": "G1", "driverId": driver, "at": 505})
+    d.outbox = []
+    d.look()
+    assert d.outbox == [] and d.wake_at() == policy.NEVER  # the app has half an hour to find a driver first
+    d.now = 530
+    assert d.wake_at() == 545
+    d.look()
+    # 1.3 x the typical fee of 9000. The drivers in Helsinki are as near as each other, and nearer than the one in Tampere.
+    assert d.outbox == [{"type": "offer", "gigId": "G1", "driverId": driver, "feeCents": 11700} for driver in ("d0", "d1", "d2")]
+    d.now, d.outbox = 535, []
+    d.look()
+    assert d.outbox == []  # three offers are open
+    d.now = 541
+    d.look()
+    assert [action["driverId"] for action in d.outbox] == ["d3", "t1"]  # nobody is asked twice for a gig
+    d.handle({"kind": "gig_booked", "gigId": "G1", "driverId": "d3", "at": 542})
+    assert d.wake_at() == policy.NEVER
+    # At night nobody reads an offer: the desk looks again at 07:00.
+    night = desk(fee=1.0, offer_hours=8)
+    posted(night, 500 + 6 * 60)
+    night.read_results([night.outbox[-1]], [{"ok": True, "id": "G1"}])
+    night.handle({"kind": "gig_viewed", "gigId": "G1", "driverId": "d0", "at": 505})
+    night.now, night.outbox = 23 * 60 + 5, []
+    night.look()
+    assert night.outbox == [] and night.wake_at() == 24 * 60 + 7 * 60
+    # A gig whose last pickup is more than `offer_hours` away gets none.
+    far = desk(fee=1.0, offer_hours=8)
+    posted(far, 500 + 9 * 60)
+    far.read_results([far.outbox[-1]], [{"ok": True, "id": "G1"}])
+    far.handle({"kind": "gig_viewed", "gigId": "G1", "driverId": "d0", "at": 505})
+    far.now, far.outbox = 540, []
+    far.look()
+    assert far.outbox == []
+    far.now = 561  # now it is 8 hours away, and a driver who dropped the gig is not asked
+    far.handle({"kind": "gig_booked", "gigId": "G1", "driverId": "d0", "at": 550})
+    far.handle({"kind": "gig_dropped", "gigId": "G1", "driverId": "d0", "at": 555})
+    far.handle({"kind": "gig_viewed", "gigId": "G1", "driverId": "d1", "at": 556})
+    far.look()
+    assert [action["driverId"] for action in far.outbox] == ["d1"]
 
 
 def test_a_rule_cannot_set_a_rule():
