@@ -1,6 +1,7 @@
 """Tests of the live desk: the final's clock, the fallback quote, and a desk that dies and starts again."""
 from __future__ import annotations
 
+import pickle
 import threading
 import time
 
@@ -129,6 +130,29 @@ def test_a_desk_that_joins_from_the_history_alone_does_not_redo_a_change_that_wa
     second.stop()
     assert {gig_id: gig["status"] for gig_id, gig in world.gigs.items()} == {"g1": "withdrawn", "g2": "open"}
     assert second.desk.leg_gigs["R1"] == {0: "g2"}
+
+
+def test_a_desk_that_starts_again_from_books_older_code_wrote_gets_what_the_desk_has_gained_since(tmp_path):
+    asked = request("R1")
+    order = {"id": "R1", "dealerId": "D01", "option": "next_day", "priceCents": 15000, "deadline": 2640, "legs": asked["legs"],
+             "lastPickupAt": 2400, "status": "waiting", "deliveredAt": [None]}
+    events = [{"seq": 0, "at": 500, "kind": "price_request", "request": asked}, {"seq": 1, "at": 515, "kind": "order_won", "order": order}]
+    world = replay.Replay(events, ROSTER, ends_at=20000, start=506, speed=0.001)
+    params = {**VARIANTS[live.VARIANT], "charge_km": 1, "due_cap": 5}  # both read attributes that books from before them lack
+    desk = lambda: live.Live(world, world.guard_act, world.minute, 8, params, MAP, tmp_path, echo=False)
+    first = desk()
+    first.join()
+    first.stop()
+    old = pickle.loads((tmp_path / "state.pickle").read_bytes())
+    for name in ("km", "night_drops", "fixes", "foreign"):
+        delattr(old, name)
+    (tmp_path / "state.pickle").write_bytes(pickle.dumps(old))
+    world.clock.saw(516)  # the win arrives while the desk is down
+    second = desk()
+    second.join()  # from the old books: it posts the car, which needs km and night_drops
+    second.stop()
+    assert second.desk.km == first.desk.km and second.desk.night_drops == {} and second.desk.fixes == {}
+    assert [g["stops"][0]["orderId"] for g in world.gigs.values()] == ["R1"]
 
 
 def test_guard_covers_a_request_that_the_desk_decided_and_did_not_send_in_time(tmp_path):
