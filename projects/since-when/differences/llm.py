@@ -80,12 +80,13 @@ def options():
     return opts
 
 
-def _post(url, key, body, timeout=None):
+def _post(url, key, body, timeout=None, key_header=None):
     timeout = timeout or float(os.environ.get("DIFFERENCES_TIMEOUT", "300"))
+    auth = {key_header: key} if key_header else {"Authorization": f"Bearer {key}"}
     req = urllib.request.Request(
         url,
         data=json.dumps(body).encode(),
-        headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
+        headers={**auth, "Content-Type": "application/json"},
     )
     with urllib.request.urlopen(req, timeout=timeout) as r:
         return json.load(r)
@@ -161,3 +162,34 @@ def chat_json(messages, schema, cfg):
                     continue
                 raise
     raise RuntimeError(f"{base_url} refused every request format")
+
+
+# Gemini Decision: not a chat model. One request holds a shared input and up to 1,000 questions,
+# and the answer is a probability per question, no text. It has its own endpoint and is not in
+# PROVIDERS; differences/decide.py is its only caller.
+DECISIONS_URL = "https://generativelanguage.googleapis.com/v1beta/decisions"
+DECISION_MODEL = "gemini-decision-1"
+
+
+def decide(text, questions, model=DECISION_MODEL):
+    """The answers to `questions` ({key: {"type", "instructions", "criteria"}}) about `text`:
+    {key: {"type", "noul" | "choice" and "probabilities" | "score", "confidence"}}, and the usage.
+
+    The key is GEMINI_API_KEY. A rate limit or server error is retried three times; every request
+    sent counts in USAGE, since the hackathon account allows few.
+    """
+    body = {"model": model, "input": text, "questions": questions}
+    for attempt in range(3):
+        with _usage_lock:
+            USAGE["calls"] += 1
+        try:
+            data = _post(DECISIONS_URL, os.environ["GEMINI_API_KEY"], body, key_header="x-goog-api-key")
+        except urllib.error.HTTPError as e:
+            if e.code in (429, 500, 502, 503, 504) and attempt < 2:
+                time.sleep(_backoff(attempt))
+                continue
+            raise RuntimeError(f"{e.code} from {DECISIONS_URL}: {e.read()[:500]!r}") from e
+        with _usage_lock:
+            USAGE["input_tokens"] += (data.get("usage") or {}).get("total_input_tokens", 0)
+        return data["answers"], data.get("usage") or {}
+    raise RuntimeError("unreachable")
