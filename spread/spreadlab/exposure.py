@@ -327,9 +327,9 @@ class ExposurePolicy(Policy):
         super().win(order)
 
     def held_due(self, day: int) -> int:
-        return sum(1 for order in self.orders.values() if order["lastPickupAt"] // DAY == day and None in order["deliveredAt"] and self.held(order))
+        return sum(1 for order in self.orders.values() if order["lastPickupAt"] // DAY == day and None in order["deliveredAt"] and self.has_driver(order))
 
-    def held(self, order) -> bool:
+    def has_driver(self, order) -> bool:
         return all(at is not None or self.leg_gigs.get(order["id"], {}).get(leg) in self.booked for leg, at in enumerate(order["deliveredAt"]))
 
     def car(self, request, last: int, held: bool, waited: float) -> dict:
@@ -348,7 +348,7 @@ class ExposurePolicy(Policy):
                 late += None not in delivered
             if None not in delivered or id_ not in self.requests:
                 continue
-            held = self.held(order)
+            held = self.has_driver(order)
             waited = 0.0 if held else (self.now - self.needs_since.get(id_, self.won_at.get(id_, self.now))) / HOUR
             cars.append(self.car(self.requests[id_], order["lastPickupAt"], held, waited))
         resolved = len(self.orders) - len(cars)

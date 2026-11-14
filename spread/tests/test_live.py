@@ -451,3 +451,14 @@ def test_a_desk_that_joined_from_the_history_stops_offering_a_driver_the_world_s
     desk.desk.send()
     desk.stop()
     assert desk.desk.offered == (0, {driver: 3})
+
+
+def test_the_live_exposure_desk_quotes_a_request():
+    # LiveDesk keeps the cars waiting for the note watcher in `held`; a desk method of that name would be shadowed by it.
+    variant = VARIANTS["exposure-k4"]
+    world = replay.Replay([], ROSTER, ends_at=20000, start=506, speed=0.001)
+    desk = live.desk_class(variant)(world, 8, 506, {**variant, "quote_share": 1}, ROSTER, MAP)
+    won = request("W1")  # a car in flight without a driver, so that the book asks whether it has one
+    desk.requests["W1"], desk.orders["W1"] = won, {"id": "W1", "legs": won["legs"], "deliveredAt": [None], "deadline": 2640, "lastPickupAt": 2400}
+    desk.quote(request("R1"))
+    assert desk.decisions["R1"]["prices"]
