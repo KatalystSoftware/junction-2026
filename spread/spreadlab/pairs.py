@@ -25,8 +25,9 @@ minutes, so a return request rarely finds the first car still without a driver: 
   cars alone, not to pair gigs.
 
 Kept out of policy.py so that the fingerprints of the saved weeks stay: play.py takes this class when `pair_hold` is set.
-`VERSION` follows this file and returns.json, so a sweep plays the weeks again when either changes. The live desk does
-not take this class yet: a gig with two orders is a new case for its restart logic, and must pass the replays first.
+`VERSION` follows this file and returns.json, so a sweep plays the weeks again when either changes. The live desk takes
+it as `live.LivePairDesk`, which adds what a gig with two orders needs after a restart and with the note watcher; a pair
+variant plays live only after the replays of `replay.py --variant` pass with it.
 """
 from __future__ import annotations
 
@@ -119,7 +120,13 @@ class PairPolicy(Policy):
         finally:
             self.first = None
 
+    def alone(self, order, legs, retry: Retry = Retry()) -> None:
+        """The policy's post of cars alone. The live desk adds the note watcher's fixes here."""
+        Policy.post(self, order, legs, retry)
+
     def post(self, order, legs, retry: Retry = Retry()) -> None:
+        if order["id"] in self.pair_wait and self.first != order["id"]:
+            return  # a held car goes out by its release, in a pair or alone: after a restart the desk does not post it twice
         if self.first == order["id"]:
             self.first = None
             if self.p["pair_hold"] and self.pairable(order) and (self.pair_up(order) or self.hold(order)):
@@ -129,7 +136,7 @@ class PairPolicy(Policy):
     def look(self) -> None:
         for id_, until in list(self.pair_wait.items()):
             if until <= self.now:
-                self.release(id_)
+                self.post_held(id_)
         for gig_id, latest in list(self.pair_gigs.items()):
             if gig_id not in self.booked and latest - self.p["pair_split"] * HOUR <= self.now:
                 self.split(gig_id, "split")
@@ -147,7 +154,7 @@ class PairPolicy(Policy):
     def raise_fees(self, order_id: str) -> None:
         if order_id in self.pair_wait:
             self.urgent.add(order_id)
-            return self.release(order_id)
+            return self.post_held(order_id)
         gig_id = self.pair_of(order_id)
         if gig_id and gig_id not in self.booked:
             self.urgent.add(order_id)
@@ -207,11 +214,11 @@ class PairPolicy(Policy):
         self.decisions.setdefault(order["id"], {})["held"] = {"at": self.now, "until": until}
         return True
 
-    def release(self, order_id: str) -> None:
+    def post_held(self, order_id: str) -> None:
         """Posts a held car alone."""
         del self.pair_wait[order_id]
         self.decisions.setdefault(order_id, {}).setdefault("held", {})["alone"] = self.now
-        Policy.post(self, self.orders[order_id], [0])
+        self.alone(self.orders[order_id], [0])
 
     def partner(self, request) -> Optional[str]:
         """The held order that the request's car can go back with, in one gig that a driver can still book in time."""
@@ -258,8 +265,8 @@ class PairPolicy(Policy):
         self.send()  # the gig's id now, as for a trade-in: later events of either order find it
         gig_id = self.leg_gigs.get(order["id"], {}).get(0)
         if gig_id is None:  # refused: both alone
-            Policy.post(self, self.orders[id_], [0])
-            Policy.post(self, order, [0])
+            self.alone(self.orders[id_], [0])
+            self.alone(order, [0])
             self.decisions.setdefault(order["id"], {})["paired"] = {"with": id_, "refused": True}
             return True
         self.pair_gigs[gig_id] = latest
@@ -277,11 +284,11 @@ class PairPolicy(Policy):
                 self.leg_gigs[stop["orderId"]].pop(stop["leg"])
                 if stop["orderId"] in self.orders:
                     self.decisions.setdefault(stop["orderId"], {}).setdefault("paired", {})["split"] = {"at": self.now, "why": why}
-                    Policy.post(self, self.orders[stop["orderId"]], [stop["leg"]])
+                    self.alone(self.orders[stop["orderId"]], [stop["leg"]])
 
     def single(self, order) -> dict:
         """The policy's post of the order's car alone, without sending it."""
-        Policy.post(self, order, [0])
+        self.alone(order, [0])
         return self.outbox.pop()
 
     def latest(self, stops: list[dict], orders: dict[str, dict]) -> Optional[int]:

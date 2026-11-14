@@ -28,7 +28,7 @@ from typing import Iterator, Optional
 from spread.client import SpreadError
 from spread.starter import DAY, WEEKDAYS
 
-from .live import Clock, Live, LiveDesk, VARIANT, clock_text, folder_of, note_watcher, report
+from .live import Clock, Live, LiveDesk, LivePairDesk, VARIANT, clock_text, folder_of, note_watcher, report
 from .play import load_run
 from .server import world_map
 from .variants import VARIANTS
@@ -232,16 +232,18 @@ class Replay:
 
 def slow_quotes(share: float, seconds: float) -> None:
     """Makes the policy stall on a share of the requests, to show the guard's fallback."""
-    from .policy import share as fixed_share
+    for cls in (LivePairDesk, LiveDesk):  # the pair desk first: its own quote is PairPolicy's, found before LiveDesk is patched
+        cls.quote = stalling(cls.quote, share, seconds)
 
-    quote = LiveDesk.quote
+
+def stalling(quote, share: float, seconds: float):
+    from .policy import share as fixed_share
 
     def stalled(self, request):
         if not self.offline and fixed_share("slow " + request["id"]) < share:
             time.sleep(seconds)
         return quote(self, request)
-
-    LiveDesk.quote = stalled
+    return stalled
 
 
 # Notes in words that the archive has not seen and the rules do not read, each stating one fact: no plates, a manual
@@ -305,7 +307,8 @@ def compare(run: dict, replay: Replay, start: int, down: tuple[int, int]) -> lis
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--seed", required=True, help="a week that `play` recorded for the reference variant")
+    parser.add_argument("--seed", required=True, help="a week that `play` recorded for the variant")
+    parser.add_argument("--variant", default=VARIANT, help=f"the variant whose recorded week plays, and that the desk plays (default {VARIANT})")
     parser.add_argument("--speed", type=float, default=1.0, help="1 is the final's speed")
     parser.add_argument("--start", type=int, default=0, help="the minute the clock starts from: 4320 is Thursday 00:00, as in a test final")
     parser.add_argument("--crash-at", type=int, default=0, help="the world minute at which the desk dies in the middle of a batch")
@@ -315,7 +318,7 @@ def main() -> None:
     parser.add_argument("--watch-notes", action="store_true", help="run the note watcher beside the desk (watch.py)")
     parser.add_argument("--inject", type=int, default=0, help="give every n-th won order a note in new words that the rules miss")
     args = parser.parse_args()
-    run = load_run(VARIANT, args.seed)
+    run = load_run(args.variant, args.seed)
     if args.inject:
         print(f"New notes on {len(inject(run['events'], args.start, args.inject))} won orders.", flush=True)
     replay = Replay(run["events"], run["roster"], max(e["at"] for e in run["events"]) + 1, args.start, args.speed, "-".join(filter(None, ["replay", args.seed, args.tag])))
@@ -326,7 +329,7 @@ def main() -> None:
         slow_quotes(args.slow, 6 / args.speed)
 
     def desk() -> Live:
-        return Live(replay, replay.guard_act, replay.minute, run["level"], VARIANTS[VARIANT], world_map(), folder, args.speed, watcher=note_watcher(args))
+        return Live(replay, replay.guard_act, replay.minute, run["level"], VARIANTS[args.variant], world_map(), folder, args.speed, watcher=note_watcher(args))
 
     live, down = desk(), (0, 0)
     print(f"Replay of {args.seed} from {clock_text(args.start)} at {args.speed} x the final's speed; files in {folder}.", flush=True)

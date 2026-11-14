@@ -45,6 +45,7 @@ from spread.client import Client, SpreadError, Unreachable, World
 from spread.starter import DAY, HOUR, WEEKDAYS, Retry, pickups, undelivered
 
 from . import notes, watch
+from .pairs import PairPolicy
 from .policy import DECLINE, Policy
 from .server import SERVER, PracticeClient, data_dir, world_map
 from .variants import VARIANTS
@@ -518,6 +519,62 @@ class LiveDesk(Policy):
             self.log.say(f"Error on {what} {about}; see the log. The desk goes on.")
 
 
+class LivePairDesk(LiveDesk, PairPolicy):
+    """The live desk with out-and-back pairs (pairs.py), for a variant that sets `pair_hold`. A pair gig carries the cars
+    of two orders. The world's snapshot gives every stop of it, so `adopt` finds both cars on their gig. What a pair adds
+    after a restart and with the note watcher is here."""
+
+    def alone(self, order, legs, retry: Retry = Retry()) -> None:
+        """A car posted alone, or as one half of a pair gig, carries what the note watcher found, as LiveDesk.post does."""
+        fix = self.fixes.get(order["id"])
+        if fix:
+            retry = Retry(max(retry.pickup_from, fix["pickupFrom"]), retry.manual_licence or fix["manual"], retry.plates or fix["plates"])
+        PairPolicy.alone(self, order, legs, retry)
+
+    def release(self, order_id: str, why: str) -> None:
+        """The first post that waited for the note watcher is still a first post: it can be held for a return, or pair."""
+        self.first = order_id
+        try:
+            super().release(order_id, why)
+        finally:
+            self.first = None
+
+    def correct(self, result: dict) -> None:
+        """When the fix took a pair gig out of the app, the other order's car goes again alone."""
+        gig_id = self.pair_of(result["orderId"])
+        super().correct(result)
+        if gig_id in self.pair_gigs and gig_id not in self.gigs_of(result["orderId"]) and gig_id not in self.booked:
+            self.split(gig_id, "note", withdraw=False)
+
+    def steepen(self, order_id: str) -> None:
+        """A deadline warning that came while the desk was away: an open pair gig goes as two gigs, as pairs.py does."""
+        gig_id = self.pair_of(order_id)
+        if gig_id and gig_id not in self.booked:
+            return self.split(gig_id, "warning")
+        super().steepen(order_id)
+
+    def adopt(self, snapshot: dict) -> None:
+        """The pair gigs are the world's live gigs with cars of two orders; a held car whose order is gone is dropped."""
+        super().adopt(snapshot)
+        live = {g["id"]: g for g in snapshot["gigs"] if g["status"] in ("open", "booked", "working")}
+        pairs = {g_id: g for g_id, g in live.items() if len({s["orderId"] for s in g["stops"]}) > 1}
+        for gig_id in list(self.pair_gigs):
+            if gig_id not in pairs:
+                del self.pair_gigs[gig_id]  # gone while the desk was away: reconcile posts its cars that have no gig
+        for gig_id, gig in pairs.items():
+            if gig_id not in self.pair_gigs:  # posted just before the books were saved, or a join from the history alone
+                orders = {s["orderId"]: self.orders[s["orderId"]] for s in gig["stops"] if s["orderId"] in self.orders}
+                latest = self.latest(gig["stops"], orders) if len(orders) > 1 else None
+                self.pair_gigs[gig_id] = self.now if latest is None else latest
+        for order_id in list(self.pair_wait):
+            if order_id not in self.orders or self.leg_gigs.get(order_id):
+                del self.pair_wait[order_id]
+
+
+def desk_class(params: dict) -> type:
+    return LivePairDesk if params.get("pair_hold") else LiveDesk
+
+
 class Store:
     """The desk's books on disk, written whole and then moved into place, so a reader never sees half of them."""
 
@@ -571,11 +628,11 @@ class Live:
         if self.desk is None:
             self.desk = self.store.load(self.world.id)
             if self.desk is not None:  # books that older code wrote lack what the desk has gained since: a new desk's starting values
-                fresh = LiveDesk(self.world, self.level, first["now"], self.params, self.world.roster(), self.map)
+                fresh = desk_class(self.params)(self.world, self.level, first["now"], self.params, self.world.roster(), self.map)
                 vars(self.desk).update({k: v for k, v in vars(fresh).items() if k not in vars(self.desk)})
         if self.desk is None:
             source = "world"
-            self.desk = LiveDesk(self.world, self.level, first["now"], self.params, self.world.roster(), self.map)
+            self.desk = desk_class(self.params)(self.world, self.level, first["now"], self.params, self.world.roster(), self.map)
         self.desk.attach(self.world, self.log, self.guard, self.clock, self.watcher)
         events = self.world.events(after=self.desk.seq)
         snapshot = self.world.snapshot()

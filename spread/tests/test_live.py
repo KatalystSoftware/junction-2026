@@ -223,3 +223,78 @@ def test_a_desk_that_starts_again_posts_a_car_whose_visit_failed_while_it_was_do
     second.stop()
     assert world.gigs["g1"]["status"] == "working" and list(world.gigs) == ["g1", "g2"]
     assert world.gigs["g2"]["stops"][0]["withPlates"] is True, "the car goes again, with plates"
+
+
+def test_a_pair_desk_that_dies_after_the_world_took_a_pair_gig_finds_both_cars_on_it(tmp_path, monkeypatch):
+    from spreadlab import pairs
+    monkeypatch.setattr(pairs, "RETURNS", {"helsinki>tampere": 20, "tampere>helsinki": 20})
+    out = request("R1", pickup="helsinki")
+    out["legs"] = [{**out["legs"][0], "delivery": {**out["legs"][0]["delivery"], "placeId": "tampere"}}]
+    back = request("R2", pickup="tampere", arrivedAt=520, respondBy=535, options=(("next_day", 2640),))
+    won = lambda r, at: {"id": r["id"], "dealerId": "D01", "option": "next_day", "priceCents": 15000, "deadline": 2640,  # noqa: E731
+                         "legs": r["legs"], "lastPickupAt": 2520, "status": "waiting", "deliveredAt": [None]}
+    events = [{"seq": 0, "at": 500, "kind": "price_request", "request": out},
+              {"seq": 1, "at": 515, "kind": "order_won", "order": won(out, 515)},
+              {"seq": 2, "at": 520, "kind": "price_request", "request": back},
+              {"seq": 3, "at": 535, "kind": "order_won", "order": won(back, 535)}]
+    world = replay.Replay(events, ROSTER, ends_at=20000, start=506, speed=0.001)
+    desk = lambda: live.Live(world, world.guard_act, world.minute, 8, VARIANTS["slow-friday-late-150-kinds-limits-pairs-0.7"], MAP, tmp_path, echo=False)  # noqa: E731
+    first = desk()
+    first.join()
+    assert isinstance(first.desk, live.LivePairDesk)
+    world.clock.saw(516)  # R1 is won: its car waits for a return, with no gig
+    for event in world.events(after=first.desk.seq):
+        first.desk.take(event)
+    first.desk.send()
+    first.store.save(first.desk)
+    assert list(world.gigs) == [] and "R1" in first.desk.pair_wait
+    world.clock.saw(521)  # R2 runs back: its quote goes out
+    for event in world.events(after=first.desk.seq):
+        first.desk.take(event)
+    first.desk.send()
+    assert first.desk.decisions["R2"]["pair"] == "R1"
+    world.clock.saw(536)  # R2 is won: both cars go in one gig, and the desk dies as the world takes it
+    world.crash_next_act = True
+    try:
+        for event in world.events(after=first.desk.seq):
+            first.desk.take(event)
+        raise AssertionError("the desk should have died")
+    except replay.Crash:
+        first.stop()
+    assert list(world.gigs) == ["g1"] and {s["orderId"] for s in world.gigs["g1"]["stops"]} == {"R1", "R2"}
+
+    second = desk()
+    second.join()  # from books that hold R1 and its hold, and know nothing of R2's win or of g1
+    second.stop()
+    assert list(world.gigs) == ["g1"], "no car of the pair gets a second gig"
+    assert second.desk.gigs_of("R1") == second.desk.gigs_of("R2") == ["g1"]
+    assert "g1" in second.desk.pair_gigs and not second.desk.pair_wait
+
+
+def test_a_held_car_is_not_posted_at_a_restart_and_goes_alone_when_its_hold_ends(tmp_path, monkeypatch):
+    from spreadlab import pairs
+    monkeypatch.setattr(pairs, "RETURNS", {"helsinki>tampere": 20, "tampere>helsinki": 20})
+    out = request("R1", pickup="helsinki")
+    out["legs"] = [{**out["legs"][0], "delivery": {**out["legs"][0]["delivery"], "placeId": "tampere"}}]
+    events = [{"seq": 0, "at": 500, "kind": "price_request", "request": out},
+              {"seq": 1, "at": 515, "kind": "order_won", "order": {"id": "R1", "dealerId": "D01", "option": "next_day", "priceCents": 15000,
+                                                                     "deadline": 2640, "legs": out["legs"], "lastPickupAt": 2520,
+                                                                     "status": "waiting", "deliveredAt": [None]}}]
+    world = replay.Replay(events, ROSTER, ends_at=20000, start=506, speed=0.001)
+    desk = lambda: live.Live(world, world.guard_act, world.minute, 8, VARIANTS["slow-friday-late-150-kinds-limits-pairs-0.7"], MAP, tmp_path, echo=False)  # noqa: E731
+    first = desk()
+    first.join()
+    world.clock.saw(516)
+    for event in world.events(after=first.desk.seq):
+        first.desk.take(event)
+    first.desk.send()
+    first.store.save(first.desk)
+    first.stop()
+    second = desk()
+    second.join()
+    assert list(world.gigs) == [] and second.desk.pair_wait == {"R1": 515 + 4 * HOUR}
+    second.desk.now = 515 + 4 * HOUR
+    second.desk.look()
+    second.desk.send()
+    second.stop()
+    assert list(world.gigs) == ["g1"] and second.desk.gigs_of("R1") == ["g1"]
