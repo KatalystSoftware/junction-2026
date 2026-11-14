@@ -42,7 +42,7 @@ def recall(cur, where=""):
 def main():
     con = mariadb.connect(
         host=os.environ.get("DB_HOST", "127.0.0.1"),
-        port=int(os.environ.get("DB_PORT", 3306)),
+        port=int(os.environ.get("DB_PORT", "3306")),
         user=os.environ["DB_USER"],
         password=os.environ["DB_PASSWORD"],
         database=os.environ["DB_NAME"],
@@ -50,7 +50,7 @@ def main():
     )
     cur = con.cursor()
     cur.execute("SELECT VERSION(), @@mhnsw_max_cache_size DIV 1048576")
-    print("MariaDB %s, mhnsw_max_cache_size %s MB" % cur.fetchone())
+    print("MariaDB {}, mhnsw_max_cache_size {} MB".format(*cur.fetchone()))
     cur.execute("DROP TABLE IF EXISTS cache_check")
     cur.execute(
         f"CREATE TABLE cache_check (id INT, ver INT, v VECTOR({D}) NOT NULL, PRIMARY KEY (id, ver), "

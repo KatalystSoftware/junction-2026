@@ -35,3 +35,7 @@ explicit = true
 [tool.ruff]
 # The code was written to about this width; ruff's 88 would rewrap a fifth of the lines.
 line-length = 120
+
+[tool.ruff.lint]
+# SIM115: the commands read a file once in a loop and exit; a with block would re-indent each loop body.
+ignore = ["SIM115"]

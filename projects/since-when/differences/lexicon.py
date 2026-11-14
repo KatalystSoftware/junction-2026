@@ -141,7 +141,7 @@ FAMILIES = {
 
 _COMPILED = {
     family: {
-        concept: (loaded, {lang: re.compile(rx, re.I) for lang, rx in rxs.items()})
+        concept: (loaded, {lang: re.compile(rx, re.IGNORECASE) for lang, rx in rxs.items()})
         for concept, (loaded, rxs) in concepts.items()
     }
     for family, concepts in FAMILIES.items()

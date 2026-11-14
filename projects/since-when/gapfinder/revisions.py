@@ -21,7 +21,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from . import wikitext
 from .db import connect
@@ -33,8 +33,8 @@ AGENT = "junction2026-gap-finder/0.1 (https://github.com/katalystsoftware/juncti
 PAUSE = 1.0  # seconds between requests
 BATCH = 50  # revision texts per request, the API's limit
 FAR = datetime(2106, 1, 1)  # row_end of a current row is later than this
-WORKERS = int(os.environ.get("WORKERS", 8))  # processes that split wikitext into passages
-THREADS = int(os.environ.get("THREADS", 0)) or None  # of the embedding model; all cores when unset
+WORKERS = int(os.environ.get("WORKERS", "8"))  # processes that split wikitext into passages
+THREADS = int(os.environ.get("THREADS", "0")) or None  # of the embedding model; all cores when unset
 # SINCE=2022-01-01 keeps every revision from that day on and the 1 January texts before it.
 SINCE = os.environ.get("SINCE")
 COLS = {
@@ -76,7 +76,7 @@ def api(lang, **params):
         if data and "error" not in data:
             _write(path, body)
             with open(ROOT / "raw" / "requests.tsv", "a") as log:
-                log.write(f"{datetime.now(timezone.utc):%Y-%m-%dT%H:%M:%SZ}\t{lang}\t{key}\t{json.dumps(params)}\n")
+                log.write(f"{datetime.now(UTC):%Y-%m-%dT%H:%M:%SZ}\t{lang}\t{key}\t{json.dumps(params)}\n")
             return data
         if data and data["error"].get("code") != "maxlag":
             raise RuntimeError(f"{lang}: {data['error']}")
@@ -147,7 +147,7 @@ def fetch_article(qid, lang, page_id, title):
         "with_text": len(texts),
         "first": revs[0]["timestamp"],
         "last": revs[-1]["timestamp"],
-        "fetched_at": f"{datetime.now(timezone.utc):%Y-%m-%dT%H:%M:%SZ}",
+        "fetched_at": f"{datetime.now(UTC):%Y-%m-%dT%H:%M:%SZ}",
     }
     _write(ROOT / qid / f"{lang}.json", json.dumps(summary, ensure_ascii=False, indent=1).encode())
     print(
@@ -229,7 +229,7 @@ def embed(qid, langs):
         for i in range(0, len(todo), 500):
             part = todo[i : i + 500]
             cur.execute(
-                "SELECT sha FROM passage WHERE embedding IS NOT NULL AND sha IN (%s)" % ",".join("?" * len(part)),
+                "SELECT sha FROM passage WHERE embedding IS NOT NULL AND sha IN ({})".format(",".join("?" * len(part))),
                 [bytes.fromhex(s) for s in part],
             )
             have |= {bytes(r[0]).hex() for r in cur.fetchall()}
@@ -255,7 +255,7 @@ def embed(qid, langs):
 
 def _current(cur, qids):
     cur.execute(
-        "SELECT id, sha, section, chunk_no FROM chunk WHERE wikidata_id IN (%s)" % ",".join("?" * len(qids)), qids
+        "SELECT id, sha, section, chunk_no FROM chunk WHERE wikidata_id IN ({})".format(",".join("?" * len(qids))), qids
     )
     return {(r[0], bytes(r[1]), r[2], r[3]) for r in cur.fetchall()}
 

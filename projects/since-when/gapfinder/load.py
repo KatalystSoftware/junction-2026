@@ -17,7 +17,7 @@ import json
 import pathlib
 import re
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from . import wikitext
 from .db import connect
@@ -32,11 +32,11 @@ LANG_NO = {"fi": 1, "sv": 2, "en": 3}
 DEMO_CLASS, CURRENT_CLASS, HISTORY_CLASS = 0, 1, 3
 
 
-_LIST = re.compile(r"^(Lists? of|Timeline of|Index of|Outline of)\b|^Luettelo|^Lista över", re.I)
+_LIST = re.compile(r"^(Lists? of|Timeline of|Index of|Outline of)\b|^Luettelo|^Lista över", re.IGNORECASE)
 _OFFICE = re.compile(
     r"^((Prime |Deputy )?Minister (of|for)|(President|Speaker|Governor|Chancellor|Chief|"
     r"Commander|Ombudsman|Mayor|Archbishop)( [A-Z][a-z]+)* of)\b|ministeri$",
-    re.I,
+    re.IGNORECASE,
 )
 
 
@@ -99,8 +99,8 @@ def topics(s_dir=DATA / "s"):
 
 def _ts(value):
     if isinstance(value, str):
-        value = datetime.fromisoformat(value.replace("Z", "+00:00"))
-    return value.astimezone(timezone.utc).replace(tzinfo=None)
+        value = datetime.fromisoformat(value)
+    return value.astimezone(UTC).replace(tzinfo=None)
 
 
 def snapshots(revs):

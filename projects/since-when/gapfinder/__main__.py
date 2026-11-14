@@ -98,7 +98,7 @@ def main():
     elif args.cmd == "measure":
         from . import measure
 
-        save = dict(out=args.out or measure.OUT, note=args.note, provisional=args.provisional)
+        save = {"out": args.out or measure.OUT, "note": args.note, "provisional": args.provisional}
         if args.versioned_index:
             measure.versioned_index(args.versioned_index, args.queries, args.one_in, args.keep, **save)
         else:

@@ -5,4 +5,4 @@ See README.md for the input and output format.
 
 from .classify import TYPE_WEIGHT, TYPES, classify_pair, classify_pairs, locate
 
-__all__ = ["TYPE_WEIGHT", "TYPES", "classify_pair", "classify_pairs", "locate"]
+__all__ = ["TYPES", "TYPE_WEIGHT", "classify_pair", "classify_pairs", "locate"]

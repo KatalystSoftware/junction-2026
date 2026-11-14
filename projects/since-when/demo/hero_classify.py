@@ -41,11 +41,11 @@ OUT = Path(os.environ.get("HERO_CLASSIFY", Path.home() / "junction2026-data/mari
 os.environ["DIFFERENCES_PROVIDER"] = MODELS[args.model]
 os.environ["DIFFERENCES_CACHE"] = str(OUT / "cache")
 if args.offline:  # the cache key needs the endpoint and model, not the key
-    os.environ.setdefault(dict(nvidia="NVIDIA_API_KEY", anthropic="ANTHROPIC_API_KEY")[MODELS[args.model]], "offline")
+    os.environ.setdefault({"nvidia": "NVIDIA_API_KEY", "anthropic": "ANTHROPIC_API_KEY"}[MODELS[args.model]], "offline")
     os.environ["DIFFERENCES_RPM"] = "6000"  # nothing is sent, so nothing to pace
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from differences import classify, lexicon, llm  # noqa: E402
+from differences import classify, lexicon, llm
 
 cfg = llm.config()
 if not cfg:
@@ -103,8 +103,9 @@ with (
         cached = (OUT / "cache" / f"{key}.json").exists()
         if not cached:
             missing.append(pair["pair_id"])
-        for row in rows:
-            rows_out.write(json.dumps(dict(row, distance=pair.get("distance")), ensure_ascii=False) + "\n")
+        rows_out.writelines(
+            json.dumps(dict(row, distance=pair.get("distance")), ensure_ascii=False) + "\n" for row in rows
+        )
         index_out.write(
             json.dumps(
                 {

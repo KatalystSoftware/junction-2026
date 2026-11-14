@@ -8,7 +8,12 @@ Without GAPFINDER_API, /api/* answers from ui/fixtures/ in the shape of docs/gap
 Finding status changes are kept in memory until the server stops.
 """
 
-import argparse, json, os, re, urllib.error, urllib.request
+import argparse
+import json
+import os
+import re
+import urllib.error
+import urllib.request
 from datetime import date
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
@@ -177,7 +182,7 @@ class Handler(SimpleHTTPRequestHandler):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("--port", type=int, default=int(os.environ.get("PORT", 8078)))
+    ap.add_argument("--port", type=int, default=int(os.environ.get("PORT", "8078")))
     port = ap.parse_args().port
     print(f"gap finder UI on http://localhost:{port} ({'proxy to ' + API if API else 'fixture data'})", flush=True)
     ThreadingHTTPServer(("0.0.0.0", port), Handler).serve_forever()

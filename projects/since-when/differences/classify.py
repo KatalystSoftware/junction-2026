@@ -228,7 +228,7 @@ def classify_pairs(pairs, workers=8, cfg=None):
     def one(pair):
         try:
             return classify_pair(pair, cfg)
-        except Exception as e:  # one bad call should not stop a run over thousands of pairs
+        except Exception as e:  # noqa: BLE001  one bad call should not stop a run over thousands of pairs
             print(
                 f"differences: {pair.get('pair_id')}: {e}; model call failed, no rows, a re-run retries it",
                 file=sys.stderr,

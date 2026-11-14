@@ -17,9 +17,10 @@ import sys
 import time
 from datetime import date, datetime, timedelta
 
+from differences.lexicon import find_concepts, sentence_at
+
 from .db import LANGS, connect
 from .wikitext import cited, paragraph_cited
-from differences.lexicon import find_concepts, sentence_at
 
 YEARS = range(2005, 2027)
 # Cosine distance thresholds for bge-m3 across languages, calibrated on leads of the same topic
@@ -569,7 +570,9 @@ def _coverage_findings(r, qid, rich, revs, history, texts=None):
             texts
             and "" not in titles
             and texts.when(
-                f["other_lang"], tuple(sorted(titles)), lambda section, chunk_no, text: _top(section) in titles
+                f["other_lang"],
+                tuple(sorted(titles)),
+                lambda section, chunk_no, text, titles=titles: _top(section) in titles,
             )
         )
         out += _dated(f, history, checked, seen_on[key], texts, holds)

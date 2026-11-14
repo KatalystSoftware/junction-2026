@@ -24,6 +24,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from pathlib import Path
+from typing import ClassVar
 
 HERE = Path(__file__).resolve().parent
 REVISIONS = Path(os.environ.get("HERO_REVISIONS", Path.home() / "junction2026-data/mariadb/revisions/agent4"))
@@ -69,8 +70,21 @@ def api(lang, name, **params):
 class _Text(html.parser.HTMLParser):
     """The text of a rendered page as a reader sees it."""
 
-    VOID = {"br", "img", "hr", "input", "meta", "link", "wbr", "area", "col", "source", "track", "embed"}
-    BLOCK = {
+    VOID: ClassVar[set[str]] = {
+        "br",
+        "img",
+        "hr",
+        "input",
+        "meta",
+        "link",
+        "wbr",
+        "area",
+        "col",
+        "source",
+        "track",
+        "embed",
+    }
+    BLOCK: ClassVar[set[str]] = {
         "p",
         "div",
         "li",
@@ -144,7 +158,7 @@ def check(quote):
     """(passed, note) for one {"lang", "rev", "text"} entry."""
     try:
         found = squeeze(quote["text"]) in revision_text(quote["lang"], quote["rev"])
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001  any failure to fetch or parse fails the quote
         return False, f"{type(e).__name__}: {e}"
     return found, "" if found else "not in the revision"
 

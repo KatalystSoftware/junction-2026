@@ -55,14 +55,18 @@ def report(result):
     if q["kept"] + q["dropped"]:
         lines += [
             "",
-            f"quote check: {q['kept']} of {q['kept'] + q['dropped']} model differences kept, "
-            f"{q['dropped']} dropped for quotes not in the passage",
+            (
+                f"quote check: {q['kept']} of {q['kept'] + q['dropped']} model differences kept, "
+                f"{q['dropped']} dropped for quotes not in the passage"
+            ),
         ]
     u = llm.USAGE
     if u["calls"]:
         lines += [
             "",
-            f"{u['calls']} model calls (not cached): {u['input_tokens']:,} input and {u['output_tokens']:,} output tokens, "
-            f"{u['input_tokens'] / u['calls']:,.0f} and {u['output_tokens'] / u['calls']:,.0f} per call",
+            (
+                f"{u['calls']} model calls (not cached): {u['input_tokens']:,} input and {u['output_tokens']:,} output tokens, "
+                f"{u['input_tokens'] / u['calls']:,.0f} and {u['output_tokens'] / u['calls']:,.0f} per call"
+            ),
         ]
     return "\n".join(lines)

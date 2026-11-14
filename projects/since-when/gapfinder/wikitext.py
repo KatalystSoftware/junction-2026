@@ -68,16 +68,16 @@ _FILE_PREFIXES = (
     "kategori:",
     "media:",
 )
-_HEADING = re.compile(r"^(={2,6})\s*(.+?)\s*\1\s*$", re.M)
+_HEADING = re.compile(r"^(={2,6})\s*(.+?)\s*\1\s*$", re.MULTILINE)
 _BLANKS = re.compile(r"\n\s*\n+")
 _SPACES = re.compile(r"[ \t\u00a0]+")
 _MARK = re.compile("\ue000([0-9]+)\ue001")
 LIST, ITEM = "\ue002", "\ue003"
 # A citation: a <ref> tag, or a short-footnote template that makes one ({{sfn|Wilson|2009|p=3}}).
-_REF = re.compile(r"<ref[\s>/]|\{\{\s*(?:sfnp?|sfnm|harvnb|efn)\s*\|", re.I)
+_REF = re.compile(r"<ref[\s>/]|\{\{\s*(?:sfnp?|sfnm|harvnb|efn)\s*\|", re.IGNORECASE)
 _QUALITY = [
-    (re.compile(r"\{\{\s*(Suositeltu|Utmärkt|Featured article)\s*[|}]", re.I), "featured"),
-    (re.compile(r"\{\{\s*(Hyvä artikkeli|Bra|Good article)\s*[|}]", re.I), "good"),
+    (re.compile(r"\{\{\s*(Suositeltu|Utmärkt|Featured article)\s*[|}]", re.IGNORECASE), "featured"),
+    (re.compile(r"\{\{\s*(Hyvä artikkeli|Bra|Good article)\s*[|}]", re.IGNORECASE), "good"),
 ]
 _CITE_KEYS = [
     ("author", "last", "last1", "tekijä", "sukunimi", "författare", "efternamn"),

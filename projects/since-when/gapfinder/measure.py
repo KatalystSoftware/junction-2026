@@ -23,7 +23,7 @@ import statistics
 import subprocess
 import sys
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from .align import Run, as_of_sql, nearest_sql
 
@@ -78,6 +78,7 @@ def _commit():
                 capture_output=True,
                 text=True,
                 cwd=pathlib.Path(__file__).parent,
+                check=False,
             ).stdout.strip()
             or None
         )
@@ -89,7 +90,7 @@ def _environment(cur, note, provisional):
     """Where and when a run happened: enough to tell two result files apart."""
     cur.execute("SELECT VERSION(), DATABASE(), @@hostname")
     version, database, server = cur.fetchone()
-    cur.execute("SHOW GLOBAL VARIABLES WHERE Variable_name IN (%s)" % ",".join(f"'{s}'" for s in SETTINGS))
+    cur.execute("SHOW GLOBAL VARIABLES WHERE Variable_name IN ({})".format(",".join(f"'{s}'" for s in SETTINGS)))
     settings = {k: int(v) for k, v in cur.fetchall()}
     cpu = mem = None
     try:
@@ -98,13 +99,13 @@ def _environment(cur, note, provisional):
     except (OSError, StopIteration):
         pass
     return {
-        "time_utc": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),
+        "time_utc": datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S"),
         "command": "python -m gapfinder " + shlex.join(sys.argv[1:]),
         "commit": _commit(),
         "database": {
             "name": database,
             "host": os.environ.get("DB_HOST", "127.0.0.1"),
-            "port": int(os.environ.get("DB_PORT", 3306)),
+            "port": int(os.environ.get("DB_PORT", "3306")),
             "server_hostname": server,
         },
         "mariadb": {"version": version, "settings": settings},
@@ -160,13 +161,19 @@ def _header(title, res):
         "",
         f"- Command: `{res['command']}`",
         f"- Run at {res['time_utc']} UTC, code at commit `{res['commit'] or 'unknown'}`.",
-        f"- Database `{db['name']}` on `{db['host']}:{db['port']}` (server host name `{db['server_hostname']}`), "
-        f"MariaDB {res['mariadb']['version']}.",
-        f"- Server settings: buffer pool {s['innodb_buffer_pool_size'] >> 20:,} MB (memory for table data), "
-        f"vector cache {s['mhnsw_max_cache_size'] >> 20:,} MB (`mhnsw_max_cache_size`, memory for vector "
-        f"indexes), `mhnsw_ef_search` {s['mhnsw_ef_search']} by default.",
-        f"- Machine running the command: {m['cpu'] or 'unknown CPU'}, {m['cores']} cores, "
-        f"{_n(m['memory_mb'] or 0)} MB of memory. One-minute load average: {load}.",
+        (
+            f"- Database `{db['name']}` on `{db['host']}:{db['port']}` (server host name `{db['server_hostname']}`), "
+            f"MariaDB {res['mariadb']['version']}."
+        ),
+        (
+            f"- Server settings: buffer pool {s['innodb_buffer_pool_size'] >> 20:,} MB (memory for table data), "
+            f"vector cache {s['mhnsw_max_cache_size'] >> 20:,} MB (`mhnsw_max_cache_size`, memory for vector "
+            f"indexes), `mhnsw_ef_search` {s['mhnsw_ef_search']} by default."
+        ),
+        (
+            f"- Machine running the command: {m['cpu'] or 'unknown CPU'}, {m['cores']} cores, "
+            f"{_n(m['memory_mb'] or 0)} MB of memory. One-minute load average: {load}."
+        ),
     ]
     if res["note"]:
         lines.append(f"- Note: {res['note']}")
@@ -187,8 +194,10 @@ def _markdown(res):
             "Exact search, median time",
             f"{rec['exact_median_ms']:.2f} ms",
             q,
-            f"Finding a passage's 10 nearest passages by comparing it with all {_n(rec['rows'])} rows of "
-            "`chunk_now`, without the index: the correct answer that the index is checked against.",
+            (
+                f"Finding a passage's 10 nearest passages by comparing it with all {_n(rec['rows'])} rows of "
+                "`chunk_now`, without the index: the correct answer that the index is checked against."
+            ),
         )
     ]
     for e in rec["ef"]:
@@ -197,8 +206,10 @@ def _markdown(res):
                 f"Index, `mhnsw_ef_search` = {e['ef_search']}: recall@10",
                 f"{e['recall_at_10']:.3f}",
                 q,
-                f"Of the 10 truly nearest passages, the index returned {e['recall_at_10'] * 10:.2f} on "
-                f"average when it keeps {e['ef_search']} candidates while searching (1.000 = the exact answer).",
+                (
+                    f"Of the 10 truly nearest passages, the index returned {e['recall_at_10'] * 10:.2f} on "
+                    f"average when it keeps {e['ef_search']} candidates while searching (1.000 = the exact answer)."
+                ),
             )
         )
         rows.append(
@@ -206,8 +217,10 @@ def _markdown(res):
                 f"Index, `mhnsw_ef_search` = {e['ef_search']}: median time",
                 f"{e['median_ms']:.2f} ms",
                 q,
-                f"The same search through the index takes this long, against {rec['exact_median_ms']:.0f} ms "
-                "for the exact search.",
+                (
+                    f"The same search through the index takes this long, against {rec['exact_median_ms']:.0f} ms "
+                    "for the exact search."
+                ),
             )
         )
     for a in al:
@@ -217,9 +230,11 @@ def _markdown(res):
                 f"Alignment {a['label']}: median time",
                 f"{a['median_ms']:.2f} ms",
                 n,
-                f"One query compares every passage of a topic with every passage of its other two editions"
-                f"{'' if a['as_of'] is None else ' as the articles stood on ' + a['as_of']}, exactly and "
-                f"without an index; the median topic had {a['median_rows']:.0f} passages to match.",
+                (
+                    f"One query compares every passage of a topic with every passage of its other two editions"
+                    f"{'' if a['as_of'] is None else ' as the articles stood on ' + a['as_of']}, exactly and "
+                    f"without an index; the median topic had {a['median_rows']:.0f} passages to match."
+                ),
             )
         )
         rows.append(
@@ -227,8 +242,10 @@ def _markdown(res):
                 f"Alignment {a['label']}: slowest topic",
                 f"{a['max_ms']:.2f} ms",
                 n,
-                f"The slowest of the {a['topics']} topics (its median over {a['runs']} runs), so the worst "
-                "case a reader of the tool waits for.",
+                (
+                    f"The slowest of the {a['topics']} topics (its median over {a['runs']} runs), so the worst "
+                    "case a reader of the tool waits for."
+                ),
             )
         )
     lines = _header("Gap finder: vector index recall and query times", res)
@@ -236,8 +253,10 @@ def _markdown(res):
     lines += [f"| {a} | {b} | {c} | {d} |" for a, b, c, d in rows]
     lines += [
         "",
-        "The topics timed are the 20 with the most past dates aligned. The queries are the passages "
-        "with the lowest `CRC32(id)`, so a second run asks the same questions.",
+        (
+            "The topics timed are the 20 with the most past dates aligned. The queries are the passages "
+            "with the lowest `CRC32(id)`, so a second run asks the same questions."
+        ),
         "",
         "## Rows per table",
         "",
@@ -342,16 +361,24 @@ def _versioned_markdown(res):
     lines += [
         f"The experiment tables live in the private database `{x['database']}`; `{x['source']}` is only read.",
         "",
-        f"- **Versioned table**: {_n(x['versions'])} versions of {_n(x['ids'])} passages from {_n(x['topics'])} "
-        f"topics, each with its 1024-number embedding and the real edit times as `row_start` and `row_end`, in "
-        f"one table `WITH SYSTEM VERSIONING` and a vector index (`{x['index']}`). Built in {x['build_s']:.0f} s.",
+        (
+            f"- **Versioned table**: {_n(x['versions'])} versions of {_n(x['ids'])} passages from {_n(x['topics'])} "
+            f"topics, each with its 1024-number embedding and the real edit times as `row_start` and `row_end`, in "
+            f"one table `WITH SYSTEM VERSIONING` and a vector index (`{x['index']}`). Built in {x['build_s']:.0f} s."
+        ),
         f"- **Sample**: {x['sample']}",
-        "- **Plain tables**: for each date, an ordinary table with only the rows visible at that date and the "
-        "same vector index. This is what the tool does today with `chunk_now`.",
-        f"- **Queries**: at each date, the {res['dates'][0]['queries']} visible passages with the lowest "
-        "`CRC32(id)`; each asks for its 10 nearest passages (`ORDER BY VEC_DISTANCE_COSINE(...) LIMIT 10`).",
-        "- **Recall@10**: of the 10 truly nearest rows visible at the date (found by comparing with every "
-        "row, `IGNORE INDEX`), the share a search returned. 1.00 is the exact answer.",
+        (
+            "- **Plain tables**: for each date, an ordinary table with only the rows visible at that date and the "
+            "same vector index. This is what the tool does today with `chunk_now`."
+        ),
+        (
+            f"- **Queries**: at each date, the {res['dates'][0]['queries']} visible passages with the lowest "
+            "`CRC32(id)`; each asks for its 10 nearest passages (`ORDER BY VEC_DISTANCE_COSINE(...) LIMIT 10`)."
+        ),
+        (
+            "- **Recall@10**: of the 10 truly nearest rows visible at the date (found by comparing with every "
+            "row, `IGNORE INDEX`), the share a search returned. 1.00 is the exact answer."
+        ),
         "",
         "## Headline figures (`mhnsw_ef_search` = 20, the server default)",
         "",
@@ -362,26 +389,36 @@ def _versioned_markdown(res):
         e, when = d["ef"][0], d["label"]
         over = f"{d['queries']} queries, {_n(d['visible_rows'])} rows visible {when}"
         lines += [
-            f"| Plain table, rows {when}: recall@10 | {e['plain_recall']:.3f} | {over} | With only the "
-            f"{_n(d['visible_rows'])} visible rows in the index, the index returns {e['plain_recall'] * 10:.1f} of "
-            "the 10 right answers on average. |",
-            f"| Versioned table with the index, {when}: recall@10 | {e['versioned_recall']:.3f} | {over} | The same "
-            f"question through the index that holds all {_n(x['versions'])} versions returns "
-            f"{e['versioned_recall'] * 10:.1f} of the 10 right answers on average. |",
-            f"| Versioned table with the index, {when}: rows returned | {e['versioned_rows']:.2f} of 10 | {over} | "
-            f"`LIMIT 10` came back with this many rows on average. Of the index's 10 nearest versions over all "
-            f"of history only {e['all_versions_visible']:.1f} were visible {when}, so 10 rows means the search "
-            "went on fetching versions until 10 passed the date filter. |",
-            f"| Versioned table without the index, {when}: recall@10 | {d['versioned_exact_recall']:.3f} | {over} | "
-            f"With `IGNORE INDEX` the versioned table gives the exact answer, in {d['versioned_exact_ms']:.0f} ms "
-            f"per search against {e['versioned_ms']:.1f} ms with the index. |",
+            (
+                f"| Plain table, rows {when}: recall@10 | {e['plain_recall']:.3f} | {over} | With only the "
+                f"{_n(d['visible_rows'])} visible rows in the index, the index returns {e['plain_recall'] * 10:.1f} of "
+                "the 10 right answers on average. |"
+            ),
+            (
+                f"| Versioned table with the index, {when}: recall@10 | {e['versioned_recall']:.3f} | {over} | The same "
+                f"question through the index that holds all {_n(x['versions'])} versions returns "
+                f"{e['versioned_recall'] * 10:.1f} of the 10 right answers on average. |"
+            ),
+            (
+                f"| Versioned table with the index, {when}: rows returned | {e['versioned_rows']:.2f} of 10 | {over} | "
+                f"`LIMIT 10` came back with this many rows on average. Of the index's 10 nearest versions over all "
+                f"of history only {e['all_versions_visible']:.1f} were visible {when}, so 10 rows means the search "
+                "went on fetching versions until 10 passed the date filter. |"
+            ),
+            (
+                f"| Versioned table without the index, {when}: recall@10 | {d['versioned_exact_recall']:.3f} | {over} | "
+                f"With `IGNORE INDEX` the versioned table gives the exact answer, in {d['versioned_exact_ms']:.0f} ms "
+                f"per search against {e['versioned_ms']:.1f} ms with the index. |"
+            ),
         ]
     lines += [
         "",
         "## Every setting",
         "",
-        "| Date | Rows visible | `mhnsw_ef_search` | Plain table recall@10 | Versioned + index recall@10 | "
-        "Rows returned of 10 | Nearest 10 versions visible at the date | Plain ms | Versioned ms |",
+        (
+            "| Date | Rows visible | `mhnsw_ef_search` | Plain table recall@10 | Versioned + index recall@10 | "
+            "Rows returned of 10 | Nearest 10 versions visible at the date | Plain ms | Versioned ms |"
+        ),
         "|---|---:|---:|---:|---:|---:|---:|---:|---:|",
     ]
     for d in res["dates"]:
@@ -393,11 +430,15 @@ def _versioned_markdown(res):
         ]
     lines += [
         "",
-        "- `mhnsw_ef_search`: how many candidates the index keeps while it searches; higher finds more and "
-        "takes longer.",
+        (
+            "- `mhnsw_ef_search`: how many candidates the index keeps while it searches; higher finds more and "
+            "takes longer."
+        ),
         "- Rows returned of 10: how many rows the `AS OF` search through the index gave back for `LIMIT 10`.",
-        "- Nearest 10 versions visible at the date: the index's 10 nearest versions over all of history "
-        "(`FOR SYSTEM_TIME ALL`), and how many of them were visible at the date.",
+        (
+            "- Nearest 10 versions visible at the date: the index's 10 nearest versions over all of history "
+            "(`FOR SYSTEM_TIME ALL`), and how many of them were visible at the date."
+        ),
         "- Plain ms, Versioned ms: median time of one search through the index.",
         "",
         "How MariaDB runs the versioned search (`EXPLAIN`, " + res["dates"][-1]["label"] + "):",
