@@ -6,7 +6,7 @@ talent they need. Kutsu finds a company worth inviting, reads what it has said i
 a sign-up in its own logo and colours that is already filled in: who it is, what we would tell talent
 about it, and who it wants to meet. The company ticks, corrects and is in.
 
-Live: <http://31.22.104.106:8046> (Espoo's screen) and <http://31.22.104.106:8046/#/join/nitor.com>
+Live: <https://kutsu.katalyst.fyi/> (Espoo's screen) and <https://kutsu.katalyst.fyi/#/join/nitor.com>
 (what a company sees). `PRODUCT.md` says who it is for, `NEXT.md` what the Espoo mentors said and what
 is open.
 
@@ -35,20 +35,32 @@ is, shows the draft and its sources, and hands out the invitation link. `ui/` is
 A company is named by its id in `companies.json`, or by any name or domain. One that is not in our
 data takes about 20 seconds; anything asked before answers at once.
 
-It runs on the Verda runner (plain http: ports 80 and 443 there belong to the gap finder).
+It runs on the Verda runner as a systemd service on port 8046; the team's shared proxy serves it as
+`https://kutsu.katalyst.fyi/` (`infra/verda/proxy/sites/kutsu.caddy`).
 `sops exec-env ../../secrets/secrets.yaml ./deploy.sh` builds the page, puts the current code and cache
 there and restarts it. Live searches for companies not asked before are capped at 300 per restart,
 four at a time, because each one spends our credits.
 
-Which API does what, and why:
+## Context.dev endpoints: what each gives Kutsu and where you see it
 
-- **Context.dev `brand/search`** turns a typed name into the right company and domain (Finnish matches
-  first; a match must carry the first word typed). 1 credit.
-- **Context.dev `brand/retrieve`** by that domain opens every sign-up: name, logo, square icon, brand
-  colour, field, size and careers link. The domain then scopes the web searches, so namesakes stay
-  out. 10 credits.
-- **Context.dev `web/scrape`** (markdown) reads the careers page from that record, script-rendered
-  ones included, as one more page to quote from: what the company tells candidates itself. 1 credit.
+Context.dev is the first call for every company and it decides how the whole sign-up looks. Three
+endpoints, all in the core flow:
+
+| Endpoint | Why Kutsu calls it | Where a viewer sees it |
+|---|---|---|
+| `GET /v1/brand/search` | A person types "nitor" or "hamina wireless". This turns the words into the right company and its domain (Finnish matches first; a match must carry the first word typed). | The company's proper name appears within a second or two of pressing Enter, on `#/join` and in Espoo's search box. |
+| `POST /v1/brand/retrieve` (by domain) | The company's identity: name, logo, square icon, brand colours, field, size, city, careers link. The domain it confirms also scopes every web search that follows, so namesakes stay out. | Everything branded: the invitation floods with the company's colour from its logo; "Is this you?" is this record, line by line; the square icons in Espoo's list; the logo on the finished card. |
+| `POST /v1/web/scrape` (markdown) | Reads the company's careers page, script-rendered ones included, as one more page to quote from: what the company tells candidates itself. | Statements and needs that cite the company's own careers page, with the quoted sentence on hover. |
+
+How it is used: every response is checked before use (`status` on the brand record, `success` on the
+scrape output), and stored in `api-cache/` so no call is paid twice, as their brief advises. We keep
+their default freshness instead of `maxAgeMs: 0`: for a live "type any company" moment a brand record
+that is at most three months old in two seconds beats a fresh crawl in thirty. The plate shows the
+record's SVG logo when it has one, because the first raster "logo" in a record can be a customer's
+logo from the company's page (Cisco's on hamina.com).
+
+## The other services
+
 - **Exa `search`** with page text, four queries: news, funding and growth, interviews and talks, and
   the company's own site. Social networks are excluded because posts there are people speaking.
 - **Claude Haiku 5.5**, three calls: one writes the statements, one lists the people named so those

@@ -1,0 +1,7 @@
+# Kutsu (projects/kutsu): a systemd service on the machine itself (talent-brief.service, port 8046),
+# not a container, so the proxy reaches it at the machine's own address instead of over the `proxy`
+# network.
+kutsu.{$BASE_DOMAIN} {
+	encode zstd gzip
+	reverse_proxy 31.22.104.106:8046
+}
