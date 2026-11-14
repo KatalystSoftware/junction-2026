@@ -1,5 +1,5 @@
 {
-  "about": "What a person decided after reading both articles, for rows the claim check let stand. Applied with `python -m gapfinder.checked hand demo/hand-checked.json`, after every load: a row is found by its topic, type and the words of its quotes as the page shows them, since finding ids change with each restore. `close` marks the row not a difference (finding.status, or checked_finding.status for a row the check found itself), with the reason; `summary` replaces the check's one-line summary with the classifier's own, where the check's rewrite lost the point; `quote` puts back an edition's words as the article has them, where an older cleaner of the text cut them. The reasons are those of hero-labels.json and hero-verify-notes.md.",
+  "about": "What a person decided after reading both articles, for rows the claim check let stand. Applied with `python -m gapfinder.checked hand demo/hand-checked.json`, after every load: a row is found by its topic, type and the words of its quotes as the page shows them, since finding ids change with each restore. An optional `outcome` limits a row to findings the check gave that outcome. `close` marks the row not a difference (finding.status, or checked_finding.status for a row the check found itself), with the reason; `summary` replaces the check's one-line summary with the classifier's own, where the check's rewrite lost the point; `quote` puts back an edition's words as the article has them, where an older cleaner of the text cut them. The reasons are those of hero-labels.json and hero-verify-notes.md.",
   "rows": [
     {
       "topic": "Q1412941",
@@ -164,6 +164,57 @@
         "fi": "Nimitys ”valtiopäivät” on vakiintunut"
       },
       "close": "\"Established\" and \"now common, of later date\" agree. (round 1 of the blind review, editor reviewer)"
+    },
+    {
+      "topic": "Q1412941",
+      "type": "numbers",
+      "quotes": {
+        "fi": "kiellettiin käytännössä jo 29. helmikuuta"
+      },
+      "close": "Two different acts: the Finnish sentence quoted is the ban in practice on 29 February; the final ban is the next sentence, and the court's on 28 May. (round 1 of the blind review, editor reviewer)"
+    },
+    {
+      "topic": "Q1412941",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "mördades den socialdemokratiske kommunpolitikern Onni Happonen"
+      },
+      "outcome": "kept",
+      "close": "The English article tells the killing of Onni Happonen. (round 1 of the blind review, editor reviewer)"
+    },
+    {
+      "topic": "Q1412941",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "A general strike was also declared in November"
+      },
+      "outcome": "kept",
+      "close": "The Finnish article tells the general strike of 16 November 1929. (round 1 of the blind review, editor reviewer)"
+    },
+    {
+      "topic": "Q1412941",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Vid nyvalet den 1–2 oktober"
+      },
+      "outcome": "set_aside",
+      "close": "Set aside in error: the English article does not give the 1–2 October election date. (round 1 of the blind review, editor reviewer)"
+    },
+    {
+      "topic": "Q736268",
+      "type": "numbers",
+      "quotes": {
+        "fi": "Tanskan 5. maaliskuuta 1808 päivätty sodanjulistus"
+      },
+      "close": "Figures that agree: the Finnish article also says the declaration reached Sweden on 14 March. (round 1 of the blind review, editor reviewer)"
+    },
+    {
+      "topic": "Q2457646",
+      "type": "contradiction",
+      "quotes": {
+        "fi": "Suomen sotalaitos pysyi entisellään"
+      },
+      "close": "Statements that agree: the old military organisation was kept while the levy was suspended against vacancy fees. (round 1 of the blind review, editor reviewer)"
     }
   ]
 }
