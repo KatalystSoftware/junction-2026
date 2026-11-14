@@ -445,3 +445,11 @@ VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss
 # on-time tail. Row A1: lane A1's `late_cost` 100 at 760 drivers or more on row 6, the rest of its held part.
 VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-late100"] = _full_weeks(
     VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02"], late_cost=100)
+# Lane 4's day cap on row 6, only in a week under 760 drivers: no option is quoted whose last pickup falls on a day that already
+# has 62 won orders still to deliver, and the cap never lifts after a drop wave (`due_cap_wave` 0). At 760 drivers or more it is
+# row 6 exactly. Played as `-thin760-q48-cap62` (737e31c2ca1e, lane4-q48-cap bda78d1) on the 48-hour count's low thin weeks:
+# fresh-8306 88.6% -> 95.2%, 36 -> 16 late orders, 13 more orders; no week pushed under 90%.
+VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62"] = {
+    **VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02"],
+    "when_tight": {**VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02"]["when_tight"],
+                   "due_cap": 62, "due_cap_wave": 0}}
