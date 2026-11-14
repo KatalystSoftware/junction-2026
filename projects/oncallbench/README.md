@@ -62,10 +62,14 @@ of what an oracle that knows the faults avoids (mean 0.75) and is never worse th
 | Stop-early (looks at the dashboards, then ends the shift) | 0.00 |
 | Try every mitigation on everything that fires | 0.00 |
 | **Opus 5.5** (9 runs, three on each of seeds 101-103) | **0.32** mean, median 0.18 (0.03-0.80) |
+| Opus 5.5 on six fresh seeds, 107-112 (one run each) | 0.55 mean (0.34-0.75) |
 | Gemini 3.1 Pro (seed 101) | 0.00 |
 | Sonnet 5.5 (seed 101) | 0.02 |
 
-Those are runs on the task as shipped. Before the instruction stated the healthy baseline, Opus
+Those are runs on the task as shipped. Across all 15 Opus runs on nine seeds the mean is 0.41 and
+the best run 0.80: the gap holds on every seed, and its size varies with the estate (seeds 101-103
+happen to be harder than 107-112). The fresh-seed runs were made once, after the reported numbers,
+with nothing changed in between. Before the instruction stated the healthy baseline, Opus
 averaged 0.58 on seeds 101-103 (four runs) and 0.45 over seven runs on seeds 101-106, Gemini 0.00
 (three runs) and Sonnet 0.26.
 
