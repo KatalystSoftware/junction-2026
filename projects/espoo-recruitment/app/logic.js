@@ -189,9 +189,60 @@
     return { rec: rec.slice(0, 4), maybe, all: out };
   }
 
+
+  // ---------------------------------------------------------------- applicant sources -> draft facts (consented scan)
+  // Every fact keeps the document and line it came from, and the applicant confirms, edits or removes each one before anyone sees it.
+  const LANGRE = { en: /\benglish\b/i, fi: /\bfinnish\b|\bsuomi\b/i, sv: /\bswedish\b|\bsvenska\b/i };
+  const OTHERLANG = /\b(ukrainian|russian|german|french|spanish|arabic|hindi|chinese|mandarin|estonian|polish|italian|portuguese|turkish|persian|farsi|somali|vietnamese)\b/i;
+  const LVL = l => /native|fluent|c1|c2|mother tongue|full professional/i.test(l) ? "fluent" : /working|professional|b1|b2|intermediate|good/i.test(l) ? "working" : /basic|beginner|a1|a2|elementary|learning|evening course/i.test(l) ? "basic" : null;
+  const near = (l, re, n) => { const m = re.exec(l); return m ? l.slice(m.index + m[0].length, m.index + m[0].length + n) : ""; };
+  function scanSources(src) {
+    const facts = [], skipped = []; let n = 0; const seen = {};
+    const add = (kind, value, from, where, quote, extra) => { facts.push(Object.assign({ id: "f" + (++n), kind, value, from, where, quote, status: "new" }, extra || {})); return facts[facts.length - 1]; };
+    const docs = [["LinkedIn", src.linkedin], ["CV", src.cv], ["Portfolio", src.portfolio]].filter(d => d[1]);
+    for (const [from, text] of docs) {
+      const lines = text.split(/\n/).map(l => l.trim()).filter(Boolean);
+      let section = "Headline";
+      lines.forEach((l, i) => {
+        if (i > 0 && l.length < 32 && /^(experience|work experience|skills|languages|education|about|summary|projects)\b/i.test(l)) { section = l.replace(/:$/, ""); return; }
+        const where = `${section}, line ${i + 1}`;
+        if (/university|polytechnic|school|college|m\.sc|b\.sc|bachelor|master'?s|phd/i.test(l) && !seen.edu) { seen.edu = 1; skipped.push({ what: "school and university names", from, quote: l }); return; }
+        if (/\b(born|age \d|nationality|citizen|photo)\b/i.test(l)) { skipped.push({ what: "age, nationality or photo", from, quote: l }); return; }
+        if (OTHERLANG.test(l) && LVL(l)) { skipped.push({ what: "languages the companies here do not work in", from, quote: l }); return; }
+        if (section === "Headline" && !seen.role) for (const [re, r] of ROLE_RULES) if (re.test(l)) { seen.role = 1; add("role", r, from, where, l); break; }
+        const learningLine = /currently taking|learning|studying|course\b/i.test(l);
+        for (const id of Object.keys(ALIAS)) {
+          if (!ALIAS[id].test(l) || /finnish|english|swedish/i.test(l)) continue;
+          const tail = near(l, ALIAS[id], 34);
+          const y = tail.match(/^[^,;.)]*?(\d+)\s*\+?\s*(?:years?|yrs?|vuotta)/i) || (Object.keys(ALIAS).filter(k => ALIAS[k].test(l)).length === 1 ? l.match(/(\d+)\s*\+?\s*(?:years?|yrs?|vuotta)/i) : null);
+          const depth = learningLine ? "learning" : /personal|own|hobby|side|university|thesis/i.test(tail) ? "project" : "work";
+          const example = /\d/.test(l) && !/^\d{4}/.test(l) && !/years?|yrs?/i.test(l) && l.length > 30 && l.length < 170 ? l.replace(/^[-•*]\s*/, "") : null;
+          const prev = facts.find(f => f.kind === "skill" && f.value === id);
+          if (prev) { if (y && !prev.years) { prev.years = +y[1]; prev.yearsFrom = from; } if (example && !prev.example && depth === "work") { prev.example = example; prev.exampleFrom = from; if (prev.from === from) { prev.where = where; prev.quote = l; } } if (prev.depth !== "work" && depth === "work") prev.depth = "work"; continue; }
+          add("skill", id, from, where, l, { depth, years: y ? +y[1] : null, example: depth === "work" ? example : null });
+        }
+        for (const [k, re] of Object.entries(LANGRE)) if (re.test(l) && LVL(l) && !seen["lang:" + k] && /language|native|fluent|basic|working|professional|proficien|elementary|a1|a2|b1|b2|c1|c2/i.test(l)) { seen["lang:" + k] = 1; add("lang", k, from, where, l, { level: LVL(l) }); }
+        const m = l.match(/(20\d\d)\s*[–-]\s*(20\d\d|present|now|today)/i);
+        if (m && !seen["range:" + m[1] + m[2].toLowerCase()]) { seen["range:" + m[1] + m[2].toLowerCase()] = 1; const end = /\d/.test(m[2]) ? +m[2] : 2026; seen.years = (seen.years || 0) + Math.max(0, end - +m[1]); seen.yearsSrc = seen.yearsSrc || [from, where, l]; }
+        if (/open to|prefer|looking for|available/i.test(l)) for (const [re, v] of [[/\bremote\b/i, "remote"], [/\bhybrid\b/i, "hybrid"], [/on-site|onsite/i, "onsite"]]) if (re.test(l) && !seen["mode:" + v]) { seen["mode:" + v] = 1; add("mode", v, from, where, l); }
+        if (!seen.start && /available (immediately|now)|start (immediately|asap|now)|notice period/i.test(l)) { seen.start = 1; add("start", /notice/i.test(l) ? "3m" : "now", from, where, l); }
+      });
+    }
+    if (seen.years) add("exp", seen.years >= 6 ? 3 : seen.years >= 3 ? 2 : seen.years >= 1 ? 1 : 0, seen.yearsSrc[0], "dated positions", `${seen.years} years of dated positions, e.g. ${seen.yearsSrc[2]}`);
+    for (const r of src.github || []) {
+      const l = `${r.name}: ${r.desc} (${r.lang})`;
+      for (const id of Object.keys(ALIAS).filter(k => ALIAS[k].test(l))) {
+        const prev = facts.find(f => f.kind === "skill" && f.value === id);
+        if (prev) { if (!prev.example) { prev.example = r.desc; prev.exampleFrom = "GitHub"; } continue; }
+        add("skill", id, "GitHub", `repository ${r.name}`, l, { depth: "project", years: null, example: r.desc });
+      }
+    }
+    return { facts, skipped };
+  }
+
   // meeting slot for an introduction: deterministic from the pair, so the company and the candidate see the same time
   const SLOTS = ["10:00", "10:20", "10:40", "11:00", "11:20", "13:00", "13:20", "13:40", "14:00", "14:20"];
   const slotFor = (coId, candId) => { let h = 0; for (const ch of coId + "|" + candId) h = (h * 31 + ch.charCodeAt(0)) % 1000003; return SLOTS[h % SLOTS.length]; };
 
-  root.LOGIC = { slotFor, extract, companyProfile, pairFacts, poolCount, recommend, meetsMust, finnishOk, skillLabel, groupLabel, SKILL, EXPMIN, LV, LVTXT, DEPTH, MODE, TYPE, START, K_MIN };
+  root.LOGIC = { slotFor, scanSources, extract, companyProfile, pairFacts, poolCount, recommend, meetsMust, finnishOk, skillLabel, groupLabel, SKILL, EXPMIN, LV, LVTXT, DEPTH, MODE, TYPE, START, K_MIN };
 })(typeof window !== "undefined" ? window : globalThis);
