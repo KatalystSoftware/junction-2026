@@ -80,16 +80,16 @@ def corr(a: list[float], b: list[float]) -> float:
 
 def score(checks: list[dict], sim: dict, draws: int) -> dict:
     """`sim`: (arm, seed, base) -> [week of each draw]."""
-    rows, weeks = [], {}
+    rows, paired = [], {}
     for check in checks:
         arm, baseline = check["arm"], check["baseline"]
         played = {s: (run.played_week(arm, s), run.played_week(baseline, s)) for s in check["seeds"]}
         for n, name in enumerate((arm, baseline)):  # each played week beside the stand-in's week of the same policy and seed
             for s in check["seeds"]:
                 ws = sim.get((name, s, baseline), [])
-                if len(ws) == draws and not (name == baseline and (name, s, baseline) in weeks):
+                if len(ws) == draws and not (name == baseline and (name, s, baseline) in paired):
                     p = played[s][n]
-                    weeks[(name, s, baseline)] = {"policy": name, "seed": s, "base": baseline, "drivers": p["drivers"], "own_base": name == baseline,
+                    paired[(name, s, baseline)] = {"policy": name, "seed": s, "base": baseline, "drivers": p["drivers"], "own_base": name == baseline,
                                                   **{f"played_{k}": p[k] for k in ("margin", "orders", "late", "on_time")},
                                                   **{f"sim_{k}": sum(w[k] for w in ws) / draws for k in ("margin", "orders", "late", "on_time")}}
         for group, keep in GROUPS.items():
@@ -118,7 +118,7 @@ def score(checks: list[dict], sim: dict, draws: int) -> dict:
         if not sel:
             continue
         # Week by week, the policies that are not the base: the base's own played week is what the stand-in measured its market from.
-        wk = [w for w in weeks.values() if not w["own_base"] and (group == "all" or GROUPS[group](w["drivers"]))]
+        wk = [w for w in paired.values() if not w["own_base"] and (group == "all" or GROUPS[group](w["drivers"]))]
         err = lambda k: [w[f"sim_{k}"] - w[f"played_{k}"] for w in wk]
         mae = lambda k: sum(map(abs, err(k))) / max(1, len(wk))
         bias = lambda k: sum(err(k)) / max(1, len(wk))
@@ -147,7 +147,7 @@ def score(checks: list[dict], sim: dict, draws: int) -> dict:
             "late_corr": corr([r["played_late"] for r in sel], [r["sim_late"] for r in sel]), "orders_corr": corr([r["played_orders"] for r in sel], [r["sim_orders"] for r in sel]),
             "arm_late_ratio": sum(r["sim_arm_late"] * r["seeds"] for r in sel) / max(1e-9, sum(r["played_arm_late"] * r["seeds"] for r in sel)),
         }
-    return {"rows": rows, "summary": summary, "weeks": list(weeks.values())}
+    return {"rows": rows, "summary": summary, "weeks": list(paired.values())}
 
 
 def report(scored: dict) -> list[str]:
