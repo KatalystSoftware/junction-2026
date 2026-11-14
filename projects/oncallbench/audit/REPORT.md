@@ -532,22 +532,22 @@ on the screen. They must be treated as uncertain priors or replaced by additiona
 From the project root, use the declared Nix environment; no credentials are required:
 
 ```sh
-nix develop -c python3 -B spikes/aq-incident/audit/check.py
-nix develop -c bash spikes/aq-incident/audit/harbor.sh
-nix develop -c bash spikes/aq-incident/audit/probe.sh
-nix develop -c bash spikes/aq-incident/audit/reward_spoof.sh
-nix develop -c uvx --from harbor==0.25.0 harbor run -p spikes/aq-incident/audit/runtime/task -o spikes/aq-incident/audit/runtime/bare-jobs --job-name bare-task-nop -a nop --quiet
-nix develop -c python3 -B spikes/aq-incident/audit/inventory.py
-nix develop -c python3 -B spikes/aq-incident/audit/diagnose.py
-nix develop -c python3 -B spikes/aq-incident/audit/collect_results.py
-nix develop -c python3 -B spikes/aq-incident/audit/integrity.py
-nix develop -c python3 -B spikes/aq-incident/audit/summarize.py
-nix develop -c python3 -B spikes/aq-incident/audit/validate.py
+nix develop -c python3 -B projects/oncallbench/audit/check.py
+nix develop -c bash projects/oncallbench/audit/harbor.sh
+nix develop -c bash projects/oncallbench/audit/probe.sh
+nix develop -c bash projects/oncallbench/audit/reward_spoof.sh
+nix develop -c uvx --from harbor==0.25.0 harbor run -p projects/oncallbench/audit/runtime/task -o projects/oncallbench/audit/runtime/bare-jobs --job-name bare-task-nop -a nop --quiet
+nix develop -c python3 -B projects/oncallbench/audit/inventory.py
+nix develop -c python3 -B projects/oncallbench/audit/diagnose.py
+nix develop -c python3 -B projects/oncallbench/audit/collect_results.py
+nix develop -c python3 -B projects/oncallbench/audit/integrity.py
+nix develop -c python3 -B projects/oncallbench/audit/summarize.py
+nix develop -c python3 -B projects/oncallbench/audit/validate.py
 ```
 
 `check.py` without `--root` captures the current source. To reproduce the **audited** source
 instead, first extract the committed archive into `audit/runtime`, then pass
-`--root spikes/aq-incident/audit/runtime` to `check.py`; this preserves the snapshot across
+`--root projects/oncallbench/audit/runtime` to `check.py`; this preserves the snapshot across
 future improvements. Remove old runtime job/probe folders before repeating names. Raw console
 logs are retained alongside the compact JSON evidence. Only files under `audit/` are committed.
 

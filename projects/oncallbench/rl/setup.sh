@@ -1,5 +1,5 @@
 #!/bin/sh
-# Run on the GPU box from spikes/aq-incident/rl: a Python env with vLLM and the training stack.
+# Run on the GPU box from projects/oncallbench/rl: a Python env with vLLM and the training stack.
 set -e
 command -v uv >/dev/null || curl -LsSf https://astral.sh/uv/install.sh | sh
 export PATH="$HOME/.local/bin:$PATH"

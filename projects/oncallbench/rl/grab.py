@@ -1,6 +1,6 @@
 """Poll Verda until one GPU that fits the job is free, and create it (cheapest first, spot first).
 
-    sops exec-env secrets/secrets.yaml 'python3 spikes/aq-incident/rl/grab.py <ssh-key-id>'
+    sops exec-env secrets/secrets.yaml 'python3 projects/oncallbench/rl/grab.py <ssh-key-id>'
 """
 
 import sys

@@ -1,6 +1,6 @@
 """Verda (ex-DataCrunch) REST helper for the training GPU. Credentials come only from the env:
 
-    sops exec-env secrets/secrets.yaml 'python3 spikes/aq-incident/rl/verda.py balance'
+    sops exec-env secrets/secrets.yaml 'python3 projects/oncallbench/rl/verda.py balance'
 
 Subcommands: balance | types | avail | images | list | keys | delete <id> | volumes | delete-volume <id>
             | create <type> <location> <ssh-key-id> <image> [spot].
