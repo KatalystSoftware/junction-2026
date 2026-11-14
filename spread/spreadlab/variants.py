@@ -271,6 +271,10 @@ VARIANTS: dict[str, dict] = {
                                                "late_cost": 150, "kinds": KINDS, "note_limits": True, "snow_odds": 0.7},
     "slow-friday-late-150-kinds-limits-snow-fee-1.2": {**REFERENCE, "backlog_step": 0, "slow_step": 0.8, "max_unbooked": 25, "slow_model": "friday", "cost": 1.2,
                                                        "late_cost": 150, "kinds": KINDS, "note_limits": True, "snow_odds": 0.7, "snow_fee": 1.2},
+    # The live default with an offset for each dealer in the day's correction of the curve (dealer.py): Monday's prior sd 0.015 and a drift of 0.02 a day,
+    # among the best on the tune weeks' log loss (scratch/dealer_filter.py). Worth 12 to 26 a week in the closed-loop replay (scratch/dealer_sim.py); see the README.
+    "slow-friday-late-150-kinds-limits-dealer": {**REFERENCE, "backlog_step": 0, "slow_step": 0.8, "max_unbooked": 25, "slow_model": "friday", "cost": 1.2,
+                                                 "late_cost": 150, "kinds": KINDS, "note_limits": True, "dealer_sd": 0.015, "dealer_drift": 0.02, "dealer_version": 1},
     # ... the same without the note's limits, whose posting changed after its weeks were played.
     "slow-friday-late-150-kinds": {**REFERENCE, "backlog_step": 0, "slow_step": 0.8, "max_unbooked": 25, "slow_model": "friday", "cost": 1.2, "late_cost": 150, "kinds": KINDS},
     # The best point of the search over these parameters together (scratch/search.py, trial 16 of 20, on 30 tune seeds), and with the kinds.

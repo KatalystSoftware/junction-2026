@@ -16,6 +16,7 @@ from pathlib import Path
 
 from spread.starter import DAY
 
+from .dealer import DealerPolicy
 from .policy import Policy, fingerprint
 from .server import PracticeClient, data_dir, read_json_gz, world_map, write_json_gz
 from .variants import VARIANTS
@@ -59,7 +60,8 @@ def play(variant: str, params: dict, seed: str, level: int = 8) -> dict:
     world = client.create(level=level, seed=seed)
     try:
         snapshot, roster = world.snapshot(), world.roster()
-        desk, ends_at = Policy(world, level, snapshot["now"], params, roster, map_), snapshot["endsAt"]
+        desk_class = DealerPolicy if params.get("dealer_sd") else Policy  # the day's correction with an offset for each dealer (dealer.py)
+        desk, ends_at = desk_class(world, level, snapshot["now"], params, roster, map_), snapshot["endsAt"]
         events: list[dict] = []
         while desk.now < ends_at:
             # One request a step, as the starter does: the advance applies the outbox, then moves the clock.

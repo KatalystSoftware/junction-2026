@@ -281,6 +281,36 @@ PYTHONPATH=. uv run --with scikit-learn python scratch/curve_day.py --write     
 Random prices lose money on purpose, so `explore` is never a candidate. It is safe only because
 practice weeks do not count for the ranking.
 
+**An offset for each dealer adds little** (`dealer_sd`, `dealer_drift`, [`dealer.py`](spreadlab/dealer.py), variant
+`slow-friday-late-150-kinds-limits-dealer`, not played). The day's shift and an offset for each dealer are fitted
+together from the day's answers in one likelihood. A sale or a loss is a censored answer, and the curve's chance is its
+likelihood. Each offset starts the week at N(0, 0.015²): a dealer with few answers stays at the market's level. Each
+morning the day before's posterior carries over with 0.02² added, so a dealer's step never falls under the drift's.
+Offline, on the weeks of `steep-notes-offers-8` (371 held-out weeks, the holdout list and the fresh seeds):
+
+- Dealers differ little. Fitted in hindsight, the dealers' offsets over a week spread 0.035 in log price beyond the
+  sampling noise. Inside a dealer's week the offset falls 0.05 (0.04 to 0.06) per unit of yesterday's win share there:
+  the competitor's morning cut where the desk wins most.
+- Log loss, quotes read in time order: 0.4721 with the day's shift alone, 0.4690 with the offsets (-3.1e-3, -3.7e-3 to
+  -2.6e-3); on the three largest dealers' quotes on Monday and Tuesday, -1.6e-3. Wider priors are worse: 0.06 makes it 0.4734.
+- Unbiased on the answers: on the three largest dealers' Monday and Tuesday quotes it predicts 31.42% sold, against 31.17%
+  sold; per week +0.2 points (-0.1 to +0.5), as with the day's shift alone.
+- In a closed-loop replay of the same weeks (`scratch/dealer_sim.py`, dealers answer by a known truth: the week's
+  hindsight day levels with its price war, the dealer offsets, the morning cuts and the trust count), +26 a week (11 to
+  41) with the hindsight offsets and +12 (-3 to 27) with drawn ones; +2 and +4 on the three largest dealers' Monday and
+  Tuesday quotes. Sampling a price from the dealer's posterior while it is unsure costs 42 to 54 a week. A wrong start,
+  the three largest dealers taken 5% dearer, loses 5 of their 78 Monday and Tuesday orders, 0.8 of their trust counts
+  by Friday and 11 to 13 euros.
+- The price war goes to the day's shift, not to the dealers: the threshold error on the day after the war is 0.000 with
+  or without the offsets.
+
+```bash
+PYTHONPATH=. uv run python scratch/dealer_rows.py steep-notes-offers-8           # one row per quote, with the trust count at the quote
+PYTHONPATH=. uv run --with numpy python scratch/dealer_filter.py 0.01,0.015 0.02  # log loss by prior sd and drift, tune and held-out weeks
+PYTHONPATH=. uv run --with numpy python scratch/dealer_truth.py                   # how far dealers differ, and the morning cut
+PYTHONPATH=. uv run --with numpy python scratch/dealer_sim.py                     # euros in the closed-loop replay
+```
+
 ## Private addresses and trade-ins
 
 The desk declines requests with a private address (11% of requests) and with two cars (2%). No curve
