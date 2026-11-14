@@ -479,3 +479,9 @@ VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss
     _A1_7, cost=1.1, queue_hours=12, kinds=_KINDS_CHEAP)
 VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100-vol105"] = {
     **_full_weeks(_A1_7, cost=1.05, queue_hours=12, kinds=_KINDS_CHEAP), "pair_onward_cost": 0.9}
+# Lane 2's aggressive candidate on safe row 7 and on the aggressive row A1: the onward pairs at a held car's release, open gigs
+# and the onward quote at 1.0 in every week, not only with 760 drivers or more (`pair_more_drivers` 0). Row 7's day cap (62
+# under 760 drivers) bounds the extra won orders a thin week can collect on one day. At 760 drivers or more each is its row exactly.
+for _row in ("fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62",
+             "fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100"):
+    VARIANTS[f"{_row}-onward-all"] = {**VARIANTS[_row], "pair_more_drivers": 0}
