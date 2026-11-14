@@ -7,6 +7,7 @@
 	import { loadQueue, queue } from './lib/queue.svelte'
 	import { LANGS, isLang, type Lang, type Topic } from './lib/types'
 	import Findings from './Findings.svelte'
+	import SqlPanel from './SqlPanel.svelte'
 	import Timeline from './Timeline.svelte'
 	import TopicList from './TopicList.svelte'
 
@@ -131,6 +132,7 @@
 </main>
 
 <TopicList />
+<SqlPanel {topic} />
 
 <style>
 	.bar {
