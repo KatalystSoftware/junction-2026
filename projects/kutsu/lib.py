@@ -25,7 +25,7 @@ HERE = Path(__file__).resolve().parent
 CACHE = HERE / "cache"
 UA = (
     "KatalystJunction2026-EspooSpike/0.1 "
-    "(+https://github.com/KatalystSoftware/junction2026; Junction 2026 hackathon research, "
+    "(+https://github.com/KatalystSoftware/junction-2026; Junction 2026 hackathon research, "
     "one request per second, obeys robots.txt)"
 )
 UA_TOKEN = "KatalystJunction2026-EspooSpike"

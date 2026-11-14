@@ -94,6 +94,15 @@ def reviews():
     return saved["reviews"]
 
 
+KEYS = ("EXA_API_KEY", "CONTEXT_DEV_API_KEY", "ANTHROPIC_API_KEY")
+
+
+def missing_key(error):
+    """The API key a request stopped on, when it stopped because this server runs without one."""
+    name = error.args[0] if isinstance(error, KeyError) and error.args else ""
+    return name if name in KEYS and not os.environ.get(name) else ""
+
+
 def keep(saved):
     """Write every sign-up at once: to a file beside the real one, then put in its place, so a crash mid-write
     leaves the last whole file and never half of one."""
@@ -218,6 +227,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
             b = signals.brief(q, COMPANIES, ROLES, lambda stage, facts: steps.append({"stage": stage, **facts}))
         except (SystemExit, KeyError) as e:  # an API turned the request down, or a key is not in the environment
             print(f"research failed for {q!r}: {e}", file=sys.stderr)
+            if missing_key(e):
+                return self.text(503, f"This server runs without {missing_key(e)}, so it can show only the companies already researched.")
             return self.text(502, "We could not research this company just now. Try again in a minute.")
         finally:
             researching.release()
@@ -259,7 +270,10 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self.text(422, str(unreadable))
         except (KeyError, OSError, ValueError, StopIteration) as error:  # a missing key, their side down, an answer in no shape
             print(f"a profile could not be read: {type(error).__name__}", file=sys.stderr)
-            self.text(502, "We could not fill this in just now. Type it in yourself, or try again in a minute.")
+            if missing_key(error):
+                self.text(503, f"This server runs without {missing_key(error)}, so it cannot read a profile. Type yours in instead.")
+            else:
+                self.text(502, "We could not fill this in just now. Type it in yourself, or try again in a minute.")
         finally:
             researching.release()
 
@@ -275,6 +289,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
             draft = write()
         except (SystemExit, KeyError) as e:
             print(f"drafting failed: {e}", file=sys.stderr)
+            if missing_key(e):
+                return self.text(503, f"This server runs without {missing_key(e)}, so it cannot draft a role. Write it in yourself.")
             return self.text(502, "The draft did not come through.")
         finally:
             researching.release()

@@ -48,7 +48,7 @@ printf 'EXA_API_KEY=%s\nCONTEXT_DEV_API_KEY=%s\nANTHROPIC_API_KEY=%s\nKUTSU_KEY=
   "${SSH[@]}" "$HOST" "umask 077; cat > /etc/talent-brief.env"
 "${SSH[@]}" "$HOST" "chown -R talentbrief: $DIR && cat > /etc/systemd/system/talent-brief.service && systemctl daemon-reload && systemctl enable --now talent-brief && systemctl restart talent-brief && sleep 2 && systemctl is-active talent-brief" <<UNIT
 [Unit]
-Description=Kutsu demo (junction2026 projects/kutsu)
+Description=Kutsu demo (junction-2026 projects/kutsu)
 After=network-online.target
 
 [Service]
