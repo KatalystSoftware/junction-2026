@@ -59,7 +59,15 @@
 
 <header class="bar">
 	<div class="inner">
-		<a class="brand" href="#/">Since When</a>
+		<a class="brand" href="#/"
+			><svg class="mark" viewBox="3.5 3.5 25 25" aria-hidden="true">
+				<!-- The mark without its tile (favicon.svg has it): the question mark's dot starts a bar on the time strip. -->
+				<path d="M10.5 10a5.5 5.5 0 1 1 7.5 5.1c-1.3.6-2 1.4-2 2.9" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" />
+				<path d="M5 25H27" stroke="#a2a9b1" stroke-width="2" />
+				<path d="M16 25H27" stroke="#ab7f2a" stroke-width="3" />
+				<circle cx="16" cy="25" r="3.3" fill="#ab7f2a" />
+			</svg>Since When</a
+		>
 		{#if nav.route}<button class="cdx-button cdx-button--action-progressive cdx-button--weight-quiet" onclick={() => (ui.topics = true)}>Topics</button>{/if}
 		<span class="grow"></span>
 		{#if flags.fixture}<span class="fixture">Fixture data</span>{/if}
@@ -132,9 +140,22 @@
 	}
 
 	.brand {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--spacing-50);
 		font-family: var(--font-family-serif);
 		font-size: var(--font-size-x-large);
 		color: var(--color-emphasized);
+	}
+
+	.brand:hover {
+		text-decoration: none;
+	}
+
+	.mark {
+		width: 1.3em;
+		height: 1.3em;
+		flex: none;
 	}
 
 	.grow {

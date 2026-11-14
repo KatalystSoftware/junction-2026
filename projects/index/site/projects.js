@@ -44,6 +44,7 @@ window.KATALYST = {
       id: "since-when",
       name: "Since When",
       short: "What three Wikipedias say differently, and since when.",
+      logo: "logos/since-when.svg",
       for: [["MariaDB", "Wikipedia Through Time"]],
       live: "https://since-when.katalyst.fyi/",
       open: "Open Since When",
