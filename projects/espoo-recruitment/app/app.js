@@ -55,7 +55,11 @@
   function route() {
     const h = location.hash.replace(/^#\/?/, "").split("/");
     const k = h[0] || "";
-    document.querySelectorAll("#nav a").forEach(a => a.classList.toggle("on", a.dataset.k === ({ org: "org", log: "org", company: "company", cand: "cand", after: "after", concept: "doc", responsible: "doc", demo: "doc", mentors: "doc" }[k])));
+    const TL = { company: 1, cand: 2, org: 3, log: 3, event: 4, after: 5 }, PH = ["", "company", "cand", "org", "event", "after"];
+    const cur = TL[k] || 0;
+    document.querySelectorAll("#nav a").forEach(a => { const n = PH.indexOf(a.dataset.k); a.classList.toggle("on", n === cur); a.classList.toggle("past", cur > 0 && n < cur); });
+    document.getElementById("aboutlink").classList.toggle("on", ["concept", "responsible", "demo", "mentors"].includes(k));
+    if (k === "event") return viewEvent();
     if (k === "org") return viewOrg(CO[h[1]] ? h[1] : "puro");
     if (k === "log") return viewLog();
     if (k === "company") { const id = CO[h[1]] ? h[1] : "puro"; return h[2] === "intros" ? viewIntros(id) : viewCompany(id); }
@@ -69,38 +73,40 @@
 
   // ---------------------------------------------------------------- home
   function viewHome() {
-    const ps = profiles(), confirmed = ps.filter(p => p.confirmed).length;
     app.innerHTML = `
     <section class="hero">
       <div>
         <span class="badge blue">City of Espoo · Rethinking Recruitment · Junction 2026 prototype</span>
-        <h1 style="margin-top:10px">Fewer, better conversations at Espoo's recruitment events.</h1><p class="sm mut" style="margin:-2px 0 8px"><b>Esittely</b> is Finnish for “introduction”.</p>
-        <p class="mut">Esittely is a light layer on top of event registration. Before the event, at their own pace, companies confirm who they want to meet in about a minute and candidates answer a few concrete questions. City organisers then hand-pick introductions, with the technical needs translated into plain language and every overlap and gap linked to its source.</p>
-        <p><b>How it differs from matchmaking platforms:</b> they let an algorithm score and rank people; Esittely gives the organiser the domain understanding to make the introduction themselves, with a reason.</p>
+        <h1 style="margin-top:10px">Fewer, better conversations at Espoo's recruitment events.</h1>
+        <p class="mut"><b>Esittely</b> (Finnish for “introduction”) is a light layer on top of event registration. Companies say in a minute who they want to meet, candidates answer a few concrete questions, and City organisers hand-pick the introductions, with a reason. Matchmaking platforms let an algorithm rank people; here the organiser decides.</p>
+        <div class="principle"><span><b>The software gathers and translates</b> what people said.</span><span><b>People decide</b> who meets whom, with a reason.</span><span><b>No scores, no rankings of people.</b></span></div>
+        <p>The timeline above is one event, left to right. Each tab is one phase, and what you do in one phase shows up in the next.</p>
+        <p><a href="#/company/puro"><button style="padding:12px 18px;font-size:16px">Start at 1 · Company confirms its needs →</button></a></p>
       </div>
       <div class="card">
         <h3>${esc(D.event.name)} <span class="mut sm">· ${esc(D.event.date)} · ${esc(D.event.format)}</span></h3>
         <div class="grid2" style="margin-top:8px">
-          <div><div style="font-size:30px;font-weight:700">${D.companies.length}</div><div class="sm mut">company stands, ${confirmed} confirmed their needs</div></div>
+          <div><div style="font-size:30px;font-weight:700">${D.companies.length}</div><div class="sm mut">company stands</div></div>
           <div><div style="font-size:30px;font-weight:700">${D.candidates.length}</div><div class="sm mut">registered candidates (synthetic)</div></div>
         </div>
-        <hr><p class="sm mut" style="margin:0">${esc(D.generated)}. Nobody here is real.</p>
+        <hr><p class="sm mut" style="margin:0">${esc(D.generated)}. Nobody here is real. Read: <a href="#/concept">concept</a> · <a href="#/responsible">responsible AI</a> · <a href="#/demo">demo script</a> · <a href="#/mentors">questions for Espoo</a></p>
       </div>
-    </section>
-    <div class="roles">
-      <a href="#/org"><div class="card"><span class="badge blue">Main screen</span><h2 style="margin-top:8px">Organiser</h2><p class="mut">See each company's needs in plain language, and for each possible introduction the overlaps, gaps and their sources. Choose your own filters, decide, write one line why.</p></div></a>
-      <a href="#/company/puro"><div class="card"><span class="badge ok">About one minute</span><h2 style="margin-top:8px">Company</h2><p class="mut">"Tell us who you want to meet and we'll promote your stand to them." Pre-filled from your public job ad; confirm or correct, and see a live anonymous count of attendees who fit.</p></div></a>
-      <a href="#/cand"><div class="card"><span class="badge info">About three minutes</span><h2 style="margin-top:8px">Candidate</h2><p class="mut">A short questionnaire with concrete choices, the same dimensions companies answer. Get a short list of stands worth visiting, each with a reason, and see exactly how organisers see you.</p></div></a>
-    </div>
-    <h2 style="margin-top:26px">The journey</h2>
-    <div class="flow">
-      <div class="step"><b>1 · 3 weeks before</b><span class="sm mut">Draft made from each company's public job ad; company confirms in a minute.</span></div>
-      <div class="step"><b>2 · 2 weeks before</b><span class="sm mut">Candidates answer on their phone, add an optional work sample, ask to meet stands.</span></div>
-      <div class="step"><b>3 · 1 week before</b><span class="sm mut">Organisers hand-pick introductions with a reason; companies get a short list.</span></div>
-      <div class="step"><b>4 · Event day</b><span class="sm mut">Planned conversations at the stands; nobody is blocked from any stand.</span></div>
-      <div class="step"><b>5 · Next day</b><span class="sm mut">One question to both sides: was this conversation relevant?</span></div>
-    </div>
-    <p class="sm mut" style="margin-top:16px">Read: <a href="#/concept">one-page concept</a> · <a href="#/responsible">responsible-AI note</a> · <a href="#/demo">3-minute demo script</a> · <a href="#/mentors">questions for Espoo mentors</a></p>`;
+    </section>`;
+  }
+
+  // ---------------------------------------------------------------- event day: both sides see the same planned conversations
+  function viewEvent() {
+    const coId = "puro", me = cand(ME);
+    const mine = Object.entries(S.dec).filter(([, o]) => o[ME] && o[ME].d === "introduce").map(([co, o]) => ({ co, d: o[ME], slot: L.slotFor(co, ME) }));
+    app.innerHTML = `<h1>Event day: planned conversations</h1>
+      <p class="mut">What phases 1 to 3 produced. The company sees its hand-picked introductions with the organiser's reason; the candidate sees the same conversations with the same times. Nobody is blocked: any candidate can still visit any stand.</p>
+      <div class="event2">
+        <div class="card"><span class="badge ok">Company stand</span>${introsHtml(coId)}</div>
+        <div class="card"><span class="badge info">Candidate's phone</span><h2 style="margin-top:8px">${esc(me.name || "Olena K.")} (${ME})</h2>
+          ${mine.length ? `<div class="okbox"><b>Your planned conversations</b>${mine.map(m => `<div class="sm" style="margin-top:4px">${m.slot} · <b>${esc(CO[m.co].name)}</b>, stand ${CO[m.co].stand}. The organiser's note: “${esc(m.d.reason)}”</div>`).join("")}</div>`
+            : `<div class="note">No planned conversation yet. In phase 3 the organiser can introduce ${ME} to a company; it then appears here with a time and the reason.</div>`}
+          <p class="sm" style="margin-top:12px"><a href="#/cand/stands">Stands worth visiting →</a> · <a href="#/cand/me">How organisers see you →</a></p></div>
+      </div>`;
   }
 
   // ---------------------------------------------------------------- organiser
@@ -268,18 +274,19 @@
     tick(); if (!e.confirmedAt) timerInt = setInterval(tick, 1000);
   }
 
-  function viewIntros(coId) {
+  function introsHtml(coId) {
     const c = CO[coId], p = prof(coId), P = pool();
     const intro = Object.entries(S.dec[coId] || {}).filter(([, d]) => d.d === "introduce");
-        app.innerHTML = `<div class="wiz" style="max-width:900px"><a href="#/company/${coId}" class="sm">← back to your needs</a>
-      <h1 style="margin-top:8px">${esc(c.name)}: your hand-picked introductions</h1>
-      <p class="mut">An Espoo organiser read each attendee's answers against your confirmed needs and chose these conversations. Each comes with the organiser's reason and the candidate's own description, which they have checked. Names are shared at the event, when the candidate agrees.</p>
+    return `<h2 style="margin-top:8px">${esc(c.name)}: your hand-picked introductions</h2>
+      <p class="mut sm">An Espoo organiser read each attendee's answers against your confirmed needs and chose these conversations, each with a reason. Names are shared at the event, when the candidate agrees.</p>
       <div class="note" style="margin-bottom:12px">Promoted to <b>${esc(L.poolCount(p, P).text)}</b> attendees whose answers fit your must-haves. ${P.filter(k => k.wants.includes(coId)).length} asked to visit your stand. Anyone can still visit; these are the planned conversations.</div>
-      ${intro.length ? intro.map(([id, d], i) => { const k = cand(id), f = L.pairFacts(p, k); return `<div class="stand"><div class="top2"><b>${L.slotFor(coId, id)} · ${id}</b><span class="xs mut">introduced by ${esc(d.by)}</span></div>
+      ${intro.length ? intro.map(([id, d]) => { const k = cand(id), f = L.pairFacts(p, k); return `<div class="stand"><div class="top2"><b>${L.slotFor(coId, id)} · ${id}</b><span class="xs mut">introduced by ${esc(d.by)}</span></div>
         <div class="sm" style="margin:4px 0 8px"><b>Organiser's reason:</b> ${esc(d.reason)}</div>
         <div class="sm">${f.overlap.slice(0, 5).map(x => `<div>✓ ${esc(x.text)}</div>`).join("")}${f.gap.slice(0, 3).map(x => `<div class="mut">○ ${esc(x.text)}</div>`).join("")}</div></div>`; }).join("")
-        : `<div class="card mut">No introductions yet. They appear here as the organiser decides (try the <a href="#/org/${coId}">organiser view</a>).</div>`}
-    </div>`;
+        : `<div class="card mut">No introductions yet. They appear here as the organiser decides in phase 3 (<a href="#/org/${coId}">organiser view</a>).</div>`}`;
+  }
+  function viewIntros(coId) {
+    app.innerHTML = `<div class="wiz" style="max-width:900px"><a href="#/company/${coId}" class="sm">← back to your needs</a>${introsHtml(coId)}</div>`;
   }
 
   // ---------------------------------------------------------------- candidate questionnaire

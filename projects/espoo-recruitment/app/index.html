@@ -11,18 +11,15 @@
 <body>
 <header class="top">
   <a class="brand" href="#/"><span class="dots"><i></i><i></i></span><b>Esittely</b><small>hand-picked introductions for Espoo recruitment events</small></a>
-  <nav id="nav">
-    <a href="#/org" data-k="org">Organiser</a>
-    <a href="#/company/puro" data-k="company">Company</a>
-    <a href="#/cand" data-k="cand">Candidate</a>
-    <a href="#/after" data-k="after">After the event</a>
-    <a href="#/concept" data-k="doc">About</a>
-  </nav>
-  <div class="topright"><span class="badge synth" title="Every company, job ad and person in this prototype is fictional">Synthetic demo data</span><button class="ghost sm" id="reset" title="Reset all demo decisions and edits">Reset demo</button></div>
+  <div class="topright"><a href="#/concept" id="aboutlink" class="sm">About</a><span class="badge synth" title="Every company, job ad and person in this prototype is fictional">Synthetic demo data</span><button class="ghost sm" id="reset" title="Reset all demo decisions and edits">Reset demo</button></div>
 </header>
-<div class="principle" id="principle">
-  <span><b>The software gathers and translates</b> what people said.</span><span><b>People decide</b> who meets whom, with a reason.</span><span><b>No scores, no rankings of people.</b></span>
-</div>
+<nav id="nav" class="timeline" aria-label="Phases of one recruitment event, left to right">
+  <a href="#/company/puro" data-k="company"><small>3 weeks before</small><b>1 · Company confirms its needs</b><span>About one minute, from its own job ad</span></a>
+  <a href="#/cand" data-k="cand"><small>2 weeks before</small><b>2 · Candidate answers</b><span>Six concrete steps on the phone</span></a>
+  <a href="#/org" data-k="org"><small>1 week before</small><b>3 · Organiser hand-picks</b><span>Overlaps and gaps with sources, a decision with a reason</span></a>
+  <a href="#/event" data-k="event"><small>Event day</small><b>4 · Planned conversations</b><span>Both sides see the same list, any stand stays open</span></a>
+  <a href="#/after" data-k="after"><small>Day after</small><b>5 · Was it relevant?</b><span>One tap from both sides</span></a>
+</nav>
 <main id="app"></main>
 <div id="toast"></div>
 <script src="data.js"></script>
