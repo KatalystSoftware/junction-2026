@@ -37,7 +37,9 @@ SET SESSION system_versioning_asof = '${v.date} 00:00:00';
 SELECT @@system_versioning_asof AS session_as_of, c.rev_id, c.row_start, c.section, p.text
 FROM chunk AS c
 JOIN passage AS p ON p.sha = c.sha
-WHERE c.wikidata_id = '${v.qid}' AND c.lang = '${v.lang}' AND INSTR(p.text, @quote) > 0
+WHERE c.wikidata_id = '${v.qid}' AND c.lang = '${v.lang}'
+  AND INSTR(LOWER(REGEXP_REPLACE(p.text, '(*UCP)\\\\W+', ' ')),
+            TRIM(LOWER(REGEXP_REPLACE(@quote, '(*UCP)\\\\W+', ' ')))) > 0
 ORDER BY c.ord
 LIMIT 1`
 	if (preset === 'asof')

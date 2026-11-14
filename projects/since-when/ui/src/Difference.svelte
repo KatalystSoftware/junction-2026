@@ -82,7 +82,7 @@
 					aria-haspopup="dialog"
 					title={asof.finding === '0'
 						? `Opens the statement that reads the ${NAMES[asof.lang]} article as it stood after that day. Nothing runs until you click Run.`
-						: `Opens the statement that reads the passage of the ${NAMES[asof.lang]} article holding the quoted words, as it stood on the day of the check. Nothing runs until you click Run.`}
+						: `Opens the statement that reads the passage of the ${NAMES[asof.lang]} article holding the quoted words, as it stood the day after they first appeared. Nothing runs until you click Run.`}
 					onclick={() => showSql('asof', asof)}>Check in MariaDB</button
 				>
 				{#if check}

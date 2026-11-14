@@ -12,7 +12,6 @@ import re
 import threading
 import time
 from datetime import date, datetime
-from itertools import pairwise
 
 import mariadb
 import uvicorn
@@ -317,19 +316,10 @@ def _words(text):
     return re.findall(r"\w+", (text or "").casefold())
 
 
-def _holds(passage_words, quote_words):
-    """Whether a passage holds a quote, allowing for changes of case, punctuation and wiki markup:
-    every number of the quote, and three in four of its pairs of consecutive words, or one in two
-    when the numbers already match (a place renamed, a clause reworded around the same figure)."""
-    have = set(passage_words)
-    if not all(w in have for w in quote_words if w.isdigit()):
-        return False
-    pairs = set(pairwise(quote_words))
-    if not pairs:
-        return all(w in have for w in quote_words)
-    there = set(pairwise(passage_words))
-    share = 0.5 if any(w.isdigit() for w in quote_words) else 0.75
-    return len(pairs & there) >= share * len(pairs)
+def _norm(text):
+    """Text as the as-of statement compares it: lower case, and every run of characters that are not
+    letters or digits (punctuation, wiki markup, spaces) one space, as the as-of statement does in SQL."""
+    return " ".join(_words(text))
 
 
 _BEGAN = {}  # topic -> {finding id: began}; the history does not change while the server runs
@@ -341,8 +331,7 @@ def began(r, qid, findings):
     words, read from the article's full history (chunk FOR SYSTEM_TIME ALL). An edit that only
     reformats the words, or touches another part of the passage, does not start a run. Sets
     `began` on each such finding: {lang: {"at", "rev", "old", "first"}}, `first` when the run
-    reaches back to the oldest version loaded, `quoted` the first revision of the run with the quote word
-    for word."""
+    reaches back to the oldest version loaded; `quoted` is the same day, kept for the page."""
     wanted = [
         f
         for f in findings
@@ -366,20 +355,18 @@ ORDER BY c.lang, c.row_start""",
     )
     by_lang = {}
     for x in rows:
-        by_lang.setdefault(x["lang"], []).append(
-            (x["row_start"], x["row_end"], x["rev_id"], _words(x["text"]), x["text"])
-        )
+        by_lang.setdefault(x["lang"], []).append((x["row_start"], x["row_end"], x["rev_id"], _norm(x["text"])))
     times = {lang: sorted({v[0] for v in vs}) for lang, vs in by_lang.items()}
     for f in wanted:
         out = {}
         for lang, quote in f["quotes"].items():
             vs, ts = by_lang.get(lang), times.get(lang)
-            q = _words(quote)
+            q = _norm(quote)
             if not vs or not q:
                 continue
 
             def holds(t, vs=vs, q=q):
-                return any(a <= t < b and _holds(w, q) for a, b, _, w, _ in vs)
+                return any(a <= t < b and q in text for a, b, _, text in vs)
 
             i = len(ts) - 1
             if not holds(ts[i]):
@@ -403,12 +390,7 @@ ORDER BY c.lang, c.row_start""",
                 i = back
             rev = max(v[2] for v in vs if v[0] == ts[i])
             old = max(v[2] for v in vs if v[0] == ts[i - 1]) if i > 0 else None
-            # The first revision of the run that has the quote word for word, for reading it back.
-            j = next(
-                (k for k in range(i, len(ts)) if any(a <= ts[k] < b and quote in text for a, b, _, _, text in vs)),
-                len(ts) - 1,
-            )
-            out[lang] = {"at": ts[i], "rev": rev, "old": old, "first": i == 0, "quoted": ts[j]}
+            out[lang] = {"at": ts[i], "rev": rev, "old": old, "first": i == 0, "quoted": ts[i]}
         if out:
             f["began"] = out
     _BEGAN[qid] = {f["id"]: f["began"] for f in wanted if "began" in f}
@@ -779,7 +761,9 @@ ASOF_PASSAGE_SQL = """
 SELECT @@system_versioning_asof AS session_as_of, c.rev_id, c.row_start, c.section, p.text
 FROM chunk AS c
 JOIN passage AS p ON p.sha = c.sha
-WHERE c.wikidata_id = ? AND c.lang = ? AND INSTR(p.text, @quote) > 0
+WHERE c.wikidata_id = ? AND c.lang = ?
+  AND INSTR(LOWER(REGEXP_REPLACE(p.text, '(*UCP)\\\\W+', ' ')),
+            TRIM(LOWER(REGEXP_REPLACE(@quote, '(*UCP)\\\\W+', ' ')))) > 0
 ORDER BY c.ord
 LIMIT 1"""
 HISTORY_SQL = """
