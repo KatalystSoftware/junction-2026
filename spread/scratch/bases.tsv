@@ -61,3 +61,12 @@ m41-i	safe		f69c93a9	m41-i-long300-c10	e51c830d13d6	ready	value	drives over 300 
 m41-j	safe		f69c93a9	m41-j-kindfee	b524c344884c	ready	code	the trade-in fee fix (kind_fees) in every week (lane 3 B), re-entered unchanged by the 22:46 rule; built 22:51 UTC	
 m41-k	safe		f69c93a9	m41-k-q18-760	5551514d6ea0	ready	value	waiting cars counted within 18 hours at 760 to 819 drivers (lane 4 A); built 22:51 UTC	
 m41-l	safe		f75f8765	m41-l-onq08-820	71a339c04bb0	ready	value	onward quote 0.8 from 820 drivers (lane 2 B); built 23:07 UTC	
+m41x-b	safe		bcb7be5a	m41x-b-cap62-onward-all	c0df9ed6d7c5	held	value	fallback if m41-k rolls back on fresh-9072 (760-819 plays trackb-merge-4.1): cap 62 with onward pairs under 760	
+m41x-e	safe		bcb7be5a	m41x-e-thin-hold12-left6	063241aed9ac	held	code	fallback if m41-k rolls back on fresh-9072 (760-819 plays trackb-merge-4.1): pair_hold 12 and pair_left 6 under 760 (thin_play)	
+m41x-d	safe		bcb7be5a	m41x-d-late80-from820	1542b397c3e7	held	value	fallback if m41-k rolls back on fresh-9072 (760-819 plays trackb-merge-4.1): late_cost 80 from 820	
+m41x-h	safe		bcb7be5a	m41x-h-ss025-820	e68288e848b1	held	value	fallback if m41-k rolls back on fresh-9072 (760-819 plays trackb-merge-4.1): slow_step 0.25 from 820	
+m41x-l	safe		bcb7be5a	m41x-l-onq08-820	1dd858be2b11	held	value	fallback if m41-k rolls back on fresh-9072 (760-819 plays trackb-merge-4.1): onward quote 0.8 from 820	
+m41x-c	safe		bcb7be5a	m41x-c-h30-c11-820	b287af830b69	held	value	fallback if m41-k rolls back on fresh-9072 (760-819 plays trackb-merge-4.1): cost 1.1 for 30 hours or more, from 820	
+m41x-f	safe		bcb7be5a	m41x-f-h24-820	638c6864fe08	held	value	fallback if m41-k rolls back on fresh-9072 (760-819 plays trackb-merge-4.1): the cost-by-hours line at 24 hours, from 820	
+m41x-i	safe		bcb7be5a	m41x-i-long300-c10-820	02e55eeedda9	held	value	fallback if m41-k rolls back on fresh-9072 (760-819 plays trackb-merge-4.1): drives over 300 minutes at cost 1.0, from 820	
+m41x-j	safe		bcb7be5a	m41x-j-kindfee-thin-820	623ba6e8f291	held	code	fallback if m41-k rolls back on fresh-9072 (760-819 plays trackb-merge-4.1): kind_fees under 760 and from 820	
