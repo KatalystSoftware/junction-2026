@@ -46,7 +46,7 @@ window.KATALYST = {
       id: "kutsu",
       short: "recruitment events that start from the last ones",
       name: "Kutsu",
-      for: "City of Espoo, Rethinking Recruitment",
+      for: "City of Espoo, Rethinking Recruitment · Context.dev, Fully Structured Web",
       live: "https://kutsu.katalyst.fyi/",
       open: "Open Kutsu",
       more: [
@@ -55,7 +55,7 @@ window.KATALYST = {
       ],
       source: "projects/kutsu",
       shot: "kutsu.webp",
-      what: "Today every Espoo recruitment event starts from scratch, and companies and candidates each wait for the other to sign up. Kutsu keeps what past events taught and hands both an invitation that is already filled in, to agree with or correct.",
+      what: "Today every Espoo recruitment event starts from scratch, and companies and candidates each wait for the other to sign up. Kutsu keeps what past events taught and hands both an invitation that is already filled in, to agree with or correct. Context.dev supplies the company details, brand colours and careers-page data that prefill the invitation.",
     },
   ],
   also: {
