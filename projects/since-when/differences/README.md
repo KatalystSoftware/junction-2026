@@ -14,7 +14,8 @@ python -m unittest differences.test_differences
 
 ```python
 from differences import classify_pair, classify_pairs, TYPE_WEIGHT
-rows = classify_pair(pair)                     # list of dicts, possibly empty
+
+rows = classify_pair(pair)  # list of dicts, possibly empty
 for rows in classify_pairs(pairs, workers=8):  # same order as the input
     ...
 ```

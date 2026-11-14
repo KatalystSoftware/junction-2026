@@ -86,7 +86,7 @@ RETRIES = 10
 
 
 def _backoff(attempt):
-    return min(60, 2 ** attempt * 2) * (0.5 + random.random())
+    return min(60, 2**attempt * 2) * (0.5 + random.random())
 
 
 # Many workers starting together, and their retries, exceed a per-minute limit at once and keep

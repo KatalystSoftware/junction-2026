@@ -15,90 +15,135 @@ LANG_NAME = {"fi": "Finnish", "sv": "Swedish", "en": "English"}
 # that a passage names the same thing in a more neutral way.
 FAMILIES = {
     "political label": {
-        "fascist": (True, {
-            "fi": r"(?<!anti-)\bfasis[mt]\w*",
-            "sv": r"(?<!anti-)\bfascis[mt]\w*",
-            "en": r"(?<!anti-)\b(?:proto-)?fascis[mt]\w*",
-        }),
-        "pro-Nazi": (True, {
-            "fi": r"\bnatsimielis\w*|\bnatsimyönteis\w*",
-            "sv": r"\bnazistvänlig\w*|\bpronazis\w*",
-            "en": r"\bpro-nazi\w*",
-        }),
-        "far right": (True, {
-            "fi": r"\bäärioikeisto\w*|\boikeistoäärimmäis\w*|\bäärinationalis\w*|\bultranationalis\w*",
-            "sv": r"\bhögerextrem\w*|\bextremt? höger\w*|\bultranationalis\w*",
-            "en": r"\bfar[- ]right\b|\bextreme[- ]right\w*|\bright-wing extrem\w*|\bultranationalis\w*",
-        }),
+        "fascist": (
+            True,
+            {
+                "fi": r"(?<!anti-)\bfasis[mt]\w*",
+                "sv": r"(?<!anti-)\bfascis[mt]\w*",
+                "en": r"(?<!anti-)\b(?:proto-)?fascis[mt]\w*",
+            },
+        ),
+        "pro-Nazi": (
+            True,
+            {
+                "fi": r"\bnatsimielis\w*|\bnatsimyönteis\w*",
+                "sv": r"\bnazistvänlig\w*|\bpronazis\w*",
+                "en": r"\bpro-nazi\w*",
+            },
+        ),
+        "far right": (
+            True,
+            {
+                "fi": r"\bäärioikeisto\w*|\boikeistoäärimmäis\w*|\bäärinationalis\w*|\bultranationalis\w*",
+                "sv": r"\bhögerextrem\w*|\bextremt? höger\w*|\bultranationalis\w*",
+                "en": r"\bfar[- ]right\b|\bextreme[- ]right\w*|\bright-wing extrem\w*|\bultranationalis\w*",
+            },
+        ),
         # Not the same as far right: Finnish "oikeistoradikaali" is "right-wing radical".
-        "radical right": (True, {
-            "fi": r"\boikeistoradikaal\w*|\bradikaalioikeisto\w*",
-            "sv": r"\bhögerradikal\w*|\bradikal höger\w*",
-            "en": r"\bradical[- ]right\w*|\bright-wing radical\w*",
-        }),
-        "nationalist": (False, {
-            "fi": r"\bkansallismielis\w*|\bnationalis\w*",
-            "sv": r"\bnationalis\w*",
-            "en": r"\bnationalis\w*",
-        }),
-        "anti-communist": (False, {
-            "fi": r"\bantikommunis\w*|\bkommunisminvastai\w*",
-            "sv": r"\bantikommunis\w*",
-            "en": r"\banti-?communis\w*",
-        }),
+        "radical right": (
+            True,
+            {
+                "fi": r"\boikeistoradikaal\w*|\bradikaalioikeisto\w*",
+                "sv": r"\bhögerradikal\w*|\bradikal höger\w*",
+                "en": r"\bradical[- ]right\w*|\bright-wing radical\w*",
+            },
+        ),
+        "nationalist": (
+            False,
+            {
+                "fi": r"\bkansallismielis\w*|\bnationalis\w*",
+                "sv": r"\bnationalis\w*",
+                "en": r"\bnationalis\w*",
+            },
+        ),
+        "anti-communist": (
+            False,
+            {
+                "fi": r"\bantikommunis\w*|\bkommunisminvastai\w*",
+                "sv": r"\bantikommunis\w*",
+                "en": r"\banti-?communis\w*",
+            },
+        ),
     },
     "name of the 1918 war": {
-        "War of Liberation": (True, {
-            "fi": r"\bvapaussod\w*|\bvapaussota\w*",
-            "sv": r"\bfrihetskrig\w*",
-            "en": r"\bwar of liberation\b|\bliberation war\b",
-        }),
+        "War of Liberation": (
+            True,
+            {
+                "fi": r"\bvapaussod\w*|\bvapaussota\w*",
+                "sv": r"\bfrihetskrig\w*",
+                "en": r"\bwar of liberation\b|\bliberation war\b",
+            },
+        ),
         "class war": (True, {"fi": r"\bluokkasod\w*|\bluokkasota\w*", "sv": r"\bklasskrig\w*", "en": r"\bclass war\b"}),
         "Red Rebellion": (True, {"fi": r"\bpunakapina\w*", "sv": r"\bröda upproret\b", "en": r"\bred rebellion\b"}),
-        "civil war": (False, {
-            "fi": r"\bsisällisso\w*|\bkansalaisso\w*",
-            "sv": r"\binbördeskrig\w*|\bmedborgarkrig\w*",
-            "en": r"\bcivil war\b",
-        }),
+        "civil war": (
+            False,
+            {
+                "fi": r"\bsisällisso\w*|\bkansalaisso\w*",
+                "sv": r"\binbördeskrig\w*|\bmedborgarkrig\w*",
+                "en": r"\bcivil war\b",
+            },
+        ),
     },
     "name of the camps": {
-        "concentration camp": (True, {
-            "fi": r"\bkeskitysleir\w*",
-            "sv": r"\bkoncentrationsläger\w*",
-            "en": r"\bconcentration camps?\b",
-        }),
-        "prison camp": (False, {
-            "fi": r"\bvankileir\w*",
-            "sv": r"\bfångläger\w*",
-            "en": r"\bprison(?:er)?(?:[- ]of[- ]war)? camps?\b|\bpow camps?\b",
-        }),
+        "concentration camp": (
+            True,
+            {
+                "fi": r"\bkeskitysleir\w*",
+                "sv": r"\bkoncentrationsläger\w*",
+                "en": r"\bconcentration camps?\b",
+            },
+        ),
+        "prison camp": (
+            False,
+            {
+                "fi": r"\bvankileir\w*",
+                "sv": r"\bfångläger\w*",
+                "en": r"\bprison(?:er)?(?:[- ]of[- ]war)? camps?\b|\bpow camps?\b",
+            },
+        ),
     },
     "name of the violence": {
         "terror": (True, {"fi": r"\bterror\w*", "sv": r"\bterror\w*", "en": r"\bterror\b|\bterrori[sz]\w*"}),
-        "political violence": (False, {
-            "fi": r"\bpoliittis\w* väkivalt\w*",
-            "sv": r"\bpolitiskt? våld\w*",
-            "en": r"\bpolitical violence\b",
-        }),
+        "political violence": (
+            False,
+            {
+                "fi": r"\bpoliittis\w* väkivalt\w*",
+                "sv": r"\bpolitiskt? våld\w*",
+                "en": r"\bpolitical violence\b",
+            },
+        ),
     },
     "name of the uprising": {
-        "coup": (True, {
-            "fi": r"\bvallankaappau\w*|\bkaappausyrity\w*",
-            "sv": r"\bstatskupp\w*|\bkupp(?:en|försök\w*)?\b",
-            "en": r"\bcoup\b",
-        }),
+        "coup": (
+            True,
+            {
+                "fi": r"\bvallankaappau\w*|\bkaappausyrity\w*",
+                "sv": r"\bstatskupp\w*|\bkupp(?:en|försök\w*)?\b",
+                "en": r"\bcoup\b",
+            },
+        ),
         # Not the February or October revolutions, which are names of other events.
-        "revolution": (True, {
-            "fi": r"(?<!helmikuun )(?<!lokakuun )\bvallankumou\w*",
-            "sv": r"(?<!februari)(?<!oktober)\brevolution\w*",
-            "en": r"(?<!February )(?<!October )\brevolution\w*",
-        }),
-        "rebellion": (False, {"fi": r"kapina\w*|\bkapino\w*", "sv": r"uppror\w*", "en": r"\brebellion\b|\brevolt\b|\buprising\b"}),
+        "revolution": (
+            True,
+            {
+                "fi": r"(?<!helmikuun )(?<!lokakuun )\bvallankumou\w*",
+                "sv": r"(?<!februari)(?<!oktober)\brevolution\w*",
+                "en": r"(?<!February )(?<!October )\brevolution\w*",
+            },
+        ),
+        "rebellion": (
+            False,
+            {"fi": r"kapina\w*|\bkapino\w*", "sv": r"uppror\w*", "en": r"\brebellion\b|\brevolt\b|\buprising\b"},
+        ),
     },
 }
 
 _COMPILED = {
-    family: {concept: (loaded, {lang: re.compile(rx, re.I) for lang, rx in rxs.items()}) for concept, (loaded, rxs) in concepts.items()}
+    family: {
+        concept: (loaded, {lang: re.compile(rx, re.I) for lang, rx in rxs.items()})
+        for concept, (loaded, rxs) in concepts.items()
+    }
     for family, concepts in FAMILIES.items()
 }
 
@@ -111,7 +156,7 @@ def sentence_at(text, pos):
     start = 0
     for m in _SENTENCE_END.finditer(text):
         if m.end() > pos:
-            return text[start:m.end()].strip()
+            return text[start : m.end()].strip()
         start = m.end()
     return text[start:].strip()
 
@@ -122,8 +167,8 @@ def _in_proper_name(text, m, lang):
     lower case."""
     if lang not in ("fi", "sv") or not m.group(0)[:1].isupper():
         return False
-    before = text[:m.start()].rstrip()
-    return bool(before) and before[-1] not in ".!?:\"”(«"
+    before = text[: m.start()].rstrip()
+    return bool(before) and before[-1] not in '.!?:"”(«'
 
 
 def find_concepts(text, lang):
@@ -172,13 +217,15 @@ def compare(a, b):
                 first_there = min(theirs.values(), key=lambda m: m.start())
                 quote_there = sentence_at(texts[other], first_there.start())
                 words = ", ".join(f"'{c}'" for c in only_here)
-                out.append({
-                    "type": "framing",
-                    "missing_in": None,
-                    "quote_a": quote_here if this == "a" else quote_there,
-                    "quote_b": quote_here if this == "b" else quote_there,
-                    "summary": f"The {LANG_NAME[side[this]['lang']]} {scope} uses {words} ({family}); "
-                               f"the {LANG_NAME[side[other]['lang']]} {scope} uses other words for the same thing.",
-                    "terms": only_here,
-                })
+                out.append(
+                    {
+                        "type": "framing",
+                        "missing_in": None,
+                        "quote_a": quote_here if this == "a" else quote_there,
+                        "quote_b": quote_here if this == "b" else quote_there,
+                        "summary": f"The {LANG_NAME[side[this]['lang']]} {scope} uses {words} ({family}); "
+                        f"the {LANG_NAME[side[other]['lang']]} {scope} uses other words for the same thing.",
+                        "terms": only_here,
+                    }
+                )
     return out

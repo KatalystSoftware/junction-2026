@@ -1,4 +1,5 @@
 """python3 -m unittest gapfinder.test_wikitext"""
+
 import unittest
 
 from gapfinder.wikitext import passages
@@ -10,8 +11,13 @@ ORDERS = [f"Grand Cross of the Order number {i}, 18 May 1884" for i in range(8)]
 class ListPassages(unittest.TestCase):
     def test_list_in_layout_template_is_its_own_passage(self):
         # The English honours of Nicholas II: prose, then the orders inside {{Columns-list}}.
-        wiki = ("==Honours==\n" + PROSE + "\n\n'''Foreign'''\n{{Columns-list|colwidth=25em|\n"
-                + "\n".join(f"* [[Order {i}|{o}]]" for i, o in enumerate(ORDERS)) + "\n}}\n")
+        wiki = (
+            "==Honours==\n"
+            + PROSE
+            + "\n\n'''Foreign'''\n{{Columns-list|colwidth=25em|\n"
+            + "\n".join(f"* [[Order {i}|{o}]]" for i, o in enumerate(ORDERS))
+            + "\n}}\n"
+        )
         texts = [p[2] for p in passages(wiki)]
         self.assertEqual(len(texts), 2, texts)
         self.assertNotIn("Grand Cross", texts[0])
@@ -27,8 +33,10 @@ class ListPassages(unittest.TestCase):
 
 class Leads(unittest.TestCase):
     # The Swedish lead of Nicholas II opens with a hand-written hatnote and names Russian in English.
-    WIKI = (":''För det finländska fartyget, se [[M/S Nikolai II]]''\n{{Regent|namn=Nikolaj II}}\n"
-            "'''Nikolaj II''' ({{lang-ru|Николай II}}) var Rysslands siste kejsare. " + PROSE)
+    WIKI = (
+        ":''För det finländska fartyget, se [[M/S Nikolai II]]''\n{{Regent|namn=Nikolaj II}}\n"
+        "'''Nikolaj II''' ({{lang-ru|Николай II}}) var Rysslands siste kejsare. " + PROSE
+    )
 
     def test_hatnote_is_not_lead_text(self):
         lead = passages(self.WIKI, edition="sv")[0][2]

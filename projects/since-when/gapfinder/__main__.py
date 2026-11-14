@@ -1,16 +1,17 @@
 """Gap finder command line. Run from projects/since-when/:
 
-    python -m gapfinder schema                 # create the tables
-    python -m gapfinder load [--only Q…]       # topics, history (fi, sv, en), page views
-    python -m gapfinder embed [--threads N]    # embed passages, lowest priority first
-    python -m gapfinder align [--only Q…]      # coverage and coverage findings
-    python -m gapfinder pairs > pairs.jsonl    # far matched pairs for the classifier
-    python -m gapfinder findings load differences.jsonl
-    python -m gapfinder findings lexicon pairs.jsonl > lexicon.jsonl   # word-list rows
-    python -m gapfinder measure                # index recall and query times, saved to a file
-    python -m gapfinder measure --versioned-index mine_a3   # a vector index on a versioned table
-    python -m gapfinder serve [--port 8077]    # the HTTP API (docs/api.md)
+python -m gapfinder schema                 # create the tables
+python -m gapfinder load [--only Q…]       # topics, history (fi, sv, en), page views
+python -m gapfinder embed [--threads N]    # embed passages, lowest priority first
+python -m gapfinder align [--only Q…]      # coverage and coverage findings
+python -m gapfinder pairs > pairs.jsonl    # far matched pairs for the classifier
+python -m gapfinder findings load differences.jsonl
+python -m gapfinder findings lexicon pairs.jsonl > lexicon.jsonl   # word-list rows
+python -m gapfinder measure                # index recall and query times, saved to a file
+python -m gapfinder measure --versioned-index mine_a3   # a vector index on a versioned table
+python -m gapfinder serve [--port 8077]    # the HTTP API (docs/api.md)
 """
+
 import argparse
 import pathlib
 
@@ -37,8 +38,11 @@ def main():
     p = sub.add_parser("measure")
     p.add_argument("--queries", type=int, default=100)
     p.add_argument("--runs", type=int, default=3, help="times each alignment query is run")
-    p.add_argument("--versioned-index", metavar="DB",
-                   help="instead: the vector index on a versioned table experiment, in this private database")
+    p.add_argument(
+        "--versioned-index",
+        metavar="DB",
+        help="instead: the vector index on a versioned table experiment, in this private database",
+    )
     p.add_argument("--one-in", type=int, default=2, help="--versioned-index: copy one topic in this many")
     p.add_argument("--keep", action="store_true", help="--versioned-index: leave the experiment tables")
     p.add_argument("--out", default=None, help="folder for the JSON and Markdown results")
@@ -50,6 +54,7 @@ def main():
 
     if args.cmd == "schema":
         from .db import connect
+
         con = connect()
         cur = con.cursor()
         sql = pathlib.Path(__file__).with_name("schema.sql").read_text()
@@ -59,6 +64,7 @@ def main():
         con.commit()
     elif args.cmd == "load":
         from . import load
+
         only = set(args.only) if args.only else None
         parts = args.part or ["topics", "fi", "sv", "en", "views"]
         if "topics" in parts:
@@ -72,21 +78,26 @@ def main():
             load.pageviews()
     elif args.cmd == "embed":
         from . import embed
+
         embed.run(args.threads, args.below)
     elif args.cmd == "align":
         from . import align
+
         align.run(set(args.only) if args.only else None, history=not args.current)
     elif args.cmd == "pairs":
         from . import align
+
         align.pairs(set(args.only) if args.only else None, history=args.history)
     elif args.cmd == "findings":
         from . import align
+
         if args.action == "lexicon":
             align.lexicon_rows(args.path)
         else:
             align.load_differences(args.path)
     elif args.cmd == "measure":
         from . import measure
+
         save = dict(out=args.out or measure.OUT, note=args.note, provisional=args.provisional)
         if args.versioned_index:
             measure.versioned_index(args.versioned_index, args.queries, args.one_in, args.keep, **save)
@@ -94,6 +105,7 @@ def main():
             measure.run(args.queries, args.runs, **save)
     elif args.cmd == "serve":
         from . import api
+
         api.serve(args.port)
 
 

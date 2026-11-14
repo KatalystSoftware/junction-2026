@@ -3,6 +3,7 @@ connection per request. Every response carries the SQL that produced it, as run.
 
     python -m gapfinder serve --port 8077
 """
+
 import decimal
 import json
 import os
@@ -21,11 +22,17 @@ from .db import DB, LANGS
 
 SEQ = f"seq_{YEARS[0]}_to_{YEARS[-1]}"
 # Editor outcomes: the API's name, the stored status, and the coarse status the UI also reads.
-OUTCOMES = {"edited": ("edited", "closed"), "talk": ("raised_on_talk", "reviewed"),
-            "intentional": ("intentional_difference", "closed"), "not_real": ("not_a_difference", "closed")}
+OUTCOMES = {
+    "edited": ("edited", "closed"),
+    "talk": ("raised_on_talk", "reviewed"),
+    "intentional": ("intentional_difference", "closed"),
+    "not_real": ("not_a_difference", "closed"),
+}
 FROM_DB = {db: (name, coarse) for name, (db, coarse) in OUTCOMES.items()}
-QUALITY = {"featured": {"fi": "Suositeltu", "sv": "Utmärkt", "en": "Featured"},
-           "good": {"fi": "Hyvä artikkeli", "sv": "Bra", "en": "Good"}}
+QUALITY = {
+    "featured": {"fi": "Suositeltu", "sv": "Utmärkt", "en": "Featured"},
+    "good": {"fi": "Hyvä artikkeli", "sv": "Bra", "en": "Good"},
+}
 
 TYPE_ORDER = "FIELD(type, " + ", ".join(f"'{t}'" for t, _ in sorted(TYPE_WEIGHT.items(), key=lambda x: -x[1])) + ")"
 
@@ -101,12 +108,21 @@ LIMIT {int(limit)} OFFSET {int(offset)}"""
 
 
 def queue_item(x):
-    return {"wikidata_id": x["wikidata_id"], "topic": x["topic"], "lang": x["lang"],
-            "rich_lang": x["rich_lang"], "readers": int(x["readers"]),
-            "coverage": round(float(x["coverage"]), 3), "size": json.loads(x["size"] or "{}"),
-            "score": int(x["score"]), "weight": round(float(x["gap"]), 2), "findings": int(x["findings"]),
-            "top_type": x["top_type"], "status": x["status"],
-            "quality": quality(json.loads(x["quality"] or "{}").items())}
+    return {
+        "wikidata_id": x["wikidata_id"],
+        "topic": x["topic"],
+        "lang": x["lang"],
+        "rich_lang": x["rich_lang"],
+        "readers": int(x["readers"]),
+        "coverage": round(float(x["coverage"]), 3),
+        "size": json.loads(x["size"] or "{}"),
+        "score": int(x["score"]),
+        "weight": round(float(x["gap"]), 2),
+        "findings": int(x["findings"]),
+        "top_type": x["top_type"],
+        "status": x["status"],
+        "quality": quality(json.loads(x["quality"] or "{}").items()),
+    }
 
 
 def findings_sql(qid=None, fid=None):
@@ -135,35 +151,58 @@ ORDER BY NOT gone AND v.status = 'open' DESC, score DESC, v.weight DESC, v.dista
 
 def finding(x):
     quotes, citations, paragraph = {}, {}, {}
-    for lang, quote, cite, par in ((x["lang"], x["quote"], x["citation"], x["paragraph_citation"]),
-                                   (x["other_lang"], x["other_quote"], x["other_citation"],
-                                    x["other_paragraph_citation"])):
+    for lang, quote, cite, par in (
+        (x["lang"], x["quote"], x["citation"], x["paragraph_citation"]),
+        (x["other_lang"], x["other_quote"], x["other_citation"], x["other_paragraph_citation"]),
+    ):
         if quote:
             quotes[lang], citations[lang], paragraph[lang] = quote, cite, par
     outcome, coarse = FROM_DB.get(x["status"], (None, "open"))
-    return {"id": x["id"], "lang": x["lang"], "other_lang": x["other_lang"], "type": x["type"],
-            "section": x["section"], "other_section": x["other_section"], "summary": x["summary"],
-            "quotes": quotes, "citations": citations, "paragraph_citations": paragraph,
-            "rev_ids": {x["lang"]: x["rev_id"], x["other_lang"]: x["other_rev_id"]},
-            "terms": json.loads(x["terms"] or "[]"),
-            "distance": None if x["distance"] is None else round(float(x["distance"]), 3),
-            "weight": round(float(x["weight"]), 2), "score": int(x["score"]),
-            "status": "closed" if x["gone"] else coarse, "outcome": outcome, "rev_url": x["status_url"],
-            "opened_at": x["opened_at"], "opened_after": x["opened_after"], "history": bool(x["history"]),
-            "closed_at": x["closed_at"] if x["gone"] else None,
-            "closed_after": x["closed_after"] if x["gone"] else None}
+    return {
+        "id": x["id"],
+        "lang": x["lang"],
+        "other_lang": x["other_lang"],
+        "type": x["type"],
+        "section": x["section"],
+        "other_section": x["other_section"],
+        "summary": x["summary"],
+        "quotes": quotes,
+        "citations": citations,
+        "paragraph_citations": paragraph,
+        "rev_ids": {x["lang"]: x["rev_id"], x["other_lang"]: x["other_rev_id"]},
+        "terms": json.loads(x["terms"] or "[]"),
+        "distance": None if x["distance"] is None else round(float(x["distance"]), 3),
+        "weight": round(float(x["weight"]), 2),
+        "score": int(x["score"]),
+        "status": "closed" if x["gone"] else coarse,
+        "outcome": outcome,
+        "rev_url": x["status_url"],
+        "opened_at": x["opened_at"],
+        "opened_after": x["opened_after"],
+        "history": bool(x["history"]),
+        "closed_at": x["closed_at"] if x["gone"] else None,
+        "closed_after": x["closed_after"] if x["gone"] else None,
+    }
 
 
 # --- Endpoints ---------------------------------------------------------------------------------
+
 
 def queue(r, q):
     lang = q.get("lang", "all")
     if lang not in LANGS + ("all",):
         raise ApiError(400, "lang must be all, fi, sv or en")
-    rows = r("Gap queue", queue_sql(None if lang == "all" else lang, limit=_int(q, "limit", 50, 1, 500),
-                                    offset=_int(q, "offset", 0, 0, 10**6)))
-    return {"as_of": date.today(), "total": int(rows[0]["total"]) if rows else 0,
-            "items": [queue_item(x) for x in rows]}
+    rows = r(
+        "Gap queue",
+        queue_sql(
+            None if lang == "all" else lang, limit=_int(q, "limit", 50, 1, 500), offset=_int(q, "offset", 0, 0, 10**6)
+        ),
+    )
+    return {
+        "as_of": date.today(),
+        "total": int(rows[0]["total"]) if rows else 0,
+        "items": [queue_item(x) for x in rows],
+    }
 
 
 def topic(r, qid):
@@ -171,17 +210,23 @@ def topic(r, qid):
     if not t:
         raise ApiError(404, f"unknown topic {qid}")
     t = t[0]
-    arts = r("Articles today, with readers", f"""
+    arts = r(
+        "Articles today, with readers",
+        f"""
 WITH {readers_cte([qid])}
 SELECT a.lang, a.title, a.rev_id, a.bytes, a.passages, a.refs, a.quality, COALESCE(rd.readers, 0) AS readers
 FROM article AS a
 LEFT JOIN readers AS rd ON rd.wikidata_id = a.wikidata_id AND rd.lang = a.lang
-WHERE a.wikidata_id = {lit(qid)}""")
-    leads = r("Leads", f"""
+WHERE a.wikidata_id = {lit(qid)}""",
+    )
+    leads = r(
+        "Leads",
+        f"""
 SELECT c.lang, c.ord, c.rev_id, p.text
 FROM chunk AS c JOIN passage AS p ON p.sha = c.sha
 WHERE c.wikidata_id = {lit(qid)} AND c.section = ''
-ORDER BY c.lang, c.ord""")
+ORDER BY c.lang, c.ord""",
+    )
     lead = {}
     for x in leads:
         if x["lang"] not in lead:
@@ -189,13 +234,17 @@ ORDER BY c.lang, c.ord""")
         elif "also" not in lead[x["lang"]]:
             lead[x["lang"]]["also"] = x["text"]
     found = r("Findings (latest version of each)", findings_sql(qid))
-    return {"wikidata_id": qid, "topic": t["title_en"],
-            "titles": {lang: t["title_" + lang] for lang in LANGS},
-            "size": {a["lang"]: a["bytes"] for a in arts},
-            "readers": {a["lang"]: int(a["readers"]) for a in arts},
-            "refs": {a["lang"]: a["refs"] for a in arts},
-            "quality": quality((a["lang"], a["quality"]) for a in arts),
-            "leads": lead, "findings": [finding(x) for x in found]}
+    return {
+        "wikidata_id": qid,
+        "topic": t["title_en"],
+        "titles": {lang: t["title_" + lang] for lang in LANGS},
+        "size": {a["lang"]: a["bytes"] for a in arts},
+        "readers": {a["lang"]: int(a["readers"]) for a in arts},
+        "refs": {a["lang"]: a["refs"] for a in arts},
+        "quality": quality((a["lang"], a["quality"]) for a in arts),
+        "leads": lead,
+        "findings": [finding(x) for x in found],
+    }
 
 
 def compare(r, qid, q):
@@ -204,14 +253,16 @@ def compare(r, qid, q):
         raise ApiError(400, "a and b must be two different editions: fi, sv, en")
     if as_of and not DAY.match(as_of):
         raise ApiError(400, "as_of must be YYYY-MM-DD")
-    near = {x["id"]: x for x in r(f"Nearest {b} passage for each {a} passage",
-                                   nearest_sql(qid, as_of, a, b))}
-    texts = r("Passages of both editions", f"""
+    near = {x["id"]: x for x in r(f"Nearest {b} passage for each {a} passage", nearest_sql(qid, as_of, a, b))}
+    texts = r(
+        "Passages of both editions",
+        f"""
 SELECT c.id, c.lang, c.ord, c.section, c.chunk_no, c.rev_id, p.text, p.embedding IS NOT NULL AS embedded
 FROM chunk FOR SYSTEM_TIME AS OF {as_of_sql(as_of)} AS c
 JOIN passage AS p ON p.sha = c.sha
 WHERE c.wikidata_id = {lit(qid)} AND c.lang IN ({lit(a)}, {lit(b)})
-ORDER BY c.lang, c.ord""")
+ORDER BY c.lang, c.ord""",
+    )
     by_id = {x["id"]: x for x in texts}
     side = lambda x: {k: x[k] for k in ("section", "chunk_no", "rev_id", "text")} | {"chunk_id": x["id"]}
     # A passage is only missing once every passage of b has a vector; until then a far or absent
@@ -226,45 +277,71 @@ ORDER BY c.lang, c.ord""")
         if status == "missing" and not b_done:
             status = "pending"
         other = by_id.get(n["other_id"]) if n and status in ("covered", "partly") else None
-        rows.append({"a": side(x), "b": side(other) if other else None,
-                     "distance": None if not n else round(float(n["distance"]), 3), "status": status})
-    return {"as_of": as_of or date.today(), "a": a, "b": b, "rows": rows,
-            "complete": b_done and all(x["embedded"] for x in texts if x["lang"] == a)}
+        rows.append(
+            {
+                "a": side(x),
+                "b": side(other) if other else None,
+                "distance": None if not n else round(float(n["distance"]), 3),
+                "status": status,
+            }
+        )
+    return {
+        "as_of": as_of or date.today(),
+        "a": a,
+        "b": b,
+        "rows": rows,
+        "complete": b_done and all(x["embedded"] for x in texts if x["lang"] == a),
+    }
 
 
 def timeline(r, qid, q):
     lang, rich = q.get("lang", "en"), q.get("rich_lang", "fi")
     if lang not in LANGS or rich not in LANGS:
         raise ApiError(400, "lang and rich_lang must be fi, sv or en")
-    sizes = r("Article size on each 1 January", f"""
+    sizes = r(
+        "Article size on each 1 January",
+        f"""
 SELECT y.seq AS year, a.lang, a.bytes
 FROM {SEQ} AS y
 JOIN article FOR SYSTEM_TIME ALL AS a
   ON a.row_start <= MAKEDATE(y.seq, 1) AND a.row_end > MAKEDATE(y.seq, 1)
 WHERE a.wikidata_id = {lit(qid)}
-ORDER BY y.seq, a.lang""")
-    cov = r("Coverage on each 1 January", f"""
+ORDER BY y.seq, a.lang""",
+    )
+    cov = r(
+        "Coverage on each 1 January",
+        f"""
 SELECT YEAR(as_of) AS year, coverage
 FROM coverage
 WHERE wikidata_id = {lit(qid)} AND lang = {lit(lang)} AND rich_lang = {lit(rich)} AND NOT is_current
-ORDER BY as_of""")
-    opened = r("Open findings on each 1 January", f"""
+ORDER BY as_of""",
+    )
+    opened = r(
+        "Open findings on each 1 January",
+        f"""
 SELECT y.seq AS year, COUNT(f.id) AS open_findings
 FROM {SEQ} AS y
 LEFT JOIN finding FOR SYSTEM_TIME ALL AS f
   ON f.row_start <= MAKEDATE(y.seq, 1) AND f.row_end > MAKEDATE(y.seq, 1)
  AND f.wikidata_id = {lit(qid)} AND f.lang = {lit(lang)} AND f.status = 'open'
-GROUP BY y.seq""")
-    versions = r("Every version of the findings", f"""
+GROUP BY y.seq""",
+    )
+    versions = r(
+        "Every version of the findings",
+        f"""
 SELECT id, type, summary, status, status_url, other_lang, opened_after, closed_after, row_start, row_end
 FROM finding FOR SYSTEM_TIME ALL
 WHERE wikidata_id = {lit(qid)} AND lang = {lit(lang)}
-ORDER BY id, row_start""")
-    revs = r("Every loaded revision of the articles", f"""
+ORDER BY id, row_start""",
+    )
+    revs = r(
+        "Every loaded revision of the articles",
+        f"""
 SELECT lang, rev_id, row_start, row_end
 FROM article FOR SYSTEM_TIME ALL
 WHERE wikidata_id = {lit(qid)}
-ORDER BY lang, row_start""")
+ORDER BY lang, row_start""",
+    )
     years = {y: {"year": y, "size": {}, "coverage": None, "open_findings": 0} for y in YEARS}
     for x in sizes:
         years[x["year"]]["size"][x["lang"]] = x["bytes"]
@@ -290,8 +367,7 @@ ORDER BY lang, row_start""")
         return out
 
     def event(x, when, kind, after=None):
-        e = {"date": when.date(), "finding_id": x["id"], "kind": kind, "type": x["type"],
-             "summary": x["summary"]}
+        e = {"date": when.date(), "finding_id": x["id"], "kind": kind, "type": x["type"], "summary": x["summary"]}
         if kind in ("opened", "closed"):
             # The change happened after `after` and no later than `date`; each diff contains it.
             e["after"] = after
@@ -310,7 +386,7 @@ ORDER BY lang, row_start""")
         if prev and prev["id"] == x["id"] and x["row_start"] == prev["row_end"]:
             if x["status"] != prev["status"]:
                 events.append(event(x, x["row_start"], kind_of(x["status"])))
-        else:   # a new finding, or the same one again after a period without it
+        else:  # a new finding, or the same one again after a period without it
             if prev and prev["row_end"].year < 2100:
                 events.append(event(prev, prev["row_end"], "closed", prev["closed_after"]))
             events.append(event(x, x["row_start"], "opened", x["opened_after"]))
@@ -334,10 +410,13 @@ def set_status(r, fid, body):
     if url and not re.match(r"^https?://", url):
         raise ApiError(400, "rev_url must be an http(s) URL")
     status = OUTCOMES[outcome][0] if outcome else "open"
-    r("Store the outcome (the old one stays in the table's history)", f"""
+    r(
+        "Store the outcome (the old one stays in the table's history)",
+        f"""
 UPDATE finding SET status = {lit(status)}, status_url = {lit(url if outcome else None)},
-       status_at = {'NOW(6)' if outcome else 'NULL'}
-WHERE id = {int(fid)}""")
+       status_at = {"NOW(6)" if outcome else "NULL"}
+WHERE id = {int(fid)}""",
+    )
     rows = r("The finding", findings_sql(fid=fid))
     if not rows:
         raise ApiError(404, f"unknown finding {fid}")
@@ -358,31 +437,43 @@ def search(r, q):
         raise ApiError(400, "lang must be all, fi, sv or en")
     if not _embedder:
         from .embed import Embedder
+
         _embedder.append(Embedder(threads=2))
     vec = _embedder[0]([text])[0]
     r.cur.execute("SET @q = VEC_FromText(?)", (json.dumps([round(v, 6) for v in vec]),))
-    r.log.append({"label": "The question's bge-m3 vector", "query": f"SET @q = VEC_FromText('[…1024 numbers…]')  -- {text}",
-                  "ms": 0, "rows": 0})
-    hits = r("Nearest current passages (vector index on chunk_now)", f"""
+    r.log.append(
+        {
+            "label": "The question's bge-m3 vector",
+            "query": f"SET @q = VEC_FromText('[…1024 numbers…]')  -- {text}",
+            "ms": 0,
+            "rows": 0,
+        }
+    )
+    hits = r(
+        "Nearest current passages (vector index on chunk_now)",
+        f"""
 SELECT n.wikidata_id, n.lang, n.section, VEC_DISTANCE_COSINE(n.embedding, @q) AS distance
 FROM chunk_now AS n
 ORDER BY VEC_DISTANCE_COSINE(n.embedding, @q)
-LIMIT {limit * 5}""")
+LIMIT {limit * 5}""",
+    )
     # An exact title in any edition comes first: vectors favour passages over names.
-    named = r("Topics with this exact title", f"""
+    named = r(
+        "Topics with this exact title",
+        f"""
 SELECT wikidata_id FROM topic
-WHERE {lit(text)} IN (title_fi, title_sv, title_en)""")
+WHERE {lit(text)} IN (title_fi, title_sv, title_en)""",
+    )
     # Farther than this, bge-m3 matches anything: "zzzzqqq" is 0.64 from its nearest passage and
     # "Olof Palme" (not a topic) 0.56, while "Talvisota" is 0.54 from Winter War.
     near = [h["wikidata_id"] for h in hits if float(h["distance"]) <= SEARCH_MAX_DISTANCE]
     order = list(dict.fromkeys([x["wikidata_id"] for x in named] + near))[:limit]
     if not order:
         return {"items": []}
-    rows = r("Queue rows of those topics", queue_sql(None if lang == "all" else lang, qids=order,
-                                                     limit=3 * len(order)))
+    rows = r("Queue rows of those topics", queue_sql(None if lang == "all" else lang, qids=order, limit=3 * len(order)))
     best = {}
     for x in rows:
-        best.setdefault(x["wikidata_id"], x)   # rows come sorted by score
+        best.setdefault(x["wikidata_id"], x)  # rows come sorted by score
     return {"items": [queue_item(best[qid]) for qid in order if qid in best]}
 
 
@@ -409,8 +500,8 @@ ROUTES = [
 # templates below and runs on a connection of DB_RO_USER with a time limit and a row cap.
 
 LIVE_SECONDS, LIVE_ROWS = 5, 500
-LIVE_SLOTS = threading.BoundedSemaphore(4)   # runs at once; the rest get 429
-FIRST_DAY = "2001-01-15"                     # Wikipedia's first day
+LIVE_SLOTS = threading.BoundedSemaphore(4)  # runs at once; the rest get 429
+FIRST_DAY = "2001-01-15"  # Wikipedia's first day
 
 ASOF_SET = "SET SESSION system_versioning_asof = ?"
 ASOF_SQL = """
@@ -433,26 +524,37 @@ PRESETS = {
     "nearest": {
         "title": "Time travel + vector search",
         "description": "One statement: the passages of a topic as they stood on a date "
-                       "(FOR SYSTEM_TIME AS OF), each matched to its nearest passage in the "
-                       "other edition (VEC_DISTANCE_COSINE). The query the tool aligns with.",
-        "params": [("qid", "qid", "Q1412941"), ("date", "date", "2026-10-24"),
-                   ("a", "lang", "fi"), ("b", "lang", "en")],
-        "statements": lambda v: [("Nearest passage in the other edition, as of the date",
-                                  nearest_sql(v["qid"], v["date"], v["a"], v["b"]), ())],
+        "(FOR SYSTEM_TIME AS OF), each matched to its nearest passage in the "
+        "other edition (VEC_DISTANCE_COSINE). The query the tool aligns with.",
+        "params": [
+            ("qid", "qid", "Q1412941"),
+            ("date", "date", "2026-10-24"),
+            ("a", "lang", "fi"),
+            ("b", "lang", "en"),
+        ],
+        "statements": lambda v: [
+            (
+                "Nearest passage in the other edition, as of the date",
+                nearest_sql(v["qid"], v["date"], v["a"], v["b"]),
+                (),
+            )
+        ],
     },
     "asof": {
         "title": "system_versioning_asof",
         "description": "Set the session variable to a date, then run a plain query with no time "
-                       "clause: it returns the first passage as it stood on that date. Change "
-                       "the date and run the same statement again.",
+        "clause: it returns the first passage as it stood on that date. Change "
+        "the date and run the same statement again.",
         "params": [("qid", "qid", "Q1412941"), ("date", "date", "2026-10-22"), ("lang", "lang", "sv")],
-        "statements": lambda v: [("Set the session's point in time", ASOF_SET, (v["date"] + " 00:00:00",)),
-                                 ("First passage, no time clause", ASOF_SQL, (v["qid"], v["lang"]))],
+        "statements": lambda v: [
+            ("Set the session's point in time", ASOF_SET, (v["date"] + " 00:00:00",)),
+            ("First passage, no time clause", ASOF_SQL, (v["qid"], v["lang"])),
+        ],
     },
     "history": {
         "title": "FOR SYSTEM_TIME ALL",
         "description": "Every version of a topic's first passage that the table has held, "
-                       "newest first, with the row_start and row_end MariaDB kept for it.",
+        "newest first, with the row_start and row_end MariaDB kept for it.",
         "params": [("qid", "qid", "Q1412941"), ("lang", "lang", "en")],
         "statements": lambda v: [("Every version of the first passage", HISTORY_SQL, (v["qid"], v["lang"]))],
     },
@@ -465,21 +567,31 @@ def live_enabled():
 
 def live_connect():
     """A connection of the SELECT-only user; its session carries the time limit and the row cap."""
-    con = mariadb.connect(**{**DB, "user": os.environ["DB_RO_USER"],
-                             "password": os.environ["DB_RO_PASSWORD"]}, autocommit=True)
+    con = mariadb.connect(
+        **{**DB, "user": os.environ["DB_RO_USER"], "password": os.environ["DB_RO_PASSWORD"]}, autocommit=True
+    )
     cur = con.cursor()
-    cur.execute(f"SET SESSION time_zone = '+00:00', max_statement_time = {LIVE_SECONDS}, "
-                f"sql_select_limit = {LIVE_ROWS}")
+    cur.execute(
+        f"SET SESSION time_zone = '+00:00', max_statement_time = {LIVE_SECONDS}, sql_select_limit = {LIVE_ROWS}"
+    )
     cur.close()
     return con
 
 
 def live_presets(body=None):
-    return {"enabled": live_enabled(), "limits": {"seconds": LIVE_SECONDS, "rows": LIVE_ROWS},
-            "presets": [{"name": name, "title": p["title"], "description": p["description"],
-                         "params": [{"name": n, "kind": kind, "default": default}
-                                    for n, kind, default in p["params"]]}
-                        for name, p in PRESETS.items()]}
+    return {
+        "enabled": live_enabled(),
+        "limits": {"seconds": LIVE_SECONDS, "rows": LIVE_ROWS},
+        "presets": [
+            {
+                "name": name,
+                "title": p["title"],
+                "description": p["description"],
+                "params": [{"name": n, "kind": kind, "default": default} for n, kind, default in p["params"]],
+            }
+            for name, p in PRESETS.items()
+        ],
+    }
 
 
 def live_params(body):
@@ -504,7 +616,10 @@ def live_params(body):
             raise ApiError(400, f"{n} must be one of {', '.join(LANGS)}")
         if kind == "date":
             try:
-                ok = bool(DAY.fullmatch(v)) and FIRST_DAY <= date.fromisoformat(v).isoformat() <= date.today().isoformat()
+                ok = (
+                    bool(DAY.fullmatch(v))
+                    and FIRST_DAY <= date.fromisoformat(v).isoformat() <= date.today().isoformat()
+                )
             except ValueError:
                 ok = False
             if not ok:
@@ -532,8 +647,7 @@ def live_run(body):
             got = cur.fetchall() if cur.description else []
             ms = round((time.perf_counter() - t0) * 1000, 1)
             # As sent: the connector writes the bound values into the text as literals.
-            shown = "".join(part + (lit(binds[i]) if i < len(binds) else "")
-                            for i, part in enumerate(sql.split("?")))
+            shown = "".join(part + (lit(binds[i]) if i < len(binds) else "") for i, part in enumerate(sql.split("?")))
             log.append({"label": label, "query": shown.strip(), "ms": ms, "rows": len(got)})
             if cur.description:
                 columns, rows = [d[0] for d in cur.description], [list(x) for x in got]
@@ -545,9 +659,16 @@ def live_run(body):
         if con:
             con.close()
         LIVE_SLOTS.release()
-    return {"preset": name, "params": values, "columns": columns, "rows": rows,
-            "capped": len(rows) >= LIVE_ROWS, "ms": round(sum(x["ms"] for x in log), 1),
-            "limits": {"seconds": LIVE_SECONDS, "rows": LIVE_ROWS}, "sql": log}
+    return {
+        "preset": name,
+        "params": values,
+        "columns": columns,
+        "rows": rows,
+        "capped": len(rows) >= LIVE_ROWS,
+        "ms": round(sum(x["ms"] for x in log), 1),
+        "limits": {"seconds": LIVE_SECONDS, "rows": LIVE_ROWS},
+        "sql": log,
+    }
 
 
 LIVE = {("GET", "/api/sql/presets"): live_presets, ("POST", "/api/sql/run"): live_run}
@@ -586,7 +707,7 @@ class Handler(BaseHTTPRequestHandler):
             else:
                 if (method, path) not in LIVE:
                     raise ApiError(404, f"no route for {method} {path}")
-                body = LIVE[(method, path)](payload)   # no connection of the app user
+                body = LIVE[(method, path)](payload)  # no connection of the app user
         except ApiError as e:
             status, body = e.status, {"error": str(e)}
         except json.JSONDecodeError:

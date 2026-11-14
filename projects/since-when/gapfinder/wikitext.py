@@ -8,6 +8,7 @@ are skipped. Each section is split into passages of about 120–300 words at par
 passage text right after which the <ref> stood, and citation a short rendering of it (author,
 title, work, year, pages, URL). A quote is cited when a reference stands in it or right after it.
 """
+
 import re
 
 import mwparserfromhell
@@ -16,17 +17,57 @@ MIN_WORDS, TARGET_WORDS, MAX_WORDS = 40, 200, 300
 
 # Sections that hold sources, links or navigation, not article content.
 SKIP_SECTIONS = {
-    "lähteet", "viitteet", "aiheesta muualla", "katso myös", "kirjallisuutta", "kirjallisuus",
-    "lisätietoja", "huomautukset", "lähdeluettelo", "lähdekirjallisuus",
-    "källor", "referenser", "noter", "se även", "externa länkar", "vidare läsning", "litteratur",
-    "fotnoter", "källhänvisningar",
-    "references", "notes", "see also", "external links", "further reading", "bibliography",
-    "sources", "footnotes", "citations", "works cited", "notes and references",
-    "general and cited references", "general references", "cited references", "selected bibliography",
-    "lähdeteokset", "kirjallisuutta ja lähteitä", "tryckta källor", "webbkällor",
+    "lähteet",
+    "viitteet",
+    "aiheesta muualla",
+    "katso myös",
+    "kirjallisuutta",
+    "kirjallisuus",
+    "lisätietoja",
+    "huomautukset",
+    "lähdeluettelo",
+    "lähdekirjallisuus",
+    "källor",
+    "referenser",
+    "noter",
+    "se även",
+    "externa länkar",
+    "vidare läsning",
+    "litteratur",
+    "fotnoter",
+    "källhänvisningar",
+    "references",
+    "notes",
+    "see also",
+    "external links",
+    "further reading",
+    "bibliography",
+    "sources",
+    "footnotes",
+    "citations",
+    "works cited",
+    "notes and references",
+    "general and cited references",
+    "general references",
+    "cited references",
+    "selected bibliography",
+    "lähdeteokset",
+    "kirjallisuutta ja lähteitä",
+    "tryckta källor",
+    "webbkällor",
 }
-_FILE_PREFIXES = ("file:", "image:", "tiedosto:", "kuva:", "fil:", "bild:", "category:",
-                  "luokka:", "kategori:", "media:")
+_FILE_PREFIXES = (
+    "file:",
+    "image:",
+    "tiedosto:",
+    "kuva:",
+    "fil:",
+    "bild:",
+    "category:",
+    "luokka:",
+    "kategori:",
+    "media:",
+)
 _HEADING = re.compile(r"^(={2,6})\s*(.+?)\s*\1\s*$", re.M)
 _BLANKS = re.compile(r"\n\s*\n+")
 _SPACES = re.compile(r"[ \t\u00a0]+")
@@ -34,15 +75,19 @@ _MARK = re.compile("\ue000([0-9]+)\ue001")
 LIST, ITEM = "\ue002", "\ue003"
 # A citation: a <ref> tag, or a short-footnote template that makes one ({{sfn|Wilson|2009|p=3}}).
 _REF = re.compile(r"<ref[\s>/]|\{\{\s*(?:sfnp?|sfnm|harvnb|efn)\s*\|", re.I)
-_QUALITY = [(re.compile(r"\{\{\s*(Suositeltu|Utmärkt|Featured article)\s*[|}]", re.I), "featured"),
-            (re.compile(r"\{\{\s*(Hyvä artikkeli|Bra|Good article)\s*[|}]", re.I), "good")]
-_CITE_KEYS = [("author", "last", "last1", "tekijä", "sukunimi", "författare", "efternamn"),
-              ("title", "nimeke", "titel", "otsikko"),
-              ("work", "journal", "newspaper", "website", "julkaisu", "verk", "tidning"),
-              ("publisher", "julkaisija", "utgivare", "förlag"),
-              ("year", "date", "ajankohta", "vuosi", "år", "datum"),
-              ("pages", "page", "sivu", "sivut", "sida", "sidor"),
-              ("url", "www", "osoite")]
+_QUALITY = [
+    (re.compile(r"\{\{\s*(Suositeltu|Utmärkt|Featured article)\s*[|}]", re.I), "featured"),
+    (re.compile(r"\{\{\s*(Hyvä artikkeli|Bra|Good article)\s*[|}]", re.I), "good"),
+]
+_CITE_KEYS = [
+    ("author", "last", "last1", "tekijä", "sukunimi", "författare", "efternamn"),
+    ("title", "nimeke", "titel", "otsikko"),
+    ("work", "journal", "newspaper", "website", "julkaisu", "verk", "tidning"),
+    ("publisher", "julkaisija", "utgivare", "förlag"),
+    ("year", "date", "ajankohta", "vuosi", "år", "datum"),
+    ("pages", "page", "sivu", "sivut", "sida", "sidor"),
+    ("url", "www", "osoite"),
+]
 
 
 def stats(wikitext):
@@ -59,7 +104,7 @@ def _cite_text(contents):
             value = next((values[k] for k in keys if values.get(k)), None)
             if value:
                 parts.append(value)
-    if not parts:   # a source template without the usual keys, such as {{BLF|3110|namn=…}}
+    if not parts:  # a source template without the usual keys, such as {{BLF|3110|namn=…}}
         for t in contents.filter_templates(recursive=False):
             parts.append(" ".join([str(t.name).strip()] + [p.value.strip_code().strip() for p in t.params]))
     text = ", ".join(parts) or contents.strip_code().strip() or str(contents).strip()
@@ -86,8 +131,11 @@ def _plain(wikitext, refs=None, names=None, lists=False, edition="en"):
     code = mwparserfromhell.parse(wikitext)
     for tag in list(code.ifilter_tags(recursive=True)):
         if refs is not None and str(tag.tag).lower() == "ref":
-            text = _cite_text(tag.contents) if tag.contents and str(tag.contents).strip() else \
-                (names or {}).get(_ref_name(tag), "")
+            text = (
+                _cite_text(tag.contents)
+                if tag.contents and str(tag.contents).strip()
+                else (names or {}).get(_ref_name(tag), "")
+            )
             refs.append(text)
             try:
                 code.replace(tag, f"\ue000{len(refs) - 1}\ue001")
@@ -116,14 +164,24 @@ def _plain(wikitext, refs=None, names=None, lists=False, edition="en"):
             except ValueError:
                 pass
     for tag in list(code.ifilter_tags(recursive=True)):
-        if str(tag.tag).lower() in ("ref", "table", "gallery", "math", "references", "score",
-                                     "timeline", "imagemap", "syntaxhighlight", "graph"):
+        if str(tag.tag).lower() in (
+            "ref",
+            "table",
+            "gallery",
+            "math",
+            "references",
+            "score",
+            "timeline",
+            "imagemap",
+            "syntaxhighlight",
+            "graph",
+        ):
             _remove(code, tag)
     for link in list(code.ifilter_wikilinks(recursive=True)):
         target = str(link.title).strip().lower().lstrip(":")
         if target.startswith(_FILE_PREFIXES) or re.match(r"^[a-z]{2,3}(-[a-z]+)?:", target):
             _remove(code, link)
-    for tag in list(code.ifilter_tags(recursive=True)):   # "*" and "#" items, which strip_code drops
+    for tag in list(code.ifilter_tags(recursive=True)):  # "*" and "#" items, which strip_code drops
         if str(tag.tag).lower() == "li":
             try:
                 code.replace(tag, ITEM)
@@ -137,7 +195,7 @@ def _plain(wikitext, refs=None, names=None, lists=False, edition="en"):
         if line.startswith(("{|", "|", "!", "__")):
             continue
         item = line.startswith(ITEM)
-        if lists and item != in_list and line:   # a list is its own paragraph, marked for passages()
+        if lists and item != in_list and line:  # a list is its own paragraph, marked for passages()
             lines += ["", LIST] if item else [""]
             in_list = item
         lines.append(line.lstrip(ITEM + "*#:; ").strip())
@@ -152,34 +210,123 @@ def _plain(wikitext, refs=None, names=None, lists=False, edition="en"):
     return _BLANKS.sub("\n\n", text).strip()
 
 
-_DASHES = {"spaced en dash space": " – ", "spaced en dash": " –", "snd": " – ", "spaced ndash": " – ",
-           "ndash": "–", "mdash": "—", "nbsp": " ", "en dash": "–", "–": "–", "sndash": " – "}
-_FIRST = ("nowrap", "nobr", "small", "lang", "transl", "sic", "abbr", "sortname", "date",
-          "oldstyledate", "oldstyledateny", "oldstyledatedy", "frac")
+_DASHES = {
+    "spaced en dash space": " – ",
+    "spaced en dash": " –",
+    "snd": " – ",
+    "spaced ndash": " – ",
+    "ndash": "–",
+    "mdash": "—",
+    "nbsp": " ",
+    "en dash": "–",
+    "–": "–",
+    "sndash": " – ",
+}
+_FIRST = (
+    "nowrap",
+    "nobr",
+    "small",
+    "lang",
+    "transl",
+    "sic",
+    "abbr",
+    "sortname",
+    "date",
+    "oldstyledate",
+    "oldstyledateny",
+    "oldstyledatedy",
+    "frac",
+)
 # Language names as each edition writes them in "{{langx|ru|…}}": "Russian: …", "ryska: …".
 _LANG_NAMES = {
-    "en": {"fi": "Finnish", "sv": "Swedish", "en": "English", "ru": "Russian", "de": "German",
-           "fr": "French", "la": "Latin", "et": "Estonian", "se": "Northern Sami", "no": "Norwegian",
-           "da": "Danish", "pl": "Polish", "uk": "Ukrainian", "krl": "Karelian"},
-    "sv": {"fi": "finska", "sv": "svenska", "en": "engelska", "ru": "ryska", "de": "tyska",
-           "fr": "franska", "la": "latin", "et": "estniska", "se": "nordsamiska", "no": "norska",
-           "da": "danska", "pl": "polska", "uk": "ukrainska", "krl": "karelska"},
-    "fi": {"fi": "suomeksi", "sv": "ruotsiksi", "en": "englanniksi", "ru": "venäjäksi", "de": "saksaksi",
-           "fr": "ranskaksi", "la": "latinaksi", "et": "viroksi", "se": "pohjoissaameksi", "no": "norjaksi",
-           "da": "tanskaksi", "pl": "puolaksi", "uk": "ukrainaksi", "krl": "karjalaksi"},
+    "en": {
+        "fi": "Finnish",
+        "sv": "Swedish",
+        "en": "English",
+        "ru": "Russian",
+        "de": "German",
+        "fr": "French",
+        "la": "Latin",
+        "et": "Estonian",
+        "se": "Northern Sami",
+        "no": "Norwegian",
+        "da": "Danish",
+        "pl": "Polish",
+        "uk": "Ukrainian",
+        "krl": "Karelian",
+    },
+    "sv": {
+        "fi": "finska",
+        "sv": "svenska",
+        "en": "engelska",
+        "ru": "ryska",
+        "de": "tyska",
+        "fr": "franska",
+        "la": "latin",
+        "et": "estniska",
+        "se": "nordsamiska",
+        "no": "norska",
+        "da": "danska",
+        "pl": "polska",
+        "uk": "ukrainska",
+        "krl": "karelska",
+    },
+    "fi": {
+        "fi": "suomeksi",
+        "sv": "ruotsiksi",
+        "en": "englanniksi",
+        "ru": "venäjäksi",
+        "de": "saksaksi",
+        "fr": "ranskaksi",
+        "la": "latinaksi",
+        "et": "viroksi",
+        "se": "pohjoissaameksi",
+        "no": "norjaksi",
+        "da": "tanskaksi",
+        "pl": "puolaksi",
+        "uk": "ukrainaksi",
+        "krl": "karjalaksi",
+    },
 }
 # A hand-written hatnote on the first lines of a section: ":''För det finländska fartyget, se …''".
 _HATNOTES = re.compile(r"\A(?:[ \t]*\n|:+[ \t]*''[^\n]*''[ \t]*(?:\n|\Z))+")
-_DATES = ("birth date", "death date", "birth date and age", "death date and age", "start date",
-          "end date", "syntymäaika ja ikä", "kuolinaika ja ikä", "födelsedatum och ålder")
+_DATES = (
+    "birth date",
+    "death date",
+    "birth date and age",
+    "death date and age",
+    "start date",
+    "end date",
+    "syntymäaika ja ikä",
+    "kuolinaika ja ikä",
+    "födelsedatum och ålder",
+)
 
 
 # Layout templates whose content parameter is wikitext readers see, usually a bulleted list.
-_WRAPPERS = ("columns-list", "columns list", "colist", "col-list", "div col", "plainlist", "plain list",
-             "flatlist", "flat list")
+_WRAPPERS = (
+    "columns-list",
+    "columns list",
+    "colist",
+    "col-list",
+    "div col",
+    "plainlist",
+    "plain list",
+    "flatlist",
+    "flat list",
+)
 # Templates whose unnamed parameters are list items readers see.
-_ITEMS = ("ubl", "unbulleted list", "ubil", "bulleted list", "blist", "hlist", "flowlist",
-          "ordered list", "collapsible list")
+_ITEMS = (
+    "ubl",
+    "unbulleted list",
+    "ubil",
+    "bulleted list",
+    "blist",
+    "hlist",
+    "flowlist",
+    "ordered list",
+    "collapsible list",
+)
 
 
 def _list_body(t):
@@ -205,9 +352,9 @@ def _inline(t, edition="en"):
         return _DASHES[name]
     if name in ("lang", "transl") and len(pos) >= 2:
         return pos[1]
-    if name == "langx" and len(pos) >= 2:   # {{langx|fi|Lapuanliike}}: "Finnish: Lapuanliike"
+    if name == "langx" and len(pos) >= 2:  # {{langx|fi|Lapuanliike}}: "Finnish: Lapuanliike"
         return f"{names.get(pos[0].lower(), pos[0])}: {pos[1]}"
-    if name.startswith("lang-") and pos:   # {{lang-fi|…}}, the older form
+    if name.startswith("lang-") and pos:  # {{lang-fi|…}}, the older form
         return f"{names.get(name[5:], name[5:])}: {pos[0]}"
     if name in ("ill", "interlanguage link", "link-interwiki") and pos:
         return pos[0]
@@ -239,7 +386,7 @@ def sections(wikitext, cites=False, edition="en"):
     parts, path = [], []
     pos, title = 0, ""
     for m in _HEADING.finditer(wikitext):
-        parts.append((title, wikitext[pos:m.start()]))
+        parts.append((title, wikitext[pos : m.start()]))
         level = len(m.group(1))
         heading = _plain(m.group(2)) or m.group(2)
         path = [p for p in path if p[0] < level] + [(level, heading)]
@@ -259,7 +406,7 @@ def sections(wikitext, cites=False, edition="en"):
             refs = []
             marked = _plain(body, refs, names, edition=edition)
             for m in _MARK.finditer(marked):
-                before = " ".join(_MARK.sub("", marked[max(0, m.start() - 200):m.start()]).split())
+                before = " ".join(_MARK.sub("", marked[max(0, m.start() - 200) : m.start()]).split())
                 if before and refs[int(m[1])]:
                     anchors.append((before[-40:], refs[int(m[1])]))
         out.append((title, text, anchors))
@@ -275,8 +422,7 @@ def _locate(chunks, anchors):
         for j in range(i, len(chunks)):
             # Anchors of nearby refs overlap, so a match may start before the previous one ended.
             floor = pos if j == i else 0
-            m = next((m for m in pattern.finditer(chunks[j], max(0, floor - len(frag) - 10))
-                      if m.end() >= floor), None)
+            m = next((m for m in pattern.finditer(chunks[j], max(0, floor - len(frag) - 10)) if m.end() >= floor), None)
             if m:
                 out[j].append([m.end(), cite])
                 i, pos = j, m.end()

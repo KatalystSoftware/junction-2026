@@ -41,17 +41,28 @@ def evaluate(pairs, labels, workers=8):
 
 def report(result):
     fmt = lambda x: "  –  " if x is None else f"{x:5.2f}"
-    lines = [f"{result['pairs']} labelled pairs, {result['rows']} differences found, model: {', '.join(result['models']) or 'none'}",
-             f"settings: {json.dumps(llm.options())}" if llm.config() else "settings: word list only",
-             "", "type           labelled  found  right  precision  recall"]
+    lines = [
+        f"{result['pairs']} labelled pairs, {result['rows']} differences found, model: {', '.join(result['models']) or 'none'}",
+        f"settings: {json.dumps(llm.options())}" if llm.config() else "settings: word list only",
+        "",
+        "type           labelled  found  right  precision  recall",
+    ]
     for t, c in result["per_type"].items():
-        lines.append(f"{t:14} {c['tp'] + c['fn']:8} {c['tp'] + c['fp']:6} {c['tp']:6}  {fmt(c['precision']):>9}  {fmt(c['recall']):>6}")
+        lines.append(
+            f"{t:14} {c['tp'] + c['fn']:8} {c['tp'] + c['fp']:6} {c['tp']:6}  {fmt(c['precision']):>9}  {fmt(c['recall']):>6}"
+        )
     q = QUOTE_CHECK
     if q["kept"] + q["dropped"]:
-        lines += ["", f"quote check: {q['kept']} of {q['kept'] + q['dropped']} model differences kept, "
-                      f"{q['dropped']} dropped for quotes not in the passage"]
+        lines += [
+            "",
+            f"quote check: {q['kept']} of {q['kept'] + q['dropped']} model differences kept, "
+            f"{q['dropped']} dropped for quotes not in the passage",
+        ]
     u = llm.USAGE
     if u["calls"]:
-        lines += ["", f"{u['calls']} model calls (not cached): {u['input_tokens']:,} input and {u['output_tokens']:,} output tokens, "
-                      f"{u['input_tokens'] / u['calls']:,.0f} and {u['output_tokens'] / u['calls']:,.0f} per call"]
+        lines += [
+            "",
+            f"{u['calls']} model calls (not cached): {u['input_tokens']:,} input and {u['output_tokens']:,} output tokens, "
+            f"{u['input_tokens'] / u['calls']:,.0f} and {u['output_tokens'] / u['calls']:,.0f} per call",
+        ]
     return "\n".join(lines)

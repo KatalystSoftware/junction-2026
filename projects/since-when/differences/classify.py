@@ -17,7 +17,9 @@ TYPES = ("missing_fact", "contradiction", "framing", "numbers")
 TYPE_WEIGHT = {"contradiction": 1.0, "framing": 1.0, "numbers": 0.8, "missing_fact": 0.5}
 
 PROMPT_VERSION = 6
-CACHE_DIR = Path(os.environ.get("DIFFERENCES_CACHE", Path(__file__).resolve().parent.parent / "data" / "differences" / "cache"))
+CACHE_DIR = Path(
+    os.environ.get("DIFFERENCES_CACHE", Path(__file__).resolve().parent.parent / "data" / "differences" / "cache")
+)
 MAX_DIFFERENCES = 8
 
 # Model differences whose quotes were found in the passages, and those dropped, in this process.
@@ -70,10 +72,10 @@ SCHEMA = {
 
 
 def _describe(label, p):
-    where = f"section \"{p['section']}\"" if p.get("section") else "lead"
+    where = f'section "{p["section"]}"' if p.get("section") else "lead"
     if p.get("chunk_no"):
         where += f", part {p['chunk_no'] + 1}"
-    return f"Passage {label} ({lexicon.LANG_NAME.get(p['lang'], p['lang'])} Wikipedia, \"{p.get('title', '')}\", {where}):\n<<<\n{p['text']}\n>>>"
+    return f'Passage {label} ({lexicon.LANG_NAME.get(p["lang"], p["lang"])} Wikipedia, "{p.get("title", "")}", {where}):\n<<<\n{p["text"]}\n>>>'
 
 
 def _messages(pair, hints):
@@ -83,7 +85,9 @@ def _messages(pair, hints):
     return [{"role": "system", "content": SYSTEM}, {"role": "user", "content": user}]
 
 
-_FOLD = str.maketrans({"“": '"', "”": '"', "„": '"', "«": '"', "»": '"', "‘": "'", "’": "'", "–": "-", "—": "-", "\u00a0": " "})
+_FOLD = str.maketrans(
+    {"“": '"', "”": '"', "„": '"', "«": '"', "»": '"', "‘": "'", "’": "'", "–": "-", "—": "-", "\u00a0": " "}
+)
 
 
 def _normalise(text):
@@ -118,19 +122,24 @@ def locate(quote, text):
         at = norm_text.lower().find(norm_quote.lower())
     if at < 0:
         return None
-    return text[index[at]:index[at + len(norm_quote) - 1] + 1]
+    return text[index[at] : index[at + len(norm_quote) - 1] + 1]
 
 
 def _parse(content):
     """The differences in a JSON answer, also when the model wraps it in a code fence or prose."""
     content = content.strip()
     start, end = content.find("{"), content.rfind("}")
-    data = json.loads(content[start:end + 1] if start >= 0 and end > start else content)
+    data = json.loads(content[start : end + 1] if start >= 0 and end > start else content)
     return data.get("differences", []) if isinstance(data, dict) else data
 
 
 def _cached_chat(messages, cfg):
-    key = hashlib.sha256(json.dumps([PROMPT_VERSION, cfg[0], cfg[2], {k: v for k, v in llm.options().items() if k != "max_tokens"}, messages], ensure_ascii=False).encode()).hexdigest()
+    key = hashlib.sha256(
+        json.dumps(
+            [PROMPT_VERSION, cfg[0], cfg[2], {k: v for k, v in llm.options().items() if k != "max_tokens"}, messages],
+            ensure_ascii=False,
+        ).encode()
+    ).hexdigest()
     path = CACHE_DIR / f"{key}.json"
     if path.exists():
         return json.loads(path.read_text())["content"]
@@ -192,10 +201,18 @@ def classify_pair(pair, cfg=None):
         if d["type"] != "missing_fact" and not (qa and qb):
             # A comparison with nothing to compare against: one edition only lacks the point.
             d = {**d, "type": "missing_fact", "missing_in": "B" if qa else "A"}
-        d = {**d, "quote_a": qa, "quote_b": qb,
-             "missing_in": lang.get(d.get("missing_in")) if d["type"] == "missing_fact" else None}
-        terms = [t for h in hints if d["type"] == "framing"
-                 and (_overlaps(qa, h["quote_a"]) or _overlaps(qb, h["quote_b"])) for t in h["terms"]]
+        d = {
+            **d,
+            "quote_a": qa,
+            "quote_b": qb,
+            "missing_in": lang.get(d.get("missing_in")) if d["type"] == "missing_fact" else None,
+        }
+        terms = [
+            t
+            for h in hints
+            if d["type"] == "framing" and (_overlaps(qa, h["quote_a"]) or _overlaps(qb, h["quote_b"]))
+            for t in h["terms"]
+        ]
         d["terms"] = list(dict.fromkeys(terms))
         rows.append(_row(pair, d, "both" if terms else "llm", cfg[2]))
     return rows
@@ -212,7 +229,10 @@ def classify_pairs(pairs, workers=8, cfg=None):
         try:
             return classify_pair(pair, cfg)
         except Exception as e:  # one bad call should not stop a run over thousands of pairs
-            print(f"differences: {pair.get('pair_id')}: {e}; model call failed, no rows, a re-run retries it", file=sys.stderr)
+            print(
+                f"differences: {pair.get('pair_id')}: {e}; model call failed, no rows, a re-run retries it",
+                file=sys.stderr,
+            )
             return []
 
     with ThreadPoolExecutor(max_workers=workers) as pool:

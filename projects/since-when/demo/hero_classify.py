@@ -17,6 +17,7 @@ Everything is written under $HERO_CLASSIFY (default ~/junction2026-data/mariadb/
 --offline never calls the model: a pair whose answer is not cached gets no rows and is listed.
 The key is read by differences.llm from NVIDIA_API_KEY or ANTHROPIC_API_KEY (sops exec-env).
 """
+
 import argparse
 import hashlib
 import json
@@ -39,9 +40,9 @@ args = ap.parse_args()
 OUT = Path(os.environ.get("HERO_CLASSIFY", Path.home() / "junction2026-data/mariadb/classify")) / args.model
 os.environ["DIFFERENCES_PROVIDER"] = MODELS[args.model]
 os.environ["DIFFERENCES_CACHE"] = str(OUT / "cache")
-if args.offline:   # the cache key needs the endpoint and model, not the key
+if args.offline:  # the cache key needs the endpoint and model, not the key
     os.environ.setdefault(dict(nvidia="NVIDIA_API_KEY", anthropic="ANTHROPIC_API_KEY")[MODELS[args.model]], "offline")
-    os.environ["DIFFERENCES_RPM"] = "6000"   # nothing is sent, so nothing to pace
+    os.environ["DIFFERENCES_RPM"] = "6000"  # nothing is sent, so nothing to pace
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from differences import classify, lexicon, llm  # noqa: E402
@@ -85,15 +86,18 @@ def cache_key(pair):
     """The key differences.classify._cached_chat files this pair's answer under."""
     messages = classify._messages(pair, lexicon.compare(pair["a"], pair["b"]))
     opts = {k: v for k, v in llm.options().items() if k != "max_tokens"}
-    return hashlib.sha256(json.dumps([classify.PROMPT_VERSION, cfg[0], cfg[2], opts, messages],
-                                     ensure_ascii=False).encode()).hexdigest()
+    return hashlib.sha256(
+        json.dumps([classify.PROMPT_VERSION, cfg[0], cfg[2], opts, messages], ensure_ascii=False).encode()
+    ).hexdigest()
 
 
 sha = lambda text: hashlib.sha1(text.encode()).hexdigest()
 pairs = [json.loads(line) for line in open(args.pairs, encoding="utf-8") if line.strip()]
 started, before, n_rows, missing = time.monotonic(), sent, 0, []
-with open(OUT / "differences.jsonl", "w", encoding="utf-8") as rows_out, \
-        open(OUT / "index.jsonl", "w", encoding="utf-8") as index_out:
+with (
+    open(OUT / "differences.jsonl", "w", encoding="utf-8") as rows_out,
+    open(OUT / "index.jsonl", "w", encoding="utf-8") as index_out,
+):
     for i, (pair, rows) in enumerate(zip(pairs, classify.classify_pairs(pairs, workers=args.workers, cfg=cfg)), 1):
         key = cache_key(pair)
         cached = (OUT / "cache" / f"{key}.json").exists()
@@ -101,21 +105,38 @@ with open(OUT / "differences.jsonl", "w", encoding="utf-8") as rows_out, \
             missing.append(pair["pair_id"])
         for row in rows:
             rows_out.write(json.dumps(dict(row, distance=pair.get("distance")), ensure_ascii=False) + "\n")
-        index_out.write(json.dumps({
-            "pair_id": pair["pair_id"], "prompt_version": classify.PROMPT_VERSION, "model": cfg[2],
-            "a_rev": pair["a"]["rev_id"], "b_rev": pair["b"]["rev_id"],
-            "a_sha1": sha(pair["a"]["text"]), "b_sha1": sha(pair["b"]["text"]),
-            "cache": f"cache/{key}.json", "cached": cached, "rows": len(rows)}) + "\n")
+        index_out.write(
+            json.dumps(
+                {
+                    "pair_id": pair["pair_id"],
+                    "prompt_version": classify.PROMPT_VERSION,
+                    "model": cfg[2],
+                    "a_rev": pair["a"]["rev_id"],
+                    "b_rev": pair["b"]["rev_id"],
+                    "a_sha1": sha(pair["a"]["text"]),
+                    "b_sha1": sha(pair["b"]["text"]),
+                    "cache": f"cache/{key}.json",
+                    "cached": cached,
+                    "rows": len(rows),
+                }
+            )
+            + "\n"
+        )
         rows_out.flush()
         index_out.flush()
         n_rows += len(rows)
-        print(f"{i}/{len(pairs)} {pair['pair_id']} {len(rows)} rows, {time.monotonic() - started:.0f} s",
-              file=sys.stderr, flush=True)
+        print(
+            f"{i}/{len(pairs)} {pair['pair_id']} {len(rows)} rows, {time.monotonic() - started:.0f} s",
+            file=sys.stderr,
+            flush=True,
+        )
 
 u = llm.USAGE
-print(f"{args.model} ({cfg[2]}, prompt version {classify.PROMPT_VERSION}): {len(pairs)} pairs, {n_rows} rows, "
-      f"{len(missing)} pairs without an answer; this run sent {sent - before} requests ({u['calls']} answered, "
-      f"{u['input_tokens']:,} input and {u['output_tokens']:,} output tokens), {sent} in all runs; "
-      f"{time.monotonic() - started:.0f} s")
+print(
+    f"{args.model} ({cfg[2]}, prompt version {classify.PROMPT_VERSION}): {len(pairs)} pairs, {n_rows} rows, "
+    f"{len(missing)} pairs without an answer; this run sent {sent - before} requests ({u['calls']} answered, "
+    f"{u['input_tokens']:,} input and {u['output_tokens']:,} output tokens), {sent} in all runs; "
+    f"{time.monotonic() - started:.0f} s"
+)
 for pid in missing:
     print("no answer:", pid)

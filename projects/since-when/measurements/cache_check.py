@@ -8,6 +8,7 @@ versioned table. Run it on a throwaway server, see ../demo/measurements.md:
 
     python cache_check.py      # DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME; takes 1-4 min
 """
+
 import os
 import random
 
@@ -25,26 +26,40 @@ def recall(cur, where=""):
     hits, rows = [], []
     for _ in range(30):
         q = vec()
-        cur.execute(f"SELECT id, ver FROM cache_check {where} ORDER BY VEC_DISTANCE_COSINE(v, VEC_FromText(?)) LIMIT 10", (q,))
+        cur.execute(
+            f"SELECT id, ver FROM cache_check {where} ORDER BY VEC_DISTANCE_COSINE(v, VEC_FromText(?)) LIMIT 10", (q,)
+        )
         approx = set(cur.fetchall())
-        cur.execute(f"SELECT id, ver FROM cache_check IGNORE INDEX (v) {where} ORDER BY VEC_DISTANCE_COSINE(v, VEC_FromText(?)) LIMIT 10", (q,))
+        cur.execute(
+            f"SELECT id, ver FROM cache_check IGNORE INDEX (v) {where} ORDER BY VEC_DISTANCE_COSINE(v, VEC_FromText(?)) LIMIT 10",
+            (q,),
+        )
         hits.append(len(approx & set(cur.fetchall())) / 10)
         rows.append(len(approx))
     return f"{sum(hits) / len(hits):.2f}  ({sum(rows) / len(rows):.1f} of 10 rows returned)"
 
 
 def main():
-    con = mariadb.connect(host=os.environ.get("DB_HOST", "127.0.0.1"), port=int(os.environ.get("DB_PORT", 3306)),
-                          user=os.environ["DB_USER"], password=os.environ["DB_PASSWORD"],
-                          database=os.environ["DB_NAME"], autocommit=True)
+    con = mariadb.connect(
+        host=os.environ.get("DB_HOST", "127.0.0.1"),
+        port=int(os.environ.get("DB_PORT", 3306)),
+        user=os.environ["DB_USER"],
+        password=os.environ["DB_PASSWORD"],
+        database=os.environ["DB_NAME"],
+        autocommit=True,
+    )
     cur = con.cursor()
     cur.execute("SELECT VERSION(), @@mhnsw_max_cache_size DIV 1048576")
     print("MariaDB %s, mhnsw_max_cache_size %s MB" % cur.fetchone())
     cur.execute("DROP TABLE IF EXISTS cache_check")
-    cur.execute(f"CREATE TABLE cache_check (id INT, ver INT, v VECTOR({D}) NOT NULL, PRIMARY KEY (id, ver), "
-                "VECTOR INDEX (v) M=16 DISTANCE=cosine)")
+    cur.execute(
+        f"CREATE TABLE cache_check (id INT, ver INT, v VECTOR({D}) NOT NULL, PRIMARY KEY (id, ver), "
+        "VECTOR INDEX (v) M=16 DISTANCE=cosine)"
+    )
     for i in range(N):
-        cur.executemany("INSERT INTO cache_check VALUES (?, ?, VEC_FromText(?))", [(i, k, vec()) for k in range(VERSIONS)])
+        cur.executemany(
+            "INSERT INTO cache_check VALUES (?, ?, VEC_FromText(?))", [(i, k, vec()) for k in range(VERSIONS)]
+        )
     for ef in (80, 1000):
         cur.execute(f"SET mhnsw_ef_search = {ef}")
         print(f"ef_search {ef:4d}, plain table, all {N * VERSIONS} rows        ", recall(cur))

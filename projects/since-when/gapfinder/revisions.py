@@ -9,6 +9,7 @@ API response, so a second fetch reads the disk, and every embedding under the ha
 so a second embed computes nothing. Embed before load: the load takes each passage's embedding from
 the cache, so the database never holds a topic half embedded.
 """
+
 import gzip
 import hashlib
 import json
@@ -30,14 +31,16 @@ from .load import _context, _sha, _ts, load_article, priorities, snapshots
 ROOT = pathlib.Path(os.environ.get("REVISIONS", "data/mariadb/revisions"))
 AGENT = "junction2026-gap-finder/0.1 (https://github.com/katalystsoftware/junction2026)"
 PAUSE = 1.0  # seconds between requests
-BATCH = 50   # revision texts per request, the API's limit
+BATCH = 50  # revision texts per request, the API's limit
 FAR = datetime(2106, 1, 1)  # row_end of a current row is later than this
 WORKERS = int(os.environ.get("WORKERS", 8))  # processes that split wikitext into passages
 THREADS = int(os.environ.get("THREADS", 0)) or None  # of the embedding model; all cores when unset
 # SINCE=2022-01-01 keeps every revision from that day on and the 1 January texts before it.
 SINCE = os.environ.get("SINCE")
-COLS = {"chunk": "id, wikidata_id, lang, page_id, ord, section, chunk_no, rev_id, sha, cites, row_start, row_end",
-        "article": "lang, page_id, wikidata_id, title, rev_id, bytes, passages, refs, quality, row_start, row_end"}
+COLS = {
+    "chunk": "id, wikidata_id, lang, page_id, ord, section, chunk_no, rev_id, sha, cites, row_start, row_end",
+    "article": "lang, page_id, wikidata_id, title, rev_id, bytes, passages, refs, quality, row_start, row_end",
+}
 
 
 def _write(path, data):
@@ -77,7 +80,7 @@ def api(lang, **params):
             return data
         if data and data["error"].get("code") != "maxlag":
             raise RuntimeError(f"{lang}: {data['error']}")
-        wait = int(wait) if wait and wait.isdigit() else 5 * 2 ** attempt
+        wait = int(wait) if wait and wait.isdigit() else 5 * 2**attempt
         print(f"{lang}: backing off {wait} s", flush=True)
         time.sleep(wait)
     raise RuntimeError(f"{lang}: no answer after 8 tries: {params}")
@@ -96,12 +99,22 @@ def _all(lang, **params):
 
 def fetch_article(qid, lang, page_id, title):
     started, sent = time.monotonic(), _requests()
-    revs = [rv for data in _all(lang, action="query", prop="revisions", pageids=str(page_id), rvlimit="max",
-                                rvdir="newer", rvprop="ids|timestamp|user|comment|sha1|size|flags")
-            for rv in data["query"]["pages"][0].get("revisions", [])]
+    revs = [
+        rv
+        for data in _all(
+            lang,
+            action="query",
+            prop="revisions",
+            pageids=str(page_id),
+            rvlimit="max",
+            rvdir="newer",
+            rvprop="ids|timestamp|user|comment|sha1|size|flags",
+        )
+        for rv in data["query"]["pages"][0].get("revisions", [])
+    ]
     texts = {}
     for i in range(0, len(revs), BATCH):
-        ids = "|".join(str(rv["revid"]) for rv in revs[i:i + BATCH])
+        ids = "|".join(str(rv["revid"]) for rv in revs[i : i + BATCH])
         for data in _all(lang, action="query", prop="revisions", revids=ids, rvprop="ids|content", rvslots="main"):
             for page in data["query"].get("pages", []):
                 for rv in page.get("revisions", []):
@@ -109,17 +122,39 @@ def fetch_article(qid, lang, page_id, title):
                     if content is not None:
                         texts[rv["revid"]] = content
         print(f"{qid} {lang}: {min(i + BATCH, len(revs))}/{len(revs)} texts", flush=True)
-    lines = [json.dumps({"revid": rv["revid"], "parentid": rv.get("parentid"), "timestamp": rv["timestamp"],
-                         "user": rv.get("user"), "comment": rv.get("comment"), "sha1": rv.get("sha1"),
-                         "size": rv.get("size"), "minor": rv.get("minor", False),
-                         "text": texts.get(rv["revid"])}, ensure_ascii=False) for rv in revs]
+    lines = [
+        json.dumps(
+            {
+                "revid": rv["revid"],
+                "parentid": rv.get("parentid"),
+                "timestamp": rv["timestamp"],
+                "user": rv.get("user"),
+                "comment": rv.get("comment"),
+                "sha1": rv.get("sha1"),
+                "size": rv.get("size"),
+                "minor": rv.get("minor", False),
+                "text": texts.get(rv["revid"]),
+            },
+            ensure_ascii=False,
+        )
+        for rv in revs
+    ]
     _write(ROOT / qid / f"{lang}.jsonl.gz", gzip.compress(("\n".join(lines) + "\n").encode()))
-    summary = {"page_id": page_id, "title": title, "revisions": len(revs), "with_text": len(texts),
-               "first": revs[0]["timestamp"], "last": revs[-1]["timestamp"],
-               "fetched_at": f"{datetime.now(timezone.utc):%Y-%m-%dT%H:%M:%SZ}"}
+    summary = {
+        "page_id": page_id,
+        "title": title,
+        "revisions": len(revs),
+        "with_text": len(texts),
+        "first": revs[0]["timestamp"],
+        "last": revs[-1]["timestamp"],
+        "fetched_at": f"{datetime.now(timezone.utc):%Y-%m-%dT%H:%M:%SZ}",
+    }
     _write(ROOT / qid / f"{lang}.json", json.dumps(summary, ensure_ascii=False, indent=1).encode())
-    print(f"{qid} {lang}: {len(revs)} revisions, {len(texts)} with text, {_requests() - sent} requests, "
-          f"{time.monotonic() - started:.0f} s", flush=True)
+    print(
+        f"{qid} {lang}: {len(revs)} revisions, {len(texts)} with text, {_requests() - sent} requests, "
+        f"{time.monotonic() - started:.0f} s",
+        flush=True,
+    )
 
 
 def _requests():
@@ -192,26 +227,36 @@ def embed(qid, langs):
         texts = {_sha(text).hex(): text for v in split(versions(cur, qid, lang, page_id)) for _, _, text, _ in v[3]}
         todo, have = [s for s in texts if not _vec(s).exists()], set()
         for i in range(0, len(todo), 500):
-            part = todo[i:i + 500]
-            cur.execute("SELECT sha FROM passage WHERE embedding IS NOT NULL AND sha IN (%s)" % ",".join("?" * len(part)),
-                        [bytes.fromhex(s) for s in part])
+            part = todo[i : i + 500]
+            cur.execute(
+                "SELECT sha FROM passage WHERE embedding IS NOT NULL AND sha IN (%s)" % ",".join("?" * len(part)),
+                [bytes.fromhex(s) for s in part],
+            )
             have |= {bytes(r[0]).hex() for r in cur.fetchall()}
         cached = len(texts) - len(todo)
         todo = sorted((s for s in todo if s not in have), key=lambda s: len(texts[s]))  # similar lengths in a batch
         words = sum(len(texts[s].split()) for s in todo)
-        print(f"{qid} {lang}: {len(texts)} passages, {cached} in the cache, {len(have)} embedded in the database, "
-              f"{len(todo)} to compute ({words} words), split in {time.monotonic() - started:.0f} s", flush=True)
+        print(
+            f"{qid} {lang}: {len(texts)} passages, {cached} in the cache, {len(have)} embedded in the database, "
+            f"{len(todo)} to compute ({words} words), split in {time.monotonic() - started:.0f} s",
+            flush=True,
+        )
         for i in range(0, len(todo), 64):
             model = model or Embedder(THREADS)
-            part = todo[i:i + 64]
+            part = todo[i : i + 64]
             for sha, v in zip(part, model([texts[s] for s in part])):
                 _write(_vec(sha), vec_bytes(v))
-            print(f"{qid} {lang}: {min(i + 64, len(todo))}/{len(todo)} embedded, {time.monotonic() - started:.0f} s", flush=True)
+            print(
+                f"{qid} {lang}: {min(i + 64, len(todo))}/{len(todo)} embedded, {time.monotonic() - started:.0f} s",
+                flush=True,
+            )
         print(f"{qid} {lang}: {len(todo)} embeddings computed, {time.monotonic() - started:.0f} s", flush=True)
 
 
 def _current(cur, qids):
-    cur.execute("SELECT id, sha, section, chunk_no FROM chunk WHERE wikidata_id IN (%s)" % ",".join("?" * len(qids)), qids)
+    cur.execute(
+        "SELECT id, sha, section, chunk_no FROM chunk WHERE wikidata_id IN (%s)" % ",".join("?" * len(qids)), qids
+    )
     return {(r[0], bytes(r[1]), r[2], r[3]) for r in cur.fetchall()}
 
 
@@ -229,21 +274,31 @@ def load(qids):
     print(f"split {sum(len(t[4]) for t in todo)} revisions, {time.monotonic() - started:.0f} s", flush=True)
     for table, cols in COLS.items():
         cur.execute(f"DROP TABLE IF EXISTS a1_keep_{table}")
-        cur.execute(f"CREATE TABLE a1_keep_{table} AS SELECT {cols} FROM {table} FOR SYSTEM_TIME ALL "
-                    f"WHERE row_end < ? AND wikidata_id NOT IN ({marks})", (FAR, *qids))
+        cur.execute(
+            f"CREATE TABLE a1_keep_{table} AS SELECT {cols} FROM {table} FOR SYSTEM_TIME ALL "
+            f"WHERE row_end < ? AND wikidata_id NOT IN ({marks})",
+            (FAR, *qids),
+        )
     for table, cols in COLS.items():
         cur.execute(f"DELETE FROM {table} WHERE wikidata_id IN ({marks})", qids)
         cur.execute(f"DELETE HISTORY FROM {table}")
         cur.execute(f"INSERT INTO {table} ({cols}) SELECT {cols} FROM a1_keep_{table}")
     for qid, lang, page_id, title, parts in todo:
         rows = load_article(cur, lang, page_id, qid, title, None, priorities(*topic[qid][:2]), parts)
-        cur.execute("REPLACE INTO full_history (wikidata_id, lang, since) VALUES (?, ?, ?)",
-                    (qid, lang, datetime.fromisoformat(SINCE) if SINCE else parts[0][1]))
+        cur.execute(
+            "REPLACE INTO full_history (wikidata_id, lang, since) VALUES (?, ?, ?)",
+            (qid, lang, datetime.fromisoformat(SINCE) if SINCE else parts[0][1]),
+        )
         shas = {text for v in parts for _, _, text, _ in v[3]}
-        print(f"{qid} {lang}: {len(parts)} article versions, {rows} chunk versions, {len(shas)} distinct passages",
-              flush=True)
-    cur.execute("SELECT DISTINCT p.sha FROM chunk FOR SYSTEM_TIME ALL AS c JOIN passage p ON p.sha = c.sha "
-                f"WHERE c.wikidata_id IN ({marks}) AND p.embedding IS NULL", qids)
+        print(
+            f"{qid} {lang}: {len(parts)} article versions, {rows} chunk versions, {len(shas)} distinct passages",
+            flush=True,
+        )
+    cur.execute(
+        "SELECT DISTINCT p.sha FROM chunk FOR SYSTEM_TIME ALL AS c JOIN passage p ON p.sha = c.sha "
+        f"WHERE c.wikidata_id IN ({marks}) AND p.embedding IS NULL",
+        qids,
+    )
     missing = [bytes(r[0]) for r in cur.fetchall()]
     found = [(_vec(sha.hex()).read_bytes(), sha) for sha in missing if _vec(sha.hex()).exists()]
     if found:
@@ -262,8 +317,11 @@ def load(qids):
     con.commit()
     for table in COLS:
         cur.execute(f"DROP TABLE a1_keep_{table}")
-    print(f"loaded; {len(before & after)} of the {len(after)} current passages kept their ids and texts; "
-          f"{time.monotonic() - started:.0f} s", flush=True)
+    print(
+        f"loaded; {len(before & after)} of the {len(after)} current passages kept their ids and texts; "
+        f"{time.monotonic() - started:.0f} s",
+        flush=True,
+    )
     for name, rows in (("before", before - after), ("now", after - before)):
         for i, sha, section, no in sorted(rows):
             print(f"  changed, {name}: passage {i} ({section or 'lead'} {no}), sha {sha.hex()}", flush=True)

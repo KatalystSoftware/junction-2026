@@ -10,6 +10,7 @@ Every article is loaded as the revisions current on 1 January 2005…2026 plus i
 Wikipedia's real edit times (system_versioning_insert_history). An article already in the
 article table is skipped, so the loader can run again as more history arrives.
 """
+
 import gzip
 import hashlib
 import json
@@ -23,8 +24,7 @@ from .db import connect
 
 DATA = pathlib.Path("data/mariadb")
 YEARS = range(2005, 2027)
-POLITICS_ROOTS = ["Suomen poliittinen historia", "Suomen sotahistoria", "Suomen ulkopolitiikka",
-                  "Suomen presidentit"]
+POLITICS_ROOTS = ["Suomen poliittinen historia", "Suomen sotahistoria", "Suomen ulkopolitiikka", "Suomen presidentit"]
 # Demo topics are embedded and aligned first, history included.
 DEMO = ["Q1412941"]  # Lapua Movement
 LANG_NO = {"fi": 1, "sv": 2, "en": 3}
@@ -33,8 +33,11 @@ DEMO_CLASS, CURRENT_CLASS, HISTORY_CLASS = 0, 1, 3
 
 
 _LIST = re.compile(r"^(Lists? of|Timeline of|Index of|Outline of)\b|^Luettelo|^Lista över", re.I)
-_OFFICE = re.compile(r"^((Prime |Deputy )?Minister (of|for)|(President|Speaker|Governor|Chancellor|Chief|"
-                     r"Commander|Ombudsman|Mayor|Archbishop)( [A-Z][a-z]+)* of)\b|ministeri$", re.I)
+_OFFICE = re.compile(
+    r"^((Prime |Deputy )?Minister (of|for)|(President|Speaker|Governor|Chancellor|Chief|"
+    r"Commander|Ombudsman|Mayor|Archbishop)( [A-Z][a-z]+)* of)\b|ministeri$",
+    re.I,
+)
 
 
 def kind(title_fi, title_en):
@@ -49,11 +52,17 @@ def kind(title_fi, title_en):
 def topics(s_dir=DATA / "s"):
     """Fill topic with the 2,919 Wikidata items in all three editions."""
     import duckdb  # only these loaders need it; the app image has none
+
     db = duckdb.connect()
-    db.execute(f"CREATE TABLE a AS SELECT lang, page_id, wikidata_id, title, length(text) AS n FROM '{s_dir}/articles-*.parquet'")
+    db.execute(
+        f"CREATE TABLE a AS SELECT lang, page_id, wikidata_id, title, length(text) AS n FROM '{s_dir}/articles-*.parquet'"
+    )
     db.execute(f"CREATE TABLE cl AS SELECT * FROM read_csv('{s_dir}/category-links-fi.tsv', delim='\t', header=true)")
-    db.execute(f"CREATE TABLE ac AS SELECT * FROM read_csv('{s_dir}/article-categories-fi.tsv', delim='\t', header=true)")
-    rows = db.execute("""
+    db.execute(
+        f"CREATE TABLE ac AS SELECT * FROM read_csv('{s_dir}/article-categories-fi.tsv', delim='\t', header=true)"
+    )
+    rows = db.execute(
+        """
         WITH RECURSIVE cats(name) AS (
             SELECT unnest(?::VARCHAR[])
             UNION SELECT cl.child FROM cl JOIN cats ON cl.parent = cats.name),
@@ -66,17 +75,24 @@ def topics(s_dir=DATA / "s"):
                any_value(a.title) FILTER (a.lang = 'en'),
                CASE WHEN tri.wikidata_id IN (SELECT * FROM politics) THEN 0 ELSE 1 END AS tier, tri.n
         FROM tri JOIN a USING (wikidata_id) GROUP BY tri.wikidata_id, tri.n
-        ORDER BY tier, tri.n DESC""", [POLITICS_ROOTS]).fetchall()
+        ORDER BY tier, tri.n DESC""",
+        [POLITICS_ROOTS],
+    ).fetchall()
     out = []
     for rank, (qid, fi, sv, en, tier, _) in enumerate(rows, 1):
         out.append((qid, fi, sv, en, tier, kind(fi, en), 0 if qid in DEMO else rank))
     con = connect()
     cur = con.cursor()
-    cur.executemany("REPLACE INTO topic (wikidata_id, title_fi, title_sv, title_en, tier, kind, priority) "
-                    "VALUES (?, ?, ?, ?, ?, ?, ?)", out)
+    cur.executemany(
+        "REPLACE INTO topic (wikidata_id, title_fi, title_sv, title_en, tier, kind, priority) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?)",
+        out,
+    )
     con.commit()
-    pages = db.execute("SELECT lang, page_id, wikidata_id FROM a WHERE wikidata_id IN (SELECT unnest(?::VARCHAR[]))",
-                       [[r[0] for r in out]]).fetchall()
+    pages = db.execute(
+        "SELECT lang, page_id, wikidata_id FROM a WHERE wikidata_id IN (SELECT unnest(?::VARCHAR[]))",
+        [[r[0] for r in out]],
+    ).fetchall()
     print(f"{len(out)} topics, {sum(1 for r in out if r[4] == 0)} in politics and war")
     return pages
 
@@ -109,8 +125,7 @@ def _sha(text):
 def load_article(cur, lang, page_id, qid, title, versions, priority, split=None):
     """versions: [(rev_id, time, wikitext)] oldest first, one per snapshot; or split, the same
     with each version's passages as a fourth item."""
-    split = split or [(rev, t, text, wikitext.passages(text, cites=True, edition=lang))
-                      for rev, t, text in versions]
+    split = split or [(rev, t, text, wikitext.passages(text, cites=True, edition=lang)) for rev, t, text in versions]
     base = LANG_NO[lang] * 10**13 + page_id * 10**4
     hist, current, passages = [], [], {}
     # article rows
@@ -145,9 +160,11 @@ def load_article(cur, lang, page_id, qid, title, versions, priority, split=None)
                 run = (k, cell, rev)
         if run:
             current.append((base + ord_, qid, lang, page_id, ord_, *run[1], run[2], split[run[0]][1]))
-    cur.executemany("INSERT INTO passage (sha, text, words, priority) VALUES (?, ?, ?, ?) "
-                    "ON DUPLICATE KEY UPDATE priority = LEAST(priority, VALUES(priority))",
-                    list(passages.values()))
+    cur.executemany(
+        "INSERT INTO passage (sha, text, words, priority) VALUES (?, ?, ?, ?) "
+        "ON DUPLICATE KEY UPDATE priority = LEAST(priority, VALUES(priority))",
+        list(passages.values()),
+    )
     cols = "id, wikidata_id, lang, page_id, ord, section, chunk_no, sha, cites, rev_id, row_start"
     if hist:
         cur.executemany(f"INSERT INTO chunk ({cols}, row_end) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)", hist)
@@ -182,15 +199,21 @@ def load_fi(m_dir=DATA / "m", only=None):
     """Finnish history from dataset M, for the topics' Finnish articles."""
     con, cur, loaded, topic = _context()
     import duckdb  # only these loaders need it; the app image has none
+
     db = duckdb.connect()
-    db.execute(f"CREATE TABLE p AS SELECT page_id, wikidata_id FROM '{DATA}/s/articles-fi.parquet' "
-               "WHERE wikidata_id IN (SELECT unnest(?::VARCHAR[]))", [list(only or topic)])
+    db.execute(
+        f"CREATE TABLE p AS SELECT page_id, wikidata_id FROM '{DATA}/s/articles-fi.parquet' "
+        "WHERE wikidata_id IN (SELECT unnest(?::VARCHAR[]))",
+        [list(only or topic)],
+    )
     todo = {pid: qid for pid, qid in db.execute("SELECT * FROM p").fetchall() if ("fi", pid) not in loaded}
     if not todo:
         return
-    meta = db.execute(f"SELECT page_id, rev_id, timestamp FROM '{m_dir}/versions-*.parquet' "
-                      "WHERE page_id IN (SELECT unnest(?::UINTEGER[])) ORDER BY page_id, timestamp, rev_id",
-                      [list(todo)]).fetchall()
+    meta = db.execute(
+        f"SELECT page_id, rev_id, timestamp FROM '{m_dir}/versions-*.parquet' "
+        "WHERE page_id IN (SELECT unnest(?::UINTEGER[])) ORDER BY page_id, timestamp, rev_id",
+        [list(todo)],
+    ).fetchall()
     revs = {}
     for pid, rev, t in meta:
         revs.setdefault(pid, []).append((rev, _ts(t)))
@@ -198,8 +221,10 @@ def load_fi(m_dir=DATA / "m", only=None):
     wanted = [rev for s in snaps.values() for rev, _ in s]
     print(f"fi: {len(todo)} articles, {len(wanted)} snapshot texts", flush=True)
     db.execute("CREATE TABLE w AS SELECT unnest(?::UINTEGER[]) AS rev_id", [wanted])
-    rel = db.execute(f"SELECT v.page_id, v.rev_id, v.text FROM '{m_dir}/versions-*.parquet' v "
-                     "SEMI JOIN w USING (rev_id) ORDER BY v.page_id")
+    rel = db.execute(
+        f"SELECT v.page_id, v.rev_id, v.text FROM '{m_dir}/versions-*.parquet' v "
+        "SEMI JOIN w USING (rev_id) ORDER BY v.page_id"
+    )
     texts, started, done, rows = {}, time.monotonic(), 0, 0
 
     def flush(pid):
@@ -271,12 +296,15 @@ def pageviews(path=None):
     con = connect()
     cur = con.cursor()
     rows = []
-    records = _records(path) if str(path).endswith(".gz") else (
-        json.loads(line) for line in open(path, encoding="utf-8") if line.strip().endswith("}"))
+    records = (
+        _records(path)
+        if str(path).endswith(".gz")
+        else (json.loads(line) for line in open(path, encoding="utf-8") if line.strip().endswith("}"))
+    )
     for rec in records:
         for ym, views in rec["monthly"].items():
             rows.append((rec["lang"], rec["page_id"], f"{ym[:4]}-{ym[4:6]}-01", views))
     for i in range(0, len(rows), 20000):
-        cur.executemany("REPLACE INTO pageviews VALUES (?, ?, ?, ?)", rows[i:i + 20000])
+        cur.executemany("REPLACE INTO pageviews VALUES (?, ?, ?, ?)", rows[i : i + 20000])
     con.commit()
     print(f"pageviews: {len(rows)} monthly rows")

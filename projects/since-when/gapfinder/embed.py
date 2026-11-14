@@ -6,6 +6,7 @@ locked while the model runs. A crashed worker's lease simply runs out.
 
     python -m gapfinder embed [--threads N]
 """
+
 import os
 import struct
 import time
@@ -27,6 +28,7 @@ class Embedder:
     def __init__(self, threads=None):
         import torch
         from transformers import AutoModel, AutoTokenizer
+
         torch.set_num_threads(threads or os.cpu_count())
         self.torch = torch
         self.tok = AutoTokenizer.from_pretrained(MODEL)
@@ -37,8 +39,7 @@ class Embedder:
         out = []
         with self.torch.inference_mode():
             for i in range(0, len(texts), BATCH):
-                b = self.tok(texts[i:i + BATCH], padding=True, truncation=True, max_length=1024,
-                             return_tensors="pt")
+                b = self.tok(texts[i : i + BATCH], padding=True, truncation=True, max_length=1024, return_tensors="pt")
                 v = self.model(**b).last_hidden_state[:, 0]
                 out += self.torch.nn.functional.normalize(v, dim=-1).tolist()
         return out
@@ -53,15 +54,19 @@ def run(threads=None, stop_priority=None):
             if con is None:
                 con = connect()
                 cur = con.cursor()
-            cur.execute("SELECT sha, text, words FROM passage WHERE embedding_done = 0 "
-                        "AND (claimed_until IS NULL OR claimed_until < UTC_TIMESTAMP()) "
-                        + ("AND priority < ? " if stop_priority is not None else "")
-                        + "ORDER BY embedding_done, priority LIMIT ? FOR UPDATE SKIP LOCKED",
-                        ((stop_priority,) if stop_priority is not None else ()) + (CLAIM,))
+            cur.execute(
+                "SELECT sha, text, words FROM passage WHERE embedding_done = 0 "
+                "AND (claimed_until IS NULL OR claimed_until < UTC_TIMESTAMP()) "
+                + ("AND priority < ? " if stop_priority is not None else "")
+                + "ORDER BY embedding_done, priority LIMIT ? FOR UPDATE SKIP LOCKED",
+                ((stop_priority,) if stop_priority is not None else ()) + (CLAIM,),
+            )
             rows = cur.fetchall()
             if rows:
-                cur.executemany("UPDATE passage SET claimed_until = UTC_TIMESTAMP() + INTERVAL 15 MINUTE "
-                                "WHERE sha = ?", [(r[0],) for r in rows])
+                cur.executemany(
+                    "UPDATE passage SET claimed_until = UTC_TIMESTAMP() + INTERVAL 15 MINUTE WHERE sha = ?",
+                    [(r[0],) for r in rows],
+                )
             con.commit()
             if not rows:
                 print(f"nothing left: {done} passages, {words} words; waiting for more", flush=True)
@@ -69,8 +74,9 @@ def run(threads=None, stop_priority=None):
                 continue
             rows.sort(key=lambda r: r[2])  # similar lengths in a batch: less padding
             vecs = embed([r[1] for r in rows])
-            cur.executemany("UPDATE passage SET embedding = ? WHERE sha = ?",
-                            [(vec_bytes(v), r[0]) for v, r in zip(vecs, rows)])
+            cur.executemany(
+                "UPDATE passage SET embedding = ? WHERE sha = ?", [(vec_bytes(v), r[0]) for v, r in zip(vecs, rows)]
+            )
             con.commit()
         except mariadb.Error as e:
             # A worker on another machine reaches the database through a tunnel that drops now

@@ -14,6 +14,7 @@ Each raw API response is kept under $HERO_REVISIONS (default
 time; --offline fails a revision that is not there instead of fetching it. Requests go one at a
 time with the project's User-Agent and wait on 429 and maxlag.
 """
+
 import html.parser
 import json
 import os
@@ -38,11 +39,14 @@ def api(lang, name, **params):
     if OFFLINE:
         raise LookupError(f"{path} is not on disk (offline)")
     url = f"https://{lang}.wikipedia.org/w/api.php?" + urllib.parse.urlencode(
-        {**params, "format": "json", "formatversion": 2, "maxlag": 5})
+        {**params, "format": "json", "formatversion": 2, "maxlag": 5}
+    )
     for attempt in range(8):
-        wait = min(60, 5 * 2 ** attempt)
+        wait = min(60, 5 * 2**attempt)
         try:
-            with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": USER_AGENT}), timeout=60) as r:
+            with urllib.request.urlopen(
+                urllib.request.Request(url, headers={"User-Agent": USER_AGENT}), timeout=60
+            ) as r:
                 raw = r.read()
             data = json.loads(raw)
             if data.get("error", {}).get("code") != "maxlag":
@@ -58,15 +62,38 @@ def api(lang, name, **params):
         raise RuntimeError(f"{url}: {data['error']}")
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(raw)
-    time.sleep(1)   # one request at a time, and not in a burst
+    time.sleep(1)  # one request at a time, and not in a burst
     return data
 
 
 class _Text(html.parser.HTMLParser):
     """The text of a rendered page as a reader sees it."""
+
     VOID = {"br", "img", "hr", "input", "meta", "link", "wbr", "area", "col", "source", "track", "embed"}
-    BLOCK = {"p", "div", "li", "h1", "h2", "h3", "h4", "h5", "h6", "tr", "td", "th", "br", "dd", "dt",
-             "blockquote", "table", "ul", "ol", "section", "figcaption", "caption"}
+    BLOCK = {
+        "p",
+        "div",
+        "li",
+        "h1",
+        "h2",
+        "h3",
+        "h4",
+        "h5",
+        "h6",
+        "tr",
+        "td",
+        "th",
+        "br",
+        "dd",
+        "dt",
+        "blockquote",
+        "table",
+        "ul",
+        "ol",
+        "section",
+        "figcaption",
+        "caption",
+    }
 
     def __init__(self):
         super().__init__()
@@ -106,8 +133,9 @@ def revision_text(lang, rev):
 
 def revision_info(lang, rev):
     """ids, parentid, timestamp, user and comment of revision rev."""
-    data = api(lang, f"{rev}.info.json", action="query", prop="revisions", revids=rev,
-               rvprop="ids|timestamp|user|comment")
+    data = api(
+        lang, f"{rev}.info.json", action="query", prop="revisions", revids=rev, rvprop="ids|timestamp|user|comment"
+    )
     page = data["query"]["pages"][0]
     return {"title": page["title"], **page["revisions"][0]}
 
@@ -134,8 +162,10 @@ def markdown(doc, findings):
                 out += [f"**{n}. {f['statement']}**", ""]
                 for q in f["quotes"]:
                     info = revision_info(q["lang"], q["rev"])
-                    out.append(f"- {q['lang']}, revision [{q['rev']}](https://{q['lang']}.wikipedia.org/w/index.php?oldid={q['rev']})"
-                               f" of {info['timestamp'][:10]}: “{q['text']}”" + (f" ({q['note']})" if q.get("note") else ""))
+                    out.append(
+                        f"- {q['lang']}, revision [{q['rev']}](https://{q['lang']}.wikipedia.org/w/index.php?oldid={q['rev']})"
+                        f" of {info['timestamp'][:10]}: “{q['text']}”" + (f" ({q['note']})" if q.get("note") else "")
+                    )
                 out.append(f"- Category: Nemotron {f['nemotron']}, Haiku {f['haiku']}")
                 out.append(f"- In the tool: {f['url']}")
                 if f.get("note"):
@@ -159,8 +189,10 @@ def main():
             total += 1
             failed += not ok
             ok_all &= ok
-            print(f"{'pass' if ok else 'FAIL'}  {f['id']}  {q['lang']} {q['rev']}  {json.dumps(q['text'], ensure_ascii=False)}"
-                  + (f"  ({note})" if note else ""))
+            print(
+                f"{'pass' if ok else 'FAIL'}  {f['id']}  {q['lang']} {q['rev']}  {json.dumps(q['text'], ensure_ascii=False)}"
+                + (f"  ({note})" if note else "")
+            )
         if ok_all:
             passing.append(f)
     print(f"{total - failed} of {total} quotes pass")

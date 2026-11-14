@@ -11,6 +11,7 @@ at most one Haiku row, the one sharing most (a row of the same category first).
 Prints the counts and writes agreement.json beside the two folders: for every Nemotron row the
 category Haiku gave the same thing, or null when Haiku reported nothing there.
 """
+
 import collections
 import json
 import os
@@ -22,8 +23,11 @@ TYPES = ["contradiction", "numbers", "missing_fact", "framing"]
 
 
 def read(model):
-    answered = {json.loads(line)["pair_id"] for line in open(ROOT / model / "index.jsonl", encoding="utf-8")
-                if json.loads(line)["cached"]}
+    answered = {
+        json.loads(line)["pair_id"]
+        for line in open(ROOT / model / "index.jsonl", encoding="utf-8")
+        if json.loads(line)["cached"]
+    }
     rows = collections.defaultdict(list)
     for line in open(ROOT / model / "differences.jsonl", encoding="utf-8"):
         row = json.loads(line)
@@ -52,8 +56,14 @@ def main():
     for pid in both:
         n_rows, h_rows = nemotron.get(pid, []), haiku.get(pid, [])
         pairs[("some" if n_rows else "none", "some" if h_rows else "none")] += 1
-        candidates = sorted(((x["type"] == y["type"], shared(x, y), -i, -j)
-                             for i, x in enumerate(n_rows) for j, y in enumerate(h_rows)), reverse=True)
+        candidates = sorted(
+            (
+                (x["type"] == y["type"], shared(x, y), -i, -j)
+                for i, x in enumerate(n_rows)
+                for j, y in enumerate(h_rows)
+            ),
+            reverse=True,
+        )
         match = {}
         for _, share, i, j in candidates:
             if share >= 0.5 and -i not in match and -j not in match.values():
@@ -62,15 +72,23 @@ def main():
             y = h_rows[match[i]] if i in match else None
             table[x["type"]]["rows"] += 1
             table[x["type"]][y["type"] if y else "nothing"] += 1
-            out.append({"pair_id": pid, "type": x["type"], "missing_in": x.get("missing_in"),
-                        "quote_a": x["quote_a"], "quote_b": x["quote_b"], "summary": x["summary"],
-                        "haiku_type": y["type"] if y else None, "haiku_summary": y["summary"] if y else None})
+            out.append(
+                {
+                    "pair_id": pid,
+                    "type": x["type"],
+                    "missing_in": x.get("missing_in"),
+                    "quote_a": x["quote_a"],
+                    "quote_b": x["quote_b"],
+                    "summary": x["summary"],
+                    "haiku_type": y["type"] if y else None,
+                    "haiku_summary": y["summary"] if y else None,
+                }
+            )
         for j, y in enumerate(h_rows):
             if j not in match.values():
                 haiku_only[y["type"]] += 1
 
-    print(f"pairs answered by both models: {len(both)} "
-          f"(Nemotron {len(n_answered)}, Haiku {len(h_answered)})")
+    print(f"pairs answered by both models: {len(both)} (Nemotron {len(n_answered)}, Haiku {len(h_answered)})")
     for (n, h), count in sorted(pairs.items()):
         print(f"  Nemotron {n} differences, Haiku {h}: {count} pairs")
     print("\nNemotron's rows, by what Haiku said about the same thing:")
@@ -78,8 +96,9 @@ def main():
     for t in TYPES:
         c = table[t]
         print(f"{t:14}{c['rows']:>6}{c[t]:>6}" + "".join(f"{c[u]:>15}" for u in TYPES) + f"{c['nothing']:>9}")
-    print("\nHaiku's rows with no Nemotron row about the same thing: "
-          + ", ".join(f"{t} {haiku_only[t]}" for t in TYPES))
+    print(
+        "\nHaiku's rows with no Nemotron row about the same thing: " + ", ".join(f"{t} {haiku_only[t]}" for t in TYPES)
+    )
     (ROOT / "agreement.json").write_text(json.dumps(out, ensure_ascii=False, indent=1) + "\n")
     print(f"\n{len(out)} Nemotron rows written to {ROOT / 'agreement.json'}")
 

@@ -9,6 +9,7 @@ answers FOR SYSTEM_TIME AS OF any date.
     partly    within PARTLY
     missing   farther: a coverage gap
 """
+
 import json
 import re
 import statistics
@@ -58,6 +59,7 @@ def first_sentence(text, low=40, high=400):
 
 def weight(type_, cited):
     return TYPE_WEIGHT[type_] * (1 if cited or type_ == "framing" else UNCITED)
+
 
 QID = re.compile(r"^Q[0-9]+$")
 DAY = re.compile(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}$")
@@ -151,9 +153,15 @@ def run(only=None, history=True):
     """Fill the coverage table for every topic whose passages are embedded, then rebuild the
     findings. Years already in the table are skipped; the current text is always recomputed."""
     r = Run()
-    topics = [t["wikidata_id"] for t in r("topics", "SELECT wikidata_id FROM topic ORDER BY priority")
-              if not only or t["wikidata_id"] in only]
-    done = {(x["wikidata_id"], str(x["as_of"])) for x in r("done", "SELECT DISTINCT wikidata_id, as_of FROM coverage WHERE NOT is_current")}
+    topics = [
+        t["wikidata_id"]
+        for t in r("topics", "SELECT wikidata_id FROM topic ORDER BY priority")
+        if not only or t["wikidata_id"] in only
+    ]
+    done = {
+        (x["wikidata_id"], str(x["as_of"]))
+        for x in r("done", "SELECT DISTINCT wikidata_id, as_of FROM coverage WHERE NOT is_current")
+    }
     today = date.today().isoformat()
     started, n_topics, n_dates = time.monotonic(), 0, 0
     for qid in topics:
@@ -167,12 +175,18 @@ def run(only=None, history=True):
             if res is None:
                 continue
             _, cov = res
-            r.cur.execute(f"DELETE FROM coverage WHERE wikidata_id = {lit(qid)} AND "
-                          + ("is_current" if as_of is None else f"as_of = {lit(as_of)}"))
+            r.cur.execute(
+                f"DELETE FROM coverage WHERE wikidata_id = {lit(qid)} AND "
+                + ("is_current" if as_of is None else f"as_of = {lit(as_of)}")
+            )
             if cov:
-                r.cur.executemany("INSERT INTO coverage VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                                  [(qid, lang, rich, as_of or today, as_of is None, n, full, c)
-                                   for (lang, rich), (n, full, c) in cov.items()])
+                r.cur.executemany(
+                    "INSERT INTO coverage VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                    [
+                        (qid, lang, rich, as_of or today, as_of is None, n, full, c)
+                        for (lang, rich), (n, full, c) in cov.items()
+                    ],
+                )
             n_dates += 1
             aligned = True
         n_topics += aligned
@@ -202,6 +216,7 @@ def refresh_now():
 
 # --- Findings ---------------------------------------------------------------------------------
 
+
 def rich_lang_sql(qid=None):
     """The richest other edition (most passages) for each topic and edition, today."""
     where = f"WHERE a.wikidata_id = {lit(qid)}" if qid else ""
@@ -221,11 +236,15 @@ FROM article AS a {where}"""
 # t therefore contains the change. Without an earlier compared date, e only says since when the
 # finding is known to hold. The same goes for closing. The current text counts as date today.
 
+
 def _revisions(r, qid):
     """{lang: [{rev_id, row_start, row_end}]}: every loaded revision of the topic's articles."""
     revs = {}
-    for v in r("revisions", f"""SELECT lang, rev_id, row_start, row_end FROM article FOR SYSTEM_TIME ALL
-                                WHERE wikidata_id = {lit(qid)} ORDER BY lang, row_start"""):
+    for v in r(
+        "revisions",
+        f"""SELECT lang, rev_id, row_start, row_end FROM article FOR SYSTEM_TIME ALL
+                                WHERE wikidata_id = {lit(qid)} ORDER BY lang, row_start""",
+    ):
         revs.setdefault(v["lang"], []).append(v)
     return revs
 
@@ -250,7 +269,7 @@ def _pair_time(revs, langs, label):
 # (it fails on the date the finding was seen, or holds on the date before), the dates above stay.
 # A finding whose evidence is still in the texts stays open on a later date that did not show it.
 
-BLIP = timedelta(days=1)   # a text that lasts less is taken for vandalism and its revert
+BLIP = timedelta(days=1)  # a text that lasts less is taken for vandalism and its revert
 
 
 class _Texts:
@@ -259,21 +278,33 @@ class _Texts:
 
     def __init__(self, r, qid, since):
         self.since, self.rows, self.memo, self.concepts = since, {}, {}, {}
-        for c in r("passage versions", f"""
+        for c in r(
+            "passage versions",
+            f"""
                 SELECT lang, section, chunk_no, sha, row_start, row_end FROM chunk FOR SYSTEM_TIME ALL
-                WHERE wikidata_id = {lit(qid)}"""):
+                WHERE wikidata_id = {lit(qid)}""",
+        ):
             self.rows.setdefault(c["lang"], []).append(c)
-        self.text = {p["sha"]: p["text"] for p in r("passage texts", f"""
+        self.text = {
+            p["sha"]: p["text"]
+            for p in r(
+                "passage texts",
+                f"""
             SELECT sha, text FROM passage
-            WHERE sha IN (SELECT sha FROM chunk FOR SYSTEM_TIME ALL WHERE wikidata_id = {lit(qid)})""")}
+            WHERE sha IN (SELECT sha FROM chunk FOR SYSTEM_TIME ALL WHERE wikidata_id = {lit(qid)})""",
+            )
+        }
 
     def when(self, lang, name, test):
         """A function of a time: whether some passage of `lang` current then passes
         test(section, chunk_no, text). `name` identifies the test."""
         if (lang, name) not in self.memo:
             spans = []
-            for s, e in sorted((c["row_start"], c["row_end"]) for c in self.rows.get(lang, [])
-                               if test(c["section"], c["chunk_no"], self.text[c["sha"]])):
+            for s, e in sorted(
+                (c["row_start"], c["row_end"])
+                for c in self.rows.get(lang, [])
+                if test(c["section"], c["chunk_no"], self.text[c["sha"]])
+            ):
                 if spans and s <= spans[-1][1]:
                     spans[-1][1] = max(spans[-1][1], e)
                 else:
@@ -317,26 +348,34 @@ def _evidence(f, texts):
     None when the finding gives nothing to test."""
     quotes = [(lang, q) for lang, q in ((f["lang"], f["quote"]), (f["other_lang"], f["other_quote"])) if q]
     term = f["terms"][0] if f["type"] == "framing" and len(f["terms"]) == 1 else None
-    user = next(((lang, family) for lang, q in quotes for family, concepts in find_concepts(q, lang).items()
-                 if term in concepts), None)
-    if user:   # a loaded word: the test the word list ran, on the first sentences or on the sections
+    user = next(
+        (
+            (lang, family)
+            for lang, q in quotes
+            for family, concepts in find_concepts(q, lang).items()
+            if term in concepts
+        ),
+        None,
+    )
+    if user:  # a loaded word: the test the word list ran, on the first sentences or on the sections
         (user, family), first = user, "first sentence" in f["summary"]
         rest = f["other_lang"] if user == f["lang"] else f["lang"]
         tops = {f["lang"]: _top(f["section"]), f["other_lang"]: _top(f["other_section"])}
 
-        def has(lang, word, top):   # word None: any word of the family
+        def has(lang, word, top):  # word None: any word of the family
             def test(section, chunk_no, text):
                 if first and (section or chunk_no) or not first and _top(section) != top:
                     return False
                 concepts = texts.found(lang, sentence_at(text, 0) if first else text).get(family, {})
                 return word in concepts if word else bool(concepts)
+
             return texts.when(lang, (family, word, first, top), test)
 
         uses, some = has(user, term, tops[user]), has(rest, None, tops[rest])
-        same = has(rest, term, tops[rest] if first else "")   # the other first sentence, or lead, uses it too
+        same = has(rest, term, tops[rest] if first else "")  # the other first sentence, or lead, uses it too
         return lambda t: uses(t) and some(t) and not same(t)
-    if f["type"] == "missing_fact":   # held from the day the fact's sentence entered the edition that has it
-        quotes = quotes[-1:]   # the other edition's sentence; a row that names no lacking side quotes its own
+    if f["type"] == "missing_fact":  # held from the day the fact's sentence entered the edition that has it
+        quotes = quotes[-1:]  # the other edition's sentence; a row that names no lacking side quotes its own
     tests = [texts.when(lang, q, lambda section, chunk_no, text, q=q: q in text) for lang, q in quotes]
     return (lambda t: all(test(t) for test in tests)) if tests else None
 
@@ -361,10 +400,10 @@ def _dated(f, revs, checked, seen, texts=None, holds=None):
                 first, before = label, prev
             last = label
         elif first is not None and label is not None and span(last) and span(last) == span(label):
-            pass   # the evidence is still in the texts: this date's comparison missed it, no edit closed it
+            pass  # the evidence is still in the texts: this date's comparison missed it, no edit closed it
         elif first is not None:
             start = _pair_time(revs, langs, first)
-            if before is not None and start <= _at(before):   # no edit between: the pipeline changed
+            if before is not None and start <= _at(before):  # no edit between: the pipeline changed
                 start = _at(before) + timedelta(seconds=1)
             after, known = before, history
             s = span(first)
@@ -372,16 +411,15 @@ def _dated(f, revs, checked, seen, texts=None, holds=None):
             # unless the articles began then.
             if s and (before is None or s[0] > _at(before)) and (whole or s[0] > born):
                 start, known = s[0], True
-                if start > born:   # the day before it; the first text of the pair has no "before"
+                if start > born:  # the day before it; the first text of the pair has no "before"
                     after = max(start.date() - timedelta(days=1), before or date.min)
             stop, till = None, None
             if label is not None:
                 stop, till = max(_pair_time(revs, langs, label), _at(last) + timedelta(seconds=1)), last
                 s = span(last)
-                if s and s[1] and s[1] <= _at(label):   # the edit that took the evidence away
+                if s and s[1] and s[1] <= _at(label):  # the edit that took the evidence away
                     stop, till = s[1], max(s[1].date() - timedelta(days=1), last)
-            out.append(dict(f, opened_at=start, opened_after=after, closed_at=stop,
-                            closed_after=till, history=known))
+            out.append(dict(f, opened_at=start, opened_after=after, closed_at=stop, closed_after=till, history=known))
             first = None
         prev = label
     return out
@@ -397,13 +435,19 @@ def _coverage_findings(r, qid, rich, revs, history, texts=None):
     """Coverage findings for one topic: one per top-level section of the richer edition that has
     no close counterpart, once per period it held. A section renamed between two dates stays the
     same finding when most of its passages are unchanged. revs: {lang: current rev_id}."""
-    dates = [x["as_of"] for x in r("dates", f"""
+    dates = [
+        x["as_of"]
+        for x in r(
+            "dates",
+            f"""
         SELECT as_of FROM coverage WHERE wikidata_id = {lit(qid)} AND NOT is_current
-        GROUP BY as_of ORDER BY as_of""")]
+        GROUP BY as_of ORDER BY as_of""",
+        )
+    ]
     by_key, seen_on, shas, canon = {}, {}, {}, {}
     checked, prev_seen = [], set()
     timeline = [(d.isoformat(), d) for d in dates] + [(None, date.today())]
-    current_ok = False   # today's text is aligned (all its passages have vectors)
+    current_ok = False  # today's text is aligned (all its passages have vectors)
     for as_of, label in timeline:
         res = align_topic(r, qid, as_of)
         if res is None:
@@ -411,19 +455,32 @@ def _coverage_findings(r, qid, rich, revs, history, texts=None):
         current_ok = current_ok or as_of is None
         checked.append(label)
         rows, _ = res
-        missing = [x for x in rows   # x is a passage of the richer edition, x["lang"]
-                   if rich.get(x["other_lang"]) == x["lang"] and x["status"] == "missing"]
-        chunks = {c["id"]: c for c in r("passages", f"""
+        missing = [
+            x
+            for x in rows  # x is a passage of the richer edition, x["lang"]
+            if rich.get(x["other_lang"]) == x["lang"] and x["status"] == "missing"
+        ]
+        chunks = (
+            {
+                c["id"]: c
+                for c in r(
+                    "passages",
+                    f"""
             SELECT c.id, c.lang, c.section, c.ord, c.rev_id, c.sha, c.cites, p.text, p.words
             FROM chunk FOR SYSTEM_TIME AS OF {as_of_sql(as_of)} AS c JOIN passage p ON p.sha = c.sha
-            WHERE c.wikidata_id = {lit(qid)}""")} if missing else {}
+            WHERE c.wikidata_id = {lit(qid)}""",
+                )
+            }
+            if missing
+            else {}
+        )
         totals, groups = {}, {}
         for c in chunks.values():
             totals[c["lang"]] = totals.get(c["lang"], 0) + c["words"]
         for x in missing:
             top = chunks[x["id"]]["section"].split(" › ")[0]
             groups.setdefault((x["other_lang"], x["lang"], top), []).append(x)
-        seen = {}   # key -> shas of its passages on this date
+        seen = {}  # key -> shas of its passages on this date
         for (lang, other, top), xs in groups.items():
             dist = statistics.mean(float(x["distance"]) for x in xs)
             if dist <= MISSING_SECTION:
@@ -431,20 +488,37 @@ def _coverage_findings(r, qid, rich, revs, history, texts=None):
             raw = f"{qid}:{lang}:{other}:coverage:{top}"
             here = {chunks[x["id"]]["sha"] for x in xs}
             key = canon.get(raw)
-            if key is None:   # a renamed section: the finding last seen whose passages it mostly keeps
-                gone = [k for k in prev_seen if k not in seen and k.split(":")[1:3] == [lang, other]
-                        and (len(shas[k] & here) * 2 >= min(len(shas[k]), len(here))
-                             or _renamed(by_key[k]["section"], top))]
+            if key is None:  # a renamed section: the finding last seen whose passages it mostly keeps
+                gone = [
+                    k
+                    for k in prev_seen
+                    if k not in seen
+                    and k.split(":")[1:3] == [lang, other]
+                    and (len(shas[k] & here) * 2 >= min(len(shas[k]), len(here)) or _renamed(by_key[k]["section"], top))
+                ]
                 key = canon[raw] = gone[0] if gone else raw
             seen[key] = here
-            f = by_key.setdefault(key, {"key": key, "wikidata_id": qid, "lang": lang, "other_lang": other,
-                                        "type": "coverage", "words": 0, "passages": set(), "quote": None,
-                                        "other_quote": None, "other_citation": None, "distance": None})
+            f = by_key.setdefault(
+                key,
+                {
+                    "key": key,
+                    "wikidata_id": qid,
+                    "lang": lang,
+                    "other_lang": other,
+                    "type": "coverage",
+                    "words": 0,
+                    "passages": set(),
+                    "quote": None,
+                    "other_quote": None,
+                    "other_citation": None,
+                    "distance": None,
+                },
+            )
             f["section"] = top
             f.setdefault("titles", set()).add(top)
             if as_of is not None:
                 continue
-            near = {}   # the sections of `lang` its passages are nearest to, by words
+            near = {}  # the sections of `lang` its passages are nearest to, by words
             for x in xs:
                 c = chunks[x["id"]]
                 f["words"] += c["words"]
@@ -470,19 +544,34 @@ def _coverage_findings(r, qid, rich, revs, history, texts=None):
             continue
         section = f["section"] or "the lead"
         near = f.pop("near_section", None)
-        near = "the lead" if near == "" else f"\"{near}\""
-        summary = (f"The {f['other_lang']} article's section \"{section}\" ({len(f['passages'])} passages, "
-                   f"{f['words']} words) has no close counterpart in the {f['lang']} article; its passages "
-                   f"are nearest to {near} (cosine distance {f['distance']:.2f})."
-                   if f["passages"] else f"A section \"{section}\" of the {f['other_lang']} article "
-                   f"had no close counterpart in the {f['lang']} article.")
+        near = "the lead" if near == "" else f'"{near}"'
+        summary = (
+            f'The {f["other_lang"]} article\'s section "{section}" ({len(f["passages"])} passages, '
+            f"{f['words']} words) has no close counterpart in the {f['lang']} article; its passages "
+            f"are nearest to {near} (cosine distance {f['distance']:.2f})."
+            if f["passages"]
+            else f'A section "{section}" of the {f["other_lang"]} article '
+            f"had no close counterpart in the {f['lang']} article."
+        )
         # Sourced when the quoted sentence, or the end of its paragraph, carries a reference.
-        f.update(summary=summary, other_section=None, source="align", terms=[], model=None, citation=None,
-                 weight=weight("coverage", bool(f["other_citation"] or f.get("other_paragraph_citation"))))
+        f.update(
+            summary=summary,
+            other_section=None,
+            source="align",
+            terms=[],
+            model=None,
+            citation=None,
+            weight=weight("coverage", bool(f["other_citation"] or f.get("other_paragraph_citation"))),
+        )
         # Held while the richer edition has the section, under any title it was seen with.
         titles = f.pop("titles")
-        holds = texts and "" not in titles and texts.when(
-            f["other_lang"], tuple(sorted(titles)), lambda section, chunk_no, text: _top(section) in titles)
+        holds = (
+            texts
+            and "" not in titles
+            and texts.when(
+                f["other_lang"], tuple(sorted(titles)), lambda section, chunk_no, text: _top(section) in titles
+            )
+        )
         out += _dated(f, history, checked, seen_on[key], texts, holds)
     return out
 
@@ -501,8 +590,9 @@ def _difference_findings(r, qid, size, history, texts=None):
     does, with no verdict. A framing finding is one loaded word in the edition that uses it, so
     "Swedish says fascist" and "English says fascist" are two findings with their own dates."""
     # Word-list rows first, so on a date both classifiers saw, the model's evidence is kept.
-    rows = r("differences", f"SELECT * FROM difference WHERE wikidata_id = {lit(qid)} "
-                            "ORDER BY as_of, source <> 'lexicon'")
+    rows = r(
+        "differences", f"SELECT * FROM difference WHERE wikidata_id = {lit(qid)} ORDER BY as_of, source <> 'lexicon'"
+    )
     # History is compared on 1 January only, so a row of any other date classified the current
     # text, which has not changed since the load. Rows the model wrote on 13 Nov and the word list
     # on 14 Nov are the same comparison; as two dates, 13 Nov opened the Lapua framing findings.
@@ -532,9 +622,15 @@ def _difference_findings(r, qid, size, history, texts=None):
         """Whether `lang`'s lead on `as_of` has the loaded word `term` anywhere."""
         if (lang, as_of) not in leads:
             t = as_of_sql(None if as_of >= date.today() else as_of.isoformat())
-            leads[(lang, as_of)] = " ".join(x["text"] for x in r("lead", f"""
+            leads[(lang, as_of)] = " ".join(
+                x["text"]
+                for x in r(
+                    "lead",
+                    f"""
                 SELECT p.text FROM chunk FOR SYSTEM_TIME AS OF {t} AS c JOIN passage AS p ON p.sha = c.sha
-                WHERE c.wikidata_id = {lit(qid)} AND c.lang = {lit(lang)} AND c.section = ''"""))
+                WHERE c.wikidata_id = {lit(qid)} AND c.lang = {lit(lang)} AND c.section = ''""",
+                )
+            )
         return any(term in c for c in find_concepts(leads[(lang, as_of)], lang).values())
 
     by_key, seen_on, listed = {}, {}, set()
@@ -563,27 +659,73 @@ def _difference_findings(r, qid, size, history, texts=None):
         # Missing fact: the side that has it must be cited. Others: either side.
         cited = bool(other_cite) if d["type"] == "missing_fact" else bool(cite or other_cite)
         by_key[key] = {  # the latest sighting's evidence
-            "key": key, "wikidata_id": qid, "lang": lang, "other_lang": d[o + "_lang"], "type": d["type"],
-            "section": section, "other_section": d[o + "_section"], "quote": quote,
-            "other_quote": other_quote, "summary": d["summary"], "terms": terms, "distance": d["distance"],
-            "share": None, "weight": weight(d["type"], cited), "rev_id": d[s + "_rev"],
-            "other_rev_id": d[o + "_rev"], "citation": cite, "other_citation": other_cite,
-            "paragraph_citation": par, "other_paragraph_citation": other_par,
-            "source": d["source"], "model": d["model"]}
+            "key": key,
+            "wikidata_id": qid,
+            "lang": lang,
+            "other_lang": d[o + "_lang"],
+            "type": d["type"],
+            "section": section,
+            "other_section": d[o + "_section"],
+            "quote": quote,
+            "other_quote": other_quote,
+            "summary": d["summary"],
+            "terms": terms,
+            "distance": d["distance"],
+            "share": None,
+            "weight": weight(d["type"], cited),
+            "rev_id": d[s + "_rev"],
+            "other_rev_id": d[o + "_rev"],
+            "citation": cite,
+            "other_citation": other_cite,
+            "paragraph_citation": par,
+            "other_paragraph_citation": other_par,
+            "source": d["source"],
+            "model": d["model"],
+        }
         seen_on.setdefault(key, set()).add(d["as_of"])
         if d["source"] == "lexicon":
             listed.add(key)
     out = []
     for key, f in by_key.items():
-        out += _dated(f, history, by_list if key in listed else by_model, seen_on[key],
-                      texts, texts and _evidence(f, texts))
+        out += _dated(
+            f, history, by_list if key in listed else by_model, seen_on[key], texts, texts and _evidence(f, texts)
+        )
     return out
 
 
-FINDING_COLS = ("id", "wikidata_id", "lang", "other_lang", "type", "section", "other_section", "quote",
-                "other_quote", "summary", "terms", "distance", "share", "weight", "rev_id", "other_rev_id",
-                "citation", "other_citation", "paragraph_citation", "other_paragraph_citation", "source", "model", "status", "status_url", "status_at",
-                "opened_at", "opened_after", "closed_at", "closed_after", "history", "key")
+FINDING_COLS = (
+    "id",
+    "wikidata_id",
+    "lang",
+    "other_lang",
+    "type",
+    "section",
+    "other_section",
+    "quote",
+    "other_quote",
+    "summary",
+    "terms",
+    "distance",
+    "share",
+    "weight",
+    "rev_id",
+    "other_rev_id",
+    "citation",
+    "other_citation",
+    "paragraph_citation",
+    "other_paragraph_citation",
+    "source",
+    "model",
+    "status",
+    "status_url",
+    "status_at",
+    "opened_at",
+    "opened_after",
+    "closed_at",
+    "closed_after",
+    "history",
+    "key",
+)
 FAR = datetime(2106, 1, 1)
 
 
@@ -621,14 +763,18 @@ def build_findings(only=None):
     for x in r("revs", "SELECT wikidata_id, lang, rev_id, passages FROM article"):
         revs.setdefault(x["wikidata_id"], {})[x["lang"]] = x["rev_id"]
         size.setdefault(x["wikidata_id"], {})[x["lang"]] = x["passages"]
-    topics = [t["wikidata_id"] for t in r("t", "SELECT DISTINCT wikidata_id FROM coverage")
-              if not only or t["wikidata_id"] in only]
+    topics = [
+        t["wikidata_id"]
+        for t in r("t", "SELECT DISTINCT wikidata_id FROM coverage")
+        if not only or t["wikidata_id"] in only
+    ]
     kinds = {x["wikidata_id"]: x["kind"] for x in r("k", "SELECT wikidata_id, kind FROM topic WHERE kind IS NOT NULL")}
-    outcome = {x["key"]: x for x in r("s", "SELECT `key`, status, status_url, status_at FROM finding "
-                                           "WHERE status <> 'open'")}
+    outcome = {
+        x["key"]: x for x in r("s", "SELECT `key`, status, status_url, status_at FROM finding WHERE status <> 'open'")
+    }
     ids = {x["key"]: x["id"] for x in r("i", "SELECT `key`, id FROM finding FOR SYSTEM_TIME ALL GROUP BY `key`, id")}
     next_id = max(ids.values(), default=0) + 1
-    full = {}   # {topic: {lang: the time from which every revision is loaded}}
+    full = {}  # {topic: {lang: the time from which every revision is loaded}}
     for x in r("full", "SELECT wikidata_id, lang, since FROM full_history"):
         full.setdefault(x["wikidata_id"], {})[x["lang"]] = x["since"]
     rows = []
@@ -636,14 +782,15 @@ def build_findings(only=None):
         r.log.clear()
         history = _revisions(r, qid)
         texts = _Texts(r, qid, full[qid]) if qid in full else None
-        for f in _coverage_findings(r, qid, rich.get(qid, {}), revs.get(qid, {}), history, texts) + \
-                _difference_findings(r, qid, size.get(qid, {}), history, texts):
+        for f in _coverage_findings(
+            r, qid, rich.get(qid, {}), revs.get(qid, {}), history, texts
+        ) + _difference_findings(r, qid, size.get(qid, {}), history, texts):
             if f["key"] not in ids:
                 ids[f["key"]] = next_id
                 next_id += 1
             f["id"] = ids[f["key"]]
             if f["type"] == "coverage" and qid in kinds:
-                f["weight"] *= LIST_COVERAGE   # lists and offices differ in structure by design
+                f["weight"] *= LIST_COVERAGE  # lists and offices differ in structure by design
             f.update(outcome.get(f["key"], {"status": "open", "status_url": None, "status_at": None}))
             rows.append(f)
     # Rebuild: purge the table and its history (DELETE HISTORY cannot filter by topic), then write
@@ -652,9 +799,15 @@ def build_findings(only=None):
     con.autocommit = False
     cur = con.cursor()
     cur.execute("SET system_versioning_insert_history = 1")
-    keep = [] if not only else [
-        x for x in r("keep", "SELECT *, row_start, row_end FROM finding FOR SYSTEM_TIME ALL")
-        if x["wikidata_id"] not in only]
+    keep = (
+        []
+        if not only
+        else [
+            x
+            for x in r("keep", "SELECT *, row_start, row_end FROM finding FOR SYSTEM_TIME ALL")
+            if x["wikidata_id"] not in only
+        ]
+    )
     cur.execute("DELETE FROM finding")
     cur.execute("DELETE HISTORY FROM finding")
     cols = ", ".join(f"`{c}`" for c in FINDING_COLS)
@@ -664,8 +817,10 @@ def build_findings(only=None):
         if x["row_end"] >= FAR:
             cur.execute(f"INSERT INTO finding ({cols}, row_start) VALUES ({marks}, ?)", vals + [x["row_start"]])
         else:
-            cur.execute(f"INSERT INTO finding ({cols}, row_start, row_end) VALUES ({marks}, ?, ?)",
-                        vals + [x["row_start"], x["row_end"]])
+            cur.execute(
+                f"INSERT INTO finding ({cols}, row_start, row_end) VALUES ({marks}, ?, ?)",
+                vals + [x["row_start"], x["row_end"]],
+            )
     for f in rows:
         _write_finding(cur, f)
     con.commit()
@@ -674,13 +829,17 @@ def build_findings(only=None):
 
 # --- Classifier input and output --------------------------------------------------------------
 
+
 def pairs(only=None, history=False, out=sys.stdout):
     """Matched passage pairs for the classifier, as JSON lines: the three leads of each topic
     against each other, and every partly covered passage with its nearest counterpart, today
     and, with history, on each 1 January."""
     r = Run()
-    topics = [t for t in r("topics", "SELECT wikidata_id, title_fi, title_sv, title_en FROM topic ORDER BY priority")
-              if not only or t["wikidata_id"] in only]
+    topics = [
+        t
+        for t in r("topics", "SELECT wikidata_id, title_fi, title_sv, title_en FROM topic ORDER BY priority")
+        if not only or t["wikidata_id"] in only
+    ]
     n = 0
     for t in topics:
         for as_of in [None] + ([f"{y}-01-01" for y in YEARS] if history else []):
@@ -696,11 +855,17 @@ def _pairs_at(r, t, as_of, out):
     if res is None:
         return 0
     rows, _ = res
-    chunks = {c["id"]: c for c in r("chunks", f"""
+    chunks = {
+        c["id"]: c
+        for c in r(
+            "chunks",
+            f"""
         SELECT c.id, c.lang, c.ord, c.section, c.chunk_no, a.rev_id, p.text
         FROM chunk FOR SYSTEM_TIME AS OF {as_of_sql(as_of)} AS c JOIN passage AS p ON p.sha = c.sha
         JOIN article FOR SYSTEM_TIME AS OF {as_of_sql(as_of)} AS a ON a.lang = c.lang AND a.page_id = c.page_id
-        WHERE c.wikidata_id = {lit(qid)}""")}
+        WHERE c.wikidata_id = {lit(qid)}""",
+        )
+    }
     want = {}
     for x in rows:
         a, b = chunks[x["id"]], chunks[x["other_id"]]
@@ -709,12 +874,30 @@ def _pairs_at(r, t, as_of, out):
             first, second = sorted([a, b], key=lambda c: LANGS.index(c["lang"]))
             want[(first["id"], second["id"])] = (first, second, x["distance"])
     for first, second, dist in want.values():
-        side = lambda c: {"chunk_id": c["id"], "lang": c["lang"], "title": t["title_" + c["lang"]],
-                          "section": c["section"], "chunk_no": c["chunk_no"], "rev_id": c["rev_id"],
-                          "text": c["text"]}
+        side = lambda c: {
+            "chunk_id": c["id"],
+            "lang": c["lang"],
+            "title": t["title_" + c["lang"]],
+            "section": c["section"],
+            "chunk_no": c["chunk_no"],
+            "rev_id": c["rev_id"],
+            "text": c["text"],
+        }
         pid = f"{qid}:{label}:{first['lang']}:{first['id']}:{second['lang']}:{second['id']}"
-        out.write(json.dumps({"pair_id": pid, "wikidata_id": qid, "as_of": label, "distance": round(dist, 4),
-                              "a": side(first), "b": side(second)}, ensure_ascii=False) + "\n")
+        out.write(
+            json.dumps(
+                {
+                    "pair_id": pid,
+                    "wikidata_id": qid,
+                    "as_of": label,
+                    "distance": round(dist, 4),
+                    "a": side(first),
+                    "b": side(second),
+                },
+                ensure_ascii=False,
+            )
+            + "\n"
+        )
         n += 1
     return n
 
@@ -724,14 +907,27 @@ def lexicon_rows(path, out=sys.stdout):
     the two leads' first sentences are written: they date when a label appeared on every 1 January,
     where the model has classified only today's text."""
     from differences.lexicon import compare
+
     n = 0
     for line in open(path, encoding="utf-8"):
         p = json.loads(line)
         for d in compare(p["a"], p["b"]):
             if "first sentence" in d["summary"]:
-                out.write(json.dumps(dict(d, pair_id=p["pair_id"], wikidata_id=p["wikidata_id"],
-                                          as_of=p["as_of"], distance=p["distance"], source="lexicon",
-                                          model="lexicon"), ensure_ascii=False) + "\n")
+                out.write(
+                    json.dumps(
+                        dict(
+                            d,
+                            pair_id=p["pair_id"],
+                            wikidata_id=p["wikidata_id"],
+                            as_of=p["as_of"],
+                            distance=p["distance"],
+                            source="lexicon",
+                            model="lexicon",
+                        ),
+                        ensure_ascii=False,
+                    )
+                    + "\n"
+                )
                 n += 1
     print(f"lexicon: {n} rows", file=sys.stderr)
 
@@ -755,36 +951,64 @@ def load_differences(path):
         # the model's rows of the same pair carry the evidence shown.
         if d.get("source") == "lexicon" and "first sentence" not in (d.get("summary") or ""):
             continue
-        if not (d.get("summary") or "").strip():   # a broken model answer: nothing to show
+        if not (d.get("summary") or "").strip():  # a broken model answer: nothing to show
             dropped += 1
             continue
         t = as_of_sql(None if as_of == today else as_of)
-        cur.execute(f"""SELECT c.id, c.section, a.rev_id, c.cites, p.text
+        cur.execute(
+            f"""SELECT c.id, c.section, a.rev_id, c.cites, p.text
                         FROM chunk FOR SYSTEM_TIME AS OF {t} AS c
                         JOIN article FOR SYSTEM_TIME AS OF {t} AS a ON a.lang = c.lang AND a.page_id = c.page_id
-                        JOIN passage AS p ON p.sha = c.sha WHERE c.id IN (?, ?)""", (int(a_id), int(b_id)))
+                        JOIN passage AS p ON p.sha = c.sha WHERE c.id IN (?, ?)""",
+            (int(a_id), int(b_id)),
+        )
         side = {r[0]: r[1:] for r in cur.fetchall()}
         a, b = side.get(int(a_id)), side.get(int(b_id))
         qa, qb = d.get("quote_a") or "", d.get("quote_b") or ""
         if not a or not b or (qa and qa not in a[3]) or (qb and qb not in b[3]):
             dropped += 1
             continue
-        rows.append((d["pair_id"], qid, as_of, a_lang, a[0], b_lang, b[0], d["type"], d.get("missing_in"),
-                     qa, qb, a[1], b[1], cited(a[3], json.loads(a[2]), qa), cited(b[3], json.loads(b[2]), qb),
-                     paragraph_cited(a[3], json.loads(a[2]), qa), paragraph_cited(b[3], json.loads(b[2]), qb),
-                     d.get("summary") or "", json.dumps(d.get("terms") or [], ensure_ascii=False),
-                     d.get("distance"), d.get("source") or "llm", d.get("model")))
+        rows.append(
+            (
+                d["pair_id"],
+                qid,
+                as_of,
+                a_lang,
+                a[0],
+                b_lang,
+                b[0],
+                d["type"],
+                d.get("missing_in"),
+                qa,
+                qb,
+                a[1],
+                b[1],
+                cited(a[3], json.loads(a[2]), qa),
+                cited(b[3], json.loads(b[2]), qb),
+                paragraph_cited(a[3], json.loads(a[2]), qa),
+                paragraph_cited(b[3], json.loads(b[2]), qb),
+                d.get("summary") or "",
+                json.dumps(d.get("terms") or [], ensure_ascii=False),
+                d.get("distance"),
+                d.get("source") or "llm",
+                d.get("model"),
+            )
+        )
     # A pair in this file replaces what the same kind of classifier (word list or model) stored for
     # it before, even when none of its new rows survives the verbatim check.
     if pairs:
-        cur.executemany("DELETE FROM difference WHERE pair_id = ? AND (source = 'lexicon') = ?",
-                        sorted(pairs))
+        cur.executemany("DELETE FROM difference WHERE pair_id = ? AND (source = 'lexicon') = ?", sorted(pairs))
     if rows:
-        cur.executemany("INSERT INTO difference (pair_id, wikidata_id, as_of, a_lang, a_section, b_lang, b_section, "
-                        "type, missing_in, quote_a, quote_b, a_rev, b_rev, a_citation, b_citation, a_par_citation, "
-                        "b_par_citation, summary, terms, distance, source, model) "
-                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", rows)
+        cur.executemany(
+            "INSERT INTO difference (pair_id, wikidata_id, as_of, a_lang, a_section, b_lang, b_section, "
+            "type, missing_in, quote_a, quote_b, a_rev, b_rev, a_citation, b_citation, a_par_citation, "
+            "b_par_citation, summary, terms, distance, source, model) "
+            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            rows,
+        )
     con.commit()
-    print(f"{len(rows)} differences for {len(topics)} topics, {dropped} dropped (no summary, or quote not verbatim)",
-          flush=True)
+    print(
+        f"{len(rows)} differences for {len(topics)} topics, {dropped} dropped (no summary, or quote not verbatim)",
+        flush=True,
+    )
     build_findings(topics)
