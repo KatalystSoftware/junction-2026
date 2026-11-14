@@ -34,18 +34,22 @@
     "models": [
       [
         "opus",
+        "Opus 5.5",
         "Opus 5.5"
       ],
       [
         "gemma-base",
-        "Gemma 4 26B-A4B untrained"
+        "Gemma 4 26B-A4B untrained",
+        "Gemma 4 26B-A4B, untrained"
       ],
       [
         "gemma-ft",
-        "Gemma 4 26B-A4B fine-tuned on OnCallBench"
+        "Gemma 4 26B-A4B fine-tuned on OnCallBench",
+        "Gemma 4 26B-A4B + our adapter"
       ]
     ],
-    "claim": "opus"
+    "claim": "opus",
+    "table": "../results.json"
   },
   "l4-s200019": {
     "order": [

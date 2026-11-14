@@ -205,12 +205,12 @@
     if (!data || !data.models.length || params.get("spread") === "0") return;
     const at = (v) => `${(Math.max(0, Math.min(1, v)) * 100).toFixed(2)}%`, two = (v) => v.toFixed(2);
     const rows = data.models.length;
-    const how = `Level ${data.level}, seeds ${data.seeds}, ${data.source}. The mean counts each seed once; `
-      + `its 95% interval is over the seed means (Student's t), because runs on one seed share its outage.`;
+    const how = `Level ${data.level}, seeds ${data.seeds}, ${data.source}. Mean over all runs; the 95% interval is a `
+      + `cluster bootstrap over seeds, as in the benchmark table (results.json), because runs on one seed share its outage.`;
     box.replaceChildren(...[
       h("p", { class: "spread-caption", style: "grid-row: 1" }, data.caption,
         data.placeholder ? h("b", { class: "placeholder", text: "Placeholder data, not results" }) : null),
-      h("p", { class: "spread-head", style: "grid-row: 1", title: how, text: "mean ± 95% CI" }),
+      h("p", { class: "spread-head", style: "grid-row: 1", title: how, text: "mean (95% CI)" }),
       h("div", { class: "spread-walls", style: `grid-row: 2 / span ${rows}`, "aria-hidden": "true" },
         [0.25, 0.5, 0.75].map((v) => h("i", { class: "grid", style: `left: ${at(v)}` })),
         h("i", { class: "floor", style: "left: 0%" }), h("i", { class: "ceiling", style: "left: 100%" })),
@@ -218,12 +218,12 @@
         h("p", { class: "spread-name", style: `grid-row: ${i + 2}`, text: m.label }),
         h("div", { class: "spread-lane", style: `grid-row: ${i + 2}`, role: "img",
             "aria-label": `${m.label}, ${m.n} runs: ${m.runs.map((r) => two(r.score)).join(", ")}` },
-          m.half != null ? h("i", { class: "ci", style: `left: ${at(m.mean - m.half)}; right: calc(100% - ${at(m.mean + m.half)})` }) : null,
+          m.low != null ? h("i", { class: "ci", style: `left: ${at(m.low)}; right: calc(100% - ${at(m.high)})` }) : null,
           m.runs.map((r) => h("i", { class: "dot", style: `left: ${at(r.score)}; top: calc(50% + ${(r.k % 3) - 1} * 0.32rem)`,
             title: `Seed ${r.seed}: ${two(r.score)}` })),
           h("i", { class: "mean", style: `left: ${at(m.mean)}` })),
         h("p", { class: "spread-stat", style: `grid-row: ${i + 2}`, title: how },
-          h("b", { text: m.half != null ? `${two(m.mean)} ± ${two(m.half)}` : two(m.mean) }),
+          h("b", { text: m.low != null ? `${two(m.mean)} (${two(m.low)}–${two(m.high)})` : two(m.mean) }),
           h("span", { text: `${m.n} run${m.n === 1 ? "" : "s"}, ${m.seeds} seed${m.seeds === 1 ? "" : "s"}` })),
       ]),
       h("div", { class: "spread-axis", style: `grid-row: ${rows + 2}`, "aria-hidden": "true" },

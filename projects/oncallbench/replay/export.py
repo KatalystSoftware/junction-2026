@@ -23,6 +23,7 @@ import importlib.util
 import itertools
 import json
 import math
+import random
 import re
 import statistics
 import sys
@@ -731,17 +732,27 @@ def session(incident, policies, seed, level, names, trials, notes):
         services=services, faults=faults, decoy=decoy or None, runs=runs)
 
 
-# two-sided 95% quantiles of Student's t, by degrees of freedom (beyond 30, the normal's 1.96)
-T975 = [None, 12.706, 4.303, 3.182, 2.776, 2.571, 2.447, 2.365, 2.306, 2.262, 2.228, 2.201, 2.179, 2.160, 2.145,
-        2.131, 2.120, 2.110, 2.101, 2.093, 2.086, 2.080, 2.074, 2.069, 2.064, 2.060, 2.056, 2.052, 2.048, 2.045, 2.042]
+
+
+def bootstrap(by_seed, resamples=10_000):
+    """The 95% interval of the mean exactly as ../results_table.py computes it for the benchmark table: a
+    cluster bootstrap over seeds (draw seeds with replacement, keep every run of each drawn seed), with the
+    same random seed and draw order, so the band and the table give the same interval."""
+    rng = random.Random(0)
+    seeds = sorted(by_seed)
+    means = []
+    for _ in range(resamples):
+        draw = [x for s in (rng.choice(seeds) for _ in seeds) for x in by_seed[s]]
+        means.append(sum(draw) / len(draw))
+    means.sort()
+    return means[int(0.025 * resamples)], means[int(0.975 * resamples) - 1]
 
 
 def spread(cfg, metrics, placeholder=False):
     """Every scored run of each model on the common seeds, for the band above the replay: scores only, no
-    actions, so it is safe for any seed. The mean is over all runs, as the reports give it. Its 95% interval is
-    clustered by seed (Student's t, seeds - 1 degrees of freedom): runs on one seed share its outage, so they
-    are not independent samples of the model. With the same number of runs on every seed this is the
-    t-interval of the seed means."""
+    actions, so it is safe for any seed. The dots come from metrics.json. The mean and its 95% interval are
+    the benchmark table's (../results.json, a cluster bootstrap over seeds) where the table has the model
+    with the same runs; otherwise they are computed here the same way."""
     rows = [r for r in json.loads(Path(metrics).read_text())
             if r.get("round") == cfg["round"] and r.get("level") == cfg["level"] and r.get("score") is not None]
     # Harbor trials only (<job>/<trial>__<id>): scores from another harness, such as rl/'s own runner, stay out
@@ -756,7 +767,9 @@ def spread(cfg, metrics, placeholder=False):
         print(f"note: spread leaves out {len(cut)} runs cut by infrastructure", file=sys.stderr)
     rows = [r for r in rows if r not in cut]
     models = []
-    for run, label in cfg["models"]:
+    table_file = HERE / cfg.get("table", "../results.json")
+    table = {r["label"]: r for r in json.loads(table_file.read_text())["rows"]} if table_file.exists() else {}
+    for run, label, listed in cfg["models"]:
         mine = sorted((r for r in rows if r["run"] == run), key=lambda r: (r["seed"], r.get("trial", "")))
         off = sorted({r["seed"] for r in mine} - set(cfg["seeds"]))
         if off:
@@ -769,11 +782,14 @@ def spread(cfg, metrics, placeholder=False):
             by.setdefault(r["seed"], []).append(round(r["score"], 4))
         n, k = len(mine), len(by)
         mean = sum(v for vs in by.values() for v in vs) / n
-        # cluster-robust standard error of the mean, clusters = seeds, with the k/(k-1) small-sample factor
-        spread_ = math.sqrt(k / (k - 1) * sum(sum(v - mean for v in vs) ** 2 for vs in by.values())) / n if k > 1 else 0
-        half = (T975[k - 1] if k <= 31 else 1.96) * spread_ if k > 1 else None
-        models.append(dict(run=run, label=label, mean=round(mean, 4), n=n, seeds=k,
-                           **({"half": round(half, 4)} if half is not None else {}),
+        low, high = bootstrap(by)
+        row = table.get(listed)
+        if row and (row["runs"], row["seeds"]) == (n, k):
+            mean, (low, high) = row["mean"], row["ci95"]
+        elif row:
+            print(f"note: {table_file.name} has {listed} at {row['runs']} runs, metrics.json at {n}; "
+                  f"the band computes its interval itself until the table is rerun", file=sys.stderr)
+        models.append(dict(run=run, label=label, mean=round(mean, 4), n=n, seeds=k, low=round(low, 4), high=round(high, 4),
                            runs=[dict(seed=s, score=v, k=i) for s, vs in by.items() for i, v in enumerate(vs)]))
     seeds = sorted(cfg["seeds"])
     named = f"{seeds[0]} to {seeds[-1]}" if seeds == list(range(seeds[0], seeds[-1] + 1)) else ", ".join(map(str, seeds))

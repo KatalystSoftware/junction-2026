@@ -130,10 +130,13 @@ python3 export.py --spread && ./deploy.sh   # pick up new runs from ../metrics.j
   in order with their labels, and the caption. A model with no runs yet has no row, and with no
   runs at all the band is not drawn, so the page looks as it did before. To drop a model, delete
   its line there. Runs on other seeds are left out, with a note.
-- The mean is over all runs, as the reports give it. Its 95% interval is clustered by seed
-  (Student's t, seeds minus one degrees of freedom), because the runs on one seed share its outage
-  and are not independent; with the same number of runs on every seed it is the t-interval of the
-  seed means.
+- The mean and its 95% interval are the benchmark table's (`../results.json`, written by
+  `../results_table.py`): the mean over all runs and a cluster bootstrap over seeds (draw seeds with
+  replacement, keep every run of a drawn seed, 10,000 resamples, fixed random seed), because the
+  runs on one seed share its outage and are not independent. The band shows it as the table does,
+  "0.45 (0.35–0.54)". Where the table lacks a model or has fewer runs than `metrics.json` (it is
+  rerun after the runs land), the exporter computes the interval itself with the same code and
+  says so; for Opus that reproduces the table's numbers.
 - It carries scores only, no actions or faults, so it is safe for any seed.
 - `--metrics <file>` reads another file of rows in the same shape, for a look at the band before
   the runs exist. The output is marked as a placeholder, the page says so in red, and `deploy.sh`
