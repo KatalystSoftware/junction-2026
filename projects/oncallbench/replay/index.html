@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>On-call shift replay</title>
+<title>OnCallBench: on-call shift replay</title>
 <meta name="description" content="An AI agent and a scripted expert work the same simulated outage, side by side, minute by minute.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='6' fill='%23d1242c'/%3E%3C/svg%3E">
+<link rel="icon" href="logo.svg" type="image/svg+xml">
 <link rel="preload" href="fonts/archivo-latin-wdth-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="style.css">
 <!-- data/index.js names the bundles; each is JSON wrapped in one assignment, so the page also works
@@ -16,7 +16,12 @@
 <body class="loading">
 <p class="loading-note" role="status">Loading the shift…</p>
 <header class="bar">
-  <h1>On-call shift replay</h1>
+  <h1>
+    <!-- the mark of logo.svg without its tile: the bar is already that ink -->
+    <svg class="mark" viewBox="4 4 24 24" aria-hidden="true"><path class="mark-agent" d="M14 19 25 7"/><path d="M6 25 14 19H26"/></svg>
+    OnCallBench
+  </h1>
+  <p class="tagline">On-call shift replay</p>
   <div class="episode" id="episode"></div>
   <div class="runs" id="runs"></div>
   <button type="button" class="results" id="open-results" aria-expanded="false" aria-controls="results"></button>

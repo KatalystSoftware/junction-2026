@@ -7,6 +7,6 @@ set -euo pipefail
 cd "$(dirname "$0")"
 host=${VERDA_HOST:-junction-runner}
 dir=/srv/katalyst/proxy/static/incident
-tar -c index.html app.js style.css fonts data/index.js data/l*-s*.js \
+tar -c index.html app.js style.css logo.svg fonts data/index.js data/l*-s*.js \
   | ssh "$host" "mkdir -p $dir && rm -rf $dir/data && tar -x --no-same-owner -C $dir && chmod -R a+rX $dir"
 echo "shipped to $host:$dir"

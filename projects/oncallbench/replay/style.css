@@ -1,4 +1,4 @@
-/* On-call shift replay. A ledger's two inks on cool paper: blue-black for what is, red for what
+/* OnCallBench, the on-call shift replay. A ledger's two inks on cool paper: blue-black for what is, red for what
    is lost. Amber marks noise, blue marks the hand at work. Sized for a projector at 1920x1080. */
 
 @font-face {
@@ -69,7 +69,11 @@ body {
   background: var(--ink);
   color: var(--paper);
 }
-.bar h1 { font-size: 1.2rem; font-weight: 680; font-stretch: 92%; white-space: nowrap; }
+.bar h1 { display: flex; align-items: center; gap: 0.45rem; font-size: 1.2rem; font-weight: 680; font-stretch: 92%; white-space: nowrap; }
+.mark { width: 1.5rem; height: 1.5rem; flex: none; fill: none; stroke: currentColor; stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; }
+.mark-agent { stroke: oklch(0.7 0.2 27); }  /* the page's red, lifted to read on the ink bar */
+.tagline { margin-left: -0.5rem; color: oklch(0.82 0.03 258); font-size: 0.9rem; white-space: nowrap; }
+@media (max-width: 1500px) { .tagline { display: none; } }
 .bar { font-stretch: 94%; }
 .bar :focus-visible { outline-color: var(--paper); }
 .episode { display: flex; gap: 0.25rem; flex: none; color: oklch(0.82 0.03 258); white-space: nowrap;

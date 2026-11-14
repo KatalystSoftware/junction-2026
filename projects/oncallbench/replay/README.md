@@ -1,6 +1,6 @@
-# Replay viewer for aq-incident
+# OnCallBench replay viewer
 
-One screen for the demo: an agent's on-call shift next to the scripted reference on the same seed.
+The on-call shift replay for the `aq-incident` task. One screen for the demo: an agent's on-call shift next to the scripted reference on the same seed.
 The first screen has only what a passer-by needs: the two estates turning red and recovering, the
 money each run has lost so far, what each run is doing now and why, play, and the timeline.
 Everything else opens on a click or a hover.
@@ -143,7 +143,7 @@ https://incident.katalyst.fyi/?seed=101&autoplay=1&seconds=25&zoom=1.15
 ./deploy.sh
 ```
 
-Copies the page, the font and the bundles to the Verda machine, into the folder the team's shared
+Copies the page, the logo, the font and the bundles to the Verda machine, into the folder the team's shared
 proxy serves as `https://incident.katalyst.fyi/` (`infra/verda/proxy/sites/incident.caddy`). It
 replaces the `data/` folder there, copies files only and restarts nothing; the proxy does not
 need a reload for new files. It needs SSH access to the machine (`VERDA_HOST`, or a

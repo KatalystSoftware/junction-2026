@@ -1,6 +1,6 @@
-# aq-incident: an on-call shift on a generated microservice estate
+# OnCallBench: an on-call shift on a generated microservice estate
 
-AfterQuery "Break the Agent" environment. Submitted level: **4**. Judged agent: **OpenCode with
+OnCallBench is the project's name; the task and its identifiers are still `aq-incident`. AfterQuery "Break the Agent" environment. Submitted level: **4**. Judged agent: **OpenCode with
 `anthropic/claude-opus-5-5`**.
 
 ## What the agent has to do
