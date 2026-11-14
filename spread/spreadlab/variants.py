@@ -329,7 +329,10 @@ VARIANTS: dict[str, dict] = {
                            # ... and a request whose car can go onward with a held car quoted at 0.9 or 1.0 of its typical fee, not
                            # 1.2; once won its car waits for that held car's release (`pair_onward_cost`): more orders won
                            ("open-onward-late-q09", {"pair_open": True, "pair_onward": 0.8, "pair_late": True, "pair_onward_cost": 0.9}),
-                           ("open-onward-late-q10", {"pair_open": True, "pair_onward": 0.8, "pair_late": True, "pair_onward_cost": 1.0}))},
+                           ("open-onward-late-q10", {"pair_open": True, "pair_onward": 0.8, "pair_late": True, "pair_onward_cost": 1.0}),
+                           # ... only in weeks with 760 or more drivers listed, where merge 1's exam had no week under 92%
+                           ("open-onward-late-q10-d760", {"pair_open": True, "pair_onward": 0.8, "pair_late": True, "pair_onward_cost": 1.0,
+                                                          "pair_onward_drivers": 760}))},
     # ... the same without the note's limits, whose posting changed after its weeks were played.
     "slow-friday-late-150-kinds": {**REFERENCE, "backlog_step": 0, "slow_step": 0.8, "max_unbooked": 25, "slow_model": "friday", "cost": 1.2, "late_cost": 150, "kinds": KINDS},
     # The best point of the search over these parameters together (scratch/search.py, trial 16 of 20, on 30 tune seeds), and with the kinds.

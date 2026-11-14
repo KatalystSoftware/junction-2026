@@ -215,3 +215,20 @@ def test_an_onward_request_is_quoted_at_the_onward_cost_and_once_won_waits_for_t
         else:
             assert "onward" not in d.decisions["R2"] and "R2" not in d.pair_wait
     assert prices[0.9] < prices[0]
+
+
+def test_the_onward_quote_stays_at_the_usual_cost_in_a_week_with_fewer_drivers_than_pair_onward_drivers(monkeypatch):
+    three = {"places": MAP["places"] + [{"id": "pori", "lat": 61.48, "lon": 21.80}],
+             "roads": [{"from": a, "to": b, "km": 100.0, "minutes": 25 if a == b else 120} for a in ("helsinki", "tampere", "pori") for b in ("helsinki", "tampere", "pori")]}
+    monkeypatch.setattr(pairs, "RETURNS", {"helsinki>tampere": 20})
+    params = {"quote_share": 1, "curve": True, "cost": 1.2, "fee": 1.0, "fee_cap": 1.2, "pair_hold": 4, "pair_onward": 0.8, "pair_late": True,
+              "pair_onward_cost": 0.9}
+    found = {}
+    for drivers in (0, len(ROSTER) + 1):  # the roster has 8 drivers: the gate at 9 keeps the usual cost
+        d = pairs.PairPolicy(World(), 8, MON_9, {**params, "pair_onward_drivers": drivers}, ROSTER, three)
+        win(d, request("R1", "helsinki", "tampere", MON_9), MON_9 + 15)
+        d.now = MON_9 + 60
+        d.quote(request("R2", "tampere", "pori", MON_9 + 60))
+        found[drivers] = d.decisions["R2"]
+    assert found[0]["onward"] == "R1" and "onward" not in found[len(ROSTER) + 1]
+    assert found[0]["prices"]["next_day"] < found[len(ROSTER) + 1]["prices"]["next_day"]

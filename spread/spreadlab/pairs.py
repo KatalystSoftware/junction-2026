@@ -62,6 +62,7 @@ PARAMS = {
                           # held car, or a car alone in an open gig that no driver holds, which is withdrawn first
     "pair_onward_cost": 0,  # with `pair_late`, a request whose car can go onward with a held car, and has no return to go with,
                           # is quoted at this cost, a multiple of its typical fee; once won its car is held until that car's release
+    "pair_onward_drivers": 0,  # ... only in a week with at least this many drivers listed: thin worlds keep the usual cost
     "pair_version": "",   # VERSION, set by the variant, so a sweep plays the weeks again when this file changes
 }
 GIG_DRIVING = 12 * HOUR  # RULES.md: a gig with more than one car plans at most 12 hours of driving
@@ -268,7 +269,8 @@ class PairPolicy(Policy):
     def onward_partner(self, request) -> Optional[str]:
         """With `pair_onward_cost`: the held car that the request's car can go onward with at that car's release."""
         p = self.p
-        if not (p["pair_onward_cost"] and p["pair_late"] and p["pair_onward"] and self.pair_wait) or len(request["legs"]) != 1 or kind(request) != "":
+        if (not (p["pair_onward_cost"] and p["pair_late"] and p["pair_onward"] and self.pair_wait) or len(request["legs"]) != 1 or kind(request) != ""
+                or len(self.roster) < p["pair_onward_drivers"]):
             return None
         reason, options = self.choose(request, self.params())
         if reason:
