@@ -1,211 +1,345 @@
 <script lang="ts">
-  import { some, type Plan } from './events'
+  import { tick } from 'svelte'
+  import type { Plan } from './events'
   import { concerns, fitCompany, rank, type Fit } from './fit'
-  import { when } from './format'
+  import { clock, when } from './format'
   import Icon from './Icon.svelte'
   import Logo from './Logo.svelte'
-  import { applications, decide, decisionOf, manage, undecide } from './manage.svelte'
-  import { app, copyText, nameOf } from './state.svelte'
+  import { applications, decide, decisionOf, undecide, type Decision } from './manage.svelte'
+  import Mark from './Mark.svelte'
+  import { app, copyText, nameOf, route } from './state.svelte'
   import Tabs from './Tabs.svelte'
   import type { Applicant } from './types'
 
-  // The applications that came back from the invitation link, one at a time, as a one-page summary with two kinds
-  // of lines kept apart: what the pipeline drafted from the applicant's sources (the AI summary) and what the applicant
-  // explicitly answered, corrected or wrote. Espoo's view analyses fit against the whole event and the pool; a
-  // company's view, reached by its own link, shows only the applications that concern it and fit against its roles.
+  // An event's applications as a queue to work through. The list says who is waiting and where each
+  // one stands without being read; one application shows the few facts that decide it first and the
+  // rest on request. A decision takes three steps, in this order: approve or decline, a reason picked
+  // from a few drafted for this applicant or written by hand, then record. The record says who decided,
+  // when and why, and can be undone. Nobody is scored or ranked, and nobody has a photo.
+  // Espoo sees the whole event; a company, by its own link, sees the applications that concern it.
   let { plan, company = '' }: { plan: Plan; company?: string } = $props()
   const brief = $derived(company ? app.briefs.find((b) => b.id === company) : undefined)
   const by = $derived(brief ? brief.id : 'espoo')
+  const who = $derived(brief ? nameOf(brief) : 'City of Espoo')
   const list = $derived(brief ? applications.list.filter((a) => concerns(a, brief)) : applications.list)
-  const counts = $derived({
-    accepted: list.filter((a) => decisionOf(by, a.id)?.d === 'accept').length,
-    declined: list.filter((a) => decisionOf(by, a.id)?.d === 'decline').length,
-  })
-  let openId = $state('')
-  let reason = $state('')
-  let copied = $state('')
-  let linkFor = $state('')
-  const current = $derived(list.find((a) => a.id === openId) ?? list.find((a) => !decisionOf(by, a.id)) ?? list[0])
-  const decision = $derived(current ? decisionOf(by, current.id) : undefined)
-  // fit: Espoo sees the closest employers of the event; a company sees each of its roles
-  const fits = $derived<Fit[]>(current ? (brief ? fitCompany(current, brief) : rank(current, plan.employers).slice(0, 3)) : [])
-  const field = $derived(current ? plan.fields.find((f) => f.name === current.field) : undefined)
-  const bestOf = (a: Applicant) => (brief ? fitCompany(a, brief)[0] : rank(a, plan.employers)[0])
-  const link = (id: string) => `${location.origin}${location.pathname}#/event/${plan.slug}/applications/${encodeURIComponent(id)}`
 
+  // ---- where each application stands
+  type Status = 'waiting' | 'later' | 'accept' | 'decline'
+  const STATUS: Record<Status, string> = { waiting: 'Waiting', later: 'Second look', accept: 'Approved', decline: 'Declined' }
+  const statusOf = (a: Applicant): Status => decisionOf(by, a.id)?.d ?? 'waiting'
+  const counts = $derived(Object.fromEntries((Object.keys(STATUS) as Status[]).map((s) => [s, list.filter((a) => statusOf(a) === s).length])) as Record<Status, number>)
+  let filter = $state<Status | 'all'>('waiting')
+  const shown = $derived(filter === 'all' ? list : list.filter((a) => statusOf(a) === filter))
+
+  // ---- which one is open. On the Applications page it is in the address; inside an event's tab it is kept here.
+  const paged = $derived(route().page === 'applications')
+  let local = $state('')
+  const openId = $derived(paged ? route().item : local)
+  const current = $derived(list.find((a) => a.id === openId) ?? shown[0])
+  const decision = $derived(current ? decisionOf(by, current.id) : undefined)
   function open(id: string) {
-    openId = id
-    reason = ''
+    if (paged) location.hash = id ? `#/applications/${encodeURIComponent(id)}` : '#/applications'
+    else local = id
   }
-  // Accept and Decline decide at once, with whatever note was written (a note is welcome, not required), and move on to
-  // the next application still to decide.
-  function save(d: 'accept' | 'decline') {
-    const me = current // read before deciding: `current` re-derives as soon as the decision lands
-    if (!me) return
-    decide(by, me.id, d, reason.trim())
-    const next = list.find((a) => a.id !== me.id && !decisionOf(by, a.id))
-    if (next) open(next.id)
-    window.scrollTo({ top: 0 })
+
+  // ---- what decides it: the closest roles, without a score
+  const fits = $derived<Fit[]>(current ? (brief ? fitCompany(current, brief) : rank(current, plan.employers)).slice(0, 3) : [])
+  const field = $derived(current ? plan.fields.find((f) => f.name === current.field) : undefined)
+  const asked = $derived(current ? plan.employers.filter((e) => current.wants.includes(e.brief.id)) : [])
+  const skillsOf = (f: Fit, kind: 'overlap' | 'gap') => f.lines.filter((l) => l.kind === kind && !/^(Level|Finnish|English)/.test(l.text)).map((l) => l.text.split(':')[0] ?? '')
+  const notes = (f: Fit) => f.lines.filter((l) => l.kind === 'check' || (l.kind !== 'overlap' && /^(Level|Finnish)/.test(l.text))).map((l) => l.text)
+  const both = (items: string[]) => (items.length > 1 ? `${items.slice(0, -1).join(', ')} and ${items.at(-1) ?? ''}` : (items[0] ?? ''))
+
+  // ---- the decision, in three steps
+  type Choice = Decision['d']
+  const VERB: Record<Choice, string> = { accept: 'Approve', decline: 'Decline', later: 'Second look' }
+  const RECORD: Record<Choice, string> = { accept: 'Record approval', decline: 'Record decline', later: 'Set aside' }
+  let choice = $state<Choice | ''>('')
+  let picked = $state(0)
+  let reason = $state('')
+  let writing = $state<HTMLTextAreaElement>()
+  let panel = $state<HTMLElement>()
+  /** A few reasons for this applicant and this event, each written so that the applicant could be shown it. The organiser picks one, edits it or writes another. */
+  function reasonsFor(a: Applicant, d: Choice): string[] {
+    const top = fits[0]
+    const shared = top ? skillsOf(top, 'overlap') : []
+    const role = top ? (brief ? `Our ${top.need.title.toLowerCase()} role` : `${nameOf(top.brief)}'s ${top.need.title.toLowerCase()} role`) : ''
+    const inField = field?.employers.length ?? 0
+    const fieldName = a.field.toLowerCase()
+    if (d === 'accept')
+      return [
+        shared.length ? `${role} asks for ${both(shared.slice(0, 2))}, which you have worked with.` : '',
+        asked.length ? `You asked to meet ${both(asked.slice(0, 2).map((e) => nameOf(e.brief)))}, and ${asked.length > 1 ? 'they are' : 'it is'} at this event.` : '',
+        inField ? `${String(inField)} ${inField === 1 ? 'employer' : 'employers'} at this event ${inField === 1 ? 'is' : 'are'} looking for people in ${fieldName}.` : '',
+        'There is room at this event and your profile is complete.',
+      ]
+        .filter(Boolean)
+        .slice(0, 3)
+    if (d === 'decline') {
+      const level = top?.lines.find((l) => l.kind === 'gap' && l.text.startsWith('Level'))
+      return [
+        !inField ? `No employer at this event has a role in ${fieldName} this time.` : '',
+        level && top ? `The ${top.need.title.toLowerCase()} role closest to your profile asks for ${top.need.seniority.toLowerCase()} experience, and your profile says ${a.level.toLowerCase()}.` : '',
+        a.skills.length < 3 ? 'Your profile names few tools or methods so far. Add what you have worked with and apply again.' : '',
+        'The 1:1 meeting places at this event are full. The company presentations are open to everyone.',
+        inField && !shared.length ? `The ${fieldName} roles at this event ask for skills your profile does not mention yet.` : '',
+      ]
+        .filter(Boolean)
+        .slice(0, 3)
+    }
+    return [
+      ...(top ? notes(top).slice(0, 1).map((n) => `To check first: ${n}.`) : []),
+      top ? `Ask ${brief ? 'the hiring team' : nameOf(top.brief)} whether this profile is close enough for the ${top.need.title.toLowerCase()} role.` : '',
+      !a.project ? 'Ask the applicant for a work sample before deciding.' : '',
+    ]
+      .filter(Boolean)
+      .slice(0, 3)
   }
-  // the drafted lines in one short list: each line's source is kept as a tooltip and a short tag, not a row of its own
+  const reasons = $derived(current && choice ? reasonsFor(current, choice) : [])
+  function choose(d: Choice) {
+    if (!current) return
+    choice = d
+    picked = 0
+    reason = reasonsFor(current, d)[0] ?? ''
+    // the reasons take room: the panel stops floating over the application and is brought into view instead
+    void tick().then(() => panel?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }))
+  }
+  function pick(i: number) {
+    picked = i
+    reason = reasons[i] ?? ''
+    if (i < 0) void tick().then(() => writing?.focus())
+  }
+  const cancel = () => ([choice, reason] = ['', ''])
+  /** The last decision recorded, so one wrong press can be taken back. */
+  let last = $state<null | { id: string; handle: string; d: Choice }>(null)
+  function record() {
+    const a = current
+    if (!a || !choice || (choice !== 'later' && !reason.trim())) return
+    // the next one still waiting, read before the decision lands and the list changes
+    const at = shown.findIndex((x) => x.id === a.id)
+    const next = [...shown.slice(at + 1), ...shown.slice(0, Math.max(at, 0))].find((x) => x.id !== a.id && statusOf(x) === 'waiting')
+    decide(by, a.id, choice, reason.trim())
+    last = { id: a.id, handle: a.handle, d: choice }
+    cancel()
+    open(filter === 'all' ? a.id : (next?.id ?? ''))
+    scrollTo({ top: 0 })
+  }
+  function undo(id: string) {
+    undecide(by, id)
+    if (last?.id === id) last = null
+  }
+  const step = (n: number) => {
+    const at = shown.findIndex((a) => a.id === current?.id)
+    const to = shown[at + n]
+    if (to) {
+      cancel()
+      open(to.id)
+    }
+  }
+  function keys(e: KeyboardEvent) {
+    const el = e.target as HTMLElement
+    const typing = ['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName)
+    if (typing) {
+      // in the reason field, Ctrl or Cmd with Enter records; Escape leaves the field
+      if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) record()
+      else if (e.key === 'Escape') el.blur()
+      return
+    }
+    if (e.metaKey || e.ctrlKey || e.altKey || !current) return
+    const key = e.key.toLowerCase()
+    if (key === 'z' && last) undo(last.id)
+    else if (key === 'j' || e.key === 'ArrowDown') step(1)
+    else if (key === 'k' || e.key === 'ArrowUp') step(-1)
+    else if (decision) return
+    else if (key === 'a') choose('accept')
+    else if (key === 'd') choose('decline')
+    else if (key === 'l') choose('later')
+    else if (choice && /^[1-3]$/.test(key) && reasons[Number(key) - 1]) pick(Number(key) - 1)
+    else if (choice && key === 'w') pick(-1)
+    else if (choice && e.key === 'Enter') record()
+    else if (choice && e.key === 'Escape') cancel()
+    else return
+    e.preventDefault()
+  }
+
+  // a company's own view of its applications, by link
+  let linkFor = $state('')
+  let copied = $state(false)
+  async function copy() {
+    if (!(await copyText(`${location.origin}${location.pathname}#/event/${plan.slug}/applications/${encodeURIComponent(linkFor)}`))) return
+    copied = true
+    setTimeout(() => (copied = false), 1600)
+  }
   const srcTag = (src: string) => src.replace(/^linkedin$/i, 'LinkedIn').replace(/^github$/i, 'GitHub')
-  // one line per role: what overlaps, then the gaps in one breath, then what to check in person
-  const gaps = (f: Fit) => f.lines.filter((l) => l.kind === 'gap').map((l) => l.text.replace(/: not mentioned$/, '')).join(', ')
-  async function copy(id: string) {
-    await copyText(link(id))
-    copied = id
-    setTimeout(() => (copied = ''), 1600)
-  }
-  const kinds = { overlap: 'Overlap', gap: 'Gap', check: 'Check' }
+  const day = (iso: string) => when(iso.slice(0, 10))
 </script>
 
-<main>
-  <a class="back" href="#/"><Icon name="back" size={16} />Events</a>
-  <header>
-    <h1>{plan.title}</h1>
-    <p>{plan.when}. {brief ? `Applications as ${nameOf(brief)} sees them.` : 'Every application is reviewed separately.'} <span class="sample">sample data</span></p>
-  </header>
-  {#if !brief}<Tabs {plan} tab="applications" />{/if}
+<svelte:window onkeydown={keys} />
 
-  {#if brief}
-    <section class="as">
-      <span class="tile"><Logo {brief} small /></span>
-      <div>
-        <b>Viewing as {nameOf(brief)}</b>
-        <p>Only the people who asked to meet {nameOf(brief)} or fit one of its roles, and fit against those roles only. Espoo's organiser sees the whole event.</p>
-      </div>
-    </section>
+<main>
+  {#if !paged}<a class="back" href="#/event/{plan.slug}"><Icon name="back" size={16} />{plan.title}</a>{/if}
+  <header>
+    <h1>Applications</h1>
+    <p>
+      <span>{#if paged}<a href="#/event/{plan.slug}">{plan.title}</a>{:else}{plan.title}{/if}, {plan.when}</span>
+      {#if brief}<span class="as"><span class="tile"><Logo {brief} small /></span>as {who} sees them</span>{/if}
+      <span class="sample">sample people</span>
+    </p>
+  </header>
+  {#if !brief && !paged}<Tabs {plan} tab="applications" />{/if}
+
+  <!-- where the applications stand, and the way to see each group -->
+  <div class="filters" role="tablist" aria-label="Applications by status">
+    {#each Object.keys(STATUS) as Status[] as s (s)}
+      <button role="tab" aria-selected={filter === s} class={s} onclick={() => { filter = s; open('') }}><i></i>{STATUS[s]}<b>{counts[s]}</b></button>
+    {/each}
+    <button role="tab" aria-selected={filter === 'all'} onclick={() => { filter = 'all'; open('') }}>All<b>{list.length}</b></button>
+  </div>
+
+  {#if last}
+    <p class="last" role="status">
+      <span class="state {last.d}"><i></i>{last.handle}: {STATUS[last.d].toLowerCase()}</span>
+      <button class="btn quiet" onclick={() => { if (last) undo(last.id) }}><Icon name="undo" size={16} />Undo <kbd>Z</kbd></button>
+    </p>
   {/if}
 
-  <section class="summary">
-    <div><b>{list.length}</b><span>applications{brief ? ` for ${nameOf(brief)}` : ''}</span></div>
-    <div><b>{counts.accepted}</b><span>accepted</span></div>
-    <div><b>{counts.declined}</b><span>declined</span></div>
-    <div><b>{list.length - counts.accepted - counts.declined}</b><span>to decide</span></div>
-    {#if !brief}
-      <div><b>{manage.sent ? some(manage.sent.n) : '0'}</b><span>invited{manage.sent ? `, sent ${when(manage.sent.at.slice(0, 10))}` : ''}</span></div>
-      <div><b>{manage.copies}</b><span>link {manage.copies === 1 ? 'copy' : 'copies'}</span></div>
+  <div class="sides" class:opened={!!openId}>
+    <ul class="queue" aria-label="Applications">
+      {#each shown as a (a.id)}
+        {@const s = statusOf(a)}
+        <li>
+          <button class:on={current?.id === a.id} aria-current={current?.id === a.id ? 'true' : undefined} onclick={() => { cancel(); open(a.id) }}>
+            <span class="mark"><Mark seed={a.id} label="" /></span>
+            <span class="who"><b>{a.handle}</b><small>{a.field} · {a.level}</small></span>
+            <span class="state {s}" title={STATUS[s]}><i></i>{s === 'waiting' ? day(a.applied_at) : STATUS[s]}</span>
+          </button>
+        </li>
+      {:else}
+        <li class="none">
+          {#if filter === 'waiting' && list.length}
+            Nothing is waiting. {counts.accept} approved, {counts.decline} declined{counts.later ? `, ${String(counts.later)} set aside for a second look` : ''}.
+          {:else if !list.length}
+            No applications yet{brief ? ` that concern ${who}` : ''}. They arrive as people finish the invitation.
+          {:else}
+            None here.
+          {/if}
+        </li>
+      {/each}
+    </ul>
+
+    {#if current}
+      {@const s = statusOf(current)}
+      <article class="one">
+        <button class="all" onclick={() => { open('') }}><Icon name="back" size={16} />All applications</button>
+        <header>
+          <span class="mark"><Mark seed={current.id} label="" /></span>
+          <div>
+            <h2>{current.handle}<span class="state {s}"><i></i>{STATUS[s]}</span></h2>
+            <p>{current.field} · {current.level} · {current.city}</p>
+          </div>
+        </header>
+        <p class="chips">
+          <span>English {current.english}</span><span>Finnish {current.finnish}</span>
+          {#if current.abroad}<span>Lives abroad</span>{/if}
+          {#if current.permit}<span>Needs work-permit support</span>{/if}
+          {#if current.project}<span>Work sample: {current.project.name}</span>{/if}
+          <span>Applied {day(current.applied_at)}</span>
+        </p>
+
+        {#if asked.length && !brief}
+          <section>
+            <h3>Asked to meet</h3>
+            <p class="asked">{#each asked as e (e.brief.id)}<span><span class="tile"><Logo brief={e.brief} small /></span>{nameOf(e.brief)}</span>{/each}</p>
+          </section>
+        {/if}
+
+        <section>
+          <h3>{brief ? `Against ${who}'s roles` : 'Closest roles at this event'}</h3>
+          {#if fits.length}
+            <ul class="fits">
+              {#each fits as f (f.brief.id + f.need.id)}
+                <li>
+                  <p class="role">{#if !brief}<span class="tile"><Logo brief={f.brief} small /></span>{/if}<b>{brief ? f.need.title : nameOf(f.brief)}</b>{#if !brief}<span>{f.need.title}</span>{/if}</p>
+                  <p class="skills">
+                    {#each skillsOf(f, 'overlap') as skill (skill)}<span class="has"><Icon name="check" size={12} />{skill}</span>{/each}
+                    {#each skillsOf(f, 'gap') as skill (skill)}<span class="lacks">{skill}</span>{/each}
+                  </p>
+                  {#each notes(f) as note (note)}<p class="note">{note}</p>{/each}
+                </li>
+              {/each}
+            </ul>
+          {:else}
+            <p class="note">{field ? 'No role at this event asks for what this profile names.' : `No employer at this event has a role in ${current.field.toLowerCase()}.`}</p>
+          {/if}
+        </section>
+
+        <section>
+          <h3>In their own words</h3>
+          <blockquote>{current.own.about}<span>Looking for: {current.own.looking}</span></blockquote>
+        </section>
+
+        <details>
+          <summary>The whole application<Icon name="plus" size={14} /></summary>
+          <h3>Drafted from {current.sources.map(srcTag).join(' and ')}, read with consent, left as drafted</h3>
+          <ul class="lines">
+            {#each current.drafted as l, i (i)}<li title="“{l.quote}”">{l.text}<small>{srcTag(l.source)}</small></li>{/each}
+          </ul>
+          <h3>Answered, corrected or written by the applicant</h3>
+          <ul class="lines">
+            {#each current.corrected as l, i (i)}<li title="was: {l.was}">{l.text}<small>corrected</small></li>{/each}
+            {#each current.answers.filter((qa) => qa.a) as qa, i (i)}<li>{qa.a}<small>{qa.q}</small></li>{/each}
+          </ul>
+        </details>
+
+        <!-- the decision: approve or decline, then a reason, then record -->
+        <footer class="decide" class:open={!!choice} bind:this={panel}>
+          {#if decision}
+            <div class="record">
+              <p><span class="state {decision.d}"><i></i>{STATUS[decision.d]}</span> by {decision.by === 'espoo' ? 'City of Espoo' : who}, {day(decision.at)} at {clock(decision.at)}</p>
+              {#if decision.reason}<blockquote>{decision.reason}</blockquote>{/if}
+              <button class="btn quiet" onclick={() => { undo(current.id) }}><Icon name="undo" size={16} />Undo this decision</button>
+            </div>
+          {:else if !choice}
+            <p class="steps"><b>1 Decide</b><span>2 Reason</span><span>3 Record</span></p>
+            <div class="row">
+              <button class="btn approve" onclick={() => { choose('accept') }}><Icon name="check" size={16} />Approve <kbd>A</kbd></button>
+              <button class="btn decline" onclick={() => { choose('decline') }}><Icon name="x" size={16} />Decline <kbd>D</kbd></button>
+              <button class="btn quiet" onclick={() => { choose('later') }}>Second look <kbd>L</kbd></button>
+            </div>
+          {:else}
+            <p class="steps"><span>1 {VERB[choice]}</span><b>2 Reason</b><span>3 Record</span></p>
+            <div class="reasons" role="radiogroup" aria-label="Reason">
+              {#each reasons as r, i (r)}
+                <button role="radio" aria-checked={picked === i} onclick={() => { pick(i) }}><kbd>{i + 1}</kbd>{r}</button>
+              {/each}
+              <button role="radio" aria-checked={picked < 0} onclick={() => { pick(-1) }}><kbd>W</kbd>Write my own</button>
+            </div>
+            <textarea bind:this={writing} bind:value={reason} rows="2" aria-label="The reason, as it will be recorded" placeholder={choice === 'later' ? 'What to look at again (optional)' : 'The reason, as it will be recorded'}></textarea>
+            <div class="row">
+              <button class="btn {choice === 'accept' ? 'approve' : choice === 'decline' ? 'decline' : ''}" disabled={choice !== 'later' && !reason.trim()} onclick={record}>{RECORD[choice]} <kbd>Enter</kbd></button>
+              <button class="btn quiet" onclick={cancel}>Back <kbd>Esc</kbd></button>
+              <span class="quiet">Recorded as decided by {who}. Nothing is sent to the applicant.</span>
+            </div>
+          {/if}
+        </footer>
+      </article>
     {/if}
-  </section>
+  </div>
 
   {#if !brief}
-    <section class="share">
-      <label>
-        <span>A company's own view of its applications</span>
-        <select bind:value={linkFor}>
+    <details class="share">
+      <summary>Share with a company<Icon name="plus" size={14} /></summary>
+      <p>
+        <select bind:value={linkFor} aria-label="Company">
           <option value="">Choose a company…</option>
           {#each plan.employers as e (e.brief.id)}<option value={e.brief.id}>{nameOf(e.brief)}</option>{/each}
         </select>
-      </label>
-      <button class="btn" disabled={!linkFor} onclick={() => copy(linkFor)}><Icon name={copied === linkFor && linkFor ? 'check' : 'copy'} size={16} />{copied === linkFor && linkFor ? 'Link copied' : 'Copy the link'}</button>
-      {#if linkFor}<a class="see" href="#/event/{plan.slug}/applications/{encodeURIComponent(linkFor)}">Open it<Icon name="flat" size={14} /></a>{/if}
-    </section>
+        <button class="btn" disabled={!linkFor} onclick={copy}><Icon name={copied ? 'check' : 'copy'} size={16} />{copied ? 'Link copied' : 'Copy its link'}</button>
+        {#if linkFor}<a class="btn quiet" href="#/event/{plan.slug}/applications/{encodeURIComponent(linkFor)}">Open its view<Icon name="flat" size={14} /></a>{/if}
+      </p>
+    </details>
   {/if}
-
-  {#if !list.length}
-    <p class="missing">No applications yet{brief ? ` that concern ${nameOf(brief)}` : ''}.</p>
-  {:else}
-    <div class="sides">
-      <ul class="queue">
-        {#each list as a (a.id)}
-          {@const d = decisionOf(by, a.id)}
-          {@const best = bestOf(a)}
-          <li>
-            <button class:on={current?.id === a.id} class:done={!!d} onclick={() => {
-                open(a.id)
-              }}>
-              <span class="who"><b>{a.handle}</b><small>{a.field} · {a.level}</small></span>
-              <span class="best">{best ? (brief ? best.need.title : nameOf(best.brief)) : 'no close role'}</span>
-              {#if d}<span class="state {d.d}">{d.d === 'accept' ? 'Accepted' : 'Declined'}</span>{:else}<span class="state">To decide</span>{/if}
-            </button>
-          </li>
-        {/each}
-      </ul>
-
-      {#if current}
-        <article class="page">
-          <header class="top">
-            <div>
-              <p class="eyebrow">Application · {when(current.applied_at.slice(0, 10))} · {current.sources.join(' and ')} read, with consent</p>
-              <h2>{current.handle}</h2>
-              <p class="facts">{current.field} · {current.level} · {current.city}{current.abroad ? ' (abroad)' : ''} · English {current.english}, Finnish {current.finnish}{current.project ? ` · work sample: ${current.project.name}` : ''}</p>
-            </div>
-          </header>
-
-          <section class="block ai">
-            <h3><span class="tag ai">AI summary</span> Drafted from {current.sources.join(' and ')}, left as drafted</h3>
-            <p class="sum">{current.ai_summary}</p>
-            <ul class="lines compact">
-              {#each current.drafted as l, i (i)}
-                <li title="{srcTag(l.source)}: “{l.quote}”"><span>{l.text}</span><small>{srcTag(l.source)}</small></li>
-              {/each}
-            </ul>
-          </section>
-
-          <section class="block ok">
-            <h3><span class="tag ok">Confirmed</span> Answered, corrected or written by the applicant</h3>
-            {#if current.corrected.length}
-              <ul class="lines compact">
-                {#each current.corrected as l, i (i)}<li title="was: {l.was}"><span>{l.text}</span><small>corrected</small></li>{/each}
-              </ul>
-            {/if}
-            <dl class="qa">
-              {#each current.answers.filter((qa) => qa.a) as qa, i (i)}<div><dt>{qa.q}</dt><dd>{qa.a}</dd></div>{/each}
-            </dl>
-            <blockquote>
-              <p>“{current.own.about}”</p>
-              <p><b>Looking for:</b> “{current.own.looking}”</p>
-            </blockquote>
-          </section>
-
-          <section class="block fit">
-            <h3>{brief ? `Fit against ${nameOf(brief)}'s roles` : 'Fit against the event and the pool'}</h3>
-            {#if !brief && field}
-              <p class="pool"><b>{field.name}:</b> {field.employers.length} {field.employers.length === 1 ? 'employer' : 'employers'} at this event, {some(field.people.people)} people in the pool{#if field.people.levels[current.level]}, {some(field.people.levels[current.level] ?? 0)} of them {current.level.toLowerCase()}{/if}.</p>
-            {:else if !brief}
-              <p class="pool">No employer at this event has a role in {current.field}; the pool is not asked for it here.</p>
-            {/if}
-            {#if fits.length}
-              <ul class="roles">
-                {#each fits as f (f.brief.id + f.need.id)}
-                  <li>
-                    <div class="role">{#if !brief}<span class="tile"><Logo brief={f.brief} small /></span>{/if}<div><b>{brief ? f.need.title : nameOf(f.brief)}</b><small>{brief ? f.need.seniority : f.need.title}</small></div></div>
-                    <ul class="lines fitlines">
-                      {#each f.lines.filter((l) => l.kind === 'overlap') as l, i (i)}<li class="overlap"><em>{kinds.overlap}</em>{l.text}</li>{/each}
-                      {#if gaps(f)}<li class="gap"><em>{kinds.gap}</em>Not mentioned: {gaps(f)}</li>{/if}
-                      {#each f.lines.filter((l) => l.kind === 'check') as l, i (i)}<li class="check"><em>{kinds.check}</em>{l.text}</li>{/each}
-                    </ul>
-                  </li>
-                {/each}
-              </ul>
-            {:else}
-              <p class="pool">Nothing in the drafted roles overlaps with this application.</p>
-            {/if}
-          </section>
-
-          <footer class="decide">
-            {#if decision}
-              <p class="made"><span class="state {decision.d}">{decision.d === 'accept' ? 'Accepted' : 'Declined'}</span> by {decision.by === 'espoo' ? 'City of Espoo' : (brief ? nameOf(brief) : decision.by)}, {when(decision.at.slice(0, 10))}{#if decision.reason}: “{decision.reason}”{/if}</p>
-              <button class="btn quiet" onclick={() => {
-                undecide(by, current.id)
-              }}>Change</button>
-            {:else}
-              <div class="pickrow">
-                <input type="text" bind:value={reason} placeholder="A note for the record (optional)" />
-                <button class="btn primary" onclick={() => {
-                  save('accept')
-                }}><Icon name="check" size={16} />Accept</button>
-                <button class="btn decline" onclick={() => {
-                  save('decline')
-                }}><Icon name="x" size={16} />Decline</button>
-              </div>
-            {/if}
-          </footer>
-        </article>
-      {/if}
-    </div>
-  {/if}
-  <p class="note">{applications.note} Decisions are kept in this browser.</p>
+  <p class="foot"><kbd>J</kbd> <kbd>K</kbd> next and previous. {applications.note} Decisions are kept in this browser.</p>
 </main>
 
 <style>
@@ -213,392 +347,498 @@
     --brand: var(--city);
     --brand-ink: var(--city-ink);
     display: grid;
-    gap: var(--s5);
-    max-width: 76rem;
+    gap: var(--s4);
+    max-width: 82rem;
     padding: var(--s6) var(--s7) var(--s8) var(--s6);
   }
-  .back {
+  .back,
+  .all {
     display: inline-flex;
     align-items: center;
     gap: var(--s1);
     justify-self: start;
+    min-height: 2.75rem;
+    padding: 0;
+    border: 0;
+    background: none;
     font-size: var(--t-sm);
     font-weight: 600;
     color: var(--ink-2);
     text-decoration: none;
   }
-  h1 {
-    font-size: var(--t-2xl);
+  .all {
+    display: none;
   }
-  header > p {
-    margin-top: var(--s3);
-    font-size: var(--t-lg);
-    line-height: 1.4;
+  h1 {
+    font: 800 var(--t-2xl) / 0.95 var(--display);
+    letter-spacing: -0.035em;
+  }
+  main > header p {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s1) var(--s3);
+    margin-top: var(--s2);
     color: var(--ink-2);
   }
+  main > header a {
+    font-weight: 600;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  main > header a:hover {
+    text-decoration: underline;
+  }
+  .as {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s2);
+    font-weight: 600;
+    color: var(--ink);
+  }
   .sample {
-    margin-left: var(--s2);
     padding: 0.2em 0.6em;
     border-radius: 99px;
     background: var(--wash);
     font: 600 var(--t-xs) / 1.4 var(--text);
-    color: var(--ink-2);
-    vertical-align: middle;
+    white-space: nowrap;
   }
-  .as {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: var(--s4);
-    align-items: center;
-    padding: var(--s4) var(--s5);
-    border-radius: var(--r2);
-    background: var(--wash);
+  kbd {
+    padding: 0.05rem 0.35rem;
+    border: 1px solid color-mix(in srgb, currentColor 40%, transparent);
+    border-radius: 4px;
+    font: 600 var(--t-xs) / 1.4 var(--text);
+    opacity: 0.8;
   }
-  .as p {
-    margin-top: 2px;
-    font-size: var(--t-sm);
-    color: var(--ink-2);
-  }
-  .summary {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--s2) var(--s6);
-  }
-  .summary div {
-    display: flex;
-    align-items: baseline;
-    gap: var(--s2);
-  }
-  .summary b {
-    font: 800 var(--t-xl) / 1 var(--display);
-    letter-spacing: -0.03em;
-    color: var(--city);
-  }
-  .summary span {
-    font-size: var(--t-sm);
-    color: var(--ink-2);
-  }
-  .share {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: end;
-    gap: var(--s3);
-    padding: var(--s4) var(--s5);
-    border: 1px solid var(--line);
-    border-radius: var(--r2);
-  }
-  .share label {
-    display: grid;
-    gap: var(--s1);
-    font-size: var(--t-sm);
-    font-weight: 600;
-  }
-  .share select {
-    min-height: 2.5rem;
-    padding: 0 var(--s3);
-    border: 1px solid var(--line);
-    border-radius: var(--r1);
-    font: inherit;
-    font-size: var(--t-sm);
-    background: var(--ground);
-  }
-  .see {
+
+  /* status, read at a glance: a dot and a word, the same everywhere on this page */
+  .state {
     display: inline-flex;
     align-items: center;
-    gap: var(--s1);
-    min-height: 2.5rem;
+    gap: var(--s2);
     font-size: var(--t-sm);
-    color: var(--ink-2);
-    text-decoration: none;
+    font-weight: 600;
+    white-space: nowrap;
   }
-  .missing,
-  .note {
-    font-size: var(--t-sm);
+  .state i,
+  .filters i {
+    flex: none;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--wait);
+  }
+  .accept {
+    color: var(--ok);
+  }
+  .accept i {
+    background: var(--ok);
+  }
+  .decline {
+    color: var(--stop);
+  }
+  .decline i {
+    background: var(--stop);
+  }
+  .later i {
+    background: none;
+    box-shadow: inset 0 0 0 2px var(--ink-2);
+  }
+  .waiting,
+  .later {
     color: var(--ink-2);
   }
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s2);
+  }
+  .filters button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s2);
+    min-height: 2.75rem;
+    padding: 0 var(--s4);
+    border: 1px solid var(--line);
+    border-radius: 99px;
+    background: var(--ground);
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .filters b {
+    font-weight: 800;
+  }
+  .filters button[aria-selected='true'] {
+    border-color: var(--ink);
+    box-shadow: inset 0 0 0 1px var(--ink);
+  }
+  .last {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s2) var(--s4);
+    padding: var(--s1) var(--s4);
+    border-radius: var(--r1);
+    background: var(--wash);
+  }
+
   .sides {
     display: grid;
-    grid-template-columns: minmax(16rem, 0.8fr) minmax(0, 1.6fr);
+    grid-template-columns: minmax(15rem, 20rem) minmax(0, 1fr);
     gap: var(--s6);
     align-items: start;
   }
   .queue {
     position: sticky;
-    top: var(--s5);
-    max-height: calc(100dvh - 2 * var(--s5));
-    overflow: auto;
+    top: var(--s4);
+    max-height: calc(100dvh - 2rem);
+    overflow-y: auto;
+    border-top: 1px solid var(--line);
   }
   .queue button {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 0 var(--s3);
+    grid-template-columns: 2rem minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--s3);
     width: 100%;
-    padding: var(--s3) var(--s3);
-    border: 1px solid transparent;
-    border-top-color: var(--line);
-    border-radius: 0;
+    min-height: 3.5rem;
+    padding: var(--s2);
+    border: 0;
+    border-bottom: 1px solid var(--line);
     background: none;
     text-align: left;
-    font: inherit;
   }
   .queue button:hover {
     background: var(--wash);
   }
   .queue button.on {
-    border-color: var(--city);
-    border-radius: var(--r1);
-    background: color-mix(in oklch, var(--city) 7%, var(--ground));
-  }
-  .queue .who b {
-    display: block;
-  }
-  .queue .who small,
-  .queue .best {
-    font-size: var(--t-xs);
-    color: var(--ink-2);
-  }
-  .queue .best {
-    grid-column: 1;
-    margin-top: 2px;
-  }
-  .queue .state {
-    grid-column: 2;
-    grid-row: 1 / span 2;
-    align-self: start;
-  }
-  .tile {
-    display: block;
-    width: 2.5rem;
-    height: 2.5rem;
-    flex: none;
-    border: 1px solid var(--line);
-    border-radius: var(--r1);
-    overflow: hidden;
-  }
-  .state {
-    padding: 0.15em 0.6em;
-    border-radius: 99px;
     background: var(--wash);
+    box-shadow: inset 3px 0 0 var(--city);
+  }
+  .mark {
+    display: block;
+    width: 2rem;
+    height: 2rem;
+  }
+  .who {
+    display: grid;
+    min-width: 0;
+    line-height: 1.25;
+  }
+  .who small {
+    overflow: hidden;
     font-size: var(--t-xs);
-    font-weight: 700;
     color: var(--ink-2);
     white-space: nowrap;
+    text-overflow: ellipsis;
   }
-  .state.accept {
-    background: color-mix(in oklch, var(--ok) 14%, white);
-    color: var(--ok);
+  .queue .state {
+    font-size: var(--t-xs);
   }
-  .state.decline {
-    background: color-mix(in oklch, var(--stop) 10%, white);
-    color: var(--stop);
+  .none {
+    padding: var(--s4) var(--s2);
+    color: var(--ink-2);
   }
-  .page {
+
+  /* one application: what decides it first, the rest on request */
+  .one {
     display: grid;
     gap: var(--s5);
-    padding: var(--s5) var(--s6) var(--s6);
-    border: 1px solid var(--line);
-    border-radius: var(--r2);
-    background: #fff;
-    box-shadow: var(--lift);
+    min-width: 0;
   }
-  .top {
+  .one > header {
     display: grid;
-    gap: var(--s3);
+    grid-template-columns: 3.5rem minmax(0, 1fr);
+    align-items: center;
+    gap: var(--s4);
   }
-  .eyebrow {
-    font-size: var(--t-xs);
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: var(--ink-2);
+  .one > header .mark {
+    width: 3.5rem;
+    height: 3.5rem;
   }
-  .page h2 {
-    margin-top: var(--s1);
+  h2 {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s2) var(--s4);
     font-size: var(--t-xl);
   }
-  .facts {
+  .one > header p {
     margin-top: var(--s1);
-    font-size: var(--t-sm);
     color: var(--ink-2);
   }
-  .tag {
-    display: inline-block;
-    padding: 0.1em 0.55em;
-    border-radius: 4px;
-    font-size: var(--t-xs);
-    font-weight: 800;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    vertical-align: middle;
-  }
-  .tag.ai {
-    background: oklch(94.5% 0.03 295);
-    color: oklch(40% 0.12 295);
-  }
-  .tag.ok {
-    background: color-mix(in oklch, var(--ok) 14%, white);
-    color: var(--ok);
-  }
-  .block {
-    padding: var(--s4) var(--s5);
-    border-radius: var(--r2);
-    border: 1px solid var(--line);
-  }
-  .block.ai {
-    border-color: oklch(88% 0.05 295);
-    background: oklch(98.5% 0.01 295);
-  }
-  .block.ok {
-    border-color: color-mix(in oklch, var(--ok) 30%, white);
-    background: color-mix(in oklch, var(--ok) 4%, white);
-  }
-  .block h3 {
+  .chips,
+  .asked,
+  .skills {
     display: flex;
+    flex-wrap: wrap;
+    gap: var(--s2);
+  }
+  .chips {
+    margin-top: calc(-1 * var(--s2));
+  }
+  .chips span,
+  .skills span {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s1);
+    padding: 0.2em 0.7em;
+    border-radius: 99px;
+    background: var(--wash);
+    font-size: var(--t-sm);
+  }
+  h3 {
+    margin-bottom: var(--s2);
+    font: 600 var(--t-sm) / 1.3 var(--text);
+    letter-spacing: 0;
+    color: var(--ink-2);
+  }
+  .asked span {
+    display: inline-flex;
     align-items: center;
     gap: var(--s2);
-    font-size: var(--t-sm);
-    letter-spacing: 0;
-  }
-  .sum {
-    margin-top: var(--s3);
-    line-height: 1.45;
-  }
-  .lines {
-    margin-top: var(--s3);
-  }
-  .lines li {
-    display: grid;
-    gap: 1px;
-    padding: var(--s2) 0;
-    border-top: 1px solid color-mix(in oklch, var(--line) 60%, transparent);
-    font-size: var(--t-sm);
-  }
-  .lines small {
-    font-size: var(--t-xs);
-    color: var(--ink-2);
-  }
-  .lines.compact li {
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: baseline;
-    gap: var(--s3);
-    padding: 3px 0;
-  }
-  .qa {
-    display: grid;
-    gap: var(--s2);
-    margin-top: var(--s3);
-  }
-  .qa div {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: var(--s3);
-    font-size: var(--t-sm);
-  }
-  .qa dt {
-    color: var(--ink-2);
-  }
-  .qa dd {
     font-weight: 600;
   }
-  blockquote {
-    margin: var(--s4) 0 0;
-    padding-left: var(--s3);
-    border-left: 3px solid var(--ok);
-    font-size: var(--t-md);
-    line-height: 1.45;
+  .tile {
+    display: inline-block;
+    flex: none;
+    width: 1.75rem;
+    height: 1.75rem;
+    padding: 3px;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 0 0 1px var(--line);
+    font-size: 0.55rem;
   }
-  blockquote p + p {
-    margin-top: var(--s1);
+  .tile:has(:global(.dark)) {
+    background: #14151a;
   }
-  .pool {
-    margin-top: var(--s3);
-    font-size: var(--t-sm);
-    line-height: 1.5;
-    color: var(--ink-2);
-  }
-  .pool b {
-    color: var(--ink);
-  }
-  .roles {
+  .fits li {
     display: grid;
-    gap: var(--s4);
-    margin-top: var(--s4);
+    gap: var(--s2);
+    padding: var(--s3) 0;
+    border-top: 1px solid var(--line);
   }
   .role {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: var(--s3);
+    gap: var(--s2) var(--s3);
   }
-  .role small {
-    display: block;
-    font-size: var(--t-xs);
+  .role span:not(.tile) {
     color: var(--ink-2);
   }
-  .fitlines {
-    margin-top: var(--s2);
+  .skills .has {
+    background: color-mix(in oklch, var(--ok) 14%, var(--ground));
+    font-weight: 600;
   }
-  .fitlines li {
-    grid-template-columns: 4.5rem minmax(0, 1fr);
-    border-top: 0;
-    padding: 2px 0;
+  .skills .lacks {
+    background: none;
+    box-shadow: inset 0 0 0 1px var(--line);
+    color: var(--ink-2);
   }
-  .fitlines em {
-    font-style: normal;
-    font-size: var(--t-xs);
-    font-weight: 800;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
+  .note {
+    font-size: var(--t-sm);
+    color: var(--ink-2);
   }
-  .fitlines .overlap em {
-    color: var(--ok);
+  blockquote {
+    margin: 0;
+    padding-left: var(--s4);
+    box-shadow: inset 2px 0 0 var(--line);
+    line-height: 1.45;
   }
-  .fitlines .gap em {
-    color: var(--wait);
+  blockquote span {
+    display: block;
+    margin-top: var(--s1);
+    color: var(--ink-2);
   }
-  .fitlines .check em {
-    color: oklch(45% 0.09 240);
+  details summary {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s2);
+    min-height: 2.75rem;
+    font-size: var(--t-sm);
+    font-weight: 600;
+    color: var(--ink-2);
+    cursor: pointer;
+    list-style: none;
   }
-  .decide {
-    padding-top: var(--s4);
-    border-top: 1px solid var(--line);
+  details summary::-webkit-details-marker {
+    display: none;
   }
-  .pickrow {
+  details[open] summary {
+    color: var(--ink);
+  }
+  details h3 {
+    margin-top: var(--s3);
+  }
+  .lines li {
     display: flex;
     flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0 var(--s4);
+    padding: var(--s2) 0;
+    border-top: 1px solid var(--line);
+    font-size: var(--t-sm);
+  }
+  .lines small {
+    color: var(--ink-2);
+  }
+
+  /* the decision stays in reach at the foot of the window while the application is read */
+  .decide {
+    position: sticky;
+    bottom: var(--s3);
+    display: grid;
+    gap: var(--s3);
+    padding: var(--s4);
+    border-radius: var(--r2);
+    background: var(--ground);
+    box-shadow: 0 0 0 1px var(--line), var(--lift);
+  }
+  .decide.open {
+    position: static;
+  }
+  .steps {
+    display: flex;
+    gap: var(--s4);
+    font-size: var(--t-xs);
+    font-weight: 600;
+    color: var(--ink-2);
+  }
+  .steps b {
+    color: var(--ink);
+  }
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s2) var(--s3);
+  }
+  .decide .btn {
+    min-height: 2.75rem;
+  }
+  .approve {
+    border-color: transparent;
+    background: var(--ok);
+    color: #fff;
+  }
+  .btn.decline {
+    border-color: transparent;
+    background: var(--stop);
+    color: #fff;
+  }
+  .btn.decline i,
+  .btn.approve i {
+    display: none;
+  }
+  .quiet {
+    font-size: var(--t-sm);
+    color: var(--ink-2);
+  }
+  .reasons {
+    display: grid;
+    gap: var(--s1);
+  }
+  .reasons button {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    gap: var(--s3);
+    min-height: 2.75rem;
+    padding: var(--s3);
+    border: 1px solid var(--line);
+    border-radius: var(--r1);
+    background: var(--ground);
+    line-height: 1.35;
+    text-align: left;
+  }
+  .reasons button[aria-checked='true'] {
+    border-color: var(--ink);
+    box-shadow: inset 0 0 0 1px var(--ink);
+  }
+  textarea {
+    width: 100%;
+    padding: var(--s3);
+    border: 1px solid var(--line);
+    border-radius: var(--r1);
+    background: var(--ground);
+    font: inherit;
+    line-height: 1.4;
+    resize: vertical;
+  }
+  textarea:focus {
+    outline: 2px solid var(--ink);
+    outline-offset: 1px;
+  }
+  .record {
+    display: grid;
+    justify-items: start;
     gap: var(--s2);
   }
-  .pickrow input {
-    flex: 1;
-    min-width: 14rem;
-    min-height: 2.5rem;
+  .record p {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s1) var(--s3);
+  }
+  .share p {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s2) var(--s3);
+  }
+  select {
+    min-height: 2.75rem;
     padding: 0 var(--s3);
     border: 1px solid var(--line);
     border-radius: var(--r1);
+    background: var(--ground);
     font: inherit;
+  }
+  .foot {
+    max-width: 80ch;
     font-size: var(--t-sm);
+    color: var(--ink-2);
   }
-  .pickrow .decline {
-    border-color: color-mix(in oklch, var(--stop) 45%, var(--line));
-    color: var(--stop);
-  }
-  .made {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--s2);
-    margin-bottom: var(--s2);
-    font-size: var(--t-sm);
-  }
-  @media (max-width: 60rem) {
+
+  /* on a phone the queue and one application take turns */
+  @media (max-width: 820px) {
+    main {
+      padding: var(--s5) var(--s4) var(--s7);
+    }
     .sides {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
     }
     .queue {
       position: static;
       max-height: none;
     }
-    .qa div {
-      grid-template-columns: 1fr;
+    .sides.opened .queue,
+    .sides:not(.opened) .one {
+      display: none;
+    }
+    .all {
+      display: inline-flex;
+    }
+    /* the statuses stay in one row that can be swiped */
+    .filters {
+      flex-wrap: nowrap;
+      margin: 0 calc(-1 * var(--s4));
+      padding: 0 var(--s4);
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .filters button {
+      flex: none;
+      padding: 0 var(--s3);
+      font-size: var(--t-sm);
+    }
+    .foot kbd,
+    .decide kbd {
+      display: none;
     }
   }
 </style>

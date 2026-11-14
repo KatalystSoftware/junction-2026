@@ -85,7 +85,7 @@
         <div>
           <dt>Applications</dt>
           <dd><b>{waiting}</b>of {total} waiting for you</dd>
-          <dd class="of">{accepted} accepted, {declined} declined</dd>
+          <dd class="of">{accepted} approved, {declined} declined</dd>
         </div>
       </dl>
 

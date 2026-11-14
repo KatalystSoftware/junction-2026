@@ -22,8 +22,14 @@ across the top on a phone):
   search that finds or adds any other. One company is at `#/<id>`.
 - **Talent pool** (`#/pool`): the people who came to earlier events, as counts by field, level and
   language. Nobody is shown as a person.
-- **Applications** (`#/applications`): the applications to the upcoming event, to accept or decline
-  with a reason. Each event's own are at `#/event/<slug>/applications`.
+- **Applications** (`#/applications`, one at `#/applications/<id>`): the upcoming event's applications
+  as a queue, filtered by status (waiting, second look, approved, declined). One application shows
+  what decides it first: who the person asked to meet and the closest roles, as skills they have and
+  skills not mentioned, never a score. A decision takes three steps: approve or decline, a reason
+  picked from a few drafted for that applicant and event or written by hand, then record. The record
+  says who decided, when and why, and can be undone. Keys: A, D, L, 1 to 3, W, Enter, Z, J and K.
+  Nothing is sent to an applicant; applicants are sample people; decisions stay in the browser. A
+  company's own view of the same is at `#/event/<slug>/applications/<company id>`.
 
 Two flows sit outside that navigation, because a company or a person opening an invitation should
 see their own flow and not the back office:

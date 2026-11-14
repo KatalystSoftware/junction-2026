@@ -99,13 +99,14 @@ export async function load() {
 const PAGES = ['events', 'companies', 'pool', 'applications']
 export const route = () => {
   const [, a = '', b = '', c = '', d = ''] = app.hash.split('/').map(decodeURIComponent)
-  if (a === 'event') return { join: false, me: false, page: '', id: '', event: b, tab: c, company: d }
+  if (a === 'event') return { join: false, me: false, page: '', item: '', id: '', event: b, tab: c, company: d }
   // `#/me` is a person's own sign-up, and `#/me/<event slug>` the same as an invitation to that event
-  if (a === 'me') return { join: false, me: true, page: '', id: '', event: b, tab: '', company: '' }
-  if (a === 'join' || a === 'c') return { join: true, me: false, page: '', id: b, event: c, tab: '', company: '' }
+  if (a === 'me') return { join: false, me: true, page: '', item: '', id: '', event: b, tab: '', company: '' }
+  if (a === 'join' || a === 'c') return { join: true, me: false, page: '', item: '', id: b, event: c, tab: '', company: '' }
   // the sections of Espoo's side; anything else after `#/` is an employer's id, as it always was
-  if (PAGES.includes(a)) return { join: false, me: false, page: a, id: '', event: '', tab: '', company: '' }
-  return { join: false, me: false, page: '', id: a, event: '', tab: '', company: '' }
+  // a section can name one thing inside it: `#/applications/<application id>`
+  if (PAGES.includes(a)) return { join: false, me: false, page: a, item: b, id: '', event: '', tab: '', company: '' }
+  return { join: false, me: false, page: '', item: '', id: a, event: '', tab: '', company: '' }
 }
 export const go = (id: string) => (location.hash = `#/${encodeURIComponent(id)}`)
 export const joinPath = (id: string, event = '') => `#/join/${encodeURIComponent(id)}${event ? `/${event}` : ''}`
