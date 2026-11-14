@@ -10,6 +10,7 @@
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230f3d33'/%3E%3Cpath d='M10 7v18M22 7l-9.5 9L22 25' fill='none' stroke='%23b9f27c' stroke-width='4'/%3E%3C/svg%3E">
 <link rel="preload" href="fonts/archivo-latin-wdth-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="shots/incident.webp" as="image" type="image/webp">
 <style>
 @font-face {
   font-family: "Archivo";
@@ -90,15 +91,12 @@ svg.arrow { width: 0.8em; height: 0.8em; flex: none; }
   border-top: 1px solid var(--field-rule);
   color: var(--field-soft); text-decoration: none; line-height: 1.35;
 }
-.toc .row { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
 .toc b { color: var(--field-ink); font-weight: 750; font-stretch: 112%; font-size: 1.15em; }
-.toc .who { color: var(--spark); font-size: 0.86em; font-weight: 600; text-align: right; }
+.toc .who { color: var(--spark); font-size: 0.86em; font-weight: 500; }
 .toc a:hover b { color: var(--spark); }
 @media (min-width: 46rem) {
   .toc { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2rem; }
-  .toc a { padding-block: 0.9rem 0; }
-  .toc .row { display: grid; gap: 0.15rem; }
-  .toc .who { order: -1; text-align: left; }
+  .toc a { padding-block: 0.9rem 0; align-content: start; }
 }
 
 /* One article per entry. */
@@ -125,7 +123,12 @@ svg.arrow { width: 0.8em; height: 0.8em; flex: none; }
 .entry .for { margin-top: 0.3rem; color: var(--soft); font-size: 0.92em; }
 .entry .for + .for { margin-top: 0; }
 .entry .for b { color: var(--ink); font-weight: 650; }
-.entry .what { margin-top: 0.75rem; max-width: 34em; text-wrap: pretty; }
+.entry .pitch { margin-top: 0.7rem; font-size: 1.15em; font-weight: 600; line-height: 1.35; text-wrap: balance; }
+.entry .what { max-width: 34em; color: var(--soft); text-wrap: pretty; }
+.result { margin: 0 0 1rem; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+.result div { border-top: 2px solid var(--ink); padding-top: 0.45rem; }
+.result dt { font-weight: 800; font-stretch: 112%; font-size: 1.6em; line-height: 1; font-variant-numeric: tabular-nums; }
+.result dd { margin: 0.35rem 0 0; color: var(--soft); font-size: 0.8em; line-height: 1.35; }
 .entry .acts { margin-top: 1.15rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem 1.3rem; }
 .btn {
   display: inline-flex; align-items: center; gap: 0.55rem;
@@ -140,17 +143,21 @@ svg.arrow { width: 0.8em; height: 0.8em; flex: none; }
 .links { display: flex; flex-wrap: wrap; column-gap: 1.3rem; }
 .more { display: inline-flex; align-items: center; min-height: 44px; font-weight: 600; }
 
+.entry { grid-template-areas: "head" "shot" "detail"; }
+.entry .shot { grid-area: shot; }
+.entry .head { grid-area: head; }
+.entry .detail { grid-area: detail; }
 @media (min-width: 46rem) {
-  .entry { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); align-items: center; }
+  .entry { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); grid-template-areas: "shot head" "shot detail"; row-gap: 1.3rem; }
+  .entry .shot { align-self: center; }
+  .entry .head { align-self: end; }
+  .entry .detail { align-self: start; }
 }
 
 .also { padding-block: clamp(1.4rem, 3vw, 2rem); border-bottom: 1px solid var(--rule); }
 .also > div { max-width: 44em; }
 .also h2 { font-size: 1em; font-weight: 750; font-stretch: 108%; display: inline; }
 .also p { display: inline; color: var(--soft); }
-@media (prefers-color-scheme: dark) {
-  .entry .shot img { filter: brightness(0.86) contrast(1.04); }
-}
 .foot { padding-block: 1.4rem 3rem; color: var(--soft); font-size: 0.92em; }
 
 @media (prefers-reduced-motion: reduce) {
@@ -198,9 +205,7 @@ svg.arrow { width: 0.8em; height: 0.8em; flex: none; }
   var toc = document.getElementById("toc");
   data.projects.forEach(function (entry) {
     var a = link("", "", "#" + entry.id);
-    var row = el("span", "row");
-    row.append(el("b", "", entry.name), el("span", "who", entry.for.map(function (f) { return f[0]; }).join(" · ")));
-    a.append(row, el("span", "", entry.short));
+    a.append(el("b", "", entry.name), el("span", "", entry.short), el("span", "who", "For " + entry.for.map(function (f) { return f[0]; }).join(" and ")));
     toc.append(a);
   });
 
@@ -218,7 +223,10 @@ svg.arrow { width: 0.8em; height: 0.8em; flex: none; }
     img.width = 960; img.height = 600; img.decoding = "async";
     frame.append(img);
 
-    var body = el("div");
+    // head: name, challenges, promise and button; detail: figures and how it works.
+    // On a phone the screenshot sits between them, so the button comes first.
+    var body = el("div", "head");
+    var detail = el("div", "detail");
     var heading = el("h2");
     if (entry.logo) {
       var logo = el("img", "project-logo");
@@ -234,7 +242,17 @@ svg.arrow { width: 0.8em; height: 0.8em; flex: none; }
       line.append(el("b", "", f[0]), ": " + f[1]);
       body.append(line);
     });
-    body.append(el("p", "what", entry.what));
+    body.append(el("p", "pitch", entry.short));
+    if (entry.result) {
+      var figures = el("dl", "result");
+      entry.result.forEach(function (r) {
+        var item = el("div");
+        item.append(el("dt", "", r[0]), el("dd", "", r[1]));
+        figures.append(item);
+      });
+      detail.append(figures);
+    }
+    detail.append(el("p", "what", entry.what));
     var acts = el("div", "acts");
     var open = link("btn", entry.open + " ", entry.live);
     open.insertAdjacentHTML("beforeend", ARROW);
@@ -246,7 +264,7 @@ svg.arrow { width: 0.8em; height: 0.8em; flex: none; }
     if (links.childNodes.length) acts.append(links);
     body.append(acts);
 
-    article.append(frame, body);
+    article.append(frame, body, detail);
     main.append(article);
   });
 
