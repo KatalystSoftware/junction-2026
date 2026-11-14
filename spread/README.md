@@ -498,8 +498,8 @@ trade-ins at 1.4 x:
   `private-1.7`): -112 and -232 on tune.
 - Two won orders that run out and back between two places could go as one gig. There are 20 such
   pairs a week, but only 2.1 where the first still has no driver when the second is won
-  (`scratch/pairs_count.py`, 60 weeks of the reference); the others would need the desk to hold
-  postings for hours. Not built.
+  (`scratch/pairs_count.py`, 60 weeks of the reference); the others need the desk to hold
+  postings for hours. Built as "Out-and-back pairs" below.
 
 ```bash
 PYTHONPATH=. uv run python scratch/kinds_report.py --variant learn-kinds-2 --seeds kinds-001,...   # answers, fees and margin by kind
@@ -793,7 +793,7 @@ plays its best trials on other seeds. After 25 trials, 11 of them played in full
 of the same family (`search-16`: `slow_step` 0.8, the gate at 40, `cost` 1.22, a small late cost):
 +1,192 with a lowest week of 93.6%. A late cost alone on the reference's backlog rules is worth +72.
 
-## Out-and-back pairs (off by default, not played yet)
+## Out-and-back pairs (off by default)
 
 A one-way fee pays for the driver's trip home. A car that goes back the same way removes that trip, so one driver
 delivers a won car and drives another back in one gig ([`pairs.py`](spreadlab/pairs.py), `PairPolicy`, variants
@@ -818,7 +818,9 @@ return in time to drive both. The desk never paired them, because its cars book 
 
 In a dry run on 8 recorded weeks, with fake drivers who book every single-car gig at once and 80% of pair gigs after
 half an hour, the desk held 75 cars a week, paired 59 orders (30 gigs) and posted 41 held cars alone. The test plan:
-the fee at 0.6, 0.7 and 0.8 on 10 tune seeds, then the return's quote on 30, then the two unseen sets.
+the fee at 0.6, 0.7 and 0.8 on 10 tune seeds, then the return's quote on 30, then the two unseen sets. Step 1 on the
+default made +863 a week (413 to 1,213) at 0.6, +678 at 0.7 and +596 at 0.8, with 29 pair gigs a week at 0.6, 83% of
+them booked within 2 hours and 0.9% of pair orders late. The default with pairs has not played unseen weeks yet.
 
 ```bash
 uv run python -m spreadlab.sweep --variants slow-friday-late-150-kinds-limits,slow-friday-late-150-kinds-limits-pairs-0.6,slow-friday-late-150-kinds-limits-pairs-0.7,slow-friday-late-150-kinds-limits-pairs-0.8 --list tune --count 10
