@@ -1,4 +1,4 @@
-// Esittely prototype UI. Plain JS, no build step, no backend: all state lives in this browser (localStorage), data is synthetic.
+// Kutsu, the invitee's pages (first built under the name Esittely). Prototype UI. Plain JS, no build step, no backend: all state lives in this browser (localStorage), data is synthetic.
 (function () {
   const D = window.DATA, L = window.LOGIC;
   const app = document.getElementById("app");
@@ -86,7 +86,7 @@
       <div>
         <span class="badge blue">City of Espoo · Rethinking Recruitment · Junction 2026 prototype</span>
         <h1 style="margin-top:10px">Fewer, better conversations at Espoo's recruitment events.</h1>
-        <p class="mut"><b>Esittely</b> (Finnish for “introduction”) is a light layer on top of event registration. Companies say in a minute who they want to meet, candidates answer a few concrete questions, and City organisers hand-pick the introductions, with a reason. Matchmaking platforms let an algorithm rank people; here the organiser decides.</p>
+        <p class="mut"><b>Kutsu</b> (Finnish for “invitation”) is a light layer on top of event registration. Companies say in a minute who they want to meet, candidates answer a few concrete questions, and City organisers hand-pick the introductions, with a reason. Matchmaking platforms let an algorithm rank people; here the organiser decides.</p>
         <div class="principle"><span><b>The software gathers and translates</b> what people said.</span><span><b>People decide</b> who meets whom, with a reason.</span><span><b>No scores, no rankings of people.</b></span></div>
         <p>One event, in order: the company confirms its needs, the applicant joins, the organiser hand-picks the introductions, both sides meet on the day, and both say the day after whether it was relevant. What you do in one step shows up in the next.</p>
         <p><a href="#/company/puro"><button style="padding:12px 18px;font-size:16px">Start at 1 · Company confirms its needs →</button></a></p>
@@ -478,7 +478,7 @@
   // real person, profile or repository. The applicant opens them from the invitation to see exactly what the pipeline reads.
   function viewSource(k) {
     const J = joinState(), back = `<a class="back" href="#/join">← Back to the invitation</a>`;
-    document.title = `${SRCNAME[k] || "Source"} (demo) · Esittely`;
+    document.title = `${SRCNAME[k] || "Source"} (demo) · Kutsu`;
     if (k === "github") {
       app.innerHTML = `<div class="wiz join fake"><p class="fakebar">Sample page: an invented GitHub account at ${esc(J.ids.github)}. Not a real account.</p>
         <div class="jcard ghcard"><div class="ghhead"><span class="avatar">OK</span><div><h1>olena-k</h1><p class="mut">Olena K. · Espoo, Finland · data analyst, dashboards and the SQL behind them</p></div></div>
@@ -850,7 +850,7 @@
       const rows = [["when", "company", "candidate", "decision", "reason", "by"]];
       for (const [c, o] of Object.entries(S.dec)) for (const [id, d] of Object.entries(o)) rows.push([d.at, CO[c].name, id, d.d, d.reason, d.by]);
       const blob = new Blob([rows.map(r => r.map(x => `"${String(x).replace(/"/g, '""')}"`).join(",")).join("\n")], { type: "text/csv" });
-      const u = URL.createObjectURL(blob), l = document.createElement("a"); l.href = u; l.download = "esittely-decisions.csv"; l.click(); return;
+      const u = URL.createObjectURL(blob), l = document.createElement("a"); l.href = u; l.download = "kutsu-decisions.csv"; l.click(); return;
     }
     // company
     const p = location.hash.startsWith("#/company") ? prof(co) : null;

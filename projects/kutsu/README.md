@@ -44,7 +44,7 @@ see their own flow and not the back office:
   It ends on the employers at the event that look for what they do, and why.
 
 Live: <https://kutsu.katalyst.fyi/> (Espoo's screen) and <https://kutsu.katalyst.fyi/#/join/nitor.com>
-(what a company sees). The candidate's side of the same idea is the team's other project, Esittely
+(what a company sees). The candidate's side of the same idea began as a separate prototype (once called Esittely; the product has one name, Kutsu)
 (`../espoo-recruitment/`). `PRODUCT.md` says who Kutsu is for, `NEXT.md` what the Espoo mentors said
 and what is open.
 

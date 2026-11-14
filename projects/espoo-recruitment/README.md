@@ -1,10 +1,10 @@
-# Esittely: hand-picked introductions for Espoo recruitment events
+# Kutsu, the invitee's pages: hand-picked introductions for Espoo recruitment events
 
 Prototype for the City of Espoo challenge **"Rethinking Recruitment"** at Junction 2026.
 
-**Live prototype:** https://esittely.duckymcduck2.workers.dev/ opens on Kutsu, the team's organiser app (events, who to invite); this app, the applicant's invitation, is under https://esittely.duckymcduck2.workers.dev/esittely/ and opens from "Preview invitation form" on an event's page. `tools/deploy.sh` publishes both.
+**Live prototype:** https://kutsu.duckymcduck2.workers.dev/ is Kutsu, the one app (events, who to invite, applications; the team's Svelte app in `projects/kutsu`). The pages in this folder are the first version of the invitee's side, kept under https://kutsu.duckymcduck2.workers.dev/apply/ ; they were first called Esittely, and the product has one name now, Kutsu. The pitch deck is at https://kutsu.duckymcduck2.workers.dev/pitch/ . `tools/deploy.sh` publishes all three (the old address esittely.duckymcduck2.workers.dev keeps working).
 
-**Principle: the AI pulls the information, and humans make the judgements.** Esittely is a light layer on top of event registration:
+**Principle: the AI pulls the information, and humans make the judgements.** Kutsu is a light layer on top of event registration:
 - Companies confirm, in about a minute, who they want to meet. Their stand is then promoted to those attendees.
 - Candidates answer a few concrete questions and get a short list of stands worth visiting.
 - City organisers hand-pick introductions. Technical needs are translated into plain language, and every overlap and gap is linked to its source.
