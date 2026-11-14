@@ -7,6 +7,12 @@ set -euo pipefail
 cd "$(dirname "$0")"
 host=${VERDA_HOST:-junction-runner}
 dir=/srv/katalyst/proxy/static/incident
+# a bundle of a shipped task's seed is that task's answer key: never put one on the public site
+shipped=" 101 102 103 $(sed -n 's/^SEED = \([0-9]*\).*/\1/p' ../tasks/*/environment/mcp-server/server.py | tr '\n' ' ')"
+for f in data/l*-s*.js; do
+  seed=${f##*-s}; seed=${seed%.js}
+  if [[ $shipped == *" $seed "* ]]; then echo "refused: $f is the bundle of a shipped task's seed" >&2; exit 1; fi
+done
 tar -c index.html app.js style.css logo.svg fonts data/index.js data/l*-s*.js \
   | ssh "$host" "mkdir -p $dir && rm -rf $dir/data && tar -x --no-same-owner -C $dir && chmod -R a+rX $dir"
 echo "shipped to $host:$dir"
