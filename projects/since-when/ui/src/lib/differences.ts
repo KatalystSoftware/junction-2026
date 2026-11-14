@@ -204,10 +204,25 @@ export function differences(topic: Topic): Difference[] {
 	return merge(topic.checked ? open.filter((f) => f.type !== 'framing' && stands(f)) : open)
 }
 
-/** Differences of wording on a checked topic: the check does not cover them. */
-export function wording(topic: Topic): Difference[] {
-	return topic.checked ? merge(topic.findings.filter((f) => f.status === 'open' && f.type === 'framing')) : []
+// Differences of wording on a checked topic, which the check does not cover. They are of two kinds.
+const framing = (topic: Topic) => (topic.checked ? merge(topic.findings.filter((f) => f.status === 'open' && f.type === 'framing')) : [])
+const listed = (d: Difference) => d.members.some((f) => !!word(f))
+
+/**
+ * Loaded words the word list found in one edition's first sentence and not in another's. A word is
+ * in a sentence or it is not, so these are no model's claim and lead the page.
+ */
+export function wordList(topic: Topic): Difference[] {
+	return framing(topic).filter(listed)
 }
+
+/** Differences of wording the language model suggested: not checked. */
+export function wording(topic: Topic): Difference[] {
+	return framing(topic).filter((d) => !listed(d))
+}
+
+/** The difference a topic leads with: a loaded word from the word list, else its first difference. */
+export const leading = (topic: Topic): Difference | undefined => wordList(topic)[0] ?? differences(topic)[0]
 
 export interface Aside {
 	key: string

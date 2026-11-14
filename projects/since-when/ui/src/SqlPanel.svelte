@@ -14,7 +14,7 @@
 
 	// What each statement shows, in a line. The MariaDB feature is in the statement itself.
 	const ABOUT: Record<string, [string, string]> = {
-		asof: ['An article as it stood on a date', "The article's first passage at 00:00 UTC on the date: set the session's time, then a plain SELECT."],
+		asof: ['An article as it stood on a date', "The article at 00:00 UTC on the date: set the session's time, then a plain SELECT. Its first passage, or for a finding the passage that holds the quoted words."],
 		history: ['Every version MariaDB has kept', "Every version of the article's first passage, with the time each one was current."],
 		nearest: ['Editions compared on a date', 'Time travel and vector search in one statement: each passage with its nearest in the other edition.'],
 		check: ['How a difference was checked', "The claim check's own statement, as stored with its verdict: the other article as it stood on the day, every sentence ranked by vector distance to the claim, dates and numbers matched with REGEXP."],

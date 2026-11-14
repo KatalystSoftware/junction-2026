@@ -652,6 +652,24 @@ SELECT @@system_versioning_asof AS session_as_of, c.rev_id, c.row_start,
 FROM chunk AS c
 JOIN passage AS p ON p.sha = c.sha
 WHERE c.wikidata_id = ? AND c.lang = ? AND c.ord = 0"""
+# With a finding: the passage that holds the words the page quotes for that finding and edition. The
+# words are read first, from the tables as they are today, into a user variable; the passage is then
+# read under the session's date.
+ASOF_QUOTE = """
+SELECT IF(k.outcome IN ('changed', 'new'),
+          IF(k.lang = ?, k.quote, k.other_quote),
+          IF(f.lang = ?, f.quote, f.other_quote))
+INTO @quote
+FROM (SELECT ? AS id) AS x
+LEFT JOIN finding AS f ON f.id = x.id
+LEFT JOIN checked_finding AS k ON k.finding_id = x.id OR (x.id < 0 AND k.id = -x.id)"""
+ASOF_PASSAGE_SQL = """
+SELECT @@system_versioning_asof AS session_as_of, c.rev_id, c.row_start, c.section, p.text
+FROM chunk AS c
+JOIN passage AS p ON p.sha = c.sha
+WHERE c.wikidata_id = ? AND c.lang = ? AND INSTR(p.text, @quote) > 0
+ORDER BY c.ord
+LIMIT 1"""
 HISTORY_SQL = """
 SELECT c.rev_id, c.row_start, c.row_end, LEFT(p.text, 200) AS text
 FROM chunk FOR SYSTEM_TIME ALL AS c
@@ -692,13 +710,15 @@ PRESETS = {
     "asof": {
         "title": "system_versioning_asof",
         "description": "Set the session variable to a date, then run a plain query with no time "
-        "clause: it returns the first passage as it stood on that date. Change "
-        "the date and run the same statement again.",
-        "params": [("qid", "qid", "Q1412941"), ("date", "date", "2026-10-22"), ("lang", "lang", "sv")],
-        "statements": lambda v: [
-            ("Set the session's point in time", ASOF_SET, (v["date"] + " 00:00:00",)),
-            ("First passage, no time clause", ASOF_SQL, (v["qid"], v["lang"])),
+        "clause: it returns the first passage as it stood on that date, or, for a finding, the "
+        "passage that holds the words the page quotes. Change the date and run the same statement again.",
+        "params": [
+            ("qid", "qid", "Q1412941"),
+            ("date", "date", "2026-10-22"),
+            ("lang", "lang", "sv"),
+            ("finding", "finding", "0"),
         ],
+        "statements": lambda v: _asof(v),
     },
     "history": {
         "title": "FOR SYSTEM_TIME ALL",
@@ -720,6 +740,19 @@ PRESETS = {
         ],
     },
 }
+
+
+def _asof(v):
+    """The statements of `asof`: the first passage, or with a finding the passage holding its quote."""
+    set_date = ("Set the session's point in time", ASOF_SET, (v["date"] + " 00:00:00",))
+    fid = int(v["finding"])
+    if not fid:
+        return [set_date, ("First passage, no time clause", ASOF_SQL, (v["qid"], v["lang"]))]
+    return [
+        ("The words the page quotes for this finding", ASOF_QUOTE, (v["lang"], v["lang"], fid)),
+        set_date,
+        ("The passage that holds them, no time clause", ASOF_PASSAGE_SQL, (v["qid"], v["lang"])),
+    ]
 
 
 def _stored(rows):

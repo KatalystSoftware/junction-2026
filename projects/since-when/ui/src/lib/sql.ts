@@ -22,6 +22,24 @@ export function sqlHtml(query: string): string {
  * statement has run, the panel shows the text the server reports instead of this one.
  */
 export function preview(preset: string, v: Record<string, string>): string {
+	if (preset === 'asof' && v.finding && v.finding !== '0')
+		return `-- The words the page quotes for finding ${v.finding}, read from the tables as they are today
+SELECT IF(k.outcome IN ('changed', 'new'),
+          IF(k.lang = '${v.lang}', k.quote, k.other_quote),
+          IF(f.lang = '${v.lang}', f.quote, f.other_quote))
+INTO @quote
+FROM (SELECT ${v.finding} AS id) AS x
+LEFT JOIN finding AS f ON f.id = x.id
+LEFT JOIN checked_finding AS k ON k.finding_id = x.id OR (x.id < 0 AND k.id = -x.id);
+
+SET SESSION system_versioning_asof = '${v.date} 00:00:00';
+
+SELECT @@system_versioning_asof AS session_as_of, c.rev_id, c.row_start, c.section, p.text
+FROM chunk AS c
+JOIN passage AS p ON p.sha = c.sha
+WHERE c.wikidata_id = '${v.qid}' AND c.lang = '${v.lang}' AND INSTR(p.text, @quote) > 0
+ORDER BY c.ord
+LIMIT 1`
 	if (preset === 'asof')
 		return `SET SESSION system_versioning_asof = '${v.date} 00:00:00';
 

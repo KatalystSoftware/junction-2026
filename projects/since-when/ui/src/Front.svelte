@@ -3,7 +3,7 @@
 	// edition took it up, and under them the whole list of topics.
 	import { onMount } from 'svelte'
 	import { api } from './lib/api.svelte'
-	import { dating, differences, lanes, turns, type Difference, type Lane } from './lib/differences'
+	import { dating, lanes, leading, turns, type Difference, type Lane } from './lib/differences'
 	import { modelName } from './lib/format'
 	import { href, showSql, ui } from './lib/nav.svelte'
 	import { queue } from './lib/queue.svelte'
@@ -22,7 +22,7 @@
 	async function load(qid: string) {
 		try {
 			const topic = await api<Topic>(`/topics/${qid}`)
-			const d = differences(topic)[0]
+			const d = leading(topic)
 			if (!d) throw new Error('no difference')
 			cards[qid] = { topic, d, strip: lanes(d, []) }
 			// The edits that date it arrive after the topic, one request for each edition.

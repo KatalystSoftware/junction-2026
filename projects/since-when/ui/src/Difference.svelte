@@ -22,6 +22,13 @@
 	const cap = (text: string) => text[0].toUpperCase() + text.slice(1)
 	// What the claim check found for the row that speaks for this difference.
 	const check = $derived(d.primary.check && d.primary.check.outcome !== 'unchecked' ? d.primary.check : null)
+	// "Check in MariaDB": for a checked difference, the passage that holds the quoted words, on the
+	// day of the check; otherwise the article's first passage the day after the edit that began it.
+	const asof = $derived.by(() => {
+		const q = d.quotes.find((x) => x.lang === began.lang) ?? d.quotes[0]
+		if (check && check.outcome !== 'set_aside' && q) return { qid: topic.wikidata_id, date: check.as_of.slice(0, 10), lang: q.lang, finding: String((q.from ?? d.primary).id) }
+		return { qid: topic.wikidata_id, date: dayAfter(began.at), lang: began.lang, finding: '0' }
+	})
 	let row: HTMLDetailsElement
 </script>
 
@@ -64,8 +71,10 @@
 				<button
 					class="cdx-button cdx-button--action-progressive cdx-button--weight-quiet check"
 					aria-haspopup="dialog"
-					title="Opens the statement that reads the {NAMES[began.lang]} article as it stood after that day. Nothing runs until you click Run."
-					onclick={() => showSql('asof', { qid: topic.wikidata_id, date: dayAfter(began.at), lang: began.lang })}>Check in MariaDB</button
+					title={asof.finding === '0'
+						? `Opens the statement that reads the ${NAMES[asof.lang]} article as it stood after that day. Nothing runs until you click Run.`
+						: `Opens the statement that reads the passage of the ${NAMES[asof.lang]} article holding the quoted words, as it stood on the day of the check. Nothing runs until you click Run.`}
+					onclick={() => showSql('asof', asof)}>Check in MariaDB</button
 				>
 				{#if check}
 					<button
