@@ -819,6 +819,24 @@ uv run python -m spreadlab.sweep --variants slow-friday-late-150-kinds-limits,sl
 PYTHONPATH=. uv run python scratch/pairs_report.py --variants slow-friday-late-150-kinds-limits-pairs-0.6,slow-friday-late-150-kinds-limits-pairs-0.7,slow-friday-late-150-kinds-limits-pairs-0.8 --list tune --count 10
 ```
 
+**The offline screen** ([`scratch/pairs_screen.py`](scratch/pairs_screen.py)) runs `PairPolicy` over recorded weeks with
+each week's own requests and wins, and books each gig after its cars' recorded wait. A recording cannot score a policy that
+acts differently, so the screen only says whether a variant is worth playing. On 1,066 recorded weeks of 185 variants (526
+of the default and its four nearest variants):
+
+| Check | Result |
+| --- | --- |
+| Actions the world would refuse: a stop window that ended, over 12 hours of driving, a car in two live gigs, a hold past its release | none, no errors |
+| Pairs a week, from the recordings' own wins | 24.2 (48 orders); 81 held, 56 posted alone |
+| Held cars without a return, late share by the hours left at the post | 2.61% to 3.38%, +0.77 points (+0.99 on all weeks) |
+| Fees saved against the two cars alone, less the held cars' lateness at 150 euros | +467, +345 and +224 a week at 0.6, 0.7 and 0.8 |
+| Trade-ins, the nearest played two-car gigs, at the mapped fee: booked within 1 and 2 hours | 78% and 85% at 0.7; too few gigs at 0.6 |
+| `-return-0.75`: expected margin of the lower quote, by the curve with the day's correction | +490 a week, 12.7 more orders |
+
+The screen puts the fees in the same order as the played tune weeks of step 1 (+863, +678 and +596 at 0.6, 0.7 and 0.8)
+at about 55 to 70% of them. The unseen thin worlds for the confirmation are in
+[`scratch/pairs-thin-60.txt`](scratch/pairs-thin-60.txt): 60 worlds with under 720 drivers that no pair variant has played.
+
 `pairs_report.py` prints the plan's checks: pair gigs booked within 1 and 2 hours, the fee paid, pair orders late, held
 cars without a return against the same orders in the base variant, return quotes won, and the margin with its interval.
 A gig with two orders is a new case for the live desk's restart logic. `live.LivePairDesk` takes `PairPolicy` for a
