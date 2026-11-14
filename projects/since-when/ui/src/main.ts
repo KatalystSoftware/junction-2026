@@ -1,6 +1,7 @@
 import '@wikimedia/codex-design-tokens/theme-wikimedia-ui.css'
 // Codex's CSS-only components: only the stylesheets of the ones the markup uses, and none of its
 // Vue code.
+import '@wikimedia/codex/dist/modules/CdxAccordion.css'
 import '@wikimedia/codex/dist/modules/CdxButton.css'
 import '@wikimedia/codex/dist/modules/CdxField.css'
 import '@wikimedia/codex/dist/modules/CdxInfoChip.css'

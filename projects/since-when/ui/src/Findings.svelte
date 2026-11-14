@@ -113,23 +113,23 @@
 			{/if}
 			<p class="small subtle">Machine-suggested summaries. Open one for the quotes.</p>
 		</div>
-		<ul>
+		<div class="rows">
 			{#each shown as f (f.id)}
-				<li><FindingRow {f} {topic} /></li>
+				<FindingRow {f} {topic} />
 			{/each}
-		</ul>
+		</div>
 		{#if listed.length > shown.length}
 			<button class="cdx-button rest" onclick={() => (all = true)}>Show all {listed.length}</button>
 		{/if}
 	{/if}
 	{#if closed.length}
-		<details class="closed">
-			<summary class="small">{closed.length} closed</summary>
-			<ul>
+		<details class="cdx-accordion closed">
+			<summary><h3 class="cdx-accordion__header">{closed.length} closed</h3></summary>
+			<div class="cdx-accordion__content">
 				{#each closed as f (f.id)}
-					<li><FindingRow {f} {topic} /></li>
+					<FindingRow {f} {topic} />
 				{/each}
-			</ul>
+			</div>
 		</details>
 	{/if}
 </section>
@@ -262,11 +262,6 @@
 
 	.closed {
 		margin-top: var(--spacing-150);
-	}
-
-	.closed > summary {
-		color: var(--color-subtle);
-		cursor: pointer;
 	}
 
 	@media (max-width: 640px) {

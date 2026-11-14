@@ -166,29 +166,31 @@
 			<button class="cdx-button rest" onclick={() => (all = true)}>Show all {listed.length}</button>
 		{/if}
 
-		<details class="years small">
-			<summary>Article size on each 1 January</summary>
-			<div class="cdx-table">
-				<div class="cdx-table__table-wrapper">
-					<table class="cdx-table__table num">
-						<caption>Article size on each 1 January</caption>
-						<thead>
-							<tr>
-								<th scope="col"><span class="cdx-table__th-content">Year</span></th>
-								{#each [lang, rich] as l}<th scope="col" class="cdx-table__table__cell--align-number"><span class="cdx-table__th-content">{NAMES[l]}</span></th>{/each}
-								<th scope="col" class="cdx-table__table__cell--align-number"><span class="cdx-table__th-content">Open differences</span></th>
-							</tr>
-						</thead>
-						<tbody>
-							{#each data.years.toReversed() as y}
+		<details class="cdx-accordion cdx-accordion--separation-minimal years">
+			<summary><h3 class="cdx-accordion__header">Article size on each 1 January</h3></summary>
+			<div class="cdx-accordion__content">
+				<div class="cdx-table">
+					<div class="cdx-table__table-wrapper">
+						<table class="cdx-table__table num">
+							<caption>Article size on each 1 January</caption>
+							<thead>
 								<tr>
-									<th scope="row">{y.year}</th>
-									{#each [lang, rich] as l}<td class="cdx-table__table__cell--align-number">{y.size[l] ? kb(y.size[l]!) : '–'}</td>{/each}
-									<td class="cdx-table__table__cell--align-number">{y.open_findings}</td>
+									<th scope="col"><span class="cdx-table__th-content">Year</span></th>
+									{#each [lang, rich] as l}<th scope="col" class="cdx-table__table__cell--align-number"><span class="cdx-table__th-content">{NAMES[l]}</span></th>{/each}
+									<th scope="col" class="cdx-table__table__cell--align-number"><span class="cdx-table__th-content">Open differences</span></th>
 								</tr>
-							{/each}
-						</tbody>
-					</table>
+							</thead>
+							<tbody>
+								{#each data.years.toReversed() as y}
+									<tr>
+										<th scope="row">{y.year}</th>
+										{#each [lang, rich] as l}<td class="cdx-table__table__cell--align-number">{y.size[l] ? kb(y.size[l]!) : '–'}</td>{/each}
+										<td class="cdx-table__table__cell--align-number">{y.open_findings}</td>
+									</tr>
+								{/each}
+							</tbody>
+						</table>
+					</div>
 				</div>
 			</div>
 		</details>
@@ -305,8 +307,7 @@
 		margin-top: var(--spacing-200);
 	}
 
-	.years summary {
-		color: var(--color-subtle);
-		cursor: pointer;
+	.years .cdx-table {
+		margin-top: var(--spacing-50);
 	}
 </style>

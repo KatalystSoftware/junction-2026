@@ -205,9 +205,14 @@
 			<h3 id="log-title" class="small">Queries this page ran</h3>
 			{#each groups as [group, qs]}
 				{#each qs as q}
-					<details>
-						<summary class="small"><span>{q.label} <span class="subtle">{group}</span></span><span class="subtle num">{q.ms} ms, {plural(q.rows, 'row', 'rows')}</span></summary>
-						{@render statement(q)}
+					<details class="cdx-accordion">
+						<summary>
+							<h4 class="cdx-accordion__header">
+								<span class="cdx-accordion__header__title">{q.label} <span class="subtle">{group}</span></span>
+								<span class="cdx-accordion__header__description num">{q.ms} ms, {plural(q.rows, 'row', 'rows')}</span>
+							</h4>
+						</summary>
+						<div class="cdx-accordion__content">{@render statement(q)}</div>
 					</details>
 				{/each}
 			{/each}
@@ -312,14 +317,10 @@
 		line-height: var(--line-height-medium);
 	}
 
-	.qhead,
-	summary {
+	.qhead {
 		display: flex;
 		justify-content: space-between;
 		gap: var(--spacing-100);
-	}
-
-	.qhead {
 		margin-top: var(--spacing-50);
 		font-weight: var(--font-weight-bold);
 	}
@@ -402,18 +403,5 @@
 		padding-bottom: var(--spacing-25);
 		border-bottom: 1px solid var(--border-color-subtle);
 		color: var(--color-subtle);
-	}
-
-	details {
-		border-bottom: 1px solid var(--border-color-muted);
-	}
-
-	summary {
-		padding: var(--spacing-35) 0;
-		cursor: pointer;
-	}
-
-	summary .num {
-		white-space: nowrap;
 	}
 </style>

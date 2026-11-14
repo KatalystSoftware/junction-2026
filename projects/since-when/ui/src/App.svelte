@@ -93,19 +93,21 @@
 	{:else}
 		<div class="title">
 			<h1>{topic.topic}</h1>
-			<details class="facts small">
-				<summary>Details</summary>
-				<ul>
-					{#each [pair.lang, pair.rich, thirdOf(pair.lang, pair.rich)!] as l}
-						{#if topic.titles[l]}
-							<li>
-								<a href={articleUrl(l, topic.titles[l]!)} target="_blank" rel="noopener" lang={l}>{topic.titles[l]}</a>
-								<span class="subtle">{[NAMES[l], topic.size[l] ? kb(topic.size[l]!) : '', topic.refs?.[l] != null ? `${topic.refs[l]} references` : '', topic.quality?.[l] ?? '', views(topic.readers[l])].filter(Boolean).join(', ')}</span>
-							</li>
-						{/if}
-					{/each}
-					<li><a href={wikidataUrl(topic.wikidata_id)} target="_blank" rel="noopener">Wikidata {topic.wikidata_id}</a></li>
-				</ul>
+			<details class="cdx-accordion cdx-accordion--separation-minimal facts">
+				<summary><h2 class="cdx-accordion__header">Details</h2></summary>
+				<div class="cdx-accordion__content">
+					<ul>
+						{#each [pair.lang, pair.rich, thirdOf(pair.lang, pair.rich)!] as l}
+							{#if topic.titles[l]}
+								<li>
+									<a href={articleUrl(l, topic.titles[l]!)} target="_blank" rel="noopener" lang={l}>{topic.titles[l]}</a>
+									<span class="subtle">{[NAMES[l], topic.size[l] ? kb(topic.size[l]!) : '', topic.refs?.[l] != null ? `${topic.refs[l]} references` : '', topic.quality?.[l] ?? '', views(topic.readers[l])].filter(Boolean).join(', ')}</span>
+								</li>
+							{/if}
+						{/each}
+						<li><a href={wikidataUrl(topic.wikidata_id)} target="_blank" rel="noopener">Wikidata {topic.wikidata_id}</a></li>
+					</ul>
+				</div>
 			</details>
 		</div>
 		<nav class="tabs" aria-label="Views">
@@ -195,9 +197,11 @@
 		line-height: var(--line-height-xxx-large);
 	}
 
-	.facts summary {
-		color: var(--color-subtle);
-		cursor: pointer;
+	/* A Codex accordion header, not one of the page's serif titles. */
+	.facts .cdx-accordion__header {
+		font-family: inherit;
+		font-weight: var(--font-weight-bold);
+		color: inherit;
 	}
 
 	/* Open, the list takes a full row under the title instead of squeezing beside it. */

@@ -83,6 +83,12 @@ select {
 	background-color: var(--background-color-progressive-subtle--hover);
 }
 
+/* Codex sets what an accordion holds in the generic sans-serif, MediaWiki's body font. Here it
+   keeps the page's own. */
+.cdx-accordion__content {
+	font-family: inherit;
+}
+
 /* A word the findings single out, and (softer) the quoted stretch around it. */
 mark {
 	background: var(--background-color-warning-subtle);
