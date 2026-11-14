@@ -432,6 +432,7 @@ class Policy(Desk):
         pickup, delivery = (next(stop for stop in stops if stop["kind"] == kind_) for kind_ in ("pickup", "delivery"))
         deadline = min(order["deadline"], limits.deadline or order["deadline"])
         start, last = max(pickup.get("window", leg["pickup"]["window"])["from"], self.now), deadline - drive
+        slot = leg["delivery"]["window"]["from"]  # a private address has its own slot, which can be days after the pickup
 
         def open_on(day: int, noted: tuple[int, int], stated) -> Optional[tuple[int, int]]:
             """The minutes a site is open on a day: the note's hours on a working day, the stated ones cut to them on a Saturday."""
@@ -452,19 +453,22 @@ class Policy(Desk):
                     here, there = open_on(day, limits.pickup_hours, leg["pickup"]["hours"]), open_on(day, limits.delivery_hours, leg["delivery"]["hours"])
                     if here is None or (both and there is None):
                         continue
+                    arrive, until = (max(slot, there[0]), min(deadline, there[1] - 1)) if both else (0, 1)
+                    if arrive >= until:  # the delivery's slot is not on this day
+                        continue
                     first = max(start, here[0], there[0] - drive if both else 0)
                     final = min(here[1] - 1, last if in_time else NEVER, there[1] - 1 - drive if both else NEVER)
                     if final - first >= HOUR:
                         pickup["window"] = {"from": first, "to": final}
                         if both:
-                            delivery["window"] = {"from": max(leg["delivery"]["window"]["from"], there[0]), "to": min(deadline, there[1] - 1)}
-                        elif limits.deadline and deadline > self.now:
-                            delivery["window"] = {"from": leg["delivery"]["window"]["from"], "to": deadline}
+                            delivery["window"] = {"from": arrive, "to": until}
+                        elif limits.deadline and deadline > max(self.now, slot):
+                            delivery["window"] = {"from": slot, "to": deadline}
                         else:
                             delivery.pop("window", None)
                         return
-        if limits.deadline and deadline > self.now:  # in place of the starter's reading, which takes the time on the day the window starts
-            delivery["window"] = {"from": leg["delivery"]["window"]["from"], "to": deadline}
+        if limits.deadline and deadline > max(self.now, slot):  # in place of the starter's reading, which takes the time on the day the window starts
+            delivery["window"] = {"from": slot, "to": deadline}
 
     def repost(self, gig_id: str) -> None:
         """A gig whose window ended without a driver. The starter posts it again without windows; with the note's

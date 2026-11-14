@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from spreadlab import notes
+from spreadlab.variants import KINDS
 from test_harness import desk, request
 
 DAY = 1440
@@ -84,3 +85,20 @@ def test_a_site_with_hours_in_the_note_gets_its_stops_on_one_day_and_the_next_da
     d = desk(read_notes=True, note_limits=True, fee=1.0)
     d.minutes = {key: 700 for key in d.minutes}
     assert windows(won(d, "Pickup weekdays 9:00-15:00 only. Destination closes at 16:00", deadline=4000, last_pickup=3300)) == {"pickup": {"from": 540, "to": 899}, "delivery": None}
+
+
+def test_a_private_address_keeps_its_own_slot_when_that_is_on_a_later_day_than_the_pickup():
+    d = desk(read_notes=True, note_limits=True, fee=1.0, kinds=KINDS)
+    q = request("R1", private=True, note={"text": "Pickup weekdays 9:00-15:00 only"})
+    q["legs"][0]["delivery"]["window"] = {"from": DAY + 900, "to": DAY + 960}  # the buyer is at home tomorrow from 15:00 to 16:00
+    d.quote(q)
+    d.win({"id": "R1", "legs": q["legs"], "deliveredAt": [None], "deadline": 2640, "option": "next_day", "lastPickupAt": 2520})
+    # Today the site is open and the buyer is not at home: both stops go on the day of the slot, and no window ends before it starts.
+    assert windows(d.outbox[-1]) == {"pickup": {"from": DAY + 540, "to": DAY + 899}, "delivery": {"from": DAY + 900, "to": 2640}}
+    # A note's deadline that is before the slot starts: the delivery keeps the world's own window.
+    d = desk(read_notes=True, note_limits=True, fee=1.0, kinds=KINDS)
+    q = request("R1", private=True, note={"text": "Perillä huomenna klo 12 mennessä"})
+    q["legs"][0]["delivery"]["window"] = {"from": DAY + 900, "to": DAY + 960}
+    d.quote(q)
+    d.win({"id": "R1", "legs": q["legs"], "deliveredAt": [None], "deadline": 2640, "option": "next_day", "lastPickupAt": 2520})
+    assert all(stop.get("window") is None or stop["window"]["from"] < stop["window"]["to"] for stop in d.outbox[-1]["stops"])
