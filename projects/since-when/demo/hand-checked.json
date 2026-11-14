@@ -267,6 +267,47 @@
       },
       "outcome": "kept",
       "close": "Partly there: the Finnish and English articles give the laws and the religion; only the language is not. (round 2 of the blind review, editor reviewer)"
+    },
+    {
+      "topic": "Q1412941",
+      "type": "numbers",
+      "quotes": {
+        "en": "some two thousand people"
+      },
+      "close": "Compatible estimates: 'up to 3,000, according to newspaper reports' is an upper bound, not a contradiction of 'some two thousand'. (round 3 of the blind review, editor reviewer)"
+    },
+    {
+      "topic": "Q1412941",
+      "type": "framing",
+      "quotes": {
+        "en": "failed coup d'etat attempt in 1932",
+        "sv": "misslyckade Mäntsäläupproret"
+      },
+      "close": "One event under two names: the Mäntsälä rebellion was the failed coup attempt. (round 3 of the blind review, editor reviewer)"
+    },
+    {
+      "topic": "Q736268",
+      "type": "numbers",
+      "quotes": {
+        "en": "45,000 troops"
+      },
+      "close": "A part against the whole: 45,000 is the whole joint force, 20,000 the army on Zealand and Funen. (round 3 of the blind review, editor reviewer)"
+    },
+    {
+      "topic": "Q736268",
+      "type": "framing",
+      "quotes": {
+        "fi": "kiihotettuja talonpoikia"
+      },
+      "close": "Not the Finnish article's own words: 'incited peasants' is a Russian commander quoted. (round 3 of the blind review, editor reviewer)"
+    },
+    {
+      "topic": "Q736268",
+      "type": "framing",
+      "quotes": {
+        "fi": "vaikutus jäi psykologiselle tasolle"
+      },
+      "close": "Compatible: a victory of psychological effect and a chance for a counter-offensive are not opposed. (round 3 of the blind review, editor reviewer)"
     }
   ]
 }

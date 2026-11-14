@@ -44,7 +44,8 @@ const anchor = (section?: string | null) => (section ? '#' + slug(section.split(
 
 export const articleUrl = (lang: Lang, title: string) => `https://${lang}.wikipedia.org/wiki/${slug(title)}`
 export const revisionUrl = (lang: Lang, rev: number, section?: string | null) => `https://${lang}.wikipedia.org/w/index.php?oldid=${rev}${anchor(section)}`
-export const diffUrl = (lang: Lang, rev: number, old: number) => `https://${lang}.wikipedia.org/w/index.php?diff=${rev}&oldid=${old}`
+// The edit itself against its parent revision on Wikipedia, whatever version was loaded before it.
+export const diffUrl = (lang: Lang, rev: number, _old?: number) => `https://${lang}.wikipedia.org/w/index.php?diff=prev&oldid=${rev}`
 export const wikidataUrl = (qid: string) => `https://www.wikidata.org/wiki/${qid}`
 
 /** Where a finding's quote sits in an edition: '' is the lead, undefined when that side has no passage. */

@@ -118,7 +118,8 @@ in, and nothing runs before **Run** is clicked.
   records what did not scale: a vector index on a versioned table answers past dates 5 to 14 times slower
   than on a plain one, so the index stays on the current rows and a past date searches one topic exactly.
 - **Usefulness for readers and editors.** A reader sees each edition's exact words side by side, and each edition's
-  date links to the Wikipedia edit that put its quoted words there:
+  date links to the Wikipedia edit that put its quoted words there word for word (an older wording of the
+  same claim can be earlier):
   [Lapua Movement](https://since-when.katalyst.fyi/#/Q1412941), where Swedish and English Wikipedia say
   "fascist" in the first sentence and Finnish does not. NVIDIA Nemotron 3.5 Super VL suggests the
   differences and then checks each one against the whole other article, and the page says so;
