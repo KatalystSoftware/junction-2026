@@ -105,6 +105,9 @@
 		const v = values[name]
 		const was = v[key]
 		v[key] = value
+		// The finding Check in MariaDB filled in names a quote of one topic and edition; another topic or
+		// edition reads that article's first passage instead.
+		if ('finding' in v && (key === 'qid' || key === 'lang') && value !== was) v.finding = '0'
 		if (v.a && v.a === v.b) v[key === 'a' ? 'b' : 'a'] = was
 	}
 

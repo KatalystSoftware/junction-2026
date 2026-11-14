@@ -316,6 +316,50 @@
         "en": "attracting more than 1,000 people"
       },
       "close": "Two different meetings: the English 'more than 1,000' is the 1 December meeting, the Finnish 'up to 3,000' the Lapua meeting (review of the pitch, MariaDB-judge reviewers)."
+    },
+    {
+      "topic": "Q1412941",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "The parliament quickly accepted amendments to the Associations Act"
+      },
+      "outcome": "kept",
+      "close": "Not left out: the Finnish article tells the December 1929 amendment and the defeated press-law amendments. (round 3 of the blind review, GPT editor reviewer)"
+    },
+    {
+      "topic": "Q1412941",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "The movement originated in November 1929, after Finnish communist youth paraded"
+      },
+      "outcome": "kept",
+      "close": "Not left out: the Finnish article tells the red-shirt parade, the assaults and the movement's origins in detail. (round 3 of the blind review, GPT editor reviewer)"
+    },
+    {
+      "topic": "Q736268",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "14. toukokuuta Gotlantiin nousi"
+      },
+      "outcome": "set_aside",
+      "close": "Set aside in error: the English article says the Russians were driven from Åland in May but does not give the 11 May date. (round 3 of the blind review, GPT editor reviewer)"
+    },
+    {
+      "topic": "Q2457646",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Finland blev inte en del av Ryssland"
+      },
+      "outcome": "set_aside",
+      "close": "Set aside in error: the English introduction does not say that Finland did not become part of Russia. (round 3 of the blind review, GPT editor reviewer)"
+    },
+    {
+      "topic": "Q736268",
+      "type": "numbers",
+      "quotes": {
+        "en": "Kamensky's 11,000-strong corps"
+      },
+      "close": "A part against the whole, possibly: a corps' strength against the troops at the two battles (two editor reviews could not tell). (round 3 of the blind review, GPT editor reviewer)"
     }
   ]
 }

@@ -24,7 +24,7 @@ suggests what to look at.
 Open <https://since-when.katalyst.fyi/>
 
 On screen: "What three Wikipedias say differently, and since when", a chip "How these were found",
-a key ("● edit that put these exact words there · said since · said earlier · 2001 to today"), and
+a key ("● edit that put the word or the quoted words there · said since · said earlier · 2001 to today"), and
 three cards. The first is Lapua Movement: "Swedish and English Wikipedia use “fascist” in their
 first sentence; Finnish Wikipedia does not.", with a time strip: Finnish "not said", Swedish
 "23 Oct 2026", English "30 May 2022". Under the cards: "Every date here is read from MariaDB 11.8.9: a
@@ -108,7 +108,7 @@ come from.
 
 Open <https://since-when.katalyst.fyi/#/Q736268> (Finnish War).
 
-On screen: "13 differences", marked "Checked by Nemotron". The first, open, is headed "Finnish says
+On screen: "12 differences", marked "Checked by Nemotron". The first, open, is headed "Finnish says
 Russia took Turku four days after 18 March; English says the Russian army took Turku on 21 March".
 Finnish: "Neljä päivää myöhemmin … valloitti … Turun"; Swedish: "… den 18 mars och Åbo … föll den
 22:a", with 18 and 22 marked; English: "… on 21 March and on the same day the Russian army took
@@ -154,8 +154,8 @@ The numbers are in [`measurements.md`](measurements.md), "Rerun on a quiet machi
 
 - **Lapua Movement:** under "Loaded words", "1 difference" marked "Checked by Nemotron": Swedish
   says 102 leaders were imprisoned after the trial, English about 50. Then "Wording" (not checked),
-  the statements one edition leaves out, and "Set aside by the check 45".
-- **Finnish War:** "13 differences"; step 5 uses the first. Step 4 on this topic:
+  the statements one edition leaves out, and "Set aside by the check".
+- **Finnish War:** "12 differences"; step 5 uses the first. Step 4 on this topic:
   <https://since-when.katalyst.fyi/?sql=nearest,Q736268,2026-10-24,fi,en#/Q736268>, 31 rows.
 - **Diet of Porvoo:** "1 difference": English says the Diet sat from 25 March to 19 July 1809,
   Swedish to 18 July. Its strip: Swedish "24 Aug 2026", English "18 Mar 2025". Step 4:

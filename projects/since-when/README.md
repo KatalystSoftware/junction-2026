@@ -120,8 +120,9 @@ in, and nothing runs before **Run** is clicked.
   These index numbers were measured offline: no statement on the live site uses the vector index, and every
   vector search there is an exact `VEC_DISTANCE_COSINE` over one topic.
 - **Usefulness for readers and editors.** A reader sees each edition's exact words side by side, and each edition's
-  date links to the Wikipedia edit that put its quoted words there word for word (an older wording of the
-  same claim can be earlier):
+  date links to the Wikipedia edit that began it: for a loaded word, the edit that put the word in the first
+  sentence; for other differences, the edit that put the quoted words there word for word (an older wording
+  of the same claim can be earlier):
   [Lapua Movement](https://since-when.katalyst.fyi/#/Q1412941), where Swedish and English Wikipedia say
   "fascist" in the first sentence and Finnish does not. NVIDIA Nemotron 3.5 Super VL suggests the
   differences and then checks each one against the whole other article, and the page says so;

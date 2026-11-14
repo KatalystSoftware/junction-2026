@@ -45,7 +45,7 @@
 
 <section class="start" aria-label="Topics to start from">
 	<Why id="why-start" label="How these were found">A word in quotation marks comes from a fixed list of loaded words: it is in the first sentence of the editions dated on its strip and not in the others'. For the other differences, {modelName(null)} compared each topic's articles passage by passage and suggested them, then looked each one up in the whole other article and set aside those it found stated there. A further review, by language models reading both articles, closed the ones it found false; no person has checked them. Open a topic to read each edition's own words.</Why>
-	<p class="key small subtle" aria-hidden="true"><span class="dot"></span> edit that put these exact words there · <span class="bar"></span> said since · <span class="bar past"></span> said earlier · 2001 to today</p>
+	<p class="key small subtle" aria-hidden="true"><span class="dot"></span> edit that put the word or the quoted words there · <span class="bar"></span> said since · <span class="bar past"></span> said earlier · 2001 to today</p>
 	<div class="cards">
 		{#each START as qid}
 			{@const c = cards[qid]}
