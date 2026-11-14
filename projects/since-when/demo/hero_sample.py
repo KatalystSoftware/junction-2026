@@ -8,6 +8,7 @@ sample is of rows the labels do not cover. Each row is printed with what the che
 claim, the verdict, how many passages of the other edition were searched and the quote that
 settled it, so the row can be judged against the article itself.
 """
+
 import argparse
 import json
 import random
@@ -20,9 +21,11 @@ HERE = Path(__file__).resolve().parent
 
 def show(n, row):
     langs = sides(row)
-    print(f"[{n}] {row['wikidata_id']} {'/'.join(langs)} {row['type']}"
-          + (f" missing in {row['missing_in']}" if row.get("missing_in") else "")
-          + (f" verdict {row['verdict']}" if row.get("verdict") else ""))
+    print(
+        f"[{n}] {row['wikidata_id']} {'/'.join(langs)} {row['type']}"
+        + (f" missing in {row['missing_in']}" if row.get("missing_in") else "")
+        + (f" verdict {row['verdict']}" if row.get("verdict") else "")
+    )
     for lang, quote in langs.items():
         if quote:
             print(f"    {lang}: {quote}")
@@ -30,9 +33,11 @@ def show(n, row):
     for name, check in (("check", row), ("reverse", row.get("reverse") or {})):
         if check.get("checked"):
             c, e = check["checked"], check.get("evidence")
-            print(f"    {name}: {check['claim']['lang']} claim in {c['lang']}, {c['searched']} passages searched, "
-                  f"{c['read']} read: {check['verdict']}"
-                  + (f"; {e['lang']} «{e['quote']}» ({e['section'] or 'lead'}, distance {e['distance']})" if e else ""))
+            print(
+                f"    {name}: {check['claim']['lang']} claim in {c['lang']}, {c['searched']} passages searched, "
+                f"{c['read']} read: {check['verdict']}"
+                + (f"; {e['lang']} «{e['quote']}» ({e['section'] or 'lead'}, distance {e['distance']})" if e else "")
+            )
     print()
 
 
@@ -55,7 +60,9 @@ def main():
     n = 0
     for group in groups:
         mine = [r for r in fresh if key(r) == group]
-        print(f"## {group}: {min(args.per_type, len(mine))} of {len(mine)} rows not labelled ({len(rows)} rows in all)\n")
+        print(
+            f"## {group}: {min(args.per_type, len(mine))} of {len(mine)} rows not labelled ({len(rows)} rows in all)\n"
+        )
         for row in random.sample(mine, min(args.per_type, len(mine))):
             n += 1
             show(n, row)

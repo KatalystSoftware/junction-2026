@@ -1,7 +1,8 @@
 """Tests for figures.py.
 
-    python -m unittest differences.test_figures
+python -m unittest differences.test_figures
 """
+
 import unittest
 
 from .figures import compatible, read

@@ -46,6 +46,7 @@ set-aside.jsonl (rows and claims that are no finding, each with the verdict and 
 settled it) and verdicts.jsonl (every claim with its verdict). Model answers are cached under
 $DIFFERENCES_CLAIMS_CACHE; --offline never calls the model.
 """
+
 import argparse
 import hashlib
 import json
@@ -58,13 +59,16 @@ from pathlib import Path
 from . import classify, figures, lexicon, llm
 
 PROMPT_VERSION = 3
-CACHE_DIR = Path(os.environ.get("DIFFERENCES_CLAIMS_CACHE",
-                                Path(__file__).resolve().parent.parent / "data" / "differences" / "claims-cache"))
+CACHE_DIR = Path(
+    os.environ.get(
+        "DIFFERENCES_CLAIMS_CACHE", Path(__file__).resolve().parent.parent / "data" / "differences" / "claims-cache"
+    )
+)
 OFFLINE = False
 LANGS = ("fi", "sv", "en")
-MAX_CLAIMS = 10        # figures and dates listed for one passage
-BATCH = 6              # claims of one passage judged in one call
-MAX_READ = 10          # passages of the other edition read in one call
+MAX_CLAIMS = 10  # figures and dates listed for one passage
+BATCH = 6  # claims of one passage judged in one call
+MAX_READ = 10  # passages of the other edition read in one call
 CHECKED = ("missing_fact", "numbers", "contradiction")
 VERDICTS = ("supported", "contradicted", "not_mentioned")
 
@@ -106,8 +110,18 @@ JUDGE_SCHEMA = {
                     "evidence_figure": {"type": "string"},
                     "note": {"type": "string"},
                 },
-                "required": ["claim", "about", "evidence_about", "verdict", "difference", "passage", "quote",
-                             "claim_figure", "evidence_figure", "note"],
+                "required": [
+                    "claim",
+                    "about",
+                    "evidence_about",
+                    "verdict",
+                    "difference",
+                    "passage",
+                    "quote",
+                    "claim_figure",
+                    "evidence_figure",
+                    "note",
+                ],
                 "additionalProperties": False,
             },
         }
@@ -155,10 +169,11 @@ EXTRACT_SCHEMA = {
 
 # --- the model, cached ---------------------------------------------------------------------------
 
+
 def _json(content):
     content = content.strip()
     start, end = content.find("{"), content.rfind("}")
-    return json.loads(content[start:end + 1] if start >= 0 and end > start else content)
+    return json.loads(content[start : end + 1] if start >= 0 and end > start else content)
 
 
 def _ask(kind, messages, schema, cfg, valid):
@@ -168,8 +183,9 @@ def _ask(kind, messages, schema, cfg, valid):
     times in all, and the last one is returned as it is.
     """
     opts = {k: v for k, v in llm.options().items() if k != "max_tokens"}
-    key = hashlib.sha256(json.dumps([kind, PROMPT_VERSION, cfg[0], cfg[2], opts, messages],
-                                    ensure_ascii=False).encode()).hexdigest()
+    key = hashlib.sha256(
+        json.dumps([kind, PROMPT_VERSION, cfg[0], cfg[2], opts, messages], ensure_ascii=False).encode()
+    ).hexdigest()
     path = CACHE_DIR / f"{key}.json"
     if path.exists():
         return json.loads(path.read_text())["answer"]
@@ -186,7 +202,7 @@ def _ask(kind, messages, schema, cfg, valid):
             path.write_text(json.dumps({"kind": kind, "model": cfg[2], "answer": answer}, ensure_ascii=False))
             return answer
     if not isinstance(answer, dict):
-        raise ValueError("no answer that parses")
+        raise ValueError("no answer that parses")  # noqa: TRY004  the answer's text is wrong, not a caller's type
     return answer
 
 
@@ -211,21 +227,38 @@ def sentence(quote, text, limit=600):
     """The whole sentence, or sentences, of text that quote is part of; quote itself if it is not in text."""
     at = text.find(quote)
     spans = [(s, e) for s, e in sentences(text) if s < at + len(quote) and e > at] if at >= 0 else []
-    whole = text[spans[0][0]:spans[-1][1]].strip() if spans else quote
+    whole = text[spans[0][0] : spans[-1][1]].strip() if spans else quote
     return whole if len(whole) <= limit else quote
 
 
 def _claim(pair, side, other, quote, origin, about="", kind="", value="", row=None):
     p, target = pair[side], pair[other]
-    ident = hashlib.sha1(json.dumps([pair["wikidata_id"], pair["as_of"], p["lang"], target["lang"], quote],
-                                    ensure_ascii=False).encode()).hexdigest()[:16]
-    return {"claim_id": ident, "wikidata_id": pair["wikidata_id"], "as_of": pair["as_of"],
-            "pair_id": pair["pair_id"], "lang": p["lang"], "title": p.get("title", ""),
-            "chunk_id": p.get("chunk_id"), "section": p.get("section", ""), "chunk_no": p.get("chunk_no", 0),
-            "rev_id": p.get("rev_id"), "quote": quote, "text": sentence(quote, p["text"]), "context": p["text"],
-            "about": about, "kind": kind, "value": value, "origin": origin, "row": row,
-            "target_lang": target["lang"], "target_title": target.get("title", ""),
-            "always": [target["chunk_id"]] if target.get("chunk_id") is not None else []}
+    ident = hashlib.sha1(
+        json.dumps([pair["wikidata_id"], pair["as_of"], p["lang"], target["lang"], quote], ensure_ascii=False).encode()
+    ).hexdigest()[:16]
+    return {
+        "claim_id": ident,
+        "wikidata_id": pair["wikidata_id"],
+        "as_of": pair["as_of"],
+        "pair_id": pair["pair_id"],
+        "lang": p["lang"],
+        "title": p.get("title", ""),
+        "chunk_id": p.get("chunk_id"),
+        "section": p.get("section", ""),
+        "chunk_no": p.get("chunk_no", 0),
+        "rev_id": p.get("rev_id"),
+        "quote": quote,
+        "text": sentence(quote, p["text"]),
+        "context": p["text"],
+        "about": about,
+        "kind": kind,
+        "value": value,
+        "origin": origin,
+        "row": row,
+        "target_lang": target["lang"],
+        "target_title": target.get("title", ""),
+        "always": [target["chunk_id"]] if target.get("chunk_id") is not None else [],
+    }
 
 
 def row_claims(pair, rows):
@@ -240,29 +273,37 @@ def row_claims(pair, rows):
             if not quote:
                 continue
             if row["type"] == "missing_fact" and row.get("missing_in") not in (None, pair[other]["lang"]):
-                continue   # the quote of the passage said to lack the fact only shows where it belongs
+                continue  # the quote of the passage said to lack the fact only shows where it belongs
             if row["type"] == "missing_fact" and row.get("missing_in") is None and side == "b" and row["quote_a"]:
-                continue   # no edition named and two quotes: the first is the fact
+                continue  # no edition named and two quotes: the first is the fact
             out.append(_claim(pair, side, other, quote, "classifier", row=n))
     return out
 
 
 def _passage(p):
-    where = f"section \"{p['section']}\"" if p.get("section") else "lead"
-    return f"{lexicon.LANG_NAME.get(p['lang'], p['lang'])} Wikipedia, \"{p.get('title', '')}\", {where}"
+    where = f'section "{p["section"]}"' if p.get("section") else "lead"
+    return f'{lexicon.LANG_NAME.get(p["lang"], p["lang"])} Wikipedia, "{p.get("title", "")}", {where}'
 
 
 def extract(passage, cfg):
     """The figures and dates of one passage, as {"quote", "about", "kind", "value"}, quotes verbatim."""
-    messages = [{"role": "system", "content": EXTRACT},
-                {"role": "user", "content": f"Passage ({_passage(passage)}):\n<<<\n{passage['text']}\n>>>"}]
+    messages = [
+        {"role": "system", "content": EXTRACT},
+        {"role": "user", "content": f"Passage ({_passage(passage)}):\n<<<\n{passage['text']}\n>>>"},
+    ]
     answer = _ask("extract", messages, EXTRACT_SCHEMA, cfg, lambda a: isinstance(a.get("claims"), list))
     out = []
     for c in answer.get("claims") or []:
         quote = classify.locate(str(c.get("quote") or ""), passage["text"])
         if quote and str(c.get("about") or "").strip():
-            out.append({"quote": quote, "about": c["about"].strip(), "kind": c.get("kind") or "",
-                        "value": str(c.get("value") or "")})
+            out.append(
+                {
+                    "quote": quote,
+                    "about": c["about"].strip(),
+                    "kind": c.get("kind") or "",
+                    "value": str(c.get("value") or ""),
+                }
+            )
     return out[:MAX_CLAIMS]
 
 
@@ -277,8 +318,11 @@ def extracted_claims(pairs, cfg, workers=8):
     def one(p):
         try:
             return extract(p, cfg)
-        except Exception as e:
-            print(f"claims: extract {p.get('lang')} {p.get('chunk_id')}: {e}; no claims, a re-run retries it", file=sys.stderr)
+        except Exception as e:  # noqa: BLE001  one bad call should not stop a run over hundreds of passages
+            print(
+                f"claims: extract {p.get('lang')} {p.get('chunk_id')}: {e}; no claims, a re-run retries it",
+                file=sys.stderr,
+            )
             return []
 
     with ThreadPoolExecutor(max_workers=workers) as pool:
@@ -288,7 +332,7 @@ def extracted_claims(pairs, cfg, workers=8):
         for side, other in (("a", "b"), ("b", "a")):
             for c in found[pair[side]["text"]]:
                 claim = _claim(pair, side, other, c["quote"], "extract", c["about"], c["kind"], c["value"])
-                if claim["claim_id"] in out:   # the passage is paired with two passages of this edition
+                if claim["claim_id"] in out:  # the passage is paired with two passages of this edition
                     out[claim["claim_id"]]["always"] += claim["always"]
                 else:
                     out[claim["claim_id"]] = claim
@@ -297,8 +341,16 @@ def extracted_claims(pairs, cfg, workers=8):
 
 # --- the verdict ---------------------------------------------------------------------------------
 
-UNCHECKED = {"verdict": "unchecked", "difference": "none", "about": "", "evidence_about": "", "note": "",
-             "quote": "", "passage": None, "figures": None}
+UNCHECKED = {
+    "verdict": "unchecked",
+    "difference": "none",
+    "about": "",
+    "evidence_about": "",
+    "note": "",
+    "quote": "",
+    "passage": None,
+    "figures": None,
+}
 
 
 def groups(claims, size=BATCH):
@@ -308,18 +360,25 @@ def groups(claims, size=BATCH):
     for n, c in enumerate(claims):
         key = (c["wikidata_id"], c["as_of"], c["lang"], c.get("context") or c["text"], c["target_lang"])
         by_passage.setdefault(key, []).append(n)
-    return [ns[i:i + size] for ns in by_passage.values() for i in range(0, len(ns), size)]
+    return [ns[i : i + size] for ns in by_passage.values() for i in range(0, len(ns), size)]
 
 
 def _read_together(group):
     """The passages the claims of one call are read against: each claim's own in turn (the one
     its passage was paired with first, then by its best rank) until MAX_READ, in the article's order."""
-    lists = []
+    lists: list[list[dict]] = []
     for c in group:
         always = set(c.get("always") or ())
-        lists.append(sorted(c["evidence"]["passages"], key=lambda p: (p["chunk_id"] not in always, min(
-            p["by_vector"], p.get("by_passage", 99) + 2, p["by_terms"] if p["term_hits"] else 99))))
-    chosen = {}
+        lists.append(
+            sorted(
+                c["evidence"]["passages"],
+                key=lambda p: (
+                    p["chunk_id"] not in always,
+                    min(p["by_vector"], p.get("by_passage", 99) + 2, p["by_terms"] if p["term_hits"] else 99),
+                ),
+            )
+        )
+    chosen: dict[int, dict] = {}
     for rank in range(max((len(ps) for ps in lists), default=0)):
         for ps in lists:
             if rank < len(ps) and len(chosen) < MAX_READ:
@@ -330,19 +389,23 @@ def _read_together(group):
 def _judge_messages(group, passages):
     first = group[0]
     source = {"lang": first["lang"], "title": first["title"], "section": first["section"]}
-    lines = [f"Claims from {_passage(source)}. Their own passage, only to tell who and what each claim speaks of:",
-             f"<<<\n{first.get('context') or first['text']}\n>>>"]
+    lines = [
+        f"Claims from {_passage(source)}. Their own passage, only to tell who and what each claim speaks of:",
+        f"<<<\n{first.get('context') or first['text']}\n>>>",
+    ]
     for n, c in enumerate(group, 1):
-        lines.append(f"\nClaim {n}: \"{c['quote']}\"")
+        lines.append(f'\nClaim {n}: "{c["quote"]}"')
         if c["text"].rstrip(".") != c["quote"].rstrip("."):
-            lines.append(f"  in the sentence: \"{c['text']}\"")
+            lines.append(f'  in the sentence: "{c["text"]}"')
         if c.get("about"):
             lines.append(f"  what it measures: {c['about']}")
     searched = max(c["evidence"]["searched"] for c in group)
-    lines.append(f"\nPassages of {lexicon.LANG_NAME.get(first['target_lang'], first['target_lang'])} Wikipedia, "
-                 f"\"{first['target_title']}\" ({len(passages)} of the article's {searched}):")
+    lines.append(
+        f"\nPassages of {lexicon.LANG_NAME.get(first['target_lang'], first['target_lang'])} Wikipedia, "
+        f'"{first["target_title"]}" ({len(passages)} of the article\'s {searched}):'
+    )
     for n, p in enumerate(passages, 1):
-        where = f"section \"{p['section']}\"" if p["section"] else "lead"
+        where = f'section "{p["section"]}"' if p["section"] else "lead"
         lines.append(f"\nPassage {n} ({where}):\n<<<\n{p['text']}\n>>>")
     return [{"role": "system", "content": JUDGE}, {"role": "user", "content": "\n".join(lines)}]
 
@@ -384,8 +447,10 @@ def judge(group, cfg):
 
     def valid(answer):
         got = by_claim(answer)
-        return all(n in got and (got[n]["verdict"] == "not_mentioned" or find(got[n])[1] is not None)
-                   for n in range(1, len(group) + 1))
+        return all(
+            n in got and (got[n]["verdict"] == "not_mentioned" or find(got[n])[1] is not None)
+            for n in range(1, len(group) + 1)
+        )
 
     got = by_claim(_ask("judge", _judge_messages(group, passages), JUDGE_SCHEMA, cfg, valid))
     out = []
@@ -395,10 +460,16 @@ def judge(group, cfg):
             out.append(dict(UNCHECKED))
             continue
         quote, passage = find(answer)
-        if passage is not None:   # this claim's own distance and rank, unknown if another claim's search found it
+        if passage is not None:  # this claim's own distance and rank, unknown if another claim's search found it
             own = {p["chunk_id"]: p for p in claim["evidence"]["passages"]}
-            passage = own.get(passage["chunk_id"]) or {**passage, "distance": None, "passage_distance": None,
-                                                       "by_vector": None, "by_passage": None, "term_hits": None}
+            passage = own.get(passage["chunk_id"]) or {
+                **passage,
+                "distance": None,
+                "passage_distance": None,
+                "by_vector": None,
+                "by_passage": None,
+                "term_hits": None,
+            }
         verdict, difference, both = answer["verdict"], answer.get("difference"), None
         if verdict in ("supported", "contradicted") and passage is None:
             verdict = "unchecked"
@@ -410,20 +481,33 @@ def judge(group, cfg):
                 verdict, difference = "contradicted", "figure"
             elif agree is True and verdict == "contradicted" and difference == "figure":
                 verdict = "supported"
-        out.append({"verdict": verdict, "difference": difference if verdict == "contradicted" else "none",
-                    "about": str(answer.get("about") or ""), "evidence_about": str(answer.get("evidence_about") or ""),
-                    "note": str(answer.get("note") or "").strip(), "quote": quote, "passage": passage, "figures": both})
+        out.append(
+            {
+                "verdict": verdict,
+                "difference": difference if verdict == "contradicted" else "none",
+                "about": str(answer.get("about") or ""),
+                "evidence_about": str(answer.get("evidence_about") or ""),
+                "note": str(answer.get("note") or "").strip(),
+                "quote": quote,
+                "passage": passage,
+                "figures": both,
+            }
+        )
     return out
 
 
 def judge_all(claims, cfg, workers=8, size=BATCH, progress=None):
     """The verdict of every claim, in input order. A failed call leaves its claims "unchecked"."""
+
     def one(positions):
         group = [claims[n] for n in positions]
         try:
             verdicts = judge(group, cfg)
-        except Exception as e:
-            print(f"claims: {', '.join(c['claim_id'] for c in group)}: {e}; unchecked, a re-run retries it", file=sys.stderr)
+        except Exception as e:  # noqa: BLE001  one bad call should not stop a run over hundreds of claims
+            print(
+                f"claims: {', '.join(c['claim_id'] for c in group)}: {e}; unchecked, a re-run retries it",
+                file=sys.stderr,
+            )
             verdicts = [dict(UNCHECKED) for _ in group]
         if progress:
             progress(group, verdicts)
@@ -439,6 +523,7 @@ def judge_all(claims, cfg, workers=8, size=BATCH, progress=None):
 
 # --- from verdicts to finding rows ---------------------------------------------------------------
 
+
 def _words(text):
     return set(re.findall(r"\w+", (text or "").lower()))
 
@@ -451,17 +536,40 @@ def _same(x, y):
 def _check(claim, v):
     """What the page needs to show the check: the search, and the passage that settled it."""
     e, p = claim["evidence"], v["passage"]
-    out = {"verdict": v["verdict"],
-           "claim": {"lang": claim["lang"], "quote": claim["quote"], "about": v["about"] or claim.get("about", ""),
-                     "kind": claim.get("kind", ""), "origin": claim["origin"]},
-           "checked": {"lang": claim["target_lang"], "as_of": claim["as_of"], "searched": e["searched"],
-                       "read": len(e["passages"]), "sql": e["sql"], "ms": e["ms"]},
-           "evidence": None, "figures": v.get("figures")}
+    out = {
+        "verdict": v["verdict"],
+        "claim": {
+            "lang": claim["lang"],
+            "quote": claim["quote"],
+            "about": v["about"] or claim.get("about", ""),
+            "kind": claim.get("kind", ""),
+            "origin": claim["origin"],
+        },
+        "checked": {
+            "lang": claim["target_lang"],
+            "as_of": claim["as_of"],
+            "searched": e["searched"],
+            "read": len(e["passages"]),
+            "sql": e["sql"],
+            "ms": e["ms"],
+        },
+        "evidence": None,
+        "figures": v.get("figures"),
+    }
     if p:
-        out["evidence"] = {"lang": claim["target_lang"], "chunk_id": p["chunk_id"], "section": p["section"],
-                           "chunk_no": p["chunk_no"], "rev_id": p["rev_id"], "quote": v["quote"],
-                           "about": v["evidence_about"], "sentence": p.get("sentence"), "distance": p["distance"],
-                           "by_vector": p["by_vector"], "term_hits": p["term_hits"]}
+        out["evidence"] = {
+            "lang": claim["target_lang"],
+            "chunk_id": p["chunk_id"],
+            "section": p["section"],
+            "chunk_no": p["chunk_no"],
+            "rev_id": p["rev_id"],
+            "quote": v["quote"],
+            "about": v["evidence_about"],
+            "sentence": p.get("sentence"),
+            "distance": p["distance"],
+            "by_vector": p["by_vector"],
+            "term_hits": p["term_hits"],
+        }
     return out
 
 
@@ -471,12 +579,22 @@ def _contradicted(claim, v, model):
     mine = {"lang": claim["lang"], "chunk_id": claim["chunk_id"], "quote": claim["quote"]}
     theirs = {"lang": claim["target_lang"], "chunk_id": p["chunk_id"], "quote": v["quote"]}
     a, b = sorted([mine, theirs], key=lambda s: LANGS.index(s["lang"]))
-    return {"pair_id": f"{claim['wikidata_id']}:{claim['as_of']}:{a['lang']}:{a['chunk_id']}:{b['lang']}:{b['chunk_id']}",
-            "wikidata_id": claim["wikidata_id"], "as_of": claim["as_of"],
-            "type": "numbers" if v["difference"] == "figure" else "contradiction", "missing_in": None,
-            "quote_a": a["quote"], "quote_b": b["quote"], "summary": v["note"], "terms": [],
-            "source": "llm", "model": model, "distance": p["distance"], "from_pair": claim["pair_id"],
-            **_check(claim, v)}
+    return {
+        "pair_id": f"{claim['wikidata_id']}:{claim['as_of']}:{a['lang']}:{a['chunk_id']}:{b['lang']}:{b['chunk_id']}",
+        "wikidata_id": claim["wikidata_id"],
+        "as_of": claim["as_of"],
+        "type": "numbers" if v["difference"] == "figure" else "contradiction",
+        "missing_in": None,
+        "quote_a": a["quote"],
+        "quote_b": b["quote"],
+        "summary": v["note"],
+        "terms": [],
+        "source": "llm",
+        "model": model,
+        "distance": p["distance"],
+        "from_pair": claim["pair_id"],
+        **_check(claim, v),
+    }
 
 
 def reverse_claims(claims, verdicts):
@@ -489,15 +607,35 @@ def reverse_claims(claims, verdicts):
         if v["verdict"] != "contradicted":
             continue
         p = v["passage"]
-        ident = hashlib.sha1(json.dumps([c["wikidata_id"], c["as_of"], c["target_lang"], c["lang"], v["quote"]],
-                                        ensure_ascii=False).encode()).hexdigest()[:16]
+        ident = hashlib.sha1(
+            json.dumps(
+                [c["wikidata_id"], c["as_of"], c["target_lang"], c["lang"], v["quote"]], ensure_ascii=False
+            ).encode()
+        ).hexdigest()[:16]
         out[c["claim_id"]] = {
-            "claim_id": ident, "reverses": c["claim_id"], "wikidata_id": c["wikidata_id"], "as_of": c["as_of"],
-            "pair_id": c["pair_id"], "lang": c["target_lang"], "title": c["target_title"], "chunk_id": p["chunk_id"],
-            "section": p["section"], "chunk_no": p["chunk_no"], "rev_id": p["rev_id"], "quote": v["quote"],
-            "text": sentence(v["quote"], p["text"]), "context": p["text"], "about": v["evidence_about"], "kind": "",
-            "value": "", "origin": "reverse", "row": None, "target_lang": c["lang"], "target_title": c["title"],
-            "always": [c["chunk_id"]] if c.get("chunk_id") is not None else []}
+            "claim_id": ident,
+            "reverses": c["claim_id"],
+            "wikidata_id": c["wikidata_id"],
+            "as_of": c["as_of"],
+            "pair_id": c["pair_id"],
+            "lang": c["target_lang"],
+            "title": c["target_title"],
+            "chunk_id": p["chunk_id"],
+            "section": p["section"],
+            "chunk_no": p["chunk_no"],
+            "rev_id": p["rev_id"],
+            "quote": v["quote"],
+            "text": sentence(v["quote"], p["text"]),
+            "context": p["text"],
+            "about": v["evidence_about"],
+            "kind": "",
+            "value": "",
+            "origin": "reverse",
+            "row": None,
+            "target_lang": c["lang"],
+            "target_title": c["title"],
+            "always": [c["chunk_id"]] if c.get("chunk_id") is not None else [],
+        }
     return list(out.values())
 
 
@@ -508,9 +646,11 @@ def findings(pairs, rows_by_pair, claims, verdicts, model, reverse=None):
     `reverse` maps a contradicted claim's id to (its reverse claim, that claim's verdict); given,
     a contradiction counts only when the reverse verdict is contradicted too.
     """
+
     def confirmed(c, v):
-        return v["verdict"] == "contradicted" and (reverse is None or (
-            c["claim_id"] in reverse and reverse[c["claim_id"]][1]["verdict"] == "contradicted"))
+        return v["verdict"] == "contradicted" and (
+            reverse is None or (c["claim_id"] in reverse and reverse[c["claim_id"]][1]["verdict"] == "contradicted")
+        )
 
     def check(c, v):
         """_check, with the reverse check of a contradicted claim, and as not_mentioned when that failed."""
@@ -532,7 +672,7 @@ def findings(pairs, rows_by_pair, claims, verdicts, model, reverse=None):
         for n, row in enumerate(rows_by_pair.get(pair["pair_id"], [])):
             checks = by_row.get((pair["pair_id"], n), [])
             if row["type"] not in CHECKED or not checks:
-                kept.append(row)   # framing, or a row the search never saw
+                kept.append(row)  # framing, or a row the search never saw
                 continue
             hits = [(c, v) for c, v in checks if confirmed(c, v)]
             if hits:
@@ -546,20 +686,26 @@ def findings(pairs, rows_by_pair, claims, verdicts, model, reverse=None):
     for c, v in extracted:
         if confirmed(c, v):
             contradictions.append((c, v))
-        elif v["verdict"] == "contradicted":   # a figure the other side did not confirm
+        elif v["verdict"] == "contradicted":  # a figure the other side did not confirm
             aside.append({**_contradicted(c, v, model), **check(c, v), "verdict": "unconfirmed"})
     seen = []
     for claim, v in contradictions:
         row = {**_contradicted(claim, v, model), **check(claim, v)}
         langs = {claim["lang"], claim["target_lang"]}
-        if any(o["wikidata_id"] == row["wikidata_id"] and set(o["pair_id"].split(":")[2:5:2]) == langs
-               and _same(o["quote_a"], row["quote_a"]) and _same(o["quote_b"], row["quote_b"]) for o in seen):
-            continue   # the same two statements, reached from the other side or from another pair
+        if any(
+            o["wikidata_id"] == row["wikidata_id"]
+            and set(o["pair_id"].split(":")[2:5:2]) == langs
+            and _same(o["quote_a"], row["quote_a"])
+            and _same(o["quote_b"], row["quote_b"])
+            for o in seen
+        ):
+            continue  # the same two statements, reached from the other side or from another pair
         seen.append(row)
     return kept + seen, aside
 
 
 # --- command line --------------------------------------------------------------------------------
+
 
 def _read(path):
     return [json.loads(line) for line in open(path, encoding="utf-8") if line.strip()]
@@ -586,14 +732,20 @@ def main():
     p.add_argument("evidence")
     p.add_argument("pairs")
     p.add_argument("rows")
-    p.add_argument("--reverse", help="the reverse claims with their evidence; without it a contradiction needs no confirmation")
+    p.add_argument(
+        "--reverse", help="the reverse claims with their evidence; without it a contradiction needs no confirmation"
+    )
     p.add_argument("--out", required=True)
     for p in sub.choices.values():
         p.add_argument("--batch", type=int, default=BATCH, help="claims of one passage judged in one call")
         p.add_argument("--workers", type=int, default=8)
         p.add_argument("--offline", action="store_true", help="answers from the cache only, no model call")
-        p.add_argument("--retries", type=int, help="tries per request on a rate limit or server error "
-                                                     f"(default {llm.RETRIES}); a busy free tier needs hundreds")
+        p.add_argument(
+            "--retries",
+            type=int,
+            help="tries per request on a rate limit or server error "
+            f"(default {llm.RETRIES}); a busy free tier needs hundreds",
+        )
     args = ap.parse_args()
     OFFLINE = args.offline
     if args.retries:
@@ -626,7 +778,9 @@ def main():
         back = reverse_claims(claims, verdicts)
         for c in back:
             print(json.dumps(c, ensure_ascii=False))
-        print(f"claims: {len(back)} contradicted of {len(claims)}, to be confirmed from the other side", file=sys.stderr)
+        print(
+            f"claims: {len(back)} contradicted of {len(claims)}, to be confirmed from the other side", file=sys.stderr
+        )
         return
 
     reverse = None
@@ -637,20 +791,50 @@ def main():
     kept, aside = findings(_read(args.pairs), _rows_by_pair(args.rows), claims, verdicts, cfg[2], reverse)
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
-    slim = lambda v: {**{k: x for k, x in v.items() if k != "quote"}, "evidence_quote": v["quote"],
-                      "passage": v["passage"] and v["passage"]["chunk_id"]}
-    for name, items in (("differences.jsonl", kept), ("set-aside.jsonl", aside),
-                        ("verdicts.jsonl", [{**{k: c.get(k) for k in ("claim_id", "reverses", "pair_id", "row", "origin", "lang",
-                                                                      "target_lang", "quote", "kind", "value")}, **slim(v)}
-                                            for c, v in zip(claims, verdicts)])):
+    slim = lambda v: {
+        **{k: x for k, x in v.items() if k != "quote"},
+        "evidence_quote": v["quote"],
+        "passage": v["passage"] and v["passage"]["chunk_id"],
+    }
+    for name, items in (
+        ("differences.jsonl", kept),
+        ("set-aside.jsonl", aside),
+        (
+            "verdicts.jsonl",
+            [
+                {
+                    **{
+                        k: c.get(k)
+                        for k in (
+                            "claim_id",
+                            "reverses",
+                            "pair_id",
+                            "row",
+                            "origin",
+                            "lang",
+                            "target_lang",
+                            "quote",
+                            "kind",
+                            "value",
+                        )
+                    },
+                    **slim(v),
+                }
+                for c, v in zip(claims, verdicts)
+            ],
+        ),
+    ):
         with open(out / name, "w", encoding="utf-8") as f:
-            for item in items:
-                f.write(json.dumps(item, ensure_ascii=False) + "\n")
-    count = lambda items, key: ", ".join(f"{k} {sum(1 for i in items if i[key] == k)}" for k in sorted({i[key] for i in items}))
+            f.writelines(json.dumps(item, ensure_ascii=False) + "\n" for item in items)
+    count = lambda items, key: ", ".join(
+        f"{k} {sum(1 for i in items if i[key] == k)}" for k in sorted({i[key] for i in items})
+    )
     u = llm.USAGE
-    print(f"{cfg[2]}, claims prompt version {PROMPT_VERSION}: {len(claims)} claims ({count(verdicts, 'verdict')}); "
-          f"{len(kept)} finding rows ({count(kept, 'type')}), {len(aside)} set aside; "
-          f"{u['calls']} model calls not from the cache, {u['input_tokens']:,} input and {u['output_tokens']:,} output tokens")
+    print(
+        f"{cfg[2]}, claims prompt version {PROMPT_VERSION}: {len(claims)} claims ({count(verdicts, 'verdict')}); "
+        f"{len(kept)} finding rows ({count(kept, 'type')}), {len(aside)} set aside; "
+        f"{u['calls']} model calls not from the cache, {u['input_tokens']:,} input and {u['output_tokens']:,} output tokens"
+    )
 
 
 if __name__ == "__main__":

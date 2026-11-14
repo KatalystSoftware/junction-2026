@@ -20,6 +20,7 @@ called real, how many are kept: a real row that is gone is as bad as a false one
 The label file's `recheck` entries (labels a search of the stored article contradicts) are applied
 in a second table.
 """
+
 import argparse
 import collections
 import json
@@ -82,14 +83,19 @@ def score(labels, rows, recheck=False):
 
 
 def report(table):
-    lines = [f"{'type':14}{'false':>6}{'gone':>6}{'moved':>6}{'kept':>6}  |{'real':>6}{'kept':>6}{'moved':>6}{'gone':>6}"
-             f"  |{'unclear':>8}{'kept':>6}{'moved':>6}{'gone':>6}"]
+    head = f"{'type':14}{'false':>6}{'gone':>6}{'moved':>6}{'kept':>6}  |{'real':>6}{'kept':>6}{'moved':>6}{'gone':>6}"
+    lines = [head + f"  |{'unclear':>8}{'kept':>6}{'moved':>6}{'gone':>6}"]
     for t in TYPES:
         c = table[t]
-        n = lambda verdict: sum(c[(verdict, w)] for w in ("kept", "moved", "gone"))
-        lines.append(f"{t:14}{n('false'):>6}{c[('false', 'gone')]:>6}{c[('false', 'moved')]:>6}{c[('false', 'kept')]:>6}  |"
-                     f"{n('real'):>6}{c[('real', 'kept')]:>6}{c[('real', 'moved')]:>6}{c[('real', 'gone')]:>6}  |"
-                     f"{n('unclear'):>8}{c[('unclear', 'kept')]:>6}{c[('unclear', 'moved')]:>6}{c[('unclear', 'gone')]:>6}")
+
+        def n(verdict, c=c):
+            return sum(c[(verdict, w)] for w in ("kept", "moved", "gone"))
+
+        lines.append(
+            f"{t:14}{n('false'):>6}{c[('false', 'gone')]:>6}{c[('false', 'moved')]:>6}{c[('false', 'kept')]:>6}  |"
+            f"{n('real'):>6}{c[('real', 'kept')]:>6}{c[('real', 'moved')]:>6}{c[('real', 'gone')]:>6}  |"
+            f"{n('unclear'):>8}{c[('unclear', 'kept')]:>6}{c[('unclear', 'moved')]:>6}{c[('unclear', 'gone')]:>6}"
+        )
     return "\n".join(lines)
 
 

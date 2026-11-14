@@ -25,6 +25,8 @@ to return whatever their rank, such as the passage the claim's own passage was p
 Each line is written back with an `evidence` object: the statement, its time, how many passages
 it searched and the passages it returned.
 """
+
+import functools
 import hashlib
 import json
 import re
@@ -36,40 +38,65 @@ from differences.claims import sentences
 from .align import Run, as_of_sql, lit
 from .db import LANGS
 
-SCHEMA = ("""
+SCHEMA = (
+    """
 CREATE TABLE IF NOT EXISTS claim_vector (
   sha          BINARY(20) NOT NULL PRIMARY KEY,   -- SHA-1 of the text
   text         TEXT NOT NULL,                     -- the claim, in the language it was written in
   embedding    VECTOR(1024) NOT NULL              -- bge-m3, as passage.embedding
-) CHARACTER SET utf8mb4""", """
+) CHARACTER SET utf8mb4""",
+    """
 CREATE TABLE IF NOT EXISTS passage_sentence (
   sha          BINARY(20) NOT NULL,               -- the passage: passage.sha, so every version of an
   no           SMALLINT UNSIGNED NOT NULL,        -- article that holds the passage shares its sentences
   text         TEXT NOT NULL,
   embedding    VECTOR(1024) NOT NULL,
   PRIMARY KEY (sha, no)
-) CHARACTER SET utf8mb4""")
-MIN_SENTENCE = 25   # characters; a shorter one joins the sentence before it
+) CHARACTER SET utf8mb4""",
+)
+MIN_SENTENCE = 25  # characters; a shorter one joins the sentence before it
 
-NEAREST = 4     # passages returned for their nearest sentence
+NEAREST = 4  # passages returned for their nearest sentence
 BY_PASSAGE = 2  # more for the distance of the passage as a whole, which a claim of several facts is nearer to
-BY_TERMS = 3    # more for the claim's names and numbers
+BY_TERMS = 3  # more for the claim's names and numbers
 MAX_TERMS = 12
 
 # Month names by number in fi, sv and en, as the start of the word ("marraskuuta", "November").
-MONTHS = [("tammikuu", "januar"), ("helmikuu", "februar"), ("maaliskuu", "mars", "march"),
-          ("huhtikuu", "april"), ("toukokuu", "maj", "may"), ("kesäkuu", "juni", "june"),
-          ("heinäkuu", "juli", "july"), ("elokuu", "august"), ("syyskuu", "september"),
-          ("lokakuu", "oktober", "october"), ("marraskuu", "november"), ("joulukuu", "december")]
+MONTHS = [
+    ("tammikuu", "januar"),
+    ("helmikuu", "februar"),
+    ("maaliskuu", "mars", "march"),
+    ("huhtikuu", "april"),
+    ("toukokuu", "maj", "may"),
+    ("kesäkuu", "juni", "june"),
+    ("heinäkuu", "juli", "july"),
+    ("elokuu", "august"),
+    ("syyskuu", "september"),
+    ("lokakuu", "oktober", "october"),
+    ("marraskuu", "november"),
+    ("joulukuu", "december"),
+]
 _MONTH = {name: i for i, names in enumerate(MONTHS) for name in names}
-ENGLISH = ("january", "february", "march", "april", "may", "june", "july", "august", "september",
-           "october", "november", "december")   # the only edition that writes the month first
+ENGLISH = (
+    "january",
+    "february",
+    "march",
+    "april",
+    "may",
+    "june",
+    "july",
+    "august",
+    "september",
+    "october",
+    "november",
+    "december",
+)  # the only edition that writes the month first
 _MONTH_WORD = "|".join(sorted(_MONTH, key=len, reverse=True))
 _SPACE = "[ \u00a0\u202f]"
-_SEP = "[ \u00a0\u202f.,]?"   # between thousands: 12 600, 12,600, 12.600, 12600
+_SEP = "[ \u00a0\u202f.,]?"  # between thousands: 12 600, 12,600, 12.600, 12600
 _NUMBER = re.compile(r"\d{1,3}(?:[ \u00a0\u202f.,]\d{3})+(?!\d)|\d+")
-_DAY_MONTH = re.compile(rf"\b(\d{{1,2}})(?:st|nd|rd|th)?\.?{_SPACE}(?:päivänä{_SPACE})?({_MONTH_WORD})", re.I)
-_MONTH_DAY = re.compile(rf"\b({'|'.join(ENGLISH)}){_SPACE}(\d{{1,2}})(?:st|nd|rd|th)?\b", re.I)
+_DAY_MONTH = re.compile(rf"\b(\d{{1,2}})(?:st|nd|rd|th)?\.?{_SPACE}(?:päivänä{_SPACE})?({_MONTH_WORD})", re.IGNORECASE)
+_MONTH_DAY = re.compile(rf"\b({'|'.join(ENGLISH)}){_SPACE}(\d{{1,2}})(?:st|nd|rd|th)?\b", re.IGNORECASE)
 _NAME = re.compile(r"(?<![.!?:]\s)(?<!^)\b[A-ZÅÄÖÜ][\w-]{3,}")
 
 
@@ -85,21 +112,23 @@ def terms(quote):
     for m in list(_DAY_MONTH.finditer(quote)) + list(_MONTH_DAY.finditer(quote)):
         day, word = (m[1], m[2]) if m[1].isdigit() else (m[2], m[1])
         month = _MONTH[word.lower()] if word.lower() in _MONTH else ENGLISH.index(word.lower())
-        out.append(rf"(?<![0-9]){day}(st|nd|rd|th)?\.?{_SPACE}(päivänä{_SPACE})?({'|'.join(MONTHS[month])})"
-                   rf"|{ENGLISH[month]}{_SPACE}{day}(?![0-9])")
+        out.append(
+            rf"(?<![0-9]){day}(st|nd|rd|th)?\.?{_SPACE}(päivänä{_SPACE})?({'|'.join(MONTHS[month])})"
+            rf"|{ENGLISH[month]}{_SPACE}{day}(?![0-9])"
+        )
         dated.add(m.span(1) if m[1].isdigit() else m.span(2))
     for m in _NUMBER.finditer(quote):
         digits = re.sub(r"\D", "", m[0])
         if m.span() in dated or len(digits) < 2:
-            continue   # the day of a date above; a single digit is in every passage
+            continue  # the day of a date above; a single digit is in every passage
         head = len(digits) % 3 or 3
-        groups = [digits[:head]] + [digits[i:i + 3] for i in range(head, len(digits), 3)]
+        groups = [digits[:head]] + [digits[i : i + 3] for i in range(head, len(digits), 3)]
         out.append("(?<![0-9])" + _SEP.join(groups) + "(?![0-9])")
     for m in _NAME.finditer(quote):
         word = m[0]
         if word.lower()[:6] in {n[:6] for n in _MONTH}:
             continue
-        out.append(re.escape(word[:max(4, len(word) - 2)]))
+        out.append(re.escape(word[: max(4, len(word) - 2)]))
     return list(dict.fromkeys(out))[:MAX_TERMS]
 
 
@@ -155,32 +184,49 @@ def split(text):
     return out
 
 
-def store_sentences(con, scopes, embedder=None):
+@functools.cache
+def _model():
+    """The embedding model, loaded on first use: a run whose vectors are all stored needs none."""
+    from .embed import Embedder
+
+    return Embedder()
+
+
+def embed(texts):
+    return _model()(texts)
+
+
+def store_sentences(con, scopes, embedder=embed):
     """Split and embed the passages of each (topic, edition, as_of) that passage_sentence lacks.
     Returns (passages, sentences) added."""
     cur = con.cursor()
     todo = {}
-    for qid, lang, as_of in sorted(scopes, key=str):
-        cur.execute(f"""SELECT c.sha, p.text FROM chunk FOR SYSTEM_TIME AS OF {as_of_sql(as_of)} AS c
+    for qid, lang, as_of in scopes:
+        cur.execute(
+            f"""SELECT c.sha, p.text FROM chunk FOR SYSTEM_TIME AS OF {as_of_sql(as_of)} AS c
                         JOIN passage AS p ON p.sha = c.sha
                         WHERE c.wikidata_id = ? AND c.lang = ?
-                          AND NOT EXISTS (SELECT 1 FROM passage_sentence AS s WHERE s.sha = c.sha)""", (qid, lang))
+                          AND NOT EXISTS (SELECT 1 FROM passage_sentence AS s WHERE s.sha = c.sha)""",
+            (qid, lang),
+        )
         todo.update(cur.fetchall())
     rows = [(key, no, text) for key, passage in todo.items() for no, text in enumerate(split(passage))]
     if rows:
-        from .embed import Embedder, vec_bytes
-        embedder = embedder or Embedder()
+        from .embed import vec_bytes
+
         for i in range(0, len(rows), 256):
-            part = rows[i:i + 256]
+            part = rows[i : i + 256]
             vectors = embedder([text for _, _, text in part])
-            cur.executemany("INSERT IGNORE INTO passage_sentence (sha, no, text, embedding) VALUES (?, ?, ?, ?)",
-                            [(key, no, text, vec_bytes(v)) for (key, no, text), v in zip(part, vectors)])
+            cur.executemany(
+                "INSERT IGNORE INTO passage_sentence (sha, no, text, embedding) VALUES (?, ?, ?, ?)",
+                [(key, no, text, vec_bytes(v)) for (key, no, text), v in zip(part, vectors)],
+            )
             con.commit()
             print(f"evidence: {min(i + 256, len(rows))} of {len(rows)} sentences embedded", file=sys.stderr, flush=True)
     return len(todo), len(rows)
 
 
-def store_vectors(con, texts, embedder=None):
+def store_vectors(con, texts, embedder=embed):
     """Embed the texts that claim_vector does not hold yet. Returns how many were embedded."""
     cur = con.cursor()
     todo = {}
@@ -189,10 +235,13 @@ def store_vectors(con, texts, embedder=None):
         if not cur.fetchone():
             todo[sha(text)] = text
     if todo:
-        from .embed import Embedder, vec_bytes
-        vectors = (embedder or Embedder())(list(todo.values()))
-        cur.executemany("INSERT IGNORE INTO claim_vector (sha, text, embedding) VALUES (UNHEX(?), ?, ?)",
-                        [(key, text, vec_bytes(v)) for (key, text), v in zip(todo.items(), vectors)])
+        from .embed import vec_bytes
+
+        vectors = embedder(list(todo.values()))
+        cur.executemany(
+            "INSERT IGNORE INTO claim_vector (sha, text, embedding) VALUES (UNHEX(?), ?, ?)",
+            [(key, text, vec_bytes(v)) for (key, text), v in zip(todo.items(), vectors)],
+        )
         con.commit()
     return len(todo)
 
@@ -209,22 +258,44 @@ def search(r, claim, today=None):
         raise ValueError(f"unknown edition {claim['target_lang']!r}")
     as_of = _as_of(claim, today)
     patterns = terms(claim.get("quote") or claim["text"])
-    sql = search_sql(claim["wikidata_id"], claim["target_lang"], as_of, sha(claim["text"]), patterns,
-                     claim.get("always") or ())
+    sql = search_sql(
+        claim["wikidata_id"], claim["target_lang"], as_of, sha(claim["text"]), patterns, claim.get("always") or ()
+    )
     rows = r("evidence", sql)
-    return dict(claim, evidence={
-        "sql": sql.strip(), "ms": r.log[-1]["ms"], "terms": patterns,
-        "searched": int(rows[0]["searched"]) if rows else 0,
-        "passages": [{"chunk_id": x["id"], "ord": x["ord"], "section": x["section"], "chunk_no": x["chunk_no"],
-                      "rev_id": x["rev_id"], "text": x["text"], "sentence": x["sentence"],
-                      "distance": round(float(x["distance"]), 4),
-                      "passage_distance": None if x["passage_distance"] is None else round(float(x["passage_distance"]), 4),
-                      "term_hits": int(x["term_hits"]), "by_vector": int(x["by_vector"]),
-                      "by_passage": int(x["by_passage"]), "by_terms": int(x["by_terms"])} for x in rows]})
+    return dict(
+        claim,
+        evidence={
+            "sql": sql.strip(),
+            "ms": r.log[-1]["ms"],
+            "terms": patterns,
+            "searched": int(rows[0]["searched"]) if rows else 0,
+            "passages": [
+                {
+                    "chunk_id": x["id"],
+                    "ord": x["ord"],
+                    "section": x["section"],
+                    "chunk_no": x["chunk_no"],
+                    "rev_id": x["rev_id"],
+                    "text": x["text"],
+                    "sentence": x["sentence"],
+                    "distance": round(float(x["distance"]), 4),
+                    "passage_distance": None
+                    if x["passage_distance"] is None
+                    else round(float(x["passage_distance"]), 4),
+                    "term_hits": int(x["term_hits"]),
+                    "by_vector": int(x["by_vector"]),
+                    "by_passage": int(x["by_passage"]),
+                    "by_terms": int(x["by_terms"]),
+                }
+                for x in rows
+            ],
+        },
+    )
 
 
 def main():
     from .db import connect
+
     if sys.argv[1:] == ["schema"]:
         con = connect()
         for statement in SCHEMA:
@@ -237,26 +308,17 @@ def main():
     con = connect()
     for statement in SCHEMA:
         con.cursor().execute(statement)
-    embedder = _Lazy()
-    passages, added = store_sentences(con, {(c["wikidata_id"], c["target_lang"], _as_of(c)) for c in claims}, embedder)
-    embedded = store_vectors(con, list(dict.fromkeys(c["text"] for c in claims)), embedder)
+    passages, added = store_sentences(con, {(c["wikidata_id"], c["target_lang"], _as_of(c)) for c in claims})
+    embedded = store_vectors(con, list(dict.fromkeys(c["text"] for c in claims)))
     r = Run()
     r.log = _Last()
     for claim in claims:
         print(json.dumps(search(r, claim), ensure_ascii=False), flush=True)
-    print(f"evidence: {len(claims)} claims searched, {embedded} claims embedded, "
-          f"{added} sentences of {passages} passages embedded", file=sys.stderr)
-
-
-class _Lazy:
-    """The embedding model, loaded on first use: a run whose vectors are all stored needs none."""
-    model = None
-
-    def __call__(self, texts):
-        if self.model is None:
-            from .embed import Embedder
-            _Lazy.model = Embedder()
-        return self.model(texts)
+    print(
+        f"evidence: {len(claims)} claims searched, {embedded} claims embedded, "
+        f"{added} sentences of {passages} passages embedded",
+        file=sys.stderr,
+    )
 
 
 class _Last(list):

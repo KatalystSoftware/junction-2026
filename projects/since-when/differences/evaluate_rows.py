@@ -7,6 +7,7 @@ of the claim check (claims.py) run on those rows: to see what the check does to 
 A type counts as found for a pair when a row of that type came from it; a row born from a claim
 names the pair its claim came from in `from_pair`.
 """
+
 import json
 import sys
 
@@ -19,7 +20,7 @@ def score(pairs, labels, rows):
     got = {}
     for row in rows:
         got.setdefault(row.get("from_pair") or row["pair_id"], set()).add(row["type"])
-    counts = {t: {"tp": 0, "fp": 0, "fn": 0} for t in TYPES}
+    counts: dict[str, dict] = {t: {"tp": 0, "fp": 0, "fn": 0} for t in TYPES}
     for pair in pairs:
         have, want = got.get(pair["pair_id"], set()), set(labels[pair["pair_id"]]["types"])
         for t in TYPES:
@@ -43,7 +44,9 @@ def main():
         print(f"{path}: {len(rows)} rows, {len(pairs)} labelled pairs")
         print("type           labelled  found  right  precision  recall")
         for t, c in score(pairs, labels, rows).items():
-            print(f"{t:14} {c['tp'] + c['fn']:8} {c['tp'] + c['fp']:6} {c['tp']:6}  {fmt(c['precision']):>9}  {fmt(c['recall']):>6}")
+            print(
+                f"{t:14} {c['tp'] + c['fn']:8} {c['tp'] + c['fp']:6} {c['tp']:6}  {fmt(c['precision']):>9}  {fmt(c['recall']):>6}"
+            )
         print()
 
 

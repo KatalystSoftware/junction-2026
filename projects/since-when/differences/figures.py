@@ -18,31 +18,100 @@ time in three, so it is decided here:
 compatible() is None when a figure cannot be read (a number in words, two units), and the model's
 own verdict then stands. Finnish, Swedish and English.
 """
+
 import re
 
-MONTHS = [("tammikuu", "januar"), ("helmikuu", "februar"), ("maaliskuu", "mars", "march"),
-          ("huhtikuu", "april"), ("toukokuu", "maj", "may"), ("kesäkuu", "juni", "june"),
-          ("heinäkuu", "juli", "july"), ("elokuu", "august"), ("syyskuu", "september"),
-          ("lokakuu", "oktober", "october"), ("marraskuu", "november"), ("joulukuu", "december")]
+MONTHS = [
+    ("tammikuu", "januar"),
+    ("helmikuu", "februar"),
+    ("maaliskuu", "mars", "march"),
+    ("huhtikuu", "april"),
+    ("toukokuu", "maj", "may"),
+    ("kesäkuu", "juni", "june"),
+    ("heinäkuu", "juli", "july"),
+    ("elokuu", "august"),
+    ("syyskuu", "september"),
+    ("lokakuu", "oktober", "october"),
+    ("marraskuu", "november"),
+    ("joulukuu", "december"),
+]
 _MONTH = {name: n for n, names in enumerate(MONTHS, 1) for name in names}
-_MONTH_AT = re.compile(r"\b(" + "|".join(sorted(_MONTH, key=len, reverse=True)) + r")", re.I)
+_MONTH_AT = re.compile(r"\b(" + "|".join(sorted(_MONTH, key=len, reverse=True)) + r")", re.IGNORECASE)
 
-ABOUT = ("about", "around", "approximately", "roughly", "circa", "some", "noin", "suunnilleen", "arviolta",
-         "omkring", "cirka", "ungefär", "runt", "ca", "c", "n")   # "n. 3 000", "c. 400", "ca 17 000"
-OVER = ("over", "more than", "at least", "above", "upwards of", "yli", "vähintään", "runsaat", "runsas", "runsaan",
-        "över", "minst", "mer än", "drygt")
-ALMOST = ("almost", "nearly", "under", "less than", "up to", "at most", "close to", "lähes", "melkein", "alle",
-          "enintään", "jopa", "vajaat", "vajaa", "nästan", "knappt", "högst", "upp till", "närmare")
+ABOUT = (
+    "about",
+    "around",
+    "approximately",
+    "roughly",
+    "circa",
+    "some",
+    "noin",
+    "suunnilleen",
+    "arviolta",
+    "omkring",
+    "cirka",
+    "ungefär",
+    "runt",
+    "ca",
+    "c",
+    "n",
+)  # "n. 3 000", "c. 400", "ca 17 000"
+OVER = (
+    "over",
+    "more than",
+    "at least",
+    "above",
+    "upwards of",
+    "yli",
+    "vähintään",
+    "runsaat",
+    "runsas",
+    "runsaan",
+    "över",
+    "minst",
+    "mer än",
+    "drygt",
+)
+ALMOST = (
+    "almost",
+    "nearly",
+    "under",
+    "less than",
+    "up to",
+    "at most",
+    "close to",
+    "lähes",
+    "melkein",
+    "alle",
+    "enintään",
+    "jopa",
+    "vajaat",
+    "vajaa",
+    "nästan",
+    "knappt",
+    "högst",
+    "upp till",
+    "närmare",
+)
 _NUMBER = re.compile(r"\d{1,3}(?:[ \u00a0\u202f.,]\d{3})+(?!\d)|\d+")
-_UNIT = re.compile(r"%|\bprosent|\bprocent|\bper ?cent|\bmilj|\bmillion|\bmrd|\bbillion|\btuhat|\btusen|\bthousand", re.I)
+_UNIT = re.compile(
+    r"%|\bprosent|\bprocent|\bper ?cent|\bmilj|\bmillion|\bmrd|\bbillion|\btuhat|\btusen|\bthousand", re.IGNORECASE
+)
 
 
 def _hedge(text):
     """about, over, almost or exact, from the words before the number."""
     low = text.lower()
     for name, words in (("about", ABOUT), ("over", OVER), ("almost", ALMOST)):
-        if any(re.search(rf"(?<!\w){re.escape(w)}\.?\s+(?:\w+\s+)?(?=\d)" if len(w) > 2
-                         else rf"(?<!\w){re.escape(w)}\.?\s*(?=\d)", low) for w in words):
+        if any(
+            re.search(
+                rf"(?<!\w){re.escape(w)}\.?\s+(?:\w+\s+)?(?=\d)"
+                if len(w) > 2
+                else rf"(?<!\w){re.escape(w)}\.?\s*(?=\d)",
+                low,
+            )
+            for w in words
+        ):
             return name
     return "exact"
 
@@ -62,10 +131,10 @@ def read(text):
     if not numbers:
         return None
     if len(numbers) == 1 and years and not _UNIT.search(text) and _hedge(text) == "exact" and len(text) <= 12:
-        return ("date", {"day": set(), "month": None, "year": years[0]})   # a bare year
+        return ("date", {"day": set(), "month": None, "year": years[0]})  # a bare year
     unit = _UNIT.search(text)
     if unit and unit[0] != "%" and not unit[0].lower().startswith(("pros", "proc", "per")):
-        return None   # "1,5 miljoonaa", "two thousand": not read
+        return None  # "1,5 miljoonaa", "two thousand": not read
     values = [n for _, n, _ in numbers]
     if len(values) > 2:
         return None
@@ -107,14 +176,17 @@ def compatible(a, b):
             if p[part] and q[part] and p[part] != q[part]:
                 return False
         if p["day"] and q["day"] and (not p["month"] or not q["month"]):
-            return None   # a day without its month says nothing
+            return None  # a day without its month says nothing
         return not (p["day"] and q["day"] and not p["day"] & q["day"])
     if x[3] != y[3]:
         return None
     (xl, xh), (yl, yh) = x[1], y[1]
-    if xl != xh or yl != yh:   # a range agrees with what overlaps it
+    if xl != xh or yl != yh:  # a range agrees with what overlaps it
         return max(xl, yl) <= min(xh, yh) if xl != xh and yl != yh else (_covers(x, yl) if xl != xh else _covers(y, xl))
     if x[2] == "exact" and y[2] == "exact":
         return xl == yl
-    return _covers(x, yl) or _covers(y, xl) if x[2] != "exact" and y[2] != "exact" else (
-        _covers(x, yl) if x[2] != "exact" else _covers(y, xl))
+    return (
+        _covers(x, yl) or _covers(y, xl)
+        if x[2] != "exact" and y[2] != "exact"
+        else (_covers(x, yl) if x[2] != "exact" else _covers(y, xl))
+    )
