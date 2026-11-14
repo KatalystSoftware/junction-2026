@@ -5,6 +5,7 @@
 	import { NAMES, articleUrl, list, plural, revisionUrl, rowDate, sectionLabel } from './lib/format'
 	import { LANGS, type TimelineEvent, type Topic } from './lib/types'
 	import Difference from './Difference.svelte'
+	import Why from './Why.svelte'
 
 	let { topic, events }: { topic: Topic; events: Map<number, TimelineEvent[]> } = $props()
 
@@ -20,9 +21,12 @@
 </script>
 
 <section aria-labelledby="list-title">
-	<h2 id="list-title">
-		{found.length ? plural(found.length, 'difference', 'differences') : 'No differences found'} between {list(editions.map((l) => NAMES[l]))} Wikipedia
-	</h2>
+	<header>
+		<h2 id="list-title">{found.length ? plural(found.length, 'difference', 'differences') : 'No differences found'}</h2>
+		{#if found.length}
+			<Why id="why-list" label="Machine-suggested">A language model suggested these and nobody has checked them. The quotes are word for word: read them to judge.</Why>
+		{/if}
+	</header>
 	{#if found.length}
 		<div class="rows">
 			{#each shown as d, i (d.id)}
@@ -32,14 +36,15 @@
 		{#if found.length > shown.length}
 			<button class="cdx-button rest" onclick={() => (all = true)}>Show all {found.length}</button>
 		{/if}
-		<p class="note small subtle">A language model suggested these and nobody has checked them. The quotes are word for word: read them to judge.</p>
 	{/if}
 </section>
 
 {#if lacking.length}
 	<section class="left" aria-labelledby="left-title">
-		<h2 id="left-title">Said in one edition, left out of another</h2>
-		<p class="note small subtle">Found by comparing passage with passage. Not yet checked against the whole of the other article, so some of these are there under another heading.</p>
+		<header>
+			<h2 id="left-title">Said in one edition, left out of another</h2>
+			<Why id="why-left" label="Unchecked">Found by comparing passage with passage. Not yet checked against the whole of the other article, so some of these are there under another heading.</Why>
+		</header>
 		{#each lacking as l (l)}
 			{@const items = left[l]}
 			<details class="cdx-accordion">
@@ -70,9 +75,17 @@
 {/if}
 
 <style>
-	h2 {
+	/* A list's heading, then the mark that says how far to trust the list. */
+	header {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: var(--spacing-25) var(--spacing-75);
 		padding-bottom: var(--spacing-25);
 		border-bottom: 1px solid var(--border-color-subtle);
+	}
+
+	h2 {
 		font-size: var(--font-size-x-large);
 		line-height: var(--line-height-x-large);
 	}
@@ -84,11 +97,6 @@
 
 	.rest {
 		margin-top: var(--spacing-100);
-	}
-
-	.note {
-		max-width: 46rem;
-		margin-top: var(--spacing-75);
 	}
 
 	.left {
