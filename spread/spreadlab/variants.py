@@ -342,5 +342,5 @@ VARIANTS.update({
 # down at most that day's cap. An option due on a full day is not quoted; a slower one of the same request still is. The cap
 # lifts for the rest of the week after the first night with 10 drops in its first hour (`due_cap_wave`).
 VARIANTS.update({f"day-cap-{cap}": {**_DEFAULT, "due_cap": cap, "due_cap_wave": 10} for cap in (70, 80)})
-# ... and the charging stop of a low-charge electric car only on a route over 180 km; RULES.md needs it over 200 km.
-VARIANTS["charge-180"] = {**_DEFAULT, "charge_km": 180}
+# ... and the charging stop of a low-charge electric car only where RULES.md needs it, on a route over 200 km.
+VARIANTS["charge-200"] = {**_DEFAULT, "charge_km": 200}

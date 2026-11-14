@@ -865,13 +865,18 @@ It is a small part of the cap's cost: of cap 70's 3.1 declined orders a week, it
 The live desk plays it: the cap and the lift are parameters of `Policy`, and the live desk counts the drops of the
 events it missed while it was down, as it learns the rest.
 
-## The charging stop by route (`charge-180`, off by default, being played)
+## The charging stop by route (`charge-200`, off by default, being played)
 
 The starter plans a 40-minute charging stop for every electric car under 30% charge. RULES.md needs one only on a route over
-200 km. With `charge_km` 180 the desk plans it only on routes over 180 km, a margin for the difference between the map's km
-and the rule's. On 120 of the default's saved weeks, 7.5 won low-charge cars a week drive 180 km or less, 0.5 drive 180 to 200
-and 4.3 more. Those weeks have no charging fine, because every such car got its stop, so only play can show that 180 is safe.
-It is kept only if no week of `charge-180` gets a charging fine.
+200 km, and with `charge_km` 200 the desk plans it only there. A changed order is judged on its new places.
+
+On the default's 230 saved weeks, 7.4 one-car orders a week are low-charge cars on routes of 200 km or less. With their stop
+they are 9.2% late against 2.9% for the other cars on such routes, and pay drivers 1.20 x the typical fee against 1.08 x. If
+they came out like the others, that is about 0.5 late orders and 0.12 x a typical fee on each car a week, in line with the
+50 to 90 euros a week of the input audit. Offline, on 13 recorded weeks of the default (10 unseen, 3 thin) played again with
+`charge-200`, no quote changes, 8.1 stops a week go, 0.7 of them on routes of 180 to 200 km, and every stop on a route over
+200 km stays. The recorded weeks cannot show a fine, because every such car got its stop: the map has routes of 199.8 and 200.0
+km, so it is kept only if no played week gets a charging fine.
 
 ## The final
 
