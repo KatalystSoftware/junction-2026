@@ -497,3 +497,18 @@ VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss
 # of the time. These orders come at the curve's full price, with the late chance in the cost. A thinner week plays A1.7 exactly.
 _A17 = VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100"]
 VARIANTS.update({f"a17-rich-slack{minutes}": _full_weeks(_A17, min_slack=minutes) for minutes in (240, 180, 120)})
+# Lane 4 B: the quote's cost by the groups where merge 1's late orders cluster, only in a week of 760 drivers or more (a
+# thinner week plays the row it is built on exactly). On merge 1's played weeks, orders with 16 to 30 hours from the win to the
+# last pickup are 5.5% late, orders with more time 0.8% (`within_3_days`), and cars over 120 euros typical (drives of about
+# 300 minutes or more) 7.2%. `-h30-c11`: an order with 30 hours or more costs 1.1 at the quote, the others 1.2. `-h16-30-c13`:
+# 16 to 30 hours costs 1.3. `-long300-c<cost>`: a drive over 300 minutes costs that. Quote levels only; no fee changes.
+# `r7-` is on safe row 7 (`-cap62`), `a17-` on the aggressive row A1 (`-cap62-late100`).
+_GROUP_COSTS = (
+    ("h30-c11", {"cost": 1.1, "cost_hours": [[30, 1.2]]}),
+    ("h16-30-c13", {"cost_hours": [[16, 1.2], [30, 1.3]]}),
+    ("h30-c11-h16-30-c13", {"cost": 1.1, "cost_hours": [[16, 1.2], [30, 1.3]]}),
+    ("long300-c13", {"long_drive": 300, "long_cost": 1.3}),
+    ("long300-c11", {"long_drive": 300, "long_cost": 1.1}))
+for _prefix, _row in (("r7", "fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62"),
+                      ("a17", "fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100")):
+    VARIANTS.update({f"{_prefix}-{name}": _full_weeks(VARIANTS[_row], **knobs) for name, knobs in _GROUP_COSTS})
