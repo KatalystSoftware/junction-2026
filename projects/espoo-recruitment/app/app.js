@@ -428,9 +428,16 @@
   }
   const YNL = { yes: "Yes, at work", learning: "Learning it now", no: "Not yet" };
 
+  // Two invitations branch here: the golden ticket (a personal invitation with a reserved place, sent to people who came to
+  // earlier events) and the regular one (an open link; the organiser decides whom to introduce). Same check pages, different words.
+  const KIND = {
+    golden: { title: () => `${esc(firstName())}, you have a golden ticket.`, lead: "You came to one of Espoo's events before, so your place is reserved. Your profile is drafted from what you already agreed we may read, the way companies get theirs drafted from their job ads. <b>You see every line before anyone else does</b>.", eyebrow: "golden ticket", go: "Draft my profile →", confirm: "Confirm: this is me", confirmed: "Confirmed. Only what you checked is used, and organisers see that you checked it.", doneH1: () => `You're in, ${esc(firstName())}.`, doneLead: (t) => `Your place is reserved. Confirmed on ${t}. Only what you checked is used, and the organiser sees that you checked it.`, first: ["Today", "Your profile goes to Espoo's event team", "lines, checked by you", "Marked “checked by the candidate”."] },
+    regular: { title: () => `Apply to attend the ${esc(D.event.name)}.`, lead: "Tell us where to read about you, and your application is drafted from it, the way companies get theirs drafted from their job ads. <b>You see every line before anyone else does</b>, and a named organiser decides who is introduced, with a reason.", eyebrow: "application", go: "Draft my application →", confirm: "Send my application", confirmed: "Application sent. A named organiser reads it and tells you their decision with a reason.", doneH1: () => `Application sent, ${esc(firstName())}.`, doneLead: (t) => `Sent on ${t}. Only what you checked is in it, and the organiser sees that you checked it.`, first: ["Next days", "Espoo's event team reads your application", "lines, checked by you", "Accepted or declined by a named organiser, with the reason written down. You get it either way."] },
+  };
+  const kindOf = (J) => KIND[J.kind] || KIND.regular;
   function viewJoin(step, sec) {
     const J = joinState();
-    if (!step) return joinInvite(J);
+    if (step === "golden" || !step) { const k = step ? "golden" : "regular"; if (J.kind !== k) { J.kind = k; save(); } return joinInvite(J); }
     if (step === "reading") return joinReading(J);
     if (!J.facts) joinScan(J); // a deep link straight to a check page still gets a draft
     if (step === "done") return J.done ? joinDone(J) : joinCheck(J, "confirm");
@@ -443,8 +450,8 @@
     const pr = J.project;
     app.innerHTML = `<div class="wiz join">
       <p class="eyebrow">${esc(D.event.name)} · ${esc(D.event.date)} · ${esc(D.event.format)}</p>
-      <h1>${esc(firstName())}, you're invited.</h1>
-      <p class="mut" style="font-size:1.0625rem;max-width:60ch">Your profile is drafted from what you already have online, the way companies get theirs drafted from their job ads. We read it once, and <b>you see every line before anyone else does</b>.</p>
+      <h1>${kindOf(J).title()}</h1>
+      <p class="mut" style="font-size:1.0625rem;max-width:60ch">${kindOf(J).lead}</p>
       <div class="jcard srcs">
         <h2>What may we read?</h2>
         ${row("linkedin", "LinkedIn profile", "Headline, experience, skills and languages.", idField("linkedin", "LinkedIn address"))}
@@ -458,7 +465,7 @@
         <div><b>Never used:</b> photo, age, gender, nationality, school names.</div>
         <div><b>No scores.</b> A named organiser introduces people, with a written reason.</div>
       </div>
-      <div class="jnav"><a href="#/cand" class="back">Prefer to type everything yourself? →</a><button data-act="jn-scan" ${DEMO || Object.values(c).some(Boolean) ? "" : "disabled"}>Draft my profile →</button></div>
+      <div class="jnav"><a href="#/cand" class="back">Prefer to type everything yourself? →</a><button data-act="jn-scan" ${DEMO || Object.values(c).some(Boolean) ? "" : "disabled"}>${kindOf(J).go}</button></div>
       <p class="xs mut" style="margin-top:14px">Demo applicant ${esc(cand(ME).name)} (${ME}), synthetic sources. Nothing leaves this browser.</p></div>`;
   }
   function joinReading(J) {
@@ -545,11 +552,11 @@
         + Q.map(q => { const a = evAnswer(J, q); return a ? sum(esc(q.text), esc(q.kind === "ynl" ? YNL[a] : a)) : ""; }).join("")
         + (J.own.about || J.own.looking ? sum("In your words", `<span class="own-q">${esc(J.own.about)}${J.own.looking ? ` <span class="mut">Looking for:</span> ${esc(J.own.looking)}` : ""}</span>`) : "")
         + (J.done ? `<div class="okbox" style="margin-top:16px"><b>Confirmed.</b> ${F.length} lines, checked by you. <a href="#/join/done">What happens next →</a></div>`
-          : `<div style="margin-top:18px"><button style="width:100%;min-height:3rem;font-size:1.0625rem" data-act="jn-confirm">Confirm: this is me</button>
+          : `<div style="margin-top:18px"><button style="width:100%;min-height:3rem;font-size:1.0625rem" data-act="jn-confirm">${kindOf(J).confirm}</button>
              <p class="jhint" style="text-align:center">${gathered.length} lines from your sources${edited ? `, ${edited} corrected by you` : ""}${removed ? `, ${removed} removed` : ""}.</p></div>`);
     }
     app.innerHTML = `<div class="wiz join">
-      <p class="eyebrow">${esc(D.event.name)} · ${esc(firstName())}'s invitation</p>
+      <p class="eyebrow">${esc(D.event.name)} · ${esc(firstName())}'s ${kindOf(J).eyebrow}</p>
       ${steps}
       <div class="jcard"><h1>${h1}</h1><p class="lead">${lead}</p>${body}${sec === "confirm" ? `<div class="jnav"><a class="back" href="#/join/check/${prev[0]}">← ${prev[1]}</a>${J.done ? `<a href="#/join/done"><button>Done →</button></a>` : ""}</div>` : nav(hint)}</div>
       ${wh}
@@ -558,10 +565,11 @@
   }
   function joinDone(J) {
     const F = (J.facts || []).filter(f => f.status !== "removed"), edited = F.filter(f => f.status === "edited").length;
-    app.innerHTML = `<div class="wiz join"><p class="eyebrow">${esc(D.event.name)} · ${esc(D.event.date)}</p><h1>You're in, ${esc(firstName())}.</h1>
-      <p class="mut" style="font-size:1.0625rem;max-width:60ch">Confirmed on ${esc(fmtTime(J.done))}. Only what you checked is used, and the organiser sees that you checked it.</p>
+    const K = kindOf(J);
+    app.innerHTML = `<div class="wiz join"><p class="eyebrow">${esc(D.event.name)} · ${esc(D.event.date)}</p><h1>${K.doneH1()}</h1>
+      <p class="mut" style="font-size:1.0625rem;max-width:60ch">${K.doneLead(esc(fmtTime(J.done)))}</p>
       <div class="jcard">
-        <div class="sumrow"><span>Today</span><span><b>Your profile goes to Espoo's event team</b><br><span class="mut">${F.length} lines, checked by you${edited ? `, ${edited} corrected` : ""}. Marked “checked by the candidate”.</span></span></div>
+        <div class="sumrow"><span>${K.first[0]}</span><span><b>${K.first[1]}</b><br><span class="mut">${F.length} ${K.first[2]}${edited ? `, ${edited} corrected` : ""}. ${K.first[3]}</span></span></div>
         <div class="sumrow"><span>Before the event</span><span><b>A named organiser picks introductions, with a reason</b><br><span class="mut">No scores, no ranking. You see every planned conversation with the organiser's note.</span></span></div>
         <div class="sumrow"><span>${esc(D.event.date)}</span><span><b>Short 1:1 conversations at the stands</b><br><span class="mut">And you can still visit any stand you like.</span></span></div>
         <div class="jnav"><a class="back" href="#/join/check/general">← Change my answers</a><a href="#/cand/me"><button>How organisers see you →</button></a></div>
@@ -605,7 +613,7 @@
     if (a === "jn-evskill") { const m = jFact(J, "skill", v); if (m) { m.status = "removed"; J.lastRemoved = m.id; save(); } else jSet(J, "skill", v, { depth: "work", years: null }); return route(); }
     if (a === "jn-ans") { J.ans[id] = v; save(); return route(); }
     if (a === "jn-want") { const w = J.wants || (cand(ME).wants || []).slice(); J.wants = w.includes(v) ? w.filter(x => x !== v) : w.concat(v); save(); return route(); }
-    if (a === "jn-confirm") { joinApply(J); jGo("done"); return toast("Confirmed. Only what you checked is used, and organisers see that you checked it."); }
+    if (a === "jn-confirm") { joinApply(J); jGo("done"); return toast(kindOf(J).confirmed); }
   }
   function joinChange(t) {
     const J = joinState(), a = t.dataset.act, id = t.dataset.id, f = (J.facts || []).find(x => x.id === id);
@@ -911,9 +919,10 @@
     if (k === "reset") { S = seed(); save(); toast("Demo reset"); return goTo("#/"); }
     if (k === "co-draft") { delete S.comp.puro; save(); return goTo("#/company/puro"); }
     if (k === "co-ok") { S.comp.puro = { finnish: "helpful", confirmedAt: now }; save(); return goTo("#/company/puro"); }
-    if (k === "jn-0") { S.join = null; joinState(); save(); return goTo("#/join"); }
+    if (k === "jn-0") { S.join = null; joinState(); save(); return goTo("#/join/golden"); }
+    if (k === "jn-reg") { S.join = null; joinState(); save(); return goTo("#/join"); }
     if (k === "jn-2") { S.join = null; const J = joinState(); joinScan(J); save(); return goTo("#/join/check/general"); }
-    if (k === "jn-done") { S.join = null; const J = joinState(); joinScan(J); J.trade = { build: "b", depth: "a", pace: "b" }; J.own = { about: "I like being the person who explains the numbers to people who hate numbers.", looking: "A team where I can grow from reporting into forecasting." }; joinApply(J); return goTo("#/join/done"); }
+    if (k === "jn-done") { S.join = null; const J = joinState(); J.kind = "golden"; joinScan(J); J.trade = { build: "b", depth: "a", pace: "b" }; J.own = { about: "I like being the person who explains the numbers to people who hate numbers.", looking: "A team where I can grow from reporting into forecasting." }; joinApply(J); return goTo("#/join/done"); }
     if (k === "org-questions") return goTo("#/org/questions");
     if (k === "org-puro") { S.ui.open = {}; S.ui.f = {}; if (S.dec.puro) delete S.dec.puro[ME]; save(); return goTo("#/org/puro"); }
     if (k === "org-intro") { (S.dec.puro = S.dec.puro || {})[ME] = { d: "introduce", reason: "Power BI and SQL at work for 4–5 years; their exact stack. Finnish only helpful.", at: now, by: ORGANISER }; S.ui.open["puro" + ME] = true; save(); return goTo("#/org/puro"); }

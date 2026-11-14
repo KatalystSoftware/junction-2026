@@ -1,3 +1,4 @@
+import { loadApplications } from './manage.svelte'
 import type { Brief, Pool, Preset, Review, Status, Step, Watch } from './types'
 
 /** Everything the page shows. Reviews are polled, so a company's reply arrives without a reload. */
@@ -34,6 +35,7 @@ export async function load() {
     get<Watch>('changes.json'),
   ])
   Object.assign(app, { briefs, presets, reviews, pool, watch, ready: true })
+  void loadApplications()
   // the server asks Context.dev at most every five minutes, so asking it once a minute is cheap
   setInterval(() => {
     void get<Watch>('changes.json').then((seen) => (app.watch = seen))
@@ -86,9 +88,9 @@ export async function load() {
  * company find itself.
  */
 export const route = () => {
-  const [, a = '', b = '', c = ''] = app.hash.split('/').map(decodeURIComponent)
-  if (a === 'event') return { join: false, id: '', event: b }
-  return a === 'join' || a === 'c' ? { join: true, id: b, event: c } : { join: false, id: a, event: '' }
+  const [, a = '', b = '', c = '', d = ''] = app.hash.split('/').map(decodeURIComponent)
+  if (a === 'event') return { join: false, id: '', event: b, tab: c, company: d }
+  return a === 'join' || a === 'c' ? { join: true, id: b, event: c, tab: '', company: '' } : { join: false, id: a, event: '', tab: '', company: '' }
 }
 export const go = (id: string) => (location.hash = `#/${encodeURIComponent(id)}`)
 export const joinPath = (id: string, event = '') => `#/join/${encodeURIComponent(id)}${event ? `/${event}` : ''}`

@@ -1,0 +1,4994 @@
+{
+ "note": "Sample applications to the event, drawn from a fixed seed against the real employers' drafted needs. Nobody here is real.",
+ "event": "deep-tech-talent-forum",
+ "generated_from": "presets.json + signals.json needs",
+ "applicants": [
+  {
+   "id": "A-001",
+   "handle": "Applicant 1",
+   "field": "Research and science",
+   "level": "Experienced",
+   "skills": [
+    {
+     "name": "Optoelectronic characterisation",
+     "depth": "project",
+     "years": null
+    },
+    {
+     "name": "Infrared optics",
+     "depth": "work",
+     "years": 2
+    },
+    {
+     "name": "Germanium detectors",
+     "depth": "work",
+     "years": 5
+    },
+    {
+     "name": "Applied research",
+     "depth": "project",
+     "years": null
+    }
+   ],
+   "finnish": "fluent",
+   "english": "fluent",
+   "city": "Espoo",
+   "abroad": false,
+   "permit": false,
+   "wants": [
+    "elfys.fi",
+    "2647375-4",
+    "nordicclean.tech"
+   ],
+   "applied_at": "2026-11-09T16:16:00Z",
+   "sources": [
+    "GitHub",
+    "LinkedIn"
+   ],
+   "ai_summary": "Experienced research and science profile. Works mainly with Optoelectronic characterisation, Infrared optics, Germanium detectors. Based in Espoo; Finnish fluent. Sources read: LinkedIn, GitHub.",
+   "drafted": [
+    {
+     "kind": "role",
+     "text": "Infrared sensor researcher (Research and science)",
+     "source": "LinkedIn",
+     "quote": "Infrared sensor researcher, gaming, 2019–2022"
+    },
+    {
+     "kind": "level",
+     "text": "Experienced: 7 years of dated positions",
+     "source": "LinkedIn",
+     "quote": "7 years of dated positions since 2019"
+    },
+    {
+     "kind": "skill",
+     "text": "Optoelectronic characterisation: own projects",
+     "source": "GitHub",
+     "quote": "Thesis work used Optoelectronic characterisation end to end."
+    },
+    {
+     "kind": "skill",
+     "text": "Infrared optics: used at work, 2 yr",
+     "source": "LinkedIn",
+     "quote": "Daily Infrared optics work since 2021."
+    },
+    {
+     "kind": "skill",
+     "text": "Germanium detectors: used at work, 5 yr",
+     "source": "LinkedIn",
+     "quote": "Led the move to Germanium detectors; cut incidents by a third."
+    },
+    {
+     "kind": "skill",
+     "text": "Applied research: own projects",
+     "source": "GitHub",
+     "quote": "Thesis work used Applied research end to end."
+    },
+    {
+     "kind": "language",
+     "text": "English fluent; Finnish fluent",
+     "source": "LinkedIn",
+     "quote": "Finnish: fluent"
+    },
+    {
+     "kind": "where",
+     "text": "Lives in Espoo; open to hybrid",
+     "source": "LinkedIn",
+     "quote": "Espoo · open to new roles"
+    }
+   ],
+   "corrected": [],
+   "answers": [
+    {
+     "q": "Which of these do you use, at work or in your own projects?",
+     "a": "Optoelectronic characterisation, Infrared optics, Germanium detectors, Applied research"
+    },
+    {
+     "q": "How is your Finnish at work?",
+     "a": "fluent"
+    },
+    {
+     "q": "Have you worked with Optoelectronic characterisation?",
+     "a": "Not yet"
+    },
+    {
+     "q": "Which kind of work do you want more of?",
+     "a": "Improving and running existing systems"
+    },
+    {
+     "q": "Which describes you better?",
+     "a": "Deep specialist in one area"
+    },
+    {
+     "q": "Which team rhythm suits you?",
+     "a": "Careful planning, fewer mistakes"
+    },
+    {
+     "q": "Which companies would you like to meet?",
+     "a": "ElFys, Teknologian tutkimuskeskus VTT Oy, Nordic Clean Tech"
+    },
+    {
+     "q": "I would need work-permit support",
+     "a": "No"
+    }
+   ],
+   "own": {
+    "about": "I am better at finishing than starting, and teams tend to need that.",
+    "looking": "Deep technical work with people who review each other's code properly."
+   },
+   "project": {
+    "name": "fw-bootloader.pdf"
+   }
+  },
+  {
+   "id": "A-002",
+   "handle": "Applicant 2",
+   "field": "Quantum",
+   "level": "Senior",
+   "skills": [
+    {
+     "name": "Python",
+     "depth": "work",
+     "years": 6
+    },
+    {
+     "name": "Quantum circuits",
+     "depth": "project",
+     "years": null
+    },
+    {
+     "name": "Qiskit",
+     "depth": "project",
+     "years": null
+    },
+    {
+     "name": "Cryo-CMOS",
+     "depth": "work",
+     "years": 9
+    }
+   ],
+   "finnish": "basic",
+   "english": "fluent",
+   "city": "Lisbon",
+   "abroad": true,
+   "permit": true,
+   "wants": [
+    "qutwo.com",
+    "kvanttinova.fi"
+   ],
+   "applied_at": "2026-11-11T12:28:00Z",
+   "sources": [
+    "GitHub",
+    "LinkedIn"
+   ],
+   "ai_summary": "Senior quantum profile. Works mainly with Python, Quantum circuits, Qiskit. Based in Lisbon; Finnish basic. Sources read: LinkedIn, GitHub.",
+   "drafted": [
+    {
+     "kind": "role",
+     "text": "Quantum algorithm researcher (Quantum)",
+     "source": "LinkedIn",
+     "quote": "Quantum algorithm researcher, defence, 2015–2018"
+    },
+    {
+     "kind": "level",
+     "text": "Senior: 11 years of dated positions",
+     "source": "LinkedIn",
+     "quote": "11 years of dated positions since 2015"
+    },
+    {
+     "kind": "skill",
+     "text": "Python: used at work, 6 yr",
+     "source": "LinkedIn",
+     "quote": "Daily Python work since 2017."
+    },
+    {
+     "kind": "skill",
+     "text": "Quantum circuits: own projects",
+     "source": "LinkedIn",
+     "quote": "Weekend repository exploring Quantum circuits."
+    },
+    {
+     "kind": "skill",
+     "text": "Qiskit: own projects",
+     "source": "GitHub",
+     "quote": "Thesis work used Qiskit end to end."
+    },
+    {
+     "kind": "skill",
+     "text": "Cryo-CMOS: used at work, 9 yr",
+     "source": "LinkedIn",
+     "quote": "Built and ran Cryo-CMOS in production for 3 teams."
+    },
+    {
+     "kind": "language",
+     "text": "English fluent; Finnish basic",
+     "source": "LinkedIn",
+     "quote": "Suomi: basic"
+    },
+    {
+     "kind": "where",
+     "text": "Lives in Lisbon (abroad); open to hybrid",
+     "source": "LinkedIn",
+     "quote": "Lisbon · open to new roles"
+    }
+   ],
+   "corrected": [
+    {
+     "kind": "skill",
+     "text": "Cryo-CMOS: corrected to own projects only",
+     "was": "Cryo-CMOS as drafted"
+    }
+   ],
+   "answers": [
+    {
+     "q": "Which of these do you use, at work or in your own projects?",
+     "a": "Python, Quantum circuits, Qiskit, Cryo-CMOS"
+    },
+    {
+     "q": "How is your Finnish at work?",
+     "a": "basic"
+    },
+    {
+     "q": "Have you worked with Optimisation methods?",
+     "a": "Learning it now"
+    },
+    {
+     "q": "Which kind of work do you want more of?",
+     "a": "Building new things from scratch"
+    },
+    {
+     "q": "Which describes you better?",
+     "a": "Generalist who covers many areas"
+    },
+    {
+     "q": "Which team rhythm suits you?",
+     "a": "Careful planning, fewer mistakes"
+    },
+    {
+     "q": "Which companies would you like to meet?",
+     "a": "Qutwo, Kvanttinova"
+    },
+    {
+     "q": "I would need work-permit support",
+     "a": "Yes"
+    }
+   ],
+   "own": {
+    "about": "Most of my best work started as a side script nobody asked for.",
+    "looking": "Deep technical work with people who review each other's code properly."
+   },
+   "project": null
+  },
+  {
+   "id": "A-003",
+   "handle": "Applicant 3",
+   "field": "AI and data",
+   "level": "Experienced",
+   "skills": [
+    {
+     "name": "Computer vision",
+     "depth": "work",
+     "years": 2
+    },
+    {
+     "name": "Edge AI",
+     "depth": "project",
+     "years": null
+    },
+    {
+     "name": "Model quantisation",
+     "depth": "work",
+     "years": 3
+    },
+    {
+     "name": "Embedded Linux",
+     "depth": "work",
+     "years": 3
+    },
+    {
+     "name": "LLMs",
+     "depth": "learning",
+     "years": null
+    }
+   ],
+   "finnish": "working level",
+   "english": "fluent",
+   "city": "Helsinki",
+   "abroad": false,
+   "permit": false,
+   "wants": [
+    "zerogravity.fi",
+    "3438021-6"
+   ],
+   "applied_at": "2026-11-03T16:30:00Z",
+   "sources": [
+    "GitHub",
+    "LinkedIn"
+   ],
+   "ai_summary": "Experienced ai and data profile. Works mainly with Computer vision, Edge AI, Model quantisation and is learning LLMs. Based in Helsinki; Finnish working level. Sources read: LinkedIn, GitHub.",
+   "drafted": [
+    {
+     "kind": "role",
+     "text": "Edge AI engineer (AI and data)",
+     "source": "LinkedIn",
+     "quote": "Edge AI engineer, defence, 2021–2024"
+    },
+    {
+     "kind": "level",
+     "text": "Experienced: 5 years of dated positions",
+     "source": "LinkedIn",
+     "quote": "5 years of dated positions since 2021"
+    },
+    {
+     "kind": "skill",
+     "text": "Computer vision: used at work, 2 yr",
+     "source": "LinkedIn",
+     "quote": "Led the move to Computer vision; cut incidents by a third."
+    },
+    {
+     "kind": "skill",
+     "text": "Edge AI: own projects",
+     "source": "GitHub",
+     "quote": "Weekend repository exploring Edge AI."
+    },
+    {
+     "kind": "skill",
+     "text": "Model quantisation: used at work, 3 yr",
+     "source": "LinkedIn",
+     "quote": "Owned Model quantisation for a defence product used daily."
+    },
+    {
+     "kind": "skill",
+     "text": "Embedded Linux: used at work, 3 yr",
+     "source": "LinkedIn",
+     "quote": "Owned Embedded Linux for a defence product used daily."
+    },
+    {
+     "kind": "skill",
+     "text": "LLMs: learning it now",
+     "source": "LinkedIn",
+     "quote": "Learning LLMs on the side this autumn."
+    },
+    {
+     "kind": "language",
+     "text": "English fluent; Finnish working level",
+     "source": "LinkedIn",
+     "quote": "Suomi: working level"
+    },
+    {
+     "kind": "where",
+     "text": "Lives in Helsinki; open to remote or hybrid",
+     "source": "LinkedIn",
+     "quote": "Helsinki · open to new roles"
+    }
+   ],
+   "corrected": [
+    {
+     "kind": "remove",
+     "text": "Removed: Excel (not worth listing)",
+     "was": "a drafted skill"
+    }
+   ],
+   "answers": [
+    {
+     "q": "Which of these do you use, at work or in your own projects?",
+     "a": "Computer vision, Edge AI, Model quantisation, Embedded Linux"
+    },
+    {
+     "q": "How is your Finnish at work?",
+     "a": "working level"
+    },
+    {
+     "q": "Have you worked with Edge AI?",
+     "a": "Learning it now"
+    },
+    {
+     "q": "Which kind of work do you want more of?",
+     "a": "Building new things from scratch"
+    },
+    {
+     "q": "Which describes you better?",
+     "a": "Deep specialist in one area"
+    },
+    {
+     "q": "Which team rhythm suits you?",
+     "a": "Careful planning, fewer mistakes"
+    },
+    {
+     "q": "Which companies would you like to meet?",
+     "a": "Zero Gravity, QMill Oy"
+    },
+    {
+     "q": "I would need work-permit support",
+     "a": "No"
+    }
+   ],
+   "own": {
+    "about": "I have shipped things used by thousands of people and fixed them at 3 am.",
+    "looking": "A team where I can grow from building pieces into owning a system."
+   },
+   "project": {
+    "name": "qc-dashboard.pdf"
+   }
+  },
+  {
+   "id": "A-004",
+   "handle": "Applicant 4",
+   "field": "Software",
+   "level": "Experienced",
+   "skills": [
+    {
+     "name": "LLM integration",
+     "depth": "work",
+     "years": 3
+    },
+    {
+     "name": "Python",
+     "depth": "project",
+     "years": null
+    },
+    {
+     "name": "GAMP 5",
+     "depth": "work",
+     "years": 2
+    },
+    {
+     "name": "REST APIs",
+     "depth": "work",
+     "years": 2
+    },
+    {
+     "name": "Kubernetes",
+     "depth": "learning",
+     "years": null
+    }
+   ],
+   "finnish": "fluent",
+   "english": "fluent",
+   "city": "Tallinn",
+   "abroad": true,
+   "permit": true,
+   "wants": [
+    "nordicclean.tech",
+    "qutwo.com",
+    "nordicsemi.com"
+   ],
+   "applied_at": "2026-11-04T21:13:00Z",
+   "sources": [
+    "LinkedIn"
+   ],
+   "ai_summary": "Experienced software profile. Works mainly with LLM integration, Python, GAMP 5 and is learning Kubernetes. Based in Tallinn; Finnish fluent. Sources read: LinkedIn.",
+   "drafted": [
+    {
+     "kind": "role",
+     "text": "Software engineers for validation tool (Software)",
+     "source": "LinkedIn",
+     "quote": "Software engineers for validation tool at a gaming company, 2021–present"
+    },
+    {
+     "kind": "level",
+     "text": "Experienced: 5 years of dated positions",
+     "source": "LinkedIn",
+     "quote": "5 years of dated positions since 2021"
+    },
+    {
+     "kind": "skill",
+     "text": "LLM integration: used at work, 3 yr",
+     "source": "LinkedIn",
+     "quote": "Owned LLM integration for a gaming product used daily."
+    },
+    {
+     "kind": "skill",
+     "text": "Python: own projects",
+     "source": "LinkedIn",
+     "quote": "Personal project: Python, open on GitHub."
+    },
+    {
+     "kind": "skill",
+     "text": "GAMP 5: used at work, 2 yr",
+     "source": "LinkedIn",
+     "quote": "Owned GAMP 5 for a gaming product used daily."
+    },
+    {
+     "kind": "skill",
+     "text": "REST APIs: used at work, 2 yr",
+     "source": "LinkedIn",
+     "quote": "Daily REST APIs work since 2021."
+    },
+    {
+     "kind": "skill",
+     "text": "Kubernetes: learning it now",
+     "source": "LinkedIn",
+     "quote": "Learning Kubernetes on the side this autumn."
+    },
+    {
+     "kind": "language",
+     "text": "English fluent; Finnish fluent",
+     "source": "LinkedIn",
+     "quote": "Finnish: fluent"
+    },
+    {
+     "kind": "where",
+     "text": "Lives in Tallinn (abroad); open to hybrid",
+     "source": "LinkedIn",
+     "quote": "Tallinn · open to new roles"
+    }
+   ],
+   "corrected": [],
+   "answers": [
+    {
+     "q": "Which of these do you use, at work or in your own projects?",
+     "a": "LLM integration, Python, GAMP 5, REST APIs"
+    },
+    {
+     "q": "How is your Finnish at work?",
+     "a": "fluent"
+    },
+    {
+     "q": "Have you worked with GAMP 5?",
+     "a": "Learning it now"
+    },
+    {
+     "q": "Which kind of work do you want more of?",
+     "a": "Building new things from scratch"
+    },
+    {
+     "q": "Which describes you better?",
+     "a": "Generalist who covers many areas"
+    },
+    {
+     "q": "Which team rhythm suits you?",
+     "a": "Careful planning, fewer mistakes"
+    },
+    {
+     "q": "Which companies would you like to meet?",
+     "a": "Nordic Clean Tech, Qutwo, Nordic Semiconductor"
+    },
+    {
+     "q": "I would need work-permit support",
+     "a": "Yes"
+    }
+   ],
+   "own": {
+    "about": "I am better at finishing than starting, and teams tend to need that.",
+    "looking": "Research-adjacent engineering: rigorous, but shipped."
+   },
+   "project": null
+  },
+  {
+   "id": "A-005",
+   "handle": "Applicant 5",
+   "field": "Semiconductors and photonics",
+   "level": "Experienced",
+   "skills": [
+    {
+     "name": "Semiconductor processing",
+     "depth": "work",
+     "years": 3
+    },
+    {
+     "name": "Black silicon",
+     "depth": "work",
+     "years": 4
+    },
+    {
+     "name": "Dark current analysis",
+     "depth": "work",
+     "years": 4
+    },
+    {
+     "name": "Photolithography",
+     "depth": "work",
+     "years": 3
+    }
+   ],
+   "finnish": "fluent",
+   "english": "fluent",
+   "city": "Helsinki",
+   "abroad": false,
+   "permit": false,
+   "wants": [
+    "elfys.fi"
+   ],
+   "applied_at": "2026-11-07T09:06:00Z",
+   "sources": [
+    "LinkedIn"
+   ],
+   "ai_summary": "Experienced semiconductors and photonics profile. Works mainly with Semiconductor processing, Black silicon, Dark current analysis. Based in Helsinki; Finnish fluent. Sources read: LinkedIn.",
+   "drafted": [
+    {
+     "kind": "role",
+     "text": "Photodetector process engineer (Semiconductors and photonics)",
+     "source": "LinkedIn",
+     "quote": "Photodetector process engineer, health tech, 2020–2023"
+    },
+    {
+     "kind": "level",
+     "text": "Experienced: 6 years of dated positions",
+     "source": "LinkedIn",
+     "quote": "6 years of dated positions since 2020"
+    },
+    {
+     "kind": "skill",
+     "text": "Semiconductor processing: used at work, 3 yr",
+     "source": "LinkedIn",
+     "quote": "Owned Semiconductor processing for a health tech product used daily."
+    },
+    {
+     "kind": "skill",
+     "text": "Black silicon: used at work, 4 yr",
+     "source": "LinkedIn",
+     "quote": "Built and ran Black silicon in production for 5 teams."
+    },
+    {
+     "kind": "skill",
+     "text": "Dark current analysis: used at work, 4 yr",
+     "source": "LinkedIn",
+     "quote": "Owned Dark current analysis for a health tech product used daily."
+    },
+    {
+     "kind": "skill",
+     "text": "Photolithography: used at work, 3 yr",
+     "source": "LinkedIn",
+     "quote": "Led the move to Photolithography; cut incidents by a third."
+    },
+    {
+     "kind": "language",
+     "text": "English working level; Finnish fluent",
+     "source": "LinkedIn",
+     "quote": "Suomi: fluent"
+    },
+    {
+     "kind": "where",
+     "text": "Lives in Helsinki; open to hybrid",
+     "source": "LinkedIn",
+     "quote": "Helsinki · open to new roles"
+    }
+   ],
+   "corrected": [
+    {
+     "kind": "skill",
+     "text": "Semiconductor processing: corrected to used at work, 2 yr",
+     "was": "Semiconductor processing as drafted"
+    }
+   ],
+   "answers": [
+    {
+     "q": "Which of these do you use, at work or in your own projects?",
+     "a": "Semiconductor processing, Black silicon, Dark current analysis, Photolithography"
+    },
+    {
+     "q": "How is your Finnish at work?",
+     "a": "fluent"
+    },
+    {
+     "q": "Have you worked with Photolithography?",
+     "a": "Learning it now"
+    },
+    {
+     "q": "Which kind of work do you want more of?",
+     "a": "Building new things from scratch"
+    },
+    {
+     "q": "Which describes you better?",
+     "a": "Deep specialist in one area"
+    },
+    {
+     "q": "Which team rhythm suits you?",
+     "a": "Fast experiments, ship often"
+    },
+    {
+     "q": "Which companies would you like to meet?",
+     "a": "ElFys"
+    },
+    {
+     "q": "I would need work-permit support",
+     "a": "No"
+    }
+   ],
+   "own": {
+    "about": "I read datasheets for fun. I also know that is not normal.",
+    "looking": "A team where I can grow from building pieces into owning a system."
+   },
+   "project": {
+    "name": "ml-eval.pdf"
+   }
+  },
+  {
+   "id": "A-006",
+   "handle": "Applicant 6",
+   "field": "Embedded and electronics",
+   "level": "Senior",
+   "skills": [
+    {
+     "name": "Thread protocol",
+     "depth": "work",
+     "years": 8
+    },
+    {
+     "name": "Zephyr RTOS",
+     "depth": "project",
+     "years": null
+    },
+    {
+     "name": "Embedded C",
+     "depth": "project",
+     "years": null
+    },
+    {
+     "name": "Real-time operating systems",
+     "depth": "learning",
+     "years": null
+    }
+   ],
+   "finnish": "basic",
+   "english": "fluent",
+   "city": "Berlin",
+   "abroad": true,
+   "permit": true,
+   "wants": [
+    "nordicsemi.com",
+    "ti.com",
+    "chipmetrics.com"
+   ],
+   "applied_at": "2026-11-09T18:14:00Z",
+   "sources": [
+    "GitHub",
+    "LinkedIn"
+   ],
+   "ai_summary": "Senior embedded and electronics profile. Works mainly with Thread protocol, Zephyr RTOS, Embedded C and is learning Real-time operating systems. Based in Berlin; Finnish basic. Sources read: LinkedIn, GitHub.",
+   "drafted": [
+    {
+     "kind": "role",
+     "text": "Wireless firmware engineer (Embedded and electronics)",
+     "source": "LinkedIn",
+     "quote": "Wireless firmware engineer, fintech, 2016–2019"
+    },
+    {
+     "kind": "level",
+     "text": "Senior: 10 years of dated positions",
+     "source": "LinkedIn",
+     "quote": "10 years of dated positions since 2016"
+    },
+    {
+     "kind": "skill",
+     "text": "Thread protocol: used at work, 8 yr",
+     "source": "LinkedIn",
+     "quote": "Built and ran Thread protocol in production for 5 teams."
+    },
+    {
+     "kind": "skill",
+     "text": "Zephyr RTOS: own projects",
+     "source": "GitHub",
+     "quote": "Weekend repository exploring Zephyr RTOS."
+    },
+    {
+     "kind": "skill",
+     "text": "Embedded C: own projects",
+     "source": "LinkedIn",
+     "quote": "Thesis work used Embedded C end to end."
+    },
+    {
+     "kind": "skill",
+     "text": "Real-time operating systems: learning it now",
+     "source": "LinkedIn",
+     "quote": "Learning Real-time operating systems on the side this autumn."
+    },
+    {
+     "kind": "language",
+     "text": "English working level; Finnish basic",
+     "source": "LinkedIn",
+     "quote": "Finnish: basic"
+    },
+    {
+     "kind": "where",
+     "text": "Lives in Berlin (abroad); open to on-site",
+     "source": "LinkedIn",
+     "quote": "Berlin · open to new roles"
+    }
+   ],
+   "corrected": [
+    {
+     "kind": "skill",
+     "text": "Zephyr RTOS: corrected to learning it now",
+     "was": "Zephyr RTOS as drafted"
+    }
+   ],
+   "answers": [
+    {
+     "q": "Which of these do you use, at work or in your own projects?",
+     "a": "Thread protocol, Zephyr RTOS, Embedded C"
+    },
+    {
+     "q": "How is your Finnish at work?",
+     "a": "basic"
+    },
+    {
+     "q": "Have you worked with Bluetooth LE?",
+     "a": "Yes, at work"
+    },
+    {
+     "q": "Which kind of work do you want more of?",
+     "a": "Improving and running existing systems"
+    },
+    {
+     "q": "Which describes you better?",
+     "a": "Deep specialist in one area"
+    },
+    {
+     "q": "Which team rhythm suits you?",
+     "a": "Careful planning, fewer mistakes"
+    },
+    {
+     "q": "Which companies would you like to meet?",
+     "a": "Nordic Semiconductor, Texas Instruments, Chipmetrics"
+    },
+    {
+     "q": "I would need work-permit support",
+     "a": "Yes"
+    }
+   ],
+   "own": {
+    "about": "I am switching from research to industry and want work that reaches a customer.",
+    "looking": "A small team, a clear product, and customers I can talk to."
+   },
+   "project": null
+  },
+  {
+   "id": "A-007",
+   "handle": "Applicant 7",
+   "field": "AI and data",
+   "level": "Senior",
+   "skills": [
+    {
+     "name": "Statistical modelling",
+     "depth": "work",
+     "years": 6
+    },
+    {
+     "name": "Causal inference",
+     "depth": "work",
+     "years": 7
+    },
+    {
+     "name": "A/B testing",
+     "depth": "project",
+     "years": null
+    },
+    {
+     "name": "Python",
+     "depth": "project",
+     "years": null
+    },
+    {
+     "name": "Infrastructure as Code",
+     "depth": "learning",
+     "years": null
+    },
+    {
+     "name": "MLOps",
+     "depth": "learning",
+     "years": null
+    }
+   ],
+   "finnish": "none",
+   "english": "fluent",
+   "city": "Kyiv",
+   "abroad": true,
+   "permit": true,
+   "wants": [
+    "smartly.io",
+    "2647375-4"
+   ],
+   "applied_at": "2026-11-05T19:47:00Z",
+   "sources": [
+    "GitHub",
+    "LinkedIn"
+   ],
+   "ai_summary": "Senior ai and data profile. Works mainly with Statistical modelling, Causal inference, A/B testing and is learning Infrastructure as Code. Based in Kyiv; Finnish none. Sources read: LinkedIn, GitHub.",
+   "drafted": [
+    {
+     "kind": "role",
+     "text": "Data scientists in incrementality measurement (AI and data)",
+     "source": "LinkedIn",
+     "quote": "Data scientists in incrementality measurement, defence, 2015–2018"
+    },
+    {
+     "kind": "level",
+     "text": "Senior: 11 years of dated positions",
+     "source": "LinkedIn",
+     "quote": "11 years of dated positions since 2015"
+    },
+    {
+     "kind": "skill",
+     "text": "Statistical modelling: used at work, 6 yr",
+     "source": "LinkedIn",
+     "quote": "Led the move to Statistical modelling; cut incidents by a third."
+    },
+    {
+     "kind": "skill",
+     "text": "Causal inference: used at work, 7 yr",
+     "source": "LinkedIn",
+     "quote": "Built and ran Causal inference in production for 3 teams."
+    },
+    {
+     "kind": "skill",
+     "text": "A/B testing: own projects",
+     "source": "GitHub",
+     "quote": "Personal project: A/B testing, open on GitHub."
+    },
+    {
+     "kind": "skill",
+     "text": "Python: own projects",
+     "source": "LinkedIn",
+     "quote": "Thesis work used Python end to end."
+    },
+    {
+     "kind": "skill",
+     "text": "Infrastructure as Code: learning it now",
+     "source": "LinkedIn",
+     "quote": "Learning Infrastructure as Code on the side this autumn."
+    },
+    {
+     "kind": "skill",
+     "text": "MLOps: learning it now",
+     "source": "LinkedIn",
+     "quote": "Learning MLOps on the side this autumn."
+    },
+    {
+     "kind": "language",
+     "text": "English fluent; Finnish none",
+     "source": "LinkedIn",
+     "quote": "Suomi: none"
+    },
+    {
+     "kind": "where",
+     "text": "Lives in Kyiv (abroad); open to hybrid",
+     "source": "LinkedIn",
+     "quote": "Kyiv · open to new roles"
+    }
+   ],
+   "corrected": [
+    {
+     "kind": "skill",
+     "text": "Python: corrected to used at work, 2 yr",
+     "was": "Python as drafted"
+    }
+   ],
+   "answers": [
+    {
+     "q": "Which of these do you use, at work or in your own projects?",
+     "a": "Statistical modelling, Causal inference, A/B testing, Python"
+    },
+    {
+     "q": "How is your Finnish at work?",
+     "a": "none"
+    },
+    {
+     "q": "Have you worked with Causal inference?",
+     "a": "Learning it now"
+    },
+    {
+     "q": "Which kind of work do you want more of?",
+     "a": "Improving and running existing systems"
+    },
+    {
+     "q": "Which describes you better?",
+     "a": "Deep specialist in one area"
+    },
+    {
+     "q": "Which team rhythm suits you?",
+     "a": "Fast experiments, ship often"
+    },
+    {
+     "q": "Which companies would you like to meet?",
+     "a": "Smartly, Teknologian tutkimuskeskus VTT Oy"
+    },
+    {
+     "q": "I would need work-permit support",
+     "a": "Yes"
+    }
+   ],
+   "own": {
+    "about": "I have shipped things used by thousands of people and fixed them at 3 am.",
+    "looking": "Research-adjacent engineering: rigorous, but shipped."
+   },
+   "project": null
+  },
+  {
+   "id": "A-008",
+   "handle": "Applicant 8",
+   "field": "AI and data",
+   "level": "Senior",
+   "skills": [
+    {
+     "name": "Causal inference",
+     "depth": "work",
+     "years": 8
+    },
+    {
+     "name": "Python",
+     "depth": "work",
+     "years": 8
+    },
+    {
+     "name": "Statistical modelling",
+     "depth": "work",
+     "years": 6
+    },
+    {
+     "name": "Model quantisation",
+     "depth": "project",
+     "years": null
+    }
+   ],
+   "finnish": "fluent",
+   "english": "fluent",
+   "city": "Bengaluru",
+   "abroad": true,
+   "permit": true,
+   "wants": [
+    "smartly.io",
+    "zerogravity.fi",
+    "elfys.fi"
+   ],
+   "applied_at": "2026-11-05T09:20:00Z",
+   "sources": [
+    "GitHub",
+    "LinkedIn"
+   ],
+   "ai_summary": "Senior ai and data profile. Works mainly with Causal inference, Python, Statistical modelling. Based in Bengaluru; Finnish fluent. Sources read: LinkedIn, GitHub.",
+   "drafted": [
+    {
+     "kind": "role",
+     "text": "Data scientists in incrementality measurement (AI and data)",
+     "source": "LinkedIn",
+     "quote": "Data scientists in incrementality measurement, space, 2017–2020"
+    },
+    {
+     "kind": "level",
+     "text": "Senior: 9 years of dated positions",
+     "source": "LinkedIn",
+     "quote": "9 years of dated positions since 2017"
+    },
+    {
+     "kind": "skill",
+     "text": "Causal inference: used at work, 8 yr",
+     "source": "LinkedIn",
+     "quote": "Led the move to Causal inference; cut incidents by a third."
+    },
+    {
+     "kind": "skill",
+     "text": "Python: used at work, 8 yr",
+     "source": "LinkedIn",
+     "quote": "Owned Python for a space product used daily."
+    },
+    {
+     "kind": "skill",
+     "text": "Statistical modelling: used at work, 6 yr",
+     "source": "LinkedIn",
+     "quote": "Built and ran Statistical modelling in production for 8 teams."
+    },
+    {
+     "kind": "skill",
+     "text": "Model quantisation: own projects",
+     "source": "GitHub",
+     "quote": "Weekend repository exploring Model quantisation."
+    },
+    {
+     "kind": "language",
+     "text": "English working level; Finnish fluent",
+     "source": "LinkedIn",
+     "quote": "Finnish: fluent"
+    },
+    {
+     "kind": "where",
+     "text": "Lives in Bengaluru (abroad); open to hybrid",
+     "source": "LinkedIn",
+     "quote": "Bengaluru · open to new roles"
+    }
+   ],
+   "corrected": [
+    {
+     "kind": "skill",
+     "text": "Causal inference: corrected to learning it now",
+     "was": "Causal inference as drafted"
+    }
+   ],
+   "answers": [
+    {
+     "q": "Which of these do you use, at work or in your own projects?",
+     "a": "Causal inference, Python, Statistical modelling, Model quantisation"
+    },
+    {
+     "q": "How is your Finnish at work?",
+     "a": "fluent"
+    },
+    {
+     "q": "Have you worked with Causal inference?",
+     "a": "Learning it now"
+    },
+    {
+     "q": "Which kind of work do you want more of?",
+     "a": "Building new things from scratch"
+    },
+    {
+     "q": "Which describes you better?",
+     "a": "Generalist who covers many areas"
+    },
+    {
+     "q": "Which team rhythm suits you?",
+     "a": "Careful planning, fewer mistakes"
+    },
+    {
+     "q": "Which companies would you like to meet?",
+     "a": "Smartly, Zero Gravity, ElFys"
+    },
+    {
+     "q": "I would need work-permit support",
+     "a": "Yes"
+    }
+   ],
+   "own": {
+    "about": "I am happiest when a messy system becomes boring and reliable.",
+    "looking": "A small team, a clear product, and customers I can talk to."
+   },
+   "project": null
+  },
+  {
+   "id": "A-009",
+   "handle": "Applicant 9",
+   "field": "AI and data",
+   "level": "Experienced",
+   "skills": [
+    {
+     "name": "Edge AI",
+     "depth": "project",
+     "years": null
+    },
+    {
+     "name": "Embedded Linux",
+     "depth": "work",
+     "years": 2
+    },
+    {
+     "name": "Computer vision",
+     "depth": "work",
+     "years": 5
+    },
+    {
+     "name": "LLM orchestration",
+     "depth": "work",
+     "years": 4
+    },
+    {
+     "name": "Speech-to-text",
+     "depth": "work",
+     "years": 4
+    }
+   ],
+   "finnish": "none",
+   "english": "fluent",
+   "city": "Lisbon",
+   "abroad": true,
+   "permit": false,
+   "wants": [
+    "zerogravity.fi",
+    "telusdigital.com",
+    "insightquestor.com"
+   ],
+   "applied_at": "2026-11-07T12:36:00Z",
+   "sources": [
+    "GitHub",
+    "LinkedIn"
+   ],
+   "ai_summary": "Experienced ai and data profile. Works mainly with Edge AI, Embedded Linux, Computer vision. Based in Lisbon; Finnish none. Sources read: LinkedIn, GitHub.",
+   "drafted": [
+    {
+     "kind": "role",
+     "text": "Edge AI engineer (AI and data)",
+     "source": "LinkedIn",
+     "quote": "Edge AI engineer, cleantech, 2021–2024"
+    },
+    {
+     "kind": "level",
+     "text": "Experienced: 5 years of dated positions",
+     "source": "LinkedIn",
+     "quote": "5 years of dated positions since 2021"
+    },
+    {
+     "kind": "skill",
+     "text": "Edge AI: own projects",
+     "source": "GitHub",
+     "quote": "Thesis work used Edge AI end to end."
+    },
+    {
+     "kind": "skill",
+     "text": "Embedded Linux: used at work, 2 yr",
+     "source": "LinkedIn",
+     "quote": "Daily Embedded Linux work since 2022."
+    },
+    {
+     "kind": "skill",
+     "text": "Computer vision: used at work, 5 yr",
+     "source": "LinkedIn",
+     "quote": "Owned Computer vision for a cleantech product used daily."
+    },
+    {
+     "kind": "skill",
+     "text": "LLM orchestration: used at work, 4 yr",
+     "source": "LinkedIn",
+     "quote": "Owned LLM orchestration for a cleantech product used daily."
+    },
+    {
+     "kind": "skill",
+     "text": "Speech-to-text: used at work, 4 yr",
+     "source": "LinkedIn",
+     "quote": "Daily Speech-to-text work since 2021."
+    },
+    {
+     "kind": "language",
+     "text": "English fluent; Finnish none",
+     "source": "LinkedIn",
+     "quote": "Suomi: none"
+    },
+    {
+     "kind": "where",
+     "text": "Lives in Lisbon (abroad); open to on-site",
+     "source": "LinkedIn",
+     "quote": "Lisbon · open to new roles"
+    }
+   ],
+   "corrected": [
+    {
+     "kind": "skill",
+     "text": "Edge AI: corrected to own projects only",
+     "was": "Edge AI as drafted"
+    },
+    {
+     "kind": "remove",
+     "text": "Removed: MATLAB (not worth listing)",
+     "was": "a drafted skill"
+    }
+   ],
+   "answers": [
+    {
+     "q": "Which of these do you use, at work or in your own projects?",
+     "a": "Edge AI, Embedded Linux, Computer vision, LLM orchestration, Speech-to-text"
+    },
+    {
+     "q": "How is your Finnish at work?",
+     "a": "none"
+    },
+    {
+     "q": "Have you worked with Computer vision?",
+     "a": "Yes, at work"
+    },
+    {
+     "q": "Which kind of work do you want more of?",
+     "a": "Improving and running existing systems"
+    },
+    {
+     "q": "Which describes you better?",
+     "a": "Deep specialist in one area"
+    },
+    {
+     "q": "Which team rhythm suits you?",
+     "a": "Careful planning, fewer mistakes"
+    },
+    {
+     "q": "Which companies would you like to meet?",
+     "a": "Zero Gravity, TELUS Digital, Insight Questor"
+    },
+    {
+     "q": "I would need work-permit support",
+     "a": "No"
+    }
+   ],
+   "own": {
+    "about": "I am better at finishing than starting, and teams tend to need that.",
+    "looking": "Hardware that leaves the lab and gets manufactured."
+   },
+   "project": {
+    "name": "fw-bootloader.pdf"
+   }
+  },
+  {
+   "id": "A-010",
+   "handle": "Applicant 10",
+   "field": "Semiconductors and photonics",
+   "level": "Experienced",
+   "skills": [
+    {
+     "name": "Etching",
+     "depth": "work",
+     "years": 3
+    },
+    {
+     "name": "Photolithography",
+     "depth": "project",
+     "years": null
+    },
+    {
+     "name": "Cleanroom processes",
+     "depth": "work",
+     "years": 2
+    },
+    {
+     "name": "Thin film deposition",
+     "depth": "work",
+     "years": 4
+    },
+    {
+     "name": "Process integration",
+     "depth": "learning",
+     "years": null
+    }
+   ],
+   "finnish": "fluent",
+   "english": "fluent",
+   "city": "Kyiv",
+   "abroad": true,
+   "permit": true,
+   "wants": [
+    "onefabnordic.fi",
+    "vexlum.com"
+   ],
+   "applied_at": "2026-11-05T16:46:00Z",
+   "sources": [
+    "GitHub",
+    "LinkedIn"
+   ],
+   "ai_summary": "Experienced semiconductors and photonics profile. Works mainly with Etching, Photolithography, Cleanroom processes and is learning Process integration. Based in Kyiv; Finnish fluent. Sources read: LinkedIn, GitHub.",
+   "drafted": [
+    {
+     "kind": "role",
+     "text": "Micro and nano fabrication engineer (Semiconductors and photonics)",
+     "source": "LinkedIn",
+     "quote": "Micro and nano fabrication engineer, space, 2020–2023"
+    },
+    {
+     "kind": "level",
+     "text": "Experienced: 6 years of dated positions",
+     "source": "LinkedIn",
+     "quote": "6 years of dated positions since 2020"
+    },
+    {
+     "kind": "skill",
+     "text": "Etching: used at work, 3 yr",
+     "source": "LinkedIn",
+     "quote": "Daily Etching work since 2021."
+    },
+    {
+     "kind": "skill",
+     "text": "Photolithography: own projects",
+     "source": "GitHub",
+     "quote": "Personal project: Photolithography, open on GitHub."
+    },
+    {
+     "kind": "skill",
+     "text": "Cleanroom processes: used at work, 2 yr",
+     "source": "LinkedIn",
+     "quote": "Built and ran Cleanroom processes in production for 5 teams."
+    },
+    {
+     "kind": "skill",
+     "text": "Thin film deposition: used at work, 4 yr",
+     "source": "LinkedIn",
+     "quote": "Built and ran Thin film deposition in production for 3 teams."
+    },
+    {
+     "kind": "skill",
+     "text": "Process integration: learning it now",
+     "source": "LinkedIn",
+     "quote": "Learning Process integration on the side this autumn."
+    },
+    {
+     "kind": "language",
+     "text": "English fluent; Finnish fluent",
+     "source": "LinkedIn",
+     "quote": "Finnish: fluent"
+    },
+    {
+     "kind": "where",
+     "text": "Lives in Kyiv (abroad); open to hybrid or on-site",
+     "source": "LinkedIn",
+     "quote": "Kyiv · open to new roles"
+    }
+   ],
+   "corrected": [
+    {
+     "kind": "skill",
+     "text": "Photolithography: corrected to own projects only",
+     "was": "Photolithography as drafted"
+    },
+    {
+     "kind": "remove",
+     "text": "Removed: Jira (not worth listing)",
+     "was": "a drafted skill"
+    }
+   ],
+   "answers": [
+    {
+     "q": "Which of these do you use, at work or in your own projects?",
+     "a": "Etching, Photolithography, Cleanroom processes, Thin film deposition"
+    },
+    {
+     "q": "How is your Finnish at work?",
+     "a": "fluent"
+    },
+    {
+     "q": "Have you worked with Etching?",
+     "a": "Yes, at work"
+    },
+    {
+     "q": "Which kind of work do you want more of?",
+     "a": "Improving and running existing systems"
+    },
+    {
+     "q": "Which describes you better?",
+     "a": "Deep specialist in one area"
+    },
+    {
+     "q": "Which team rhythm suits you?",
+     "a": "Fast experiments, ship often"
+    },
+    {
+     "q": "Which companies would you like to meet?",
+     "a": "OneFab Nordic, Vexlum"
+    },
+    {
+     "q": "I would need work-permit support",
+     "a": "Yes"
+    }
+   ],
+   "own": {
+    "about": "I am switching from research to industry and want work that reaches a customer.",
+    "looking": "A team where I can grow from building pieces into owning a system."
+   },
+   "project": null
+  },
+  {
+   "id": "A-011",
+   "handle": "Applicant 11",
+   "field": "Quantum",
+   "level": "Experienced",
+   "skills": [
+    {
+     "name": "Qiskit",
+     "depth": "project",
+     "years": null
+    },
+    {
+     "name": "Optimisation methods",
+     "depth": "work",
+     "years": 3
+    },
+    {
+     "name": "Python",
+     "depth": "work",
+     "years": 2
+    }
+   ],
+   "finnish": "basic",
+   "english": "fluent",
+   "city": "Tallinn",
+   "abroad": true,
+   "permit": true,
+   "wants": [
+    "qutwo.com",
+    "vexlum.com",
+    "telusdigital.com"
+   ],
+   "applied_at": "2026-11-09T16:54:00Z",
+   "sources": [
+    "GitHub",
+    "LinkedIn"
+   ],
+   "ai_summary": "Experienced quantum profile. Works mainly with Qiskit, Optimisation methods, Python. Based in Tallinn; Finnish basic. Sources read: LinkedIn, GitHub.",
+   "drafted": [
+    {
+     "kind": "role",
+     "text": "Quantum algorithm researcher (Quantum)",
+     "source": "LinkedIn",
+     "quote": "Quantum algorithm researcher at a gaming company, 2020–present"
+    },
+    {
+     "kind": "level",
+     "text": "Experienced: 6 years of dated positions",
+     "source": "LinkedIn",
+     "quote": "6 years of dated positions since 2020"
+    },
+    {
+     "kind": "skill",
+     "text": "Qiskit: own projects",
+     "source": "GitHub",
+     "quote": "Weekend repository exploring Qiskit."
+    },
+    {
+     "kind": "skill",
+     "text": "Optimisation methods: used at work, 3 yr",
+     "source": "LinkedIn",
+     "quote": "Owned Optimisation methods for a gaming product used daily."
+    },
+    {
+     "kind": "skill",
+     "text": "Python: used at work, 2 yr",
+     "source": "LinkedIn",
+     "quote": "Built and ran Python in production for 5 teams."
+    },
+    {
+     "kind": "language",
+     "text": "English working level; Finnish basic",
+     "source": "LinkedIn",
+     "quote": "Suomi: basic"
+    },
+    {
+     "kind": "where",
+     "text": "Lives in Tallinn (abroad); open to remote or hybrid",
+     "source": "LinkedIn",
+     "quote": "Tallinn · open to new roles"
+    }
+   ],
+   "corrected": [
+    {
+     "kind": "skill",
+     "text": "Qiskit: corrected to used at work, 2 yr",
+     "was": "Qiskit as drafted"
+    }
+   ],
+   "answers": [
+    {
+     "q": "Which of these do you use, at work or in your own projects?",
+     "a": "Qiskit, Optimisation methods, Python"
+    },
+    {
+     "q": "How is your Finnish at work?",
+     "a": "basic"
+    },
+    {
+     "q": "Have you worked with Python?",
+     "a": "Learning it now"
+    },
+    {
+     "q": "Which kind of work do you want more of?",
+     "a": "Improving and running existing systems"
+    },
+    {
+     "q": "Which describes you better?",
+     "a": "Deep specialist in one area"
+    },
+    {
+     "q": "Which team rhythm suits you?",
+     "a": "Fast experiments, ship often"
+    },
+    {
+     "q": "Which companies would you like to meet?",
+     "a": "Qutwo, Vexlum, TELUS Digital"
+    },
+    {
+     "q": "I would need work-permit support",
+     "a": "Yes"
+    }
+   ],
+   "own": {
+    "about": "I read datasheets for fun. I also know that is not normal.",
+    "looking": "A small team, a clear product, and customers I can talk to."
+   },
+   "project": null
+  },
+  {
+   "id": "A-012",
+   "handle": "Applicant 12",
+   "field": "Software",
+   "level": "Experienced",
+   "skills": [
+    {
+     "name": "Python",
+     "depth": "project",
+     "years": null
+    },
+    {
+     "name": "MLOps",
+     "depth": "work",
+     "years": 3
+    },
+    {
+     "name": "REST APIs",
+     "depth": "work",
+     "years": 2
+    }
+   ],
+   "finnish": "none",
+   "english": "fluent",
+   "city": "Lisbon",
+   "abroad": true,
+   "permit": true,
+   "wants": [
+    "qutwo.com",
+    "smartly.io",
+    "amertate.com"
+   ],
+   "applied_at": "2026-11-10T08:03:00Z",
+   "sources": [
+    "GitHub",
+    "LinkedIn"
+   ],
+   "ai_summary": "Experienced software profile. Works mainly with Python, MLOps, REST APIs. Based in Lisbon; Finnish none. Sources read: LinkedIn, GitHub.",
+   "drafted": [
+    {
+     "kind": "role",
+     "text": "Enterprise AI deployment engineer (Software)",
+     "source": "LinkedIn",
+     "quote": "Enterprise AI deployment engineer at a semiconductor company, 2020–present"
+    },
+    {
+     "kind": "level",
+     "text": "Experienced: 6 years of dated positions",
+     "source": "LinkedIn",
+     "quote": "6 years of dated positions since 2020"
+    },
+    {
+     "kind": "skill",
+     "text": "Python: own projects",
+     "source": "GitHub",
+     "quote": "Weekend repository exploring Python."
+    },
+    {
+     "kind": "skill",
+     "text": "MLOps: used at work, 3 yr",
+     "source": "LinkedIn",
+     "quote": "Daily MLOps work since 2020."
+    },
+    {
+     "kind": "skill",
+     "text": "REST APIs: used at work, 2 yr",
+     "source": "LinkedIn",
+     "quote": "Built and ran REST APIs in production for 3 teams."
+    },
+    {
+     "kind": "language",
+     "text": "English fluent; Finnish none",
+     "source": "LinkedIn",
+     "quote": "Suomi: none"
+    },
+    {
+     "kind": "where",
+     "text": "Lives in Lisbon (abroad); open to remote or hybrid",
+     "source": "LinkedIn",
+     "quote": "Lisbon · open to new roles"
+    }
+   ],
+   "corrected": [
+    {
+     "kind": "skill",
+     "text": "REST APIs: corrected to own projects only",
+     "was": "REST APIs as drafted"
+    }
+   ],
+   "answers": [
+    {
+     "q": "Which of these do you use, at work or in your own projects?",
+     "a": "Python, MLOps, REST APIs"
+    },
+    {
+     "q": "How is your Finnish at work?",
+     "a": "none"
+    },
+    {
+     "q": "Have you worked with Kubernetes?",
+     "a": "Learning it now"
+    },
+    {
+     "q": "Which kind of work do you want more of?",
+     "a": "Improving and running existing systems"
+    },
+    {
+     "q": "Which describes you better?",
+     "a": "Deep specialist in one area"
+    },
+    {
+     "q": "Which team rhythm suits you?",
+     "a": "Careful planning, fewer mistakes"
+    },
+    {
+     "q": "Which companies would you like to meet?",
+     "a": "Qutwo, Smartly, Amertate"
+    },
+    {
+     "q": "I would need work-permit support",
+     "a": "Yes"
+    }
+   ],
+   "own": {
+    "about": "I am better at finishing than starting, and teams tend to need that.",
+    "looking": "A team where I can grow from building pieces into owning a system."
+   },
+   "project": null
+  },
+  {
+   "id": "A-013",
+   "handle": "Applicant 13",
+   "field": "AI and data",
+   "level": "Experienced",
+   "skills": [
+    {
+     "name": "Python",
+     "depth": "work",
+     "years": 5
+    },
+    {
+     "name": "REST APIs",
+     "depth": "work",
+     "years": 3
+    },
+    {
+     "name": "Speech-to-text",
+     "depth": "project",
+     "years": null
+    }
+   ],
+   "finnish": "basic",
+   "english": "fluent",
+   "city": "Vantaa",
+   "abroad": false,
+   "permit": false,
+   "wants": [
+    "telusdigital.com"
+   ],
+   "applied_at": "2026-11-06T14:01:00Z",
+   "sources": [
+    "LinkedIn"
+   ],
+   "ai_summary": "Experienced ai and data profile. Works mainly with Python, REST APIs, Speech-to-text. Based in Vantaa; Finnish basic. Sources read: LinkedIn.",
+   "drafted": [
+    {
+     "kind": "role",
+     "text": "AI integration engineer (AI and data)",
+     "source": "LinkedIn",
+     "quote": "AI integration engineer, energy, 2021–2024"
+    },
+    {
+     "kind": "level",
+     "text": "Experienced: 5 years of dated positions",
+     "source": "LinkedIn",
+     "quote": "5 years of dated positions since 2021"
+    },
+    {
+     "kind": "skill",
+     "text": "Python: used at work, 5 yr",
+     "source": "LinkedIn",
+     "quote": "Owned Python for a energy product used daily."
+    },
+    {
+     "kind": "skill",
+     "text": "REST APIs: used at work, 3 yr",
+     "source": "LinkedIn",
+     "quote": "Daily REST APIs work since 2022."
+    },
+    {
+     "kind": "skill",
+     "text": "Speech-to-text: own projects",
+     "source": "LinkedIn",
+     "quote": "Weekend repository exploring Speech-to-text."
+    },
+    {
+     "kind": "language",
+     "text": "English fluent; Finnish basic",
+     "source": "LinkedIn",
+     "quote": "Suomi: basic"
+    },
+    {
+     "kind": "where",
+     "text": "Lives in Vantaa; open to hybrid or on-site",
+     "source": "LinkedIn",
+     "quote": "Vantaa · open to new roles"
+    }
+   ],
+   "corrected": [
+    {
+     "kind": "remove",
+     "text": "Removed: Excel (not worth listing)",
+     "was": "a drafted skill"
+    }
+   ],
+   "answers": [
+    {
+     "q": "Which of these do you use, at work or in your own projects?",
+     "a": "Python, REST APIs, Speech-to-text"
+    },
+    {
+     "q": "How is your Finnish at work?",
+     "a": "basic"
+    },
+    {
+     "q": "Have you worked with Speech-to-text?",
+     "a": "Not yet"
+    },
+    {
+     "q": "Which kind of work do you want more of?",
+     "a": "Building new things from scratch"
+    },
+    {
+     "q": "Which describes you better?",
+     "a": "Deep specialist in one area"
+    },
+    {
+     "q": "Which team rhythm suits you?",
+     "a": "Fast experiments, ship often"
+    },
+    {
+     "q": "Which companies would you like to meet?",
+     "a": "TELUS Digital"
+    },
+    {
+     "q": "I would need work-permit support",
+     "a": "No"
+    }
+   ],
+   "own": {
+    "about": "I read datasheets for fun. I also know that is not normal.",
+    "looking": "Less reporting, more forecasting and decisions."
+   },
+   "project": null
+  },
+  {
+   "id": "A-014",
+   "handle": "Applicant 14",
+   "field": "Embedded and electronics",
+   "level": "Experienced",
+   "skills": [
+    {
+     "name": "Real-time operating systems",
+     "depth": "project",
+     "years": null
+    },
+    {
+     "name": "EtherCAT",
+     "depth": "project",
+     "years": null
+    },
+    {
+     "name": "Embedded C",
+     "depth": "work",
+     "years": 4
+    }
+   ],
+   "finnish": "none",
+   "english": "fluent",
+   "city": "Tallinn",
+   "abroad": true,
+   "permit": true,
+   "wants": [
+    "ti.com",
+    "aveksana.com"
+   ],
+   "applied_at": "2026-11-05T13:08:00Z",
+   "sources": [
+    "GitHub",
+    "LinkedIn"
+   ],
+   "ai_summary": "Experienced embedded and electronics profile. Works mainly with Real-time operating systems, EtherCAT, Embedded C. Based in Tallinn; Finnish none. Sources read: LinkedIn, GitHub.",
+   "drafted": [
+    {
+     "kind": "role",
+     "text": "Industrial networking firmware engineer (Embedded and electronics)",
+     "source": "LinkedIn",
+     "quote": "Industrial networking firmware engineer at a space company, 2021–present"
+    },
+    {
+     "kind": "level",
+     "text": "Experienced: 5 years of dated positions",
+     "source": "LinkedIn",
+     "quote": "5 years of dated positions since 2021"
+    },
+    {
+     "kind": "skill",
+     "text": "Real-time operating systems: own projects",
+     "source": "LinkedIn",
+     "quote": "Thesis work used Real-time operating systems end to end."
+    },
+    {
+     "kind": "skill",
+     "text": "EtherCAT: own projects",
+     "source": "GitHub",
+     "quote": "Personal project: EtherCAT, open on GitHub."
+    },
+    {
+     "kind": "skill",
+     "text": "Embedded C: used at work, 4 yr",
+     "source": "LinkedIn",
+     "quote": "Built and ran Embedded C in production for 8 teams."
+    },
+    {
+     "kind": "language",
+     "text": "English fluent; Finnish none",
+     "source": "LinkedIn",
+     "quote": "Finnish: none"
+    },
+    {
+     "kind": "where",
+     "text": "Lives in Tallinn (abroad); open to hybrid",
+     "source": "LinkedIn",
+     "quote": "Tallinn · open to new roles"
+    }
+   ],
+   "corrected": [
+    {
+     "kind": "skill",
+     "text": "Real-time operating systems: corrected to used at work, 2 yr",
+     "was": "Real-time operating systems as drafted"
+    }
+   ],
+   "answers": [
+    {
+     "q": "Which of these do you use, at work or in your own projects?",
+     "a": "Real-time operating systems, EtherCAT, Embedded C"
+    },
+    {
+     "q": "How is your Finnish at work?",
+     "a": "none"
+    },
+    {
+     "q": "Have you worked with Industrial Ethernet?",
+     "a": "Not yet"
+    },
+    {
+     "q": "Which kind of work do you want more of?",
+     "a": "Building new things from scratch"
+    },
+    {
+     "q": "Which describes you better?",
+     "a": "Generalist who covers many areas"
+    },
+    {
+     "q": "Which team rhythm suits you?",
+     "a": "Careful planning, fewer mistakes"
+    },
+    {
+     "q": "Which companies would you like to meet?",
+     "a": "Texas Instruments, Aveksana"
+    },
+    {
+     "q": "I would need work-permit support",
+     "a": "Yes"
+    }
+   ],
+   "own": {
+    "about": "I am better at finishing than starting, and teams tend to need that.",
+    "looking": "A team where I can grow from building pieces into owning a system."
+   },
+   "project": null
+  },
+  {
+   "id": "A-015",
+   "handle": "Applicant 15",
+   "field": "Semiconductors and photonics",
+   "level": "Experienced",
+   "skills": [
+    {
+     "name": "Photolithography",
+     "depth": "work",
+     "years": 3
+    },
+    {
+     "name": "Cleanroom processes",
+     "depth": "work",
+     "years": 4
+    },
+    {
+     "name": "Epitaxy",
+     "depth": "project",
+     "years": null
+    }
+   ],
+   "finnish": "fluent",
+   "english": "fluent",
+   "city": "Tallinn",
+   "abroad": true,
+   "permit": false,
+   "wants": [
+    "onefabnordic.fi",
+    "vexlum.com",
+    "amertate.com"
+   ],
+   "applied_at": "2026-11-09T21:47:00Z",
+   "sources": [
+    "GitHub",
+    "LinkedIn"
+   ],
+   "ai_summary": "Experienced semiconductors and photonics profile. Works mainly with Photolithography, Cleanroom processes, Epitaxy. Based in Tallinn; Finnish fluent. Sources read: LinkedIn, GitHub.",
+   "drafted": [
+    {
+     "kind": "role",
+     "text": "Micro and nano fabrication engineer (Semiconductors and photonics)",
+     "source": "LinkedIn",
+     "quote": "Micro and nano fabrication engineer at a consultancy company, 2021–present"
+    },
+    {
+     "kind": "level",
+     "text": "Experienced: 5 years of dated positions",
+     "source": "LinkedIn",
+     "quote": "5 years of dated positions since 2021"
+    },
+    {
+     "kind": "skill",
+     "text": "Photolithography: used at work, 3 yr",
+     "source": "LinkedIn",
+     "quote": "Led the move to Photolithography; cut incidents by a third."
+    },
+    {
+     "kind": "skill",
+     "text": "Cleanroom processes: used at work, 4 yr",
+     "source": "LinkedIn",
+     "quote": "Daily Cleanroom processes work since 2023."
+    },
+    {
+     "kind": "skill",
+     "text": "Epitaxy: own projects",
+     "source": "GitHub",
+     "quote": "Personal project: Epitaxy, open on GitHub."
+    },
+    {
+     "kind": "language",
+     "text": "English fluent; Finnish fluent",
+     "source": "LinkedIn",
+     "quote": "Suomi: fluent"
+    },
+    {
+     "kind": "where",
+     "text": "Lives in Tallinn (abroad); open to remote or hybrid",
+     "source": "LinkedIn",
+     "quote": "Tallinn · open to new roles"
+    }
+   ],
+   "corrected": [
+    {
+     "kind": "remove",
+     "text": "Removed: Excel (not worth listing)",
+     "was": "a drafted skill"
+    }
+   ],
+   "answers": [
+    {
+     "q": "Which of these do you use, at work or in your own projects?",
+     "a": "Photolithography, Cleanroom processes, Epitaxy"
+    },
+    {
+     "q": "How is your Finnish at work?",
+     "a": "fluent"
+    },
+    {
+     "q": "Have you worked with Cleanroom processes?",
+     "a": "Learning it now"
+    },
+    {
+     "q": "Which kind of work do you want more of?",
+     "a": "Building new things from scratch"
+    },
+    {
+     "q": "Which describes you better?",
+     "a": "Generalist who covers many areas"
+    },
+    {
+     "q": "Which team rhythm suits you?",
+     "a": "Fast experiments, ship often"
+    },
+    {
+     "q": "Which companies would you like to meet?",
+     "a": "OneFab Nordic, Vexlum, Amertate"
+    },
+    {
+     "q": "I would need work-permit support",
+     "a": "No"
+    }
+   ],
+   "own": {
+    "about": "I have shipped things used by thousands of people and fixed them at 3 am.",
+    "looking": "Research-adjacent engineering: rigorous, but shipped."
+   },
+   "project": null
+  },
+  {
+   "id": "A-016",
+   "handle": "Applicant 16",
+   "field": "Embedded and electronics",
+   "level": "Experienced",
+   "skills": [
+    {
+     "name": "Bluetooth LE",
+     "depth": "work",
+     "years": 5
+    },
+    {
+     "name": "Embedded C",
+     "depth": "work",
+     "years": 5
+    },
+    {
+     "name": "IEC 62304",
+     "depth": "work",
+     "years": 2
+    }
+   ],
+   "finnish": "basic",
+   "english": "fluent",
+   "city": "Tampere",
+   "abroad": false,
+   "permit": false,
+   "wants": [
+    "nordicsemi.com",
+    "vitalsigns.fi",
+    "smartly.io"
+   ],
+   "applied_at": "2026-11-13T09:17:00Z",
+   "sources": [
+    "LinkedIn"
+   ],
+   "ai_summary": "Experienced embedded and electronics profile. Works mainly with Bluetooth LE, Embedded C, IEC 62304. Based in Tampere; Finnish basic. Sources read: LinkedIn.",
+   "drafted": [
+    {
+     "kind": "role",
+     "text": "Wireless firmware engineer (Embedded and electronics)",
+     "source": "LinkedIn",
+     "quote": "Wireless firmware engineer at a semiconductor company, 2021–present"
+    },
+    {
+     "kind": "level",
+     "text": "Experienced: 5 years of dated positions",
+     "source": "LinkedIn",
+     "quote": "5 years of dated positions since 2021"
+    },
+    {
+     "kind": "skill",
+     "text": "Bluetooth LE: used at work, 5 yr",
+     "source": "LinkedIn",
+     "quote": "Led the move to Bluetooth LE; cut incidents by a third."
+    },
+    {
+     "kind": "skill",
+     "text": "Embedded C: used at work, 5 yr",
+     "source": "LinkedIn",
+     "quote": "Led the move to Embedded C; cut incidents by a third."
+    },
+    {
+     "kind": "skill",
+     "text": "IEC 62304: used at work, 2 yr",
+     "source": "LinkedIn",
+     "quote": "Owned IEC 62304 for a semiconductor product used daily."
+    },
+    {
+     "kind": "language",
+     "text": "English working level; Finnish basic",
+     "source": "LinkedIn",
+     "quote": "Suomi: basic"
+    },
+    {
+     "kind": "where",
+     "text": "Lives in Tampere; open to remote or hybrid",
+     "source": "LinkedIn",
+     "quote": "Tampere · open to new roles"
+    }
+   ],
+   "corrected": [],
+   "answers": [
+    {
+     "q": "Which of these do you use, at work or in your own projects?",
+     "a": "Bluetooth LE, Embedded C, IEC 62304"
+    },
+    {
+     "q": "How is your Finnish at work?",
+     "a": "basic"
+    },
+    {
+     "q": "Have you worked with Zephyr RTOS?",
+     "a": "Not yet"
+    },
+    {
+     "q": "Which kind of work do you want more of?",
+     "a": "Improving and running existing systems"
+    },
+    {
+     "q": "Which describes you better?",
+     "a": "Deep specialist in one area"
+    },
+    {
+     "q": "Which team rhythm suits you?",
+     "a": "Careful planning, fewer mistakes"
+    },
+    {
+     "q": "Which companies would you like to meet?",
+     "a": "Nordic Semiconductor, Ikigaia, Smartly"
+    },
+    {
+     "q": "I would need work-permit support",
+     "a": "No"
+    }
+   ],
+   "own": {
+    "about": "Most of my best work started as a side script nobody asked for.",
+    "looking": "Work in English, with a real path to learning Finnish on the job."
+   },
+   "project": null
+  },
+  {
+   "id": "A-017",
+   "handle": "Applicant 17",
+   "field": "Research and science",
+   "level": "Experienced",
+   "skills": [
+    {
+     "name": "Filamentous fungi",
+     "depth": "work",
+     "years": 3
+    },
+    {
+     "name": "Strain engineering",
+     "depth": "project",
+     "years": null
+    },
+    {
+     "name": "Fermentation analytics",
+     "depth": "work",
+     "years": 2
+    },
+    {
+     "name": "Germanium detectors",
+     "depth": "project",
+     "years": null
+    },
+    {
+     "name": "Infrared optics",
+     "depth": "work",
+     "years": 2
+    }
+   ],
+   "finnish": "basic",
+   "english": "fluent",
+   "city": "Berlin",
+   "abroad": true,
+   "permit": false,
+   "wants": [
+    "metacell.fi",
+    "elfys.fi",
+    "3438021-6"
+   ],
+   "applied_at": "2026-11-13T12:15:00Z",
+   "sources": [
+    "GitHub",
+    "LinkedIn"
+   ],
+   "ai_summary": "Experienced research and science profile. Works mainly with Filamentous fungi, Strain engineering, Fermentation analytics. Based in Berlin; Finnish basic. Sources read: LinkedIn, GitHub.",
+   "drafted": [
+    {
+     "kind": "role",
+     "text": "Strain engineering scientist (Research and science)",
+     "source": "LinkedIn",
+     "quote": "Strain engineering scientist, health tech, 2019–2022"
+    },
+    {
+     "kind": "level",
+     "text": "Experienced: 7 years of dated positions",
+     "source": "LinkedIn",
+     "quote": "7 years of dated positions since 2019"
+    },
+    {
+     "kind": "skill",
+     "text": "Filamentous fungi: used at work, 3 yr",
+     "source": "LinkedIn",
+     "quote": "Owned Filamentous fungi for a health tech product used daily."
+    },
+    {
+     "kind": "skill",
+     "text": "Strain engineering: own projects",
+     "source": "GitHub",
+     "quote": "Personal project: Strain engineering, open on GitHub."
+    },
+    {
+     "kind": "skill",
+     "text": "Fermentation analytics: used at work, 2 yr",
+     "source": "LinkedIn",
+     "quote": "Led the move to Fermentation analytics; cut incidents by a third."
+    },
+    {
+     "kind": "skill",
+     "text": "Germanium detectors: own projects",
+     "source": "GitHub",
+     "quote": "Thesis work used Germanium detectors end to end."
+    },
+    {
+     "kind": "skill",
+     "text": "Infrared optics: used at work, 2 yr",
+     "source": "LinkedIn",
+     "quote": "Owned Infrared optics for a health tech product used daily."
+    },
+    {
+     "kind": "language",
+     "text": "English fluent; Finnish basic",
+     "source": "LinkedIn",
+     "quote": "Suomi: basic"
+    },
+    {
+     "kind": "where",
+     "text": "Lives in Berlin (abroad); open to on-site",
+     "source": "LinkedIn",
+     "quote": "Berlin · open to new roles"
+    }
+   ],
+   "corrected": [
+    {
+     "kind": "skill",
+     "text": "Filamentous fungi: corrected to own projects only",
+     "was": "Filamentous fungi as drafted"
+    },
+    {
+     "kind": "remove",
+     "text": "Removed: MATLAB (not worth listing)",
+     "was": "a drafted skill"
+    }
+   ],
+   "answers": [
+    {
+     "q": "Which of these do you use, at work or in your own projects?",
+     "a": "Filamentous fungi, Strain engineering, Fermentation analytics, Germanium detectors, Infrared optics"
+    },
+    {
+     "q": "How is your Finnish at work?",
+     "a": "basic"
+    },
+    {
+     "q": "Have you worked with Fermentation analytics?",
+     "a": "Not yet"
+    },
+    {
+     "q": "Which kind of work do you want more of?",
+     "a": "Improving and running existing systems"
+    },
+    {
+     "q": "Which describes you better?",
+     "a": "Generalist who covers many areas"
+    },
+    {
+     "q": "Which team rhythm suits you?",
+     "a": "Fast experiments, ship often"
+    },
+    {
+     "q": "Which companies would you like to meet?",
+     "a": "Metacell, ElFys, QMill Oy"
+    },
+    {
+     "q": "I would need work-permit support",
+     "a": "No"
+    }
+   ],
+   "own": {
+    "about": "I care about security as a habit, not a department.",
+    "looking": "A team where I can grow from building pieces into owning a system."
+   },
+   "project": null
+  },
+  {
+   "id": "A-018",
+   "handle": "Applicant 18",
+   "field": "Quantum",
+   "level": "Senior",
+   "skills": [
+    {
+     "name": "Device characterisation",
+     "depth": "work",
+     "years": 9
+    },
+    {
+     "name": "Cryo-CMOS",
+     "depth": "work",
+     "years": 6
+    },
+    {
+     "name": "Cryogenics",
+     "depth": "work",
+     "years": 7
+    }
+   ],
+   "finnish": "basic",
+   "english": "fluent",
+   "city": "Lisbon",
+   "abroad": true,
+   "permit": false,
+   "wants": [
+    "kvanttinova.fi",
+    "smartly.io"
+   ],
+   "applied_at": "2026-11-10T20:28:00Z",
+   "sources": [
+    "LinkedIn"
+   ],
+   "ai_summary": "Senior quantum profile. Works mainly with Device characterisation, Cryo-CMOS, Cryogenics. Based in Lisbon; Finnish basic. Sources read: LinkedIn.",
+   "drafted": [
+    {
+     "kind": "role",
+     "text": "Quantum device engineer (Quantum)",
+     "source": "LinkedIn",
+     "quote": "Quantum device engineer, logistics, 2017–2020"
+    },
+    {
+     "kind": "level",
+     "text": "Senior: 9 years of dated positions",
+     "source": "LinkedIn",
+     "quote": "9 years of dated positions since 2017"
+    },
+    {
+     "kind": "skill",
+     "text": "Device characterisation: used at work, 9 yr",
+     "source": "LinkedIn",
+     "quote": "Built and ran Device characterisation in production for 2 teams."
+    },
+    {
+     "kind": "skill",
+     "text": "Cryo-CMOS: used at work, 6 yr",
+     "source": "LinkedIn",
+     "quote": "Built and ran Cryo-CMOS in production for 5 teams."
+    },
+    {
+     "kind": "skill",
+     "text": "Cryogenics: used at work, 7 yr",
+     "source": "LinkedIn",
+     "quote": "Daily Cryogenics work since 2017."
+    },
+    {
+     "kind": "language",
+     "text": "English fluent; Finnish basic",
+     "source": "LinkedIn",
+     "quote": "Suomi: basic"
+    },
+    {
+     "kind": "where",
+     "text": "Lives in Lisbon (abroad); open to on-site",
+     "source": "LinkedIn",
+     "quote": "Lisbon · open to new roles"
+    }
+   ],
+   "corrected": [],
+   "answers": [
+    {
+     "q": "Which of these do you use, at work or in your own projects?",
+     "a": "Device characterisation, Cryo-CMOS, Cryogenics"
+    },
+    {
+     "q": "How is your Finnish at work?",
+     "a": "basic"
+    },
+    {
+     "q": "Have you worked with Cryogenics?",
+     "a": "Yes, at work"
+    },
+    {
+     "q": "Which kind of work do you want more of?",
+     "a": "Building new things from scratch"
+    },
+    {
+     "q": "Which describes you better?",
+     "a": "Generalist who covers many areas"
+    },
+    {
+     "q": "Which team rhythm suits you?",
+     "a": "Careful planning, fewer mistakes"
+    },
+    {
+     "q": "Which companies would you like to meet?",
+     "a": "Kvanttinova, Smartly"
+    },
+    {
+     "q": "I would need work-permit support",
+     "a": "No"
+    }
+   ],
+   "own": {
+    "about": "I am switching from research to industry and want work that reaches a customer.",
+    "looking": "Research-adjacent engineering: rigorous, but shipped."
+   },
+   "project": null
+  },
+  {
+   "id": "A-019",
+   "handle": "Applicant 19",
+   "field": "Research and science",
+   "level": "Senior",
+   "skills": [
+    {
+     "name": "Heuristic search",
+     "depth": "work",
+     "years": 8
+    },
+    {
+     "name": "Combinatorial optimisation",
+     "depth": "work",
+     "years": 7
+    },
+    {
+     "name": "Python",
+     "depth": "work",
+     "years": 6
+    },
+    {
+     "name": "Python test automation",
+     "depth": "learning",
+     "years": null
+    },
+    {
+     "name": "VNA measurements",
+     "depth": "learning",
+     "years": null
+    }
+   ],
+   "finnish": "working level",
+   "english": "fluent",
+   "city": "Tampere",
+   "abroad": false,
+   "permit": false,
+   "wants": [
+    "3438021-6",
+    "onefabnordic.fi",
+    "telusdigital.com"
+   ],
+   "applied_at": "2026-11-11T12:53:00Z",
+   "sources": [
+    "LinkedIn"
+   ],
+   "ai_summary": "Senior research and science profile. Works mainly with Heuristic search, Combinatorial optimisation, Python and is learning Python test automation. Based in Tampere; Finnish working level. Sources read: LinkedIn.",
+   "drafted": [
+    {
+     "kind": "role",
+     "text": "Optimisation algorithm developer (Research and science)",
+     "source": "LinkedIn",
+     "quote": "Optimisation algorithm developer, logistics, 2017–2020"
+    },
+    {
+     "kind": "level",
+     "text": "Senior: 9 years of dated positions",
+     "source": "LinkedIn",
+     "quote": "9 years of dated positions since 2017"
+    },
+    {
+     "kind": "skill",
+     "text": "Heuristic search: used at work, 8 yr",
+     "source": "LinkedIn",
+     "quote": "Daily Heuristic search work since 2019."
+    },
+    {
+     "kind": "skill",
+     "text": "Combinatorial optimisation: used at work, 7 yr",
+     "source": "LinkedIn",
+     "quote": "Led the move to Combinatorial optimisation; cut incidents by a third."
+    },
+    {
+     "kind": "skill",
+     "text": "Python: used at work, 6 yr",
+     "source": "LinkedIn",
+     "quote": "Led the move to Python; cut incidents by a third."
+    },
+    {
+     "kind": "skill",
+     "text": "Python test automation: learning it now",
+     "source": "LinkedIn",
+     "quote": "Currently taking a Python test automation course."
+    },
+    {
+     "kind": "skill",
+     "text": "VNA measurements: learning it now",
+     "source": "LinkedIn",
+     "quote": "Learning VNA measurements on the side this autumn."
+    },
+    {
+     "kind": "language",
+     "text": "English fluent; Finnish working level",
+     "source": "LinkedIn",
+     "quote": "Suomi: working level"
+    },
+    {
+     "kind": "where",
+     "text": "Lives in Tampere; open to on-site",
+     "source": "LinkedIn",
+     "quote": "Tampere · open to new roles"
+    }
+   ],
+   "corrected": [],
+   "answers": [
+    {
+     "q": "Which of these do you use, at work or in your own projects?",
+     "a": "Heuristic search, Combinatorial optimisation, Python"
+    },
+    {
+     "q": "How is your Finnish at work?",
+     "a": "working level"
+    },
+    {
+     "q": "Have you worked with Python?",
+     "a": "Not yet"
+    },
+    {
+     "q": "Which kind of work do you want more of?",
+     "a": "Improving and running existing systems"
+    },
+    {
+     "q": "Which describes you better?",
+     "a": "Deep specialist in one area"
+    },
+    {
+     "q": "Which team rhythm suits you?",
+     "a": "Careful planning, fewer mistakes"
+    },
+    {
+     "q": "Which companies would you like to meet?",
+     "a": "QMill Oy, OneFab Nordic, TELUS Digital"
+    },
+    {
+     "q": "I would need work-permit support",
+     "a": "No"
+    }
+   ],
+   "own": {
+    "about": "I like being the person who explains the numbers to people who hate numbers.",
+    "looking": "A first role in Finland after my degree here."
+   },
+   "project": null
+  },
+  {
+   "id": "A-020",
+   "handle": "Applicant 20",
+   "field": "Semiconductors and photonics",
+   "level": "Senior",
+   "skills": [
+    {
+     "name": "Free-space optics",
+     "depth": "work",
+     "years": 9
+    },
+    {
+     "name": "Laser optics",
+     "depth": "work",
+     "years": 8
+    },
+    {
+     "name": "Linewidth measurement",
+     "depth": "project",
+     "years": null
+    },
+    {
+     "name": "MEMS",
+     "depth": "work",
+     "years": 6
+    },
+    {
+     "name": "Etching",
+     "depth": "learning",
+     "years": null
+    }
+   ],
+   "finnish": "basic",
+   "english": "fluent",
+   "city": "Helsinki",
+   "abroad": false,
+   "permit": false,
+   "wants": [
+    "vexlum.com",
+    "onefabnordic.fi",
+    "jmpventures.org"
+   ],
+   "applied_at": "2026-11-06T21:51:00Z",
+   "sources": [
+    "GitHub",
+    "LinkedIn"
+   ],
+   "ai_summary": "Senior semiconductors and photonics profile. Works mainly with Free-space optics, Laser optics, Linewidth measurement and is learning Etching. Based in Helsinki; Finnish basic. Sources read: LinkedIn, GitHub.",
+   "drafted": [
+    {
+     "kind": "role",
+     "text": "Optical and laser engineer (Semiconductors and photonics)",
+     "source": "LinkedIn",
+     "quote": "Optical and laser engineer, space, 2017–2020"
+    },
+    {
+     "kind": "level",
+     "text": "Senior: 9 years of dated positions",
+     "source": "LinkedIn",
+     "quote": "9 years of dated positions since 2017"
+    },
+    {
+     "kind": "skill",
+     "text": "Free-space optics: used at work, 9 yr",
+     "source": "LinkedIn",
+     "quote": "Daily Free-space optics work since 2017."
+    },
+    {
+     "kind": "skill",
+     "text": "Laser optics: used at work, 8 yr",
+     "source": "LinkedIn",
+     "quote": "Daily Laser optics work since 2018."
+    },
+    {
+     "kind": "skill",
+     "text": "Linewidth measurement: own projects",
+     "source": "GitHub",
+     "quote": "Personal project: Linewidth measurement, open on GitHub."
+    },
+    {
+     "kind": "skill",
+     "text": "MEMS: used at work, 6 yr",
+     "source": "LinkedIn",
+     "quote": "Owned MEMS for a space product used daily."
+    },
+    {
+     "kind": "skill",
+     "text": "Etching: learning it now",
+     "source": "LinkedIn",
+     "quote": "Learning Etching on the side this autumn."
+    },
+    {
+     "kind": "language",
+     "text": "English working level; Finnish basic",
+     "source": "LinkedIn",
+     "quote": "Suomi: basic"
+    },
+    {
+     "kind": "where",
+     "text": "Lives in Helsinki; open to on-site",
+     "source": "LinkedIn",
+     "quote": "Helsinki · open to new roles"
+    }
+   ],
+   "corrected": [
+    {
+     "kind": "remove",
+     "text": "Removed: Excel (not worth listing)",
+     "was": "a drafted skill"
+    }
+   ],
+   "answers": [
+    {
+     "q": "Which of these do you use, at work or in your own projects?",
+     "a": "Free-space optics, Laser optics, Linewidth measurement, MEMS"
+    },
+    {
+     "q": "How is your Finnish at work?",
+     "a": "basic"
+    },
+    {
+     "q": "Have you worked with Free-space optics?",
+     "a": "Not yet"
+    },
+    {
+     "q": "Which kind of work do you want more of?",
+     "a": "Building new things from scratch"
+    },
+    {
+     "q": "Which describes you better?",
+     "a": "Generalist who covers many areas"
+    },
+    {
+     "q": "Which team rhythm suits you?",
+     "a": "Careful planning, fewer mistakes"
+    },
+    {
+     "q": "Which companies would you like to meet?",
+     "a": "Vexlum, OneFab Nordic, JMP Ventures"
+    },
+    {
+     "q": "I would need work-permit support",
+     "a": "No"
+    }
+   ],
+   "own": {
+    "about": "Most of my best work started as a side script nobody asked for.",
+    "looking": "Hardware that leaves the lab and gets manufactured."
+   },
+   "project": null
+  },
+  {
+   "id": "A-021",
+   "handle": "Applicant 21",
+   "field": "Semiconductors and photonics",
+   "level": "Early career",
+   "skills": [
+    {
+     "name": "DC-DC converters",
+     "depth": "project",
+     "years": null
+    },
+    {
+     "name": "Analog IC design",
+     "depth": "work",
+     "years": 3
+    },
+    {
+     "name": "Battery management",
+     "depth": "project",
+     "years": null
+    },
+    {
+     "name": "Semiconductor metrology",
+     "depth": "work",
+     "years": 3
+    }
+   ],
+   "finnish": "working level",
+   "english": "fluent",
+   "city": "Helsinki",
+   "abroad": false,
+   "permit": false,
+   "wants": [
+    "nordicsemi.com",
+    "chipmetrics.com",
+    "vitalsigns.fi"
+   ],
+   "applied_at": "2026-11-08T14:54:00Z",
+   "sources": [
+    "GitHub",
+    "LinkedIn"
+   ],
+   "ai_summary": "Early career semiconductors and photonics profile. Works mainly with DC-DC converters, Analog IC design, Battery management. Based in Helsinki; Finnish working level. Sources read: LinkedIn, GitHub.",
+   "drafted": [
+    {
+     "kind": "role",
+     "text": "Power management IC engineer (Semiconductors and photonics)",
+     "source": "LinkedIn",
+     "quote": "Power management IC engineer, fintech, 2024–2027"
+    },
+    {
+     "kind": "level",
+     "text": "Early career: 2 years of dated positions",
+     "source": "LinkedIn",
+     "quote": "2 years of dated positions since 2024"
+    },
+    {
+     "kind": "skill",
+     "text": "DC-DC converters: own projects",
+     "source": "GitHub",
+     "quote": "Weekend repository exploring DC-DC converters."
+    },
+    {
+     "kind": "skill",
+     "text": "Analog IC design: used at work, 3 yr",
+     "source": "LinkedIn",
+     "quote": "Daily Analog IC design work since 2025."
+    },
+    {
+     "kind": "skill",
+     "text": "Battery management: own projects",
+     "source": "GitHub",
+     "quote": "Thesis work used Battery management end to end."
+    },
+    {
+     "kind": "skill",
+     "text": "Semiconductor metrology: used at work, 3 yr",
+     "source": "LinkedIn",
+     "quote": "Built and ran Semiconductor metrology in production for 5 teams."
+    },
+    {
+     "kind": "language",
+     "text": "English working level; Finnish working level",
+     "source": "LinkedIn",
+     "quote": "Finnish: working level"
+    },
+    {
+     "kind": "where",
+     "text": "Lives in Helsinki; open to hybrid",
+     "source": "LinkedIn",
+     "quote": "Helsinki · open to new roles"
+    }
+   ],
+   "corrected": [],
+   "answers": [
+    {
+     "q": "Which of these do you use, at work or in your own projects?",
+     "a": "DC-DC converters, Analog IC design, Battery management, Semiconductor metrology"
+    },
+    {
+     "q": "How is your Finnish at work?",
+     "a": "working level"
+    },
+    {
+     "q": "Have you worked with DC-DC converters?",
+     "a": "Learning it now"
+    },
+    {
+     "q": "Which kind of work do you want more of?",
+     "a": "Building new things from scratch"
+    },
+    {
+     "q": "Which describes you better?",
+     "a": "Generalist who covers many areas"
+    },
+    {
+     "q": "Which team rhythm suits you?",
+     "a": "Fast experiments, ship often"
+    },
+    {
+     "q": "Which companies would you like to meet?",
+     "a": "Nordic Semiconductor, Chipmetrics, Ikigaia"
+    },
+    {
+     "q": "I would need work-permit support",
+     "a": "No"
+    }
+   ],
+   "own": {
+    "about": "I care about security as a habit, not a department.",
+    "looking": "Research-adjacent engineering: rigorous, but shipped."
+   },
+   "project": {
+    "name": "ml-eval.pdf"
+   }
+  },
+  {
+   "id": "A-022",
+   "handle": "Applicant 22",
+   "field": "Software",
+   "level": "Senior",
+   "skills": [
+    {
+     "name": "REST APIs",
+     "depth": "work",
+     "years": 9
+    },
+    {
+     "name": "LLM integration",
+     "depth": "project",
+     "years": null
+    },
+    {
+     "name": "Python",
+     "depth": "work",
+     "years": 7
+    },
+    {
+     "name": "LLM agents",
+     "depth": "learning",
+     "years": null
+    },
+    {
+     "name": "C++",
+     "depth": "learning",
+     "years": null
+    }
+   ],
+   "finnish": "fluent",
+   "english": "fluent",
+   "city": "Oulu",
+   "abroad": false,
+   "permit": false,
+   "wants": [
+    "nordicclean.tech",
+    "ti.com",
+    "vitalsigns.fi"
+   ],
+   "applied_at": "2026-11-10T08:23:00Z",
+   "sources": [
+    "GitHub",
+    "LinkedIn"
+   ],
+   "ai_summary": "Senior software profile. Works mainly with REST APIs, LLM integration, Python and is learning LLM agents. Based in Oulu; Finnish fluent. Sources read: LinkedIn, GitHub.",
+   "drafted": [
+    {
+     "kind": "role",
+     "text": "Software engineers for validation tool (Software)",
+     "source": "LinkedIn",
+     "quote": "Software engineers for validation tool, semiconductor, 2015–2018"
+    },
+    {
+     "kind": "level",
+     "text": "Senior: 11 years of dated positions",
+     "source": "LinkedIn",
+     "quote": "11 years of dated positions since 2015"
+    },
+    {
+     "kind": "skill",
+     "text": "REST APIs: used at work, 9 yr",
+     "source": "LinkedIn",
+     "quote": "Led the move to REST APIs; cut incidents by a third."
+    },
+    {
+     "kind": "skill",
+     "text": "LLM integration: own projects",
+     "source": "GitHub",
+     "quote": "Personal project: LLM integration, open on GitHub."
+    },
+    {
+     "kind": "skill",
+     "text": "Python: used at work, 7 yr",
+     "source": "LinkedIn",
+     "quote": "Led the move to Python; cut incidents by a third."
+    },
+    {
+     "kind": "skill",
+     "text": "LLM agents: learning it now",
+     "source": "LinkedIn",
+     "quote": "Learning LLM agents on the side this autumn."
+    },
+    {
+     "kind": "skill",
+     "text": "C++: learning it now",
+     "source": "LinkedIn",
+     "quote": "Learning C++ on the side this autumn."
+    },
+    {
+     "kind": "language",
+     "text": "English fluent; Finnish fluent",
+     "source": "LinkedIn",
+     "quote": "Finnish: fluent"
+    },
+    {
+     "kind": "where",
+     "text": "Lives in Oulu; open to hybrid",
+     "source": "LinkedIn",
+     "quote": "Oulu · open to new roles"
+    }
+   ],
+   "corrected": [],
+   "answers": [
+    {
+     "q": "Which of these do you use, at work or in your own projects?",
+     "a": "REST APIs, LLM integration, Python"
+    },
+    {
+     "q": "How is your Finnish at work?",
+     "a": "fluent"
+    },
+    {
+     "q": "Have you worked with REST APIs?",
+     "a": "Learning it now"
+    },
+    {
+     "q": "Which kind of work do you want more of?",
+     "a": "Building new things from scratch"
+    },
+    {
+     "q": "Which describes you better?",
+     "a": "Generalist who covers many areas"
+    },
+    {
+     "q": "Which team rhythm suits you?",
+     "a": "Careful planning, fewer mistakes"
+    },
+    {
+     "q": "Which companies would you like to meet?",
+     "a": "Nordic Clean Tech, Texas Instruments, Ikigaia"
+    },
+    {
+     "q": "I would need work-permit support",
+     "a": "No"
+    }
+   ],
+   "own": {
+    "about": "I have shipped things used by thousands of people and fixed them at 3 am.",
+    "looking": "Research-adjacent engineering: rigorous, but shipped."
+   },
+   "project": null
+  },
+  {
+   "id": "A-023",
+   "handle": "Applicant 23",
+   "field": "Sales and business",
+   "level": "Senior",
+   "skills": [
+    {
+     "name": "B2B SaaS sales",
+     "depth": "project",
+     "years": null
+    },
+    {
+     "name": "Public procurement",
+     "depth": "work",
+     "years": 7
+    },
+    {
+     "name": "ATS systems",
+     "depth": "project",
+     "years": null
+    },
+    {
+     "name": "Boolean sourcing",
+     "depth": "work",
+     "years": 7
+    }
+   ],
+   "finnish": "none",
+   "english": "fluent",
+   "city": "Espoo",
+   "abroad": false,
+   "permit": false,
+   "wants": [
+    "aveksana.com",
+    "ictdirect.io",
+    "zerogravity.fi"
+   ],
+   "applied_at": "2026-11-05T12:40:00Z",
+   "sources": [
+    "GitHub",
+    "LinkedIn"
+   ],
+   "ai_summary": "Senior sales and business profile. Works mainly with B2B SaaS sales, Public procurement, ATS systems. Based in Espoo; Finnish none. Sources read: LinkedIn, GitHub.",
+   "drafted": [
+    {
+     "kind": "role",
+     "text": "Enterprise sales lead (Sales and business)",
+     "source": "LinkedIn",
+     "quote": "Enterprise sales lead at a space company, 2017–present"
+    },
+    {
+     "kind": "level",
+     "text": "Senior: 9 years of dated positions",
+     "source": "LinkedIn",
+     "quote": "9 years of dated positions since 2017"
+    },
+    {
+     "kind": "skill",
+     "text": "B2B SaaS sales: own projects",
+     "source": "LinkedIn",
+     "quote": "Weekend repository exploring B2B SaaS sales."
+    },
+    {
+     "kind": "skill",
+     "text": "Public procurement: used at work, 7 yr",
+     "source": "LinkedIn",
+     "quote": "Built and ran Public procurement in production for 5 teams."
+    },
+    {
+     "kind": "skill",
+     "text": "ATS systems: own projects",
+     "source": "GitHub",
+     "quote": "Thesis work used ATS systems end to end."
+    },
+    {
+     "kind": "skill",
+     "text": "Boolean sourcing: used at work, 7 yr",
+     "source": "LinkedIn",
+     "quote": "Built and ran Boolean sourcing in production for 2 teams."
+    },
+    {
+     "kind": "language",
+     "text": "English fluent; Finnish none",
+     "source": "LinkedIn",
+     "quote": "Finnish: none"
+    },
+    {
+     "kind": "where",
+     "text": "Lives in Espoo; open to on-site",
+     "source": "LinkedIn",
+     "quote": "Espoo · open to new roles"
+    }
+   ],
+   "corrected": [
+    {
+     "kind": "remove",
+     "text": "Removed: PowerPoint (not worth listing)",
+     "was": "a drafted skill"
+    }
+   ],
+   "answers": [
+    {
+     "q": "Which of these do you use, at work or in your own projects?",
+     "a": "B2B SaaS sales, Public procurement, ATS systems, Boolean sourcing"
+    },
+    {
+     "q": "How is your Finnish at work?",
+     "a": "none"
+    },
+    {
+     "q": "Have you worked with Pilot management?",
+     "a": "Learning it now"
+    },
+    {
+     "q": "Which kind of work do you want more of?",
+     "a": "Improving and running existing systems"
+    },
+    {
+     "q": "Which describes you better?",
+     "a": "Deep specialist in one area"
+    },
+    {
+     "q": "Which team rhythm suits you?",
+     "a": "Fast experiments, ship often"
+    },
+    {
+     "q": "Which companies would you like to meet?",
+     "a": "Aveksana, ICT Direct, Zero Gravity"
+    },
+    {
+     "q": "I would need work-permit support",
+     "a": "No"
+    }
+   ],
+   "own": {
+    "about": "I am switching from research to industry and want work that reaches a customer.",
+    "looking": "Research-adjacent engineering: rigorous, but shipped."
+   },
+   "project": null
+  },
+  {
+   "id": "A-024",
+   "handle": "Applicant 24",
+   "field": "Security",
+   "level": "Early career",
+   "skills": [
+    {
+     "name": "Threat modelling",
+     "depth": "work",
+     "years": 1
+    },
+    {
+     "name": "OWASP LLM Top 10",
+     "depth": "work",
+     "years": 2
+    },
+    {
+     "name": "Prompt injection",
+     "depth": "work",
+     "years": 3
+    },
+    {
+     "name": "Python",
+     "depth": "work",
+     "years": 1
+    }
+   ],
+   "finnish": "basic",
+   "english": "fluent",
+   "city": "Tampere",
+   "abroad": false,
+   "permit": false,
+   "wants": [
+    "telusdigital.com",
+    "lotussirius.com"
+   ],
+   "applied_at": "2026-11-05T10:09:00Z",
+   "sources": [
+    "LinkedIn"
+   ],
+   "ai_summary": "Early career security profile. Works mainly with Threat modelling, OWASP LLM Top 10, Prompt injection. Based in Tampere; Finnish basic. Sources read: LinkedIn.",
+   "drafted": [
+    {
+     "kind": "role",
+     "text": "AI red-teaming specialist (Security)",
+     "source": "LinkedIn",
+     "quote": "AI red-teaming specialist, research, 2025–2028"
+    },
+    {
+     "kind": "level",
+     "text": "Early career: 1 years of dated positions",
+     "source": "LinkedIn",
+     "quote": "1 years of dated positions since 2025"
+    },
+    {
+     "kind": "skill",
+     "text": "Threat modelling: used at work, 1 yr",
+     "source": "LinkedIn",
+     "quote": "Built and ran Threat modelling in production for 2 teams."
+    },
+    {
+     "kind": "skill",
+     "text": "OWASP LLM Top 10: used at work, 2 yr",
+     "source": "LinkedIn",
+     "quote": "Daily OWASP LLM Top 10 work since 2025."
+    },
+    {
+     "kind": "skill",
+     "text": "Prompt injection: used at work, 3 yr",
+     "source": "LinkedIn",
+     "quote": "Led the move to Prompt injection; cut incidents by a third."
+    },
+    {
+     "kind": "skill",
+     "text": "Python: used at work, 1 yr",
+     "source": "LinkedIn",
+     "quote": "Built and ran Python in production for 5 teams."
+    },
+    {
+     "kind": "language",
+     "text": "English working level; Finnish basic",
+     "source": "LinkedIn",
+     "quote": "Suomi: basic"
+    },
+    {
+     "kind": "where",
+     "text": "Lives in Tampere; open to on-site",
+     "source": "LinkedIn",
+     "quote": "Tampere · open to new roles"
+    }
+   ],
+   "corrected": [
+    {
+     "kind": "skill",
+     "text": "Threat modelling: corrected to own projects only",
+     "was": "Threat modelling as drafted"
+    }
+   ],
+   "answers": [
+    {
+     "q": "Which of these do you use, at work or in your own projects?",
+     "a": "Threat modelling, OWASP LLM Top 10, Prompt injection, Python"
+    },
+    {
+     "q": "How is your Finnish at work?",
+     "a": "basic"
+    },
+    {
+     "q": "Have you worked with Adversarial testing?",
+     "a": "Not yet"
+    },
+    {
+     "q": "Which kind of work do you want more of?",
+     "a": "Building new things from scratch"
+    },
+    {
+     "q": "Which describes you better?",
+     "a": "Deep specialist in one area"
+    },
+    {
+     "q": "Which team rhythm suits you?",
+     "a": "Careful planning, fewer mistakes"
+    },
+    {
+     "q": "Which companies would you like to meet?",
+     "a": "TELUS Digital, Lotus Sirius"
+    },
+    {
+     "q": "I would need work-permit support",
+     "a": "No"
+    }
+   ],
+   "own": {
+    "about": "I am better at finishing than starting, and teams tend to need that.",
+    "looking": "A first role in Finland after my degree here."
+   },
+   "project": {
+    "name": "rf-notes.pdf"
+   }
+  },
+  {
+   "id": "A-025",
+   "handle": "Applicant 25",
+   "field": "Research and science",
+   "level": "Senior",
+   "skills": [
+    {
+     "name": "Semiconductor physics",
+     "depth": "work",
+     "years": 8
+    },
+    {
+     "name": "Heat transfer modelling",
+     "depth": "project",
+     "years": null
+    },
+    {
+     "name": "COMSOL",
+     "depth": "work",
+     "years": 9
+    },
+    {
+     "name": "MATLAB",
+     "depth": "work",
+     "years": 6
+    },
+    {
+     "name": "Combinatorial optimisation",
+     "depth": "project",
+     "years": null
+    },
+    {
+     "name": "Heuristic search",
+     "depth": "work",
+     "years": 8
+    }
+   ],
+   "finnish": "basic",
+   "english": "fluent",
+   "city": "Vantaa",
+   "abroad": false,
+   "permit": false,
+   "wants": [
+    "2764193-2",
+    "3438021-6",
+    "hipped.io"
+   ],
+   "applied_at": "2026-11-13T15:44:00Z",
+   "sources": [
+    "GitHub",
+    "LinkedIn"
+   ],
+   "ai_summary": "Senior research and science profile. Works mainly with Semiconductor physics, Heat transfer modelling, COMSOL. Based in Vantaa; Finnish basic. Sources read: LinkedIn, GitHub.",
+   "drafted": [
+    {
+     "kind": "role",
+     "text": "MEMS modelling engineer (Research and science)",
+     "source": "LinkedIn",
+     "quote": "MEMS modelling engineer at a consultancy company, 2016–present"
+    },
+    {
+     "kind": "level",
+     "text": "Senior: 10 years of dated positions",
+     "source": "LinkedIn",
+     "quote": "10 years of dated positions since 2016"
+    },
+    {
+     "kind": "skill",
+     "text": "Semiconductor physics: used at work, 8 yr",
+     "source": "LinkedIn",
+     "quote": "Owned Semiconductor physics for a consultancy product used daily."
+    },
+    {
+     "kind": "skill",
+     "text": "Heat transfer modelling: own projects",
+     "source": "GitHub",
+     "quote": "Weekend repository exploring Heat transfer modelling."
+    },
+    {
+     "kind": "skill",
+     "text": "COMSOL: used at work, 9 yr",
+     "source": "LinkedIn",
+     "quote": "Daily COMSOL work since 2017."
+    },
+    {
+     "kind": "skill",
+     "text": "MATLAB: used at work, 6 yr",
+     "source": "LinkedIn",
+     "quote": "Led the move to MATLAB; cut incidents by a third."
+    },
+    {
+     "kind": "skill",
+     "text": "Combinatorial optimisation: own projects",
+     "source": "LinkedIn",
+     "quote": "Personal project: Combinatorial optimisation, open on GitHub."
+    },
+    {
+     "kind": "skill",
+     "text": "Heuristic search: used at work, 8 yr",
+     "source": "LinkedIn",
+     "quote": "Daily Heuristic search work since 2016."
+    },
+    {
+     "kind": "language",
+     "text": "English fluent; Finnish basic",
+     "source": "LinkedIn",
+     "quote": "Finnish: basic"
+    },
+    {
+     "kind": "where",
+     "text": "Lives in Vantaa; open to hybrid or on-site",
+     "source": "LinkedIn",
+     "quote": "Vantaa · open to new roles"
+    }
+   ],
+   "corrected": [
+    {
+     "kind": "skill",
+     "text": "COMSOL: corrected to used at work, 2 yr",
+     "was": "COMSOL as drafted"
+    },
+    {
+     "kind": "remove",
+     "text": "Removed: MATLAB (not worth listing)",
+     "was": "a drafted skill"
+    }
+   ],
+   "answers": [
+    {
+     "q": "Which of these do you use, at work or in your own projects?",
+     "a": "Semiconductor physics, Heat transfer modelling, COMSOL, MATLAB, Combinatorial optimisation, Heuristic search"
+    },
+    {
+     "q": "How is your Finnish at work?",
+     "a": "basic"
+    },
+    {
+     "q": "Have you worked with Semiconductor physics?",
+     "a": "Not yet"
+    },
+    {
+     "q": "Which kind of work do you want more of?",
+     "a": "Building new things from scratch"
+    },
+    {
+     "q": "Which describes you better?",
+     "a": "Deep specialist in one area"
+    },
+    {
+     "q": "Which team rhythm suits you?",
+     "a": "Careful planning, fewer mistakes"
+    },
+    {
+     "q": "Which companies would you like to meet?",
+     "a": "KYOCERA Technologies Oy, QMill Oy, Hipped"
+    },
+    {
+     "q": "I would need work-permit support",
+     "a": "No"
+    }
+   ],
+   "own": {
+    "about": "I care about security as a habit, not a department.",
+    "looking": "Deep technical work with people who review each other's code properly."
+   },
+   "project": null
+  },
+  {
+   "id": "A-026",
+   "handle": "Applicant 26",
+   "field": "Semiconductors and photonics",
+   "level": "Experienced",
+   "skills": [
+    {
+     "name": "Back-end packaging",
+     "depth": "work",
+     "years": 3
+    },
+    {
+     "name": "Yield analysis",
+     "depth": "project",
+     "years": null
+    },
+    {
+     "name": "Semiconductor process integration",
+     "depth": "project",
+     "years": null
+    },
+    {
+     "name": "MEMS fabrication",
+     "depth": "project",
+     "years": null
+    }
+   ],
+   "finnish": "basic",
+   "english": "fluent",
+   "city": "Lisbon",
+   "abroad": true,
+   "permit": true,
+   "wants": [
+    "ti.com",
+    "2764193-2"
+   ],
+   "applied_at": "2026-11-09T14:54:00Z",
+   "sources": [
+    "GitHub",
+    "LinkedIn"
+   ],
+   "ai_summary": "Experienced semiconductors and photonics profile. Works mainly with Back-end packaging, Yield analysis, Semiconductor process integration. Based in Lisbon; Finnish basic. Sources read: LinkedIn, GitHub.",
+   "drafted": [
+    {
+     "kind": "role",
+     "text": "Chip plant process and manufacturing engineer (Semiconductors and photonics)",
+     "source": "LinkedIn",
+     "quote": "Chip plant process and manufacturing engineer, health tech, 2020–2023"
+    },
+    {
+     "kind": "level",
+     "text": "Experienced: 6 years of dated positions",
+     "source": "LinkedIn",
+     "quote": "6 years of dated positions since 2020"
+    },
+    {
+     "kind": "skill",
+     "text": "Back-end packaging: used at work, 3 yr",
+     "source": "LinkedIn",
+     "quote": "Built and ran Back-end packaging in production for 5 teams."
+    },
+    {
+     "kind": "skill",
+     "text": "Yield analysis: own projects",
+     "source": "GitHub",
+     "quote": "Personal project: Yield analysis, open on GitHub."
+    },
+    {
+     "kind": "skill",
+     "text": "Semiconductor process integration: own projects",
+     "source": "LinkedIn",
+     "quote": "Thesis work used Semiconductor process integration end to end."
+    },
+    {
+     "kind": "skill",
+     "text": "MEMS fabrication: own projects",
+     "source": "GitHub",
+     "quote": "Weekend repository exploring MEMS fabrication."
+    },
+    {
+     "kind": "language",
+     "text": "English fluent; Finnish basic",
+     "source": "LinkedIn",
+     "quote": "Suomi: basic"
+    },
+    {
+     "kind": "where",
+     "text": "Lives in Lisbon (abroad); open to on-site",
+     "source": "LinkedIn",
+     "quote": "Lisbon · open to new roles"
+    }
+   ],
+   "corrected": [],
+   "answers": [
+    {
+     "q": "Which of these do you use, at work or in your own projects?",
+     "a": "Back-end packaging, Yield analysis, Semiconductor process integration, MEMS fabrication"
+    },
+    {
+     "q": "How is your Finnish at work?",
+     "a": "basic"
+    },
+    {
+     "q": "Have you worked with Back-end packaging?",
+     "a": "Learning it now"
+    },
+    {
+     "q": "Which kind of work do you want more of?",
+     "a": "Improving and running existing systems"
+    },
+    {
+     "q": "Which describes you better?",
+     "a": "Generalist who covers many areas"
+    },
+    {
+     "q": "Which team rhythm suits you?",
+     "a": "Careful planning, fewer mistakes"
+    },
+    {
+     "q": "Which companies would you like to meet?",
+     "a": "Texas Instruments, KYOCERA Technologies Oy"
+    },
+    {
+     "q": "I would need work-permit support",
+     "a": "Yes"
+    }
+   ],
+   "own": {
+    "about": "I read datasheets for fun. I also know that is not normal.",
+    "looking": "Hardware that leaves the lab and gets manufactured."
+   },
+   "project": null
+  },
+  {
+   "id": "A-027",
+   "handle": "Applicant 27",
+   "field": "Security",
+   "level": "Experienced",
+   "skills": [
+    {
+     "name": "Prompt injection",
+     "depth": "work",
+     "years": 3
+    },
+    {
+     "name": "Python",
+     "depth": "work",
+     "years": 3
+    },
+    {
+     "name": "OWASP LLM Top 10",
+     "depth": "work",
+     "years": 3
+    },
+    {
+     "name": "Firewalls",
+     "depth": "project",
+     "years": null
+    }
+   ],
+   "finnish": "working level",
+   "english": "fluent",
+   "city": "Turku",
+   "abroad": false,
+   "permit": false,
+   "wants": [
+    "telusdigital.com",
+    "sansaino.com"
+   ],
+   "applied_at": "2026-11-12T18:17:00Z",
+   "sources": [
+    "GitHub",
+    "LinkedIn"
+   ],
+   "ai_summary": "Experienced security profile. Works mainly with Prompt injection, Python, OWASP LLM Top 10. Based in Turku; Finnish working level. Sources read: LinkedIn, GitHub.",
+   "drafted": [
+    {
+     "kind": "role",
+     "text": "AI red-teaming specialist (Security)",
+     "source": "LinkedIn",
+     "quote": "AI red-teaming specialist, gaming, 2020–2023"
+    },
+    {
+     "kind": "level",
+     "text": "Experienced: 6 years of dated positions",
+     "source": "LinkedIn",
+     "quote": "6 years of dated positions since 2020"
+    },
+    {
+     "kind": "skill",
+     "text": "Prompt injection: used at work, 3 yr",
+     "source": "LinkedIn",
+     "quote": "Built and ran Prompt injection in production for 5 teams."
+    },
+    {
+     "kind": "skill",
+     "text": "Python: used at work, 3 yr",
+     "source": "LinkedIn",
+     "quote": "Led the move to Python; cut incidents by a third."
+    },
+    {
+     "kind": "skill",
+     "text": "OWASP LLM Top 10: used at work, 3 yr",
+     "source": "LinkedIn",
+     "quote": "Built and ran OWASP LLM Top 10 in production for 5 teams."
+    },
+    {
+     "kind": "skill",
+     "text": "Firewalls: own projects",
+     "source": "GitHub",
+     "quote": "Personal project: Firewalls, open on GitHub."
+    },
+    {
+     "kind": "language",
+     "text": "English fluent; Finnish working level",
+     "source": "LinkedIn",
+     "quote": "Suomi: working level"
+    },
+    {
+     "kind": "where",
+     "text": "Lives in Turku; open to remote or hybrid",
+     "source": "LinkedIn",
+     "quote": "Turku · open to new roles"
+    }
+   ],
+   "corrected": [
+    {
+     "kind": "skill",
+     "text": "OWASP LLM Top 10: corrected to used at work, 2 yr",
+     "was": "OWASP LLM Top 10 as drafted"
+    }
+   ],
+   "answers": [
+    {
+     "q": "Which of these do you use, at work or in your own projects?",
+     "a": "Prompt injection, Python, OWASP LLM Top 10, Firewalls"
+    },
+    {
+     "q": "How is your Finnish at work?",
+     "a": "working level"
+    },
+    {
+     "q": "Have you worked with Threat modelling?",
+     "a": "Yes, at work"
+    },
+    {
+     "q": "Which kind of work do you want more of?",
+     "a": "Building new things from scratch"
+    },
+    {
+     "q": "Which describes you better?",
+     "a": "Generalist who covers many areas"
+    },
+    {
+     "q": "Which team rhythm suits you?",
+     "a": "Careful planning, fewer mistakes"
+    },
+    {
+     "q": "Which companies would you like to meet?",
+     "a": "TELUS Digital, Sansaino"
+    },
+    {
+     "q": "I would need work-permit support",
+     "a": "No"
+    }
+   ],
+   "own": {
+    "about": "I read datasheets for fun. I also know that is not normal.",
+    "looking": "Research-adjacent engineering: rigorous, but shipped."
+   },
+   "project": {
+    "name": "sensor-pipeline.pdf"
+   }
+  },
+  {
+   "id": "A-028",
+   "handle": "Applicant 28",
+   "field": "Research and science",
+   "level": "Senior",
+   "skills": [
+    {
+     "name": "Fermentation analytics",
+     "depth": "work",
+     "years": 8
+    },
+    {
+     "name": "High-throughput screening",
+     "depth": "work",
+     "years": 9
+    },
+    {
+     "name": "Strain engineering",
+     "depth": "work",
+     "years": 6
+    }
+   ],
+   "finnish": "working level",
+   "english": "fluent",
+   "city": "Vantaa",
+   "abroad": false,
+   "permit": false,
+   "wants": [
+    "metacell.fi"
+   ],
+   "applied_at": "2026-11-06T08:23:00Z",
+   "sources": [
+    "LinkedIn"
+   ],
+   "ai_summary": "Senior research and science profile. Works mainly with Fermentation analytics, High-throughput screening, Strain engineering. Based in Vantaa; Finnish working level. Sources read: LinkedIn.",
+   "drafted": [
+    {
+     "kind": "role",
+     "text": "Strain engineering scientist (Research and science)",
+     "source": "LinkedIn",
+     "quote": "Strain engineering scientist, logistics, 2017–2020"
+    },
+    {
+     "kind": "level",
+     "text": "Senior: 9 years of dated positions",
+     "source": "LinkedIn",
+     "quote": "9 years of dated positions since 2017"
+    },
+    {
+     "kind": "skill",
+     "text": "Fermentation analytics: used at work, 8 yr",
+     "source": "LinkedIn",
+     "quote": "Daily Fermentation analytics work since 2019."
+    },
+    {
+     "kind": "skill",
+     "text": "High-throughput screening: used at work, 9 yr",
+     "source": "LinkedIn",
+     "quote": "Built and ran High-throughput screening in production for 2 teams."
+    },
+    {
+     "kind": "skill",
+     "text": "Strain engineering: used at work, 6 yr",
+     "source": "LinkedIn",
+     "quote": "Built and ran Strain engineering in production for 2 teams."
+    },
+    {
+     "kind": "language",
+     "text": "English fluent; Finnish working level",
+     "source": "LinkedIn",
+     "quote": "Finnish: working level"
+    },
+    {
+     "kind": "where",
+     "text": "Lives in Vantaa; open to hybrid or on-site",
+     "source": "LinkedIn",
+     "quote": "Vantaa · open to new roles"
+    }
+   ],
+   "corrected": [],
+   "answers": [
+    {
+     "q": "Which of these do you use, at work or in your own projects?",
+     "a": "Fermentation analytics, High-throughput screening, Strain engineering"
+    },
+    {
+     "q": "How is your Finnish at work?",
+     "a": "working level"
+    },
+    {
+     "q": "Have you worked with Filamentous fungi?",
+     "a": "Learning it now"
+    },
+    {
+     "q": "Which kind of work do you want more of?",
+     "a": "Building new things from scratch"
+    },
+    {
+     "q": "Which describes you better?",
+     "a": "Deep specialist in one area"
+    },
+    {
+     "q": "Which team rhythm suits you?",
+     "a": "Fast experiments, ship often"
+    },
+    {
+     "q": "Which companies would you like to meet?",
+     "a": "Metacell"
+    },
+    {
+     "q": "I would need work-permit support",
+     "a": "No"
+    }
+   ],
+   "own": {
+    "about": "Give me a hard measurement problem and a quiet room.",
+    "looking": "A small team, a clear product, and customers I can talk to."
+   },
+   "project": null
+  },
+  {
+   "id": "A-029",
+   "handle": "Applicant 29",
+   "field": "Security",
+   "level": "Senior",
+   "skills": [
+    {
+     "name": "Threat modelling",
+     "depth": "project",
+     "years": null
+    },
+    {
+     "name": "ISO 27001",
+     "depth": "work",
+     "years": 7
+    },
+    {
+     "name": "Python",
+     "depth": "project",
+     "years": null
+    }
+   ],
+   "finnish": "none",
+   "english": "fluent",
+   "city": "Oulu",
+   "abroad": false,
+   "permit": false,
+   "wants": [
+    "lotussirius.com",
+    "telusdigital.com",
+    "certiud.fi"
+   ],
+   "applied_at": "2026-11-09T15:02:00Z",
+   "sources": [
+    "GitHub",
+    "LinkedIn"
+   ],
+   "ai_summary": "Senior security profile. Works mainly with Threat modelling, ISO 27001, Python. Based in Oulu; Finnish none. Sources read: LinkedIn, GitHub.",
+   "drafted": [
+    {
+     "kind": "role",
+     "text": "Post-quantum security engineer (Security)",
+     "source": "LinkedIn",
+     "quote": "Post-quantum security engineer at a fintech company, 2017–present"
+    },
+    {
+     "kind": "level",
+     "text": "Senior: 9 years of dated positions",
+     "source": "LinkedIn",
+     "quote": "9 years of dated positions since 2017"
+    },
+    {
+     "kind": "skill",
+     "text": "Threat modelling: own projects",
+     "source": "GitHub",
+     "quote": "Weekend repository exploring Threat modelling."
+    },
+    {
+     "kind": "skill",
+     "text": "ISO 27001: used at work, 7 yr",
+     "source": "LinkedIn",
+     "quote": "Built and ran ISO 27001 in production for 5 teams."
+    },
+    {
+     "kind": "skill",
+     "text": "Python: own projects",
+     "source": "GitHub",
+     "quote": "Personal project: Python, open on GitHub."
+    },
+    {
+     "kind": "language",
+     "text": "English fluent; Finnish none",
+     "source": "LinkedIn",
+     "quote": "Suomi: none"
+    },
+    {
+     "kind": "where",
+     "text": "Lives in Oulu; open to on-site",
+     "source": "LinkedIn",
+     "quote": "Oulu · open to new roles"
+    }
+   ],
+   "corrected": [],
+   "answers": [
+    {
+     "q": "Which of these do you use, at work or in your own projects?",
+     "a": "Threat modelling, ISO 27001, Python"
+    },
+    {
+     "q": "How is your Finnish at work?",
+     "a": "none"
+    },
+    {
+     "q": "Have you worked with ISO 27001?",
+     "a": "Learning it now"
+    },
+    {
+     "q": "Which kind of work do you want more of?",
+     "a": "Building new things from scratch"
+    },
+    {
+     "q": "Which describes you better?",
+     "a": "Deep specialist in one area"
+    },
+    {
+     "q": "Which team rhythm suits you?",
+     "a": "Fast experiments, ship often"
+    },
+    {
+     "q": "Which companies would you like to meet?",
+     "a": "Lotus Sirius, TELUS Digital, Certiud"
+    },
+    {
+     "q": "I would need work-permit support",
+     "a": "No"
+    }
+   ],
+   "own": {
+    "about": "Most of my best work started as a side script nobody asked for.",
+    "looking": "Work in English, with a real path to learning Finnish on the job."
+   },
+   "project": {
+    "name": "ml-eval.pdf"
+   }
+  },
+  {
+   "id": "A-030",
+   "handle": "Applicant 30",
+   "field": "Semiconductors and photonics",
+   "level": "Experienced",
+   "skills": [
+    {
+     "name": "Black silicon",
+     "depth": "work",
+     "years": 3
+    },
+    {
+     "name": "Semiconductor processing",
+     "depth": "work",
+     "years": 5
+    },
+    {
+     "name": "Photolithography",
+     "depth": "work",
+     "years": 2
+    },
+    {
+     "name": "Dark current analysis",
+     "depth": "work",
+     "years": 5
+    },
+    {
+     "name": "Process integration",
+     "depth": "work",
+     "years": 2
+    }
+   ],
+   "finnish": "working level",
+   "english": "fluent",
+   "city": "Oulu",
+   "abroad": false,
+   "permit": false,
+   "wants": [
+    "elfys.fi",
+    "vexlum.com",
+    "2647375-4"
+   ],
+   "applied_at": "2026-11-10T18:43:00Z",
+   "sources": [
+    "LinkedIn"
+   ],
+   "ai_summary": "Experienced semiconductors and photonics profile. Works mainly with Black silicon, Semiconductor processing, Photolithography. Based in Oulu; Finnish working level. Sources read: LinkedIn.",
+   "drafted": [
+    {
+     "kind": "role",
+     "text": "Photodetector process engineer (Semiconductors and photonics)",
+     "source": "LinkedIn",
+     "quote": "Photodetector process engineer at a space company, 2021–present"
+    },
+    {
+     "kind": "level",
+     "text": "Experienced: 5 years of dated positions",
+     "source": "LinkedIn",
+     "quote": "5 years of dated positions since 2021"
+    },
+    {
+     "kind": "skill",
+     "text": "Black silicon: used at work, 3 yr",
+     "source": "LinkedIn",
+     "quote": "Led the move to Black silicon; cut incidents by a third."
+    },
+    {
+     "kind": "skill",
+     "text": "Semiconductor processing: used at work, 5 yr",
+     "source": "LinkedIn",
+     "quote": "Daily Semiconductor processing work since 2022."
+    },
+    {
+     "kind": "skill",
+     "text": "Photolithography: used at work, 2 yr",
+     "source": "LinkedIn",
+     "quote": "Led the move to Photolithography; cut incidents by a third."
+    },
+    {
+     "kind": "skill",
+     "text": "Dark current analysis: used at work, 5 yr",
+     "source": "LinkedIn",
+     "quote": "Led the move to Dark current analysis; cut incidents by a third."
+    },
+    {
+     "kind": "skill",
+     "text": "Process integration: used at work, 2 yr",
+     "source": "LinkedIn",
+     "quote": "Daily Process integration work since 2022."
+    },
+    {
+     "kind": "language",
+     "text": "English working level; Finnish working level",
+     "source": "LinkedIn",
+     "quote": "Suomi: working level"
+    },
+    {
+     "kind": "where",
+     "text": "Lives in Oulu; open to remote or hybrid",
+     "source": "LinkedIn",
+     "quote": "Oulu · open to new roles"
+    }
+   ],
+   "corrected": [
+    {
+     "kind": "remove",
+     "text": "Removed: PowerPoint (not worth listing)",
+     "was": "a drafted skill"
+    }
+   ],
+   "answers": [
+    {
+     "q": "Which of these do you use, at work or in your own projects?",
+     "a": "Black silicon, Semiconductor processing, Photolithography, Dark current analysis, Process integration"
+    },
+    {
+     "q": "How is your Finnish at work?",
+     "a": "working level"
+    },
+    {
+     "q": "Have you worked with Dark current analysis?",
+     "a": "Yes, at work"
+    },
+    {
+     "q": "Which kind of work do you want more of?",
+     "a": "Improving and running existing systems"
+    },
+    {
+     "q": "Which describes you better?",
+     "a": "Deep specialist in one area"
+    },
+    {
+     "q": "Which team rhythm suits you?",
+     "a": "Fast experiments, ship often"
+    },
+    {
+     "q": "Which companies would you like to meet?",
+     "a": "ElFys, Vexlum, Teknologian tutkimuskeskus VTT Oy"
+    },
+    {
+     "q": "I would need work-permit support",
+     "a": "No"
+    }
+   ],
+   "own": {
+    "about": "I moved to Finland two years ago and want to stay; my Finnish is getting there.",
+    "looking": "Hardware that leaves the lab and gets manufactured."
+   },
+   "project": null
+  },
+  {
+   "id": "A-031",
+   "handle": "Applicant 31",
+   "field": "Research and science",
+   "level": "Senior",
+   "skills": [
+    {
+     "name": "MATLAB",
+     "depth": "work",
+     "years": 7
+    },
+    {
+     "name": "Heat transfer modelling",
+     "depth": "work",
+     "years": 6
+    },
+    {
+     "name": "Semiconductor physics",
+     "depth": "work",
+     "years": 8
+    },
+    {
+     "name": "Heuristic search",
+     "depth": "work",
+     "years": 7
+    }
+   ],
+   "finnish": "none",
+   "english": "fluent",
+   "city": "Berlin",
+   "abroad": true,
+   "permit": false,
+   "wants": [
+    "2764193-2",
+    "3438021-6"
+   ],
+   "applied_at": "2026-11-10T14:44:00Z",
+   "sources": [
+    "LinkedIn"
+   ],
+   "ai_summary": "Senior research and science profile. Works mainly with MATLAB, Heat transfer modelling, Semiconductor physics. Based in Berlin; Finnish none. Sources read: LinkedIn.",
+   "drafted": [
+    {
+     "kind": "role",
+     "text": "MEMS modelling engineer (Research and science)",
+     "source": "LinkedIn",
+     "quote": "MEMS modelling engineer, telecom, 2015–2018"
+    },
+    {
+     "kind": "level",
+     "text": "Senior: 11 years of dated positions",
+     "source": "LinkedIn",
+     "quote": "11 years of dated positions since 2015"
+    },
+    {
+     "kind": "skill",
+     "text": "MATLAB: used at work, 7 yr",
+     "source": "LinkedIn",
+     "quote": "Built and ran MATLAB in production for 5 teams."
+    },
+    {
+     "kind": "skill",
+     "text": "Heat transfer modelling: used at work, 6 yr",
+     "source": "LinkedIn",
+     "quote": "Daily Heat transfer modelling work since 2017."
+    },
+    {
+     "kind": "skill",
+     "text": "Semiconductor physics: used at work, 8 yr",
+     "source": "LinkedIn",
+     "quote": "Built and ran Semiconductor physics in production for 8 teams."
+    },
+    {
+     "kind": "skill",
+     "text": "Heuristic search: used at work, 7 yr",
+     "source": "LinkedIn",
+     "quote": "Led the move to Heuristic search; cut incidents by a third."
+    },
+    {
+     "kind": "language",
+     "text": "English working level; Finnish none",
+     "source": "LinkedIn",
+     "quote": "Suomi: none"
+    },
+    {
+     "kind": "where",
+     "text": "Lives in Berlin (abroad); open to hybrid or on-site",
+     "source": "LinkedIn",
+     "quote": "Berlin · open to new roles"
+    }
+   ],
+   "corrected": [
+    {
+     "kind": "skill",
+     "text": "Heat transfer modelling: corrected to own projects only",
+     "was": "Heat transfer modelling as drafted"
+    }
+   ],
+   "answers": [
+    {
+     "q": "Which of these do you use, at work or in your own projects?",
+     "a": "MATLAB, Heat transfer modelling, Semiconductor physics, Heuristic search"
+    },
+    {
+     "q": "How is your Finnish at work?",
+     "a": "none"
+    },
+    {
+     "q": "Have you worked with Python?",
+     "a": "Not yet"
+    },
+    {
+     "q": "Which kind of work do you want more of?",
+     "a": "Improving and running existing systems"
+    },
+    {
+     "q": "Which describes you better?",
+     "a": "Generalist who covers many areas"
+    },
+    {
+     "q": "Which team rhythm suits you?",
+     "a": "Fast experiments, ship often"
+    },
+    {
+     "q": "Which companies would you like to meet?",
+     "a": "KYOCERA Technologies Oy, QMill Oy"
+    },
+    {
+     "q": "I would need work-permit support",
+     "a": "No"
+    }
+   ],
+   "own": {
+    "about": "Give me a hard measurement problem and a quiet room.",
+    "looking": "Work in English, with a real path to learning Finnish on the job."
+   },
+   "project": {
+    "name": "sensor-pipeline.pdf"
+   }
+  },
+  {
+   "id": "A-032",
+   "handle": "Applicant 32",
+   "field": "Software",
+   "level": "Senior",
+   "skills": [
+    {
+     "name": "Kubernetes",
+     "depth": "work",
+     "years": 7
+    },
+    {
+     "name": "REST APIs",
+     "depth": "project",
+     "years": null
+    },
+    {
+     "name": "Python",
+     "depth": "work",
+     "years": 7
+    },
+    {
+     "name": "MLOps",
+     "depth": "project",
+     "years": null
+    },
+    {
+     "name": "C++",
+     "depth": "work",
+     "years": 9
+    }
+   ],
+   "finnish": "basic",
+   "english": "fluent",
+   "city": "Bengaluru",
+   "abroad": true,
+   "permit": true,
+   "wants": [
+    "qutwo.com",
+    "ti.com"
+   ],
+   "applied_at": "2026-11-09T13:35:00Z",
+   "sources": [
+    "GitHub",
+    "LinkedIn"
+   ],
+   "ai_summary": "Senior software profile. Works mainly with Kubernetes, REST APIs, Python. Based in Bengaluru; Finnish basic. Sources read: LinkedIn, GitHub.",
+   "drafted": [
+    {
+     "kind": "role",
+     "text": "Enterprise AI deployment engineer (Software)",
+     "source": "LinkedIn",
+     "quote": "Enterprise AI deployment engineer at a cleantech company, 2015–present"
+    },
+    {
+     "kind": "level",
+     "text": "Senior: 11 years of dated positions",
+     "source": "LinkedIn",
+     "quote": "11 years of dated positions since 2015"
+    },
+    {
+     "kind": "skill",
+     "text": "Kubernetes: used at work, 7 yr",
+     "source": "LinkedIn",
+     "quote": "Led the move to Kubernetes; cut incidents by a third."
+    },
+    {
+     "kind": "skill",
+     "text": "REST APIs: own projects",
+     "source": "GitHub",
+     "quote": "Thesis work used REST APIs end to end."
+    },
+    {
+     "kind": "skill",
+     "text": "Python: used at work, 7 yr",
+     "source": "LinkedIn",
+     "quote": "Built and ran Python in production for 2 teams."
+    },
+    {
+     "kind": "skill",
+     "text": "MLOps: own projects",
+     "source": "LinkedIn",
+     "quote": "Weekend repository exploring MLOps."
+    },
+    {
+     "kind": "skill",
+     "text": "C++: used at work, 9 yr",
+     "source": "LinkedIn",
+     "quote": "Built and ran C++ in production for 2 teams."
+    },
+    {
+     "kind": "language",
+     "text": "English fluent; Finnish basic",
+     "source": "LinkedIn",
+     "quote": "Suomi: basic"
+    },
+    {
+     "kind": "where",
+     "text": "Lives in Bengaluru (abroad); open to hybrid or on-site",
+     "source": "LinkedIn",
+     "quote": "Bengaluru · open to new roles"
+    }
+   ],
+   "corrected": [],
+   "answers": [
+    {
+     "q": "Which of these do you use, at work or in your own projects?",
+     "a": "Kubernetes, REST APIs, Python, MLOps, C++"
+    },
+    {
+     "q": "How is your Finnish at work?",
+     "a": "basic"
+    },
+    {
+     "q": "Have you worked with Kubernetes?",
+     "a": "Not yet"
+    },
+    {
+     "q": "Which kind of work do you want more of?",
+     "a": "Building new things from scratch"
+    },
+    {
+     "q": "Which describes you better?",
+     "a": "Deep specialist in one area"
+    },
+    {
+     "q": "Which team rhythm suits you?",
+     "a": "Careful planning, fewer mistakes"
+    },
+    {
+     "q": "Which companies would you like to meet?",
+     "a": "Qutwo, Texas Instruments"
+    },
+    {
+     "q": "I would need work-permit support",
+     "a": "Yes"
+    }
+   ],
+   "own": {
+    "about": "I have shipped things used by thousands of people and fixed them at 3 am.",
+    "looking": "Hardware that leaves the lab and gets manufactured."
+   },
+   "project": null
+  },
+  {
+   "id": "A-033",
+   "handle": "Applicant 33",
+   "field": "Security",
+   "level": "Experienced",
+   "skills": [
+    {
+     "name": "Adversarial testing",
+     "depth": "work",
+     "years": 2
+    },
+    {
+     "name": "Python",
+     "depth": "work",
+     "years": 5
+    }
+   ],
+   "finnish": "none",
+   "english": "fluent",
+   "city": "Helsinki",
+   "abroad": false,
+   "permit": false,
+   "wants": [
+    "telusdigital.com",
+    "ti.com"
+   ],
+   "applied_at": "2026-11-12T08:55:00Z",
+   "sources": [
+    "LinkedIn"
+   ],
+   "ai_summary": "Experienced security profile. Works mainly with Adversarial testing, Python. Based in Helsinki; Finnish none. Sources read: LinkedIn.",
+   "drafted": [
+    {
+     "kind": "role",
+     "text": "AI red-teaming specialist (Security)",
+     "source": "LinkedIn",
+     "quote": "AI red-teaming specialist at a energy company, 2021–present"
+    },
+    {
+     "kind": "level",
+     "text": "Experienced: 5 years of dated positions",
+     "source": "LinkedIn",
+     "quote": "5 years of dated positions since 2021"
+    },
+    {
+     "kind": "skill",
+     "text": "Adversarial testing: used at work, 2 yr",
+     "source": "LinkedIn",
+     "quote": "Owned Adversarial testing for a energy product used daily."
+    },
+    {
+     "kind": "skill",
+     "text": "Python: used at work, 5 yr",
+     "source": "LinkedIn",
+     "quote": "Built and ran Python in production for 3 teams."
+    },
+    {
+     "kind": "language",
+     "text": "English fluent; Finnish none",
+     "source": "LinkedIn",
+     "quote": "Finnish: none"
+    },
+    {
+     "kind": "where",
+     "text": "Lives in Helsinki; open to hybrid or on-site",
+     "source": "LinkedIn",
+     "quote": "Helsinki · open to new roles"
+    }
+   ],
+   "corrected": [
+    {
+     "kind": "skill",
+     "text": "Python: corrected to learning it now",
+     "was": "Python as drafted"
+    }
+   ],
+   "answers": [
+    {
+     "q": "Which of these do you use, at work or in your own projects?",
+     "a": "Adversarial testing, Python"
+    },
+    {
+     "q": "How is your Finnish at work?",
+     "a": "none"
+    },
+    {
+     "q": "Have you worked with Threat modelling?",
+     "a": "Not yet"
+    },
+    {
+     "q": "Which kind of work do you want more of?",
+     "a": "Improving and running existing systems"
+    },
+    {
+     "q": "Which describes you better?",
+     "a": "Deep specialist in one area"
+    },
+    {
+     "q": "Which team rhythm suits you?",
+     "a": "Fast experiments, ship often"
+    },
+    {
+     "q": "Which companies would you like to meet?",
+     "a": "TELUS Digital, Texas Instruments"
+    },
+    {
+     "q": "I would need work-permit support",
+     "a": "No"
+    }
+   ],
+   "own": {
+    "about": "I moved to Finland two years ago and want to stay; my Finnish is getting there.",
+    "looking": "Hardware that leaves the lab and gets manufactured."
+   },
+   "project": null
+  },
+  {
+   "id": "A-034",
+   "handle": "Applicant 34",
+   "field": "Semiconductors and photonics",
+   "level": "Experienced",
+   "skills": [
+    {
+     "name": "Photonics",
+     "depth": "work",
+     "years": 3
+    },
+    {
+     "name": "Optical design software",
+     "depth": "work",
+     "years": 5
+    },
+    {
+     "name": "Thin film deposition",
+     "depth": "work",
+     "years": 3
+    }
+   ],
+   "finnish": "working level",
+   "english": "fluent",
+   "city": "Tallinn",
+   "abroad": true,
+   "permit": true,
+   "wants": [
+    "zerogravity.fi",
+    "onefabnordic.fi",
+    "elfys.fi"
+   ],
+   "applied_at": "2026-11-09T08:17:00Z",
+   "sources": [
+    "LinkedIn"
+   ],
+   "ai_summary": "Experienced semiconductors and photonics profile. Works mainly with Photonics, Optical design software, Thin film deposition. Based in Tallinn; Finnish working level. Sources read: LinkedIn.",
+   "drafted": [
+    {
+     "kind": "role",
+     "text": "Thermal payload hardware engineer (Semiconductors and photonics)",
+     "source": "LinkedIn",
+     "quote": "Thermal payload hardware engineer, gaming, 2020–2023"
+    },
+    {
+     "kind": "level",
+     "text": "Experienced: 6 years of dated positions",
+     "source": "LinkedIn",
+     "quote": "6 years of dated positions since 2020"
+    },
+    {
+     "kind": "skill",
+     "text": "Photonics: used at work, 3 yr",
+     "source": "LinkedIn",
+     "quote": "Built and ran Photonics in production for 5 teams."
+    },
+    {
+     "kind": "skill",
+     "text": "Optical design software: used at work, 5 yr",
+     "source": "LinkedIn",
+     "quote": "Built and ran Optical design software in production for 5 teams."
+    },
+    {
+     "kind": "skill",
+     "text": "Thin film deposition: used at work, 3 yr",
+     "source": "LinkedIn",
+     "quote": "Owned Thin film deposition for a gaming product used daily."
+    },
+    {
+     "kind": "language",
+     "text": "English fluent; Finnish working level",
+     "source": "LinkedIn",
+     "quote": "Suomi: working level"
+    },
+    {
+     "kind": "where",
+     "text": "Lives in Tallinn (abroad); open to on-site",
+     "source": "LinkedIn",
+     "quote": "Tallinn · open to new roles"
+    }
+   ],
+   "corrected": [],
+   "answers": [
+    {
+     "q": "Which of these do you use, at work or in your own projects?",
+     "a": "Photonics, Optical design software, Thin film deposition"
+    },
+    {
+     "q": "How is your Finnish at work?",
+     "a": "working level"
+    },
+    {
+     "q": "Have you worked with Thermal infrared optics?",
+     "a": "Not yet"
+    },
+    {
+     "q": "Which kind of work do you want more of?",
+     "a": "Building new things from scratch"
+    },
+    {
+     "q": "Which describes you better?",
+     "a": "Generalist who covers many areas"
+    },
+    {
+     "q": "Which team rhythm suits you?",
+     "a": "Careful planning, fewer mistakes"
+    },
+    {
+     "q": "Which companies would you like to meet?",
+     "a": "Zero Gravity, OneFab Nordic, ElFys"
+    },
+    {
+     "q": "I would need work-permit support",
+     "a": "Yes"
+    }
+   ],
+   "own": {
+    "about": "Give me a hard measurement problem and a quiet room.",
+    "looking": "Less reporting, more forecasting and decisions."
+   },
+   "project": null
+  },
+  {
+   "id": "A-035",
+   "handle": "Applicant 35",
+   "field": "Semiconductors and photonics",
+   "level": "Early career",
+   "skills": [
+    {
+     "name": "Equipment maintenance",
+     "depth": "project",
+     "years": null
+    },
+    {
+     "name": "Vacuum systems",
+     "depth": "work",
+     "years": 1
+    },
+    {
+     "name": "Gas handling",
+     "depth": "project",
+     "years": null
+    },
+    {
+     "name": "Cleanroom processes",
+     "depth": "project",
+     "years": null
+    }
+   ],
+   "finnish": "working level",
+   "english": "fluent",
+   "city": "Oulu",
+   "abroad": false,
+   "permit": false,
+   "wants": [
+    "kvanttinova.fi",
+    "onefabnordic.fi",
+    "jmpventures.org"
+   ],
+   "applied_at": "2026-11-05T21:26:00Z",
+   "sources": [
+    "GitHub",
+    "LinkedIn"
+   ],
+   "ai_summary": "Early career semiconductors and photonics profile. Works mainly with Equipment maintenance, Vacuum systems, Gas handling. Based in Oulu; Finnish working level. Sources read: LinkedIn, GitHub.",
+   "drafted": [
+    {
+     "kind": "role",
+     "text": "Semiconductor equipment technician (Semiconductors and photonics)",
+     "source": "LinkedIn",
+     "quote": "Semiconductor equipment technician at a research company, 2024–present"
+    },
+    {
+     "kind": "level",
+     "text": "Early career: 2 years of dated positions",
+     "source": "LinkedIn",
+     "quote": "2 years of dated positions since 2024"
+    },
+    {
+     "kind": "skill",
+     "text": "Equipment maintenance: own projects",
+     "source": "GitHub",
+     "quote": "Weekend repository exploring Equipment maintenance."
+    },
+    {
+     "kind": "skill",
+     "text": "Vacuum systems: used at work, 1 yr",
+     "source": "LinkedIn",
+     "quote": "Owned Vacuum systems for a research product used daily."
+    },
+    {
+     "kind": "skill",
+     "text": "Gas handling: own projects",
+     "source": "LinkedIn",
+     "quote": "Thesis work used Gas handling end to end."
+    },
+    {
+     "kind": "skill",
+     "text": "Cleanroom processes: own projects",
+     "source": "GitHub",
+     "quote": "Weekend repository exploring Cleanroom processes."
+    },
+    {
+     "kind": "language",
+     "text": "English fluent; Finnish working level",
+     "source": "LinkedIn",
+     "quote": "Suomi: working level"
+    },
+    {
+     "kind": "where",
+     "text": "Lives in Oulu; open to remote or hybrid",
+     "source": "LinkedIn",
+     "quote": "Oulu · open to new roles"
+    }
+   ],
+   "corrected": [
+    {
+     "kind": "remove",
+     "text": "Removed: Jira (not worth listing)",
+     "was": "a drafted skill"
+    }
+   ],
+   "answers": [
+    {
+     "q": "Which of these do you use, at work or in your own projects?",
+     "a": "Equipment maintenance, Vacuum systems, Gas handling, Cleanroom processes"
+    },
+    {
+     "q": "How is your Finnish at work?",
+     "a": "working level"
+    },
+    {
+     "q": "Have you worked with Cleanroom protocols?",
+     "a": "Yes, at work"
+    },
+    {
+     "q": "Which kind of work do you want more of?",
+     "a": "Building new things from scratch"
+    },
+    {
+     "q": "Which describes you better?",
+     "a": "Generalist who covers many areas"
+    },
+    {
+     "q": "Which team rhythm suits you?",
+     "a": "Careful planning, fewer mistakes"
+    },
+    {
+     "q": "Which companies would you like to meet?",
+     "a": "Kvanttinova, OneFab Nordic, JMP Ventures"
+    },
+    {
+     "q": "I would need work-permit support",
+     "a": "No"
+    }
+   ],
+   "own": {
+    "about": "I am better at finishing than starting, and teams tend to need that.",
+    "looking": "A small team, a clear product, and customers I can talk to."
+   },
+   "project": {
+    "name": "fw-bootloader.pdf"
+   }
+  },
+  {
+   "id": "A-036",
+   "handle": "Applicant 36",
+   "field": "Mechanical and manufacturing",
+   "level": "Experienced",
+   "skills": [
+    {
+     "name": "CAD",
+     "depth": "work",
+     "years": 4
+    },
+    {
+     "name": "Fatigue analysis",
+     "depth": "work",
+     "years": 2
+    },
+    {
+     "name": "Composite and aluminium structures",
+     "depth": "project",
+     "years": null
+    }
+   ],
+   "finnish": "working level",
+   "english": "fluent",
+   "city": "Tallinn",
+   "abroad": true,
+   "permit": false,
+   "wants": [
+    "amertate.com"
+   ],
+   "applied_at": "2026-11-03T21:31:00Z",
+   "sources": [
+    "GitHub",
+    "LinkedIn"
+   ],
+   "ai_summary": "Experienced mechanical and manufacturing profile. Works mainly with CAD, Fatigue analysis, Composite and aluminium structures. Based in Tallinn; Finnish working level. Sources read: LinkedIn, GitHub.",
+   "drafted": [
+    {
+     "kind": "role",
+     "text": "Mechanical and blade-structure engineer (Mechanical and manufacturing)",
+     "source": "LinkedIn",
+     "quote": "Mechanical and blade-structure engineer at a space company, 2019–present"
+    },
+    {
+     "kind": "level",
+     "text": "Experienced: 7 years of dated positions",
+     "source": "LinkedIn",
+     "quote": "7 years of dated positions since 2019"
+    },
+    {
+     "kind": "skill",
+     "text": "CAD: used at work, 4 yr",
+     "source": "LinkedIn",
+     "quote": "Owned CAD for a space product used daily."
+    },
+    {
+     "kind": "skill",
+     "text": "Fatigue analysis: used at work, 2 yr",
+     "source": "LinkedIn",
+     "quote": "Owned Fatigue analysis for a space product used daily."
+    },
+    {
+     "kind": "skill",
+     "text": "Composite and aluminium structures: own projects",
+     "source": "GitHub",
+     "quote": "Thesis work used Composite and aluminium structures end to end."
+    },
+    {
+     "kind": "language",
+     "text": "English fluent; Finnish working level",
+     "source": "LinkedIn",
+     "quote": "Finnish: working level"
+    },
+    {
+     "kind": "where",
+     "text": "Lives in Tallinn (abroad); open to remote or hybrid",
+     "source": "LinkedIn",
+     "quote": "Tallinn · open to new roles"
+    }
+   ],
+   "corrected": [
+    {
+     "kind": "skill",
+     "text": "CAD: corrected to learning it now",
+     "was": "CAD as drafted"
+    }
+   ],
+   "answers": [
+    {
+     "q": "Which of these do you use, at work or in your own projects?",
+     "a": "CAD, Fatigue analysis, Composite and aluminium structures"
+    },
+    {
+     "q": "How is your Finnish at work?",
+     "a": "working level"
+    },
+    {
+     "q": "Have you worked with CAD?",
+     "a": "Learning it now"
+    },
+    {
+     "q": "Which kind of work do you want more of?",
+     "a": "Building new things from scratch"
+    },
+    {
+     "q": "Which describes you better?",
+     "a": "Deep specialist in one area"
+    },
+    {
+     "q": "Which team rhythm suits you?",
+     "a": "Fast experiments, ship often"
+    },
+    {
+     "q": "Which companies would you like to meet?",
+     "a": "Amertate"
+    },
+    {
+     "q": "I would need work-permit support",
+     "a": "No"
+    }
+   ],
+   "own": {
+    "about": "I am happiest when a messy system becomes boring and reliable.",
+    "looking": "Work in English, with a real path to learning Finnish on the job."
+   },
+   "project": null
+  }
+ ]
+}

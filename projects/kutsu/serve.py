@@ -38,7 +38,7 @@ DIST = lib.HERE / "ui" / "dist"
 # screen can open the invitation form: a copy next to this file on the server, the sibling project in the repo
 ESITTELY = next((d for d in (lib.HERE / "esittely", lib.HERE.parent / "espoo-recruitment" / "app") if d.is_dir()), None)
 REVIEWS = lib.HERE / "reviews.json"
-DATA = {"/signals.json": "signals.json", "/presets.json": "presets.json", "/pool.json": "pool.json"}
+DATA = {"/signals.json": "signals.json", "/presets.json": "presets.json", "/pool.json": "pool.json", "/applications.json": "applications.json"}
 TYPES = {".html": "text/html; charset=utf-8", ".js": "text/javascript", ".css": "text/css", ".json": "application/json",
          ".svg": "image/svg+xml", ".woff2": "font/woff2", ".png": "image/png", ".ico": "image/x-icon", ".md": "text/markdown; charset=utf-8"}
 STATUSES = {"draft", "invited", "joined"}

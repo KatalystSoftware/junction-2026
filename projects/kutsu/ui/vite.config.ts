@@ -12,7 +12,7 @@ export default defineConfig({
     port: 8047,
     strictPort: true,
     proxy: Object.fromEntries(
-      ['/signals.json', '/presets.json', '/reviews.json', '/pool.json', '/changes.json', '/role', '/reviews', '/brief', '/progress', '/review'].map((p) => [p, api]),
+      ['/signals.json', '/presets.json', '/reviews.json', '/pool.json', '/changes.json', '/applications.json', '/role', '/reviews', '/brief', '/progress', '/review'].map((p) => [p, api]),
     ),
   },
 })
