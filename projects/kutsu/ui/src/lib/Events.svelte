@@ -32,12 +32,13 @@
     <section class="next">
       <div class="title">
         <h2><a href="#/event/{plan.slug}">{plan.title}</a></h2>
-        <p>{[when(plan.date), left(plan.date)].filter(Boolean).join(', ')}</p>
+        <p>{[when(plan.date), left(plan.date)].filter(Boolean).join(', ')}. {plan.employers.length} employers.</p>
       </div>
-      <dl>
-        <div><dt>employers</dt><dd>{plan.employers.length}</dd></div>
-        <div><dt>people in the pool do what they ask for</dt><dd>{some(plan.people.people)}</dd></div>
-      </dl>
+      <ul class="asked">
+        {#each plan.rows.slice(0, 3) as row (row.label)}
+          <li><b>{row.label}</b><span>{row.asked} employers ask, {some(row.have)} people do it</span></li>
+        {/each}
+      </ul>
       <div class="progress">
         <div class="bar" role="img" aria-label={STATES.map(([s, label]) => `${String(by(s).length)} ${label}`).join(', ')}>
           {#each STATES as [status] (status)}
@@ -145,24 +146,16 @@
     margin-top: var(--s2);
     color: var(--ink-2);
   }
-  dl {
-    display: flex;
-    gap: var(--s6);
-    margin: 0;
-  }
-  dl div {
-    display: flex;
-    flex-direction: column-reverse;
-    max-width: 11rem;
-  }
-  dd {
-    font: 700 var(--t-xl) / 1 var(--display);
-    letter-spacing: -0.02em;
-  }
-  dt {
-    margin-top: var(--s1);
+  .asked {
+    display: grid;
+    gap: var(--s2);
     font-size: var(--t-sm);
     line-height: 1.3;
+  }
+  .asked li {
+    display: grid;
+  }
+  .asked span {
     color: var(--ink-2);
   }
   .progress,

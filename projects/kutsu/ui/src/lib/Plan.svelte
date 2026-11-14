@@ -18,11 +18,15 @@
   const events = $derived(app.pool.events.map((e) => ({ ...e, came: people.events[e.id] ?? 0 })).filter((e) => e.came).sort((a, b) => b.came - a.came))
   const most = $derived(Math.max(1, ...plan.rows.map((r) => r.have)))
   const names = $derived(plan.employers.slice(0, 3).map((e) => nameOf(e.brief)))
-  const work = $derived(plan.kind === 'suggested' ? plan.title.toLowerCase() : 'the work these employers ask for')
+  // An event in one field has one count of people. An event whose employers ask across many fields has
+  // none: adding the fields up gives nearly the whole pool, which says nothing, so it is shown field by field.
+  const oneField = $derived(plan.kind === 'suggested')
   // what each side asks before it commits, answered from the other side
   const toEmployers = $derived(
-    `${some(people.people)} people who came to Espoo's events work in ${work}` +
-      (events[0] ? `; ${some(events[0].came)} of them came to ${events[0].name} in ${when(events[0].date.slice(0, 7))}.` : '.'),
+    oneField
+      ? `${some(people.people)} people who came to Espoo's events work in ${plan.title.toLowerCase()}` +
+          (events[0] ? `; ${some(events[0].came)} of them came to ${events[0].name} in ${when(events[0].date.slice(0, 7))}.` : '.')
+      : `Of the people who came to Espoo's events, ${plan.rows.slice(0, 3).map((r) => `${some(r.have)} work in ${r.label.toLowerCase()}`).join(', ')}.`,
   )
   const toPeople = $derived(
     `${String(plan.employers.length)} employers have said what they are looking for` + (names.length ? `, among them ${names.join(', ')}.` : '.'),
@@ -84,7 +88,8 @@
 
     <section class="people">
       <h2>People to invite <span class="sample">sample data</span></h2>
-      <p class="count"><b>{some(people.people)}</b> {plan.kind === 'upcoming' ? 'do what these employers ask for' : 'do this work'}{#if people.wanting}<span>+{some(people.wanting)} want to move into it</span>{/if}</p>
+      {#if oneField}
+      <p class="count"><b>{some(people.people)}</b> do this work{#if people.wanting}<span>+{some(people.wanting)} want to move into it</span>{/if}</p>
 
       {#if levels.length}
         <div class="levels" aria-hidden="true">
@@ -100,9 +105,12 @@
         <span><b>{some(people.finnish)}</b> in Finnish</span>
         <span><b>{some(people.abroad)}</b> live abroad</span>
       </p>
+      {:else}
+        <p class="by">By the work these employers ask for, most asked first. Open a field for its people.</p>
+      {/if}
 
       {#if plan.rows.length}
-        <h3>{plan.kind === 'upcoming' ? 'By field' : 'What employers ask for'}</h3>
+        {#if oneField}<h3>What employers ask for</h3>{/if}
         <ul class="rows">
           {#each plan.rows as row (row.label)}
             <li>
@@ -115,7 +123,7 @@
         </ul>
       {/if}
 
-      {#if events.length}
+      {#if oneField && events.length}
         <h3>They came to</h3>
         <ul class="came">
           {#each events as event (event.id)}
@@ -300,6 +308,11 @@
   }
   .count span {
     flex-basis: 100%;
+    font-size: var(--t-sm);
+    color: var(--ink-2);
+  }
+  .by {
+    margin: var(--s2) 0 var(--s4);
     font-size: var(--t-sm);
     color: var(--ink-2);
   }

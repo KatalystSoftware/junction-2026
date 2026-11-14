@@ -14,6 +14,7 @@ export type Plan = {
   date: string
   fields: string[]
   employers: Invitee[]
+  /** the pool's people in these fields. Only an event in one field shows it as a number: across many fields it is nearly everyone */
   people: PoolField
   /** what is asked for against what the pool has: fields for a whole event, skills for one field */
   rows: Row[]
