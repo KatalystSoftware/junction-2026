@@ -58,7 +58,7 @@
   }
 </script>
 
-<svelte:window onkeydown={(e) => { if (e.key === 'Escape') open = false }} onclick={() => (open = false)} />
+<svelte:window onkeydown={(e: KeyboardEvent) => { if (e.key === 'Escape') open = false }} onclick={() => (open = false)} />
 
 <div class="demo" role="presentation" onclick={(e) => { e.stopPropagation() }}>
   <button class="toggle" aria-expanded={open} onclick={() => (open = !open)}>Demo</button>

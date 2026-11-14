@@ -38,7 +38,7 @@
       {#if brief.card.pitch || identity?.slogan}<p class="slogan">{brief.card.pitch || identity?.slogan}</p>{/if}
       {#if facts.length}
         <dl>
-          {#each facts as [label, value]}
+          {#each facts as [label, value] (label)}
             <div><dt>{label}</dt><dd>{value}</dd></div>
           {/each}
         </dl>

@@ -1,29 +1,50 @@
 import type { Brief, Pool, Preset, Review, Status, Step, Watch } from './types'
 
 /** Everything the page shows. Reviews are polled, so a company's reply arrives without a reload. */
-export const app = $state({
-  briefs: [] as Brief[],
-  presets: [] as Preset[],
-  reviews: {} as Record<string, Review>,
-  pool: { note: '', people: 0, events: [], fields: {} } as Pool,
-  watch: { watched: {}, changes: [], checked_at: '' } as Watch,
+type App = {
+  briefs: Brief[]
+  presets: Preset[]
+  reviews: Record<string, Review>
+  pool: Pool
+  watch: Watch
+  hash: string
+  ready: boolean
+  research: null | { query: string; steps: Step[]; error: string }
+}
+export const app = $state<App>({
+  briefs: [],
+  presets: [],
+  reviews: {},
+  pool: { note: '', people: 0, events: [], fields: {} },
+  watch: { watched: {}, changes: [], checked_at: '' },
   hash: location.hash,
   ready: false,
-  research: null as null | { query: string; steps: Step[]; error: string },
+  research: null,
 })
 
-const get = (path: string) => fetch(path).then((r) => r.json())
+/** A JSON answer from our own server, as the type the caller names: the server and the page are built together. */
+const get = <T>(path: string): Promise<T> => fetch(path).then((r) => r.json() as Promise<T>)
 
 export async function load() {
-  const [briefs, presets, reviews, pool, watch] = await Promise.all(['signals.json', 'presets.json', 'reviews.json', 'pool.json', 'changes.json'].map(get))
+  const [briefs, presets, reviews, pool, watch] = await Promise.all([
+    get<Brief[]>('signals.json'),
+    get<Preset[]>('presets.json'),
+    get<Record<string, Review>>('reviews.json'),
+    get<Pool>('pool.json'),
+    get<Watch>('changes.json'),
+  ])
   Object.assign(app, { briefs, presets, reviews, pool, watch, ready: true })
   // the server asks Context.dev at most every five minutes, so asking it once a minute is cheap
-  setInterval(async () => (app.watch = await get('changes.json')), 60_000)
+  setInterval(() => {
+    void get<Watch>('changes.json').then((seen) => (app.watch = seen))
+  }, 60_000)
   // A new screen starts at its top; back or forward through the browser's history returns to where the reader was.
   // Each history entry is numbered in history.state; the position of the current one follows the reader's scrolling,
   // and is not touched while a fresh render still moves the page.
   const scrolls: Record<number, number> = {}
-  let at = typeof history.state?.i === 'number' ? (history.state.i as number) : 0
+  /** The number this page gave the current history entry, if it has given one. */
+  const entry = () => (history.state as { i?: number } | null)?.i
+  let at = entry() ?? 0
   let settling = false
   if (!history.state) history.replaceState({ i: at }, '')
   history.scrollRestoration = 'manual'
@@ -36,25 +57,26 @@ export async function load() {
   addEventListener('keydown', press, true)
   const settle = (y: number, tries: number) => {
     scrollTo({ top: y })
-    if (Math.abs(scrollY - y) > 2 && tries > 0) setTimeout(() => settle(y, tries - 1), 50)
+    if (Math.abs(scrollY - y) > 2 && tries > 0) setTimeout(() => { settle(y, tries - 1) }, 50)
     else settling = false
   }
   addEventListener('hashchange', () => {
     if (pressed >= 0 && performance.now() - pressedAt < 1500) scrolls[at] = pressed
     pressed = -1
     settling = true
-    const traverse = typeof history.state?.i === 'number'
-    if (traverse) at = history.state.i as number
+    const numbered = entry()
+    const traverse = numbered !== undefined
+    if (traverse) at = numbered
     else {
       at += 1
       history.replaceState({ i: at }, '')
     }
     app.hash = location.hash
-    requestAnimationFrame(() => settle(traverse ? (scrolls[at] ?? 0) : 0, traverse ? 10 : 0))
+    requestAnimationFrame(() => { settle(traverse ? (scrolls[at] ?? 0) : 0, traverse ? 10 : 0) })
   })
   // a field being typed in would lose its text to a poll, so polls wait for the typing to end
   setInterval(async () => {
-    if (!(document.activeElement as HTMLElement | null)?.isContentEditable) app.reviews = await get('reviews.json')
+    if (!(document.activeElement as HTMLElement | null)?.isContentEditable) app.reviews = await get<Record<string, Review>>('reviews.json')
   }, 3000)
 }
 
@@ -73,16 +95,13 @@ export const joinPath = (id: string, event = '') => `#/join/${encodeURIComponent
 export const joinLink = (id: string, event = '') => `${location.origin}${location.pathname}${joinPath(id, event)}`
 /** Put a company's invitation link on the clipboard, which is how an invitation leaves this screen: a person sends it. */
 export const copyLink = (id: string, event = '') => copyText(joinLink(id, event))
+/** Put text on the clipboard. False when the browser refuses, so no screen says "copied" when nothing was. */
 export async function copyText(text: string) {
-  // the clipboard API needs https; on plain http fall back to selecting a hidden field
   try {
     await navigator.clipboard.writeText(text)
+    return true
   } catch {
-    const field = Object.assign(document.createElement('textarea'), { value: text })
-    document.body.append(field)
-    field.select()
-    document.execCommand('copy')
-    field.remove()
+    return false
   }
 }
 
@@ -112,13 +131,13 @@ export async function research(query: string, open: (id: string) => void = go) {
   const mine = ++run
   app.research = { query, steps: [], error: '' }
   const poll = setInterval(async () => {
-    const steps = await get(`progress?q=${encodeURIComponent(query)}`).catch(() => null)
+    const steps = await get<Step[]>(`progress?q=${encodeURIComponent(query)}`).catch(() => null)
     if (steps && run === mine && app.research) app.research.steps = steps
   }, 400)
   try {
     const r = await fetch(`brief?q=${encodeURIComponent(query)}`)
     if (!r.ok) throw new Error(await r.text())
-    const brief: Brief = await r.json()
+    const brief = (await r.json()) as Brief
     app.briefs = [...app.briefs.filter((b) => b.id !== brief.id), brief]
     if (run === mine) {
       app.research = null

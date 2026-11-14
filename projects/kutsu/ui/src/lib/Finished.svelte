@@ -3,7 +3,7 @@
   import Icon from './Icon.svelte'
   import Logo from './Logo.svelte'
   import type { Occasion } from './events'
-  import { joinLink, saveReview } from './state.svelte'
+  import { copyLink, saveReview } from './state.svelte'
   import type { Brief, Need, Review, Told } from './types'
 
   // The company's finished page: who it is, who it is looking for, and what Espoo does for it,
@@ -45,15 +45,7 @@
 
   let copied = $state(false)
   async function share() {
-    try {
-      await navigator.clipboard.writeText(joinLink(brief.id, event.slug))
-    } catch {
-      const field = Object.assign(document.createElement('textarea'), { value: joinLink(brief.id, event.slug) })
-      document.body.append(field)
-      field.select()
-      document.execCommand('copy')
-      field.remove()
-    }
+    if (!(await copyLink(brief.id, event.slug))) return
     copied = true
     setTimeout(() => (copied = false), 1600)
   }
@@ -91,8 +83,8 @@
           <li>
             <h4>{n.title}</h4>
             <p class="terms">{terms(n).join(' · ')}</p>
-            {#if n.can_do?.length}<ul class="can">{#each n.can_do as task}<li>{task}</li>{/each}</ul>{/if}
-            {#if n.skills.length}<p class="knows">{#each n.skills as skill}<span>{skill}</span>{/each}</p>{/if}
+            {#if n.can_do.length}<ul class="can">{#each n.can_do as task, j (j)}<li>{task}</li>{/each}</ul>{/if}
+            {#if n.skills.length}<p class="knows">{#each n.skills as skill, j (j)}<span>{skill}</span>{/each}</p>{/if}
             <p class="reach">{reach(n)}</p>
           </li>
         {/each}
@@ -102,7 +94,7 @@
     <div class="does" style:--i={2}>
       <h3>What Espoo does for you</h3>
       <ol>
-        {#each steps as step}
+        {#each steps as step (step.what)}
           <li><b>{step.when}</b><span><strong>{step.what}</strong>{step.detail}</span></li>
         {/each}
       </ol>

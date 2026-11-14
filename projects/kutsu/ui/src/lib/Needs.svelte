@@ -12,6 +12,8 @@
   let { brief, review, who, editable }: { brief: Brief; review: Review; who: 'espoo' | 'company'; editable: boolean } = $props()
   let list: HTMLOListElement
   const number = (id: string) => brief.signals.findIndex((s) => s.id === id) + 1
+  /** The public statements a need rests on. */
+  const cited = (need: Need) => need.signals.map((id) => brief.signals.find((s) => s.id === id)).filter((s) => !!s)
   const BY = { espoo: 'Edited by Espoo', company: 'Changed by the company' }
   const blank = (): Need => ({ id: `e${String(Date.now())}`, title: '', why: '', can_do: [], skills: [], seniority: 'Experienced', signals: [], roles: [], by: who })
 
@@ -19,35 +21,39 @@
 
   function edit(i: number, key: 'title' | 'why', e: FocusEvent) {
     const text = (e.currentTarget as HTMLElement).innerText.replace(/\s+/g, ' ').trim()
-    if (text === review.needs[i][key]) return
-    save(review.needs.map((n, j) => (j === i ? { ...n, [key]: text, by: who } : n)))
+    if (text === review.needs[i]?.[key]) return
+    void save(review.needs.map((n, j) => (j === i ? { ...n, [key]: text, by: who } : n)))
   }
-  const remove = (i: number) => save(review.needs.filter((_, j) => j !== i))
+  const remove = (i: number) => void save(review.needs.filter((_, j) => j !== i))
   async function add() {
     await save([...review.needs, blank()])
     await tick()
     list.querySelector<HTMLElement>('li:last-child h3')?.focus()
   }
-  const enter = (e: KeyboardEvent) => e.key === 'Enter' && (e.preventDefault(), (e.currentTarget as HTMLElement).blur())
+  const enter = (e: KeyboardEvent) => {
+    if (e.key !== 'Enter') return
+    e.preventDefault()
+    ;(e.currentTarget as HTMLElement).blur()
+  }
 </script>
 
 <ol bind:this={list} class:editable>
   {#each review.needs as need, i (i)}
     <li style:--i={i}>
       <!-- svelte-ignore a11y_missing_content (the `text` action writes the title into it) -->
-      <h3 contenteditable={editable ? 'plaintext-only' : undefined} spellcheck="false" data-placeholder="Who do they need?" onblur={(e) => edit(i, 'title', e)} onkeydown={enter} use:text={need.title}></h3>
+      <h3 contenteditable={editable ? 'plaintext-only' : undefined} spellcheck="false" data-placeholder="Who do they need?" onblur={(e) => { edit(i, 'title', e) }} onkeydown={enter} use:text={need.title}></h3>
       <p class="why">
-        <span role={editable ? 'textbox' : undefined} aria-label="Why" contenteditable={editable ? 'plaintext-only' : undefined} data-placeholder="Why? One line." onblur={(e) => edit(i, 'why', e)} onkeydown={enter} use:text={need.why}></span><span class="cites">{#each need.signals.filter(number) as id}<Cite signal={brief.signals[number(id) - 1]} n={number(id)} />{/each}</span>
+        <span role={editable ? 'textbox' : undefined} aria-label="Why" contenteditable={editable ? 'plaintext-only' : undefined} data-placeholder="Why? One line." onblur={(e) => { edit(i, 'why', e) }} onkeydown={enter} use:text={need.why}></span><span class="cites">{#each cited(need) as signal (signal.id)}<Cite {signal} n={number(signal.id)} />{/each}</span>
       </p>
-      {#if need.can_do?.length}<ul class="can">{#each need.can_do as task}<li>{task}</li>{/each}</ul>{/if}
+      {#if need.can_do.length}<ul class="can">{#each need.can_do as task, j (j)}<li>{task}</li>{/each}</ul>{/if}
       <p class="tags">
         <span class="level">{terms(need).join(' · ')}</span>
-        {#each need.skills as skill}<span class="skill">{skill}</span>{/each}
-        {#each need.roles as role}<span class="role">Hiring now: {role}</span>{/each}
+        {#each need.skills as skill, j (j)}<span class="skill">{skill}</span>{/each}
+        {#each need.roles as role, j (j)}<span class="role">Hiring now: {role}</span>{/each}
         {#if need.by}<span class="by">{need.signals.length ? BY[need.by] : need.by === 'espoo' ? 'Added by Espoo' : 'Added by the company'}</span>{/if}
       </p>
       {#if editable}
-        <button class="remove" aria-label="Remove this need" title="Remove" onclick={() => remove(i)}><Icon name="x" size={16} /></button>
+        <button class="remove" aria-label="Remove this need" title="Remove" onclick={() => { remove(i) }}><Icon name="x" size={16} /></button>
       {/if}
     </li>
   {:else}

@@ -14,7 +14,11 @@ export default ts.config(
   {
     languageOptions: {
       globals: globals.browser,
-      parserOptions: { projectService: true, extraFileExtensions: ['.svelte'], tsconfigRootDir: import.meta.dirname },
+      parserOptions: { projectService: { allowDefaultProject: ['*.mjs'] }, extraFileExtensions: ['.svelte'], tsconfigRootDir: import.meta.dirname },
+    },
+    rules: {
+      // a number in a template string says what it is; the preset only allows strings
+      '@typescript-eslint/restrict-template-expressions': ['error', { allowNumber: true }],
     },
   },
   {
@@ -22,4 +26,6 @@ export default ts.config(
     languageOptions: { parserOptions: { parser: ts.parser, svelteConfig } },
   },
   { files: ['*.js', '*.config.ts'], ...ts.configs.disableTypeChecked },
+  // the headless walk is a plain Node script outside the page's TypeScript project
+  { files: ['*.mjs'], ...ts.configs.disableTypeChecked, languageOptions: { globals: globals.node } },
 )

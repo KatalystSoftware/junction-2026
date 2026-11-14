@@ -8,6 +8,7 @@
     "allowArbitraryExtensions": true,
     "noEmit": true,
     "strict": true,
+    "noUncheckedIndexedAccess": true,
     "noUnusedLocals": true,
     "moduleDetection": "force",
     "skipLibCheck": true

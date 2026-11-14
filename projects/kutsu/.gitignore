@@ -1,6 +1,9 @@
 # raw page cache and work files stay out of git: records, quotes and URLs only
 cache/
 work/
+# every paid request and its raw response: third-party page text, which names people as news does.
+# It stays on this machine and on the server; ./fetch-cache.sh brings the server's copy down.
+api-cache/
 __pycache__/
 # the built page, its dependencies and the demo's review state
 ui/node_modules/

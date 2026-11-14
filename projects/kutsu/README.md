@@ -37,17 +37,22 @@ python3 pool.py                                                                 
 
 `serve.py` without `sops exec-env` still shows every stored company; only new searches need keys.
 
-The test has two parts. `check` type-checks the page and fails on any warning; `deploy.sh` runs it
-first and stops there if it fails. `walk` needs `serve.py` running: it opens every screen in a
-headless Chromium, signs one company up by pressing Enter until the finished page, and fails on any
-error the page reports. `npm --prefix ui run lint` is ESLint with typescript-eslint's strict
-type-checked rules; it still reports 83 findings and is not part of the check yet.
+The test has two parts. `check` is the gate: `deploy.sh` runs it before it builds or copies anything
+and stops if it fails. It runs, in order:
 
-The **Demo** button belongs to the demo, not the product. It is out of sight until the pointer is in
-the top right corner (on a phone it stays faintly visible). It moves between the
-three people Kutsu is for (Espoo's organiser, an invited company, a candidate), fills in example
-sign-ups so the screens can be seen in use, and clears every sign-up. An example sign-up is marked
-as one wherever it shows: no company did it.
+- `svelte-check`, failing on any warning, with `strict` and `noUncheckedIndexedAccess` on;
+- ESLint with typescript-eslint's strict type-checked rules and eslint-plugin-svelte, failing on any
+  warning. Every list in the page must be keyed, non-null assertions and unsafe `any` are errors. One
+  rule option differs from the preset: a number may stand in a template string
+  (`restrict-template-expressions`, `allowNumber`). No rule is turned off for the page; the two
+  config files and the headless walk are linted without type information, being outside the page's
+  TypeScript project;
+- `test_data.py`: every list the page keys has unique keys in the committed data, the server refuses
+  a saved sign-up the page could not key (one shaped like older builds' among them), and reading a
+  person's profile writes no file and prints nothing of the person.
+
+`walk` needs `serve.py` running: it opens every screen in a headless Chromium, signs one company up
+by pressing Enter until the finished page, and fails on any error the page reports.
 
 ## A person's profile, filled in from what they hand over
 
@@ -71,6 +76,24 @@ it reads at most 60 profiles per start (`PEOPLE_LIMIT`), and that is a reason th
 ```sh
 curl -s https://kutsu.katalyst.fyi/person -d '{"kind": "linkedin", "value": "https://www.linkedin.com/in/<you>"}'
 ```
+
+## What is kept about companies, and what about people
+
+The rule: **the cache may hold company information; data about an individual person is never stored.**
+
+- **About companies** we read public pages: the company's brand record and careers page through
+  Context.dev, and news about it through Exa. The raw responses are kept in `api-cache/` (not in git,
+  see below) so nothing is paid for twice. That text is third-party writing and names people as news
+  does; nothing that names a person is ever shown, and `signals.json`, which is in git, holds only
+  claims, short quotes and addresses.
+- **About a person** we read one thing, and only when that person hands it over in their own
+  invitation: their LinkedIn address, a portfolio page, or the text of their CV (`POST /person`). A
+  LinkedIn address goes to Context.dev's people lookup, a portfolio page to its scraper, and the
+  resulting text to the model (Anthropic) to be turned into lines the person agrees with or strikes.
+  None of it is cached, logged or saved on our side: the answer goes back to the person's browser
+  and that is the only copy. Company research never looks people up, and its searches leave out
+  social networks.
+- **People as numbers:** the pool on Espoo's screen is sample data, and it is counts, never rows.
 
 ## What is real, what is sample, what is proposed
 
@@ -174,9 +197,11 @@ What a need asks for, and where each value comes from:
 | Hiring from abroad | yes, or only people already in Finland | always the company: no post says it |
 
 Four Exa searches, two or three Context.dev requests and three Haiku calls per company, about $0.03
-and 11 to 13 credits. Every request and its raw response is stored in `api-cache/`, which is in git,
-so a rerun is free for everyone and needs no keys. The cache holds third-party article text with
-people's names in it: delete it (and its history) before this repository is made public. A statement
+and 11 to 13 credits. Every request and its raw response is stored in `api-cache/`, so a rerun is
+free and needs no keys. The cache is not in git, because it holds the raw text of third-party pages,
+which names people as news does. It lives on the machine that ran the pipeline and on the server
+(`/srv/talent-brief/api-cache`, the fullest copy); `./fetch-cache.sh` brings the server's copy down,
+and a deploy adds the local files to the server's without ever deleting any there. A statement
 is kept only when its quote is found word for word in the page it cites and it names no person. Names
 are found by a model call and a pattern, which is not a guarantee, so read new output before showing
 it.
@@ -279,8 +304,10 @@ Finland 96, outside Finland 92, posted on another company's job board 18, no loc
 ## Crawling rules and what each portal allowed
 
 Identifiable User-Agent, robots.txt obeyed per host, at most one request per second per host, a cached
-URL is never fetched again. No LinkedIn, nothing behind a login, no block bypassed. No recruiter names,
-emails or phone numbers are stored (a field whose quote contains one is dropped).
+URL is never fetched again. This crawl of company job pages reads no LinkedIn, nothing behind a login,
+and bypasses no block. No recruiter names, emails or phone numbers are stored (a field whose quote
+contains one is dropped). The one place a LinkedIn profile is read is a person's own, when that
+person hands it over in their invitation; see "What is kept about companies, and what about people".
 
 | portal | robots.txt | terms of use | used |
 |---|---|---|---|
@@ -376,4 +403,5 @@ Claude Haiku 5.5 only: 2,376 calls, 15.7 M input and 1.1 M output tokens, **$2.1
    page or feed, 68 expose a machine-readable feed, and those 68 give 63% of the roles. A
    "publish your jobs feed" nudge from the city would cover most of the rest without any form.
 5. We stayed inside the rules: robots.txt obeyed, one request per second, no portals whose terms forbid
-   reuse, no personal data. The city can run this itself without asking anyone's permission.
+   reuse, no personal data in the job-post crawl. The city can run this itself without asking anyone's
+   permission.

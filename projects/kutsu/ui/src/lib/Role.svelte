@@ -14,7 +14,8 @@
   type Key = 'seniority' | 'language' | 'workplace' | 'abroad'
   let asking = $state<Key | null>(null)
 
-  const number = (id: string) => brief.signals.findIndex((s) => s.id === id) + 1
+  // the public statements this role rests on
+  const cited = $derived(need.signals.map((id) => brief.signals.find((s) => s.id === id)).filter((s) => !!s))
   const typed = (e: FocusEvent) => (e.currentTarget as HTMLElement).innerText.replace(/\s+/g, ' ').trim()
   const enter = (e: KeyboardEvent) => {
     if (e.key !== 'Enter') return
@@ -62,7 +63,7 @@
   <h2 role={editing ? 'textbox' : undefined} aria-label={editing ? 'Role' : undefined} contenteditable={editing ? 'plaintext-only' : undefined} spellcheck="false" data-placeholder="Who are you looking for?" onblur={(e) => { reword('title', e) }} onkeydown={enter} use:text={need.title}></h2>
   {#if need.why || need.signals.length || editing}
     <p class="why">
-      <span role={editing ? 'textbox' : undefined} aria-label={editing ? 'Why now' : undefined} contenteditable={editing ? 'plaintext-only' : undefined} data-placeholder="Why now?" onblur={(e) => { reword('why', e) }} onkeydown={enter} use:text={need.why}></span><span class="cites">{#each need.signals.filter(number) as id, k (id)}<Cite signal={brief.signals[number(id) - 1]} n={k + 1} />{/each}</span>
+      <span role={editing ? 'textbox' : undefined} aria-label={editing ? 'Why now' : undefined} contenteditable={editing ? 'plaintext-only' : undefined} data-placeholder="Why now?" onblur={(e) => { reword('why', e) }} onkeydown={enter} use:text={need.why}></span><span class="cites">{#each cited as signal, k (signal.id)}<Cite {signal} n={k + 1} />{/each}</span>
     </p>
   {/if}
 
