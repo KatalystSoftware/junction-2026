@@ -72,30 +72,40 @@ happen to be harder than 107-112). The fresh-seed runs were made once, after the
 with nothing changed in between. After the agent's image moved to Alpine (see the known limitation
 below), one more Opus run per shift scored 0.00, 0.78 and 0.28, in line with the runs above; the
 0.00 rolled back quotes-svc without protecting it and set off the retry storm. Before the
-instruction stated the healthy baseline, Opus averaged 0.57 on seeds 101-103 (four runs) and 0.44
+instruction stated the healthy baseline, Opus averaged 0.58 on seeds 101-103 (four runs) and 0.45
 over seven runs on seeds 101-106, Gemini 0.00 (three runs) and Sonnet 0.26.
 
 Every run with its cost: `metrics.json`; how each level was built and checked: `LOOP.md`.
 
+**Pre-registered seeds for the scores spread.** Before any run on them, we fixed six more level-4
+seeds for the per-run spread on the replay site: **404, 418, 500, 502, 503 and 504** (HTTP status
+codes, outside every seed range used to build, tune, validate or train). Each model gets three runs
+per seed, and every result goes into `metrics.json` and this section whatever it is.
+
 Known limit: the agent's container reaches the internet, because OpenCode calls the model API
-from it. This repository is public, so an agent could download the reference policy and run it
-against the tools; that scores the reference's 1.00 and no more, since the score is clipped at
-1. Harbor 0.25's `allowlist` network mode for the agent phase would close it, but it needs an
-egress sidecar and nftables support on the host's Docker, so the shipped task stays on `public`
-rather than risk failing on a judge's machine.
+from it, and this repository is public, so an agent could try to download the reference and run it
+(at best the reference's 1.00, since the score is clipped at 1). `extra_hosts` in
+`task/environment/docker-compose.yaml` points GitHub's download hosts, common mirrors and the replay
+site at localhost, which is why the agent's image is Alpine: there Harbor installs OpenCode's Node
+from the distro instead of from GitHub. Another mirror could still serve the code. Harbor 0.25's
+`allowlist` network mode would close it fully, but it needs an egress sidecar and nftables support
+on the host's Docker, so the shipped task stays on `public` rather than risk failing on a judge's
+machine. A production benchmark would keep its reference and held-out seeds private
+(`redteam/REPORT.md`).
 
 ## Reproduce
 
 Needs Docker with Compose v2 (`docker compose version` must work; on Ubuntu's `docker.io` install
 `docker-compose-v2`), `uv`, Harbor 0.25.0 (`uv tool install harbor==0.25.0`; `run.sh` fetches it
 by itself) and, for the Opus runs only, an `ANTHROPIC_API_KEY` in the environment. No Python
-install is needed: without `python3`, `run.sh` uses uv's. AfterQuery provides no inference
-credits. A run downloads the base images from Docker Hub, `mcp` from PyPI and, for the agent,
+install is needed: without `python3`, `run.sh` uses uv's, and the other `python3 <script>.py`
+commands here run as `uv run --no-project --python 3.13 python3 <script>.py`. AfterQuery
+provides no inference credits. A run downloads the base images from Docker Hub, `mcp` from PyPI and, for the agent,
 OpenCode through Harbor's installer. Run everything from this folder (`projects/oncallbench`).
 
 The reported seeds ship as ready-to-run Harbor tasks: `tasks/shift-1`, `shift-2` and `shift-3` are
 seeds 101, 102 and 103 at level 4, with the briefing and the verifier's calibration filled in
-(`./export-tasks.sh` writes them; `./export-tasks.sh 4 <seed>...` writes others). Plain Harbor 0.25.0
+(`./export-tasks.sh` writes them). Plain Harbor 0.25.0
 runs them as they are (`alias harbor='uvx --from harbor==0.25.0 harbor'`):
 
 ```
@@ -108,14 +118,9 @@ harbor run -p tasks/shift-1 -a nop                                     # do-noth
 On a busy machine Harbor's six minutes for installing OpenCode in the container can run out before
 the shift starts (`AgentSetupTimeoutError`); add `--agent-setup-timeout-multiplier 2`.
 
-Known limitation: the simulator and the reference are public by design, so judges can rerun them,
-and with the code an agent could compute its shift instead of working it. The agent's container
-therefore cannot reach the hosts that serve them: `extra_hosts` in
-`task/environment/docker-compose.yaml` points GitHub's download hosts, common mirrors and the
-replay site at localhost. That is why the agent's image is Alpine: there Harbor installs OpenCode's
-Node from the distro's packages instead of from GitHub. A determined agent could still find another
-mirror; a production benchmark would keep its reference and held-out seeds private
-(`redteam/REPORT.md`).
+Shifts 1-3 are the seeds we report. To check that we did not tune for them, export any other seed:
+`./export-tasks.sh 4 <seed>...` writes `tasks-custom/seed-<seed>` and never touches `tasks/`; run it
+the same way (`harbor run -p tasks-custom/seed-777 ...`), or use `SEED=<seed> ./run.sh ...`.
 
 `run.sh` does the same for any seed and runs several at once. One command runs the reference, both
 baselines and Opus on the committed run's seed:

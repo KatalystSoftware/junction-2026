@@ -13,7 +13,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 ./sync.sh
 
-# uv's own Python builds do not run on NixOS; everywhere else uv may fetch one.
+# NixOS keeps uv on system Python, as before; everywhere else uv may fetch one.
 [ ! -e /etc/NIXOS ] || export UV_PYTHON_PREFERENCE=only-system
 harbor() {
   if command -v uvx >/dev/null; then
@@ -23,8 +23,8 @@ harbor() {
   fi
 }
 if command -v python3 >/dev/null; then python=(python3)
-elif command -v uv >/dev/null; then python=(uv run --no-project --python 3.13 python3)
-else python=(nix shell nixpkgs#python313 -c python3); fi
+elif command -v nix >/dev/null; then python=(nix shell nixpkgs#python313 -c python3)
+else python=(uv run --no-project --python 3.13 python3); fi
 read -ra extra <<<"${HARBOR_ARGS:-}"
 
 # Each episode is a copy of the task with its own hidden seed, calibration and level rules. The folder name is

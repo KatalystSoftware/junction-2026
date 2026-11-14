@@ -14,17 +14,25 @@ xdg-open index.html   # macOS: open index.html
 ```
 
 The page is static and has no dependencies; it opens straight from disk with the committed
-bundles in `data/`. Level 4 opens first; level 3 is the second tab in the bar.
+bundles in `data/`. Level 4, seed 109 opens first; seed 108 is the second tab in the bar.
 
 ## Add or refresh an episode
 
 An episode is one level and seed. Each is one bundle, `data/l<level>-s<seed>.js`, and
-`data/index.js` lists them for the page, newest level first; the first one is what opens.
+`data/index.js` lists them for the page: the episode `notes.json` names under `open` first, then
+newest level first. The first one is what opens.
 
 ```
-python3 export.py --level 5 --seeds 101 --jobs ../jobs   # add level 5: reference, scripted policies, trials found
+python3 export.py --level 5 --seeds 110 --jobs ../jobs   # add level 5: reference, scripted policies, trials found
 python3 export.py                                        # every bundle again, with the current simulator
 ```
+
+**A bundle is an answer key.** It holds the episode's faults and every call of the reference, and
+the site is public. The exporter refuses the seeds of the shipped tasks at every level (101, 102
+and 103, and any `SEED` under `../tasks/`), and refuses to run while a bundle of one sits in
+`data/`. Levels of a seed share its estate and most of its faults, so a level-3 bundle of a
+shipped seed gives the level-4 task away too. Use the fresh seeds 107 to 112: the task as shipped
+was run once on each (round 13 in `../metrics.json`), and no task plays them.
 
 That first line is all a new level needs: the exporter writes the bundle and rewrites
 `data/index.js`, and the page picks it up as a new tab that opens by default. To caption it, add
@@ -52,7 +60,11 @@ flake: `nix develop -c python3 export.py ...`.
 - `headline`: where the level's result over all measured runs comes from (the regrade file and the
   receipts under `../loop-evidence/`). The exporter computes the mean, median and range from it,
   and replays each receipt to see whether capacity went on the quiet fault's service before the
-  rollback.
+  rollback. Its `fresh` entry adds the same model's runs on the fresh seeds from `../metrics.json`.
+  The receipts are not exported, only each run's score and how it handled the quiet fault.
+- `open` (top level): the episode that opens first.
+- The first call of a run that has a `label` is its key moment (`pause=key`, "Go to the key
+  moment"), so label the decisive call and leave earlier moments with a quote only.
 
 ## Test
 
@@ -67,33 +79,30 @@ replay. A clean diff means the simulator and the reference still give the bundle
 
 ## The bundles
 
-Every number on the page comes from the simulator and reference on `main`, and matches the closing
-report at the top of `../LOOP.md`: level 4 as shipped (round 10's instruction), graded against the
-round-11 reference.
+Every number on the page comes from the simulator and reference on `main`. The results strip
+matches the closing report at the top of `../LOOP.md`: level 4 as shipped (round 10's
+instruction), graded against the round-11 reference.
 
-**Level 4, seed 101** (`data/l4-s101.js`). Seed 101 has all three round-10 Opus runs, one Sonnet
-and one Gemini run, and it is the same estate and faults as the level-3 example.
+Both episodes are fresh seeds with the one Opus 5.5 run each made on the task as shipped
+(round 13). The runs on the shipped seeds 101 to 103 are not replayed here: their bundles would be
+the tasks' answer keys.
 
-| Run | Score | What happened |
+| Episode | Opus 5.5 | What happened |
 | --- | --- | --- |
-| Claude Opus 5.5 (`r10-l4-s101-opus-155047-i52GNAA`), opens first | 0.11 | Rolled back quotes-svc without adding capacity first: retries overloaded it and partner-api went to 72% errors. Also rejected 90% of pricing-svc's traffic for 23 minutes. |
-| Claude Opus 5.5 run 2 (`...-yZYAnrJ`) | 0.18 | Added capacity before the rollback, but rolled back the innocent returns-svc first and reached the quiet fault at minute 74. |
-| Claude Opus 5.5 run 3 (`...-pKMRL8v`) | 0.73 | Added capacity before the rollback and wasted nothing. |
-| Claude Sonnet 5.5 (`r10-l4-s101-sonnet-153636`) | 0.02 | One run. |
-| Gemini 3.1 Pro (`r10-l4-s101-gemini-153638`) | 0.00 | One run. |
-| Unprotected rollbacks, Do nothing | 0.69, 0.00 | Scripted baselines. |
+| **Level 4, seed 109** (`data/l4-s109.js`), opens first | 0.36 | Level with the reference until minute 34. Then it rolled back search-svc without adding capacity first: retries overloaded it and web-storefront went to 72% errors. Minutes 34 to 46 cost it $163,000, the reference $42,000. |
+| Level 4, seed 108 (`data/l4-s108.js`) | 0.34 | The same mistake on checkout-svc, then a 50% throttle once the storm had started. Minutes 34 to 46 cost it $132,000, the reference $36,000. |
 
-The run that opens is one of the six of nine Opus runs that rolled the quiet fault's service back
-unprotected; run 3, one click away in the results, is one of the two that added capacity first
-and wasted nothing. The strip in the bar shows all nine Opus scores on the level (mean 0.32,
-median 0.18, range 0.03 to 0.80); its sheet lists them by seed and by what the run did. One
-number differs from the report's text: it gives the unprotected runs as 0.03 to 0.59, which is
-the highest of them as run; graded against the round-11 reference that run is 0.61, and the page
-shows the regraded score like the report's own table.
+Seed 109 opens because its run is the clearest case of the level's decisive moment: the agent
+matches the reference until the quiet fault, rolls back unprotected, and says so in its own
+closing message. The scripted baselines (unprotected rollbacks, do nothing and the others) are in
+the run picker.
 
-**Level 3, seed 101** (`data/l3-s101.js`): the quiet fault. Opus (0.88) finds every cause but
-fixes the quiet fault 28 minutes after the reference. Gemini (0.41) rolls back the innocent
-caller, then reverts and restarts the decoy.
+The strip in the bar shows all nine Opus scores on the shipped seeds (mean 0.32, median 0.18,
+range 0.03 to 0.80); its sheet lists them by seed and by what the run did, then the six fresh-seed
+runs (mean 0.55, 0.34 to 0.75). One number differs from the report's text: it gives the
+unprotected runs as 0.03 to 0.59, which is the highest of them as run; graded against the
+round-11 reference that run is 0.61, and the page shows the regraded score like the report's own
+table.
 
 ## Using the page
 
@@ -116,17 +125,21 @@ caller, then reverts and restarts the decoy.
 - "Go to the key moment" jumps to the call the agent's run turns on and pauses there. While that
   call holds the agent's line, the reference's line shows what it did at its own moment on the
   same service, so the two decisions sit side by side.
-- Links to a moment: `index.html?session=l3-s101&run=<run id>&t=54`, `&a=<action index>` to open
+- Links to a moment: `index.html?session=l4-s108&run=<run id>&t=54`, `&a=<action index>` to open
   an action (`&side=ref` for the reference), `&lanes=1`, `&sheet=runbook|results|key`,
   `&intro=1` or `&intro=0`, `&speed=2`, `&still` to switch motion off for screenshots.
 
 ### For a screen recording
 
 ```
-https://incident.katalyst.fyi/?seed=101&autoplay=1&seconds=25&zoom=1.15
+https://incident.katalyst.fyi/?seed=109&autoplay=1&seconds=25&pause=key&zoom=1.1
 ```
 
-- `seed=101` (with `level=4` if several levels share a seed) opens that episode; `run=<run id>`
+That plays seed 109 from 12 minutes before the page and stops at minute 37, three minutes after
+the unprotected rollback, with web-storefront at 71% errors. `?seed=109&t=37&zoom=1.1` opens
+paused on that minute for a still.
+
+- `seed=109` (with `level=4` if several levels share a seed) opens that episode; `run=<run id>`
   picks another run than the one that opens.
 - `autoplay=1` plays at once and skips the intro.
 - `seconds=25` plays what is left of the shift in that many seconds; `speed=1.5` sets a multiple
@@ -135,7 +148,9 @@ https://incident.katalyst.fyi/?seed=101&autoplay=1&seconds=25&zoom=1.15
 - `pause=key` stops the playback at the key moment (three minutes after the agent's decisive
   call, when its effect shows); `pause=44` stops at that minute. Space resumes.
 - `t=44` alone opens paused on that minute, for a still.
-- `zoom=1.15` enlarges all type for video compression; the layout holds at 1920x1080 up to 1.2.
+- `zoom=1.1` enlarges all type for video compression. On seed 109 at 1920x1080, 1.1 places every
+  label clear of the graph; at 1.15 the loyalty-svc caption lands on its neighbours, and at 1.2
+  the bar runs out of room.
 
 ## Deploy
 
@@ -184,6 +199,8 @@ files. Shape:
   made (the replica count, the throttle share, a shared word). Otherwise the action has its
   rule number at most and the page shows the plain action. On eight episodes (levels 3 and 4,
   seeds 1 and 101 to 103) all 54 mitigations and throttles of the reference get a reason this way.
+  On seeds 108 and 109, 20 of 22 do: the rollback of a leaking deploy, which the reference finds
+  from memory rather than from a log line that matches the diff, shows only its rule.
 - **Details are on demand.** The first screen is the two estates, the counters, the line on what
   each run is doing, play and the timeline. The key, the score's definition, each fault's lane,
   the action details, the runbook and the nine-run results each open from one control.
@@ -233,8 +250,8 @@ files. Shape:
 - **The timeline is static.** It shows the whole of both runs at once. In the loss chart, what
   both runs lose is pale and what only the agent loses is full red: the red area is the gap.
 - **Agent's words** during the run are matched to the receipt by walking the trajectory's tool
-  calls in order. Quotes on pinned moments are verbatim from the closing message in
-  `../loop-evidence/final-messages/`.
+  calls in order. Quotes on pinned moments are from the run's closing message (in the bundle as
+  its `report`), verbatim apart from a capital at the start and the bold markers.
 - **Look.** A light page, because it is projected in a lit hall. Two inks: blue-black for what is,
   red for what is lost. Amber marks noise (the decoy), blue marks the run at work. One moving
   thing: failures flowing up the links toward the edge, as thick as the share of calls failing.

@@ -176,6 +176,24 @@ T 1.0, 32k context, rollouts overlapped with training (`--overlap`), same simula
   folder. The adapter (`ckpt/gemma26-sft`) and the per-episode transcripts are on the Modal Volume
   `aq-rl`, not in git.
 
+## Gemma 4 26B-A4B in Harbor, the way the judged models run
+
+### Which fine-tuned checkpoint runs the scores spread (fixed before those runs)
+
+Rule (the orchestrator's, written here before any fine-tuned run on the spread seeds 404, 418, 500,
+502, 503, 504): for each candidate RL run, take the mean of its last two held-out level-4 evals
+(seeds 101-106, 8 samples each); the higher mean wins, and a tie goes to `gemma26-rl-l4`, which
+trained on level 4 only, the environment we submit. Both runs log an eval at their last step and an
+end-of-run eval of the same weights, so for both "the last two" are those two rows of
+`out/evals.jsonl`.
+
+| Candidate | Trained on | Last step eval | End-of-run eval | Mean |
+| --- | --- | --- | --- | --- |
+| `gemma26-rl-l4` (B200) | level 4, 24 steps from the SFT adapter | 0.640 (step 24) | 0.752 | **0.696** |
+| `gemma26-rl` (RTX PRO 6000) | levels 3+4, 60 steps from the SFT adapter | RTX_LAST | RTX_FINAL | RTX_MEAN |
+
+Winner: WINNER.
+
 ## Setup
 
 - **Environment**: `env.py` wraps the in-process `Estate`. System prompt = `task/instruction.md` +

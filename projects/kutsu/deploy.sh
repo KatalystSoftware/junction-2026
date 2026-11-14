@@ -5,9 +5,10 @@
 #
 # Checks the page and stops if the check fails. Then builds it, copies it with the code and the stored briefs to /srv/talent-brief, adds this
 # machine's request cache to the server's (when there is one here; the cache is not in git), writes the three API
-# keys from the environment into a root-only file there, and (re)starts a systemd service that runs
-# serve.py as its own user. Ports 80 and 443 on that machine belong to the gap finder, so this stays
-# on plain http on its own port. Temporary: `systemctl disable --now talent-brief` takes it down.
+# keys and the demo key (KUTSU_KEY) from the environment into a root-only file there, and (re)starts a systemd
+# service that runs serve.py as its own user. It listens only on the proxy's Docker network (HOST below):
+# ports 80 and 443 belong to the shared proxy, which is the only way in. Temporary: `systemctl disable --now
+# talent-brief` takes it down.
 set -euo pipefail
 cd "$(dirname "$0")"
 HOST=root@31.22.104.106
@@ -41,8 +42,9 @@ ids = {b["id"] for b in ours}
 out = sorted(ours + [b for b in theirs if b["id"] not in ids], key=lambda b: b["name"].lower())
 json.dump(out, open("signals.json", "w"), ensure_ascii=False, indent=1)
 PY
-printf 'EXA_API_KEY=%s\nCONTEXT_DEV_API_KEY=%s\nANTHROPIC_API_KEY=%s\nHOST=0.0.0.0\n' \
-  "$EXA_API_KEY" "$CONTEXT_DEV_API_KEY" "$ANTHROPIC_API_KEY" |
+# HOST: the gateway of the proxy's Docker network, so only the proxy reaches the app (sites/kutsu.caddy)
+printf 'EXA_API_KEY=%s\nCONTEXT_DEV_API_KEY=%s\nANTHROPIC_API_KEY=%s\nKUTSU_KEY=%s\nHOST=172.19.0.1\n' \
+  "$EXA_API_KEY" "$CONTEXT_DEV_API_KEY" "$ANTHROPIC_API_KEY" "${KUTSU_KEY:?KUTSU_KEY from secrets.yaml}" |
   "${SSH[@]}" "$HOST" "umask 077; cat > /etc/talent-brief.env"
 "${SSH[@]}" "$HOST" "chown -R talentbrief: $DIR && cat > /etc/systemd/system/talent-brief.service && systemctl daemon-reload && systemctl enable --now talent-brief && systemctl restart talent-brief && sleep 2 && systemctl is-active talent-brief" <<UNIT
 [Unit]
@@ -55,6 +57,8 @@ WorkingDirectory=$DIR
 EnvironmentFile=/etc/talent-brief.env
 ExecStart=/usr/bin/python3 serve.py
 Restart=on-failure
+# the proxy's network may come up after this does; the address is then not there yet to listen on
+RestartSec=5
 NoNewPrivileges=true
 ProtectSystem=strict
 ProtectHome=true
@@ -64,4 +68,4 @@ ReadWritePaths=$DIR
 [Install]
 WantedBy=multi-user.target
 UNIT
-curl -s -o /dev/null -w "page: http %{http_code}\n" --max-time 10 http://31.22.104.106:8046/
+curl -s -o /dev/null -w "page: http %{http_code}\n" --max-time 10 https://kutsu.katalyst.fyi/
