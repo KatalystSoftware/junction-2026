@@ -11,6 +11,10 @@ export type Signal = {
 
 /** One talent need. `by` is set once a person has written or changed it; `off` once the company says no to it. */
 export type Need = {
+  /** stable within one sign-up, so a card can be followed as it moves */
+  id?: string
+  /** the company has accepted it */
+  ok?: boolean
   title: string
   why: string
   /** what the person must be able to do, as work that can be shown */
@@ -56,7 +60,7 @@ export type Brief = {
   open_roles: number
   identity: Identity | null
   signals: Signal[]
-  card: { pitch: string; momentum: string; needs: Need[] }
+  card: { pitch: string; momentum: string; needs: Need[]; also?: string[] }
   generated_at: string
   stats: { results_read: number; signals_dropped: number }
 }
@@ -66,8 +70,13 @@ export type Status = 'draft' | 'invited' | 'joined'
 export type Review = {
   status: Status
   needs: Need[]
+  /** the company has confirmed who it is */
+  about_ok?: boolean
   about?: Record<string, string>
+  /** per statement: true to tell talent, false to leave out; absent while undecided */
   facts?: Record<string, boolean>
+  /** the company has said there is no one else to add */
+  added_done?: boolean
   wants?: string[]
   note?: string
   invited_at?: string

@@ -26,9 +26,12 @@ sops exec-env ../../secrets/secrets.yaml 'python3 signals.py 2639822-1 Varjo wol
 ## How it works
 
 There are two screens. The company's sign-up (`#/join/<id>`, or `#/join` to find yourself) is an
-invitation to an event that is already filled in: who they are, what we would tell talent about them,
-and who they want to meet, each to tick or correct, ending on their finished card with a job posting
-drafted per role. Espoo's screen (`#/<id>`) lists employers by how fresh their funding and growth news
+invitation to an event that is already filled in. It shows one card at a time in the centre: who they
+are, then each piece of their news, then each drafted role, then "anyone else?", which drafts a whole
+role from one line or a suggestion. Enter accepts, Backspace leaves out or removes, the left arrow
+goes back. What they accept moves to the side and stays in view, who they are on the left and who
+they want to meet on the right, and any line there opens again in the centre. A job posting can be
+drafted for any role. Espoo's screen (`#/<id>`) lists employers by how fresh their funding and growth news
 is, shows the draft and its sources, and hands out the invitation link. `ui/` is the Svelte app;
 `serve.py` serves it and keeps sign-up state in `reviews.json`.
 

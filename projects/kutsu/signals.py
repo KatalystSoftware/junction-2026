@@ -266,9 +266,10 @@ FAMILIES = ["Software", "AI and data", "Embedded and electronics", "Semiconducto
             "Sales and business", "Operations and support", "Leadership"]
 SENIORITY = ["Early career", "Experienced", "Senior", "Lead"]
 CARD_SCHEMA = {
-    "type": "object", "additionalProperties": False, "required": ["pitch", "momentum", "needs"],
+    "type": "object", "additionalProperties": False, "required": ["pitch", "momentum", "needs", "also"],
     "properties": {
         "pitch": {"type": "string"},
+        "also": {"type": "array", "items": {"type": "string"}},
         "momentum": {"type": "string", "enum": ["growing", "steady", "shrinking", "unclear"]},
         "needs": {"type": "array", "items": {
             "type": "object", "additionalProperties": False,
@@ -305,7 +306,10 @@ work sample or a conversation. Take them from an open role's must-haves when the
 - seniority: the level most of the need sits at.
 - signals: the ids of the one to three statements it rests on.
 - roles: open role titles, copied exactly, that are this need; empty when there are none.
-A need must rest on at least one statement or one open role. Never name a person."""
+A need must rest on at least one statement or one open role. Never name a person.
+
+also: up to 4 further kinds of people a company like this one often needs and you did not list, \
+as titles of the same form. These are guesses to offer, not claims, so they need no statement."""
 
 
 LANGUAGE = {"english_enough": "English is enough", "finnish_required": "Finnish needed"}
@@ -343,7 +347,7 @@ def card(company, posts, signals, named):
              "Open tech roles:" + (f"\n{listed}" if posts else f" {company['no_roles']}"), ""]
     lines += [f"{x['id']} [{x['type']}{', ' + x['date'] if x['date'] else ''}] {x['claim']}" for x in signals]
     answer, usd = ask(CARD_SYSTEM, CARD_SCHEMA, "\n".join(lines)) if signals or roles else (None, 0.0)
-    answer = answer or {"pitch": "", "momentum": "unclear", "needs": []}
+    answer = answer or {"pitch": "", "momentum": "unclear", "needs": [], "also": []}
     ids = {x["id"] for x in signals}
     clean = lambda t: not PERSON.search(t) and not any(p in t for p in named)
     needs = [{**n, "can_do": [k.strip() for k in n["can_do"] if k.strip()][:3],
@@ -353,6 +357,7 @@ def card(company, posts, signals, named):
     needs = [{**n, **from_posts(n["roles"], posts)} for n in needs]
     return {"kind": "inferred", "method": f"{MODEL} reading of the checked statements and open roles",
             "pitch": answer["pitch"] if clean(answer["pitch"]) else "", "momentum": answer["momentum"],
+            "also": [t.strip() for t in answer["also"] if t.strip() and clean(t)][:4],
             "needs": [n for n in needs if (n["signals"] or n["roles"])
                       and clean(" ".join([n["title"], n["why"], *n["can_do"]]))]}, usd
 
@@ -385,6 +390,36 @@ def posting(brief, need):
     lines += [f"{x['id']} [{x['type']}{', ' + x['date'] if x['date'] else ''}] {x['claim']}" for x in brief["signals"]]
     answer, _ = ask(POSTING_SYSTEM, POSTING_SCHEMA, "\n".join(lines))
     return answer
+
+
+ROLE_SCHEMA = {
+    "type": "object", "additionalProperties": False, "required": ["title", "why", "can_do", "skills", "seniority", "family"],
+    "properties": {"title": {"type": "string"}, "why": {"type": "string"}, "family": {"type": "string", "enum": FAMILIES},
+                   "can_do": {"type": "array", "items": {"type": "string"}},
+                   "skills": {"type": "array", "items": {"type": "string"}},
+                   "seniority": {"type": "string", "enum": SENIORITY}}}
+ROLE_SYSTEM = """A company signing up for a recruitment event describes, in one line, a kind of person it wants \
+to meet. Turn that line into a role for the company to correct. You also get what the company does \
+and numbered statements about it, each checked against a public source.
+- title: 2 to 5 words naming the kind of person in the plural, in sentence case.
+- why: one sentence, at most 16 words, when a statement explains the need; otherwise an empty string. \
+Do not invent a reason.
+- can_do: 2 or 3 things this person must be able to do, each 5 to 10 words starting with a verb, \
+fitted to what this company does.
+- skills: 3 to 5 tools, methods or fields this person knows, one to three words each. Hard skills only.
+- seniority and family: the closest of the choices, by what the line says.
+Never name a person."""
+
+
+def role(brief, line):
+    """A need drafted from one line a company typed about who else it wants to meet, or None."""
+    lines = [f"Company: {brief['name']}", f"What it does: {brief['card']['pitch'] or (brief['identity'] or {}).get('description') or 'unknown'}",
+             f"The line: {line}", ""]
+    lines += [f"{x['id']} [{x['type']}{', ' + x['date'] if x['date'] else ''}] {x['claim']}" for x in brief["signals"]]
+    answer, _ = ask(ROLE_SYSTEM, ROLE_SCHEMA, "\n".join(lines))
+    if not answer or PERSON.search(" ".join([answer["title"], answer["why"], *answer["can_do"]])):
+        return None
+    return {**answer, "can_do": answer["can_do"][:3], "skills": answer["skills"][:5], "signals": [], "roles": []}
 
 
 def gather(name, domain, step):

@@ -8,6 +8,7 @@ GET  /progress?q=<same>                     the steps that research has taken so
 GET  /reviews.json                          every brief's sign-up state: status, the needs, what the company changed
 POST /review?id=<brief id>                  replaces one of those (the officer's edits, or the company's sign-up)
 POST /posting?id=<brief id>                 drafts a job posting for the need in the body
+POST /role?id=<brief id>                    drafts a whole need from the one line in the body
 
 Without keys the page still shows every brief already in signals.json, and anything in api-cache/
 still answers.
@@ -109,10 +110,14 @@ class Handler(http.server.BaseHTTPRequestHandler):
             need = None
         if not brief or not need or not need["title"].strip():
             return self.text(400, "A posting needs a known brief id and a need with a title.")
+        self.draft(lambda: signals.posting(brief, need))
+
+    def draft(self, write):
+        """One model draft, a few at a time, as JSON."""
         if not researching.acquire(blocking=False):
             return self.text(429, "Busy. Try again in a minute.")
         try:
-            draft = signals.posting(brief, need)
+            draft = write()
         except (SystemExit, KeyError) as e:
             return self.text(502, f"Drafting failed: {e}")
         finally:
@@ -123,7 +128,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
         url = urllib.parse.urlsplit(self.path)
         brief_id = urllib.parse.parse_qs(url.query).get("id", [""])[0]
         length = int(self.headers.get("content-length") or 0)
-        if url.path not in ("/review", "/posting") or not 0 < length < 50_000:
+        if url.path not in ("/review", "/posting", "/role") or not 0 < length < 50_000:
             return self.text(404, "not found")
         try:
             review = json.loads(self.rfile.read(length))
@@ -132,6 +137,11 @@ class Handler(http.server.BaseHTTPRequestHandler):
         briefs = {b["id"]: b for b in json.loads(signals.OUT.read_text())}
         if url.path == "/posting":
             return self.posting(briefs.get(brief_id), review)
+        if url.path == "/role":
+            line = str(review.get("line") or "").strip()[:200] if isinstance(review, dict) else ""
+            if not line or brief_id not in briefs:
+                return self.text(400, "A role needs a known brief id and a line describing it.")
+            return self.draft(lambda: signals.role(briefs[brief_id], line))
         known = set(briefs)
         if brief_id not in known or review.get("status") not in STATUSES or not isinstance(review.get("needs"), list):
             return self.text(400, "The review needs a known brief id, a status and a list of needs.")

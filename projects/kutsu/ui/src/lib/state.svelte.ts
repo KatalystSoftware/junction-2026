@@ -36,7 +36,7 @@ export const nameOf = (b: Brief) =>
   app.presets.map((p) => p.names?.[b.id]).find(Boolean) ?? b.name.replace(/\s+(Oyj Abp|Oyj|Oy Ab|Oy|Ab|sr)$/i, '')
 
 export const reviewOf = (b: Brief): Review =>
-  app.reviews[b.id] ?? { status: 'draft', needs: b.card.needs.map((n) => ({ ...n })) }
+  app.reviews[b.id] ?? { status: 'draft', needs: b.card.needs.map((n, i) => ({ ...n, id: `n${i}` })) }
 
 export async function saveReview(id: string, review: Review) {
   app.reviews[id] = review
