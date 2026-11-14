@@ -60,7 +60,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--arms", nargs="+", required=True, help="names in variants.py")
     parser.add_argument("--baseline", default="", help=f"default: {MERGE_1}, or {DEFAULT} where variants.py lacks it")
-    parser.add_argument("--sets", nargs="+", default=["natural", "thin"], help="natural, thin, or files with a seed a line")
+    parser.add_argument("--sets", nargs="+", default=["natural", "thin"], help="natural, thin, cat (60 seeds the fit has seen), or files with a seed a line")
     parser.add_argument("--limit", type=int, default=0, help="at most this many seeds a set")
     parser.add_argument("--half", default="", choices=["", "a", "b"], help="every other seed of each set: climb on a, confirm on b, so a search does not fit its own seeds")
     parser.add_argument("--draws", type=int, default=1)
@@ -76,7 +76,7 @@ def main() -> None:
         raise SystemExit(f"Not in this checkout's variants.py: {missing}")
     seeds: list[str] = []
     for name in args.sets:
-        path = HERE / f"seeds-{name}.txt" if name in ("natural", "thin") else Path(name)
+        path = HERE / f"seeds-{name}.txt" if (HERE / f"seeds-{name}.txt").exists() else Path(name)
         found = [line.strip() for line in path.read_text().splitlines() if line.strip()]
         found = found[{"": slice(None), "a": slice(0, None, 2), "b": slice(1, None, 2)}[args.half]]
         seeds += found[: args.limit] if args.limit else found
