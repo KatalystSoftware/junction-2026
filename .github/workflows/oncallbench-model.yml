@@ -1,26 +1,219 @@
 name: OnCallBench model
 
+# What a judge would do with the trained Gemma adapter, on a clean runner and without an account:
+# download it and the training demos from the public bucket, check them against SHA256SUMS, check
+# that no demo comes from a held-out seed, fetch the base model from Hugging Face, serve base +
+# adapter on CPU with llama.cpp, and play one short held-out episode through Harbor + OpenCode,
+# the harness the judged agents run in. The base model's GGUF is cached by its Hugging Face
+# revision, with the sha256 of every file it was converted from.
 on:
   push:
     paths: [.github/workflows/oncallbench-model.yml]
   workflow_dispatch:
+    inputs:
+      level:
+        description: Episode level (0-4; CPU inference makes 0-1 practical)
+        default: "0"
+        type: string
+      seed:
+        description: Held-out seed (101-106)
+        default: "101"
+        type: string
 
 permissions:
   contents: read
 
+env:
+  BUCKET: https://storage.googleapis.com/katalyst-fyi-models/oncallbench
+  BASE_MODEL: google/gemma-4-26B-A4B-it
+  # llama.cpp b12017 (30 Oct 2026): Gemma 4 conversion and tool-call parsing.
+  LLAMA_CPP: b12017
+  LLAMA_CPP_SHA256: 16fe348b1bc2e943bc4c220938ce46af789e88291138bca5bd68c0cc017769a5
+  LEVEL: ${{ inputs.level || '0' }}
+  SEED: ${{ inputs.seed || '101' }}
+
 jobs:
-  probe:
+  model:
     runs-on: craci
+    timeout-minutes: 180
     steps:
       - uses: cracicorp/setup@v1
         with:
           size: "32"
-      - name: Probe
+      - uses: actions/checkout@v4
+
+      - name: Download the adapter and demos, check SHA256SUMS
         run: |
-          nproc; free -g; df -h; lscpu | grep -iE 'model name|flags' | cut -c1-300
-          docker version --format '{{.Server.Version}}'; docker compose version
-          env | grep -E '^ACTIONS_|^CRACI|^RUNNER_' | sed -E 's/(TOKEN|KEY)=.*/\1=***/' | cut -c1-120
-          python3 --version; cmake --version | head -1
-          t=$(date +%s); curl -sL -o /tmp/x https://huggingface.co/google/gemma-4-26B-A4B-it/resolve/main/model-00001-of-00002.safetensors --max-time 30 -w '%{size_download} %{speed_download}\n' || true
-          curl -s https://huggingface.co/api/models/google/gemma-4-26B-A4B-it/tree/main | jq -c '.[] | [.path,.size]'
-          rm -f /tmp/x
+          start=$(date +%s)
+          mkdir -p "$RUNNER_TEMP/adapter" && cd "$RUNNER_TEMP/adapter"
+          for f in SHA256SUMS README.md adapter_config.json adapter_model.safetensors; do
+            curl -fsSL -o "$f" "$BUCKET/gemma4-26b-a4b-sft/$f"
+          done
+          curl -fsSL -o demos-l34.jsonl "$BUCKET/demos/demos-l34.jsonl"
+          # Every file SHA256SUMS lists must be here and match; a missing or changed file fails.
+          sha256sum --check --strict SHA256SUMS | tee "$RUNNER_TEMP/sha.txt"
+          {
+            echo "## Adapter and demos (anonymous download, checked against SHA256SUMS)"
+            echo '| File | Bytes | sha256 | Check |'; echo '|---|---|---|---|'
+            while read -r sum f; do
+              echo "| $f | $(stat -c %s "$f") | \`$sum\` | $(grep -q "^$f: OK$" "$RUNNER_TEMP/sha.txt" && echo OK) |"
+            done < SHA256SUMS
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "| Download and sha256 check | $(( $(date +%s) - start )) s |" >> "$RUNNER_TEMP/times.md"
+
+      - name: Check no demo comes from a held-out seed
+        working-directory: ${{ runner.temp }}/adapter
+        run: |
+          start=$(date +%s)
+          total=$(jq -s length demos-l34.jsonl)
+          held=$(jq .seed demos-l34.jsonl | awk '$1>=101&&$1<=106 || $1>=200000' | wc -l)
+          seeds=$(jq .seed demos-l34.jsonl | sort -n | uniq | awk 'NR==1{lo=$1} {hi=$1; n++} END{print n" seeds, "lo"-"hi}')
+          echo "$total demos ($seeds); $held from held-out seeds 101-106 or >= 200000"
+          {
+            echo "## Held-out check"
+            echo "\`jq .seed demos-l34.jsonl | awk '\$1>=101&&\$1<=106 || \$1>=200000' | wc -l\` = **$held** of $total demos ($seeds)"
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "| Held-out check | $(( $(date +%s) - start )) s |" >> "$RUNNER_TEMP/times.md"
+          [ "$held" -eq 0 ]
+
+      - name: Resolve the base model on Hugging Face
+        id: base
+        run: |
+          curl -fsSL "https://huggingface.co/api/models/$BASE_MODEL/tree/main?expand=true" > "$RUNNER_TEMP/tree.json"
+          info=$(curl -fsSL "https://huggingface.co/api/models/$BASE_MODEL")
+          rev=$(jq -r .sha <<<"$info")
+          echo "gated=$(jq -r .gated <<<"$info") revision=$rev"
+          # Anonymous: a gated model would need a token, which this job does not have.
+          [ "$(jq -r .gated <<<"$info")" = false ]
+          echo "rev=$rev" >> "$GITHUB_OUTPUT"
+
+      - name: Restore the base model
+        id: cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/base-gguf
+          key: gemma-4-26B-A4B-it-${{ steps.base.outputs.rev }}-q8_0-llama.cpp-${{ env.LLAMA_CPP }}
+
+      - name: Set up the llama.cpp converters
+        run: |
+          start=$(date +%s)
+          git clone -q --depth 1 --branch "$LLAMA_CPP" https://github.com/ggml-org/llama.cpp "$RUNNER_TEMP/llama.cpp"
+          python3 -m venv "$RUNNER_TEMP/venv"
+          "$RUNNER_TEMP/venv/bin/pip" install -q -r "$RUNNER_TEMP/llama.cpp/requirements/requirements-convert_lora_to_gguf.txt" 'huggingface_hub[hf_xet]==0.36.2'
+          echo "| Converter setup (llama.cpp $LLAMA_CPP, torch CPU) | $(( $(date +%s) - start )) s |" >> "$RUNNER_TEMP/times.md"
+
+      - name: Download the base model and convert it to GGUF
+        if: steps.cache.outputs.cache-hit != 'true'
+        env:
+          REV: ${{ steps.base.outputs.rev }}
+          HF_XET_HIGH_PERFORMANCE: "1"
+        run: |
+          start=$(date +%s)
+          base=$RUNNER_TEMP/base
+          "$RUNNER_TEMP/venv/bin/hf" download "$BASE_MODEL" --revision "$REV" --local-dir "$base" --quiet
+          echo "| Base model download ($(du -sh "$base" | cut -f1)) | $(( $(date +%s) - start )) s |" >> "$RUNNER_TEMP/times.md"
+          start=$(date +%s)
+          # Check each weight file against the sha256 Hugging Face lists for it at this revision.
+          mkdir -p ~/base-gguf
+          jq -r '.[] | select(.lfs) | "\(.lfs.oid)  \(.path)"' "$RUNNER_TEMP/tree.json" > ~/base-gguf/hf-sha256
+          (cd "$base" && sha256sum --check --strict ~/base-gguf/hf-sha256)
+          echo "| Base model sha256 check | $(( $(date +%s) - start )) s |" >> "$RUNNER_TEMP/times.md"
+          start=$(date +%s)
+          "$RUNNER_TEMP/venv/bin/python" "$RUNNER_TEMP/llama.cpp/convert_hf_to_gguf.py" "$base" \
+            --outtype q8_0 --outfile ~/base-gguf/base-q8_0.gguf
+          (cd ~/base-gguf && sha256sum base-q8_0.gguf > gguf-sha256)
+          echo "$REV" > ~/base-gguf/revision
+          echo "| Conversion to GGUF q8_0 | $(( $(date +%s) - start )) s |" >> "$RUNNER_TEMP/times.md"
+
+      - name: Save the base model
+        if: steps.cache.outputs.cache-hit != 'true'
+        # GitHub's cache holds 10 GB per repository unless raised; a refusal must not stop the episode.
+        continue-on-error: true
+        uses: actions/cache/save@v4
+        with:
+          path: ~/base-gguf
+          key: ${{ steps.cache.outputs.cache-primary-key }}
+
+      - name: Check the base model GGUF
+        env:
+          HIT: ${{ steps.cache.outputs.cache-hit }}
+        run: |
+          start=$(date +%s)
+          cd ~/base-gguf && sha256sum --check --strict gguf-sha256
+          {
+            echo "## Base model"
+            echo "\`$BASE_MODEL\` at revision \`$(cat revision)\`, not gated; from cache: ${HIT:-false}"
+            echo; echo '| File | sha256 |'; echo '|---|---|'
+            awk '{print "| " $2 " (Hugging Face) | `" $1 "` |"}' hf-sha256
+            awk '{print "| " $2 " (converted, llama.cpp '"$LLAMA_CPP"') | `" $1 "` |"}' gguf-sha256
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "| GGUF sha256 check | $(( $(date +%s) - start )) s |" >> "$RUNNER_TEMP/times.md"
+
+      - name: Convert the adapter to GGUF
+        env:
+          REV: ${{ steps.base.outputs.rev }}
+        run: |
+          start=$(date +%s)
+          # The converter reads the base model's config, not its weights.
+          "$RUNNER_TEMP/venv/bin/hf" download "$BASE_MODEL" --revision "$REV" --local-dir "$RUNNER_TEMP/base-config" \
+            --include '*.json' '*.jinja' --quiet
+          "$RUNNER_TEMP/venv/bin/python" "$RUNNER_TEMP/llama.cpp/convert_lora_to_gguf.py" "$RUNNER_TEMP/adapter" \
+            --base "$RUNNER_TEMP/base-config" --outtype f16 --outfile "$RUNNER_TEMP/adapter.gguf"
+          echo "| Adapter conversion | $(( $(date +%s) - start )) s |" >> "$RUNNER_TEMP/times.md"
+
+      - name: Serve base + adapter on CPU
+        run: |
+          start=$(date +%s)
+          curl -fsSL -o /tmp/llama.tar.gz \
+            "https://github.com/ggml-org/llama.cpp/releases/download/$LLAMA_CPP/llama-$LLAMA_CPP-bin-ubuntu-x64.tar.gz"
+          echo "$LLAMA_CPP_SHA256  /tmp/llama.tar.gz" | sha256sum -c -
+          mkdir -p "$RUNNER_TEMP/llama" && tar -xzf /tmp/llama.tar.gz -C "$RUNNER_TEMP/llama" --strip-components=1
+          server=$(find "$RUNNER_TEMP/llama" -name llama-server -type f | head -1)
+          nohup "$server" -m ~/base-gguf/base-q8_0.gguf --lora "$RUNNER_TEMP/adapter.gguf" \
+            --alias gemma4-oncallbench-sft --jinja -c 65536 -t "$(nproc)" --host 0.0.0.0 --port 8100 \
+            > "$RUNNER_TEMP/server.log" 2>&1 &
+          until curl -sf localhost:8100/health >/dev/null; do
+            kill -0 $! 2>/dev/null || { tail -40 "$RUNNER_TEMP/server.log"; exit 1; }
+            sleep 5
+          done
+          grep -iE 'lora|adapter' "$RUNNER_TEMP/server.log" | head -5
+          curl -s localhost:8100/v1/chat/completions -H 'Content-Type: application/json' \
+            -d '{"messages":[{"role":"user","content":"Reply with one word: ready?"}],"max_tokens":32}' | jq -c '.choices[0].message, .timings'
+          echo "| Model load (llama.cpp CPU) | $(( $(date +%s) - start )) s |" >> "$RUNNER_TEMP/times.md"
+
+      - name: Play one held-out episode (Harbor + OpenCode)
+        working-directory: projects/oncallbench
+        run: |
+          start=$(date +%s)
+          pip install -q --user uv==0.9.9 2>/dev/null || pip install -q --user --break-system-packages uv==0.9.9
+          export PATH="$HOME/.local/bin:$PATH" UV_PYTHON_PREFERENCE=only-system
+          ./export-tasks.sh "$LEVEL" "$SEED"
+          # The agent's container reaches the server through the Docker bridge's gateway.
+          host=$(docker network inspect bridge -f '{{(index .IPAM.Config 0).Gateway}}')
+          uvx --from harbor==0.25.0 harbor run -p tasks/shift-1 -o jobs --job-name model-check -a opencode \
+            -m vllm/gemma4-oncallbench-sft --base-url "http://$host:8100/v1" \
+            --api-format openai_chat_completions --api-key-name VLLM_API_KEY --ae VLLM_API_KEY=local
+          reward=$(cat jobs/model-check/*/verifier/reward.txt)
+          {
+            echo "## Episode"
+            echo "Level $LEVEL, held-out seed $SEED, Harbor 0.25.0 + OpenCode, the adapter served by llama.cpp on CPU: **score $reward**"
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "| Episode | $(( $(date +%s) - start )) s |" >> "$RUNNER_TEMP/times.md"
+
+      - name: Timings
+        if: always()
+        run: |
+          {
+            echo "## Time per step ($(nproc) vCPU, $(free -g | awk '/Mem:/{print $2}') GB)"
+            echo '| Step | Time |'; echo '|---|---|'
+            cat "$RUNNER_TEMP/times.md" 2>/dev/null
+          } >> "$GITHUB_STEP_SUMMARY"
+          cp "$RUNNER_TEMP/server.log" projects/oncallbench/jobs/ 2>/dev/null || true
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: oncallbench-model-${{ github.run_id }}
+          path: projects/oncallbench/jobs/
+          if-no-files-found: ignore
+          retention-days: 7
