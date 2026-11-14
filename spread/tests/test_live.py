@@ -29,7 +29,7 @@ def test_the_final_takes_34_minutes_and_a_test_final_from_thursday_19():
     assert waiting.now() == 3 * DAY and abs(waiting.seconds_until(3 * DAY + 1) - 900.05) < 0.05
 
 
-def test_guard_quotes_the_fallback_only_for_a_request_the_desk_has_not_taken_up_and_before_its_deadline(tmp_path):
+def test_guard_quotes_the_fallback_only_for_a_request_the_desk_sends_no_quote_for_and_before_its_deadline(tmp_path):
     clock = live.Clock(minute=500, speed=10)  # 15 minutes are 0.45 seconds
     sent = []
     guard = live.Guard(lambda actions: sent.extend((clock.seconds_until(515), a) for a in actions) or [{"ok": True}] * len(actions),
@@ -38,7 +38,7 @@ def test_guard_quotes_the_fallback_only_for_a_request_the_desk_has_not_taken_up_
     forgotten, taken = request("R1", options=(("same_day", 1200), ("next_day", 2640))), request("R2")
     for r in (forgotten, taken):
         guard.add(r)
-    guard.claim("R2")
+    guard.claim(["R2"])  # the desk sends its own quote for R2
     time.sleep(0.6)
     guard.stopped.set()
     assert [a["requestId"] for _, a in sent] == ["R1"]
@@ -128,3 +128,18 @@ def test_a_desk_that_joins_from_the_history_alone_does_not_redo_a_change_that_wa
     second.stop()
     assert {gig_id: gig["status"] for gig_id, gig in world.gigs.items()} == {"g1": "withdrawn", "g2": "open"}
     assert second.desk.leg_gigs["R1"] == {0: "g2"}
+
+
+def test_guard_covers_a_request_that_the_desk_decided_and_did_not_send_in_time(tmp_path):
+    # The desk takes the request up and is then held up before it sends, here by never sending at all.
+    asked = request("R1", arrivedAt=506, respondBy=507)  # 0.3 s at the final's speed
+    world = replay.Replay([{"seq": 0, "at": 506, "kind": "price_request", "request": asked}], ROSTER, ends_at=20000, start=506, speed=0.001)
+    desk = live.Live(world, world.guard_act, world.minute, 8, VARIANTS[live.VARIANT], MAP, tmp_path, echo=False)
+    desk.clock.saw(506, exact=True)
+    desk.desk = live.LiveDesk(world, 8, 506, VARIANTS[live.VARIANT], ROSTER, MAP)
+    desk.desk.attach(world, desk.log, desk.guard, desk.clock)
+    desk.guard.add(asked)  # as the stream reader does when the request arrives
+    desk.desk.take(world.events()[0])
+    time.sleep(0.35)
+    desk.stop()
+    assert [by for _, _, by in world.quotes.get("R1", [])] == ["fallback"]

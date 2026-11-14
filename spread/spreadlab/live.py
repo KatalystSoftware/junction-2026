@@ -147,7 +147,7 @@ def declined(request: dict) -> dict[str, int]:
 
 
 class Guard(threading.Thread):
-    """Quotes the fallback price for each request that the desk has not taken up when a third of its time is left.
+    """Quotes the fallback price for each request that the desk has not sent a quote for when a third of its time is left.
     It has its own connection, so a desk that waits on the network or on the rate limit does not hold it up."""
 
     def __init__(self, act: Callable[[list], list], clock: Clock, log: Log, max_unbooked: int):
@@ -164,12 +164,14 @@ class Guard(threading.Thread):
         with self.lock:
             self.pending.setdefault(request["id"], {"request": request, "fire": time.monotonic() + left - margin, "state": "waiting"})
 
-    def claim(self, request_id: str) -> None:
-        """The desk is answering the request."""
+    def claim(self, request_ids: list[str]) -> None:
+        """The desk sends its quotes for these requests now. While the guard sends a fallback, this waits for it, so
+        the desk's quote reaches the world after the fallback and replaces it."""
         with self.lock:
-            entry = self.pending.get(request_id)
-            if entry is not None and entry["state"] == "waiting":
-                entry["state"] = "desk"
+            for request_id in request_ids:
+                entry = self.pending.get(request_id)
+                if entry is not None and entry["state"] == "waiting":
+                    entry["state"] = "desk"
 
     def run(self) -> None:
         while not self.stopped.wait(0.05):
@@ -181,8 +183,8 @@ class Guard(threading.Thread):
                         due.append(entry["request"])
                     elif now > entry["fire"] + 60:
                         del self.pending[id_]
-            if due:
-                self.quote(due)
+                if due:
+                    self.quote(due)
 
     def quote(self, requests: list[dict]) -> None:
         shut = self.backlog >= self.max_unbooked > 0
@@ -198,8 +200,7 @@ class Guard(threading.Thread):
             self.log.write("fallback", requestId=request["id"], prices=action["prices"], ok=result["ok"], reason=result.get("reason"),
                            left=round(self.clock.seconds_until(request["respondBy"]), 3), took=took)
             if result["ok"]:
-                with self.lock:
-                    self.fired.add(request["id"])
+                self.fired.add(request["id"])
         self.log.say(f"Fallback quote for {', '.join(r['id'] for r in requests)}: the desk had not answered with a third of the time left.")
 
 
@@ -238,8 +239,6 @@ class LiveDesk(Policy):
         if kind == "visit_failed":
             self.failed.setdefault(event["orderId"], {})[event["leg"]] = event["reason"]
         request = event.get("request") if kind == "price_request" else None
-        if request is not None and not self.offline:
-            self.guard.claim(request["id"])
         try:
             self.handle(event)
             if request is not None and self.offline and request["id"] not in self.quoted:
@@ -279,6 +278,7 @@ class LiveDesk(Policy):
             keep.append(action)
         if not keep:
             return
+        self.guard.claim([action["requestId"] for action in keep if action["type"] == "quote"])
         started = time.monotonic()
         try:
             results = self.world.act(keep)
@@ -368,8 +368,9 @@ class LiveDesk(Policy):
                 self.safely("post", order_id, self.post, order, rest)
         for order_id in self.urgent & set(self.orders):  # the steep fees of a deadline warning that came while the desk was away
             self.safely("steep", order_id, self.steepen, order_id)
-        for request in snapshot["openRequests"]:  # the desk answers each open request; the guard does not replace a quote it sent before
-            self.guard.claim(request["id"])
+        # The desk answers each open request. The guard does not replace a quote that the desk sent before it stopped.
+        self.guard.claim([request["id"] for request in snapshot["openRequests"] if request["id"] in self.quoted])
+        for request in snapshot["openRequests"]:
             if request["id"] not in self.quoted:
                 self.safely("quote", request["id"], self.quote, request)
                 if not any(a.get("requestId") == request["id"] for a in self.outbox):
@@ -506,6 +507,8 @@ class Live:
                         raise item
                     desk.take(item)
                     woken |= item["kind"] in desk.wake_on
+                    if item["kind"] == "price_request":  # its quote goes out now: a hold-up later in the batch does not delay it
+                        desk.send()
                 day = desk.now // DAY
                 desk.now = max(desk.now, int(self.clock.now()))
                 # The direct offers, when play.py looks: after each event that the desk answers, at midnight, and at the minute
@@ -707,7 +710,15 @@ def report(world_id: str) -> str:
     desk_quotes = {l["action"]["requestId"]: l for l in lines if l["kind"] == "action" and l["action"]["type"] == "quote" and l["ok"]}
     fallbacks = {l["requestId"]: l for l in lines if l["kind"] == "fallback" and l["ok"]}
     asked = [r for r in requests.values() if r["respondBy"] > live_from]  # the requests that arrived while the desk could answer
-    missed = [r["id"] for r in asked if r["id"] not in desk_quotes and r["id"] not in fallbacks]
+    down, seen = [], live_from  # the world minutes between the last event a desk took and the join of the next one
+    for l in lines:
+        if l["kind"] == "event" and not l["replayed"]:
+            seen = l["event"]["at"]
+        elif l["kind"] == "joined" and l is not joins[0]:
+            down.append((seen, l["minute"]))
+    unanswered = [r for r in asked if r["id"] not in desk_quotes and r["id"] not in fallbacks]
+    away = [r["id"] for r in unanswered if any(start <= r["arrivedAt"] <= end for start, end in down)]
+    missed = [r["id"] for r in unanswered if r["id"] not in away]
     lead = sorted(l["left"] for l in desk_quotes.values())
     refused = Counter(l["reason"].split(":")[0][:60] for l in lines if l["kind"] == "action" and not l["ok"])
     shifts: dict[int, float] = {}
@@ -716,7 +727,8 @@ def report(world_id: str) -> str:
             shifts[requests[l["requestId"]]["arrivedAt"] // DAY] = l["shift"]
     end = next((l["score"] for l in reversed(lines) if l["kind"] in ("end", "score")), None)
     out = [f"World {world_id}: {len(asked)} requests while the desk ran, {len(desk_quotes)} quoted by the policy, "
-           f"{len(fallbacks)} by the fallback, {len(missed)} missed{' (' + ', '.join(missed[:10]) + ')' if missed else ''}.",
+           f"{len(fallbacks)} by the fallback, {len(missed)} missed{' (' + ', '.join(missed[:10]) + ')' if missed else ''}, "
+           f"{len(away)} unquoted while the desk was down.",
            f"Seconds left at the policy's quotes: least {lead[0] if lead else '-'}, 5th percentile "
            f"{lead[len(lead) // 20] if lead else '-'}, median {statistics.median(lead) if lead else '-'}.",
            f"Joins: {len(joins)} ({'; '.join(join_text(j) for j in joins)}).",

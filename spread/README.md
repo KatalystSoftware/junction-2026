@@ -365,8 +365,8 @@ desk adds to the policy, which is the same class as in the sweeps:
 
 - **Quotes first, and a fallback.** It answers each event as it comes and sends the quotes ahead of the other
   actions. A guard thread, with its own connection, quotes 1.9 x the typical fee (no `same_day`, no trade-in or private
-  address; a decline while 15 won cars have no driver) for a request the desk has not taken up when a third of its
-  time is left. A quote that would arrive after the deadline is not sent, and its answer does not count in the day's correction.
+  address; a decline while 15 won cars have no driver) for a request that the desk has sent no quote for when a third
+  of its time is left. A policy quote that is still in time replaces it, because the dealer takes the last quote. A quote that would arrive after the deadline is not sent, and its answer does not count in the day's correction.
 - **Restarts.** The books go to disk every second. A desk that starts again reads the events it missed and learns
   from them without acting: the day's answers, the dealers' orders on time, who used the app, failed visits. It then
   takes the gigs and orders from the world's snapshot and acts on the world as it is: it posts the cars that have no
