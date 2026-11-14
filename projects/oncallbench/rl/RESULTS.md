@@ -7,10 +7,21 @@ steps (about 70 GPU-minutes). With the reference's trajectories as SFT data firs
 to 0.29. All numbers are the environment's score, `clip((cost_null - cost) / (cost_null - cost_ref), 0, 1)`,
 on held-out seeds 101-106: do-nothing is 0.00, the scripted reference 1.00.
 
+**Two harnesses, never mixed.** Every score in the Qwen and Gemma tables up to "Gemma 4 26B-A4B in
+Harbor" comes from our own runner (`env.py`: the simulator in process, at most 40 or 48 replies of up
+to 4 tool calls, a 16k or 32k context). It is the same reward against the same reference, but not the
+Harbor + OpenCode harness that produced the README's Opus numbers, so those scores are **not
+comparable** with Opus's. The Harbor + OpenCode runs are in their own tables in the last sections.
+
+**"Held-out" means held out from training.** Seeds 101-106 were in no demo and no RL batch. They are
+not unseen by the project: the Opus runs in the README used them, and 101-103 measured the gap
+between Opus and the reference while level 4 was built.
+
 ## Qwen3.5-2B (levels 0-2, simulator pinned at `aec3d09`)
 
-Mean score over 8 sampled episodes per held-out seed (48 per level; T 0.7, top-p 0.8, top-k 20,
-Qwen's non-thinking settings), ± one standard error.
+Our own runner (`env.py`, 40 replies, 16k context), not Harbor + OpenCode; not comparable with the
+README's Opus numbers. Mean score over 8 sampled episodes per held-out seed (48 per level; T 0.7,
+top-p 0.8, top-k 20, Qwen's non-thinking settings), ± one standard error.
 
 | Model | Level 0 | Level 1 | Level 2 | Level 3 |
 | --- | --- | --- | --- | --- |
@@ -170,8 +181,8 @@ T 1.0, 32k context, rollouts overlapped with training (`--overlap`), same simula
   Modal's two H200s the same step took 11-12.5 minutes, measured from the untrained model, whose
   episodes all run to the reply cap.
 - **The harness is ours, not Harbor's.** These scores come from `env.py`, not from the OpenCode
-  agent the judges run. A like-for-like run of the base model and the adapter through Harbor on
-  `tasks/shift-1..3` (the reported seeds 101-103) was in progress when this was written.
+  agent the judges run, and are not comparable with the README's Opus numbers. The same models
+  through Harbor + OpenCode are in the next section.
 
 - **SFT:** `run.py sft --model google/gemma-4-26B-A4B-it --lora 32 --train-device cuda:1` on
   the reference's demos, 2 epochs, 100 optimiser steps. The loss fell from 0.30 at step 5 to 0.011 at
@@ -187,10 +198,56 @@ T 1.0, 32k context, rollouts overlapped with training (`--overlap`), same simula
 
 ## Gemma 4 26B-A4B in Harbor, the way the judged models run
 
+Copying the reference took Gemma from 0.06 to about Opus's level in the judges' harness.
+
+These runs use the judges' harness: OpenCode in Harbor 0.25.0 against a vLLM OpenAI-compatible
+endpoint serving the base model and the SFT adapter (`serve.sh`, `judge.sh`), on `tasks/shift-1..3`
+(level 4, seeds 101-103, the current `main` simulator), three attempts per shift. The agent sees
+OpenCode's own prompt and the MCP tools under OpenCode's names, not the prompt and tool names the
+adapter was trained on. Opus 5.5's row is its nine runs on the same three shifts in `metrics.json`
+(round 10). Rescored against the current reference it is still 0.32.
+
+| Model (Harbor + OpenCode) | Runs | Mean ± s.e. | Shift 1 | Shift 2 | Shift 3 |
+| --- | --- | --- | --- | --- | --- |
+| Gemma 4 26B-A4B, untrained | 9 | 0.06 ± 0.02 | 0.10 / 0.20 / 0.10 | 0.00 / 0.00 / 0.00 | 0.00 / 0.11 / 0.00 |
+| + SFT adapter | 9 | **0.26 ± 0.11** | 0.88 / 0.14 / 0.00 | 0.00 / 0.26 / 0.00 | 0.00 / 0.65 / 0.41 |
+| + SFT adapter, second set of 9 | 9 | 0.34 ± 0.12 | 0.23 / 0.63 / 0.60 | 0.00 / 0.71 / 0.85 | 0.00 / 0.00 / 0.00 |
+| Opus 5.5 (`metrics.json`, round 10) | 9 | 0.32 | 0.11 / 0.73 / 0.18 | 0.04 / 0.03 / 0.80 | 0.17 / 0.20 / 0.59 |
+
+The like-for-like comparison holds in the sense of the headline: with the adapter, Gemma scores
+about what Opus scores, with error bars that overlap. It does not hold as "Gemma beats Opus": 0.26
+and 0.34 (0.30 over all 18 runs) against 0.32.
+
+Per trial (`judge.py`, which replays each signed action log): the untrained model wasted 1
+mitigation in 9 runs and left 2-3 of the 3 faults unfixed in every run. It mostly queried and then
+waited out the shift or called `finish`. The adapter wasted 1 mitigation in 18 runs and fixed every
+fault in 8 of them. Of its rollbacks and restarts on services whose callers retry, it protected
+about half first with a scale-up or throttle (9 of 17). None of its runs called `finish`; they
+ended at the shift's end (11), with the agent ending its session between minutes 91 and 105 (6),
+or at the 30-minute agent timeout (1).
+
+Harness errors, all reported, none rerun:
+
+- 4 of the adapter's runs ended in a `ContextOverflowError`: the conversation passed the 131,072-token
+  context the server was started with. Gemma 4 takes 256k, and `serve.sh` now serves that, but these
+  18 runs were at 128k. Harbor files the overflow as `ApiRateLimitError`, because its error
+  classifier matches "rate limit" and "too many requests" anywhere in the output, and the
+  simulator's own logs say "429 Too Many Requests: rate limiter bucket empty". The verifier still
+  scored each run (0.00, 0.00, 0.23 and 0.60).
+- 3 runs hit the task's 30-minute agent timeout (`AgentTimeoutError`): one untrained, two with the
+  adapter. Their logged actions were scored as usual.
+- The first judge-style run (one untrained run, not in the table) failed before any action: OpenCode's
+  built-in `openai` provider calls the Responses API. A provider named `vllm` with the
+  chat-completions format fixed it.
+
 ### Which fine-tuned checkpoint runs the scores spread (fixed before those runs)
 
-Rule (the orchestrator's, written here before any fine-tuned run on the spread seeds 404, 418, 500,
-502, 503, 504): for each candidate RL run, take the mean of its last two held-out level-4 evals
+The spread's seeds were first 404, 418, 500, 502, 503 and 504. Before any run on them finished they
+were replaced by one common set for every model: level 4, seeds 200000-200023. 21 Harbor jobs started
+on the first set were cancelled within a minute of starting, with no finished trial, and are not
+results. The rule below did not change.
+
+Rule (the orchestrator's, written here before any fine-tuned run on the spread seeds): for each candidate RL run, take the mean of its last two held-out level-4 evals
 (seeds 101-106, 8 samples each); the higher mean wins, and a tie goes to `gemma26-rl-l4`, which
 trained on level 4 only, the environment we submit. Both runs log an eval at their last step and an
 end-of-run eval of the same weights, so for both "the last two" are those two rows of

@@ -1,0 +1,141 @@
+{
+    "id": "0873fe6a-d0fc-4275-ba84-282d9834a869",
+    "task_name": "katalyst/aq-incident",
+    "trial_name": "shift-3__MzFXbU6",
+    "trial_uri": "file:///root/ocb/projects/jobs/like4-sft-shift-3/shift-3__MzFXbU6",
+    "task_id": {
+        "path": "/root/ocb/projects/oncallbench/tasks/shift-3"
+    },
+    "source": null,
+    "task_checksum": "de1d0ba966c02356c9b15a78f84df9025e2519d0bfb7d207b1a452039796a864",
+    "config": {
+        "task": {
+            "path": "/root/ocb/projects/oncallbench/tasks/shift-3",
+            "git_url": null,
+            "git_commit_id": null,
+            "name": null,
+            "ref": null,
+            "overwrite": false,
+            "download_dir": null,
+            "source": null
+        },
+        "trial_name": "shift-3__MzFXbU6",
+        "trials_dir": "jobs/like4-sft-shift-3",
+        "install_only": false,
+        "timeout_multiplier": 1.0,
+        "agent_timeout_multiplier": null,
+        "verifier_timeout_multiplier": null,
+        "agent_setup_timeout_multiplier": null,
+        "environment_build_timeout_multiplier": null,
+        "agent": {
+            "name": "opencode",
+            "import_path": null,
+            "model_name": "vllm/gemma26-sft",
+            "base_url": "http://172.17.0.1:8100/v1",
+            "model_api_key_name": "VLLM_API_KEY",
+            "model_api_format": "openai_chat_completions",
+            "skip_model_parsing": false,
+            "n_concurrent": null,
+            "concurrency_group": null,
+            "skills": [],
+            "override_timeout_sec": null,
+            "override_setup_timeout_sec": null,
+            "max_timeout_sec": null,
+            "resume_trajectory": false,
+            "load_trajectory": null,
+            "extra_allowed_hosts": [],
+            "kwargs": {},
+            "env": {
+                "VLLM_API_KEY": "****"
+            },
+            "mcp_servers": []
+        },
+        "user_agent": null,
+        "environment": {
+            "type": "docker",
+            "import_path": null,
+            "force_build": false,
+            "delete": true,
+            "stream": false,
+            "cpu_enforcement_policy": "auto",
+            "memory_enforcement_policy": "auto",
+            "override_cpus": null,
+            "override_memory_mb": null,
+            "override_storage_mb": null,
+            "override_gpus": null,
+            "override_tpu": null,
+            "mounts": null,
+            "extra_docker_compose": [],
+            "kwargs": {},
+            "extra_allowed_hosts": []
+        },
+        "verifier": {
+            "override_timeout_sec": null,
+            "max_timeout_sec": null,
+            "disable": false
+        },
+        "artifacts": [],
+        "extra_instruction_paths": [],
+        "extra_instructions": [],
+        "job_id": "98be7a6f-54a9-42da-91dc-bca4db0da43d",
+        "source_trial": null
+    },
+    "agent_info": {
+        "name": "opencode",
+        "version": "1.19.5",
+        "model_info": {
+            "name": "gemma26-sft",
+            "provider": "vllm"
+        }
+    },
+    "agent_result": {
+        "n_input_tokens": 866375,
+        "n_cache_tokens": 0,
+        "n_output_tokens": 1010,
+        "cost_usd": null,
+        "model_usage": {
+            "vllm/gemma26-sft": {
+                "n_input_tokens": 866375,
+                "n_cache_tokens": 0,
+                "n_output_tokens": 1010,
+                "cost_usd": null
+            }
+        },
+        "rollout_details": null,
+        "metadata": null
+    },
+    "verifier_result": {
+        "rewards": {
+            "reward": 0.41349012137860774,
+            "cost_total": 187122.87,
+            "beats_reference": 0.0,
+            "valid_receipt": 1.0,
+            "actions": 48,
+            "faults_left": 0,
+            "cost_outage": 186000.87,
+            "cost_replicas": 1122,
+            "cost_wasted": 0
+        }
+    },
+    "verifier_environment_mode": "separate",
+    "exception_info": null,
+    "started_at": "2026-11-14T20:35:04.731766Z",
+    "finished_at": "2026-11-14T20:40:06.980283Z",
+    "environment_setup": {
+        "started_at": "2026-11-14T20:35:04.785774Z",
+        "finished_at": "2026-11-14T20:35:49.987410Z"
+    },
+    "agent_setup": {
+        "started_at": "2026-11-14T20:35:49.987437Z",
+        "finished_at": "2026-11-14T20:39:04.496138Z"
+    },
+    "agent_execution": {
+        "started_at": "2026-11-14T20:39:04.496382Z",
+        "finished_at": "2026-11-14T20:39:37.333617Z"
+    },
+    "verifier": {
+        "started_at": "2026-11-14T20:39:51.369075Z",
+        "finished_at": "2026-11-14T20:40:06.980271Z"
+    },
+    "step_results": null
+}
