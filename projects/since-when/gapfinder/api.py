@@ -826,9 +826,9 @@ PRESETS = {
     "check": {
         "title": "The claim check",
         "description": "How a difference was checked: the other article as it stands now "
-        "(FOR SYSTEM_TIME AS OF NOW(6), as the check ran it), each of its sentences ranked by VEC_DISTANCE_COSINE to the claim, "
-        "and dates, numbers and names matched with REGEXP. The statement the check ran, from the "
-        "table it stored it in.",
+        "(FOR SYSTEM_TIME AS OF NOW(6)), each passage's nearest sentence to the claim by VEC_DISTANCE_COSINE, "
+        "and dates, numbers and names matched with REGEXP: the passages the judge was given, by the "
+        "statement the check stored. The verdict and the sentence it settled on are on the page.",
         "params": [("finding", "finding", "14115")],
         "statements": lambda v: [
             ("The claim, the verdict and the statement the check ran", CHECK_SQL, (int(v["finding"]),) * 3),

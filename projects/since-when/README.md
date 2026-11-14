@@ -117,6 +117,8 @@ in, and nothing runs before **Run** is clicked.
   the public instance with its text and ids, takes about 130 ms). It also
   records what did not scale: a vector index on a versioned table answers past dates 5 to 14 times slower
   than on a plain one, so the index stays on the current rows and a past date searches one topic exactly.
+  These index numbers were measured offline: no statement on the live site uses the vector index, and every
+  vector search there is an exact `VEC_DISTANCE_COSINE` over one topic.
 - **Usefulness for readers and editors.** A reader sees each edition's exact words side by side, and each edition's
   date links to the Wikipedia edit that put its quoted words there word for word (an older wording of the
   same claim can be earlier):

@@ -17,7 +17,7 @@
 		asof: ['An article as it stood on a date', "The article at 00:00 UTC on the date: set the session's time, then a plain SELECT. Its first passage, or for a finding the passage that holds the quoted words."],
 		history: ['Every version MariaDB has kept', "Every version of the article's first passage, with the time each one was current."],
 		nearest: ['Editions compared on a date', 'Time travel and vector search in one statement: each passage with its nearest in the other edition.'],
-		check: ['How a difference was checked', "The claim check's own statement, as stored with its verdict: the other article as it stands now (AS OF NOW(6), as the check ran it), every sentence ranked by vector distance to the claim, dates and numbers matched with REGEXP."],
+		check: ['How a difference was checked', "The claim check's own statement, as stored with its verdict: the other article as it stands now (AS OF NOW(6)), each passage's nearest sentence to the claim by vector distance, dates and numbers matched with REGEXP: the passages the judge was given. Its verdict and the sentence it settled on are on the page."],
 	}
 	const DEMO: Record<string, string> = { Q1412941: 'Lapua Movement', Q736268: 'Finnish War', Q2457646: 'Diet of Porvoo' }
 	const LABEL: Record<string, string> = { qid: 'Topic', date: 'As of', lang: 'Edition', a: 'Passages in', b: 'Nearest in', finding: 'Finding' }

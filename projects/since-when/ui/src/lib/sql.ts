@@ -61,9 +61,10 @@ ORDER BY c.row_start DESC`
 FROM checked_finding
 WHERE finding_id = ${v.finding} OR (${v.finding} < 0 AND id = -${v.finding});
 
--- Then the statement in search_sql, as the check ran it: the other article
--- FOR SYSTEM_TIME AS OF the day, each sentence ranked by VEC_DISTANCE_COSINE to the
--- claim's vector, and its dates, numbers and names matched with REGEXP.`
+-- Then the statement in search_sql, as the check stored it: the other article as it
+-- stands now (FOR SYSTEM_TIME AS OF NOW(6)), each passage's nearest sentence to the
+-- claim by VEC_DISTANCE_COSINE, and its dates, numbers and names matched with REGEXP.
+-- These are the passages the judge was given; its verdict is on the page.`
 	if (preset === 'nearest')
 		return `WITH c AS (
   SELECT c.id, c.lang, c.ord, c.section, c.chunk_no, c.rev_id, p.embedding
