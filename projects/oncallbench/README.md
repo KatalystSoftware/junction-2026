@@ -71,9 +71,9 @@ the best run 0.80: the gap holds on every seed, and its size varies with the est
 happen to be harder than 107-112). The fresh-seed runs were made once, after the reported numbers,
 with nothing changed in between. After the agent's image moved to Alpine (see the known limitation
 below), one more Opus run per shift scored 0.00, 0.78 and 0.28, in line with the runs above; the
-0.00 rolled back quotes-svc without protecting it and set off the retry storm. Before the instruction stated the healthy baseline, Opus
-averaged 0.58 on seeds 101-103 (four runs) and 0.45 over seven runs on seeds 101-106, Gemini 0.00
-(three runs) and Sonnet 0.26.
+0.00 rolled back quotes-svc without protecting it and set off the retry storm. Before the
+instruction stated the healthy baseline, Opus averaged 0.57 on seeds 101-103 (four runs) and 0.44
+over seven runs on seeds 101-106, Gemini 0.00 (three runs) and Sonnet 0.26.
 
 Every run with its cost: `metrics.json`; how each level was built and checked: `LOOP.md`.
 
@@ -88,14 +88,15 @@ rather than risk failing on a judge's machine.
 
 Needs Docker with Compose v2 (`docker compose version` must work; on Ubuntu's `docker.io` install
 `docker-compose-v2`), `uv`, Harbor 0.25.0 (`uv tool install harbor==0.25.0`; `run.sh` fetches it
-by itself) and an `ANTHROPIC_API_KEY` in the environment. AfterQuery provides no inference
+by itself) and, for the Opus runs only, an `ANTHROPIC_API_KEY` in the environment. No Python
+install is needed: without `python3`, `run.sh` uses uv's. AfterQuery provides no inference
 credits. A run downloads the base images from Docker Hub, `mcp` from PyPI and, for the agent,
-OpenCode through Harbor's installer.
+OpenCode through Harbor's installer. Run everything from this folder (`projects/oncallbench`).
 
 The reported seeds ship as ready-to-run Harbor tasks: `tasks/shift-1`, `shift-2` and `shift-3` are
 seeds 101, 102 and 103 at level 4, with the briefing and the verifier's calibration filled in
-(`./export-tasks.sh` writes them; `./export-tasks.sh 4 <seed>...` writes others). Plain Harbor runs
-them as they are:
+(`./export-tasks.sh` writes them; `./export-tasks.sh 4 <seed>...` writes others). Plain Harbor 0.25.0
+runs them as they are (`alias harbor='uvx --from harbor==0.25.0 harbor'`):
 
 ```
 harbor run -p tasks/shift-1 -a opencode -m anthropic/claude-opus-5-5   # the judged agent
@@ -124,11 +125,13 @@ LEVEL=4 SEED=101 ./run.sh reference nop stop-early opus
 ```
 
 Expect 1.00, 0.00, 0.00 and, for Opus, anything from 0.1 to 0.7 on this seed (0.11, 0.18 and 0.73
-in three runs; 0.32 mean over nine runs on 101-103). Results land in
-`jobs/<name>/`. `run.sh` writes a Harbor task for the episode to `jobs/variants/` and calls
-`harbor run -p <task> -a opencode -m anthropic/claude-opus-5-5`, so a judge can rerun that folder
-with plain Harbor. Stop-early and the other scripted policies run as Harbor's `oracle` agent with
-`POLICY=<name>`. `SEED` picks the episode (held-out 101-106); `ATTEMPTS=3` gives three Opus runs.
+in three runs; 0.32 mean over nine runs on 101-103). The runs go side by side: the first call
+spends about 5 minutes building the images, then the scripted runs take about a minute and an
+Opus run 5-8. Each run's score is in `jobs/<name>/<trial>/verifier/reward.txt`, its cost
+breakdown next to it in `reward.json`. `run.sh` writes a Harbor task for the episode to
+`jobs/variants/` and calls `harbor run -p <task> -a opencode -m anthropic/claude-opus-5-5`, so a
+judge can rerun that folder with plain Harbor. Stop-early and the other scripted policies run as
+Harbor's `oracle` agent with `POLICY=<name>`. `SEED` picks the episode (held-out 101-106); `ATTEMPTS=3` gives three Opus runs.
 
 Committed run logs, each trial with its transcript in `agent/opencode.txt`, its action log in
 `artifacts/ledger/receipt.json` and its score in `verifier/reward.txt`:
@@ -147,8 +150,11 @@ Committed run logs, each trial with its transcript in `agent/opencode.txt`, its 
 ## Test
 
 ```
-python3 eval.py --fuzz 200
+uv run --no-project --python 3.13 python3 eval.py --fuzz 200
 ```
+
+(`python3 eval.py --fuzz 200` with a Python 3.13 of your own; about 4 minutes, exit status 0 on a
+pass.)
 
 Plays every scripted policy on the build and held-out seeds, checks that each replay is
 byte-identical, that stopping early and the try-everything exploiter stay below the reference, and
