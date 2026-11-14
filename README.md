@@ -18,4 +18,4 @@ Setup: `direnv allow` (or `nix develop`) for the tools; secrets are sops-encrypt
 - [`docs/overnight-loop.md`](docs/overnight-loop.md): how we run unattended develop/test/verify/measure loops, with a brief template.
 - [`spread/`](spread/README.md): harness for the Bahn Express "Spread" challenge: scan practice weeks, compare policy variants, find their mistakes.
 - [`projects/espoo-recruitment/`](projects/espoo-recruitment/README.md): Esittely, the City of Espoo "Rethinking Recruitment" prototype: organisers hand-pick introductions with plain-language overlaps and gaps; no scores. Live: https://esittely.duckymcduck2.workers.dev/
-- [`projects/mariadb-wikipedia/cleanroom/`](projects/mariadb-wikipedia/cleanroom/README.md): clean-room test of the gap finder: an API check against live Wikipedia and four agent testers who see only what a user or judge sees.
+- [`projects/mariadb-wikipedia/cleanroom/`](projects/mariadb-wikipedia/cleanroom/README.md): clean-room test of [Edition Ledger](projects/mariadb-wikipedia/README.md), the MariaDB "Wikipedia Through Time" entry: an API check against live Wikipedia and four agent testers who see only what a user or judge sees.

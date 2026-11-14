@@ -16,8 +16,8 @@ services:
 networks:
   proxy:
     external: true
-  # The gap finder was live before the proxy. The proxy joins its network, so a redeploy of the
-  # gap finder needs no change and its pages stay reachable as gapfinder-ui-1.
+  # Edition Ledger was live before the proxy. The proxy joins its network, so a redeploy of
+  # Edition Ledger needs no change and its pages stay reachable as gapfinder-ui-1.
   gapfinder:
     external: true
     name: gapfinder_default

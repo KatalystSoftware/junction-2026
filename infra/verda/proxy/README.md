@@ -6,10 +6,10 @@ Docker network `proxy` and publishes no ports.
 
 | App | Address | Upstream on the `proxy` network |
 | --- | --- | --- |
-| Gap finder | `https://gapfinder.<base domain>/` and `https://31-22-104-106.sslip.io/` | `gapfinder-ui-1:8078`, on its own network |
+| Edition Ledger | `https://gapfinder.<base domain>/` and `https://31-22-104-106.sslip.io/` | `gapfinder-ui-1:8078`, on its own network |
 | Since When | `https://since-when.<base domain>/` and `https://since-when.31-22-104-106.sslip.io/` | `since-when-app:8078` |
 
-The gap finder is the one exception to "apps join the `proxy` network": it was live first, so the
+Edition Ledger is the one exception to "apps join the `proxy` network": it was live first, so the
 proxy joins its network `gapfinder_default` and its deploys need no change. If that project is ever
 taken down with `docker compose down`, start it again before restarting the proxy.
 
@@ -29,7 +29,7 @@ and run `deploy.sh`:
 
 For `BASE_DOMAIN=demo.example.org` that is `*.demo.example.org`. Caddy gets a certificate for each
 hostname on its first request, over HTTP on port 80 (or TLS on 443), so no DNS provider key is
-needed and the record must exist before the switch. The gap finder and Since When keep answering
+needed and the record must exist before the switch. Edition Ledger and Since When keep answering
 on the sslip.io addresses they were first published under.
 
 ## Add an app
@@ -60,7 +60,7 @@ on the sslip.io addresses they were first published under.
 3. Run `infra/verda/proxy/deploy.sh`. The app is on `https://my-app.<base domain>/` once Caddy has
    its certificate, a few seconds after the first request.
 
-Leave memory for the others: the gap finder is capped at about 13 GB, Since When at 3 GB, and the
+Leave memory for the others: Edition Ledger is capped at about 13 GB, Since When at 3 GB, and the
 machine also runs evaluation containers at times. Give each service a `deploy.resources.limits`.
 
 On the machine the files are in `/srv/katalyst/proxy/`; certificates are in the volume `proxy_data`.
