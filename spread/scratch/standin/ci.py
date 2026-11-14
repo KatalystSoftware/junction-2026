@@ -3,7 +3,7 @@ stand-in on the played paired checks of the held-out seeds (spreadlab/standin/va
 
     python3 scratch/standin/ci.py <design name or place in the list> <out folder> [jobs]
 
-A design is an entry of designs.json: the features to leave out of the fit (`drop`) and the world's options (`design`, world.DESIGN).
+A design is an entry of spreadlab/standin/designs.json: the features to leave out of the fit (`drop`) and the world's options (`design`, world.DESIGN).
 """
 from __future__ import annotations
 
@@ -15,7 +15,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 name, out, jobs = sys.argv[1], Path(sys.argv[2]), sys.argv[3] if len(sys.argv) > 3 else str(os.cpu_count())
-designs = json.loads((HERE / "designs.json").read_text())
+designs = json.loads((HERE.parents[1] / "spreadlab" / "standin" / "designs.json").read_text())  # beside the code: scratch/ ignores *.json
 if name.isdigit():  # a place in the list: a CI job's slot
     if int(name) >= len(designs):
         sys.exit(0)

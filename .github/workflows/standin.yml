@@ -1,6 +1,6 @@
 name: Spread stand-in
 
-# Fits and checks each design of the Spread stand-in (spread/scratch/standin/designs.json) on its own CRACI runner, in parallel.
+# Fits and checks each design of the Spread stand-in (spread/spreadlab/standin/designs.json) on its own CRACI runner, in parallel.
 # Offline: the jobs read packed saved weeks from the release `spread-standin-data` and get no secret and no team key.
 # Start a round by pushing the commit to the branch `standin-ci`; each design's report and result are in its artifact.
 on:
