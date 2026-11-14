@@ -57,6 +57,20 @@ def load_score(variant: str, seed: str, level: int = 8) -> dict | None:
     return json.loads(path.read_text(encoding="utf-8")) if path.exists() else None
 
 
+def policy_class(params: dict) -> type[Policy]:
+    """The desk a variant plays a week with. Every script that plays a week asks here, so that a ranking run plays the
+    policy its practice weeks played."""
+    # The day's correction with an offset for each dealer (dealer.py), the note fallback (fallback.py), the fees by each car's
+    # risk (riskfee.py), or out-and-back pairs (pairs.py).
+    chosen = (PairPolicy if params.get("pair_hold") else DealerPolicy if params.get("dealer_sd") else ActionDesk if "note_actions" in params
+              else RiskFeePolicy if params.get("risk_fees") else Policy)
+    if params.get("late_wide"):  # the wide late chance (late_wide.py), with or without pairs
+        chosen = {Policy: WidePolicy, PairPolicy: WidePairPolicy}[chosen]
+    if params.get("exposure"):  # the quote's cost by the book's exposure to drops (exposure.py)
+        chosen = {Policy: ExposurePolicy}[chosen]
+    return chosen
+
+
 def play(variant: str, params: dict, seed: str, level: int = 8) -> dict:
     """Plays the week and returns the summary that goes to the score file."""
     started = time.time()
@@ -65,15 +79,7 @@ def play(variant: str, params: dict, seed: str, level: int = 8) -> dict:
     world = client.create(level=level, seed=seed)
     try:
         snapshot, roster = world.snapshot(), world.roster()
-        # The day's correction with an offset for each dealer (dealer.py), the note fallback (fallback.py), the fees by each car's
-        # risk (riskfee.py), or out-and-back pairs (pairs.py).
-        desk_class = (PairPolicy if params.get("pair_hold") else DealerPolicy if params.get("dealer_sd") else ActionDesk if "note_actions" in params
-                      else RiskFeePolicy if params.get("risk_fees") else Policy)
-        if params.get("late_wide"):  # the wide late chance (late_wide.py), with or without pairs
-            desk_class = {Policy: WidePolicy, PairPolicy: WidePairPolicy}[desk_class]
-        if params.get("exposure"):  # the quote's cost by the book's exposure to drops (exposure.py)
-            desk_class = {Policy: ExposurePolicy}[desk_class]
-        desk, ends_at = desk_class(world, level, snapshot["now"], params, roster, map_), snapshot["endsAt"]
+        desk, ends_at = policy_class(params)(world, level, snapshot["now"], params, roster, map_), snapshot["endsAt"]
         events: list[dict] = []
         while desk.now < ends_at:
             # One request a step, as the starter does: the advance applies the outbox, then moves the clock.

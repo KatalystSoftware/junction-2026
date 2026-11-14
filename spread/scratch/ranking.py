@@ -26,7 +26,8 @@ import time
 from spread.client import ACTIONS_PER_CALL, Client, SpreadError, Unreachable
 from spread.starter import DAY
 
-from spreadlab.policy import Policy, fingerprint
+from spreadlab.play import policy_class
+from spreadlab.policy import fingerprint
 from spreadlab.server import SERVER, PracticeClient, data_dir, world_map, write_json_gz
 from spreadlab.variants import VARIANTS
 
@@ -75,9 +76,10 @@ def play(client: Client, world, variant: str, level: int, path, extra: dict) -> 
     snapshot, roster = answered(world.snapshot, "the snapshot"), answered(world.roster, "the drivers")
     if snapshot["now"] != snapshot.get("startsAt", snapshot["now"]) or snapshot.get("events"):
         raise Stop(f"World {world.id} has already moved (minute {snapshot['now']}). This script only plays a week from its start")
-    desk, ends_at = Policy(world, level, snapshot["now"], params, roster, map_), snapshot["endsAt"]
+    # The desk practice play builds for this variant: a pair or wide variant is another class than the plain policy.
+    desk, ends_at = policy_class(params)(world, level, snapshot["now"], params, roster, map_), snapshot["endsAt"]
     events: list[dict] = []
-    saved = {"variant": variant, "level": level, "worldId": world.id, "params": desk.p, "fingerprint": fingerprint(params), **extra}
+    saved = {"variant": variant, "level": level, "worldId": world.id, "params": desk.p, "fingerprint": fingerprint(params), "desk": type(desk).__name__, **extra}
     try:
         while desk.now < ends_at:
             actions, step = advance(world, desk, ends_at, events[-1]["seq"] if events else -1)
