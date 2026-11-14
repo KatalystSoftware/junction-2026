@@ -298,6 +298,14 @@ VARIANTS: dict[str, dict] = {
         **REFERENCE, "backlog_step": 0, "slow_step": 0.8, "max_unbooked": 25, "slow_model": "friday", "cost": 1.2, "late_cost": 150, "kinds": KINDS,
         "note_limits": True, "fee_rules": [[0, 10 ** 6, 16, 10 ** 6, 0.9, 0.1, 1.2]], "late_wide": True, "late_wide_version": late_wide.VERSION,
         "pair_hold": 4, "pair_fee": 0.6, "pair_cost": 0.75, "pair_version": pairs.VERSION},
+    # ... with `queue_hours` 24: the waiting-car surcharge and the gate of 25 count only the cars due within a day. A car that opens
+    # cheap and waits a day for its driver is no risk to the week. With the 0.9 opening (the attribution arm), and with the
+    # qualifying track's 0.8 opening (Track B's second distillation: its candidate without the outage split).
+    **{f"fee16{tail}-q24-wide-pairs-0.6-return-0.75": {
+        **REFERENCE, "backlog_step": 0, "slow_step": 0.8, "max_unbooked": 25, "slow_model": "friday", "cost": 1.2, "late_cost": 150, "kinds": KINDS,
+        "note_limits": True, "fee_rules": [[0, 10 ** 6, 16, 10 ** 6, opening, 0.1, 1.2]], "queue_hours": 24, "late_wide": True,
+        "late_wide_version": late_wide.VERSION, "pair_hold": 4, "pair_fee": 0.6, "pair_cost": 0.75, "pair_version": pairs.VERSION}
+       for tail, opening in (("", 0.9), ("-80", 0.8))},
     # ... the same without the note's limits, whose posting changed after its weeks were played.
     "slow-friday-late-150-kinds": {**REFERENCE, "backlog_step": 0, "slow_step": 0.8, "max_unbooked": 25, "slow_model": "friday", "cost": 1.2, "late_cost": 150, "kinds": KINDS},
     # The best point of the search over these parameters together (scratch/search.py, trial 16 of 20, on 30 tune seeds), and with the kinds.

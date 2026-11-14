@@ -95,6 +95,7 @@ DEFAULTS = {
     "slow_bar": [],       # [[cars, chance], ...] in rising cars: once this many won cars have no driver, decline a request whose chance of arriving late (slow.py) is above this
     "slow_model": "",     # the weights of the chance of arriving late (slow.MODELS): "friday" has terms for an order that must be collected on a Friday
     "slow_step": 0,       # the cost rises by this much x the request's chance of arriving late, for each won car without a driver
+    "queue_hours": 0,     # `slow_step` and `max_unbooked` count only the won cars without a driver that must be collected within this many hours; 0 counts all
     "late_cost": 0,       # the cost rises by the request's chance of arriving late (slow.py) x this many euros: the refund and the dealer's trust
     "rule_cost": 0,       # ... and by (that chance - 0.10) x this many euros, the price of the 90% rule: an order safer than the rule gets cheaper. The cost is then never under the typical fee
     # Snow. A `forecast` event names places and hours a day ahead; there drives are slower and some drivers stay at home. Each is off at its default.
@@ -231,7 +232,7 @@ class Policy(Desk):
             fee, day, on_time = request["referenceFeeCents"], request["arrivedAt"] // DAY, self.trust.get(request["dealerId"], 0)
             surcharge = p["backlog_step"] * max(0, self.unbooked(p["backlog_hours"]) - p["backlog_from"])
             if p["slow_step"]:
-                surcharge += p["slow_step"] * self.unbooked() * self.slow(request, options)
+                surcharge += p["slow_step"] * self.unbooked(p["queue_hours"]) * self.slow(request, options)
             if p["backlog_later"]:
                 surcharge += p["backlog_later"] * (self.unbooked() - self.unbooked(p["backlog_hours"]))
             log_odds = 0.0
@@ -342,7 +343,7 @@ class Policy(Desk):
         options = [o for o in options if self.slack(request, o) >= p["min_slack"]]
         if not options:
             return "slack", []
-        if p["max_unbooked"] and self.unbooked() >= p["max_unbooked"]:
+        if p["max_unbooked"] and self.unbooked(p["queue_hours"]) >= p["max_unbooked"]:
             return "backlog", []
         bar = next((chance for cars, chance in reversed(p["slow_bar"]) if self.unbooked() >= cars), None)
         if bar is not None and self.slow(request, options) > bar:
