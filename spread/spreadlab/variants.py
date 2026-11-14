@@ -491,3 +491,9 @@ VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss
     _A1, slow_step=0.0, cost=1.05, queue_hours=6, max_unbooked=40, min_slack=240,
     kinds={**_A1["kinds"], "private_pickup": {**_A1["kinds"]["private_pickup"], "cost": 1.4},
            "private_delivery": {**_A1["kinds"]["private_delivery"], "cost": 1.2}, "trade_in": {**_A1["kinds"]["trade_in"], "cost": 2.0}})
+# Lane 3, aggressive: a shorter time to find a driver (`min_slack`, 300 minutes) on the aggressive row A1.7, only in a week of
+# 760 drivers or more. There merge 1 drops the same_day option of 116 requests a week and declines 33 more for slack under 5
+# hours, yet its won orders with 5 to 6 hours of slack are 4.6% late, and a dealer offered same_day beside next_day takes it 84%
+# of the time. These orders come at the curve's full price, with the late chance in the cost. A thinner week plays A1.7 exactly.
+_A17 = VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100"]
+VARIANTS.update({f"a17-rich-slack{minutes}": _full_weeks(_A17, min_slack=minutes) for minutes in (240, 180, 120)})
