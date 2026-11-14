@@ -42,10 +42,13 @@ The page says nothing the repo does not. When one of these files changes, change
 
 | Entry | Source |
 | --- | --- |
-| Since When | [`projects/since-when/README.md`](../since-when/README.md) |
-| OnCallBench | [`projects/oncallbench/README.md`](../oncallbench/README.md) and its [`replay/README.md`](../oncallbench/replay/README.md); "worse than a scripted expert" is the round 4 status in [`LOOP.md`](../oncallbench/LOOP.md) |
-| Kutsu | [`projects/kutsu/README.md`](../kutsu/README.md) |
-| Spread desk | [`spread/README.md`](../../spread/README.md) and the [challenge brief](../../docs/challenges/main/bahn-express--spread.md) |
+| OnCallBench | [`projects/oncallbench/README.md`](../oncallbench/README.md): 120 minutes and 60 services under "What the agent has to do"; "finds the causes, then loses on judgment"; 0.45 and 21% worse than doing nothing in the "Common seeds" table (Opus 5.5, 48 runs on seeds 200000-200023), which the replay's header also shows |
+| Since When | [`projects/since-when/README.md`](../since-when/README.md), first paragraph |
+| Kutsu | [`projects/kutsu/README.md`](../kutsu/README.md): the first paragraphs, the two sign-up flows, and the Context.dev table (brand record, careers page) |
+| Spread desk | [`spread/README.md`](../../spread/README.md), "How the desk decides" |
+
+The screenshots are cropped to one readable moment: the replay at minute 34 of seed 200019
+(`?session=l4-s200019&t=34&intro=0&still`), Since When at 760 × 475, Kutsu's invitation at 1280 × 800.
 
 Source links are off: `repo` in `projects.js` is empty because this repository is private. Set it to
 the public copy's address once `scripts/publish-public.sh` has pushed one, and every entry gets a
