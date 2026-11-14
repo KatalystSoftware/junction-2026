@@ -40,6 +40,7 @@ from multiprocessing import Pool
 from pathlib import Path
 
 from spreadlab import curve, notes
+from spreadlab.late_wide import WidePairPolicy
 from spreadlab.pairs import PairPolicy
 from spreadlab.policy import Policy, kind
 from spreadlab.server import data_dir
@@ -124,8 +125,8 @@ class World:
                 del self.live[car]
 
 
-class Screen(PairPolicy):
-    """PairPolicy that also notes, for each return quote, the quote the policy would have sent at its usual cost."""
+class Screening:
+    """The pair desk that also notes, for each return quote, the quote the policy would have sent at its usual cost."""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -153,6 +154,14 @@ class Screen(PairPolicy):
         lo = self.answer(request, self.decisions[request["id"]]["prices"])
         self.return_quotes.append({"id": request["id"], "partner": partner, "hi": hi, "lo": lo, "typical": request["referenceFeeCents"],
                              "partner_typical": self.requests[partner]["referenceFeeCents"]})
+
+
+class Screen(Screening, PairPolicy):
+    pass
+
+
+class ScreenWide(Screening, WidePairPolicy):
+    pass
 
 
 def screen(path: str) -> dict:
@@ -184,7 +193,9 @@ def screen(path: str) -> dict:
         out["slack"] = slack
         map_ = json.loads((data_dir() / "map.json").read_text())
         world = World(map_, waits)
-        d = Screen(world, 8, 0, VARIANTS[SCREENED], run["roster"], map_)
+        params = VARIANTS[SCREENED]
+        desk_class = ScreenWide if params.get("late_wide") else Screen  # as play.py takes the desk
+        d = desk_class(world, 8, 0, params, run["roster"], map_)
 
         def until(t: int) -> None:
             for _ in range(10_000):
@@ -284,6 +295,11 @@ def screen(path: str) -> dict:
     return out
 
 
+def screening(variant: str) -> None:
+    global SCREENED
+    SCREENED = variant
+
+
 def read(rows: list[dict]) -> None:
     errors = [r for r in rows if "error" in r]
     bad = [r for r in rows if r.get("n_violations")]
@@ -352,6 +368,7 @@ def main() -> None:
     parser.add_argument("--out", default=str(data_dir() / "pairs-screen.jsonl"))
     parser.add_argument("--read", help="only print the screen from this file")
     parser.add_argument("--processes", type=int, default=4)
+    parser.add_argument("--screened", default=SCREENED, help=f"the pair variant to run over the recorded weeks (default {SCREENED})")
     args = parser.parse_args()
     if args.read:
         return read([json.loads(line) for line in open(args.read)])
@@ -364,7 +381,7 @@ def main() -> None:
     rows = [json.loads(line) for line in open(args.out)] if Path(args.out).exists() else []  # a screen that stopped goes on
     done = {r["path"] for r in rows}
     paths = [p for p in paths if p not in done]
-    with Pool(args.processes) as pool, open(args.out, "a") as f:
+    with Pool(args.processes, initializer=screening, initargs=(args.screened,)) as pool, open(args.out, "a") as f:
         for i, row in enumerate(pool.imap(screen, paths, chunksize=2)):
             rows.append(row)
             f.write(json.dumps(row) + "\n")

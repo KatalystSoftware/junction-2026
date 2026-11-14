@@ -30,6 +30,11 @@ SEARCH_16 = {"cost": 1.2210258222821198, "late_cost": 25.623005665608154, "backl
 FEES_THIN = [[0, 40, 0, 8, 1.2, 0.2, 1.6], [0, 40, 8, 24, 1.1, 0.1, 1.4]]
 FEES_DEEP = [[100, 10 ** 6, 24, 10 ** 6, 0.9, 0.05, 1.2]]
 
+# Merge 1 of the lanes, `fee16-80-q24-wide-pairs-0.6-return-0.75`: the base that lane 2's knobs change one at a time.
+VARIANTS_MERGE1 = {**REFERENCE, "backlog_step": 0, "slow_step": 0.8, "max_unbooked": 25, "slow_model": "friday", "cost": 1.2, "late_cost": 150,
+                   "kinds": KINDS, "note_limits": True, "fee_rules": [[0, 10 ** 6, 16, 10 ** 6, 0.8, 0.1, 1.2]], "queue_hours": 24, "late_wide": True,
+                   "late_wide_version": late_wide.VERSION, "pair_hold": 4, "pair_fee": 0.6, "pair_cost": 0.75, "pair_version": pairs.VERSION}
+
 VARIANTS: dict[str, dict] = {
     "baseline": {},
     # The anchor that does nothing: declines every request. Any variant must beat it in the same week.
@@ -309,6 +314,15 @@ VARIANTS: dict[str, dict] = {
         "note_limits": True, "fee_rules": [[0, 10 ** 6, 16, 10 ** 6, opening, 0.1, 1.2]], "queue_hours": hours, "late_wide": True,
         "late_wide_version": late_wide.VERSION, "pair_hold": 4, "pair_fee": 0.6, "pair_cost": 0.75, "pair_version": pairs.VERSION}
        for tail, opening, hours in (("", 0.9, 12), ("", 0.9, 24), ("", 0.9, 36), ("", 0.9, 48), ("-80", 0.8, 24), ("-80", 0.8, 12))},
+    # Lane 2, pairing and combining cars: one knob at a time on merge 1, `fee16-80-q24-wide-pairs-0.6-return-0.75`. Pair ends within
+    # 45 km, not 30 (`pair_km`); a won return also pairs with a car whose own gig is still open and unbooked, which is withdrawn first
+    # (`pair_open`); a held car also goes with a car collected near its delivery place, wherever that one goes, at 0.8 x the two
+    # typical fees (`pair_onward`); holds on lanes with 4 or more return requests a week, not 8; holds for cars with 12 hours or
+    # more, not 16; the return quoted at a cost of 0.6, not 0.75.
+    **{f"l2-{tail}": {**VARIANTS_MERGE1, **extra}
+       for tail, extra in (("km45", {"pair_km": 45}), ("open", {"pair_open": True}), ("onward", {"pair_onward": 0.8}),
+                           ("traffic4", {"pair_traffic": 4}), ("slack12", {"pair_slack": 12}), ("cost06", {"pair_cost": 0.6}),
+                           ("open-onward", {"pair_open": True, "pair_onward": 0.8}))},
     # ... the same without the note's limits, whose posting changed after its weeks were played.
     "slow-friday-late-150-kinds": {**REFERENCE, "backlog_step": 0, "slow_step": 0.8, "max_unbooked": 25, "slow_model": "friday", "cost": 1.2, "late_cost": 150, "kinds": KINDS},
     # The best point of the search over these parameters together (scratch/search.py, trial 16 of 20, on 30 tune seeds), and with the kinds.

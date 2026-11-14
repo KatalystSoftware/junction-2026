@@ -109,3 +109,43 @@ def test_a_car_with_too_little_time_or_no_return_traffic_is_posted_at_once(monke
     win(d, request("R1", "helsinki", "tampere", MON_9, deadline=MON_9 + 10 * 60), MON_9 + 15)  # under 16 hours to its last pickup
     win(d, request("R2", "helsinki", "helsinki", MON_9), MON_9 + 15)  # a lane without return traffic
     assert not d.pair_wait and len([a for a in d.world.sent if a["type"] == "post"]) == 2
+
+
+class Refusing(World):
+    """Refuses withdrawals: a driver booked the gig as the desk withdrew it."""
+
+    def act(self, actions):
+        return [{"ok": False, "reason": "Gig is not open"} if a["type"] == "withdraw" else r for a, r in zip(actions, super().act(actions))]
+
+
+@pytest.mark.parametrize("world", [World, Refusing])
+def test_a_return_pairs_with_a_car_whose_own_gig_is_still_open_only_once_that_gig_is_withdrawn(monkeypatch, world):
+    d = desk(monkeypatch, pair_open=True, pair_slack=100)  # no car is held: R1 goes alone at once
+    d.world = world()
+    win(d, request("R1", "helsinki", "tampere", MON_9), MON_9 + 15)
+    assert d.gigs_of("R1") == ["G1"] and not d.pair_wait
+    win(d, request("R2", "tampere", "helsinki", MON_9 + 60), MON_9 + 75)
+    sent = [(a["type"], a.get("gigId"), len(a.get("stops", []))) for a in d.world.sent]
+    if world is World:
+        assert sent == [("post", None, 2), ("withdraw", "G1", 0), ("post", None, 4)]
+        assert d.gigs_of("R1") == d.gigs_of("R2") == ["G3"] and "G3" in d.pair_gigs
+    else:  # the car stays on the gig a driver now holds, and the return goes alone
+        assert sent == [("post", None, 2), ("withdraw", "G1", 0), ("post", None, 2)]
+        assert d.gigs_of("R1") == ["G1"] and d.gigs_of("R2") == ["G3"] and not d.pair_gigs
+
+
+def test_a_held_car_goes_onward_with_a_car_collected_where_it_is_delivered_at_the_onward_fee(monkeypatch):
+    three = {"places": MAP["places"] + [{"id": "pori", "lat": 61.48, "lon": 21.80}],
+             "roads": [{"from": a, "to": b, "km": 100.0, "minutes": 25 if a == b else 120} for a in ("helsinki", "tampere", "pori") for b in ("helsinki", "tampere", "pori")]}
+    monkeypatch.setattr(pairs, "RETURNS", {"helsinki>tampere": 20})
+    found = {}
+    for onward in (0, 0.8):
+        d = pairs.PairPolicy(World(), 8, MON_9, {"quote_share": 1, "curve": True, "cost": 1.2, "fee": 1.0, "fee_cap": 1.2, "pair_hold": 4,
+                                                 "pair_onward": onward}, ROSTER, three)
+        win(d, request("R1", "helsinki", "tampere", MON_9), MON_9 + 15)
+        win(d, request("R2", "tampere", "pori", MON_9 + 60), MON_9 + 75)  # collected where R1 is delivered, going elsewhere
+        found[onward] = [a for a in d.world.sent if a["type"] == "post"]
+    assert found[0] == [] or all(len(a["stops"]) == 2 for a in found[0])  # without onward pairs R2 goes alone, R1 stays held
+    (pair,) = found[0.8]
+    assert [(s["orderId"], s["kind"]) for s in pair["stops"]] == [("R1", "pickup"), ("R1", "delivery"), ("R2", "pickup"), ("R2", "delivery")]
+    assert pair["schedule"][0]["feeCents"] == 16000  # 0.8 x the two typical fees of 10000
