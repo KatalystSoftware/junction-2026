@@ -97,10 +97,15 @@ def evaluate(llm, chat, tag, samples, temp, levels, max_ctx, seeds=HELD_OUT, ste
 def cmd_eval(o):
     from transformers import AutoTokenizer
 
-    chat = core.make_chat(AutoTokenizer.from_pretrained(o.model), think=o.think)
-    llm = engine(o.model, o.gpu_mem, o.max_ctx)
+    path = resolve(o.model)
+    chat = core.make_chat(AutoTokenizer.from_pretrained(path), think=o.think)
+    llm = engine(path, o.gpu_mem, o.max_ctx)
+    if o.adapter:  # merge the LoRA on the trainer's GPU and copy it into vLLM, as rl does
+        model, _ = trainer(path, 0.0, o.lora, o.train_device, o.adapter)
+        core.sync(model, llm)
+        del model
     for temp in o.temps:
-        evaluate(llm, chat, o.tag, o.samples if temp else 1, temp, o.levels, o.max_ctx)
+        evaluate(llm, chat, o.tag, o.samples if temp else 1, temp, o.levels, o.max_ctx, seeds=o.seeds)
 
 
 def resolve(model):
@@ -258,7 +263,10 @@ if __name__ == "__main__":
     ap.add_argument("--lr", type=float, default=1e-5)
     ap.add_argument("--lora", type=int, default=0, help="LoRA rank; 0 trains every weight")
     ap.add_argument("--train-device", default="cuda")
-    ap.add_argument("--adapter", help="LoRA adapter to start from (rl)")
+    ap.add_argument("--adapter", help="LoRA adapter to start from (rl) or to evaluate (eval, with --lora and "
+                                      "--train-device)")
+    ap.add_argument("--seeds", type=ints, default=HELD_OUT,
+                    help="eval seeds; 100000+ are in no demo or rl pool (demos 1-399, rl 1000-99999)")
     # rl
     ap.add_argument("--steps", type=int, default=40)
     ap.add_argument("--groups", type=int, default=8)

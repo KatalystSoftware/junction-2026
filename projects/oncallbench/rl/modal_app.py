@@ -60,8 +60,9 @@ def run1(argv: str, submitted: float = 0.0):
 
 
 def _run(argv, submitted):
-    """`python run.py <argv>` with cache/, ckpt/ and out/ on the Volume, committed every two minutes.
-    The container's `nvidia-smi -L` is the first lines of out/<tag>/run.log."""
+    """`python run.py <argv>`, or `python <argv>` when argv starts with a script (`audit.py complete ...`),
+    with cache/, ckpt/ and out/ on the Volume, committed every two minutes. The container's
+    `nvidia-smi -L` is the first lines of out/<tag>/run.log."""
     t0 = time.time()
     tag = _tag(argv)
     work, out = Path("/root/rl"), Path(f"{VOL}/out/{tag}")
@@ -85,8 +86,9 @@ def _run(argv, submitted):
 
     threading.Thread(target=commit, daemon=True).start()
     with open(out / "run.log", "a") as log:
-        p = subprocess.Popen(["python", "run.py", *shlex.split(argv)], cwd=work, stdout=subprocess.PIPE,
-                             stderr=subprocess.STDOUT, text=True, bufsize=1)
+        args = shlex.split(argv)
+        cmd = ["python", *args] if args[0].endswith(".py") else ["python", "run.py", *args]
+        p = subprocess.Popen(cmd, cwd=work, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
         for line in p.stdout:
             print(line, end="", flush=True)
             log.write(line)
