@@ -10,12 +10,14 @@ world shows the bar of the top 10, so mean margin stands in for it:
 
 A trial is within the limit with at most 1 of its 30 weeks under 90%; the sampler gets J2 - 2,000 for each week beyond
 that. A trial stops after rung 1 (8 seeds, the 4 with the fewest drivers among them) when 2 of those weeks are under
-90%, or when its margin against the reference there is more than 600 under the best so far.
+90%, or when its margin against the reference there is more than 1,000 under the best so far: the 8 seeds are hard for
+every variant, and a mean of 8 paired differences has a standard error of about 390.
 
 The study is in data/search/search1.db and survives a restart: a trial that a stop cut short is queued again, and its
 saved weeks are not played again. Stop it with `touch data/search/STOP` or --until. The first objective (J: a week
 under 91% as no margin, and 300 for each point under 93%) scored the studies `search1` and `search1b` in the same file;
-their trials start the study `search1c`, scored again from their saved weeks.
+their trials started the study `search1c`. `search1d` starts from its trials in turn, with the kinds as a parameter
+(off in every trial before it) and the wider stop; the trials that the narrower stop ended are queued again.
 """
 from __future__ import annotations
 
@@ -34,10 +36,10 @@ from spreadlab.catalogue import load_catalogue, load_seeds
 from spreadlab.play import load_score, play
 from spreadlab.policy import DEFAULTS, fingerprint
 from spreadlab.server import data_dir
-from spreadlab.variants import REFERENCE
+from spreadlab.variants import KINDS, REFERENCE
 
 REFERENCE_NAME = "steep-notes-offers-8"
-PRUNE_UNDER = 600  # a trial stops after rung 1 when its margin against the reference there is this far under the best so far
+PRUNE_UNDER = 1000  # a trial stops after rung 1 when its margin against the reference there is this far under the best so far
 OVER_LIMIT = 2000  # what the sampler takes off J2 for each week under 90% beyond the one that the limit allows
 # The points to play first, as the search's parameters. `GUARD` is the mildest guard the ranges allow.
 BASE = {"guard": "on", "cost": 1.3, "late_cost": 0.0, "backlog_step": 0.04, "slow_step": 0.0, "backlog_hours": 0, "max_unbooked": 15, "fee": 1.0, "fee_cap": 1.2, "f_short": 1.0, "offer_hours": 8}
@@ -61,6 +63,11 @@ THIRD = [
     {**BASE, **GUARD, "guard": "off", "cost": 1.19, "late_cost": 225.0, "backlog_step": 0.02, "backlog_hours": 24, "max_unbooked": 40},
     {**BASE, **GUARD, "guard": "off", "backlog_step": 0.0, "slow_step": 0.8, "max_unbooked": 25},  # slow-step-gate-25 as it is in variants.py
 ]
+# Queued when the kinds joined the search (`search1d`): five points that each put one part of the best trial so far back to the
+# reference's, played in full whatever their first rung, then that trial and two others with the kinds.
+BEST = "s1-a75fecb071"
+BACK = [{"late_cost": 0.0}, {"cost": 1.3}, {"fee": 1.0, "fee_cap": 1.2, "f_short": 1.0}, {"max_unbooked": 25}, {"backlog_step": 0.0}]
+WITH_KINDS = [BEST, "s1-606512f11c", "s1-45c37e88a3"]
 
 
 class Stopped(Exception):
@@ -83,6 +90,7 @@ SPACE = {
     "fee_cap": Float(1.15, 1.50),
     "f_short": Float(1.0, 1.4),            # the opening fee of an order with under 8 hours to find a driver
     "offer_hours": Choice([8, 12, 24]),
+    "kinds": Choice(["off", "on"]),        # on: private pickups, private deliveries and trade-ins are quoted (KINDS in variants.py)
 }
 
 
@@ -99,6 +107,8 @@ def build(t: dict) -> dict:
                        "when_behind": {"rule_cost": t["rule_cost"], "max_unbooked": t["behind_max_unbooked"], "backlog_hours": 0, "backlog_step": max(0.04, t["backlog_step"])}})
     if t["f_short"] > t["fee"]:  # an order with under 8 hours to find a driver opens higher; at or under `fee` it opens as the others
         params["fee_rules"] = [[0, 10 ** 6, 0, 8, t["f_short"], 0.1, max(t["f_short"], t["fee_cap"]) + 0.2]]
+    if t.get("kinds") == "on":
+        params["kinds"] = KINDS
     return params
 
 
@@ -106,7 +116,7 @@ def name_of(t: dict) -> str:
     # A point with the guard and without `slow_step` keeps the name it had before those parameters joined the search, and so
     # its saved weeks. Without the guard, its three parameters are not read and not part of the name.
     off = t["guard"] == "off"
-    named = {k: v for k, v in t.items() if not (k == "slow_step" and not v) and not (k == "guard" and not off) and not (off and k in GUARD)}
+    named = {k: v for k, v in t.items() if not (k == "slow_step" and not v) and not (k == "guard" and not off) and not (off and k in GUARD) and not (k == "kinds" and v == "off")}
     return "s1-" + hashlib.sha256(json.dumps(named, sort_keys=True).encode()).hexdigest()[:10]
 
 
@@ -126,7 +136,7 @@ def main() -> None:
     args = parser.parse_args()
     folder = data_dir() / "search"
     folder.mkdir(parents=True, exist_ok=True)
-    stop_file, requeued_file = folder / "STOP", folder / "search1c-requeued.json"
+    stop_file, requeued_file = folder / "STOP", folder / "search1d-requeued.json"
     until = None
     if args.until:
         hour, minute = map(int, args.until.split(":"))
@@ -210,21 +220,22 @@ def main() -> None:
 
     print(f"reference on S: {json.dumps(summary(reference))}; on rung 1: {json.dumps(summary({s: reference[s] for s in rung1}))}", flush=True)
     storage = f"sqlite:///{folder / 'search1.db'}"
-    study = optuna.create_study(study_name="search1c", storage=storage, direction="maximize", load_if_exists=True,
+    study = optuna.create_study(study_name="search1d", storage=storage, direction="maximize", load_if_exists=True,
                                 sampler=optuna.samplers.TPESampler(multivariate=True, n_startup_trials=24, seed=1))
     if not study.get_trials(deepcopy=False):
         # The trials of the studies before it, with the guard on, scored again from their saved weeks. Those that the first
         # rule stopped at rung 1 and the new rule lets pass are queued, as are those that a stop cut short.
         try:
-            before = optuna.load_study(study_name="search1b", storage=storage).get_trials()
+            before = optuna.load_study(study_name="search1c", storage=storage).get_trials()
         except KeyError:
             before = []
-        played = []
+        played, was, again = [], {}, []
         for trial in before:
-            point = {"guard": "on", **trial.params}
+            point = {"kinds": "off", **trial.params}
             if set(point) != set(SPACE):
                 continue
             name = name_of(point)
+            was.setdefault(name, f"search1c {trial.number}")
             saved = {seed: load_score(name, seed) for seed in seeds}
             weeks = {seed: row["score"] for seed, row in saved.items() if row is not None and same_parameters(row, build(point))}
             played.append((point, name, weeks))
@@ -237,13 +248,15 @@ def main() -> None:
             first = {s: weeks[s] for s in rung1 if s in weeks}
             if len(weeks) == len(seeds):
                 study.add_trial(optuna.trial.create_trial(params=point, distributions=SPACE, value=value_of(weeks),
-                                                          user_attrs={"variant": name, "rung1": summary(first), "full": summary(weeks)}))
+                                                          user_attrs={"was": was[name], "variant": name, "rung1": summary(first), "full": summary(weeks)}))
             elif len(first) == len(rung1) and (under(first) >= 2 or versus(first) < best_first - PRUNE_UNDER):
                 study.add_trial(optuna.trial.create_trial(state=optuna.trial.TrialState.PRUNED, params=point, distributions=SPACE, intermediate_values={0: versus(first)},
-                                                          user_attrs={"variant": name, "rung1": summary(first)}))
+                                                          user_attrs={"was": was[name], "variant": name, "rung1": summary(first)}))
             else:
-                study.enqueue_trial(point)
-        for point in (THIRD if before else FIRST + SECOND + THIRD):
+                again.append(point)
+        points = {name: point for point, name, _ in played}
+        first_points = [{**points[BEST], **back} for back in BACK] + [{**points[name], "kinds": "on"} for name in WITH_KINDS] if BEST in points else []
+        for point in first_points + again + ([] if before else [{"kinds": "off", **point} for point in FIRST + SECOND + THIRD]):
             study.enqueue_trial(point)
     # A fixed seed draws the same points after every restart, so the seed follows the trials that the study has.
     study.sampler = optuna.samplers.TPESampler(multivariate=True, n_startup_trials=24, seed=1 + len(study.get_trials(deepcopy=False)))
@@ -257,6 +270,8 @@ def main() -> None:
             study.enqueue_trial(trial.params)
             requeued.add(trial.number)
     requeued_file.write_text(json.dumps(sorted(requeued)))
+    start = next((t.params for t in study.get_trials(deepcopy=False) if t.user_attrs.get("variant") == BEST and len(t.params) == len(SPACE)), None)
+    no_stop = {name_of({**start, **back}) for back in BACK} if start else set()
     lock = threading.Lock()
     done = [t for t in study.get_trials(deepcopy=False) if "rung1" in t.user_attrs]
     best = {"rung1": max((t.user_attrs["rung1"]["vsReference"] for t in done), default=float("-inf"))}
@@ -270,7 +285,7 @@ def main() -> None:
         trial.set_user_attr("rung1", summary(first))
         trial.report(value, 0)
         with lock:
-            pruned = under(first) >= 2 or value < best["rung1"] - PRUNE_UNDER
+            pruned = name not in no_stop and (under(first) >= 2 or value < best["rung1"] - PRUNE_UNDER)
             best["rung1"] = max(best["rung1"], value)
         if pruned:
             print(f"trial {trial.number} {name} pruned  rung 1 {json.dumps(summary(first))}  {json.dumps(point)}", flush=True)

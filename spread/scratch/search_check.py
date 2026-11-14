@@ -41,7 +41,11 @@ def main() -> None:
     args = parser.parse_args()
     seeds = args.seeds.split(",")
     folder = data_dir() / "search"
-    study = optuna.load_study(study_name="search1c", storage=f"sqlite:///{folder / 'search1.db'}")
+    storage = f"sqlite:///{folder / 'search1.db'}"
+    try:
+        study = optuna.load_study(study_name="search1d", storage=storage)
+    except KeyError:  # before the kinds joined the search
+        study = optuna.load_study(study_name="search1c", storage=storage)
     full = [t for t in study.get_trials() if "full" in t.user_attrs]
     by_name = {t.user_attrs["variant"]: t for t in full}
     if args.variants:

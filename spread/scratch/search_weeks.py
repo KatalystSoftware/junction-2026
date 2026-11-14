@@ -25,7 +25,7 @@ def main() -> None:
     folder = data_dir() / "search"
     storage = f"sqlite:///{folder / 'search1.db'}"
     trials, seen = [], set()
-    for name in ("search1c", "search1b", "search1"):
+    for name in ("search1d", "search1c", "search1b", "search1"):
         try:
             study = optuna.load_study(study_name=name, storage=storage)
         except KeyError:
