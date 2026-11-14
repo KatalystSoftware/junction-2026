@@ -254,6 +254,13 @@ VARIANTS: dict[str, dict] = {
     # ... and with lateness in every quote and the late chance that knows Friday's deadlines (`slow-step-gate-25-friday-late-150`).
     "slow-friday-late-150-kinds-limits": {**REFERENCE, "backlog_step": 0, "slow_step": 0.8, "max_unbooked": 25, "slow_model": "friday", "cost": 1.2, "late_cost": 150,
                                           "kinds": KINDS, "note_limits": True},
+    # ... with the note fallback (fallback.py, played by fallback.ActionDesk): on a won note that the rules are unsure of, a model
+    # picks cited posting actions. "note_actions" is fallback.VERSION: raise both on each change of the prompt, the checks or the
+    # model, so the fingerprint follows. The second also acts on an earlier deadline and on haste, which cost margin when wrong.
+    **{name: {**REFERENCE, "backlog_step": 0, "slow_step": 0.8, "max_unbooked": 25, "slow_model": "friday", "cost": 1.2, "late_cost": 150,
+              "kinds": KINDS, "note_limits": True, "note_actions": 1, **extra}
+       for name, extra in (("slow-friday-late-150-kinds-limits-actions", {}),
+                           ("slow-friday-late-150-kinds-limits-actions-risky", {"note_actions_risky": ["deadline", "urgent"]}))},
     # An internal on-time target in place of the fixed buffer. Lateness is priced at what a late order costs (refund 46 and
     # dealer trust 36, scratch/opt/calibrate.py), the waiting-car surcharge is halved and the gate is 40, so the desk quotes
     # lower than the candidate. While the projected on-time share is under the target, once 40 orders are won, it quotes as
