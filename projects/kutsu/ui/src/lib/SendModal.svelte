@@ -33,7 +33,9 @@
 
 <!-- the veil closes on a click outside the box; the keyboard closes with Escape (window handler above) -->
 <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
-<div class="veil" onclick={(e) => e.target === e.currentTarget && onclose()}>
+<div class="veil" onclick={(e) => {
+    if (e.target === e.currentTarget) onclose()
+  }}>
   <div class="box" role="dialog" aria-modal="true" aria-labelledby="send-title" tabindex="-1">
     <header>
       <h2 id="send-title">Send the invitation</h2>

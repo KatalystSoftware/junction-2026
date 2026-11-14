@@ -111,7 +111,9 @@
           {@const d = decisionOf(by, a.id)}
           {@const best = bestOf(a)}
           <li>
-            <button class:on={current?.id === a.id} class:done={!!d} onclick={() => open(a.id)}>
+            <button class:on={current?.id === a.id} class:done={!!d} onclick={() => {
+                open(a.id)
+              }}>
               <span class="who"><b>{a.handle}</b><small>{a.field} · {a.level}</small></span>
               <span class="best">{best ? (brief ? best.need.title : nameOf(best.brief)) : 'no close role'}</span>
               {#if d}<span class="state {d.d}">{d.d === 'accept' ? 'Accepted' : 'Declined'}</span>{:else}<span class="state">To decide</span>{/if}
@@ -188,8 +190,10 @@
 
           <footer class="decide">
             {#if decision}
-              <p class="made"><span class="state {decision.d}">{decision.d === 'accept' ? 'Accepted' : 'Declined'}</span> by {decision.by === 'espoo' ? 'City of Espoo' : nameOf(brief ?? app.briefs[0]!)}, {when(decision.at.slice(0, 10))}: “{decision.reason}”</p>
-              <button class="btn quiet" onclick={() => undecide(by, current.id)}>Change</button>
+              <p class="made"><span class="state {decision.d}">{decision.d === 'accept' ? 'Accepted' : 'Declined'}</span> by {decision.by === 'espoo' ? 'City of Espoo' : (brief ? nameOf(brief) : decision.by)}, {when(decision.at.slice(0, 10))}: “{decision.reason}”</p>
+              <button class="btn quiet" onclick={() => {
+                undecide(by, current.id)
+              }}>Change</button>
             {:else}
               <div class="pickrow">
                 <button class="btn" class:primary={pick === 'accept'} onclick={() => (pick = 'accept')}><Icon name="check" size={16} />Accept</button>

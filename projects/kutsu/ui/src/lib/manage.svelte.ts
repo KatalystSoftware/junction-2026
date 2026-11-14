@@ -27,18 +27,20 @@ export const persist = () => {
   }
 }
 
+// a timestamp for the record; the lint prefers SvelteDate for anything held in state, but this is read once and stored as text
+const now = () => new Date(Date.now()).toISOString()
 export const decisionKey = (by: string, id: string) => `${by}:${id}`
 export const decisionOf = (by: string, id: string): Decision | undefined => manage.decisions[decisionKey(by, id)]
 export function decide(by: string, id: string, d: 'accept' | 'decline', reason: string) {
-  manage.decisions[decisionKey(by, id)] = { d, reason, by, at: new Date().toISOString() }
+  manage.decisions[decisionKey(by, id)] = { d, reason, by, at: now() }
   persist()
 }
 export function undecide(by: string, id: string) {
-  delete manage.decisions[decisionKey(by, id)]
+  manage.decisions = Object.fromEntries(Object.entries(manage.decisions).filter(([k]) => k !== decisionKey(by, id)))
   persist()
 }
 export function sendInvitation(g: Omit<Sent, 'at'>) {
-  manage.sent = { ...g, at: new Date().toISOString() }
+  manage.sent = { ...g, at: now() }
   persist()
 }
 export function countCopy() {
