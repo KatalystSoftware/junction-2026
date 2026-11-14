@@ -19,38 +19,61 @@ shares no files with it. The Python package names are unchanged.
 - [`differences/`](differences/README.md): classifies the differences between two passages with Nemotron.
 - [`ui/`](ui/README.md): the app, in Svelte.
 - [`deploy/`](deploy/README.md): the public instance on the Verda machine.
-- [`demo/`](demo/HANDOFF.md): the handoff note, the [walkthrough script](demo/WALKTHROUGH.md) and the builders' notes.
+- [`demo/`](demo/): the [two-minute walkthrough](demo/WALKTHROUGH.md) on the public instance, and the team's
+  notes from building and checking it.
 - [`measurements/`](demo/measurements.md): recall and query times, with the runs they come from.
 
-Run, from this directory on hestia, where the scratch database is (container `gapfinder-scratch-db`,
-login in `~/junction2026-data/mariadb/scratch.env`):
+## Run it
 
-    docker compose up --build -d                              # http://127.0.0.1:8078
+The quickest way, with no database: the app and its API answering from a small sample of the data in
+[`ui/fixtures/`](ui/fixtures/). You need [uv](https://docs.astral.sh/uv/), Node 20 or newer, and MariaDB
+Connector/C, which the `mariadb` Python driver builds against (`apt install libmariadb-dev`, or
+`brew install mariadb-connector-c`). From this directory:
 
-One container serves the app and the API. Without Docker or a database, `npm --prefix ui run build` and then
-`SINCE_WHEN_FIXTURES=1 uv run python -m gapfinder serve` serves the app on fixture data.
+    npm --prefix ui ci && npm --prefix ui run build
+    SINCE_WHEN_FIXTURES=1 uv run python -m gapfinder serve      # http://127.0.0.1:8078
 
-Test, from this directory in the repo's dev shell (`nix develop`, which has uv, Node and MariaDB Connector/C):
+That serves the page and `/api/queue`, `/api/topics/<id>`, `/api/topics/<id>/compare` and
+`/api/topics/<id>/timeline` from the sample, marked "Fixture data" on the page: eleven topics, Lapua Movement
+among them, from an earlier run without the claim check. Search answers 503 (it needs the embedding model)
+and the SQL panel's Run is off (it needs a database); the public instance,
+<https://since-when.katalyst.fyi/>, has both, with the full data.
+
+With a MariaDB 11.8 of your own, loaded as [the data](#the-data) describes, the same server reads it: set
+`DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD` and `DB_NAME`, and `DB_RO_USER` and `DB_RO_PASSWORD` for a
+SELECT-only login that turns on the SQL panel's Run ([the API contract](docs/api.md)), then
+`uv run python -m gapfinder serve`.
+
+[`compose.yaml`](compose.yaml) is the team's own instance and runs only on its machine: it reads the login
+of its scratch database from a file there and joins that database's Docker network. The public instance is
+deployed with [`deploy/`](deploy/README.md).
+
+## Test
+
+From this directory, with uv, Node and MariaDB Connector/C as above (the repository's `nix develop` shell
+has all three):
 
     uv run ruff format --check && uv run ruff check && uv run ty check && uv run python -m unittest differences.test_differences differences.test_claims differences.test_decide differences.test_figures gapfinder.test_wikitext gapfinder.test_live_sql gapfinder.test_evidence gapfinder.test_checked && npm --prefix ui ci --silent && npm --prefix ui run check
 
-The six tests that run the SQL presets skip without a database login; `docker compose run --rm app python -m unittest gapfinder.test_live_sql`
-runs them against the scratch database. The torch and DuckDB wheels don't load on NixOS outside a container, so the
-embedder and the loaders run in the image.
+The eight tests that run the SQL presets against MariaDB skip without a database login; with `DB_HOST` and
+`DB_RO_USER` set they run against that database. The torch and DuckDB wheels the loaders and the embedder
+use may not load outside a container on some systems (NixOS among them); the Docker image has them.
 
-Dependencies are pinned in `uv.lock` and the image installs from it. `ty check` passes with 33 warnings (21 are listed here; the claim check's modules added the rest), left in
-place because the fix is a restructure or ty is wrong ([`pyproject.toml`](pyproject.toml) keeps them as warnings
-per file, so a new finding still fails):
+Dependencies are pinned in `uv.lock` and the image installs from it. `ty check` passes: its remaining
+findings are kept as warnings per file in [`pyproject.toml`](pyproject.toml), so a new kind of finding
+still fails, and were 46 at the last check. They stay because the fix is a restructure or ty is wrong. The
+main ones:
 
-- `gapfinder/api.py` (12) and `gapfinder/test_live_sql.py` (2): `PRESETS` keeps a title, a parameter list and a
-  function per preset in one dict, and the timeline's per-year rows are mixed dicts; `findings_sql` takes either
-  a topic or a finding id and ty sees `int(None)`.
-- `gapfinder/align.py` (3): `max` over dates read from database rows that ty types as possibly `None`, and
+- `gapfinder/api.py` and `gapfinder/test_live_sql.py`: `PRESETS` keeps a title, a parameter list and a
+  function per preset in one dict, and the timeline's per-year rows are mixed dicts; `findings_sql` takes
+  either a topic or a finding id and ty sees `int(None)`.
+- `gapfinder/align.py`: `max` over dates read from database rows that ty types as possibly `None`, and
   `max(near, key=near.get)`.
-- `gapfinder/embed.py` (1), `gapfinder/wikitext.py` (1): ty misreads `AutoTokenizer.from_pretrained` and
+- `gapfinder/embed.py`, `gapfinder/wikitext.py`: ty misreads `AutoTokenizer.from_pretrained` and
   `"…".join(map(re.escape, …))`.
-- `differences/evaluate.py` (2), `demo/hero_classify.py` (2): precision and recall stored as `None` in a dict of
+- `differences/evaluate.py`, `demo/hero_classify.py`: precision and recall stored as `None` in a dict of
   counts, and a script that swaps `llm._post` and `llm.RETRIES` to count calls.
+- The claim check's modules under `differences/` add the rest, of the same kinds.
 
 ## The data
 
@@ -83,7 +106,9 @@ one a year has not been tried.
 
 ## How this meets the brief
 
-The brief is [`docs/challenges/main/mariadb--wikipedia-through-time.md`](../../docs/challenges/main/mariadb--wikipedia-through-time.md).
+The brief scores five things at 20% each: effective and creative use of MariaDB (RAG and/or
+system-versioned tables), technical execution and scalability across the provided datasets, usefulness for
+readers or editors, design and demo quality, and originality.
 Each line points at something to click or run; the links open the public instance with the statement filled
 in, and nothing runs before **Run** is clicked.
 
@@ -127,14 +152,17 @@ in, and nothing runs before **Run** is clicked.
   "fascist" in the first sentence and Finnish does not. NVIDIA Nemotron 3.5 Super VL suggests the
   differences and then checks each one against the whole other article, and the page says so;
   [`demo/hero-findings-notes.md`](demo/hero-findings-notes.md) and [`demo/hero-verify-notes.md`](demo/hero-verify-notes.md)
-  are the hand checks of how often they are right before and after, and
+  measure how often they are right before and after the check, against labels from reviews that language
+  models made of the cited revisions; [`demo/hand-checked.json`](demo/hand-checked.json) lists the rows such
+  reviews closed, each with its reason; and
   [`demo/nvidia-submission.md`](demo/nvidia-submission.md) the text for NVIDIA's prize.
 - **Design and demo quality.** The [front page](https://since-when.katalyst.fyi/) leads with three topics,
   each difference shows since when as a time strip, and the look is Wikipedia's own (Wikimedia Codex).
   [`demo/WALKTHROUGH.md`](demo/WALKTHROUGH.md) is the two-minute script, link by link.
 - **Originality.** It reads Wikipedia across language editions instead of within one: what one edition says
-  that another does not, and since which edit. [`docs/research/mariadb-wikipedia.md`](../../docs/research/mariadb-wikipedia.md)
-  is the survey of existing tools it was chosen against.
+  that another does not, and since which edit. Neither the Finnish nor the Swedish Wikipedia has a tool that
+  compares content across editions (the only cross-language gadget, on the Swedish one, compares
+  categories), so editors find these differences by reading.
 
-The database is Since When's own: the scratch instance and the demo snapshot named in the
-[handoff note](demo/HANDOFF.md). Nothing here deploys to the gap finder's live server.
+The public instance runs on its own MariaDB, loaded from a snapshot of the team's database
+([`deploy/`](deploy/README.md)).

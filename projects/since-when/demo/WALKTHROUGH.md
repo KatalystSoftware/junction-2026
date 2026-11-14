@@ -5,8 +5,7 @@ Team Katalyst, MariaDB challenge "Wikipedia Through Time". The product name is "
 
 Runs against the public instance, <https://since-when.katalyst.fyi/>. Every step below was clicked
 through there late on 14 November 2026, after the last deploy of the review rounds (`main` at
-`7fe0368`). The same paths work on hestia's instance: `ssh -N -L 8078:127.0.0.1:8078 hestia`, then
-`http://localhost:8078/` in place of the address.
+`7fe0368`).
 
 Two things to know before clicking:
 
