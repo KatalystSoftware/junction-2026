@@ -174,8 +174,10 @@ def call(msgs: list[dict], timeout: float = TIMEOUT) -> dict:
 class Cache:
     """Answers on disk by model and prompt, so a week played again gives the same actions and the same seconds."""
 
+    LOCK = threading.Lock()  # one for every cache: a sweep plays several weeks in threads of one process, onto one file
+
     def __init__(self, path: Optional[Path]):
-        self.path, self.lock, self.answers = path, threading.Lock(), {}
+        self.path, self.lock, self.answers = path, self.LOCK, {}
         if path is not None and path.exists():
             for line in open(path, encoding="utf-8"):
                 entry = json.loads(line)
