@@ -800,8 +800,10 @@ find a driver on Friday itself, and few booked that day. The gigs that ended lat
 open at 1.5 to 2.5 x the typical fee until they expired at their last pickup minute. The late model put most of them at 1 to
 3%: over 24 hours to find a driver, and many drivers notified.
 
-Such a wave, 10 or more drops in a day's first hour, comes in about one week in five. The desk cannot see it coming:
-the scans do not show it, and it is not tied to the snow forecast. It does bite in proportion to the orders due that day.
+Such a wave, 10 or more drops in a day's first hour, comes in about one week in five, and looks like the flu day of the
+scenario map ([`scratch/scenarios/flu.py`](scratch/scenarios/flu.py)): drivers who meant to work stay at home, and give back
+what they had booked. The desk cannot see it coming: the scans do not show it, and it is not tied to the snow forecast.
+It does bite in proportion to the orders due that day.
 [`scratch/drop_waves.py`](scratch/drop_waves.py) on saved weeks:
 
 | | Weeks | A wave on Tue, Wed, Thu, Fri | Due on Friday, no wave: late | With a Friday wave, 50 to 99 due | With a Friday wave, 100 or more due |
@@ -814,10 +816,14 @@ the scans do not show it, and it is not tied to the snow forecast. It does bite 
   default carries heavier Fridays than the reference: 102 orders due against 79 on `fresh-098`. Its two lowest weeks are both Friday
   waves on 100 or more orders due that day: `fresh-098` (29 drops, 102 due, 30 late) and `fresh-053` (30 drops, 105 due, 90.2%).
   So is `fresh-284`, 89.9% in the R1 hard seeds (30 drops, 101 due).
-- Bulk orders are not the risk. Orders won from a week's largest batch are 5.3% late against 3.7% for all orders under
+- The bulk orders themselves are not the risk. Orders won from a week's largest batch are 5.3% late against 3.7% for all orders under
   the default (3.9% and 3.9% for `slow-step-gate-25`), about 0.2 late orders a week. With the bulk order on Monday they
   are 3.2% late, and those weeks average 96.5% on time against 96.2% for the rest. Of the default's
   65 such weeks only `fresh-098` is under 90%, and 11 of its 12 bulk orders were on time.
+- A bulk order on Thursday is the one that matters, because its cars fall due on Friday: the default's Thursday-bulk
+  weeks have 86 orders due on Friday against 76 to 84, and 5 of their 50 weeks are under 92% against 3 of 180 for a bulk
+  order on another day (the scenario map has 5 of 57 against 3 of 209). The 25 such worlds among `fresh-1301` to `1460`
+  test the cap there.
 - Prices cannot fix this on the day: no fee booked those gigs. What the desk controls is how many cars wait on one day
   when a wave comes.
 
