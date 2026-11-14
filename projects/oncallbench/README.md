@@ -79,7 +79,8 @@ below), one more Opus run per shift scored 0.00, 0.78 and 0.28, in line with the
 instruction stated the healthy baseline, Opus averaged 0.58 on seeds 101-103 (four runs) and 0.45
 over seven runs on seeds 101-106, Gemini 0.00 (three runs) and Sonnet 0.26.
 
-Every run with its cost: `metrics.json`; how each level was built and checked: `LOOP.md`.
+Every run behind the scores above, with its cost: `metrics.json` (the clean-machine reruns under
+Reproduce are in `runs/` instead); how each level was built and checked: `LOOP.md`.
 
 **Common seeds.** Every model is compared on the same 24 level-4 seeds, **200000-200023**, which no
 demo, tuning or training run used: the Gemma adapter was first evaluated there in our own runner
@@ -211,13 +212,16 @@ with `POLICY=<name>`. `SEED` picks the episode (the reported seeds are 101-106);
 three Opus runs.
 
 Committed run logs, each trial with its transcript in `agent/opencode.txt`, its action log in
-`artifacts/ledger/receipt.json` and its score in `verifier/reward.txt`:
+`artifacts/ledger/receipt.json` and its score and cost breakdown in `verifier/reward.json`:
 
 - `runs/rerun-l4-shift1-opus-x2/`: `harbor run -p tasks/shift-1 -a opencode -m
-  anthropic/claude-opus-5-5 -k 2` on the task as shipped, from a fresh copy of this repository on
-  a machine that had never run it (Sat 14 Nov, 4 vCPU, Harbor 0.25.0): 0.53 and 0.26. On the same
-  machine `run.sh reference nop stop-early opus` gave 1.00, 0.00, 0.00 and 0.20 (5m36s), and the
-  reference again through plain Harbor 1.00 at the same cost to the cent ($85,246.31).
+  anthropic/claude-opus-5-5 -k 2` from a fresh copy of this repository on a machine that had never
+  run it (Sat 14 Nov, 4 vCPU, Harbor 0.25.0), before the agent's image moved to Alpine: 0.53 and
+  0.26. On the same machine `run.sh reference nop stop-early opus` gave 1.00, 0.00, 0.00 and 0.20
+  (5m36s), and the reference again through plain Harbor 1.00 at the same cost to the cent
+  ($85,246.31); the logs of those two were not kept.
+- `runs/repro-l4-s101-opus-204757/`: the clean-clone rerun of the one command described above,
+  Opus 0.00.
 - `runs/r4-l4-s101-opus-130256/`: Opus 5.5, seed 101, 0.5728, recorded before the instruction
   gained its sentence on the healthy baseline.
 
