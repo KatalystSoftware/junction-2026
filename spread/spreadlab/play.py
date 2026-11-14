@@ -28,11 +28,20 @@ from .variants import VARIANTS
 
 
 class CountingClient(PracticeClient):
+    """Counts the week's requests and notes the lowest and highest share of the key's practice bucket that the server
+    stated during the week (RateLimit-Limit, requests a second). The share is 10,000 a second split among the teams that
+    practise, at most 1,000 (API.md, Limits); all worlds on the key share it, so it caps the weeks an hour."""
     calls = 0
+    rates: tuple[float, float] | None = None
 
     def call(self, *args, **kwargs):
         self.calls += 1
-        return super().call(*args, **kwargs)
+        answer = super().call(*args, **kwargs)
+        bucket = self._buckets.get("practice")
+        if bucket is not None:
+            low, high = self.rates or (bucket.per_second, bucket.per_second)
+            self.rates = (min(low, bucket.per_second), max(high, bucket.per_second))
+        return answer
 
 
 def run_path(variant: str, seed: str, level: int = 8) -> Path:
@@ -73,7 +82,7 @@ def policy_class(params: dict) -> type[Policy]:
 
 def play(variant: str, params: dict, seed: str, level: int = 8) -> dict:
     """Plays the week and returns the summary that goes to the score file."""
-    started = time.time()
+    started, cpu = time.time(), time.thread_time()
     client = CountingClient()
     map_ = world_map(client)
     world = client.create(level=level, seed=seed)
@@ -92,7 +101,10 @@ def play(variant: str, params: dict, seed: str, level: int = 8) -> dict:
                 desk.handle(event)
             desk.look()
         summary = {"variant": variant, "seed": seed, "level": level, "params": desk.p, "fingerprint": fingerprint(params),
-                   "score": world.score(), "calls": client.calls, "seconds": round(time.time() - started)}
+                   "score": world.score(), "calls": client.calls, "seconds": round(time.time() - started),
+                   # The desk's own CPU seconds, and the bucket's share. While the key's worlds together send about `rate`
+                   # requests a second, the share is what limits the weeks an hour, and more worlds add nothing.
+                   "cpu": round(time.thread_time() - cpu, 1), "rate": client.rates}
         write_json_gz(run_path(variant, seed, level), {**summary, "events": events, "reveal": world.reveal(), "gigs": world.snapshot()["gigs"],
                                                        "roster": roster, "decisions": desk.decisions, "refused": desk.refused,
                                                        **({"noteActions": desk.review} if "note_actions" in params else {})})
@@ -106,7 +118,8 @@ def play(variant: str, params: dict, seed: str, level: int = 8) -> dict:
 def line(summary: dict) -> str:
     score = summary["score"]
     return (f"{summary['variant']:16s} {summary['seed']:10s} margin {score['marginCents'] / 100:>10,.0f}  orders {score['wonOrders']:>3}  "
-            f"on time {score['onTimeShare']:6.1%}  {'ranked' if score['ranked'] else 'NOT RANKED'}  calls {summary['calls']}  secs {summary['seconds']}")
+            f"on time {score['onTimeShare']:6.1%}  {'ranked' if score['ranked'] else 'NOT RANKED'}  calls {summary['calls']}  secs {summary['seconds']}"
+            + (f"  rate {summary['rate'][0]:.0f}" if summary.get("rate") else ""))
 
 
 def main() -> None:
