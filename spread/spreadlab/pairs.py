@@ -63,6 +63,8 @@ PARAMS = {
     "pair_onward_cost": 0,  # with `pair_late`, a request whose car can go onward with a held car, and has no return to go with,
                           # is quoted at this cost, a multiple of its typical fee; once won its car is held until that car's release
     "pair_onward_drivers": 0,  # ... only in a week with at least this many drivers listed: thin worlds keep the usual cost
+    "pair_more_drivers": 0,  # in a week with fewer drivers listed, `pair_open`, `pair_onward`, `pair_late` and `pair_onward_cost` are
+                          # off, so the week plays as the base; known before the first quote
     "pair_version": "",   # VERSION, set by the variant, so a sweep plays the weeks again when this file changes
 }
 GIG_DRIVING = 12 * HOUR  # RULES.md: a gig with more than one car plans at most 12 hours of driving
@@ -97,6 +99,8 @@ class PairPolicy(Policy):
         if self.p["push_from"] or self.p["home_offers"]:
             raise ValueError("Pairs do not reprice for the backlog (push_from) or send offers home (home_offers)")
         self.p.update(own)
+        if len(roster) < self.p["pair_more_drivers"]:
+            self.p.update(pair_open=False, pair_onward=0, pair_late=False, pair_onward_cost=0)
         self.pair_wait: dict[str, int] = {}  # order id -> the minute its car is posted alone if no return comes
         self.pair_gigs: dict[str, int] = {}  # gig id of a pair -> the latest minute a driver can set out and deliver both cars on time
         self.first: Optional[str] = None  # the order whose first post is being decided

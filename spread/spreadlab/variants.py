@@ -393,6 +393,12 @@ VARIANTS.update({
     "fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48": {**_MERGE_1_BASE, "tight_drivers": 760, "when_tight": {"queue_hours": 48}},
 })
 
+# Lane 2 on the base `-thin760-all`: onward pairs at a held car's release, with open gigs, and the onward quote at 1.0, all only
+# in weeks with 760 or more drivers (`pair_more_drivers`). A thinner week plays as the base to the cent.
+VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-all-onward-q10-d760"] = {
+    **VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-all"], "pair_open": True, "pair_onward": 0.8, "pair_late": True,
+    "pair_onward_cost": 1.0, "pair_more_drivers": 760}
+
 # The live default with a cap on the won orders to collect on one day (`due_cap`): a night's wave of dropped gigs then takes
 # down at most that day's cap. An option due on a full day is not quoted; a slower one of the same request still is. The cap
 # lifts for the rest of the week after the first night with 10 drops in its first hour (`due_cap_wave`).

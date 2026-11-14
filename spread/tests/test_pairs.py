@@ -232,3 +232,18 @@ def test_the_onward_quote_stays_at_the_usual_cost_in_a_week_with_fewer_drivers_t
         found[drivers] = d.decisions["R2"]
     assert found[0]["onward"] == "R1" and "onward" not in found[len(ROSTER) + 1]
     assert found[0]["prices"]["next_day"] < found[len(ROSTER) + 1]["prices"]["next_day"]
+
+
+def test_with_pair_more_drivers_a_week_with_fewer_drivers_plays_without_the_extras(monkeypatch):
+    three = {"places": MAP["places"] + [{"id": "pori", "lat": 61.48, "lon": 21.80}],
+             "roads": [{"from": a, "to": b, "km": 100.0, "minutes": 25 if a == b else 120} for a in ("helsinki", "tampere", "pori") for b in ("helsinki", "tampere", "pori")]}
+    monkeypatch.setattr(pairs, "RETURNS", {"helsinki>tampere": 20})
+    extras = {"pair_open": True, "pair_onward": 0.8, "pair_late": True, "pair_onward_cost": 0.9}
+    params = {"quote_share": 1, "curve": True, "cost": 1.2, "fee": 1.0, "fee_cap": 1.2, "pair_hold": 4}
+    sent = {}
+    for name, extra in (("base", {}), ("thin", {**extras, "pair_more_drivers": len(ROSTER) + 1}), ("full", {**extras, "pair_more_drivers": len(ROSTER)})):
+        d = pairs.PairPolicy(World(), 8, MON_9, {**params, **extra}, ROSTER, three)
+        win(d, request("R1", "helsinki", "tampere", MON_9), MON_9 + 15)
+        win(d, request("R2", "tampere", "pori", MON_9 + 60), MON_9 + 75)
+        sent[name] = (d.world.sent, d.decisions["R2"]["prices"])
+    assert sent["thin"] == sent["base"] and sent["full"] != sent["base"]
