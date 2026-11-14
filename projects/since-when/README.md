@@ -35,10 +35,9 @@ Connector/C, which the `mariadb` Python driver builds against (`apt install libm
 
 That serves the page and `/api/queue`, `/api/topics/<id>`, `/api/topics/<id>/compare` and
 `/api/topics/<id>/timeline` from the sample, marked "Fixture data" on the page: eleven topics, Lapua Movement
-among them, from an earlier run without the claim check. Search answers 503 (it needs the embedding model)
-and the SQL panel's Run is off (it needs a database). The public instance,
-<https://since-when.katalyst.fyi/>, has the full data and the Run button; its search is off too, as it has
-no embedding model.
+among them, from an earlier run without the claim check. Search answers 503 and the SQL panel's Run is off,
+both needing a database. The public instance, <https://since-when.katalyst.fyi/>, has the full data, the Run
+button, and search by title (vector search too where the embedding model is on disk; it is not there).
 
 With a MariaDB 11.8 of your own, loaded as [the data](#the-data) describes, the same server reads it: set
 `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD` and `DB_NAME`, and `DB_RO_USER` and `DB_RO_PASSWORD` for a
