@@ -42,12 +42,13 @@
     error = ''
   }
   function save() {
-    if (!current) return
+    const me = current // read before deciding: `current` re-derives as soon as the decision lands
+    if (!me) return
     if (!pick) return (error = 'Choose Accept or Decline first.')
     if (reason.trim().length < 8) return (error = 'Write one line explaining why: it is part of the record.')
-    decide(by, current.id, pick, reason.trim())
+    decide(by, me.id, pick, reason.trim())
     error = ''
-    const next = list.find((a) => a.id !== current.id && !decisionOf(by, a.id))
+    const next = list.find((a) => a.id !== me.id && !decisionOf(by, a.id))
     if (next) open(next.id)
   }
   async function copy(id: string) {
