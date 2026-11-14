@@ -123,6 +123,8 @@ def chat_json(messages, schema, cfg):
     ]
     for fmt in formats:
         body = {"model": model, "messages": messages, **options()}
+        if "anthropic.com" in base_url:
+            body.pop("temperature")  # claude-haiku-5-5 answers 400 to a request that sets it
         if fmt:
             body["response_format"] = fmt
         for attempt in range(RETRIES):
