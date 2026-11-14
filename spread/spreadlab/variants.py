@@ -616,3 +616,11 @@ VARIANTS["m41-j-kindfee"] = {**_M41_I, "kind_fees": True,
                              "thin_play": {**_M41_I["thin_play"], "params": {**_M41_I["thin_play"]["params"], "kind_fees": True}}}
 VARIANTS["m41-k-q18-760"] = {**VARIANTS["m41-j-kindfee"], "queue_hours": 18,
                              "when_rich": {**VARIANTS["m41-j-kindfee"]["when_rich"], "queue_hours": _M41_I["queue_hours"]}}
+# `m41-l`: lane 2 B's onward quote at 0.8 in place of 1.0 on `m41-k`, in a week of 820 drivers or more (`when_rich`): more requests
+# that can go onward with a held car are won. At 760 to 819 the stand-in read it as more late orders and a week under 90%, so a
+# week under 820 plays `m41-k` to the cent. `l2bk-head` and `l2bk-onq08` are short names for the stand-in screen, whose run name
+# cannot hold the long ones.
+VARIANTS["m41-l-onq08-820"] = {**VARIANTS["m41-k-q18-760"],
+                               "when_rich": {**VARIANTS["m41-k-q18-760"]["when_rich"], "pair_onward_cost": 0.8}}
+VARIANTS["l2bk-head"] = VARIANTS["m41-k-q18-760"]
+VARIANTS["l2bk-onq08"] = VARIANTS["m41-l-onq08-820"]

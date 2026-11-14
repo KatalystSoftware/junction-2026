@@ -937,7 +937,8 @@ def test_each_m41_row_adds_one_part_on_its_own_side_of_760_drivers():
             ("m41-h-ss025-820", {900: {"slow_step": 0.25}}),
             ("m41-i-long300-c10", {d: {"long_drive": 300, "long_cost": 1.0} for d in (800, 900)}),
             ("m41-j-kindfee", {d: {"kind_fees": True} for d in (700, 800, 900)}),
-            ("m41-k-q18-760", {800: {"queue_hours": 18}})]
+            ("m41-k-q18-760", {800: {"queue_hours": 18}}),
+            ("m41-l-onq08-820", {900: {"pair_onward_cost": 0.8}})]
     for (below, _), (row, part) in zip(rows, rows[1:]):
         for n in (700, 800, 900):
             new, old = desk(row, n), desk(below, n)
