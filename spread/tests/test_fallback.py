@@ -40,7 +40,12 @@ def test_an_action_acts_only_with_the_notes_own_words_for_it_and_only_when_it_ma
     # Tyres that travel in the car are not tyres on it, and summer tyres that the rules read need no action.
     assert vet("Kesäkiekot tavaratilassa, kulkee mukana.", [{"action": "summer_tyres", "cite": "Kesäkiekot tavaratilassa"}])[1] == \
         {"summer_tyres": "tyres carried, not on the car"}
+    assert vet("Lisäksi 4 kesäkiekkoa tavratilassa.", [{"action": "summer_tyres", "cite": "4 kesäkiekkoa"}])[1] == \
+        {"summer_tyres": "tyres carried, not on the car"}, "the boot is read in the cite's clause, with a typo"
     assert vet("Still on summer tyres.", [{"action": "summer_tyres", "cite": "summer tyres"}])[1] == {"summer_tyres": "the rules have it"}
+    # Hours in a clause that names the other site are that site's.
+    assert vet("Nouto arkisin klo 15 asti.", [{"action": "delivery_hours", "closes": "15:00", "cite": "Nouto arkisin klo 15 asti"}])[1] == \
+        {"delivery_hours": "hours of the other site"}
     # A time that the cited words do not carry, or that opens the site later than it closes, or a deadline after the order's.
     _, dropped = vet(text, [{"action": "delivery_hours", "closes": "13:00", "cite": "stops taking vehicles at 15"},
                             {"action": "pickup_hours", "opens": "19:00", "cite": "stops taking vehicles at 15"}])

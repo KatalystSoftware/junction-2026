@@ -260,7 +260,7 @@ VARIANTS: dict[str, dict] = {
     # picks cited posting actions. "note_actions" is fallback.VERSION: raise both on each change of the prompt, the checks or the
     # model, so the fingerprint follows. The second also acts on an earlier deadline and on haste, which cost margin when wrong.
     **{name: {**REFERENCE, "backlog_step": 0, "slow_step": 0.8, "max_unbooked": 25, "slow_model": "friday", "cost": 1.2, "late_cost": 150,
-              "kinds": KINDS, "note_limits": True, "note_actions": 2, **extra}
+              "kinds": KINDS, "note_limits": True, "note_actions": 3, **extra}
        for name, extra in (("slow-friday-late-150-kinds-limits-actions", {}),
                            ("slow-friday-late-150-kinds-limits-actions-risky", {"note_actions_risky": ["deadline", "urgent"]}))},
     # An internal on-time target in place of the fixed buffer. Lateness is priced at what a late order costs (refund 46 and

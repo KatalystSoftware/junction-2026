@@ -37,7 +37,7 @@ from . import notes, watch
 from .policy import Policy
 
 DAY, HOUR = 24 * 60, 60
-VERSION = 2  # raise on each change to the prompt, the checks or the model: a sweep's fingerprint follows "note_actions"
+VERSION = 3  # raise on each change to the prompt, the checks or the model: a sweep's fingerprint follows "note_actions"
 ACTIONS = ("pickup_hours", "delivery_hours", "deadline", "delay", "plates", "manual", "summer_tyres", "urgent", "keep")
 RISKY = ("deadline", "urgent")  # cost margin when wrong: they act only when the desk names them
 FEE_STEP, FEE_CAP = 0.2, 1.4  # "urgent" adds this to the opening fee, as a multiple of the typical fee, up to the cap: the variant's highest kind fee
@@ -246,10 +246,28 @@ def normal(text: str) -> str:
 
 
 # Tyres that travel in the car, not on it: the model takes "4 kesärengasta tavaratilassa" for a car on summer tyres.
-CARRIED = re.compile(r"trunk|boot|takakont|tavaratil|kontissa|bakluck|bagage|kofferd|mukana|följer|go with|travel|spare|extra|lisäksi|rengassarja|sarja|set of|takapenk|back seat")
+# Words of the clause, with one typo ("tavratilassa"), as notes.summer_tyres reads them, and a few more.
+CARRIED = notes.CARRIED + ("tavaratila", "takakontti", "kofferten", "bagaget", "spare", "extra", "lisaksi", "rengassarja", "travel", "seat")
 URGENT = re.compile(r"kiire|urgent|asap|bråttom|brådsk|skyndsam|pikaisesti|pikaisest|hoppu|rush|as soon as|heti|snabbt|quickly|express")
 SUMMER = re.compile(r"kesä|summer|sommar")
 WORDS = {"plates": watch.ABOUT_PLATES, "manual": watch.ABOUT_GEARS, "summer_tyres": SUMMER, "urgent": URGENT}
+
+
+def clause(note: str, cite: str) -> str:
+    """The clause of the note that holds the cited words: from the sentence or comma before them to the one after."""
+    at = note.find(cite)
+    start = max(note.rfind(c, 0, at) for c in ".!?;,\n") + 1
+    ends = [i for i in (note.find(c, at + len(cite)) for c in ".!?;,\n") if i >= 0]
+    return note[start:min(ends, default=len(note))]
+
+
+def names(text: str) -> Optional[str]:
+    """The site that a clause names by the words of notes.limits, "pickup" or "delivery", or None for neither or both:
+    a clause in words that the lists lack is the model's to read."""
+    words = notes.TOKEN.findall(text)
+    said = [site for site, known in (("delivery", notes.LIMIT_WORDS["delivery"]), ("pickup", notes.LIMIT_WORDS["collect"] + notes.LIMIT_WORDS["fetches"]))
+            if any(notes.near(w, k) for w in words for k in known)]
+    return said[0] if len(said) == 1 else None
 
 
 def vet(actions: list[dict], text: str, request: dict, deadline: int, facts: notes.Facts, limits: notes.Limits) -> tuple[list[dict], list[dict]]:
@@ -267,8 +285,10 @@ def vet(actions: list[dict], text: str, request: dict, deadline: int, facts: not
             why = "uncited"
         elif kind in WORDS and not WORDS[kind].search(cite):
             why = "cite lacks the word"
-        elif kind == "summer_tyres" and CARRIED.search(cite):
+        elif kind == "summer_tyres" and any(notes.near(w, k) for w in re.findall(r"[a-z]+", notes.plain(clause(note, cite))) for k in CARRIED):
             why = "tyres carried, not on the car"
+        elif kind in ("pickup_hours", "delivery_hours") and names(clause(note, cite)) == ("pickup" if kind == "delivery_hours" else "delivery"):
+            why = "hours of the other site"
         elif kind in ("deadline", "delay"):
             at = watch.when(action.get("day"), action.get("time"), arrived)
             if at is None or at % DAY not in minutes_in(cite):
