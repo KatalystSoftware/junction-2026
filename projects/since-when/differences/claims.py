@@ -718,9 +718,16 @@ def findings(pairs, rows_by_pair, claims, verdicts, model, reverse=None):
             contradictions.append((c, v, None))
         elif v["verdict"] == "contradicted":  # a figure the other side did not confirm
             aside.append({**_contradicted(c, v, model), **check(c, v), "verdict": "unconfirmed"})
-    # The classifier's own numbers and contradiction rows first, then what its missing facts
-    # turned into, then the figures the check listed: of rows that say the same, the first stays.
-    contradictions.sort(key=lambda x: 2 if x[2] is None else x[2]["type"] == "missing_fact")
+    # Of rows that say the same, the first stays. Rows with two figures that were read and differ
+    # come first: a claim with no comparable figure ("75 per cent were Reds") must not stand in
+    # for the one that has it ("11 652" against "about 12,500"). Then the classifier's own numbers
+    # and contradiction rows, what its missing facts turned into, and the figures the check listed.
+    contradictions.sort(
+        key=lambda x: (
+            (x[1].get("figures") or {}).get("agree") is not False,
+            2 if x[2] is None else x[2]["type"] == "missing_fact",
+        )
+    )
     seen = []
     for claim, v, first in contradictions:
         row = {**_contradicted(claim, v, model), **check(claim, v)}

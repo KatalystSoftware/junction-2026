@@ -89,7 +89,7 @@ with two readable figures, the arithmetic overruled the judge in 15.
 | | Before | After, Super VL | After, Haiku 5.5 |
 | --- | --- | --- | --- |
 | missing fact | 688 | 493; 165 set aside as stated elsewhere, 13 became numbers or contradiction rows, the rest repeat one | 435; 224 set aside |
-| numbers | 23 | 30: 13 of the classifier's, 10 that were missing facts, 7 from figures the check listed | 31 |
+| numbers | 23 | 31: 13 of the classifier's, 10 that were missing facts, 8 from figures the check listed | 31 |
 | contradiction | 6 | 6: 3 of the classifier's, 3 that were missing facts | 5 |
 | framing | 18 | 18 | 18 |
 
@@ -100,7 +100,7 @@ article (`python3 demo/hero_sample.py`, seed 5).
 | | Rows | Real or plausible | False | Unclear or partly there |
 | --- | --- | --- | --- | --- |
 | numbers, before (the notes) | 23 | 9 | 11 | 3 |
-| numbers, after, Super VL | 30 | 23 | 4 | 3 |
+| numbers, after, Super VL | 31 | 24 | 4 | 3 |
 | numbers, after, Haiku 5.5 (first run's pairs) | 33 | 25 | 5 | 3 |
 | contradiction, before (the notes) | 7 | 0 | 2 | 5 |
 | contradiction, after, Super VL | 6 | 2 | 1 | 3 |
@@ -150,6 +150,10 @@ that the war was planned to incorporate it.
   judged in the same call.
 - **Framing is unchecked.** Its five false rows ("kapina" against "coup d'état", where the Finnish
   introduction says "vallankaappausyritys") need the same lookup for a word, not a claim.
+- **A count against a list.** On the older labels the check loses "Speaker six times" against five
+  listed years (see the older labels below). A classifier row whose sentence has three figures is
+  still one claim, and the judge compares the first; the figure is found only when the check
+  also lists it itself, and that list is capped at ten a passage.
 - **Super VL sets aside fewer missing facts than Haiku** (165 against 224) and keeps more false
   ones in the sample (3 against 1 of 24). It asks for the whole sentence to be stated.
 
@@ -163,14 +167,31 @@ disk, precision / recall:
 | | missing fact | contradiction (1 labelled) | framing | numbers |
 | --- | --- | --- | --- | --- |
 | classifier rows, before the check | 0.98 / 1.00 | 0.33 / 1.00 | 0.76 / 0.86 | 0.92 / 1.00 |
-| after the check | pending | | | |
+| after the check, Super VL | 1.00 / 0.93 | 0.33 / 1.00 | 0.76 / 0.86 | 0.57 / 0.73 |
 
-**Pending:** the check of those rows (`$M/classify/verify/eval-super/`, 850 claims against the 16
-topics' articles as of 13 November, whose sentences are embedded) had judged 824 claims when this
-was written and was waiting on the container for the rest. `sh demo/hero-verify.sh eval-super
-differences/eval/pairs.jsonl $M/classify/verify/eval/rows.jsonl --extract` finishes it from the
-cache, and `python -m differences.evaluate_rows $M/classify/verify/eval-super/differences.jsonl`
-gives the second row. Framing cannot change: the check does not touch it.
+`$M/classify/verify/eval-super/`: 850 claims against the 16 topics' articles as of 13 November
+(`FOR SYSTEM_TIME AS OF TIMESTAMP '2026-11-13 00:00:00'`), 191 rows after the check.
+
+**Numbers got worse by these labels**, and the two halves of that are different things:
+
+- *Recall, 11 of 11 pairs to 8 of 11.* Three labelled differences are lost, two of them real
+  losses: Kallio was Speaker "six times" in Finnish and English where Swedish lists five years,
+  a count against a list, which the judge calls not mentioned (two pairs). The third, "about a
+  tenth" of the territory against "9%", it calls supported, which is arguable. A fourth was lost
+  until the last fix: the Reds who died in the camps, 11,652 in Finnish and about 12,500 in
+  English, was hidden behind a vaguer row on the same English sentence.
+- *Precision, 11 of 12 pairs to 8 of 14.* Six pairs now have a numbers row the labels do not.
+  The labels say what two leads differ in; the check compares a lead's claims with the whole
+  other article. Read by hand, five of the seven new rows are real differences the labels do not
+  have: Finland declared war on 25 or 26 June 1941; the Lapua Movement was banned in May or on
+  21 November 1932; about twenty or 52 people were sentenced to prison after Mäntsälä (two
+  pairs); the defence forces were reorganised in 1933 or 1934. Two are doubtful (the leaders
+  arrested "after a week" or the arrest ordered "two days later"; the king's election under the
+  constitution of 1772 or the law of 1734).
+
+Missing facts lose three pairs for the same reason, in the other direction: every fact the
+classifier found missing in those leads is stated in the body of the other article. Framing
+cannot change: the check does not touch it.
 
 ## Design choices
 
