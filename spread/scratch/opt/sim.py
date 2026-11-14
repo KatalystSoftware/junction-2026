@@ -78,62 +78,32 @@ class Weeks:
         level = {tuple(int(x) for x in k.split("|")): v for k, v in json.load(open(f"{cache}/levels-{variant}.json"))["level"].items()}
         self.seeds, self.drivers, self.played, self.W = [], [], [], []
         self.pool, self.took = collections.defaultdict(list), collections.defaultdict(collections.Counter)
-
-        def slack(q, o):
-            leg = q["legs"][0]
-            return o["deadline"] - minutes[(leg["pickup"]["placeId"], leg["delivery"]["placeId"])] - max(q["respondBy"], leg["pickup"]["window"]["from"])
-
         for wi, w in enumerate(weeks):
-            notified = drivers_near(w["roster"], near)
-            self.seeds.append(w["seed"]); self.drivers.append(len(w["roster"])); self.played.append(w["score"])
-            unbooked = {}
-            for o in w["orders"].values():  # the minutes, from the win, in which no driver held the order's car
-                ev = sorted([(b[0], 1) for b in o["bookings"]] + [(d[0], 0) for d in o["drops"]])
-                open_from, iv = o["wonAt"], []
-                for at, kind in ev:
-                    if kind == 1 and open_from is not None:
-                        iv.append((open_from - o["wonAt"], at - o["wonAt"])); open_from = None
-                    elif kind == 0 and open_from is None:
-                        open_from = at
-                if open_from is not None:
-                    iv.append((open_from - o["wonAt"], (o["pickedUp"] or o["lastPickupAt"] + 600) - o["wonAt"]))
-                unbooked[o["id"]] = iv
-            reqs = []
-            for rid, r in sorted(w["reqs"].items(), key=lambda kv: (kv[1]["request"]["arrivedAt"], kv[0])):
-                q, dec = r["request"], w["decisions"][rid]
-                if lib.req_kind(q) != "dealer" or dec["declined"] == "slack":
-                    continue
-                opts = [o for o in q["options"] if slack(q, o) >= 300]
-                if dec["declined"] is None:
-                    opts = [o for o in q["options"] if o["kind"] in dec["prices"]]
-                day = q["arrivedAt"] // DAY
-                if not opts or (wi, day) not in level:
-                    continue
-                first, leg = curve.fastest(opts), q["legs"][0]
-                drive = minutes[(leg["pickup"]["placeId"], leg["delivery"]["placeId"])]
-                row = {"w": wi, "rid": rid, "at": q["arrivedAt"], "by": q["respondBy"], "dealer": q["dealerId"], "day": day, "a0": curve.at_list(q, opts, 0, M),
-                       "list": first["listPriceCents"], "lists": {o["kind"]: o["listPriceCents"] for o in opts}, "fee": q["referenceFeeCents"], "s": level[(wi, day)],
-                       "kinds": "+".join(sorted(o["kind"] for o in opts)), "ready": leg["pickup"]["window"]["from"], "played": None, "life": None,
-                       "premium": leg["car"]["premium"], "note": q["note"] is not None, "drive": drive, "notified": notified[leg["pickup"]["placeId"]],
-                       "drivers": len(w["roster"]), "h": (first["deadline"] - drive - q["respondBy"]) / 60, "u": {}}
-                pq = quotes.get((wi, rid))
-                if pq is not None:
-                    row["played"] = (sig(pq["a"] - B * (math.log(pq["m"]) - pq["s"])), pq["won"])
-                o = w["orders"].get(rid)
-                if o is not None and not o["cancelled"]:
-                    st = state[(wi, rid)]
-                    row["life"] = {"iv": unbooked[rid], "lag": None if o["delivered"] is None else o["delivered"] - max(row["ready"], o["wonAt"]), "late": o["late"],
-                                   "last": o["lastPickupAt"] - o["wonAt"], "fee": o["fees"] / q["referenceFeeCents"], "refund": o["refund"] / max(o["price"], 1),
-                                   "other": o["other"], "option": o["option"], "u": (st["u8"], st["u24"], st["ulater"])}
-                    self.pool[(wi, band(row["h"]))].append(row["life"]); self.pool[(band(row["h"]),)].append(row["life"])
-                    self.took[row["kinds"]][o["option"]] += 1
-                reqs.append(row)
-            self.W.append(reqs)
-        self.refund_late = lib.mean(l["refund"] for k, v in self.pool.items() if len(k) == 1 for l in v if l["late"])
-        self.beta, self.week = None, [0.0] * len(self.W)
+            self.add(w["seed"], len(w["roster"]), w["score"], *week_rows(wi, w, quotes, state, level, minutes, near))
+        self.finish()
 
-    def fit(self, fit_on: list[int]) -> None:
-        """The late model on the won orders of the weeks `fit_on`, then each week's own intercept (prior sd 0.5)."""
+    def add(self, seed: str, drivers: int, score: dict, reqs: list[dict], took: dict) -> None:
+        """Adds one week's rows (week_rows)."""
+        wi = len(self.W)
+        self.seeds.append(seed); self.drivers.append(drivers); self.played.append(score); self.W.append(reqs)
+        for row in reqs:
+            row["w"] = wi
+            if row["life"]:
+                self.pool[(wi, band(row["h"]))].append(row["life"]); self.pool[(band(row["h"]),)].append(row["life"])
+        for kinds, counts in took.items():
+            self.took[kinds].update(counts)
+
+    def finish(self) -> None:
+        self.refund_late = lib.mean(l["refund"] for k, v in self.pool.items() if len(k) == 1 for l in v if l["late"])
+        self.beta, self.week, self.day = None, [0.0] * len(self.W), {}
+
+    def offset(self, wi: int, row: dict) -> float:
+        """The hindsight log odds of a late order in week `wi`: its own intercept, and with `fit(by_day=True)` that of the day its car must be collected."""
+        return self.week[wi] + self.day.get((wi, due_day(row)), 0.0)
+
+    def fit(self, fit_on: list[int], by_day: bool = False) -> None:
+        """The late model on the won orders of the weeks `fit_on`, then each week's own intercept (prior sd 0.5). With `by_day`, also an intercept for
+        each day of the last pickup on top of the week's (prior sd 0.5), so that a night when drivers drop their gigs hits the orders due that day."""
         rows = [r for wi in fit_on for r in self.W[wi] if r["life"]]
         X = np.array([[1.0] + [float(v) for v in features(r, r["life"]["u"])] for r in rows]); y = np.array([float(r["life"]["late"]) for r in rows])
         beta = np.zeros(X.shape[1]); beta[0] = math.log(y.mean() / (1 - y.mean()))
@@ -148,6 +118,12 @@ class Weeks:
                 p = 1 / (1 + np.exp(-(z + d)))
                 d += ((late - p).sum() - d / 0.25) / ((p * (1 - p)).sum() + 1 / 0.25)
             self.week[wi] = d
+            for day in sorted({due_day(r) for r in own}) if by_day else ():
+                on = np.array([due_day(r) == day for r in own]); e = 0.0
+                for _ in range(20):
+                    p = 1 / (1 + np.exp(-(z[on] + d + e)))
+                    e += ((late[on] - p).sum() - e / 0.25) / ((p * (1 - p)).sum() + 1 / 0.25)
+                self.day[(wi, day)] = e
 
     def logit(self, row: dict, parts) -> float:
         return float(self.beta[0] + sum(b * float(v) for b, v in zip(self.beta[1:], features(row, parts))))
@@ -155,6 +131,65 @@ class Weeks:
     def late(self, row: dict, parts) -> float:
         """The chance that the order ends late, as the desk can know it at the quote: without the week's intercept."""
         return sig(self.logit(row, parts))
+
+
+def week_rows(wi: int, w: dict, quotes: dict, state: dict, level: dict, minutes: dict, near: dict) -> tuple[list[dict], dict]:
+    """One saved week as the stand-in's rows: its quoted one-car dealer requests in order, each with its won order's course if it has one;
+    and how often each menu of options ended as each option."""
+    took = collections.defaultdict(collections.Counter)
+
+    def slack(q, o):
+        leg = q["legs"][0]
+        return o["deadline"] - minutes[(leg["pickup"]["placeId"], leg["delivery"]["placeId"])] - max(q["respondBy"], leg["pickup"]["window"]["from"])
+
+    notified = drivers_near(w["roster"], near)
+    unbooked = {}
+    for o in w["orders"].values():  # the minutes, from the win, in which no driver held the order's car
+        ev = sorted([(b[0], 1) for b in o["bookings"]] + [(d[0], 0) for d in o["drops"]])
+        open_from, iv = o["wonAt"], []
+        for at, kind in ev:
+            if kind == 1 and open_from is not None:
+                iv.append((open_from - o["wonAt"], at - o["wonAt"])); open_from = None
+            elif kind == 0 and open_from is None:
+                open_from = at
+        if open_from is not None:
+            iv.append((open_from - o["wonAt"], (o["pickedUp"] or o["lastPickupAt"] + 600) - o["wonAt"]))
+        unbooked[o["id"]] = iv
+    reqs = []
+    for rid, r in sorted(w["reqs"].items(), key=lambda kv: (kv[1]["request"]["arrivedAt"], kv[0])):
+        q, dec = r["request"], w["decisions"][rid]
+        if lib.req_kind(q) != "dealer" or dec["declined"] == "slack":
+            continue
+        opts = [o for o in q["options"] if slack(q, o) >= 300]
+        if dec["declined"] is None:
+            opts = [o for o in q["options"] if o["kind"] in dec["prices"]]
+        day = q["arrivedAt"] // DAY
+        if not opts or (wi, day) not in level:
+            continue
+        first, leg = curve.fastest(opts), q["legs"][0]
+        drive = minutes[(leg["pickup"]["placeId"], leg["delivery"]["placeId"])]
+        row = {"w": wi, "rid": rid, "at": q["arrivedAt"], "by": q["respondBy"], "dealer": q["dealerId"], "day": day, "a0": curve.at_list(q, opts, 0, M),
+               "list": first["listPriceCents"], "lists": {o["kind"]: o["listPriceCents"] for o in opts}, "fee": q["referenceFeeCents"], "s": level[(wi, day)],
+               "kinds": "+".join(sorted(o["kind"] for o in opts)), "ready": leg["pickup"]["window"]["from"], "played": None, "life": None,
+               "premium": leg["car"]["premium"], "note": q["note"] is not None, "drive": drive, "notified": notified[leg["pickup"]["placeId"]],
+               "drivers": len(w["roster"]), "h": (first["deadline"] - drive - q["respondBy"]) / 60, "u": {}}
+        pq = quotes.get((wi, rid))
+        if pq is not None:
+            row["played"] = (sig(pq["a"] - B * (math.log(pq["m"]) - pq["s"])), pq["won"])
+        o = w["orders"].get(rid)
+        if o is not None and not o["cancelled"]:
+            st = state[(wi, rid)]
+            row["life"] = {"iv": unbooked[rid], "lag": None if o["delivered"] is None else o["delivered"] - max(row["ready"], o["wonAt"]), "late": o["late"],
+                           "last": o["lastPickupAt"] - o["wonAt"], "fee": o["fees"] / q["referenceFeeCents"], "refund": o["refund"] / max(o["price"], 1),
+                           "other": o["other"], "option": o["option"], "u": (st["u8"], st["u24"], st["ulater"])}
+            took[row["kinds"]][o["option"]] += 1
+        reqs.append(row)
+    return reqs, took
+
+
+def due_day(row: dict) -> int:
+    """The day of the last minute to collect the car of the fastest option."""
+    return int(row["by"] + row["h"] * 60) // DAY
 
 
 def draws(row: dict, draw: int) -> np.ndarray:
@@ -220,10 +255,10 @@ def simulate(weeks: Weeks, rule, on: list[int], draw: int = 0, learn: float = 0.
                         break
                 pool = weeks.pool.get((wi, band(r["h"]))) or weeks.pool[(band(r["h"]),)]
                 life = pool[int(u[2] * len(pool))]
-                late = u[3] < sig(weeks.logit(r, parts) + weeks.week[wi])
+                late = u[3] < sig(weeks.logit(r, parts) + weeks.offset(wi, r))
             else:  # its own course; its lateness moves with the backlog at the win, against the backlog it was saved under
                 option, late = life["option"], life["late"]
-                p0, p1 = sig(weeks.logit(r, life["u"]) + weeks.week[wi]), sig(weeks.logit(r, parts) + weeks.week[wi])
+                p0, p1 = sig(weeks.logit(r, life["u"]) + weeks.offset(wi, r)), sig(weeks.logit(r, parts) + weeks.offset(wi, r))
                 if not late and p1 > p0 and u[3] < (p1 - p0) / (1 - p0):
                     late = True
                 elif late and p1 < p0 and u[3] < (p0 - p1) / p0:
