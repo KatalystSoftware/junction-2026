@@ -173,9 +173,19 @@ harbor run -p tasks/shift-1 -a nop                                     # do-noth
 On a busy machine Harbor's six minutes for installing OpenCode in the container can run out before
 the shift starts (`AgentSetupTimeoutError`); add `--agent-setup-timeout-multiplier 2`.
 
-Shifts 1-3 are the seeds we report. To check that we did not tune for them, export any other seed:
-`./export-tasks.sh 4 <seed>...` writes `tasks-custom/seed-<seed>` and never touches `tasks/`; run it
-the same way (`harbor run -p tasks-custom/seed-777 ...`), or use `SEED=<seed> ./run.sh ...`.
+Shifts 1-3 are the seeds we report. To check that we did not tune for them, export any other seed
+and run it the same way, or use `SEED=<seed> ./run.sh ...`:
+
+```
+./export-tasks.sh 4 777        # prints e.g. tasks-custom/episode-3f9a2b1c: level 4, seed 777
+harbor run -p tasks-custom/episode-3f9a2b1c -a oracle --ae POLICY=stop-early
+```
+
+The folder name is random so that the agent cannot learn the seed from it (Harbor names the
+containers after the folder); `tasks-custom/index.tsv` lists which folder holds which seed, and
+`tasks/` is never touched. On any seed the reference scores 1.00 and doing nothing 0.00 by
+construction, since the score is scaled between those two; stop-early and the agents are the runs
+worth comparing.
 
 `run.sh` does the same for any seed and runs several at once. One command runs the reference, both
 baselines and Opus on the committed run's seed:

@@ -21,7 +21,10 @@ for seed in "$@"; do
   for _ in $(seq "$runs"); do
     job="${ROUND:-r16}-l4-s$seed-gemma-$kind-$(date +%H%M%S)"
     echo "$job"
-    uvx --from harbor==0.25.0 harbor run -p "$tasks/seed-$seed" -o jobs --job-name "$job" -a opencode \
+    # export-tasks.sh lists its folders in index.tsv; older exports were named seed-<seed>
+    task=$(awk -F'\t' -v s="$seed" '$2 == 4 && $3 == s { print $1 }' "$tasks/index.tsv" 2>/dev/null | tail -1)
+    task=$tasks/${task:-seed-$seed}
+    uvx --from harbor==0.25.0 harbor run -p "$task" -o jobs --job-name "$job" -a opencode \
       -m "vllm/$served" --base-url "http://$bridge:$port/v1" --api-format openai_chat_completions \
       --api-key-name VLLM_API_KEY --ae VLLM_API_KEY=local --agent-setup-timeout-multiplier 3 \
       > "$here/spread-$job.log" 2>&1 &

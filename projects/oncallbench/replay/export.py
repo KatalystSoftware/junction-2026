@@ -315,17 +315,19 @@ def variants(incident):
 
 def episode_of(path, config):
     """The level and seed of a trial run from an exported task (../export-tasks.sh writes
-    tasks-custom/seed-<seed>, with SEED and LEVEL in its MCP server): read from the task the trial
-    ran, which sits next to the jobs folder, else from the job's name (r<round>-l<level>-s<seed>-...)."""
-    seed = int(re.match(r"seed-(\d+)__", path.name)[1])
+    tasks-custom/episode-<random>, formerly tasks-custom/seed-<seed>, with SEED and LEVEL in its MCP
+    server): read from the task the trial ran, which sits next to the jobs folder, else from the
+    job's name (r<round>-l<level>-s<seed>-...). An old seed-<seed> name must agree with either."""
+    named_seed = re.match(r"seed-(\d+)__", path.name)
+    seed = int(named_seed[1]) if named_seed else None
     task = path.parents[2] / config.get("task", {}).get("path", "-") / "environment/mcp-server/server.py"
     if task.exists():
         found = dict(re.findall(r"^(SEED|LEVEL) = (\d+)", task.read_text(), re.M))
-        if int(found.get("SEED", -1)) == seed and "LEVEL" in found:
-            return int(found["LEVEL"]), seed
+        if "SEED" in found and "LEVEL" in found and seed in (None, int(found["SEED"])):
+            return int(found["LEVEL"]), int(found["SEED"])
     named = re.search(r"-l(\d+)-s(\d+)-", path.parent.name)
-    if named and int(named[2]) == seed:
-        return int(named[1]), seed
+    if named and seed in (None, int(named[2])):
+        return int(named[1]), int(named[2])
     return None
 
 
@@ -339,7 +341,8 @@ def read_trial(incident, path, known):
         return None
     if variant and variant[1] in known:  # run.sh's task copies are named by a hash of level and seed
         level, seed = known[variant[1]]
-    elif re.match(r"seed-\d+__", path.name) and episode_of(path, json.loads(config.read_text())):
+    elif (re.match(r"(seed-\d+|episode-[0-9a-f]{8})__", path.name)
+          and episode_of(path, json.loads(config.read_text()))):
         level, seed = episode_of(path, json.loads(config.read_text()))
     else:
         return None

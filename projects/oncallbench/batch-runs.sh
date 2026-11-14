@@ -22,7 +22,9 @@ one() {
   sleep $((RANDOM % 20))
   local job="r$round-l4-s$seed-$tag-$(date +%H%M%S)"
   [ "$tag" = gemini ] && extra=(--ae "GOOGLE_GENERATIVE_AI_API_KEY=${GEMINI_API_KEY:-}")
-  harbor run -p "tasks-custom/seed-$seed" -a opencode -m "$model" --agent-setup-timeout-multiplier 3 \
+  local task
+  task=tasks-custom/$(awk -F'\t' -v s="$seed" '$2 == 4 && $3 == s { print $1 }' tasks-custom/index.tsv | tail -1)
+  harbor run -p "$task" -a opencode -m "$model" --agent-setup-timeout-multiplier 3 \
     -o jobs --job-name "$job" "${extra[@]}" >"jobs-$job.log" 2>&1 || true
   local f
   f=$(ls jobs/"$job"/*/result.json 2>/dev/null | head -1)

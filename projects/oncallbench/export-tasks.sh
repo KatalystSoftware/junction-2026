@@ -2,12 +2,13 @@
 # Writes ready-to-run Harbor tasks: full copies of task/ with seed, level, briefing and verifier
 # calibration filled in, so plain `harbor run -p <folder> ...` plays the same episode as
 # `SEED=<seed> ./run.sh`. The seed lives only in the MCP server and the verifier, which the agent
-# cannot read.
+# cannot read. Folder names must not say it either: Harbor names the containers after the folder,
+# and Docker's DNS gives those names to anyone in the task's network.
 #
 #   ./export-tasks.sh                 the shipped tasks: tasks/shift-1..3 = level 4, seeds 101-103
-#                                     (folder names do not say the seed)
-#   ./export-tasks.sh <level> <seed>...   any other episode, as tasks-custom/seed-<seed>; never
-#                                     touches tasks/
+#   ./export-tasks.sh <level> <seed>...   any other episode, as tasks-custom/episode-<random>; never
+#                                     touches tasks/. tasks-custom/index.tsv says which folder holds
+#                                     which level and seed, and exporting a seed again reuses its folder.
 set -euo pipefail
 cd "$(dirname "$0")"
 ./sync.sh
@@ -24,12 +25,23 @@ else
   level=$1 shipped=0
   shift
   mkdir -p tasks-custom
+  touch tasks-custom/index.tsv
 fi
 
 n=0
 for seed in "$@"; do
   n=$((n + 1))
-  if [ "$shipped" = 1 ]; then out=tasks/shift-$n; else out=tasks-custom/seed-$seed; rm -rf "$out"; fi
+  if [ "$shipped" = 1 ]; then
+    out=tasks/shift-$n
+  else
+    name=$(awk -F'\t' -v l="$level" -v s="$seed" '$2 == l && $3 == s { print $1 }' tasks-custom/index.tsv | tail -1)
+    if [ -z "$name" ]; then
+      name=episode-$(od -An -N4 -tx1 /dev/urandom | tr -d ' \n')
+      printf '%s\t%s\t%s\n' "$name" "$level" "$seed" >>tasks-custom/index.tsv
+    fi
+    out=tasks-custom/$name
+    rm -rf "$out"
+  fi
   cp -r task "$out"
   sed -i "s/^SEED = .*/SEED = $seed/; s/^LEVEL = .*/LEVEL = $level/" "$out/environment/mcp-server/server.py"
   "${python[@]}" -B -c "

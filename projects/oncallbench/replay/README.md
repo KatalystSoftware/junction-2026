@@ -43,8 +43,8 @@ flake: `nix develop -c python3 export.py ...`.
   <folder>` adds one trial. `--only a,b` keeps the trials whose job name contains one of the strings.
   A job run with several attempts gives one run per attempt, named `<job>-<attempt>`.
   Trials of `../run.sh`'s task copies (`aq-incident-<hash>__...`) and of exported tasks
-  (`seed-<seed>__...`, from `../export-tasks.sh`, whose level and seed are read from the task's
-  MCP server) are both recognised.
+  (`episode-<random>__...` from `../export-tasks.sh`, `seed-<seed>__...` from older exports; level
+  and seed are read from the task's MCP server or the job's name) are both recognised.
 - `--policies a,b` picks the scripted policies shown next to the reference.
 - A bundle keeps its trials' action logs and words, so later exports of the same episode keep them
   without the Harbor folders. `--fresh` drops them.
