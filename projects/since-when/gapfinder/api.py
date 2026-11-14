@@ -330,6 +330,9 @@ def _holds(passage_words, quote_words):
     return len(pairs & there) >= share * len(pairs)
 
 
+_BEGAN = {}  # topic -> {finding id: began}; the history does not change while the server runs
+
+
 def began(r, qid, findings):
     """For each difference of fact or wording a model wrote, and each edition it quotes: the first
     revision of the unbroken run of revisions, up to today, in which that edition holds the quoted
@@ -344,6 +347,11 @@ def began(r, qid, findings):
         if f["status"] == "open" and f["type"] in BEGAN_TYPES and not LEXICON_SUMMARY.search(f["summary"] or "")
     ]
     if not wanted:
+        return
+    if qid in _BEGAN:
+        for f in wanted:
+            if f["id"] in _BEGAN[qid]:
+                f["began"] = _BEGAN[qid][f["id"]]
         return
     rows = r(
         "Every version of every passage, for when each quote first stood",
@@ -386,6 +394,7 @@ ORDER BY c.lang, c.row_start""",
             out[lang] = {"at": ts[i], "rev": rev, "old": old, "first": i == 0, "quoted": ts[j]}
         if out:
             f["began"] = out
+    _BEGAN[qid] = {f["id"]: f["began"] for f in wanted if "began" in f}
 
 
 def checks(r, qid):

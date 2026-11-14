@@ -42,6 +42,10 @@
 	const most = $derived(Math.max(1, ...lacking.map((l) => left[l].length)))
 </script>
 
+{#snippet key()}
+	<p class="key small subtle" aria-hidden="true"><span class="dot"></span> the edit that put the words there, <span class="bar"></span> since then, <span class="bar past"></span> an earlier period; 2001 to today</p>
+{/snippet}
+
 {#snippet scale()}
 	<!-- The scale of every strip below, labelled once. -->
 	<div class="scale num" aria-hidden="true">
@@ -57,6 +61,7 @@
 			<Why id="why-words" label="Word list">Found by a fixed list of loaded words, not by a language model: the word is in the first sentence of the editions named and not in the others'. The sentences are quoted word for word.</Why>
 			{@render scale()}
 		</header>
+		{@render key()}
 		<div class="rows">
 			{#each loaded as d, i (d.id)}
 				<Difference {d} {topic} {events} open={i === 0} />
@@ -73,25 +78,21 @@
 		{/if}
 		{#if found.length}
 			{#if judge}
-				<Why id="why-list" label="Checked by Nemotron">{modelName(topic.checked?.model)} suggested these by comparing the articles passage by passage{#if modelName(topic.checked?.model) === modelName(judge)}, then looked each one up in the whole other article{:else}; {modelName(judge)} looked each one up in the whole other article{/if}. A person closed the rows found false on reading; the rest no person has checked. The quotes are word for word: read them to judge.</Why>
+				<Why id="why-list" label="Checked by Nemotron">{modelName(topic.checked?.model)} suggested these by comparing the articles passage by passage{#if modelName(topic.checked?.model) === modelName(judge)}, then looked each one up in the whole other article{:else}; {modelName(judge)} looked each one up in the whole other article{/if}. A person closed the rows found false on reading; the rest no person has checked. The quotes are word for word: read them to judge.{#if tally}<br /><br />{modelName(judge)} looked up {tally.looked} suggestions in the whole other article on {day(topic.checked!.as_of)} and set aside {tally.aside}{#if tally.aside}:
+				{list([
+					tally.by.stated_elsewhere ? `${tally.by.stated_elsewhere} where the other edition states the fact elsewhere` : '',
+					tally.by.repeat ? `${plural(tally.by.repeat, 'repeat', 'repeats')} of another row` : '',
+					tally.by.not_confirmed ? `${tally.by.not_confirmed} not confirmed from both sides` : '',
+				].filter(Boolean))}{/if}.
+			{#if aside.length}<a href="#aside-title" onclick={() => (asideOpen = true)}>{plural(aside.length, 'statement', 'statements')} the other edition states</a>, each with the passage that states it, are listed below; a statement set aside more than once is listed once.{/if}
+			{#if tally.closed}A person read both articles and closed {tally.closed} more.{/if}{/if}</Why>
 			{:else}
 				<Why id="why-list" label="Suggested by Nemotron">{modelName(null)} suggested these by comparing passage with passage. They have not been looked up in the whole other article, and no person has checked them. The quotes are word for word: read them to judge.</Why>
 			{/if}
 			{#if !loaded.length}{@render scale()}{/if}
 		{/if}
 	</header>
-	{#if tally}
-		<p class="tally">
-			{modelName(judge)} looked up {tally.looked} suggestions in the whole other article on {day(topic.checked!.as_of)} and set aside {tally.aside}{#if tally.aside}:
-				{list([
-					tally.by.stated_elsewhere ? `${tally.by.stated_elsewhere} where the other edition states the fact elsewhere` : '',
-					tally.by.repeat ? `${plural(tally.by.repeat, 'repeat', 'repeats')} of another row` : '',
-					tally.by.not_confirmed ? `${tally.by.not_confirmed} not confirmed from both sides` : '',
-				].filter(Boolean))}{/if}.
-			{#if aside.length}<a href="#aside-title" onclick={() => (asideOpen = true)}>{plural(aside.length, 'statement', 'statements')} the other edition states</a>, each with the passage that states it, are listed below.{/if}
-			{#if tally.closed}A person read both articles and closed {tally.closed} more.{/if}
-		</p>
-	{/if}
+	{#if !loaded.length && found.length}{@render key()}{/if}
 	{#if found.length}
 		<div class="rows">
 			{#each shown as d, i (d.id)}
@@ -108,7 +109,7 @@
 	<section class="left" aria-labelledby="wording-title">
 		<header>
 			<h2 id="wording-title">Wording</h2>
-			<Why id="why-wording" label="Unchecked">{modelName(null)} suggested these differences of wording. The check does not cover them, and no person has checked them.</Why>
+			<Why id="why-wording" label="Not checked">{modelName(null)} suggested these differences of wording. The check does not cover them, and no person has checked them.</Why>
 		</header>
 		<div class="rows">
 			{#each words as d (d.id)}
@@ -243,11 +244,6 @@
 		margin-top: var(--spacing-100);
 	}
 
-	.tally {
-		max-width: 48rem;
-		margin: var(--spacing-50) 0 var(--spacing-25);
-		color: var(--color-subtle);
-	}
 
 	.left {
 		margin-top: var(--spacing-300);
@@ -297,5 +293,25 @@
 		.scale {
 			display: none;
 		}
+	}
+
+	/* The key to the time strips: the marks drawn as the strips draw them. */
+	.key span {
+		display: inline-block;
+		vertical-align: middle;
+		background: var(--border-color-warning);
+	}
+	.key .dot {
+		width: 10px;
+		height: 10px;
+		border-radius: var(--border-radius-circle);
+	}
+	.key .bar {
+		width: 18px;
+		height: 6px;
+	}
+	.key .bar.past {
+		height: 4px;
+		background: var(--color-placeholder);
 	}
 </style>

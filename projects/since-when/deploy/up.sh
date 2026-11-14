@@ -53,3 +53,16 @@ docker compose run --rm -T app python -m gapfinder.checked hand - < ../demo/hand
 
 docker compose up -d --remove-orphans
 echo "Since When is up behind the proxy (infra/verda/proxy) as since-when-app:8078"
+
+# The first answer for a topic with its full history walks every version of its passages (a few
+# seconds); ask for the three on the front page once, so no visitor waits for it.
+docker compose exec -T app python -c '
+import time, urllib.request
+for _ in range(60):
+    try:
+        for q in ("Q1412941", "Q736268", "Q2457646"):
+            urllib.request.urlopen(f"http://127.0.0.1:8078/api/topics/{q}", timeout=60).read()
+        break
+    except Exception:
+        time.sleep(2)
+' && echo "Front-page topics warmed"
