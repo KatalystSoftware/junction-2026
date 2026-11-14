@@ -13,13 +13,14 @@ gh workflow run standin-screen.yml --repo katalystsoftware/junction2026 --ref sp
 ```
 
 - It plays every arm and the baseline on the same 206 saved seeds (114 natural, 92 thin, under 720 drivers) on one
-  32-core CRACI runner, with the desk code of `ref`. The baseline is merge 1
-  (`fee16-80-q24-wide-pairs-0.6-return-0.75`); `-f baseline=<variant>` changes it, `-f draws=2` narrows the intervals.
+  32-core CRACI runner, with the desk code of `ref`. `-f baseline=<variant>` names what the arms are compared with; left
+  out, it is merge 1 (`fee16-80-q24-wide-pairs-0.6-return-0.75`), which is no longer the base. `-f half=a` and
+  `-f half=b` take every other seed, `-f draws=2` narrows the intervals.
 - Time: 7 arms took 4 min 41 s to play (1,442 weeks), about 5.5 minutes with the runner's start. Two arms and the
   baseline take about 2.5 minutes. Several runs go at once, each on its own runner.
 - Result: the run's summary page, and the artifact `standin-screen` with `rows.csv` (one row a variant, seed and draw,
-  in the columns of the `trackb-rounds` row files plus the money lines) and `summary.md` (natural and thin apart, a
-  PASS or FAIL for each arm with its reasons).
+  in the columns of the `trackb-rounds` row files plus the money lines) and `summary.md` (natural and thin apart, and for
+  each arm PASS, FAIL or NEEDS PLAYED THIN WEEKS with its reasons: the merge gate below).
 
 ```bash
 gh run list --repo katalystsoftware/junction2026 --workflow standin-screen.yml -L 3     # find the run
@@ -32,20 +33,54 @@ On a machine with the packed weeks (release `spread-standin-screen`, unpacked in
 cd spread && uv run --with numpy python -m spreadlab.standin.screen --arms <variant> <variant> --out out
 ```
 
+## The merge gate
+
+A part merges onto the base on the stand-in alone; the base's played weeks judge it afterwards. The review thread owns
+that rule. This is what the screen's line for each arm says about it:
+
+```bash
+git fetch origin && git merge origin/trackb-merged        # or rebase: your branch then has the base's variant and desk code
+git push
+gh workflow run standin-screen.yml --repo katalystsoftware/junction2026 --ref spread-standin \
+  -f ref=<your branch> -f arms=<variant>,<variant> -f baseline=<base variant> -f half=a      # then the same with half=b
+```
+
+- **The baseline is the current base**, the variant `origin/trackb-merged` plays, and it moves with each merge. Without
+  `-f baseline` the screen compares with merge 1 and counts the base's own parts as the arm's gain; the summary says so.
+  A branch that lacks the base's variant stops at once with "Not in this checkout's variants.py".
+- **PASS**, needed on half a and on half b: over 500 euros a week on natural worlds with the 95% interval above zero, no
+  loss on thin worlds, and no more natural weeks under 90% than the base.
+- **A gain on thin worlds (under 720 drivers) does not count.** Play returned 0.18 to 0.39 of a stand-in thin gain, and
+  the stand-in sees about a third of play's thin weeks under 90%. It reads merge 1 at +2,650 a week over the base on
+  thin worlds, with 27% more orders and as many weeks under 90%, where play has merge 1 under 90% in 3 thin weeks of 60
+  and the base's all-hours count lifting those to 93 to 95%. A gate that counted thin gains would undo the base.
+- **NEEDS PLAYED THIN WEEKS**: the arm does not fail, and on worlds under 760 drivers (the base's line for a short driver
+  list) it wins over 3% more orders or has over 10% more late orders than the base. Such a part plays thin weeks before
+  it merges, whatever the stand-in's on-time numbers say.
+- **Weeks under 90%** are a tripwire on natural worlds, where the stand-in counts as many as play or more. On a half every
+  desk has 0 or 1 of them, so an equal count is no evidence that a part is safe.
+- 500 is not a noise margin: one half's gain has a standard error of 60 to 200 a week. The stand-in's errors are bias.
+  Expect about three quarters of a natural-world gain in play, and about two thirds where the gain is more orders.
+
+The stand-in cannot judge, so such parts still need played weeks:
+
+- Margin and on-time on thin worlds.
+- New pair shapes. No pair gig was in the weeks the drivers were fitted on, so a gig with two cars is booked like a
+  one-car gig. On the pair ladder the order held (18 of 18 decided pairs) and the sizes read up to twice play's.
+- Stacked merges. The accuracy below was measured one step from the default or from merge 1; no played week of merge 1 or
+  a later base is in the fitted data yet.
+- Note reading, cancelled and changed orders, failed visits, snow, the competitor's answer to what the desk wins.
+
 ## Climbing on it
 
-A search that keeps the best of many variants on the same seeds fits those seeds and the stand-in's own errors. Rules
-that keep the climb honest, the same ones the played exams use plus what the stand-in's error asks for:
+A search that keeps the best of many variants on the same seeds fits those seeds and the stand-in's own errors.
 
 - Climb on half the seeds (`-f half=a`, 57 natural and 46 thin) and confirm the winner once on the other half
   (`-f half=b`). A gain that does not hold on `b` was noise.
-- A step counts only when its paired 95% interval against the current best is above zero on natural worlds and not below
-  zero on thin worlds. The screen's PASS says this.
-- Two variants within about 500 euros a week are a tie here: play did not decide such pairs either.
-- The 90% rule: at most 1 week in 60 under 90%, natural and thin apart, as in the played exam. On thin worlds the
-  stand-in sees about a third of play's weeks under 90%, so also hold thin weeks under 92% at the baseline's count.
-- Expect about three quarters of a natural-world gain in play, and less of a gain that comes from winning more orders.
-- What comes out of the climb still plays an exam on unseen seeds before it is used. The stand-in chooses what to play.
+- A step counts when the merge gate passes it against the current best. Two variants within about 500 euros a week are a
+  tie here: play did not decide such pairs either.
+- Hold thin weeks under 92% at the baseline's count: that count did mark merge 1 as the riskiest of the pair ladder.
+- What comes out of the climb goes through the merge gate like any lane's part.
 
 ## How it is built
 

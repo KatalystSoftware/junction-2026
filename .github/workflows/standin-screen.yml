@@ -1,9 +1,11 @@
 name: Spread stand-in screen
 
 # Screens Spread policy variants on the offline stand-in (spread/spreadlab/standin) on a CRACI runner, before they bid for practice worlds.
-#   gh workflow run standin-screen.yml --ref spread-standin -f ref=<branch with the variants> -f arms=<variant,variant,...>
+#   gh workflow run standin-screen.yml --ref spread-standin -f ref=<branch with the variants> -f arms=<variant,variant,...> \
+#     -f baseline=<the current base's variant> -f half=a      (then half=b)
 # The arms and the baseline play the same 206 saved seeds (114 natural, 92 thin) with the desk code of `ref`. Rows and a summary, with
-# natural and thin worlds apart, are in the run's summary page and its artifact `standin-screen`.
+# natural and thin worlds apart, are in the run's summary page and its artifact `standin-screen`. Each arm gets PASS, FAIL or
+# NEEDS PLAYED THIN WEEKS: the merge gate of spread/spreadlab/standin/README.md.
 # Offline: the job reads packed saved weeks from the release `spread-standin-screen`. It gets no secret and no team key.
 on:
   workflow_dispatch:
@@ -17,7 +19,7 @@ on:
         required: true
         type: string
       baseline:
-        description: The variant to compare with (empty is merge 1, fee16-80-q24-wide-pairs-0.6-return-0.75)
+        description: The variant to compare with. For the merge gate, the current base (what origin/trackb-merged plays). Empty is merge 1
         default: ""
         type: string
       draws:
