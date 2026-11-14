@@ -114,7 +114,7 @@
 			<span class="grow"></span>
 			<label class="pair">
 				<span class="sr-only">Editions compared</span>
-				<select class="field" onchange={choosePair}>
+				<select class="cdx-select" onchange={choosePair}>
 					{#each pairs as [a, b]}
 						<option value="{a}/{b}" selected={a === pair.lang && b === pair.rich}>{NAMES[a]} and {NAMES[b]}</option>
 					{/each}

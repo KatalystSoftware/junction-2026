@@ -83,15 +83,6 @@ select {
 	background-color: var(--background-color-progressive-subtle--hover);
 }
 
-.field {
-	min-height: var(--size-200);
-	padding: 0 var(--spacing-50);
-	border: 1px solid var(--border-color-interactive);
-	border-radius: var(--border-radius-base);
-	background: var(--background-color-base);
-	font-size: var(--font-size-small);
-}
-
 /* Type of difference. The label carries the meaning; the tint only groups. */
 .tag {
 	display: inline-block;

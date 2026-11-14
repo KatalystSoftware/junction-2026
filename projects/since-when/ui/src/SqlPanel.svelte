@@ -143,20 +143,26 @@
 			<form onsubmit={run}>
 				{#each preset.params as x}
 					{@const v = values[preset.name]}
-					<label class="small">
-						<span>{LABEL[x.name] ?? x.name}</span>
-						{#if x.kind === 'date'}
-							<input class="field" type="date" value={v[x.name]} min="2001-01-15" max={today} required onchange={(e) => set(x.name, e.currentTarget.value)} />
-						{:else}
-							<select class="field" value={v[x.name]} onchange={(e) => set(x.name, e.currentTarget.value)}>
-								{#if x.kind === 'lang'}
-									{#each LANGS as l}<option value={l}>{NAMES[l]}</option>{/each}
-								{:else}
-									{#each Object.entries({ ...topics, [v.qid]: topics[v.qid] ?? v.qid }) as [id, title]}<option value={id}>{title}</option>{/each}
-								{/if}
-							</select>
-						{/if}
-					</label>
+					<div class="cdx-field">
+						<div class="cdx-label">
+							<label class="cdx-label__label" for="sql-{x.name}"><span class="cdx-label__label__text">{LABEL[x.name] ?? x.name}</span></label>
+						</div>
+						<div class="cdx-field__control">
+							{#if x.kind === 'date'}
+								<div class="cdx-text-input">
+									<input id="sql-{x.name}" class="cdx-text-input__input" type="date" value={v[x.name]} min="2001-01-15" max={today} required onchange={(e) => set(x.name, e.currentTarget.value)} />
+								</div>
+							{:else}
+								<select id="sql-{x.name}" class="cdx-select" value={v[x.name]} onchange={(e) => set(x.name, e.currentTarget.value)}>
+									{#if x.kind === 'lang'}
+										{#each LANGS as l}<option value={l}>{NAMES[l]}</option>{/each}
+									{:else}
+										{#each Object.entries({ ...topics, [v.qid]: topics[v.qid] ?? v.qid }) as [id, title]}<option value={id}>{title}</option>{/each}
+									{/if}
+								</select>
+							{/if}
+						</div>
+					</div>
 				{/each}
 				<button class="cdx-button cdx-button--action-progressive cdx-button--weight-primary" type="submit" disabled={running}>{running ? 'Running…' : 'Run'}</button>
 			</form>
@@ -252,14 +258,15 @@
 		gap: var(--spacing-75);
 	}
 
-	label {
-		display: flex;
-		flex-direction: column;
-		color: var(--color-subtle);
+	/* The fields sit side by side, so Codex's space between stacked fields and its 256px minimum
+	   width give way to the row. */
+	form .cdx-field {
+		margin: 0;
 	}
 
-	label .field {
-		color: var(--color-base);
+	form .cdx-select,
+	form .cdx-text-input {
+		min-width: 9rem;
 	}
 
 	.run {

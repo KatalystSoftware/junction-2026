@@ -40,8 +40,15 @@
 		</header>
 		{#if queue.searchable}
 			<form role="search" onsubmit={search}>
-				<input class="field" type="search" name="q" placeholder="Search topics" aria-label="Search topics" value={nav.q} autocomplete="off" />
-				<button class="cdx-button" type="submit">Search</button>
+				<div class="cdx-search-input cdx-search-input--has-end-button">
+					<div class="cdx-search-input__input-wrapper">
+						<div class="cdx-text-input cdx-text-input--has-start-icon">
+							<input class="cdx-text-input__input" type="search" name="q" placeholder="Search topics" aria-label="Search topics" value={nav.q} autocomplete="off" />
+							<span class="cdx-text-input__icon cdx-text-input__start-icon"></span>
+						</div>
+					</div>
+					<button class="cdx-button cdx-search-input__end-button" type="submit">Search</button>
+				</div>
 			</form>
 		{/if}
 		<div class="filters" role="group" aria-label="Edition">
@@ -107,16 +114,6 @@
 
 	h2 {
 		font-size: var(--font-size-xx-large);
-	}
-
-	form {
-		display: flex;
-		gap: var(--spacing-35);
-	}
-
-	form .field {
-		flex: 1;
-		min-width: 0;
 	}
 
 	.filters {
