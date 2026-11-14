@@ -7,7 +7,7 @@ Docker network `proxy` and publishes no ports.
 | App | Address | Upstream on the `proxy` network |
 | --- | --- | --- |
 | Gap finder | `https://gapfinder.<base domain>/` and `https://31-22-104-106.sslip.io/` | `gapfinder-ui-1:8078`, on its own network |
-| Since When | `https://since-when.<base domain>/` | `since-when-app:8078` |
+| Since When | `https://since-when.<base domain>/` and `https://since-when.31-22-104-106.sslip.io/` | `since-when-app:8078` |
 
 The gap finder is the one exception to "apps join the `proxy` network": it was live first, so the
 proxy joins its network `gapfinder_default` and its deploys need no change. If that project is ever
@@ -20,17 +20,17 @@ Apply a change (run from a checkout, needs SSH access to the machine):
 ## The base domain
 
 `BASE_DOMAIN` in [`proxy.env`](proxy.env) is the one setting: every app is `<app>.<base domain>`.
-It is `31-22-104-106.sslip.io` today, which needs no DNS record.
+It is `katalyst.fyi`; the zone and its wildcard record are in [`infra/dns/main.tf`](../../dns/main.tf).
 
-To move to a real domain, create one wildcard record at the DNS provider, then change `BASE_DOMAIN`
+To move to another domain, create one wildcard record at its DNS provider, then change `BASE_DOMAIN`
 and run `deploy.sh`:
 
     *.<base domain>.    A    31.22.104.106
 
 For `BASE_DOMAIN=demo.example.org` that is `*.demo.example.org`. Caddy gets a certificate for each
 hostname on its first request, over HTTP on port 80 (or TLS on 443), so no DNS provider key is
-needed and the record must exist before the switch. The gap finder keeps answering on its first
-address, `31-22-104-106.sslip.io`.
+needed and the record must exist before the switch. The gap finder and Since When keep answering
+on the sslip.io addresses they were first published under.
 
 ## Add an app
 
