@@ -2,9 +2,12 @@
 compare it with the others on the same seeds."""
 from __future__ import annotations
 
-GATE_10 = {"same_day": True, "floor": 1.7, "quote_share": 1, "max_unbooked": 10}  # the reference, `gate-10`
+GATE_10 = {"same_day": True, "floor": 1.7, "quote_share": 1, "max_unbooked": 10}  # `gate-10`
 # `curve-live-surcharge`: the win curve sets the price, the day's answers correct it, and the backlog raises the cost
 CURVE = {"same_day": True, "quote_share": 1, "floor": 0, "curve": True, "learn": 0.16, "max_unbooked": 15, "backlog_step": 0.04}
+FEE = {**CURVE, "fee": 1.0, "cost": 1.2}  # `curve-fee-1.0-cost-1.2`: gigs open at the typical fee, and an order is taken to cost 1.2 x it
+# The reference, `fee-cap-1.2-drop-cost-1.3`: the fee rises a tenth of the typical fee an hour to 1.2 x it and holds, starts again after a drop, and an order is taken to cost 1.3 x it
+CAPPED = {**FEE, "fee_cap": 1.2, "drop_fee": 1.1, "cost": 1.3}
 
 VARIANTS: dict[str, dict] = {
     "baseline": {},
@@ -62,6 +65,40 @@ VARIANTS: dict[str, dict] = {
     "curve-step-8": {**CURVE, "backlog_step": 0.08},
     "curve-gate-10": {**CURVE, "max_unbooked": 10},
     "curve-no-gate": {**CURVE, "max_unbooked": 0},
+    # The cost follows the order, and the dealer's later prices count in it.
+    "curve-order-cost": {**CURVE, "cost_by_order": True},
+    "curve-trust-0.3": {**CURVE, "trust_value": 0.3},
+    "curve-trust-1": {**CURVE, "trust_value": 1},
+    "curve-order-cost-trust-0.3": {**CURVE, "cost_by_order": True, "trust_value": 0.3},
+    "curve-order-cost-trust-1": {**CURVE, "cost_by_order": True, "trust_value": 1},
+    # The opening driver fee (the schedule still rises 10% of it an hour), and the requests that the desk has never quoted.
+    "curve-fee-0.9": {**CURVE, "fee": 0.9},
+    "curve-fee-1.0": {**CURVE, "fee": 1.0},
+    "curve-fee-1.1": {**CURVE, "fee": 1.1},
+    "curve-fee-1.3": {**CURVE, "fee": 1.3},
+    "curve-private": {**CURVE, "private": True},
+    "curve-trade-in": {**CURVE, "trade_in": True},
+    # Around the opening fee of 1.0: what an order is then taken to cost, the backlog rules, and private addresses.
+    "curve-fee-0.8": {**CURVE, "fee": 0.8},
+    "curve-fee-0.9-cost-1.2": {**CURVE, "fee": 0.9, "cost": 1.2},
+    "curve-fee-1.0-cost-1.2": {**CURVE, "fee": 1.0, "cost": 1.2},
+    "curve-fee-1.0-cost-1.3": {**CURVE, "fee": 1.0, "cost": 1.3},
+    "curve-fee-1.0-gate-25": {**CURVE, "fee": 1.0, "max_unbooked": 25},
+    "curve-fee-1.0-step-2": {**CURVE, "fee": 1.0, "backlog_step": 0.02},
+    "curve-fee-1.0-private": {**CURVE, "fee": 1.0, "private": True},
+    # The fees after the opening, from the opening fee of 1.0 and the cost of 1.2. After a drop the fees start again;
+    # the rises stop at 1.2 x the typical fee, or there are none; one early step to 1.5 when drivers plan the day.
+    "fee-drop": {**FEE, "drop_fee": 1.1},
+    "fee-cap-1.2": {**FEE, "fee_cap": 1.2},
+    "fee-flat": {**FEE, "fee_cap": 1.0},
+    "fee-cap-1.2-jump": {**FEE, "fee_cap": 1.2, "jump": 1.5},
+    "fee-flat-jump": {**FEE, "fee_cap": 1.0, "jump": 1.5},
+    "fee-cap-1.2-drop": {**FEE, "fee_cap": 1.2, "drop_fee": 1.1},
+    "fee-cap-1.2-drop-jump": {**FEE, "fee_cap": 1.2, "drop_fee": 1.1, "jump": 1.5},
+    "fee-cap-1.2-drop-cost-1.3": CAPPED,
+    # The fees and the cost follow the lane's usual fee in place of the request's typical fee.
+    "fee-lane": {**FEE, "lane_fee": True},
+    "fee-lane-1.05": {**FEE, "lane_fee": True, "fee": 1.05},
     # Not a candidate: random multiples of the list price, never under 1.3 x the typical fee, to fit the win curve from.
     "explore": {**GATE_10, "floor": 1.3, "explore": [1.1, 2.4]},
 }

@@ -19,7 +19,8 @@ MAP = {
     ],
     "roads": [{"from": a, "to": b, "km": 100.0, "minutes": 120} for a in ("helsinki", "vantaa", "tampere") for b in ("helsinki", "vantaa", "tampere")],
 }
-ROSTER = [{"id": f"d{i}", "homePlaceId": "helsinki"} for i in range(8)] + [{"id": "t1", "homePlaceId": "tampere"}]
+ROSTER = ([{"id": f"d{i}", "homePlaceId": "helsinki", "rating": 4.9, "licence": "manual", "completedGigs": 60} for i in range(8)]
+          + [{"id": "t1", "homePlaceId": "tampere", "rating": 4.9, "licence": "manual", "completedGigs": 60}])
 
 
 def stop(place: str, private: bool = False) -> dict:
@@ -78,10 +79,10 @@ def test_backlog_counts_the_won_cars_that_no_driver_holds_now():
     d.quote(request("R3"))
     assert d.decisions["R3"]["declined"] == "backlog"
 
-    d.handle({"kind": "gig_booked", "gigId": "G1"})  # a booked car does not count
+    d.handle({"kind": "gig_booked", "gigId": "G1", "driverId": "d0", "at": 500})  # a booked car does not count
     d.quote(request("R4"))
     assert (d.unbooked(), d.decisions["R4"]["declined"]) == (1, None)
-    d.handle({"kind": "gig_dropped", "gigId": "G1"})  # a dropped car counts again
+    d.handle({"kind": "gig_dropped", "gigId": "G1", "driverId": "d0", "at": 500})  # a dropped car counts again
     assert d.unbooked() == 2
     d.handle({"kind": "delivered", "orderId": "R2", "leg": 0, "at": 900})  # a delivered car never does
     assert d.unbooked() == 1
@@ -113,7 +114,7 @@ def test_projected_on_time_share_counts_each_order_by_what_the_desk_sees_of_it()
     d.handle({"kind": "delivered", "orderId": "R1", "leg": 0, "at": 900})  # on time: no risk left
     d.handle({"kind": "delivered", "orderId": "R2", "leg": 0, "at": 950})  # before the deadline, but the account refunds it: late
     d.handle({"kind": "ledger", "at": 950, "line": {"kind": "late_refund", "cents": -3750, "orderId": "R2", "gigId": None}})
-    d.handle({"kind": "gig_booked", "gigId": "G3"})  # a driver holds it
+    d.handle({"kind": "gig_booked", "gigId": "G3", "driverId": "d0", "at": 500})  # a driver holds it
     assert d.on_time() == pytest.approx(1 - (0 + 1 + 0.03 + 0.15) / 4)
 
     d.now = 500 + 120  # R4 has waited two hours for a driver
@@ -129,7 +130,7 @@ def test_a_desk_that_is_behind_takes_its_own_parameters_until_it_recovers():
     d.read_results([action for action in d.outbox if action["type"] == "post"], [{"ok": True, "id": "G1"}])
     d.quote(request("R2"))
     assert d.decisions["R2"] == {"declined": "volume", "prices": {"same_day": 100000}, "onTime": 0.85}
-    d.handle({"kind": "gig_booked", "gigId": "G1"})
+    d.handle({"kind": "gig_booked", "gigId": "G1", "driverId": "d0", "at": 500})
     d.quote(request("R3"))
     assert d.decisions["R3"] == {"declined": None, "prices": {"next_day": 15000}, "onTime": 0.97}
     # The same order under a line of 85% is not behind: the line itself is allowed.
@@ -241,12 +242,93 @@ def test_curve_price_follows_the_answers_of_the_day_and_starts_each_day_from_the
     assert price(refused, "R2") == price(bought, "R2") == price(plain, "R2")  # Tuesday has no answers yet
 
 
+def test_cost_by_order_is_higher_for_a_long_lane_a_note_and_few_drivers():
+    usual = curve.cost(curve.known(request(), [{"kind": "next_day"}], notified=80, unbooked=0))
+    long_lane = curve.known(request(referenceFeeCents=25000), [{"kind": "next_day"}], notified=80, unbooked=0)
+    few = curve.known(request(note={"text": "x"}), [{"kind": "next_day"}], notified=2, unbooked=0)
+    assert 1.2 < usual < 1.4 < curve.cost(few) < curve.cost(long_lane) < 2.0
+    assert curve.late(curve.known(request(), [{"kind": "next_day"}], 80, 0)) < 0.03 < 0.10 < curve.late(long_lane)
+    flat, by_order = desk(curve=True), desk(curve=True, cost_by_order=True)
+    for d in (flat, by_order):
+        d.quote(request("R1", referenceFeeCents=7000))
+        d.quote(request("R2", pickup="tampere", options=(("next_day", 2640),), note={"text": "x"}))  # one driver is notified there
+    price = lambda d, id_: d.decisions[id_]["prices"]["next_day"]
+    assert price(by_order, "R1") < price(flat, "R1")
+    assert price(by_order, "R2") > price(flat, "R2")
+
+
+def test_trust_value_lowers_the_quote_for_a_dealer_with_much_still_to_come_and_raises_it_where_a_late_order_would_cost_most():
+    plain, d = desk(curve=True), desk(curve=True, trust_value=1)
+    for desk_ in (plain, d):
+        for n in range(12):
+            desk_.quote(request(f"A{n}", arrivedAt=540, respondBy=555))  # a dealer with 12 requests in the first hour
+        desk_.quote(request("B1", dealerId="D02", arrivedAt=540, respondBy=555))  # a dealer with one
+        desk_.quote(request("C1", options=(("next_day", 7 * 1440 + 1200),), arrivedAt=4 * 1440 + 1080, respondBy=4 * 1440 + 1095))  # Friday 18:00: nothing is to come
+    price = lambda desk_, id_: desk_.decisions[id_]["prices"]["next_day"]
+    assert price(d, "A11") < price(d, "B1") < price(plain, "B1") == price(plain, "A11")
+    assert price(d, "C1") == price(plain, "C1")
+    # At 25 orders on time, one more adds nothing, and a late one halves the count.
+    assert d.trust_worth(request("A0", arrivedAt=540), 25, 0.1, 10000) < 0 < d.trust_worth(request("A0", arrivedAt=540), 0, 0.1, 10000)
+
+
 def test_shift_of_the_curve_is_found_from_answers_and_stays_near_zero_with_few():
     random = __import__("random").Random(1)
     quotes = [(2.0 - curve.SLOPE * math.log(random.uniform(1.1, 2.0))) for _ in range(4000)]
     answers = [(z, random.random() < curve.chance(2.0, math.exp((2.0 - z) / curve.SLOPE), 0.2)) for z in quotes]  # dealers accept 20% more
     assert curve.shift(answers, sd=1.0) == pytest.approx(0.2, abs=0.02)
     assert 0 < curve.shift(answers[:5], sd=0.05) < curve.shift(answers[:5], sd=1.0)
+
+
+def posted(d: policy.Policy, last_pickup: int, id_: str = "R1") -> list[tuple[int, int]]:
+    """The fees of the gig that the desk posts for a won order, as (minute, cents)."""
+    d.quote(request(id_))
+    d.win({"id": id_, "legs": request(id_)["legs"], "deliveredAt": [None], "deadline": last_pickup + 120, "option": "next_day", "lastPickupAt": last_pickup})
+    return [(step["at"], step["feeCents"]) for step in d.outbox[-1]["schedule"]]
+
+
+def test_fees_rise_to_the_cap_and_hold_and_jump_once_when_drivers_plan_the_day_of_the_last_pickup():
+    day = 24 * 60
+    assert posted(desk(fee=1.0), day + 14 * 60) == [(500 + 60 * k, 9000 + 900 * k) for k in range(6)]  # the starter's schedule
+    assert posted(desk(fee=1.0, fee_cap=1.2), day + 14 * 60) == [(500, 9000), (560, 9900), (620, 10800)]
+    assert posted(desk(fee=1.0, fee_cap=1.0), day + 14 * 60) == [(500, 9000)]
+    # A last pickup after 10:00 is planned at 04:30 that morning, an earlier one at 16:00 the day before.
+    assert posted(desk(fee=1.0, fee_cap=1.2, jump=1.5), day + 14 * 60) == [(500, 9000), (560, 9900), (620, 10800), (day + 270, 13500)]
+    assert posted(desk(fee=1.0, fee_cap=1.2, jump=1.5), day + 9 * 60) == [(500, 9000), (560, 9900), (620, 10800), (960, 13500)]
+    assert posted(desk(fee=1.0, fee_cap=1.2, jump=1.5), 14 * 60) == [(500, 9000), (560, 9900), (620, 10800)]  # that morning has passed
+    assert posted(desk(fee=1.0, jump=1.2), day + 9 * 60) == [(500 + 60 * k, 9000 + 900 * k) for k in range(6)]  # a jump under the fee of that minute does nothing
+
+
+def test_a_dropped_gig_starts_its_fees_again_unless_the_deadline_warning_has_come():
+    d = desk(fee=1.0, drop_fee=1.1)
+    assert "gig_dropped" in d.wake_on and "gig_dropped" not in desk().wake_on
+    posted(d, 2000)
+    d.read_results([d.outbox[-1]], [{"ok": True, "id": "G1"}])
+    d.handle({"kind": "gig_booked", "gigId": "G1", "driverId": "d0", "at": 500})
+    d.now, d.outbox = 1100, []
+    d.handle({"kind": "gig_dropped", "gigId": "G1", "driverId": "d0", "at": 500})
+    assert d.outbox == [{"type": "reprice", "gigId": "G1", "schedule": [{"at": 1100 + 60 * k, "feeCents": int(9900 * (1 + k / 10) + 0.5)} for k in range(6)]}]
+    d.handle({"kind": "gig_booked", "gigId": "G1", "driverId": "d0", "at": 500})
+    d.urgent.add("R1")
+    d.outbox = []
+    d.handle({"kind": "gig_dropped", "gigId": "G1", "driverId": "d0", "at": 500})
+    assert d.outbox == [] and d.unbooked() == 1
+
+
+def test_fees_and_cost_follow_the_usual_fee_of_a_known_lane(monkeypatch):
+    monkeypatch.setattr(policy, "LANES", {"vantaa>helsinki": math.log(8000)})
+    assert posted(desk(fee=1.0, fee_cap=1.0, lane_fee=True), 2000) == [(500, 8000)]
+    assert posted(desk(fee=1.0, fee_cap=1.0), 2000) == [(500, 9000)]
+    d = desk(fee=1.0, fee_cap=1.0, lane_fee=True, private=True)
+    d.quote(request("R2", private=True))  # a lane that the table does not have keeps the request's typical fee
+    d.win({"id": "R2", "legs": request("R2", private=True)["legs"], "deliveredAt": [None], "deadline": 2640, "option": "next_day", "lastPickupAt": 2000})
+    assert d.outbox[-1]["schedule"] == [{"at": 500, "feeCents": 9000}]
+    price = lambda **params: desk(curve=True, cost=1.2, **params)  # noqa: E731
+    quotes = []
+    for params in ({}, {"lane_fee": True}):
+        d = price(**params)
+        d.quote(request())
+        quotes.append(d.decisions["R1"]["prices"]["next_day"])
+    assert quotes[1] < quotes[0]  # the lane's usual fee is lower than this request's typical fee, so the order costs less
 
 
 def test_a_rule_cannot_set_a_rule():

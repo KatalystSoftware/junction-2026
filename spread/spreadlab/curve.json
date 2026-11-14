@@ -75,5 +75,39 @@
   "vaasa": 0.4031,
   "vantaa": -1.1116,
   "ylivieska": 0.5604
+ },
+ "cost": {
+  "intercept": 1.2854,
+  "names": [
+   "long",
+   "few_notified",
+   "note",
+   "same_day",
+   "unbooked"
+  ],
+  "weights": [
+   0.4284,
+   0.12,
+   0.0869,
+   -0.0252,
+   0.1303
+  ]
+ },
+ "late": {
+  "intercept": -4.3001,
+  "names": [
+   "long",
+   "few_notified",
+   "note",
+   "same_day",
+   "unbooked"
+  ],
+  "weights": [
+   2.6306,
+   1.5919,
+   0.6017,
+   0.5218,
+   0.6438
+  ]
  }
 }

@@ -13,9 +13,10 @@ import inspect
 import json
 import math
 import sys
+from pathlib import Path
 from typing import Optional
 
-from spread.starter import DAY, Desk, rising, steep
+from spread.starter import DAY, HOUR, WAKE_ON, Desk, pickups, rising, steep
 
 from . import curve
 from .server import drivers_near, near_places
@@ -31,6 +32,11 @@ DEFAULTS = {
     "min_notified": 0,    # decline when fewer drivers than this are notified of the pickup
     "max_unbooked": 0,    # decline while this many won cars have no driver; 0 is no limit
     "fee": 1.2,           # the opening fee, as a multiple of the request's typical fee
+    # The fees after the opening. The starter's schedule rises 10% of the opening fee an hour, to 1.5 times. Each is off at its default.
+    "fee_cap": 0,         # the fee rises a tenth of the typical fee an hour up to this multiple of it, then holds
+    "drop_fee": 0,        # after a driver drops a gig, its fees start again at this multiple of the opening fee; the old schedule is at its top by then
+    "jump": 0,            # one step to this multiple of the typical fee, when drivers plan the day of the order's last pickup and the gig is still open
+    "lane_fee": False,    # the fees and the cost follow the lane's usual fee (lanes.json) in place of the request's typical fee
     # What the floor follows. Each is off at its default.
     "dealer_steps": [],   # [[share, floor], ...]: the floor at a dealer once the desk has won this share of its quotes there in the week
     "day_floor": {},      # {"0": floor}: the floor on a day of the week (0 is Monday), whatever the dealer
@@ -42,6 +48,8 @@ DEFAULTS = {
     "curve": False,
     "cost": 1.4,          # what an order costs, as a multiple of its typical fee: fees, failed visits and refunds
     "learn": 0,           # how far a day's prices usually are from the curve, in log price; 0 does not correct the curve by the day's answers
+    "cost_by_order": False,  # the cost follows the order (curve.cost: long lanes, few drivers, a note) and replaces `cost`
+    "trust_value": 0,     # the share to count of what an order on time, or a late one, is worth in the dealer's later prices; 0 counts none
     # Two rules change the parameters above. Each names the parameters it replaces while it applies.
     "tight_drivers": 0,   # the week is tight when the driver list is shorter than this; 0 is never
     "when_tight": {},     # the parameters of a tight week, known before the first quote
@@ -57,6 +65,12 @@ LATE_HELD, LATE_WAITING, LATE_WAITING_LONG = 0.03, 0.15, 0.40
 LONG_WAIT = 120  # minutes
 MIN_ANSWERS = 5  # a dealer's win share counts once it has answered this many quotes
 MAX_TRUST = 25  # a dealer counts at most this many orders on time (RULES.md)
+# Drivers book open gigs mostly when they plan: early in the morning for the day, and in the late afternoon for the next.
+PLAN_MORNING, PLAN_EVENING, PLANS_SAME_DAY = 4 * 60 + 30, 16 * 60, 10 * 60  # a last pickup after 10:00 is planned that morning
+# lane -> the mean of the log of its requests' typical fee, in cents (scratch/lane_fit.py). A request's typical fee is
+# its lane's usual fee times noise that the drivers do not share.
+LANES = json.loads(Path(__file__).with_name("lanes.json").read_text(encoding="utf-8"))
+OPENS, OPEN = 8 * 60, 10 * 60  # requests arrive from 08:00 for about ten hours, Monday to Friday
 
 
 class Policy(Desk):
@@ -78,9 +92,11 @@ class Policy(Desk):
         self.asked: dict[str, tuple[str, int, float]] = {}  # request id -> dealer, day and the curve's log odds, for each serious quote without an answer
         self.today: tuple[int, list[tuple[float, bool]]] = (0, [])  # the day, and the answers to its quotes: the curve's log odds and whether the dealer bought
         self.answers: dict[str, list[int]] = {}  # dealer -> [serious quotes answered, of which won]
+        self.requested: dict[str, int] = {}  # dealer -> its requests so far
         self.trust: dict[str, int] = {}  # dealer -> the orders it counts as on time, as the dealer counts them
         self.minutes = {(road["from"], road["to"]): road["minutes"] for road in map_["roads"]}
         self.notified = drivers_near(roster, near_places(map_))
+        self.wake_on = WAKE_ON + (["gig_dropped"] if self.p["drop_fee"] else [])  # the events that the desk answers at once
         self.decisions: dict[str, dict] = {}  # request id -> what the policy answered, and why it declined
         self.refused: list[dict] = []  # the actions that the world refused
 
@@ -109,6 +125,7 @@ class Policy(Desk):
 
     def quote(self, request) -> None:
         self.requests[request["id"]] = request
+        self.requested[request["dealerId"]] = self.requested.get(request["dealerId"], 0) + 1
         p = self.params()
         reason, options = self.choose(request, p)
         if reason:
@@ -120,7 +137,13 @@ class Policy(Desk):
             log_odds = 0.0
             if p["curve"]:
                 at_list, first = curve.at_list(request, options, on_time), curve.fastest(options)
-                multiple = curve.best(at_list, self.shift(day, p), first["listPriceCents"], fee * (p["cost"] + surcharge))
+                known = curve.known(request, options, min(self.notified[leg["pickup"]["placeId"]] for leg in request["legs"]), self.unbooked())
+                cost, shift = self.usual_fee(request, p) * ((curve.cost(known) if p["cost_by_order"] else p["cost"]) + surcharge), self.shift(day, p)
+                multiple = curve.best(at_list, shift, first["listPriceCents"], cost)
+                if p["trust_value"]:  # an order on time raises what the dealer accepts later, and a late one lowers it
+                    revenue = multiple * first["listPriceCents"] * curve.chance(at_list, multiple, shift)
+                    cost -= p["trust_value"] * self.trust_worth(request, on_time, curve.late(known), revenue)
+                    multiple = curve.best(at_list, shift, first["listPriceCents"], cost)
                 log_odds = at_list - curve.SLOPE * math.log(multiple)
                 prices = {o["kind"]: int(round(max(o["listPriceCents"] * multiple, fee * self.floor(request, p)))) for o in options}
             else:
@@ -145,6 +168,17 @@ class Policy(Desk):
         elif answered >= MIN_ANSWERS:
             floor = max([step for least, step in p["dealer_steps"] if won / answered >= least], default=floor)
         return floor
+
+    def trust_worth(self, request, on_time: int, late: float, revenue: float) -> float:
+        """What winning this order is worth in the dealer's later prices, in cents. Each order on time raises the prices
+        the dealer accepts by 1%, up to 25, and a late one halves the count. One count is worth 1% of the revenue that
+        the desk expects from the dealer in the rest of the week: its requests so far, continued at the same rate, each
+        at the expected revenue of this one."""
+        minute = request["arrivedAt"]
+        elapsed = minute // DAY * OPEN + min(max(minute % DAY - OPENS, 0), OPEN)
+        later = self.requested[request["dealerId"]] * max(0, 5 * OPEN - elapsed) / (elapsed + 60)  # an hour is added, so that the first requests do not promise a week of them
+        counts = (1 - late) * (on_time < MAX_TRUST) - late * (on_time - on_time // 2)
+        return 0.01 * later * revenue * counts
 
     def shift(self, day: int, p: dict) -> float:
         """How far today's dealers are from the curve, from their answers so far today."""
@@ -184,9 +218,44 @@ class Policy(Desk):
         return sum(1 for id_, order in self.orders.items() for leg, at in enumerate(order["deliveredAt"])
                    if at is None and self.leg_gigs.get(id_, {}).get(leg) not in self.booked)
 
-    def fees_for(self, order, cars):
-        fee = self.requests[order["id"]]["referenceFeeCents"] * cars / len(order["legs"]) * self.params()["fee"]
-        return steep(self.now, fee, self.level) if order["id"] in self.urgent else rising(self.now, fee, self.level)
+    def usual_fee(self, request, p: dict) -> float:
+        """What drivers usually take for the request, in cents: its typical fee, or its lane's usual fee."""
+        if p["lane_fee"] and len(request["legs"]) == 1 and lane(request) in LANES:
+            return math.exp(LANES[lane(request)])
+        return request["referenceFeeCents"]
+
+    def fees_for(self, order, cars, opening: float = 1.0):
+        """The fees for some of the order's cars from now. `opening` multiplies the opening fee."""
+        p = self.params()
+        usual = self.usual_fee(self.requests[order["id"]], p) * cars / len(order["legs"])
+        fee = usual * p["fee"] * opening
+        if order["id"] in self.urgent:
+            return steep(self.now, fee, self.level)
+        if self.level == 1 or not (p["fee_cap"] or p["jump"]):
+            return rising(self.now, fee, self.level)
+        step, top = (usual / 10, max(fee, usual * p["fee_cap"])) if p["fee_cap"] else (fee / 10, fee * 1.5)
+        fees = {self.now + k * HOUR: min(fee + k * step, top) for k in range(math.ceil((top - fee) / step - 1e-9) + 1)}
+        last, jump = order["lastPickupAt"], usual * p["jump"]
+        plan = last // DAY * DAY + PLAN_MORNING if last % DAY > PLANS_SAME_DAY else (last // DAY - 1) * DAY + PLAN_EVENING
+        if jump > fee and plan > self.now:
+            before = max(fee_ for at, fee_ in fees.items() if at <= plan)
+            fees = {**{at: fee_ if at < plan else max(fee_, jump) for at, fee_ in fees.items()}, plan: max(before, jump)}
+        steps, shown = [], None
+        for at, fee_ in sorted(fees.items()):
+            cents = max(1, int(fee_ + 0.5))
+            if cents != shown:
+                steps.append({"at": at, "feeCents": cents})
+                shown = cents
+        return steps
+
+    def reopen(self, gig_id: str) -> None:
+        """A dropped gig is open again with its old schedule, which shows its top fee by then. Drivers are notified
+        of it again and book it fast at any fee, so its fees start again near the opening fee."""
+        action = self.posts.get(gig_id)
+        order = self.orders.get(action["stops"][0]["orderId"]) if action else None
+        # After the deadline warning, the world sends the warning again and the steep fees start again.
+        if order is not None and order["id"] not in self.urgent and gig_id in self.gigs_of(order["id"]):
+            self.outbox.append({"type": "reprice", "gigId": gig_id, "schedule": self.fees_for(order, pickups(action), self.params()["drop_fee"])})
 
     def win(self, order) -> None:
         self.won_at.setdefault(order["id"], self.now)
@@ -206,6 +275,8 @@ class Policy(Desk):
                     self.today = (day, [])
                 self.today[1].append((log_odds, event["kind"] == "order_won"))
         super().handle(event)
+        if event["kind"] == "gig_dropped" and self.p["drop_fee"]:
+            self.reopen(event["gigId"])
 
     def delivered(self, order_id: str, leg: int, at: int) -> None:
         super().delivered(order_id, leg, at)
@@ -223,6 +294,13 @@ class Policy(Desk):
                 self.refused.append({"at": self.now, "action": action, "reason": result["reason"]})
 
 
+def lane(request) -> str:
+    """The key of a one-car request in LANES: its pickup place, its delivery place, and whether an address is private."""
+    leg = request["legs"][0]
+    private = leg["pickup"]["privateAddress"] or leg["delivery"]["privateAddress"]
+    return f"{leg['pickup']['placeId']}>{leg['delivery']['placeId']}{' private' if private else ''}"
+
+
 def share(request_id: str) -> float:
     """A number from 0 to 1 that is fixed for a request id, so a variant makes the same choice on every run."""
     return int.from_bytes(hashlib.sha256(request_id.encode()).digest()[:8], "big") / 2**64
@@ -233,4 +311,6 @@ def fingerprint(params: dict) -> str:
     source = inspect.getsource(sys.modules[__name__])
     if params.get("curve"):  # the curve's code and weights count only for the variants that price by it
         source += inspect.getsource(curve) + json.dumps(curve.MODEL, sort_keys=True)
+    if params.get("lane_fee"):
+        source += json.dumps(LANES, sort_keys=True)
     return hashlib.sha256((source + json.dumps({**DEFAULTS, **params}, sort_keys=True)).encode()).hexdigest()[:12]

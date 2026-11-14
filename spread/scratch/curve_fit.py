@@ -77,7 +77,8 @@ if "--write" in sys.argv:  # the weights that spreadlab/curve.py reads
     weights = {n: round(float(c), 4) for n, c in zip(names, model.coef_[0])}
     part = lambda prefix: {n[len(prefix):]: w for n, w in sorted(weights.items()) if n.startswith(prefix)}
     target = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "spreadlab", "curve.json")
-    json.dump({"weeks": len(seeds), "quotes": len(rows), "intercept": round(float(model.intercept_[0]), 4), "slope": -weights["x"], "trust": weights["trust"],
+    kept = {k: v for k, v in json.load(open(target)).items() if k in ("cost", "late")} if os.path.exists(target) else {}  # written by cost_fit.py
+    json.dump({**kept, "weeks": len(seeds), "quotes": len(rows), "intercept": round(float(model.intercept_[0]), 4), "slope": -weights["x"], "trust": weights["trust"],
                "feelist": weights["feelist"], "kinds": part("kinds="), "from": part("from="), "to": part("to=")}, open(target, "w"), indent=1)
     print("wrote", os.path.normpath(target))
 

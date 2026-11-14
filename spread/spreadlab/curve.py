@@ -32,6 +32,26 @@ def at_list(request: dict, options: list[dict], on_time: int) -> float:
             + MODEL["from"].get(leg["pickup"]["placeId"], 0.0) + MODEL["to"].get(leg["delivery"]["placeId"], 0.0))
 
 
+def known(request: dict, options: list[dict], notified: int, unbooked: int) -> list[float]:
+    """What the desk knows at a quote about how the order will go, in the order of the weights `cost` and `late`
+    (scratch/cost_fit.py): the typical fee beyond 150 euros in hundreds of euros (long lanes), how few drivers are
+    notified of the pickup, a dealer's note, the same_day option, and the won cars without a driver."""
+    return [max(0.0, request["referenceFeeCents"] / 100 - 150) / 100, 1 / (1 + notified), float(request["note"] is not None),
+            float(fastest(options)["kind"] == "same_day"), min(unbooked, 15) / 10]
+
+
+def cost(known_: list[float]) -> float:
+    """What the order costs, as a multiple of its typical fee: fees, failed visits, waiting and late refunds."""
+    weights = MODEL["cost"]
+    return weights["intercept"] + sum(w * v for w, v in zip(weights["weights"], known_))
+
+
+def late(known_: list[float]) -> float:
+    """The chance that the order arrives late."""
+    weights = MODEL["late"]
+    return 1 / (1 + math.exp(-(weights["intercept"] + sum(w * v for w, v in zip(weights["weights"], known_)))))
+
+
 def chance(log_odds_at_list: float, multiple: float, shift: float = 0.0) -> float:
     """The chance that the dealer buys at this multiple of the list price. A shift of 0.1 means that the dealer accepts
     prices about 10% higher than the curve says."""

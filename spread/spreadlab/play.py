@@ -14,7 +14,7 @@ import json
 import time
 from pathlib import Path
 
-from spread.starter import DAY, WAKE_ON
+from spread.starter import DAY
 
 from .policy import Policy, fingerprint
 from .server import PracticeClient, data_dir, read_json_gz, world_map, write_json_gz
@@ -64,7 +64,7 @@ def play(variant: str, params: dict, seed: str, level: int = 8) -> dict:
         while desk.now < ends_at:
             # One request a step, as the starter does: the advance applies the outbox, then moves the clock.
             actions, desk.outbox = desk.outbox, []
-            step = world.advance(until=WAKE_ON, max=min(ends_at, (desk.now // DAY + 1) * DAY), actions=actions)
+            step = world.advance(until=desk.wake_on, max=min(ends_at, (desk.now // DAY + 1) * DAY), actions=actions)
             desk.read_results(actions, step["results"])
             desk.now = step["now"]
             for event in step["events"]:

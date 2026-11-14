@@ -86,10 +86,17 @@ Level 8, mean margin a week in euros on the first 10 seeds of each list. Every w
 | `curve` | the win curve sets the price (see "The win curve") | 5,490 | 4,627 | 93.1% |
 | `curve-live` | the day's answers correct the curve | 6,487 | 5,609 | 92.2% |
 | `curve-live-surcharge` | each won car without a driver adds 0.04 x the typical fee to the order's cost | 7,032 | 6,359 | 95.0% |
+| `curve-fee-1.0-cost-1.3` | gigs open at the typical fee, not 1.2 x it, and an order is taken to cost 1.3 x it, not 1.4 | 10,009 | 8,933 | 94.2% |
+| `fee-cap-1.2-drop-cost-1.3` | the fee rises to 1.2 x the typical fee and holds, and starts again after a drop (see "Driver fees") | 10,263 | 9,245 | 93.3% |
 
-`curve-live-surcharge` is the reference for new ideas. On 20 seeds that no list holds (`fresh-001` to
-`fresh-020`, every week ranked) it makes 5,816 against 3,978 for `gate-10`: 1,838 more (95% interval
-1,355 to 2,359), better in 19 weeks of 20, lowest week 93.0% on time. Its three numbers are not
+`fee-cap-1.2-drop-cost-1.3` is the reference for new ideas. On 20 seeds that no list holds
+(`fresh-001` to `fresh-020`, every week ranked) it makes 9,053 against 5,816 for
+`curve-live-surcharge`: 3,237 more (95% interval 2,734 to 3,746), better in 20 weeks of 20. Its
+lowest fresh week is 91.3% on time, in a world with 644 drivers, against 93.0% for
+`curve-live-surcharge`: the lower fee buys margin with part of the distance to the 90% rule.
+
+`curve-live-surcharge` makes 5,816 on the fresh seeds against 3,978 for `gate-10`: 1,838 more (95%
+interval 1,355 to 2,359), better in 19 weeks of 20, lowest week 93.0% on time. Its three numbers are not
 sensitive on the tuning seeds: a cost of 1.3 or 1.4, a day's correction of 0.10 to 0.25, a backlog
 step of 0.04 or 0.08, and the gate at 10, 15 or off all land within 350 of each other, inside the
 noise of 10 weeks. `floor-1.7-all` shows why `gate-10` needs its gate: without it, one tight week
@@ -108,6 +115,56 @@ Tried against `gate-10` and not kept, as the difference in mean margin (95% inte
 
 The curve does what the last two rows try by hand, and measures it: the count of orders on time is
 one of its terms, and the day's correction finds a cheap Monday or a price-war day from the answers.
+
+## Driver fees
+
+The kit's starter opens a gig at a multiple of the request's typical fee and raises it 10% of that
+an hour, to 1.5 times. The policy opened at 1.2 x until `curve-live-surcharge`. What the weeks show:
+
+- **Drivers book in the first minutes or wait for their planning hours.** In a gig's first 15
+  minutes, 10%, 19%, 26%, 29% and 31% of the drivers who look at it book it at 0.9, 1.0, 1.1, 1.2
+  and 1.3 x the typical fee. After that 2 to 7% book, at any fee up to 2 x.
+- **Opening at the typical fee is worth about 2,000 a week, and pricing for it 1,000 more.** On the
+  tuning seeds, fees paid fall from 1.30 to 1.09 x the typical fee, and 80% of orders are still
+  booked within an hour of the win, against 88%. With the lower cost in the quote the desk wins
+  more orders.
+- **Lower than that loses the week.** At 0.9 x, 65% are booked within the hour and one holdout week
+  is not ranked; at 0.8 x, 40%, and one tuning week is not ranked.
+- **Rises after the first hour buy little.** A fee that rises a tenth of the typical fee an hour to
+  1.2 x it and then holds (`fee_cap`) pays 0.05 x less with the same bookings in the first hour. No
+  rise at all is too little: one tuning week is not ranked.
+- **A dropped gig keeps its old fees,** which are at their top by then, though drivers are notified
+  again and book it fast. `drop_fee` starts its fees again at 1.1 x the opening fee.
+
+Mean margin a week against `curve-fee-1.0-cost-1.2` (opening 1.0, cost 1.2: 10,057 on tune, 8,709
+on holdout), with the 95% interval, the lowest week on time, and fees paid over typical fees:
+
+| Variant | What it changes | Tune | Holdout | Fees paid |
+| --- | --- | --- | --- | --- |
+| `curve-fee-0.9-cost-1.2` | opens at 0.9 x | +455 (-115 to 1,022), 93.2% | +481, one week not ranked | 1.03 |
+| `curve-fee-1.0-cost-1.3` | cost 1.3 | -48 (-567 to 525), 94.6% | +223 (-394 to 787), 94.2% | 1.10 |
+| `fee-drop` | fees start again after a drop | +64 (-45 to 167), 92.6% | not played | 1.11 |
+| `fee-cap-1.2` | rises to 1.2 x and holds | +330 (-28 to 682), 93.0% | +595 (39 to 1,152), 93.0% | 1.07 |
+| `fee-cap-1.2-drop` | both | +420 (187 to 623), 93.0% | +570 (148 to 982), 92.6% | 1.06 |
+| `fee-cap-1.2-drop-cost-1.3` | both, cost 1.3 | +206 (-333 to 728), 93.3% | +535 (-28 to 1,148), 94.1% | 1.05 |
+| `fee-flat` | no rise | -280 (-1,001 to 351), one week not ranked | not played | 1.04 |
+| `fee-cap-1.2-jump`, `fee-flat-jump` | one step to 1.5 x at 04:30 or 16:00, when drivers plan | -23, +104 | -396 (-971 to 117) for the second | 1.08, 1.07 |
+| `fee-lane`, `fee-lane-1.05` | the lane's usual fee as the base (`lanes.json`, from 200 scans) | +254 (-114 to 674), -1,136 | +193 (-230 to 618) for the first | 1.10, 1.15 |
+
+On the fresh seeds, cost 1.2 has a week at 88.9% (`curve-fee-1.0-cost-1.2`) and the capped fees
+with cost 1.2 one at 91.1%; with cost 1.3 the lowest is 91.3%. So the reference takes cost 1.3: it
+wins about 25 orders a week fewer and leaves fewer cars without a driver in a tight week.
+
+```bash
+PYTHONPATH=. uv run python scratch/fee_report.py --variants curve-live-surcharge,fee-cap-1.2-drop-cost-1.3  # fees paid, bookings in the first hour, warnings, late orders
+PYTHONPATH=. uv run python scratch/driver_views.py --variants curve-fee-0.9,curve-fee-1.0,curve-live-surcharge  # who books at which fee, by minutes open
+PYTHONPATH=. uv run python scratch/lane_fit.py --write                                                       # the lanes' usual fees
+```
+
+Private addresses (`curve-private`, +246 on tune at the old fees; -38 with opening 1.0, lowest week
+92.0%), a cost that follows the order (`curve-order-cost`, +193, -16 to 411) and counting what an
+order on time is worth in the dealer's later prices (`curve-trust-0.3`, -126; `curve-trust-1`,
+-1,655) were tried on `curve-live-surcharge` and not kept.
 
 ## The win curve
 
