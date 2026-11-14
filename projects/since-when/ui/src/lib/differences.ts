@@ -120,7 +120,7 @@ function headline(primary: Finding, title: string): { who: string; what: string 
 	const clause = first && clauses(primary.summary)?.[byName(first)]
 	if (clause) return { who: first, what: clause }
 	const cut = title
-		.split(/[:;]|,? (?:while|whereas|but) /)[0]
+		.split(/[:;]|,? (?:while|whereas|but|contradicting) /)[0]
 		.replace(/\.$/, '')
 		.trim()
 	const m = /^((?:Finnish|Swedish|English)(?:(?:,| and) (?:Finnish|Swedish|English))*) Wikipedia(?:'s first sentence)? (.+)$/.exec(cut)
