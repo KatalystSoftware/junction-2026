@@ -237,15 +237,32 @@ def material(problems: list[dict], facts: notes.Facts, request: dict, deadline: 
 tag = functools.lru_cache(maxsize=50_000)(notes.tag)  # notes have few distinct words, and each tag is a search through the rules' word lists
 
 
-def about_pickup(text: str, minute: int) -> bool:
-    """Whether the note states this clock time in a sentence that the rules take to be about the pickup: one without
-    a word for the delivery or for a site that closes. A model calls "the customer collects at 12, the car must be
-    there by then" a ready time; moving the pickup there would make the car late."""
+CUSTOMER = re.compile(r"asiaka|asiakk|customer|client|kund")  # "the customer collects at 12": a time at the delivery
+
+
+def about_pickup(text: str, minute: int, arrived_at: int) -> bool:
+    """Whether the note states this time in a clause about the pickup, on a day that the note names. A clause is about
+    the pickup when it has no word for the delivery, a site that closes or the customer: a model calls "the customer
+    collects at 12, the car must be there by then" a ready time. The day can come from a correction elsewhere in the
+    note ("eikun ylihuomenna"); a model has read "huomenna" as the day after tomorrow."""
     text = notes.SHORT.sub(r"\1 ", notes.RANGE.sub(" ", text.lower()))
-    for sentence in notes.SENTENCE.split(text):
-        tokens = notes.TOKEN.findall(sentence)
+    arrived_day = arrived_at // DAY % 7
+    days = set()  # the days that the note names, counted from the request's arrival
+    for token in notes.TOKEN.findall(text):
+        word, named = tag(token), notes.weekday(token)
+        if word in ("today", "tomorrow", "overmorrow"):
+            days.add(("today", "tomorrow", "overmorrow").index(word))
+        elif named is not None:
+            days.add((named - arrived_day - 2) % 7 + 2)
+    offset = minute // DAY - arrived_at // DAY
+    if offset not in days and (days or offset != 0):
+        return False
+    for clause in re.split(r",|\s[-–]\s", " ".join(notes.SENTENCE.split(text))):
+        tokens = notes.TOKEN.findall(clause)
         tags = {tag(token) for token in tokens}
-        if "there" not in tags and "closed" not in tags and any(t.minute == minute % DAY for t in notes.times(tokens, 0)):
+        if "there" in tags or "closed" in tags or CUSTOMER.search(clause):
+            continue
+        if any(t.minute == minute % DAY for t in notes.times(tokens, arrived_day)):
             return True
     return False
 
@@ -265,7 +282,7 @@ def safe_fix(problems: list[dict], facts: notes.Facts, request: dict) -> dict:
     for problem in problems:
         if problem["fact"] == "ready":
             at = when(problem.get("day"), problem.get("time"), request["arrivedAt"])
-            if at is not None and at > start and about_pickup(text, at):
+            if at is not None and at > start and about_pickup(text, at, request["arrivedAt"]):
                 fix["pickupFrom"] = max(fix.get("pickupFrom", 0), at)
         elif problem["fact"] == "no_plates" and problem.get("value") is True and not facts.plates and ABOUT_PLATES.search(text):
             fix["plates"] = True

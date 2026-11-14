@@ -23,6 +23,8 @@ def test_a_fix_adds_plates_and_a_manual_licence_and_moves_the_pickup_later_never
     # A weekday name is that weekday 2 to 6 days after the request (RULES.md): "tue" on a Monday is the Tuesday after next.
     later = [{"fact": "ready", "day": "tue", "time": "09:00"}, {"fact": "manual", "value": True}, {"fact": "deadline", "day": "wed", "time": "16:00"}]
     assert watch.safe_fix(later, rules, asked) == {"pickupFrom": 8 * DAY + 9 * HOUR, "manual": True}
+    # On a day that the note does not name, it is no ready time either.
+    assert watch.safe_fix([{"fact": "ready", "day": "thu", "time": "09:00"}], rules, asked) == {}
     # A time that the note gives for the delivery is no ready time, whatever the model says.
     delivery = [{"fact": "ready", "day": "wed", "time": "16:00"}]
     assert watch.safe_fix(delivery, rules, asked) == {}
