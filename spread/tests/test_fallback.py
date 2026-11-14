@@ -29,21 +29,30 @@ def vet(text: str, actions: list[dict], deadline: int = 2 * DAY + 17 * HOUR):
 
 
 def test_an_action_acts_only_with_the_notes_own_words_for_it_and_only_when_it_makes_the_post_stricter():
-    text = "Drop-off point stops taking vehicles at 15 on weekdays. Summer tyres on. Customer waits, there by Tuesday 12."
+    text = "Drop-off point stops taking vehicles at 15 on weekdays. Kesäkiekot alla vielä. Customer waits, there by Tuesday 12."
     kept, dropped = vet(text, [{"action": "delivery_hours", "closes": "15:00", "cite": "stops taking vehicles at 15"},
-                               {"action": "summer_tyres", "cite": "summer tyres on"},
-                               {"action": "plates", "cite": "Summer tyres on"},  # cited, but no word about plates
+                               {"action": "summer_tyres", "cite": "kesäkiekot alla vielä"},  # wording that notes.summer_tyres does not read
+                               {"action": "plates", "cite": "Kesäkiekot alla"},  # cited, but no word about plates
                                {"action": "manual", "cite": "it is a stick shift"},  # not in the note
                                {"action": "urgent", "cite": "Customer waits"}])  # no word for haste
     assert kept == ["delivery_hours", "summer_tyres"]
     assert dropped == {"plates": "cite lacks the word", "manual": "uncited", "urgent": "cite lacks the word"}
+    # Tyres that travel in the car are not tyres on it, and summer tyres that the rules read need no action.
+    assert vet("Kesäkiekot tavaratilassa, kulkee mukana.", [{"action": "summer_tyres", "cite": "Kesäkiekot tavaratilassa"}])[1] == \
+        {"summer_tyres": "tyres carried, not on the car"}
+    assert vet("Lisäksi 4 kesäkiekkoa tavratilassa.", [{"action": "summer_tyres", "cite": "4 kesäkiekkoa"}])[1] == \
+        {"summer_tyres": "tyres carried, not on the car"}, "the boot is read in the cite's clause, with a typo"
+    assert vet("Still on summer tyres.", [{"action": "summer_tyres", "cite": "summer tyres"}])[1] == {"summer_tyres": "the rules have it"}
+    # Hours in a clause that names the other site are that site's.
+    assert vet("Nouto arkisin klo 15 asti.", [{"action": "delivery_hours", "closes": "15:00", "cite": "Nouto arkisin klo 15 asti"}])[1] == \
+        {"delivery_hours": "hours of the other site"}
     # A time that the cited words do not carry, or that opens the site later than it closes, or a deadline after the order's.
     _, dropped = vet(text, [{"action": "delivery_hours", "closes": "13:00", "cite": "stops taking vehicles at 15"},
                             {"action": "pickup_hours", "opens": "19:00", "cite": "stops taking vehicles at 15"}])
     assert set(dropped) == {"delivery_hours", "pickup_hours"}
     _, dropped = vet(text, [{"action": "deadline", "day": "tue", "time": "12:00", "cite": "there by Tuesday 12"}], deadline=7 * DAY + 10 * HOUR)
     assert dropped == {"deadline": "not earlier than the deadline"}  # "tue" on a Monday is the Tuesday after next: 8 days on
-    kept, _ = vet(text, [{"action": "keep"}, {"action": "summer_tyres", "cite": "Summer tyres"}])
+    kept, _ = vet(text, [{"action": "keep"}, {"action": "summer_tyres", "cite": "Kesäkiekot alla"}])
     assert kept == ["summer_tyres"], "keep is dropped beside another action"
     assert fallback.parse('Sure: {"actions": [{"action": "summer_tyres", "cite": "x"}, {"action": "cancel_order"}]}') == [{"action": "summer_tyres", "cite": "x"}]
     assert fallback.parse("I would keep it as it is.") is None
@@ -58,6 +67,17 @@ def test_a_fix_never_loosens_what_the_rules_read():
     kept = [{"action": "deadline", "at": 1900}, {"action": "urgent"}, {"action": "plates"}]
     assert fallback.fix_of(kept) == {"plates": True}
     assert fallback.fix_of(kept, fallback.RISKY) == {"plates": True, "limits": {"deadline": 1900}, "fee": fallback.FEE_STEP}
+
+
+def test_a_field_asks_the_model_only_while_the_rules_miss_it_often(monkeypatch):
+    def why(text):
+        return fallback.trigger(text, 600, notes.read({"text": text}, 600), notes.limits({"text": text}, 600), {"newWords": [], "newSentences": []})
+    monkeypatch.setattr(fallback, "MISSES", {"deadline": fallback.OFTEN, "summer_tyres": fallback.OFTEN})
+    assert why("call the customer an hour before arrival") == ["deadline or delivery unread"]
+    assert why("Summer tyres in the trunk, go with the car") == ["summer tyres"]
+    monkeypatch.setattr(fallback, "MISSES", {"deadline": fallback.OFTEN - 1, "summer_tyres": 0})  # the rules have healed
+    assert why("call the customer an hour before arrival") == why("Summer tyres in the trunk, go with the car") == []
+    assert fallback.trigger("Summer tyres in the trunk", 600, notes.Facts(), notes.Limits(), {"newWords": ["trunk"], "newSentences": []}) == ["new wording"]
 
 
 def answering(content: str, seconds: float = 0.4, error: str = None):
@@ -78,7 +98,7 @@ def played(desk, text: str):
 
 
 def test_the_desk_posts_with_the_fix_and_quotes_and_posts_as_the_rules_when_the_answer_is_late_or_fails():
-    text = "Drop-off point stops taking vehicles at 15 on weekdays. Summer tyres on."
+    text = "Drop-off point stops taking vehicles at 15 on weekdays. Kesäkiekot alla vielä."
     answer = json.dumps({"actions": [{"action": "delivery_hours", "closes": "15:00", "cite": "stops taking vehicles at 15"}]})
     plain_quote, plain_post = played(policy.Policy(None, 8, 500, PARAMS, ROSTER, MAP), text)
     ask, calls = answering(answer)
@@ -97,8 +117,8 @@ def test_the_desk_posts_with_the_fix_and_quotes_and_posts_as_the_rules_when_the_
 
 
 def test_a_car_on_summer_tyres_is_collected_after_the_snow_forecast_at_its_pickup():
-    text = "Still on summer tyres."
-    answer = json.dumps({"actions": [{"action": "summer_tyres", "cite": "summer tyres"}]})
+    text = "Kesäkiekot alla vielä."
+    answer = json.dumps({"actions": [{"action": "summer_tyres", "cite": "Kesäkiekot alla"}]})
     desk = fallback.ActionDesk(None, 8, 500, {**PARAMS, "note_actions": 1}, ROSTER, MAP, ask=answering(answer)[0])
     desk.forecasts.append({"from": 500, "to": DAY + 6 * HOUR, "placeIds": ["vantaa"]})
     _, post = played(desk, text)

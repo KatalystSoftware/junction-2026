@@ -6,12 +6,12 @@ results on the three hero topics (Lapua Movement `Q1412941`, Finnish War `Q73626
 `Q2457646`), against the hand judgements of [`hero-findings-notes.md`](hero-findings-notes.md).
 `M=~/junction2026-data/mariadb`; commands run from `projects/since-when/`.
 
+The judge is **Nemotron 3.5 Super VL** on the Verda container unless a table says otherwise. Claude
+Haiku 5.5 and Nemotron 3.5 Lightning judged the same claims as comparisons. `checked_finding` in
+the scratch database holds the Super VL run of the current pairs.
+
 Gemini Decision as the judge, measured on the same labels:
 [`hero-verify-gemini-decision.md`](hero-verify-gemini-decision.md).
-
-**Pending:** the tables judged by Nemotron 3.5 Super VL. That run is in progress on the Verda
-container. Until it is in, the tables below are judged by Claude Haiku 5.5 and Nemotron 3.5
-Lightning, and `checked_finding` in the scratch database holds the Haiku-judged run.
 
 ## The labels
 
@@ -35,111 +35,151 @@ of its quotes, against other evidence or under another type) or `gone`.
 ## Before and after, on the 75 labelled rows
 
 Before is the first full run as it was: every row present. The claim check ran on the labelled
-rows' own claims, without the figures the check lists itself.
+rows' own claims (`$M/classify/verify/labelled-<judge>/`), without the figures the check lists
+itself.
 
 | Type | Judge | False rows: gone / moved / kept | Real rows: kept / moved / gone | Unclear rows: kept / moved / gone |
 | --- | --- | --- | --- | --- |
 | missing fact | before | 5: 0 / 0 / 5 | 10: 10 / 0 / 0 | 9: 9 / 0 / 0 |
+| | **Nemotron 3.5 Super VL** | 5: 2 / 1 / 2 | 10: 9 / 1 / 0 | 9: 5 / 1 / 3 |
 | | Haiku 5.5 | 5: 3 / 1 / 1 | 10: 9 / 1 / 0 | 9: 4 / 2 / 3 |
-| | Nemotron 3.5 Lightning | 5: 4 / 0 / 1 | 10: 9 / 1 / 0 | 9: 5 / 0 / 4 |
-| | Nemotron 3.5 Super VL | pending | | |
+| | Nemotron 3.5 Lightning | 5: 3 / 1 / 1 | 10: 9 / 1 / 0 | 9: 5 / 0 / 4 |
 | numbers | before | 11: 0 / 0 / 11 | 9: 9 / 0 / 0 | 3: 3 / 0 / 0 |
+| | **Nemotron 3.5 Super VL** | 11: 9 / 1 / 1 | 9: 9 / 0 / 0 | 3: 2 / 0 / 1 |
 | | Haiku 5.5 | 11: 9 / 1 / 1 | 9: 8 / 1 / 0 | 3: 1 / 0 / 2 |
-| | Nemotron 3.5 Lightning | 11: 9 / 1 / 1 | 9: 5 / 1 / 3 | 3: 2 / 0 / 1 |
-| | Nemotron 3.5 Super VL | pending | | |
+| | Nemotron 3.5 Lightning | 11: 9 / 1 / 1 | 9: 6 / 1 / 2 | 3: 2 / 0 / 1 |
 | contradiction | before | 2: 0 / 0 / 2 | none labelled real | 5: 5 / 0 / 0 |
+| | **Nemotron 3.5 Super VL** | 2: 1 / 1 / 0 | | 5: 1 / 0 / 4 |
 | | Haiku 5.5 | 2: 1 / 1 / 0 | | 5: 2 / 0 / 3 |
 | | Nemotron 3.5 Lightning | 2: 2 / 0 / 0 | | 5: 2 / 0 / 3 |
-| | Nemotron 3.5 Super VL | pending | | |
 | framing | before and after | 5: 0 / 0 / 5 | 14: 14 / 0 / 0 | 2: 2 / 0 / 0 |
 
-Framing is not checked, so its five false rows stay.
+Framing is not checked, so its five false rows stay. Lightning loses two real numbers rows (102 or
+about 50 leaders; 1 000 or 1,100 men): it finds the right sentence and calls the claim not
+mentioned.
 
-What the moved rows are (Haiku):
+What the moved rows are, with Super VL:
 
 - The false missing fact "the Finnish dates of the diet are missing in English" became a numbers
   row, 22 March in Finnish against 25 March in English: English has the dates, and they differ.
 - The real missing fact "banned on 21 November 1932, missing in Finnish" became a numbers row
-  against the Finnish sentence that dates the dissolution to 24 March and 28 May: the same
-  difference, now as two dates. The labelled numbers row on the same ban moved to that sentence.
+  against the Finnish sentence that dates the ban to 29 February: the same difference, as two
+  dates.
 - The false numbers row "11 000 under Moore against a hypothetical 10,000" became 11 000 against
   the English sentence that gives 14,000: the difference the notes said the tool should show.
 - The false contradiction "the landing at Vaasa against another landing" became the numbers row
   1 000 against 1,100 men landed at Vaasa, which the notes list as real.
+- The unclear missing fact "an assembly of some two thousand, missing in Finnish" became a
+  numbers row against the Finnish "up to 3 000".
 
-What stays wrong on the labels, with both judges: the Swedish retreat "at 40 degrees below" is
-kept as missing in Finnish (the sentence holds three facts and only the temperature is in
-Finnish), and "five years against three years" is kept as a numbers row (a law's term against the
-term one party would accept).
+What stays wrong on the labels with Super VL: two false missing facts are kept (the general strike
+of November 1929, and the retreat "at 40 degrees below": each sentence holds several facts, one of
+them is in the other edition, and the verdict is not mentioned), and "five years against three
+years" is kept as a numbers row (a law's term against the term one party would accept; the judge
+calls it contradicted from both sides).
 
-Lightning loses three real numbers rows (102 or about 50 leaders; 22 or 25 March; 1 000 or 1,100
-men): it finds the right sentence and calls the claim not mentioned.
+## The full run on the current pairs, judged by Super VL
 
-## The full run, judged by Haiku 5.5, and a hand check of rows the labels do not cover
+`$M/classify/verify/current-super/`: the 125 pairs and 735 rows the scratch database holds, with
+the figures the check lists itself. 1,569 claims (746 from the classifier's rows, 823 figures and
+dates from 112 passages): 1,057 not mentioned, 366 supported, 146 contradicted. The statements
+behind 126 contradicted claims were looked up back, and 91 held from both sides. Of 410 verdicts
+with two readable figures, the arithmetic overruled the judge in 15.
 
-`$M/classify/verify/run1-haiku/`: the first run's 127 pairs and 721 rows, with the figures the
-check lists itself. 1,508 claims (730 from the classifier's rows, 778 figures and dates from 112
-passages): 958 not mentioned, 421 supported, 129 contradicted. The statements behind 110 of the
-contradicted ones were looked up back, and 77 held from both sides.
-
-| | Before | After |
-| --- | --- | --- |
-| missing fact | 670 | 414; 228 set aside as stated elsewhere, the rest became numbers or contradiction rows or repeat one |
-| numbers | 23 | 31 (22 from classifier rows, of which most were missing facts; 9 from figures the check listed) |
-| contradiction | 7 | 5 |
-| framing | 21 | 21 |
+| | Before | After, Super VL | After, Haiku 5.5 |
+| --- | --- | --- | --- |
+| missing fact | 688 | 493; 165 set aside as stated elsewhere, 13 became numbers or contradiction rows, the rest repeat one | 435; 224 set aside |
+| numbers | 23 | 30: 13 of the classifier's, 10 that were missing facts, 7 from figures the check listed | 31 |
+| contradiction | 6 | 6: 3 of the classifier's, 3 that were missing facts | 5 |
+| framing | 18 | 18 | 18 |
 
 Hand check, as the notes did it: every numbers and contradiction row read against both articles,
-a seeded sample of 24 kept missing facts and 20 set-aside ones searched in the whole other
-article (`python3 demo/hero_sample.py`, seed 5). This check was made on the output before repeats
-were merged, which had 33 numbers rows.
+and a seeded sample of 24 kept missing facts and 20 set-aside ones searched in the whole other
+article (`python3 demo/hero_sample.py`, seed 5).
 
 | | Rows | Real or plausible | False | Unclear or partly there |
 | --- | --- | --- | --- | --- |
 | numbers, before (the notes) | 23 | 9 | 11 | 3 |
-| numbers, after | 33 | 25 | 5 | 3 |
+| numbers, after, Super VL | 30 | 23 | 4 | 3 |
+| numbers, after, Haiku 5.5 (first run's pairs) | 33 | 25 | 5 | 3 |
 | contradiction, before (the notes) | 7 | 0 | 2 | 5 |
-| contradiction, after | 5 | 2 | 1 | 2 |
+| contradiction, after, Super VL | 6 | 2 | 1 | 3 |
+| contradiction, after, Haiku 5.5 | 5 | 2 | 1 | 2 |
 | missing fact kept, before (the notes' sample) | 24 | 10 | 5 | 9 |
-| missing fact kept, after (sample) | 24 | 17 | 1 | 6 |
-| missing fact set aside (sample): was it right to set it aside? | 20 | 18 right | 0 wrong | 2 partly |
+| missing fact kept, after, Super VL (sample) | 24 | 16 | 3 | 5 |
+| missing fact kept, after, Haiku 5.5 (sample) | 24 | 17 | 1 | 6 |
+| missing fact set aside, Super VL (sample): was it right to set it aside? | 20 | 19 right | 0 wrong | 1 partly |
+| missing fact set aside, Haiku 5.5 (sample) | 20 | 18 right | 0 wrong | 2 partly |
 
-New numbers findings the old flow did not have: 7 700 or 11,000 men under Kamensky at Kuortane;
-Klingspor took command on 1 or 2 March; Turku fell on 21 or 22 March; the diet closed on 18 or 19
-July; the first Lapua assembly had "some two thousand" or "up to 3 000" people.
+The Haiku hand check was made on the first run's pairs, before repeats were merged.
+
+Numbers findings the old flow did not have, with Super VL: 7 700 or 11,000 men under Kamensky at
+Kuortane; Klingspor took command on 1 or 2 March (Finnish and Swedish against English); Turku
+fell on 21 or 22 March; the diet closed on 18 or 19 July; Gotland was taken with 1 600 or about
+1 800 men; the first Lapua assembly had "some two thousand" or "up to 3 000" people; Moore's
+force of 11 000 or 14 000, now against the right English and Swedish sentences. A new
+contradiction: Finnish says Russia had no intention of annexing Finland before the war, Swedish
+that the war was planned to incorporate it.
 
 ## What is still wrong
 
-- **Two steps of one course of events set against each other** (4 of the 5 false numbers rows):
-  the Russians reached Revolax on 24 April and the battle was on the 27th; a decision to attack
-  and the battle four days later; a landing on 14 May and the island retaken on the 16th; the
-  diet sitting from 25 March and its invitation of 1 February. The judge calls these
-  contradictions from both sides. The prompt names the pattern and Haiku does not hold to it.
+- **Two steps of one course of events set against each other** (2 of Super VL's 4 false numbers
+  rows): a government that resigned on 2 July and its successor of 4 July; a landing on 14 May
+  and the island retaken on the 16th. The prompt names the pattern; the judge calls these
+  contradicted from both sides.
+- **The same statement in two languages called a contradiction**: "before the end of the 1800s"
+  against "before the late 19th century". One row, from a figure the check listed.
+- **A term against a term**: the law limited to five years against the three years one party
+  would accept.
 - **One man under two forms of his name** ("Ernst" and "Eberhard" von Vegesack) is still a
-  contradiction, now between Finnish and Swedish.
-- **A sentence with several facts** is one claim. If one of its facts is in the other edition and
-  another is not, the verdict is not mentioned and the row is kept; six of the 24 sampled kept
-  rows are "partly there" for this reason.
+  contradiction.
+- **A sentence with several facts is one claim.** If one of its facts is in the other edition and
+  another is not, the verdict is not mentioned and the row is kept: 5 of the 24 sampled kept rows
+  are "partly there", and 2 of the 3 false ones are of this kind (the Grand Duchy "until 1917";
+  Moore's army with its 62 transports).
+- **The fact is in the passage next to the one the search returned.** English says the movement
+  began with the attack on a communist youth parade in November 1929; the Finnish section on that
+  event is two passages, the search returned the first and the attack is in the second. One of
+  the 24.
 - **Real disagreements of account are lost**: of the five contradictions the notes left "for a
-  human", two survive. The other three (who attacked at Siikajoki; Sandels at Toivala until
-  October; who averted the threat to Stockholm) are not contradicted claim by claim, because each
-  edition tells another part of the story.
+  human", one survives on the labelled rows (who won at Pyhäjoki). In the full run the military
+  establishment at Porvoo survives too, and Sandels at Toivala "until October" against a retreat
+  after 26 September comes back as a numbers row. Who attacked at Siikajoki and who averted the
+  threat to Stockholm are lost: they are not contradicted claim by claim, because each edition
+  tells another part of the story. The verdict on such a row also changes with the other claims
+  judged in the same call.
 - **Framing is unchecked.** Its five false rows ("kapina" against "coup d'état", where the Finnish
   introduction says "vallankaappausyritys") need the same lookup for a word, not a claim.
-- **The judge matters.** Lightning loses a third of the real numbers rows. Whether Super VL does
-  better is the pending measurement.
-- **Not measured:** the older labels in `differences/eval/` (46 pairs). The sentences of their 16
-  topics are embedded in the database, but the classifier's rows for those pairs are in no cache
-  here, and the Nemotron endpoints were too slow on the day to make them.
+- **Super VL sets aside fewer missing facts than Haiku** (165 against 224) and keeps more false
+  ones in the sample (3 against 1 of 24). It asks for the whole sentence to be stated.
+
+## The older labels in `differences/eval/`
+
+The 46 lead pairs of 16 topics, labelled by type per pair. The classifier (prompt version 6)
+ran on them again with Super VL on the Verda container, 331 rows
+(`$M/classify/verify/eval/rows.jsonl`); `python -m differences.evaluate_rows` scores rows on
+disk, precision / recall:
+
+| | missing fact | contradiction (1 labelled) | framing | numbers |
+| --- | --- | --- | --- | --- |
+| classifier rows, before the check | 0.98 / 1.00 | 0.33 / 1.00 | 0.76 / 0.86 | 0.92 / 1.00 |
+| after the check | pending | | | |
+
+**Pending:** the check of those rows (`$M/classify/verify/eval-super/`, 850 claims against the 16
+topics' articles as of 13 November, whose sentences are embedded) had judged 824 claims when this
+was written and was waiting on the container for the rest. `sh demo/hero-verify.sh eval-super
+differences/eval/pairs.jsonl $M/classify/verify/eval/rows.jsonl --extract` finishes it from the
+cache, and `python -m differences.evaluate_rows $M/classify/verify/eval-super/differences.jsonl`
+gives the second row. Framing cannot change: the check does not touch it.
 
 ## Design choices
 
 - **A missing fact that the other edition states elsewhere is set aside, not turned into a weaker
-  "placed elsewhere" finding.** A third of the missing facts are of this kind; as findings they
-  would crowd the page with differences of structure, which the coverage findings already show.
-  They are kept with the passage that states the fact (`set-aside.jsonl`, and `checked_finding`
-  with `outcome = 'set_aside'`), so the page can say how many were dropped and show where the
-  fact is.
+  "placed elsewhere" finding.** A quarter to a third of the missing facts are of this kind; as
+  findings they would crowd the page with differences of structure, which the coverage findings
+  already show. They are kept with the passage that states the fact (`set-aside.jsonl`, and
+  `checked_finding` with `outcome = 'set_aside'`), so the page can say how many were dropped and
+  show where the fact is.
 - **One engine for both changes.** A claim is looked up in the whole other article and gets one
   verdict; a missing fact is a claim that must come back not mentioned, a numbers or
   contradiction finding is a claim that comes back contradicted. The pair classifier stays as the
@@ -154,16 +194,19 @@ July; the first Lapua assembly had "some two thousand" or "up to 3 000" people.
   written in the document).
 - **Whether two figures agree is computed**, from the figures the judge copies: about 12,000
   against 12,600 differs, over 3,000 against 3,600 agrees, May 1808 against 6 May 1808 agrees.
-- **Claims of one passage are judged six to a call.** A call per claim would be 1,600 calls for
-  the hero topics.
+- **One difference is one row.** A row that repeats a statement and its figure against a second
+  sentence of the other edition is set aside as a repeat.
+- **Claims of one passage are judged six to a call**: about 400 calls for the hero topics instead
+  of 1,600.
 
 ## Models and calls
 
 - NVIDIA Build refused most requests to Nemotron 3.5 Super VL on 14 November (HTTP 429 with
   `Nvcf-Error-Source: upstream_status`: the model's capacity, not the key's limit), and answered
   about three a minute for Lightning.
-- The Verda container (`verda-super`) answers every request, about 5.5 minutes after it is sent
-  when 12 are waiting.
+- The Verda container (`verda-super`) answered every request: about 5.5 minutes after it was sent
+  while the gap finder's run shared it, under a minute later in the day. The full run took 50
+  minutes with 24 workers.
 - Haiku 5.5: the labelled rows take about a minute, the full run twelve, most of it embedding the
   claims.
 - Every answer is cached under `$M/classify/verify/cache/<judge>/`; `sh demo/hero-verify.sh …

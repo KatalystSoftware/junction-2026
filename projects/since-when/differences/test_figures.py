@@ -55,9 +55,17 @@ class Dates(unittest.TestCase):
         self.assertFalse(compatible("1921", "1920"))
 
     def test_two_calendars_agree_when_one_day_matches(self):
-        self.assertEqual(read("12. huhtikuuta (J: 31. maaliskuuta)")[1]["day"], {12, 31})
+        self.assertEqual(read("12. huhtikuuta (J: 31. maaliskuuta)")[1]["days"], {4: {12}, 3: {31}})
         self.assertTrue(compatible("the 2nd/14th day of April", "14 April"))
         self.assertFalse(compatible("the 2nd/14th day of April", "16 April"))
+
+    def test_a_period_is_compared_end_by_end(self):
+        period = "2. huhtikuuta (J: 21. maaliskuuta), ja ne päätettiin 9. elokuuta (J: 28. heinäkuuta) 1920"
+        self.assertEqual(read(period)[1]["days"], {4: {2}, 3: {21}, 8: {9}, 7: {28}})
+        self.assertFalse(compatible(period, "between 5 April and 9 August 1920"))  # the same end, another start
+        self.assertTrue(compatible(period, "between 2 April and 9 August 1920"))
+        self.assertEqual(read("April 2 to August 9, 1920")[1]["days"], {4: {2}, 8: {9}})
+        self.assertFalse(compatible("5 april–9 augusti 1920", "April 2 to August 9, 1920"))
 
 
 if __name__ == "__main__":

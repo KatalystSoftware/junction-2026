@@ -60,6 +60,12 @@ LATE = 0.05  # seconds: a quote that would reach the world later than this befor
 # in world minutes: a driver often books a gig within a minute or two of its post, and a booked gig cannot be withdrawn.
 HOLD_SECONDS, HOLD_MINUTES = 1.5, 5
 POLL, SAVE, SCORE = 1.0, 1.0, HOUR  # seconds between reads of the events that the stream may have missed, between saves; world minutes between scores
+BEAT = 2.0  # seconds between the desk's heartbeats in the log, which alarm.py watches
+FENCE = 5.0  # real seconds: a gig that this desk did not post, posted this long after its books end, is another desk's
+
+
+class Fenced(BaseException):
+    """Another desk plays this world: this one must never act on it again. A BaseException, so that keep_going stops."""
 
 
 def seconds_per_minute(minute: float) -> float:
@@ -222,6 +228,7 @@ class LiveDesk(Policy):
         self.failed: dict[str, dict[int, tuple[str, str, int]]] = {}  # order id -> leg -> its last failed visit: reason, gig, minute
         self.fixes: dict[str, dict] = {}  # order id -> what the note watcher found that the rules missed: pickupFrom, plates, manual
         self.unchecked: set[str] = set()  # won orders whose note the watcher has not answered for
+        self.foreign: set[str] = set()  # gigs in the stream that this desk did not post: another desk may be playing
         self.log = self.guard = self.clock = self.watch = None
         self.held: dict[str, dict] = {}  # order id -> its first post, while it waits for the note watcher: legs, retry, since, at
 
@@ -229,7 +236,7 @@ class LiveDesk(Policy):
         return {k: v for k, v in vars(self).items() if k not in self.RUNTIME}
 
     def __setstate__(self, state: dict) -> None:
-        vars(self).update({"fixes": {}, "unchecked": set(), "forecasts": [], **state})  # books written before the note watcher or the snow forecasts lack them
+        vars(self).update({"fixes": {}, "unchecked": set(), "forecasts": [], "foreign": set(), **state})  # books written before the note watcher, the snow forecasts or the fence lack them
         for k in self.RUNTIME:
             setattr(self, k, None)
 
@@ -248,6 +255,11 @@ class LiveDesk(Policy):
             self.failed.setdefault(event["orderId"], {})[event["leg"]] = (event["reason"], event["gigId"], event["at"])
         elif kind == "gig_started":  # a driver who sets out holds the gig, whether or not the desk saw the booking
             self.booked.add(event["gigId"])
+        gig_id = event.get("gigId")
+        if gig_id and not self.offline and gig_id not in self.posts and gig_id not in self.foreign:
+            self.foreign.add(gig_id)  # the world posts no gigs: a person may have started a second desk while this one plays
+            self.log.write("foreign_gig", gigId=gig_id, eventKind=kind, at=event["at"])
+            self.log.say(f"Warning: {kind} for gig {gig_id}, which this desk did not post. If a second desk plays this world, stop one of them now.")
         request = event.get("request") if kind == "price_request" else None
         if (kind == "order_won" and not self.offline and self.watch is not None and self.watch.verify is not None
                 and self.requests.get(event["order"]["id"], {}).get("note") and event["order"]["id"] not in self.orders):
@@ -565,6 +577,8 @@ class Live:
         events = self.world.events(after=self.desk.seq)
         snapshot = self.world.snapshot()
         self.clock.saw(snapshot["now"], exact=True)
+        if source != "world":
+            self.fence(snapshot)
         if out is not None:
             self.generation += 1
             after = events[-1]["seq"] if events else self.desk.seq
@@ -582,6 +596,24 @@ class Live:
                        liveGigs=live_gigs, openRequests=len(snapshot["openRequests"]), level=self.level, params=self.desk.p)
         self.log.say(f"Joined world {self.world.id} at {clock_text(snapshot['now'])} from {source}: {len(events)} events read, "
                      f"{len(self.desk.orders)} orders, {live_gigs} live gigs, {len(snapshot['openRequests'])} open requests.")
+
+    def fence(self, snapshot: dict) -> None:
+        """Stops for good when another desk has played the world since this desk's books end. The world posts no gigs
+        by itself, so a gig that this desk did not post, posted well after the last minute it knows, is another desk's:
+        a standby that a person started while this one was away. Two desks on one world post every car twice."""
+        # The books are saved when the desk has done something, so they can end long before a post that the world took
+        # just as the desk died. Its log has a line every BEAT seconds and the event that the post answered.
+        last = max(self.desk.now, last_minute(self.folder / "log.jsonl"))
+        margin = FENCE / seconds_per_minute(last) * self.clock.speed  # world minutes in FENCE real seconds
+        foreign = sorted((g["postedAt"], g["id"]) for g in snapshot["gigs"] if g["id"] not in self.desk.posts and g["postedAt"] > last + margin)
+        if not foreign:
+            return
+        reason = (f"{len(foreign)} gigs that this desk did not post were posted from {clock_text(foreign[0][0])} on, after it last played at "
+                  f"{clock_text(last)}: another desk plays world {self.world.id}.")
+        (self.folder / "fenced").write_text(reason + "\n", encoding="utf-8")
+        self.log.write("fenced", gigs=[g for _, g in foreign[:20]], lastPlayed=last, firstPostedAt=foreign[0][0])
+        self.log.say(f"Stopped for good: {reason} This desk will not act on it again.")
+        raise Fenced(reason)
 
     def read(self, out: queue.Queue, after: int, generation: int) -> None:
         """The stream, into the queue. A request goes to the guard as soon as it arrives."""
@@ -607,7 +639,7 @@ class Live:
             self.generation += 1  # the stream that the join started stops
             raise
         desk = self.desk
-        saved = polled = time.monotonic()
+        saved = polled = beat = time.monotonic()
         scored, dirty, look_at = -SCORE, False, desk.now
         try:
             while True:
@@ -652,6 +684,9 @@ class Live:
                 dirty |= bool(batch or desk.outbox)
                 desk.send()
                 self.guard.backlog = desk.unbooked()
+                if time.monotonic() - beat >= BEAT:  # for the alarm: the desk is alive, and how far it is
+                    beat = time.monotonic()
+                    self.log.write("beat", minute=desk.now, clock=round(self.clock.now(), 1), seq=desk.seq, unbooked=self.guard.backlog)
                 if dirty and time.monotonic() - saved >= SAVE:
                     self.store.save(desk)
                     saved, dirty = time.monotonic(), False
@@ -702,6 +737,27 @@ class Live:
             self.watcher.stopped.set()
 
 
+def last_minute(log: Path) -> float:
+    """The last world minute that the log shows the desk at: its heartbeats and the events it took, from the log's end."""
+    try:
+        with open(log, "rb") as f:
+            f.seek(max(0, f.seek(0, os.SEEK_END) - 256_000))
+            tail = f.read().split(b"\n")[1:]
+    except OSError:
+        return -1
+    last = -1
+    for raw in tail:
+        try:
+            line = json.loads(raw)
+        except ValueError:
+            continue
+        if line.get("kind") == "beat":
+            last = max(last, line["minute"])
+        elif line.get("kind") == "event":
+            last = max(last, line["event"]["at"])
+    return last
+
+
 def clock_text(minute: int) -> str:
     return f"{WEEKDAYS[minute // DAY % 7][:3]} {minute % DAY // HOUR:02d}:{minute % HOUR:02d}"
 
@@ -714,6 +770,10 @@ def keep_going(live: Live, label: str) -> None:
     """Runs the desk to the world's end through lost connections and server restarts (API.md, Errors: the server
     answers again in under a minute, and every world goes on from where it was). One desk at a time: a second one on
     the same world would post every car again."""
+    fenced = live.folder / "fenced"
+    if fenced.exists():  # another desk took the world over: a supervisor loop that starts this one again gets here at once
+        live.stop()
+        sys.exit(f"Fenced: {fenced.read_text(encoding='utf-8').strip()} Delete {fenced} and state.pickle to play this world from here again.")
     lock = open(live.folder / "desk.lock", "w")
     try:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)  # the kernel lets go when the process ends, also on a kill
@@ -724,6 +784,9 @@ def keep_going(live: Live, label: str) -> None:
         try:
             live.run()
             return
+        except Fenced as error:
+            live.stop()
+            sys.exit(f"Fenced: {error}")
         except KeyboardInterrupt:
             live.stop()
             sys.exit(f"Stopped. The {label} keeps running without the desk; the same command goes on from data/live/{live.world.id}.")

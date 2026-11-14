@@ -13,7 +13,8 @@ time in three, so it is decided here:
     almost N against M       agree when M is below N by less than half a step: almost 7,000
                              agrees with 6,800 and not with 6,000
     date against date        agree when every part both give (day, month, year) is equal: May 1808
-                             agrees with 6 May 1808; 3 May does not
+                             agrees with 6 May 1808; 3 May does not. Of a period or a date in
+                             two calendars, each month's days are compared with the other's
 
 compatible() is None when a figure cannot be read (a number in words, two units), and the model's
 own verdict then stands. Finnish, Swedish and English.
@@ -117,21 +118,40 @@ def _hedge(text):
 
 
 def read(text):
-    """A figure as written: ("date", {"day": {..}, "month": n, "year": n}), ("count", (low, high),
-    hedge, unit) or None when it cannot be read."""
+    """A figure as written: ("date", {"days": {month: {day, ..}}, "year": n}), ("count", (low, high),
+    hedge, unit) or None when it cannot be read.
+
+    A date may name several days: two calendars for one day ("22. maaliskuuta (J: 10. maaliskuuta)")
+    or the two ends of a period ("between 25 March and 19 July"). Each day goes to its month: the
+    month written after it, or before it where the text opens with the month ("March 25").
+    """
     text = (text or "").strip()
     if not text:
         return None
-    month = _MONTH_AT.search(text)
     numbers = [(m.start(), int(re.sub(r"\D", "", m[0])), m[0]) for m in _NUMBER.finditer(text)]
     years = [n for _, n, raw in numbers if 1000 <= n <= 2100 and raw.isdigit()]
-    if month:
-        days = {n for at, n, raw in numbers if 1 <= n <= 31 and len(raw) <= 2}
-        return ("date", {"day": days, "month": _MONTH[month[1].lower()], "year": years[0] if years else None})
+    months = [(m.start(), _MONTH[m[1].lower()]) for m in _MONTH_AT.finditer(text)]
+    if months:
+        tokens = sorted(months + [(at, -n) for at, n, raw in numbers if 1 <= n <= 31 and len(raw) <= 2])
+        month_first = tokens[0][1] > 0
+        days, waiting, last = {m: set() for _, m in months}, [], months[0][1]
+        for _, token in tokens:
+            if token > 0:
+                last = token
+                if not month_first:
+                    days[token].update(waiting)
+                    waiting = []
+            elif month_first:
+                days[last].add(-token)
+            else:
+                waiting.append(-token)
+        if waiting:  # "the 14th" after its month was named
+            days[last].update(waiting)
+        return ("date", {"days": days, "year": years[0] if years else None})
     if not numbers:
         return None
     if len(numbers) == 1 and years and not _UNIT.search(text) and _hedge(text) == "exact" and len(text) <= 12:
-        return ("date", {"day": set(), "month": None, "year": years[0]})  # a bare year
+        return ("date", {"days": {}, "year": years[0]})  # a bare year
     unit = _UNIT.search(text)
     if unit and unit[0] != "%" and not unit[0].lower().startswith(("pros", "proc", "per")):
         return None  # "1,5 miljoonaa", "two thousand": not read
@@ -172,12 +192,13 @@ def compatible(a, b):
         return None
     if x[0] == "date":
         p, q = x[1], y[1]
-        for part in ("year", "month"):
-            if p[part] and q[part] and p[part] != q[part]:
-                return False
-        if p["day"] and q["day"] and (not p["month"] or not q["month"]):
-            return None  # a day without its month says nothing
-        return not (p["day"] and q["day"] and not p["day"] & q["day"])
+        if p["year"] and q["year"] and p["year"] != q["year"]:
+            return False
+        shared = set(p["days"]) & set(q["days"])
+        if p["days"] and q["days"] and not shared:
+            return False  # no month in common
+        # In every month both name, the days must meet: a day of one calendar, or one end of a period.
+        return all(not (p["days"][m] and q["days"][m]) or bool(p["days"][m] & q["days"][m]) for m in shared)
     if x[3] != y[3]:
         return None
     (xl, xh), (yl, yh) = x[1], y[1]

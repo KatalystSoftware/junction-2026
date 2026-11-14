@@ -37,11 +37,15 @@ from . import notes, watch
 from .policy import Policy
 
 DAY, HOUR = 24 * 60, 60
-VERSION = 1  # raise on each change to the prompt, the checks or the model: a sweep's fingerprint follows "note_actions"
+VERSION = 4  # raise on each change to the prompt, the checks or the model: a sweep's fingerprint follows "note_actions"
 ACTIONS = ("pickup_hours", "delivery_hours", "deadline", "delay", "plates", "manual", "summer_tyres", "urgent", "keep")
 RISKY = ("deadline", "urgent")  # cost margin when wrong: they act only when the desk names them
 FEE_STEP, FEE_CAP = 0.2, 1.4  # "urgent" adds this to the opening fee, as a multiple of the typical fee, up to the cap: the variant's highest kind fee
-FIELDS = {"by", "closing", "hours", "delivery", "summer"}  # watch.topics that the rules read least well (scratch/note-actions)
+FIELDS = {"by", "closing", "hours", "delivery", "summer"}  # watch.topics that name a field the rules may miss
+# A field asks the model only while the rules miss it often: at least once in 1,000 of the archive's 66,672 won notes, by
+# the counts that `python -m spreadlab.notecheck --check --write` keeps. As the rules heal, the fallback asks less.
+MISSES = json.loads((Path(__file__).parents[1] / "catalogue" / "note-misses.json").read_text())
+OFTEN = 67
 TIMEOUT = 6.0  # seconds for one call; the post waits live.HOLD_SECONDS at most, and a sweep keeps only answers inside that
 HOLD = 1.5
 
@@ -71,33 +75,33 @@ def site(opens: str, closes: str) -> dict:
 
 SHOTS = [  # made up, as the handbook's examples are; none comes from the archive
     ("Vastaanotto sulkee perjantaisin jo klo 14. Kesärenkaat alla.",
-     {"ready": None, "no_plates": False, "manual": False, "deadline": None, "pickup_hours": None, "delivery_hours": None},
+     {"ready": None, "no_plates": False, "manual": False, "summer_tyres": False, "deadline": None, "pickup_hours": None, "delivery_hours": None},
      {"pickup_window": {"from": {"day": "today", "time": "12:00"}, "to": {"day": "thu", "time": "18:00"}}, "pickup_hours": site("08:00", "18:00"),
       "delivery_hours": site("08:00", "18:00"), "deadline": {"day": "fri", "time": "18:00"}},
      {"actions": [{"action": "delivery_hours", "opens": None, "closes": "14:00", "cite": "Vastaanotto sulkee perjantaisin jo klo 14"},
                   {"action": "summer_tyres", "cite": "Kesärenkaat alla"}]}),
     ("Customer is waiting, needs the car at the showroom tomorrow before 11. Spare wheels in the trunk.",
-     {"ready": None, "no_plates": False, "manual": False, "deadline": None, "pickup_hours": None, "delivery_hours": None},
+     {"ready": None, "no_plates": False, "manual": False, "summer_tyres": False, "deadline": None, "pickup_hours": None, "delivery_hours": None},
      {"pickup_window": {"from": {"day": "today", "time": "09:00"}, "to": {"day": "tomorrow", "time": "17:00"}}, "pickup_hours": site("08:00", "17:00"),
       "delivery_hours": site("09:00", "18:00"), "deadline": {"day": "tomorrow", "time": "18:00"}},
      {"actions": [{"action": "deadline", "day": "tomorrow", "time": "11:00", "cite": "tomorrow before 11"}]}),
     ("Hämtning vardagar 10-15, bilen står vid porten. Tack!",
-     {"ready": None, "no_plates": False, "manual": False, "deadline": None, "pickup_hours": None, "delivery_hours": None},
+     {"ready": None, "no_plates": False, "manual": False, "summer_tyres": False, "deadline": None, "pickup_hours": None, "delivery_hours": None},
      {"pickup_window": {"from": {"day": "today", "time": "13:00"}, "to": {"day": "wed", "time": "17:00"}}, "pickup_hours": site("08:00", "17:00"),
       "delivery_hours": site("08:00", "17:00"), "deadline": {"day": "wed", "time": "17:00"}},
      {"actions": [{"action": "pickup_hours", "opens": "10:00", "closes": "15:00", "cite": "Hämtning vardagar 10-15"}]}),
     ("Kiireellinen! Auto pitää olla perillä viimeistään huomenna klo 12. Avaimet tiskillä.",
-     {"ready": None, "no_plates": False, "manual": False, "deadline": {"day": "tomorrow", "time": "12:00"}, "pickup_hours": None, "delivery_hours": None},
+     {"ready": None, "no_plates": False, "manual": False, "summer_tyres": False, "deadline": {"day": "tomorrow", "time": "12:00"}, "pickup_hours": None, "delivery_hours": None},
      {"pickup_window": {"from": {"day": "today", "time": "10:00"}, "to": {"day": "tomorrow", "time": "16:00"}}, "pickup_hours": site("08:00", "18:00"),
       "delivery_hours": site("08:00", "18:00"), "deadline": {"day": "tomorrow", "time": "18:00"}},
      {"actions": [{"action": "urgent", "cite": "Kiireellinen!"}]}),
     ("Soita 30 min ennen tuloa, talvirenkaat takakontissa. Kiitos",
-     {"ready": None, "no_plates": False, "manual": False, "deadline": None, "pickup_hours": None, "delivery_hours": None},
+     {"ready": None, "no_plates": False, "manual": False, "summer_tyres": False, "deadline": None, "pickup_hours": None, "delivery_hours": None},
      {"pickup_window": {"from": {"day": "today", "time": "11:00"}, "to": {"day": "tomorrow", "time": "18:00"}}, "pickup_hours": site("08:00", "18:00"),
       "delivery_hours": site("09:00", "17:00"), "deadline": {"day": "tomorrow", "time": "17:00"}},
      {"actions": [{"action": "keep"}]}),
     ("Paperwork clears thursday morning, not before 10. No plates on it, and it's a stick.",
-     {"ready": {"day": "thu", "time": "10:00"}, "no_plates": True, "manual": False, "deadline": None, "pickup_hours": None, "delivery_hours": None},
+     {"ready": {"day": "thu", "time": "10:00"}, "no_plates": True, "manual": False, "summer_tyres": False, "deadline": None, "pickup_hours": None, "delivery_hours": None},
      {"pickup_window": {"from": {"day": "today", "time": "14:00"}, "to": {"day": "fri", "time": "18:00"}}, "pickup_hours": site("08:00", "18:00"),
       "delivery_hours": site("08:00", "18:00"), "deadline": {"day": "fri", "time": "18:00"}},
      {"actions": [{"action": "manual", "cite": "it's a stick"}]}),
@@ -108,10 +112,10 @@ def clock(minute: int) -> str:
     return f"{minute // HOUR:02d}:{minute % HOUR:02d}"
 
 
-def reading(facts: notes.Facts, limits: notes.Limits, arrived_at: int) -> dict:
-    """What the rules read, in the prompt's words: the watcher's three facts and notes.limits."""
+def reading(facts: notes.Facts, limits: notes.Limits, arrived_at: int, summer: bool = False) -> dict:
+    """What the rules read, in the prompt's words: the watcher's three facts, notes.summer_tyres and notes.limits."""
     hours = lambda h: None if h == (0, 0) else {"opens": clock(h[0]) if h[0] else None, "closes": clock(h[1]) if h[1] else None}
-    return {**watch.reading(facts, arrived_at), "deadline": watch.day_time(limits.deadline, arrived_at) if limits.deadline else None,
+    return {**watch.reading(facts, arrived_at), "summer_tyres": summer, "deadline": watch.day_time(limits.deadline, arrived_at) if limits.deadline else None,
             "pickup_hours": hours(limits.pickup_hours), "delivery_hours": hours(limits.delivery_hours)}
 
 
@@ -183,9 +187,11 @@ class Cache:
                 entry = json.loads(line)
                 self.answers[entry["key"]] = entry
 
-    @staticmethod
-    def key(msgs: list[dict]) -> str:
-        return hashlib.sha256(json.dumps([endpoint()[1], VERSION, msgs[-1]["content"]], ensure_ascii=False).encode()).hexdigest()[:24]
+    PROMPT = hashlib.sha256(json.dumps([SYSTEM, SHOTS], ensure_ascii=False).encode()).hexdigest()[:8]  # a new prompt asks again
+
+    @classmethod
+    def key(cls, msgs: list[dict]) -> str:
+        return hashlib.sha256(json.dumps([endpoint()[1], cls.PROMPT, msgs[-1]["content"]], ensure_ascii=False).encode()).hexdigest()[:24]
 
     def ask(self, msgs: list[dict]) -> dict:
         key = self.key(msgs)
@@ -208,11 +214,12 @@ def trigger(text: str, arrived_at: int, facts: notes.Facts, limits: notes.Limits
     if news.get("newWords") or news.get("newSentences"):
         why.append("new wording")
     said = watch.topics(text, arrived_at) & FIELDS
-    if "summer" in said:
+    often = {field for field, n in MISSES.items() if n >= OFTEN}
+    if "summer" in said and "summer_tyres" in often and not notes.summer_tyres({"text": text}):
         why.append("summer tyres")
-    if said & {"by", "delivery"} and not limits.deadline and limits.delivery_hours == (0, 0):
+    if said & {"by", "delivery"} and often & {"deadline", "delivery_hours"} and not limits.deadline and limits.delivery_hours == (0, 0):
         why.append("deadline or delivery unread")
-    if said & {"closing", "hours"} and limits.pickup_hours == (0, 0) and limits.delivery_hours == (0, 0):
+    if said & {"closing", "hours"} and often & {"pickup_hours", "delivery_hours"} and limits.pickup_hours == (0, 0) and limits.delivery_hours == (0, 0):
         why.append("hours unread")
     why += [f"watcher: {fact}" for fact in disagree if fact in ("deadline", "pickup_hours", "delivery_hours", "summer_tyres", "other")]
     return why
@@ -243,9 +250,29 @@ def normal(text: str) -> str:
     return re.sub(r"\s+", " ", text.lower()).strip(" .,!")
 
 
+# Tyres that travel in the car, not on it: the model takes "4 kesärengasta tavaratilassa" for a car on summer tyres.
+# Words of the clause, with one typo ("tavratilassa"), as notes.summer_tyres reads them, and a few more.
+CARRIED = notes.CARRIED + ("tavaratila", "takakontti", "kofferten", "bagaget", "spare", "extra", "lisaksi", "rengassarja", "travel", "seat")
 URGENT = re.compile(r"kiire|urgent|asap|bråttom|brådsk|skyndsam|pikaisesti|pikaisest|hoppu|rush|as soon as|heti|snabbt|quickly|express")
 SUMMER = re.compile(r"kesä|summer|sommar")
 WORDS = {"plates": watch.ABOUT_PLATES, "manual": watch.ABOUT_GEARS, "summer_tyres": SUMMER, "urgent": URGENT}
+
+
+def clause(note: str, cite: str) -> str:
+    """The clause of the note that holds the cited words: from the sentence or comma before them to the one after."""
+    at = note.find(cite)
+    start = max(note.rfind(c, 0, at) for c in ".!?;,\n") + 1
+    ends = [i for i in (note.find(c, at + len(cite)) for c in ".!?;,\n") if i >= 0]
+    return note[start:min(ends, default=len(note))]
+
+
+def names(text: str) -> Optional[str]:
+    """The site that a clause names by the words of notes.limits, "pickup" or "delivery", or None for neither or both:
+    a clause in words that the lists lack is the model's to read."""
+    words = notes.TOKEN.findall(text)
+    said = [site for site, known in (("delivery", notes.LIMIT_WORDS["delivery"]), ("pickup", notes.LIMIT_WORDS["collect"] + notes.LIMIT_WORDS["fetches"]))
+            if any(notes.near(w, k) for w in words for k in known)]
+    return said[0] if len(said) == 1 else None
 
 
 def vet(actions: list[dict], text: str, request: dict, deadline: int, facts: notes.Facts, limits: notes.Limits) -> tuple[list[dict], list[dict]]:
@@ -263,6 +290,10 @@ def vet(actions: list[dict], text: str, request: dict, deadline: int, facts: not
             why = "uncited"
         elif kind in WORDS and not WORDS[kind].search(cite):
             why = "cite lacks the word"
+        elif kind == "summer_tyres" and any(notes.near(w, k) for w in re.findall(r"[a-z]+", notes.plain(clause(note, cite))) for k in CARRIED):
+            why = "tyres carried, not on the car"
+        elif kind in ("pickup_hours", "delivery_hours") and names(clause(note, cite)) == ("pickup" if kind == "delivery_hours" else "delivery"):
+            why = "hours of the other site"
         elif kind in ("deadline", "delay"):
             at = watch.when(action.get("day"), action.get("time"), arrived)
             if at is None or at % DAY not in minutes_in(cite):
@@ -286,7 +317,7 @@ def vet(actions: list[dict], text: str, request: dict, deadline: int, facts: not
                 why = "leaves under an hour"
             else:
                 action = {**action, "range": (opens or 0, closes or 0)}
-        elif kind == "plates" and facts.plates or kind == "manual" and facts.manual:
+        elif kind == "plates" and facts.plates or kind == "manual" and facts.manual or kind == "summer_tyres" and notes.summer_tyres({"text": text}):
             why = "the rules have it"
         (dropped if why else kept).append({**action, "why": why} if why else action)
     if any(a["action"] != "keep" for a in kept):
@@ -398,7 +429,7 @@ class Decision:
         self.fix, self.line = {}, None
         if not self.why:
             return
-        msgs = messages(text, reading(facts, limits, arrived), watch.stated(request, deadline))
+        msgs = messages(text, reading(facts, limits, arrived, notes.summer_tyres(request["note"])), watch.stated(request, deadline))
         answer = ask(msgs)
         actions = parse(answer.get("content")) if not answer.get("error") else None
         error = answer.get("error") or (None if actions is not None else "unreadable")

@@ -1,0 +1,5 @@
+{"target": "HOUR_CASES", "add": {"puolta neljää": "15.30", "puolta viittä": "16.30", "puolta kolmea": "14.30", "poulta kolmea": "14.30", "puoli viiden": "16.30", "kahteentoista": "12.00"}, "why": "Finnish half-hour phrases, plus a typo and noon", "examples": [0, 10, 17, 24, 26, 29, 35, 37, 41, 44]}
+{"target": "MANUAL", "add": ["mauaal|maunaa?l|manula|manul\\b|mnuel|mnua|manal\\b|manuuaal|mannual|käivaiht"], "why": "frequent manual typos", "examples": [4, 5, 7, 8, 9, 11, 13, 14, 15, 18, 19, 22, 32, 38, 39, 40, 42]}
+{"target": "PLATES", "add": ["siirtokii?l|ilman ki?l?pi"], "why": "transfer plates or no plates, with typos", "examples": [23, 27]}
+{"target": "LIMIT_WORDS", "key": "delivery", "add": ["vastaanottaja"], "why": "receiver limits delivery, not pickup", "examples": [20, 31]}
+{"target": "LIMIT_WORDS", "key": "collect", "add": ["hämtning"], "why": "Swedish pickup noun", "examples": [46]}
