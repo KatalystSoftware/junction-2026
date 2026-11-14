@@ -520,3 +520,14 @@ VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-all-onward-q10-d760-ss
     **_ROW_7_F, "when_tight": {**_ROW_7_F["when_tight"], "queue_hours": 0}}
 VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-default-onward-q10-d760-ss02"] = {
     **_ROW_7_F, "thin_play": {"drivers": 760, "params": VARIANTS["slow-friday-late-150-kinds-limits"], "version": thin_play.VERSION}}
+# Row 6 with a trade-in's own opening fee (`kinds`: 1.4) kept under the fee ladder (`kind_fees`). Merge 1's ladder opened
+# every car with 16 hours or more left at 0.8 and capped it at 1.2, trade-ins too: on merge 1's 11 thin exam weeks 10 of
+# 38 trade-ins went late, against 8% of one-car orders. `-thin-open100` also opens every car at 1.0 in a week under 760
+# drivers, as the default does: the fallback if the ladder's slow rise costs the thin weeks (`fresh-8830`).
+_ROW_6 = VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02"]
+VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-kindfee"] = {**_ROW_6, "kind_fees": True}
+VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-kindfee-thin-open100"] = {
+    **_ROW_6, "kind_fees": True, "when_tight": {**_ROW_6["when_tight"], "fee_rules": []}}
+# Row 7 (the day cap under 760 drivers) with the trade-in fee kept under the ladder: the fix as it merges on the current base.
+VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-kindfee"] = {
+    **VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62"], "kind_fees": True}

@@ -110,6 +110,7 @@ DEFAULTS = {
     # [[drivers from, drivers under, hours from, hours under, opening fee, rise an hour, top fee], ...]: the fees of a gig by the drivers
     # notified of its pickup and the hours left to collect the car when it is posted, as multiples of the typical fee. The first rule that fits applies.
     "fee_rules": [],
+    "kind_fees": False,   # a request whose kind has its own opening fee in `kinds` (a trade-in's 1.4) keeps it: `fee_rules` pass it by
     "slope_by": 1,        # multiplies the curve's slope where the price is chosen: above 1 takes dealers to be more sensitive to the price
     "cost_by_order": False,  # the cost follows the order (curve.cost: long lanes, few drivers, a note) and replaces `cost`
     "trust_value": 0,     # the share to count of what an order on time, or a late one, is worth in the dealer's later prices; 0 counts none
@@ -560,7 +561,7 @@ class Policy(Desk):
 
     def fee_rule(self, order, p: dict) -> Optional[list[float]]:
         """The rule of `fee_rules` for the order now: [opening fee, rise an hour, top fee], or None."""
-        if not p["fee_rules"]:
+        if not p["fee_rules"] or p["kind_fees"] and p["kinds"].get(kind(self.requests[order["id"]]), {}).get("fee"):
             return None
         notified, hours = min(self.notified[leg["pickup"]["placeId"]] for leg in order["legs"]), (order["lastPickupAt"] - self.now) / HOUR
         return next((rule[4:] for rule in p["fee_rules"] if rule[0] <= notified < rule[1] and rule[2] <= hours < rule[3]), None)
