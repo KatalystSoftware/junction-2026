@@ -1,0 +1,8 @@
+# raw page cache and work files stay out of git: records, quotes and URLs only
+cache/
+work/
+__pycache__/
+# the built page, its dependencies and the demo's review state
+ui/node_modules/
+ui/dist/
+reviews.json

@@ -1,0 +1,176 @@
+/* Tokens. The rail is the city's colour; --brand and --brand-ink are set per company on the stage. */
+:root {
+  --city: oklch(33% 0.155 264);
+  --city-raise: oklch(40% 0.16 264);
+  --city-line: oklch(46% 0.13 264);
+  --city-ink: oklch(98.5% 0.008 264);
+  --city-dim: oklch(84% 0.05 264);
+
+  --ground: oklch(99.2% 0.002 264);
+  --wash: oklch(96.4% 0.006 264);
+  --line: oklch(89.5% 0.012 264);
+  --ink: oklch(21% 0.03 264);
+  --ink-2: oklch(44% 0.03 264);
+
+  --ok: oklch(50% 0.14 155);
+  --wait: oklch(56% 0.14 65);
+  --stop: oklch(52% 0.19 27);
+
+  --brand: var(--ink);
+  --brand-ink: #fff;
+
+  --display: 'Hanken Grotesk Variable', system-ui, sans-serif;
+  --text: 'Hanken Grotesk Variable', system-ui, sans-serif;
+
+  --t-xs: 0.75rem;
+  --t-sm: 0.875rem;
+  --t-md: 1rem;
+  --t-lg: 1.1875rem;
+  --t-xl: clamp(1.5rem, 1.05rem + 1.3vw, 2.125rem);
+  --t-2xl: clamp(2.25rem, 1.3rem + 3.2vw, 4.25rem);
+
+  --s1: 0.25rem;
+  --s2: 0.5rem;
+  --s3: 0.75rem;
+  --s4: 1rem;
+  --s5: 1.5rem;
+  --s6: 2rem;
+  --s7: 3rem;
+  --s8: 4.5rem;
+
+  --r1: 6px;
+  --r2: 12px;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --lift: 0 1px 2px oklch(21% 0.03 264 / 0.08), 0 12px 32px -8px oklch(21% 0.03 264 / 0.22);
+  --rail: 19rem;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scrollbar-color: var(--line) transparent;
+}
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font: var(--t-md) / 1.5 var(--text);
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--brand);
+  color: var(--brand-ink);
+}
+
+h1,
+h2,
+h3,
+p,
+ol,
+ul,
+dl,
+dd {
+  margin: 0;
+  padding: 0;
+}
+
+ol,
+ul {
+  list-style: none;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--display);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+a {
+  color: inherit;
+  text-underline-offset: 0.2em;
+  text-decoration-thickness: 1px;
+}
+
+button,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+/* One button, three weights. The primary one is the company's colour: it is the step toward them. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+  min-height: 2.5rem;
+  padding: 0 var(--s4);
+  border: 1px solid var(--line);
+  border-radius: var(--r1);
+  background: var(--ground);
+  font-weight: 600;
+  font-size: var(--t-sm);
+  white-space: nowrap;
+  text-decoration: none;
+  transition: background 0.15s, border-color 0.15s, transform 0.15s var(--ease);
+}
+.btn:hover {
+  border-color: var(--ink-2);
+}
+.btn:active {
+  transform: translateY(1px);
+}
+.btn.primary {
+  border-color: transparent;
+  background: var(--brand);
+  color: var(--brand-ink);
+  min-height: 2.75rem;
+  padding: 0 var(--s5);
+  font-size: var(--t-md);
+}
+.btn.primary:hover {
+  filter: brightness(1.1);
+}
+.btn.quiet {
+  border-color: transparent;
+  background: none;
+  color: var(--ink-2);
+  padding: 0 var(--s2);
+}
+.btn.quiet:hover {
+  color: var(--ink);
+  background: var(--wash);
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
