@@ -399,6 +399,20 @@ VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-all-onward-q10-d760"] 
     **VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-all"], "pair_open": True, "pair_onward": 0.8, "pair_late": True,
     "pair_onward_cost": 1.0, "pair_more_drivers": 760}
 
+# ... with the waiting-car count of a week under 760 drivers over the cars due within 48 hours instead of all of them (the
+# 48-hour arm of the thin seeds kept every week at 90% or more and made about 1,000 a week more there than all hours).
+_MERGE_3 = VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-all-onward-q10-d760"]
+VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760"] = {
+    **_MERGE_3, "when_tight": {**_MERGE_3["when_tight"], "queue_hours": 48}}
+# ... and in a week with 760 or more drivers a lower waiting-car surcharge (`slow_step` 0.2, from 0.8) and late price
+# (`late_cost` 100, from 150): with spare drivers a waiting car is less likely to end late, so the quote can carry less of
+# that risk and win more orders. A thinner week puts both back (`when_tight`), so the part is switched once, at the start
+# of the week, by the driver list. Lane A1's `b2-rich-ss02-late100`.
+_Q48 = VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760"]
+VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-rich-ss02-late100"] = {
+    **_Q48, "slow_step": 0.2, "late_cost": 100,
+    "when_tight": {**_Q48["when_tight"], "slow_step": _Q48["slow_step"], "late_cost": _Q48["late_cost"]}}
+
 # The live default with a cap on the won orders to collect on one day (`due_cap`): a night's wave of dropped gigs then takes
 # down at most that day's cap. An option due on a full day is not quoted; a slower one of the same request still is. The cap
 # lifts for the rest of the week after the first night with 10 drops in its first hour (`due_cap_wave`).
