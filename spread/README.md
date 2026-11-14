@@ -466,6 +466,43 @@ requests with the policy, missed none while it ran and left 15 unquoted while it
 lost connections, at least 1.16 s left at a quote, and the week was ranked at 97.0% on time. An action took 10 ms
 there, 25 ms at the 99th percentile.
 
+### The note watcher (`--watch-notes`, off by default)
+
+[`watch.py`](spreadlab/watch.py) adds a second reader of the dealers' notes beside the desk. It needs
+`NVIDIA_API_KEY` in the environment; without it, only the log of new notes and drift runs.
+
+```bash
+uv run python -m spreadlab.live final --watch-notes                          # the same desk, with the note watcher
+uv run python -m spreadlab.watch review <world id>                           # the notes the model said the rules missed, by fact
+uv run python -m spreadlab.watch check "Registration tags are off, bring your own."   # one note: the rules, the model, the fix
+```
+
+- **The check.** For each won order with a note, Nemotron 3.5 Lightning gets the note, what the request states
+  (pickup window, both sites' hours, the deadline) and what `notes.read` made of it. It answers yes or no: did the rules capture every operational fact in the note? On a no it names each
+  missing or wrong fact. A no counts only when the fact it names would change what the desk knows. A no that names
+  only "other" goes to the review queue, not as a no: the model puts spare tyres and parked cars there.
+- **Safe fixes only.** The desk applies plates, a manual licence and a ready time later than the rules read, never
+  earlier. A later ready time must also be a clock time that the rules find in the note, in a sentence that is not
+  about the delivery or a closing site: the model calls "the customer collects at 12, the car must be there by
+  then" a ready time. Deadlines, opening hours and summer tyres are logged, not acted on.
+- **The first post waits, briefly.** A driver often books a gig within a world minute or two of its post, and a
+  booked gig cannot be withdrawn. So the car's first post waits for the answer, at most 1.5 s and 5 world minutes;
+  then it goes with the rules' reading. A later no withdraws the gig, alone and first, and posts the cars whose gig
+  left the app again; when a driver holds the gig, the fix waits for the car's next post, a retry after a failed visit.
+- **Never in the way of a quote.** The model runs on a thread of its own, 30 calls a minute at most, with a 6-second
+  timeout and retries when the free tier answers 429. A check that has waited 2 minutes is dropped. A call that
+  fails leaves the rules' post as it is. The books on disk keep the fixes and the notes still to check, so a desk
+  that starts again checks those whose cars no driver holds yet.
+- **The review queue.** Every no goes to `review.jsonl` in the world's folder with the note, the rules' reading and
+  the model's answer. `report` and the end of the week print it by fact. It is what `notes.py` should learn next:
+  in practice weeks, hand it to whoever extends the rules.
+- **New notes and drift.** The thread also scores each request's note against the words and digit-masked sentence
+  patterns of the archive's 202,579 notes ([`note-vocab.json`](spreadlab/note-vocab.json), built by
+  `python -m spreadlab.watch build`). A word that is more than one typo from a known word, or a new sentence, goes
+  to the log as `note_new`. It counts the share of the last 200 notes that mention a ready time, a closing time, a
+  limit ("by", "ennen"), the delivery, opening hours, plates, a manual car, summer tyres or something new. When a
+  share is more than twice the archive's, at 4 standard deviations or more, it prints a line and logs `note_drift`.
+
 ## Rules for policy code
 
 The final is one secret week. A policy may use only what the live system sees at that minute: the

@@ -42,9 +42,9 @@ from pathlib import Path
 from typing import Callable, Optional
 
 from spread.client import Client, SpreadError, Unreachable, World
-from spread.starter import DAY, HOUR, WEEKDAYS, pickups, undelivered
+from spread.starter import DAY, HOUR, WEEKDAYS, Retry, pickups, undelivered
 
-from . import notes
+from . import notes, watch
 from .policy import DECLINE, Policy
 from .server import SERVER, PracticeClient, data_dir, world_map
 from .variants import VARIANTS
@@ -56,6 +56,9 @@ VARIANT = "steep-notes-offers-8"
 FALLBACK_FEE, FALLBACK_LIST = 1.9, 1.5
 GUARD_SHARE, GUARD_MIN, GUARD_MAX = 1 / 3, 0.2, 1.5  # the guard quotes when this share of a request's time is left, in seconds
 LATE = 0.05  # seconds: a quote that would reach the world later than this before its deadline is not sent
+# The first post of a won order with a note waits for the note watcher's answer this long at most, in real seconds and
+# in world minutes: a driver often books a gig within a minute or two of its post, and a booked gig cannot be withdrawn.
+HOLD_SECONDS, HOLD_MINUTES = 1.5, 5
 POLL, SAVE, SCORE = 1.0, 1.0, HOUR  # seconds between reads of the events that the stream may have missed, between saves; world minutes between scores
 
 
@@ -208,7 +211,7 @@ class Guard(threading.Thread):
 class LiveDesk(Policy):
     """The policy on the live stream: it takes each event once, sends its actions at once, and can be put on disk."""
 
-    RUNTIME = ("world", "log", "guard", "clock")  # not on disk: the connection, the log, the guard thread and the clock
+    RUNTIME = ("world", "log", "guard", "clock", "watch", "held")  # not on disk: the connection, the log, the guard, the clock, the note watcher, held posts
 
     def __init__(self, world, level: int, now: int, params: dict, roster: list[dict], map_: dict):
         super().__init__(world, level, now, params, roster, map_)
@@ -217,18 +220,22 @@ class LiveDesk(Policy):
         self.offline = False  # while it reads the events it missed: it learns from them and sends nothing
         self.quoted: set[str] = set()  # the requests whose policy quote the world accepted
         self.failed: dict[str, dict[int, tuple[str, str, int]]] = {}  # order id -> leg -> its last failed visit: reason, gig, minute
-        self.log = self.guard = self.clock = None
+        self.fixes: dict[str, dict] = {}  # order id -> what the note watcher found that the rules missed: pickupFrom, plates, manual
+        self.unchecked: set[str] = set()  # won orders whose note the watcher has not answered for
+        self.log = self.guard = self.clock = self.watch = None
+        self.held: dict[str, dict] = {}  # order id -> its first post, while it waits for the note watcher: legs, retry, since, at
 
     def __getstate__(self) -> dict:
         return {k: v for k, v in vars(self).items() if k not in self.RUNTIME}
 
     def __setstate__(self, state: dict) -> None:
-        vars(self).update(state)
+        vars(self).update({"fixes": {}, "unchecked": set(), **state})  # books written before the note watcher have neither
         for k in self.RUNTIME:
             setattr(self, k, None)
 
-    def attach(self, world, log: Log, guard: Guard, clock: Clock) -> None:
-        self.world, self.log, self.guard, self.clock = world, log, guard, clock
+    def attach(self, world, log: Log, guard: Guard, clock: Clock, watcher: Optional[watch.Watcher] = None) -> None:
+        self.world, self.log, self.guard, self.clock, self.watch = world, log, guard, clock, watcher
+        self.held = self.held or {}  # a desk that starts again posts what was held, as any car without a gig
 
     def take(self, event: dict) -> None:
         """Answers one event, once: the stream and the reads of missed events can bring it twice."""
@@ -242,6 +249,9 @@ class LiveDesk(Policy):
         elif kind == "gig_started":  # a driver who sets out holds the gig, whether or not the desk saw the booking
             self.booked.add(event["gigId"])
         request = event.get("request") if kind == "price_request" else None
+        if (kind == "order_won" and not self.offline and self.watch is not None and self.watch.verify is not None
+                and self.requests.get(event["order"]["id"], {}).get("note") and event["order"]["id"] not in self.orders):
+            self.held[event["order"]["id"]] = {"legs": None, "retry": Retry(), "since": time.monotonic(), "at": self.now}
         try:
             self.handle(event)
             if request is not None and self.offline and request["id"] not in self.quoted:
@@ -253,8 +263,13 @@ class LiveDesk(Policy):
             self.log.say(f"Error on {kind} {event['seq']}; see the log. The desk goes on.")
             if request is not None and not any(a.get("requestId") == request["id"] for a in self.outbox):
                 self.outbox.append({"type": "quote", "requestId": request["id"], "prices": fallback_prices(request)})
+        won = event["order"]["id"] if kind == "order_won" and event["order"]["id"] in self.orders else None
+        if won and self.watch is not None and self.requests[won]["note"]:
+            self.unchecked.add(won)  # checked now, or at the next join for a win that it reads offline
         if self.offline:
             return
+        if request is not None and request["note"] and self.watch is not None:
+            self.watch.observe(request)
         if request is not None and request["id"] in self.decisions:
             day, place = request["arrivedAt"] // DAY, request["legs"][0]["pickup"]["placeId"]
             decision = self.decisions[request["id"]]
@@ -265,6 +280,95 @@ class LiveDesk(Policy):
             facts = notes.read(self.requests[event["order"]["id"]]["note"], self.requests[event["order"]["id"]]["arrivedAt"])
             if facts != notes.Facts():
                 self.log.write("note", orderId=event["order"]["id"], pickupFrom=facts.pickup_from, plates=facts.plates, manual=facts.manual)
+            if won in self.unchecked:
+                self.watch.check(won, self.requests[won], self.orders[won]["deadline"], facts, self.now)
+
+    def post(self, order, legs, retry: Retry = Retry()) -> None:
+        """The policy's post, with what the note watcher found that the rules missed: it only adds plates and a manual
+        licence and moves the pickup later. The first post of a won note waits for the watcher in `held`."""
+        if order["id"] in self.held:
+            self.held[order["id"]].update(legs=legs, retry=retry)
+            return
+        fix = self.fixes.get(order["id"])
+        if fix:
+            retry = Retry(max(retry.pickup_from, fix["pickupFrom"]), retry.manual_licence or fix["manual"], retry.plates or fix["plates"])
+        super().post(order, legs, retry)
+
+    def correct(self, result: dict) -> None:
+        """Applies the watcher's answer on a won note: posts the car again with the safe corrections, unless a driver
+        has booked it, when they wait for its next post (a retry after a failed visit, or a change of plan)."""
+        order_id = result["orderId"]
+        self.unchecked.discard(order_id)
+        order, old = self.orders.get(order_id), self.fixes.get(order_id, {"pickupFrom": 0, "plates": False, "manual": False})
+        fix = result["fix"]
+        new = {"pickupFrom": max(old["pickupFrom"], fix.get("pickupFrom", 0)), "plates": old["plates"] or fix.get("plates", False),
+               "manual": old["manual"] or fix.get("manual", False)}
+        changed = order is not None and new != old
+        if changed:
+            self.fixes[order_id] = new
+        if order_id in self.held:  # the first post waited for this answer: it goes now, with the fix
+            self.release(order_id, "answer")
+            if changed:
+                self.log.write("note_fix", orderId=order_id, fix=new, outcome="posted with the fix", problems=result["problems"])
+                self.log.say(f"Note of {order_id}: the model found {self.found(old, new)}, which the rules missed; posted with the fix.")
+            return
+        if not changed:
+            return
+        self.send_post_of(order_id)  # the rules' post may still wait in the outbox: its gig must be known first
+        legs, gigs = undelivered(order), self.gigs_of(order_id)
+        if not legs:
+            outcome = "nothing to do: delivered"
+        elif any(gig_id in self.booked for gig_id in gigs):
+            outcome = "kept for its next post: a driver holds the gig"
+        else:
+            # The withdrawal goes first and alone: a driver may book the gig meanwhile, and the world then refuses it.
+            # Only the cars whose gig left the app, or that have none, go again; a post in the same batch would give a
+            # booked car a second gig.
+            withdrawals = [{"type": "withdraw", "gigId": gig_id} for gig_id in gigs]
+            results = self.world.act(withdrawals) if withdrawals else []
+            for action, answer in zip(withdrawals, results):
+                self.log.write("action", action=action, ok=answer["ok"], reason=answer.get("reason"))
+            off = {action["gigId"] for action, answer in zip(withdrawals, results) if answer["ok"]}
+            held = self.leg_gigs.get(order_id, {})
+            freed = [leg for leg in legs if held.get(leg) in off or leg not in held]
+            for leg in freed:
+                held.pop(leg, None)
+            if freed:
+                self.post(order, freed)
+            outcome = "withdrawn and posted again" if len(off) == len(gigs) else "kept for its next post: a driver booked the gig as the desk withdrew it"
+        self.log.write("note_fix", orderId=order_id, fix=new, outcome=outcome, problems=result["problems"])
+        self.log.say(f"Note of {order_id}: the model found {self.found(old, new)}, which the rules missed; {outcome}.")
+
+    @staticmethod
+    def found(old: dict, new: dict) -> str:
+        what = [f"ready from {clock_text(new['pickupFrom'])}" if new["pickupFrom"] > old["pickupFrom"] else "",
+                "plates" if new["plates"] > old["plates"] else "", "a manual licence" if new["manual"] > old["manual"] else ""]
+        return ", ".join(w for w in what if w)
+
+    def release(self, order_id: str, why: str) -> None:
+        """Posts a held first post now: with the watcher's fix, or with the rules alone when the answer is late."""
+        entry = self.held.pop(order_id)
+        self.log.write("note_hold", orderId=order_id, why=why, seconds=round(time.monotonic() - entry["since"], 3), minutes=self.now - entry["at"])
+        order = self.orders.get(order_id)
+        legs = [leg for leg in entry["legs"] or [] if order is not None and leg in undelivered(order)]
+        if legs:
+            self.post(order, legs, entry["retry"])
+
+    def release_due(self) -> None:
+        """Posts the held first posts whose answer is late: the rules' reading goes out, and a later no withdraws and posts again."""
+        now = time.monotonic()
+        for order_id in [i for i, e in self.held.items() if now - e["since"] >= HOLD_SECONDS or self.now - e["at"] >= HOLD_MINUTES]:
+            self.release(order_id, "late")
+
+    def recheck(self) -> None:
+        """Hands the watcher the won notes that it has not answered for: those won while the desk was away, or in flight at a
+        stop. Only cars that no driver holds yet: a fix can still change their post."""
+        for order_id in sorted(self.unchecked):
+            order, request = self.orders.get(order_id), self.requests.get(order_id)
+            if order is None or request is None or not undelivered(order) or any(g in self.booked for g in self.gigs_of(order_id)):
+                self.unchecked.discard(order_id)
+            else:
+                self.watch.check(order_id, request, order["deadline"], notes.read(request["note"], request["arrivedAt"]), self.now)
 
     def send(self) -> None:
         """Sends the outbox now, quotes first. A quote that cannot reach the world before its deadline stays home."""
@@ -429,9 +533,12 @@ class Live:
     or starting the program again, goes on from the books on disk."""
 
     def __init__(self, world, guard_act: Callable[[list], list], minute_now: Callable[[], int], level: int, params: dict,
-                 map_: dict, folder: Path, speed: float = 1.0, echo: bool = True):
+                 map_: dict, folder: Path, speed: float = 1.0, echo: bool = True, watcher: Optional[Callable[..., watch.Watcher]] = None):
         self.world, self.minute_now, self.level, self.params, self.map = world, minute_now, level, params, map_
         self.folder, self.store, self.log = folder, Store(folder), Log(folder / "log.jsonl", echo)
+        self.watcher = watcher(self.log, folder) if watcher else None  # the note watcher, with --watch-notes
+        if self.watcher is not None:
+            self.watcher.start()
         self.clock = Clock(speed=speed)
         self.guard = Guard(guard_act, self.clock, self.log, params.get("max_unbooked", 0))
         self.guard.start()
@@ -452,7 +559,7 @@ class Live:
         if self.desk is None:
             source = "world"
             self.desk = LiveDesk(self.world, self.level, first["now"], self.params, self.world.roster(), self.map)
-        self.desk.attach(self.world, self.log, self.guard, self.clock)
+        self.desk.attach(self.world, self.log, self.guard, self.clock, self.watcher)
         events = self.world.events(after=self.desk.seq)
         snapshot = self.world.snapshot()
         self.clock.saw(snapshot["now"], exact=True)
@@ -461,6 +568,8 @@ class Live:
         changed, dropped = self.desk.catch_up(events)
         self.desk.adopt(snapshot)
         self.desk.reconcile(snapshot, changed, dropped)
+        if self.watcher is not None:
+            self.desk.recheck()
         self.store.save(self.desk)
         live_gigs = sum(1 for g in snapshot["gigs"] if g["status"] in ("open", "booked", "working"))
         self.log.write("joined", source=source, minute=snapshot["now"], missed=len(events), seq=self.desk.seq, orders=len(self.desk.orders),
@@ -519,6 +628,11 @@ class Live:
                     woken |= item["kind"] in desk.wake_on
                     if item["kind"] == "price_request":  # its quote goes out now: a hold-up later in the batch does not delay it
                         desk.send()
+                if self.watcher is not None:  # the answers of the note watcher; it never holds the desk up
+                    for result in self.watcher.results():
+                        desk.safely("note check", result["orderId"], desk.correct, result)
+                    desk.now = max(desk.now, int(self.clock.now()))
+                    desk.safely("note hold", "", desk.release_due)
                 day = desk.now // DAY
                 desk.now = max(desk.now, int(self.clock.now()))
                 # The direct offers, when play.py looks: after each event that the desk answers, at midnight, and at the minute
@@ -551,6 +665,9 @@ class Live:
             on_time = score.get("onTimeShare")
             self.log.say(f"{WEEKDAYS[before // DAY % 7]:<9}  margin €{score['marginCents'] / 100:>11,.2f}  {score['wonOrders']:>4} orders  "
                          f"{'' if on_time is None else f'{on_time:6.1%} on time'}  fallbacks {len(self.guard.fired)}")
+            if self.watcher is not None:
+                self.watcher.end_day(before // DAY)
+                self.log.say(f"           {self.watcher.day_line()}")
 
     def finish(self) -> None:
         score = self.world.score()
@@ -565,10 +682,15 @@ class Live:
         self.log.write("end", score=score)
         self.log.say(f"End: margin €{score['marginCents'] / 100:,.2f}, {score['wonOrders']} orders, "
                      f"{'ranked' if score.get('ranked') else 'not ranked'}, {len(self.guard.fired)} fallback quotes.")
+        if self.watcher is not None:
+            self.log.say(self.watcher.day_line())
+            self.log.say(watch.summary(self.folder / "review.jsonl"))
 
     def stop(self) -> None:
         self.generation += 1
         self.guard.stopped.set()
+        if self.watcher is not None:
+            self.watcher.stopped.set()
 
 
 def clock_text(minute: int) -> str:
@@ -625,12 +747,26 @@ def wait_for_final(client: Client) -> tuple[World, dict]:
         time.sleep(10)
 
 
+def note_watcher(args) -> Optional[Callable[..., watch.Watcher]]:
+    """The note watcher, with --watch-notes: the model checks each won note when its key is in the environment."""
+    if not args.watch_notes:
+        return None
+
+    def start(log: Log, folder: Path) -> watch.Watcher:
+        verify = watch.model_verifier()
+        log.say(f"Note watcher on: {watch.MODEL} checks each won note after its post; corrections and the review queue go to {folder}."
+                if verify else f"Note watcher on without a model ({watch.KEY} is not set): the rules read alone; new notes and drift go to the log.")
+        return watch.Watcher(log, folder, verify, echo=log.echo)
+    return start
+
+
 def play_final(args) -> None:
     client = Client(url=os.environ.get("SPREAD_URL") or SERVER)
     world, final = wait_for_final(client)
     level = next((w["level"] for w in client.worlds() if w["worldId"] == world.id), 8)
     guard_world = World(Client(url=client.url, key=client.key), world.id)
-    live = Live(world, guard_world.act, lambda: client.final()["now"], level, VARIANTS[args.variant], client.map(), folder_of(world.id))
+    live = Live(world, guard_world.act, lambda: client.final()["now"], level, VARIANTS[args.variant], client.map(), folder_of(world.id),
+                watcher=note_watcher(args))
     live.clock.start_at(datetime.fromisoformat(final["startsAt"].replace("Z", "+00:00")).timestamp())
     live.log.say(f"Final world {world.id}, level {level}, starts at {final['startsAt']}; variant {args.variant}. "
                  f"Ctrl-C stops the desk; the world goes on without it.")
@@ -649,7 +785,8 @@ def play_practice(args) -> None:
     client = PracticeClient()
     world = practice_world(client, args.world)
     guard_world = World(PracticeClient(), world.id)
-    live = Live(world, guard_world.act, lambda: world.snapshot()["now"], 8, VARIANTS[args.variant], world_map(client), folder_of(world.id), args.speed)
+    live = Live(world, guard_world.act, lambda: world.snapshot()["now"], 8, VARIANTS[args.variant], world_map(client), folder_of(world.id), args.speed,
+                watcher=note_watcher(args))
     keep_going(live, "practice world")
 
 
@@ -683,7 +820,7 @@ def rehearse(args) -> None:
     print(f"Practice world {world.id}, seed {args.seed}, speed {args.speed}. Files in {folder}.", flush=True)
     here = Path(__file__).resolve().parent.parent
     command = [sys.executable, "-m", "spreadlab.live"]
-    desk = command + ["play", world.id, "--speed", str(args.speed), "--variant", args.variant]
+    desk = command + ["play", world.id, "--speed", str(args.speed), "--variant", args.variant] + (["--watch-notes"] if args.watch_notes else [])
     pacer = subprocess.Popen(command + ["pace", world.id, "--speed", str(args.speed), "--start", str(args.start)], cwd=here)
     minute = lambda: int((folder / "minute").read_text() or 0) if (folder / "minute").exists() else 0
     started, killed = [], False
@@ -755,6 +892,21 @@ def report(world_id: str) -> str:
            "The day's correction at its last quote: " + ", ".join(f"{WEEKDAYS[d % 7][:3]} {s:+.3f}" for d, s in sorted(shifts.items())) + ".",
            f"Notes read at a win: {sum(1 for l in lines if l['kind'] == 'note')}. Offers sent: "
            f"{sum(1 for l in lines if l['kind'] == 'action' and l['action']['type'] == 'offer' and l['ok'])}."]
+    checks = [l for l in lines if l["kind"] == "note_check"]
+    if checks or any(l["kind"] == "note_new" for l in lines):
+        answers, fixes = Counter(l["answer"] or l["error"] for l in checks), [l for l in lines if l["kind"] == "note_fix"]
+        seconds = sorted(l["seconds"] for l in checks if l["answer"] and l["seconds"] is not None)
+        drift = ", ".join(f"{l['topic']} {l['share']:.0%} at {clock_text(l['minute'])}" for l in lines if l["kind"] == "note_drift") or "none"
+        holds = [l for l in lines if l["kind"] == "note_hold"]
+        out.append(f"First posts held for the model: {len(holds)}, {sum(1 for l in holds if l['why'] == 'answer')} until its answer, "
+                   f"{sum(1 for l in holds if l['why'] == 'late')} posted with the rules when it was late; longest "
+                   f"{max((l['seconds'] for l in holds), default=0)} s, {max((l['minutes'] for l in holds), default=0)} world minutes.")
+        out.append(f"Note watcher: {len(checks)} won notes checked ({', '.join(f'{n} {a}' for a, n in answers.most_common())}); "
+                   f"seconds median {statistics.median(seconds) if seconds else '-'}, most {seconds[-1] if seconds else '-'}; "
+                   f"{len(fixes)} fixed ({', '.join(f'{n} {o}' for o, n in Counter(l['outcome'] for l in fixes).items()) or 'none'}); "
+                   f"{sum(1 for l in lines if l['kind'] == 'note_new')} notes with a new word or sentence; "
+                   f"drift alerts: {drift}.")
+        out.append(watch.summary(folder_of(world_id) / "review.jsonl"))
     if end:
         on_time = end.get("onTimeShare")
         out.append(f"Score: margin €{end['marginCents'] / 100:,.2f}, {end['wonOrders']} orders"
@@ -767,10 +919,12 @@ def main() -> None:
     commands = parser.add_subparsers(dest="command", required=True)
     final = commands.add_parser("final", help="wait for the final or test final that is set, and play it to its end")
     final.add_argument("--variant", default=VARIANT)
+    final.add_argument("--watch-notes", action="store_true", help="a model checks each won note beside the desk (watch.py); off by default")
     play = commands.add_parser("play", help="play a practice world that something else moves (rehearse starts it)")
     play.add_argument("world")
     play.add_argument("--speed", type=float, default=1.0)
     play.add_argument("--variant", default=VARIANT)
+    play.add_argument("--watch-notes", action="store_true", help="a model checks each won note beside the desk (watch.py); off by default")
     pacer = commands.add_parser("pace", help="move a practice world's clock like the final's")
     pacer.add_argument("world")
     pacer.add_argument("--speed", type=float, default=1.0)
@@ -782,6 +936,7 @@ def main() -> None:
     rehearsal.add_argument("--kill-at", type=int, default=0, help="the world minute at which to kill the desk")
     rehearsal.add_argument("--down", type=float, default=20, help="seconds the desk stays down")
     rehearsal.add_argument("--variant", default=VARIANT)
+    rehearsal.add_argument("--watch-notes", action="store_true", help="a model checks each won note beside the desk (watch.py); off by default")
     reporting = commands.add_parser("report", help="the evidence of a run from its log")
     reporting.add_argument("world")
     args = parser.parse_args()
