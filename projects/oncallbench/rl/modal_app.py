@@ -19,7 +19,7 @@ from pathlib import Path
 
 import modal
 
-SIM_REF = os.environ.get("AQ_SIM_REF", "3bac4f4")  # the simulator the Verda runs use
+SIM_REF = os.environ.get("AQ_SIM_REF", "3bac4f4")  # the simulator the Verda runs use (then at spikes/aq-incident)
 HERE = Path(__file__).resolve().parent
 VOL = "/vol"
 HOURS = 6

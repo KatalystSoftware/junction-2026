@@ -28,7 +28,7 @@ the `aq-rl` Volume: `ckpt/<tag>/` and `out/<tag>/`. The first lines of `out/<tag
 container's `nvidia-smi -L`. From the repo root:
 
 ```
-direnv exec . sops exec-env secrets/secrets.yaml 'cd spikes/aq-incident/rl && sh -c "
+direnv exec . sops exec-env secrets/secrets.yaml 'cd projects/oncallbench/rl && sh -c "
   G=\"rl --model google/gemma-4-26B-A4B-it --adapter ckpt/gemma26-sft --lora 32 --train-device cuda:1 --groups 4 --per 8 --steps 60 --overlap --max-ctx 32768 --gpu-mem 0.85 --eval-every 15 --eval-samples 8 --eval-temp 1.0 --save-every 5 --final-samples 8\"
   ~/.local/bin/modal run --detach modal_app.py --runs \"\$G --levels 3,4 --lr 1e-5 --tag gemma26-rl-m; \$G --levels 4 --lr 1e-5 --tag gemma26-rl-l4\"
 "'

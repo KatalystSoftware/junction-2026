@@ -94,8 +94,38 @@ context. The mean score is ± one standard error.
 
 The fresh seeds were never in any demo or evaluation before this run. The adapter scores the same
 on its training seeds, the held-out seeds and the fresh ones, so the gain does not come from
-remembering seeds. Whether it reads each incident or replays the reference's routine is a separate
-question. An audit of that (`audit.py`) is in progress beside the Modal runner and is not settled here.
+remembering seeds. It also reads each incident rather than replaying the reference's routine
+(`audit.py`):
+
+- **A replayed routine scores nothing.** The reference's own calls from one seed, replayed unchanged
+  on another, score 0.00 on all 20 level-4 pairs tried (raw −0.28: worse than doing nothing). Only 4 of
+  71 replayed undos hit a fault. Nearby seeds are unrelated incidents (each seed is hashed per draw),
+  and no held-out or fresh seed has the same set of faults as any demo seed.
+- **It acts on what it observed.** In 96 fresh level-4 episodes, every one of its 317 rollbacks and
+  config reverts came after it had read that service's diff. 97% of its undos hit a planted fault.
+  5 of its 337 mitigations went to a service that is a fault in another evaluated seed but not in this one.
+- **Edited observations change its action.** At 30 decision points in 10 level-4 transcripts, one tool
+  result was edited and the adapter asked for its next reply at T 0:
+  - Swap the name of the service it was about to mitigate with that of a healthy one, everywhere in
+    the conversation: it mitigates the new service 10 times out of 10.
+  - Remove the harmful hunk from the diff it was about to undo: 8 out of 10 times it skips the undo
+    and reads the other change's diff.
+  - Make the metrics calm before a scale-up: it still scales 7 times out of 10. The alerts and the
+    retry-storm logs in the same conversation still show overload, so this edit is not decisive.
+
+  Without edits, it repeats the transcript's action at all 30 points. The untrained model mitigates at
+  none of them, edited or not: it keeps querying.
+- **What it does not do.** It writes no reasoning text, only tool calls, and it follows the
+  reference's procedure: logs, then changes, then the diff, then the undo, then a one-minute throttle
+  to drain the retries. Its misses are faults that this procedure handles badly. An overload with a
+  retry storm gets throttled for a minute instead of scaled (the worst fresh seed, 0.34). A batch job's
+  saturation gets scaled. At level 4, 31 of 96 episodes run out of their 48 replies around minute 88
+  (0.42, against 0.67 for the rest). It makes about one call per reply, as the demos do, and these
+  episodes spend more replies on queries. A simple scripted policy, the simulator's `alerts_only`
+  (the reference without tracing from the failing edge), still scores 0.74 at level 4 on the same seeds.
+- **Where the adapter changed Gemma.** Layers 11-23 changed most, through every module, and
+  `q_proj` changed most of all; layers 0-7 changed least (`out/lora-sft.png`). The updates use
+  about 10-16 of the 32 ranks for 90% of their size.
 
 - **SFT:** `run.py sft --model google/gemma-4-26B-A4B-it --lora 32 --train-device cuda:1` on
   the reference's demos, 2 epochs, 100 optimiser steps. The loss fell from 0.30 at step 5 to 0.011 at
@@ -105,8 +135,9 @@ question. An audit of that (`audit.py`) is in progress beside the Modal runner a
   vLLM on one, the LoRA trainer on the other. The adapter's three evaluations above and the fresh-seed
   baseline ran there. RL from the untrained model ran 2 steps at level 4 as a smoke test (training
   reward 0.068, then 0.088). That is too short to claim an RL result for Gemma, and none is claimed.
-- **Where the code is:** `modal_app.py` is on the branch `feat/aq-incident-modal`, not yet merged into `projects/oncallbench/rl/`. The adapter (`ckpt/gemma26-sft`) and the
-  per-episode transcripts are on the Modal Volume `aq-rl`, not in git.
+- **Where the code is:** `modal_app.py` (the Modal runner) and `audit.py` (the audit) are in this
+  folder. The adapter (`ckpt/gemma26-sft`) and the per-episode transcripts are on the Modal Volume
+  `aq-rl`, not in git.
 
 ## Setup
 
