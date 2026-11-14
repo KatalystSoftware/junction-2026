@@ -441,3 +441,7 @@ VARIANTS["t760all-onward-step04"] = _full_weeks(VARIANTS["fee16-80-q24-wide-pair
 # 0.2, and `late_cost` 150 to 100 (with step04's 0.4). A thinner week plays t760all-onward-step04 exactly.
 VARIANTS["s04-rich-ss02"] = _full_weeks(VARIANTS["t760all-onward-step04"], slow_step=0.2)
 VARIANTS["s04-rich-late100"] = _full_weeks(VARIANTS["t760all-onward-step04"], late_cost=100)
+# Track B's row 5 on `trackb-merged`: the climb's step04 on the 48-hour count under 760 drivers (row 4), only in a week of
+# 760 or more drivers. A thinner week plays row 4 exactly; at 760 or more it is `t760all-onward-step04`.
+_ROW_4 = VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760"]
+VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss04"] = _full_weeks(_ROW_4, slow_step=0.4)
