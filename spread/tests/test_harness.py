@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import collections
 import gzip
+import json
 import inspect
 import math
 import shutil
@@ -772,3 +773,34 @@ def test_a_week_notes_the_lowest_and_highest_share_of_the_bucket(monkeypatch):
     for _ in range(3):
         client.call("GET", "/v1/worlds/w1")
     assert client.calls == 3 and client.rates == (150, 180)
+
+
+def test_a_paired_check_stops_only_when_its_answer_cannot_change(tmp_path, monkeypatch):
+    from spreadlab import stopcheck
+
+    monkeypatch.setenv("SPREAD_DATA", str(tmp_path))
+    seeds = stopcheck.expand("s-01..60")
+    assert seeds[0] == "s-01" and seeds[-1] == "s-60" and len(seeds) == 60
+
+    def save(variant, seed, euros, ranked=True):
+        path = play.score_path(variant, seed)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps({"score": {"marginCents": euros * 100, "ranked": ranked}}))
+
+    for i, seed in enumerate(seeds):
+        save("ref", seed, 10_000 + 37 * (i % 7))
+    for seed in seeds[:9] + seeds[10:12]:  # 11 weeks, but the 10th seed is missing: no look yet
+        save("worse", seed, 8_000)
+    assert stopcheck.decide("worse", "ref", seeds)[0] is False
+    save("worse", seeds[9], 8_000)
+    stop, why = stopcheck.decide("worse", "ref", seeds)
+    assert stop and why.startswith("stop: worse") and "first 10 of 60" in why
+
+    for seed in seeds[:20]:  # far ahead: plays on, the 1-in-60 rule needs the whole list
+        save("better", seed, 12_000)
+    assert stopcheck.decide("better", "ref", seeds)[0] is False
+
+    save("risky", seeds[0], 0, ranked=False)  # 60 seeds allow one week under 90% on time ...
+    assert stopcheck.decide("risky", "ref", seeds)[0] is False
+    save("risky", seeds[30], 0, ranked=False)  # ... and a second is out, wherever it is in the list
+    assert stopcheck.decide("risky", "ref", seeds) == (True, "stop: out, 2 weeks under 90% on time where 60 seeds allow 1")

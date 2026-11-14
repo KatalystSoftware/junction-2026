@@ -131,6 +131,7 @@ from this folder with `PYTHONPATH=. uv run --with scikit-learn python scratch/<n
 | `uv run python -m spreadlab.play --variant baseline --seed cat-001` | Plays one week with a variant and saves the run | 900 to 1,200 requests |
 | `uv run python -m spreadlab.sweep --variants baseline,price-1.6 --list tune --count 10` | Plays the variants on the first seeds of a list, 7 weeks at once, and prints the comparison | one week each |
 | `uv run python -m spreadlab.report --variants ... --weeks` | Prints the comparison again, with one line per week | none |
+| `uv run python -m spreadlab.stopcheck --variant fee16 --reference ... --seeds fresh-1901..1960` | Exit 0 when a paired check can stop early: the challenger is out by the 1-in-60 rule or worse at a look every 10 weeks. Run it before each challenger week; on the saved checks it played 54% fewer weeks and changed no answer | none |
 | `uv run python -m spreadlab.ledger --variants ...` | Builds the mistake ledger of the variants | none |
 
 A sweep skips a week that is saved with the same parameters and policy code, so it can be stopped
