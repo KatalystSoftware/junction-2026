@@ -254,6 +254,14 @@ VARIANTS: dict[str, dict] = {
     # ... and with lateness in every quote and the late chance that knows Friday's deadlines (`slow-step-gate-25-friday-late-150`).
     "slow-friday-late-150-kinds-limits": {**REFERENCE, "backlog_step": 0, "slow_step": 0.8, "max_unbooked": 25, "slow_model": "friday", "cost": 1.2, "late_cost": 150,
                                           "kinds": KINDS, "note_limits": True},
+    # An internal on-time target in place of the fixed buffer. Lateness is priced at what a late order costs (refund 46 and
+    # dealer trust 36, scratch/opt/calibrate.py), the waiting-car surcharge is halved and the gate is 40, so the desk quotes
+    # lower than the candidate. While the projected on-time share is under the target, once 40 orders are won, it quotes as
+    # the candidate with the 90% rule's price on and a gate of 12. Only new quotes change: won orders are posted as always.
+    **{f"target-{t}": {**REFERENCE, "backlog_step": 0, "slow_step": 0.4, "max_unbooked": 40, "slow_model": "friday", "cost": 1.2, "late_cost": 85,
+                       "kinds": KINDS, "note_limits": True, "min_on_time": t / 100, "behind_from": 40,
+                       "when_behind": {"late_cost": 150, "slow_step": 0.8, "max_unbooked": 12, "rule_cost": 800}}
+       for t in (85, 87, 89, 91, 93)},
     # ... the same without the note's limits, whose posting changed after its weeks were played.
     "slow-friday-late-150-kinds": {**REFERENCE, "backlog_step": 0, "slow_step": 0.8, "max_unbooked": 25, "slow_model": "friday", "cost": 1.2, "late_cost": 150, "kinds": KINDS},
     # The best point of the search over these parameters together (scratch/search.py, trial 16 of 20, on 30 tune seeds), and with the kinds.
