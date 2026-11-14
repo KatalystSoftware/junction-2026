@@ -191,7 +191,11 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self.send_response(301); self.send_header("location", "/pitch/"); self.end_headers(); return
         if url.path.startswith("/pitch/") and PITCH:
             rel = url.path[len("/pitch/"):] or "index.html"
+            if rel.endswith("/"):  # a folder inside the deck (the light deck, /pitch/lite/)
+                rel += "index.html"
             path = PITCH / rel
+            if path.is_dir():  # /pitch/lite: relative links need the slash
+                self.send_response(301); self.send_header("location", url.path + "/"); self.end_headers(); return
             if not re.fullmatch(r"[\w.-]+(/[\w.-]+)*", rel) or ".." in rel or not path.is_file():
                 return self.text(404, "not found")
             return self.reply(200, path.read_bytes(), TYPES.get(path.suffix, "application/octet-stream"))
