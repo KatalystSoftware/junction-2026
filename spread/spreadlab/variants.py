@@ -453,3 +453,6 @@ VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss
     **VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02"],
     "when_tight": {**VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02"]["when_tight"],
                    "due_cap": 62, "due_cap_wave": 0}}
+# The aggressive row A1 on safe row 7: the day cap under 760 drivers and `late_cost` 100 at 760 or more.
+VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100"] = _full_weeks(
+    VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62"], late_cost=100)
