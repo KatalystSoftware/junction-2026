@@ -1119,6 +1119,13 @@ stopped it after the screen; `exposure` stays off and `day-cap-70` stays the on-
   gigs, 98% of its drops are due that day, and no week of 1,094 has two; a dropped car's late chance by hours left and load.
 - `need` with drivers near the delivery place and daytime hours in hand: left-out AUC 0.809 to 0.827.
 
+**Missing before it can go on the live desk.** `LiveExposureDesk` exists but has not been through the crash-and-restart
+replay. At a rejoin, `ExposurePolicy` does not rebuild `needs_since` (the hours each car has waited for a driver) or
+`nights` (each night's held cars due that day and how many were dropped in its first hour). Both live only in memory, so a
+restarted desk would lose each dropped car's wait since its drop and would read every past night as calm. And `need` was fitted on weeks without
+fee holds. A hold makes cars wait longer, and the hours waited is one of its terms, so `need` must be refitted on such
+weeks before the rule is combined with them.
+
 ```bash
 # the inputs and fits (data/exposure/; each reads the saved weeks under data/runs/)
 PYTHONPATH=. uv run --with numpy python scratch/exposure/measure.py rows slow-friday-late-150-kinds-limits,steep-notes-offers-8,thin-premium-0.4
