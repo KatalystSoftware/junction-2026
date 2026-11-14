@@ -166,7 +166,7 @@
 				{/each}
 				<button class="cdx-button cdx-button--action-progressive cdx-button--weight-primary" type="submit" disabled={running}>{running ? 'Running…' : 'Run'}</button>
 			</form>
-			{#if failure}<p class="small error" role="alert">{failure}</p>{/if}
+			{#if failure}<div class="cdx-message cdx-message--inline cdx-message--error" role="alert"><span class="cdx-message__icon"></span><div class="cdx-message__content">{failure}</div></div>{/if}
 
 			<div aria-live="polite">
 				{#each runs[preset.name] ?? [] as r, i}

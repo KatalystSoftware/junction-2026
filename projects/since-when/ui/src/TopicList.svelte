@@ -57,7 +57,7 @@
 			{/each}
 		</div>
 		{#if queue.error}
-			<p class="note error" role="alert">Could not load the topics: {queue.error}</p>
+			<div class="cdx-message cdx-message--block cdx-message--error" role="alert"><span class="cdx-message__icon"></span><div class="cdx-message__content">Could not load the topics: {queue.error}</div></div>
 		{:else if !queue.items.length}
 			<p class="note subtle">{queue.loading ? 'Loading…' : nav.q ? `No topic matches "${nav.q}".` : 'No topics yet.'}</p>
 		{/if}

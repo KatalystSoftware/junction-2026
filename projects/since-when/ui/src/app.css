@@ -130,10 +130,6 @@ mark.term {
 	font-variant-numeric: tabular-nums;
 }
 
-.error {
-	color: var(--color-error);
-}
-
 .sr-only {
 	position: absolute;
 	width: 1px;

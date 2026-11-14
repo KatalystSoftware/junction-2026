@@ -108,7 +108,7 @@
 <section aria-labelledby="timeline-title">
 	<h2 id="timeline-title">When each difference opened and closed</h2>
 	{#if failure}
-		<p class="state error" role="alert">{failure}</p>
+		<div class="cdx-message cdx-message--block cdx-message--error" role="alert"><span class="cdx-message__icon"></span><div class="cdx-message__content">{failure}</div></div>
 	{:else if !data}
 		<p class="state subtle">Reading the history…</p>
 	{:else if !stories.length}
@@ -197,6 +197,10 @@
 
 	.state {
 		padding: var(--spacing-150) 0;
+	}
+
+	.cdx-message {
+		margin-top: var(--spacing-100);
 	}
 
 	.tools {

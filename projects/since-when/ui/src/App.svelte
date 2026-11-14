@@ -85,7 +85,7 @@
 
 <main>
 	{#if failure}
-		<p class="state error" role="alert">Could not load this topic: {failure}</p>
+		<div class="cdx-message cdx-message--block cdx-message--error" role="alert"><span class="cdx-message__icon"></span><div class="cdx-message__content">Could not load this topic: {failure}</div></div>
 	{:else if !route && !queue.loading && !queue.items.length}
 		<p class="state">{queue.error ? `Could not load the topics: ${queue.error}` : 'No topics yet.'}</p>
 	{:else if !topic || !route || !pair}
