@@ -109,8 +109,28 @@ One row per (topic, edition to fix), sorted by `score` descending.
  "refs": {"fi": 500, "sv": 21, "en": 30},
  "quality": {"fi": "Suositeltu"},
  "leads": {"fi": {"text": "…", "rev_id": 123, "also": "second lead passage, if any"}},
- "findings": [Finding], "sql": []}
+ "findings": [Finding],
+ "checked": {"judge": "nemotron-3.5-super-vl", "as_of": "2026-11-14", "kept": 146, "changed": 3, "new": 2,
+             "unchecked": 9, "set_aside": {"stated_elsewhere": 55, "not_confirmed": 1, "repeat": 5}},
+ "sql": []}
 ```
+
+`checked` is the claim check's totals for the topic (`checked_finding`, described in
+[`differences/README.md`](../differences/README.md)), or `null` when the check has not run on it.
+Each finding then has `check`: `null` when the check did not look at the row (the word list's
+framing rows, coverage rows), else
+
+```json
+{"outcome": "kept", "reason": null, "verdict": "contradicted", "judge": "nemotron-3.5-super-vl",
+ "as_of": "2026-11-14", "claim": {"lang": "sv", "quote": "…", "about": "…"}, "figures": ["102", "50"],
+ "searched": 22, "read": 4,
+ "evidence": {"lang": "en", "rev_id": 1383067871, "section": "…", "quote": "…", "passage": null}}
+```
+
+`outcome` is `kept`, `changed` (the finding is returned as the check rewrote it, under its own id
+and dates), `new` (a difference the check found itself: a negative `id`, no history), `set_aside`
+(with `reason` `stated_elsewhere`, `not_confirmed` or `repeat`; not a difference after all) or
+`unchecked` (framing, passed through). `evidence.passage` is the whole passage, on a set-aside row only.
 
 A **Finding**:
 

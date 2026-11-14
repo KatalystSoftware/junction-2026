@@ -66,7 +66,9 @@ builds the bundle in a Node stage. `fixtures/` holds the answers it gives when s
 - `src/App.svelte`: the top bar, the topic's title, loading the topic and the edits behind its
   differences (the API's timeline, asked once for each edition), the articles' links.
 - `src/Differences.svelte`: the list of differences under the strips' scale, then what one edition
-  says and another leaves out, collapsed for each edition.
+  says and another leaves out, collapsed for each edition. On a topic the claim check has run on:
+  only what the check let stand, then wording (unchecked), then what the check set aside, collapsed,
+  each with the passage that states it.
 - `src/Difference.svelte`: one difference: its headline and time strip; opened, each edition's
   quote with the differing words marked, and "Check in MariaDB".
 - `src/Strip.svelte`: the time strip: one lane for each quoted edition from 2001 to today, a bar
@@ -150,7 +152,9 @@ Codex documents no CSS-only version of three things, and those stay native:
 
 - Quotes are shown word for word, as the API stores them, each linking to the revision it was
   taken from.
-- The list is marked "Machine-suggested" and what one edition leaves out is marked "Unchecked";
+- A list says how far to trust it: "Model-checked" where the claim check has run (a second model
+  looked each row up in the whole other article; an opened difference has "Checked", with the judge
+  and the passage it settled on), otherwise "Machine-suggested" and "Unchecked";
   each mark opens the sentence that says what it means. The page never says what an article should
   say.
 - No sentence that explains the page is printed in the open. It goes behind a mark's popover, a

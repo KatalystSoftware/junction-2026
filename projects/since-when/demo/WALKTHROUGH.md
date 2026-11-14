@@ -20,7 +20,9 @@ what must be on screen.
 
 Open <http://localhost:8078/#/Q1412941>
 
-On screen: "9 differences". The first one is open, headed “fascist”, with its time strip on the
+On screen: "9 differences", marked "Model-checked": figures and accounts a second model looked up in
+the whole other article. Scroll past them to **Wording**, marked "Unchecked", and open its first row,
+“fascist”. Its time strip is on the
 right: three lanes, Finnish, Swedish and English, from 2001 to today. The Finnish lane is empty. The
 Swedish lane has a dot at its right end and "23 Oct 2026". The English lane has two grey bars
 (2004–2006 and 2007–2009), then a bar from "30 May 2022" to today. Under it the three first
@@ -114,12 +116,9 @@ Same steps, same clicks. Only the opening sentence of step 1 changes:
 
 What comes back:
 
-- Step 1, Finnish War: "19 differences"; the first, open, is the surrender of Sveaborg (early May
-  in Finnish, 3 May in Swedish, 6 May in English, the English lane dated "24 May 2015"; findings 14353 and
-  14474 as one difference). Diet of Porvoo: "5 differences"; the first is the emperor's pledge
-  (29 March 1809 in Finnish and Swedish, "15th/27th day of March" in English, the English lane
-  dated "16 Jun 2024"), and the third is the opening date of the diet (22 March in Finnish, 25 March in English;
-  finding 14115). The wording and quotes of both are in [`hero-findings.md`](hero-findings.md).
+- Step 1, Finnish War: "20 differences", all from the claim check; Diet of Porvoo: "3 differences".
+  Which one is first changed when the page moved to checked findings and has not been rehearsed:
+  open the page before presenting it. The wording and quotes of both are in [`hero-findings.md`](hero-findings.md).
 - Step 3 uses the link in the table, not **Check in MariaDB**: the statement reads an article's
   first passage, and the first difference of these two topics is further down the article.
 - Step 3, Finnish War: on 2026-04-25 the English first passage is revision 1259768954, "The Finnish
