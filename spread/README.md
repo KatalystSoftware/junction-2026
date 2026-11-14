@@ -49,6 +49,7 @@ chance the private and trade-in requests and the note's own deadline and site ho
 | 38 thin worlds, the lowest of `steep-notes-offers-8` among them | +€1,830 a week (1,398 to 2,268); no week under 90% against 5 |
 | Test final, Saturday 14:00 Helsinki, played by `steep-notes-offers-8` at `480d933` | Joined on Thursday after three replayed days, so live for two days: €1,401.25, 68 orders, 97.1% on time, ranked. All 417 live requests quoted by the policy, none by the guard, none missed; at least 3.6 s left at a quote, 4.5 s at the median; no lost connection, no 429 or 5xx, and the longest hold-up of the event stream under a second |
 | Ranking round, Saturday 15:00 Helsinki, played by this variant from the checkout the unseen sets confirmed | €68,743.40 over five weeks, €13,749 a week, every week ranked: €15,686, €13,473, €9,339, €11,968 and €18,278 on 323, 343, 240, 345 and 409 orders; 96.9% on time, the lowest week 95.6%. Place 40 of 62 ranked teams on the final board, at 0.81 of tenth place's €84,939.50 |
+| Test final, Sunday 01:00 Helsinki, played by `fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-all` (tag `trackb-merge-2`) with a planned takeover | €10,192, 251 orders, 96.4% on time, ranked. The desk was killed on purpose and the standby joined 26.1 s later and played the rest without errors; 5 requests went unquoted in the gap. The one dip in on-time share, from 98% to 93.3% and back to 96.4%, came with a Wednesday-night drop wave of drivers |
 | The final | not played yet at this commit |
 
 The gap to the top 10 in that round is orders won, not price: they won 441 orders a week at €41.6 an
@@ -73,7 +74,9 @@ to disk every second, and a desk that starts again rejoins the week without givi
 gig. A second machine stands by, started by a person: its alarm rings after 8 seconds without the desk's
 heartbeat or when a request reaches its deadline without a quote, and a desk that rejoins and finds gigs
 it did not post stops for good. In the 14:00 test final the alarm watched the whole run and raised no
-false alarm. "The final" has the replays, the rehearsal and the standby's procedure.
+false alarm. In the Sunday 01:00 test final a planned kill of the first desk was followed by the standby's join 26.1 s
+later; it left 5 requests unquoted and played the rest of the week. "The final" has the replays, the rehearsal and the
+standby's procedure.
 
 **What would break it.** A Friday drop wave: on some Fridays 10 or more drivers drop their bookings in
 the night's first hour, and Thursday's wins must find a driver on the day. The default's three lowest weeks
@@ -1295,7 +1298,8 @@ When the alarm rings:
    machine's world folder: that desk then rebuilds the week from the world's history.
 
 Rehearse it in a test final. Stop the first desk on purpose with Ctrl-C in its loop, start the standby by hand,
-and time the gap from the alarm's first ring to the standby's "Joined" line.
+and time the gap from the alarm's first ring to the standby's "Joined" line. In the Sunday 01:00 test final this took
+26.1 s from the kill to the join, 5 requests went unquoted in the gap, and the week was ranked at 96.4% on time.
 
 **As set up for the final.** The standby is the Verda instance `the standby instance` in FIN-01, another data
 centre than the runner's FIN-03, made with the API outside `infra/verda` (4 vCPU, €0.05 an hour). Its user `amp` has
