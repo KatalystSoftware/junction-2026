@@ -42,7 +42,7 @@ and Since When `site/logos/since-when.svg`, the same file as `projects/since-whe
 ## The Spread pitch
 
 [`site/spread/index.html`](site/spread/index.html), at <https://spread.katalyst.fyi/>, is the Spread desk's
-jury deck: one self-contained page in the site's typeface and colours, five slides by default. `#7`, `#9`
+jury deck: one self-contained page in the site's typeface on the deck's own dark colours, five slides by default. `#7`, `#9`
 or `#10` in the address opens a longer cut; the arrow keys step through it, and Print or Save as PDF gives
 one 16:9 slide a page. The "See the pitch" link under "Also built" points at it.
 

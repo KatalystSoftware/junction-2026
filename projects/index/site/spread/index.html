@@ -264,21 +264,15 @@
 
 <style>
 	.deck {
-		/* katalyst.fyi's palette: ground, ink and rule for the slides, the masthead's field for the title. */
-		--bg: oklch(97% 0.012 165);
-		--panel: oklch(99.5% 0.004 165);
-		--ink: oklch(24% 0.035 170);
-		--dim: oklch(42% 0.03 170);
-		--line: oklch(86% 0.025 165);
-		--field: oklch(32% 0.065 168);
-		--field-ink: oklch(96% 0.02 150);
-		--field-soft: oklch(84% 0.045 160);
-		--field-rule: oklch(46% 0.06 168);
-		--spark: oklch(89% 0.19 128);
-		/* amber: the desk and play; cyan: the stand-in and the farm. The names stay; the colours are the site's. */
-		--amber: oklch(36% 0.085 168);
-		--cyan: oklch(52% 0.15 135);
-		--red: oklch(52% 0.18 28);
+		--bg: #0a0f1d;
+		--panel: #111829;
+		--ink: #f3efe4;
+		--dim: #98a0b3;
+		--line: #26304a;
+		/* amber: the desk and play; cyan: the stand-in and the farm. */
+		--amber: #ffb22e;
+		--cyan: #46d9cf;
+		--red: #ff6b5e;
 		--sans: 'Archivo', system-ui, sans-serif;
 		--serif: var(--sans);
 		--mono: var(--sans);
@@ -287,21 +281,6 @@
 		font-stretch: 100%;
 		-webkit-font-smoothing: antialiased;
 		outline: none;
-	}
-	@media (prefers-color-scheme: dark) {
-		.deck {
-			--bg: oklch(19% 0.022 170);
-			--panel: oklch(23% 0.026 170);
-			--ink: oklch(94% 0.015 160);
-			--dim: oklch(76% 0.03 162);
-			--line: oklch(33% 0.03 168);
-			--field: oklch(26% 0.05 168);
-			--field-soft: oklch(82% 0.04 160);
-			--field-rule: oklch(40% 0.05 168);
-			--amber: oklch(88% 0.15 132);
-			--cyan: oklch(78% 0.1 185);
-			--red: oklch(72% 0.16 28);
-		}
 	}
 	.deck *,
 	.deck *::before,
@@ -323,13 +302,14 @@
 		position: relative;
 		aspect-ratio: 16 / 9;
 		overflow: hidden;
-		border-radius: 8px;
-		border: 1px solid var(--line);
-		background: var(--bg);
+		border-radius: 10px;
+		background:
+			radial-gradient(120% 90% at 85% 10%, #16213d 0%, rgba(10, 15, 29, 0) 55%),
+			var(--bg);
 		font-variant-numeric: tabular-nums;
 	}
 	.deck:fullscreen {
-		background: var(--bg);
+		background: #05080f;
 		display: grid;
 		place-items: center;
 	}
@@ -338,7 +318,6 @@
 	}
 	.deck:fullscreen .stage {
 		border-radius: 0;
-		border: 0;
 	}
 
 	/* slides */
@@ -364,16 +343,13 @@
 			opacity 0.35s ease-out,
 			transform 0.35s ease-out;
 	}
-	.s-title::after {
-		display: none;
-	}
 	.slide::after {
 		content: '';
 		position: absolute;
 		left: calc(5.4 * var(--k));
 		right: calc(5.4 * var(--k));
 		bottom: calc(4.4 * var(--k));
-		border-top: 1px solid var(--line);
+		border-top: 2px dashed rgba(255, 178, 46, 0.18);
 	}
 	.in {
 		opacity: 0;
@@ -457,13 +433,6 @@
 
 	/* title */
 	.s-title {
-		--ink: var(--field-ink);
-		--dim: var(--field-soft);
-		--line: var(--field-rule);
-		--amber: var(--spark);
-		--cyan: var(--field-ink);
-		color: var(--ink);
-		background: linear-gradient(var(--field), var(--field)) top / 100% calc(100% - 4.4 * var(--k)) no-repeat;
 		flex-direction: row;
 		gap: calc(3 * var(--k));
 	}
@@ -1422,9 +1391,6 @@
 			break-after: page;
 			background: var(--bg);
 		}
-		.s-title {
-			background: var(--field);
-		}
 		.in {
 			opacity: 1;
 			transform: none;
@@ -1548,7 +1514,7 @@
 			if (FINAL) {
 				f.textContent = FINAL
 				f.classList.add('done')
-			} else f.textContent = 'The final plays Sunday at 09:00 Helsinki. Its result goes here when it ends.'
+			} else f.textContent = 'Test final, Sunday 01:00 Helsinki: merge 2 on the live desk, €10,192, 96.4% on time, ranked. We killed the desk on purpose; the standby took over in 26.1 s. The final plays at 09:00.'
 		}
 
 		// ---------- counters ----------
