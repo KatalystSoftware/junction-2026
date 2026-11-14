@@ -28,6 +28,9 @@ function chromium() {
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 const browser = spawn(chromium(), ['--headless', '--no-sandbox', '--remote-debugging-port=0', `--user-data-dir=${mkdtempSync(join(tmpdir(), 'kutsu-walk-'))}`, 'about:blank'])
 const errors = []
+// what the page sent that was not a plain GET, and how many times it opened a file chooser
+const posts = []
+let choosers = 0
 try {
   // the browser prints the address of its debugging socket on stderr
   const address = await new Promise((resolve, reject) => {
@@ -48,6 +51,8 @@ try {
   socket.onmessage = ({ data }) => {
     const message = JSON.parse(data)
     if (message.id) return waiting.get(message.id)?.(message.result ?? message.error)
+    if (message.method === 'Network.requestWillBeSent' && message.params.request.method !== 'GET') posts.push(message.params.request.url)
+    if (message.method === 'Page.fileChooserOpened') choosers++
     if (message.method === 'Runtime.exceptionThrown') errors.push(message.params.exceptionDetails.exception?.description ?? message.params.exceptionDetails.text)
     if (message.method === 'Runtime.consoleAPICalled' && message.params.type === 'error')
       errors.push(message.params.args.map((a) => a.value ?? a.description).join(' '))
@@ -177,6 +182,106 @@ try {
   await paste(LINK, 'https://www.linkedin.com/in/someone-else/')
   await holds('a LinkedIn address pasted among the links', LINK, '')
   await holds('the LinkedIn field after that paste', LINKEDIN, 'someone-else')
+
+  // a CV is a PDF read in the browser, or its text pasted. The files are made here: one with text, one with a drawing
+  // and no text (what a scan is to a reader), one that is not a PDF, an empty one and one too large.
+  const pdf = (lines) => {
+    const stream = lines.length ? `BT /F1 11 Tf 50 780 Td 14 TL ${lines.map((l) => `(${l}) Tj T*`).join(' ')} ET` : '50 50 m 500 700 l S'
+    const objects = [
+      '<< /Type /Catalog /Pages 2 0 R >>',
+      '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
+      '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>',
+      `<< /Length ${String(stream.length)} >>\nstream\n${stream}\nendstream`,
+      '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>',
+    ]
+    let out = '%PDF-1.4\n'
+    const at = objects.map((o, i) => {
+      const start = out.length
+      out += `${String(i + 1)} 0 obj\n${o}\nendobj\n`
+      return start
+    })
+    const size = String(objects.length + 1)
+    return `${out}xref\n0 ${size}\n0000000000 65535 f \n${at.map((a) => `${String(a).padStart(10, '0')} 00000 n \n`).join('')}trailer\n<< /Size ${size} /Root 1 0 R >>\nstartxref\n${String(out.length)}\n%%EOF\n`
+  }
+  const CV = ['Aino Example', 'Process engineer, thin films', 'Espoo, Finland', 'Experience', '2019-2026 Process engineer at a made-up fab: ran ALD and PECVD deposition on 200 mm tools,', 'wrote the recipes and the run cards, and cut particle counts by a third.', 'Education', 'M.Sc. (Tech.), materials science', 'Languages: Finnish, English']
+  const files = mkdtempSync(join(tmpdir(), 'kutsu-cv-'))
+  const file = (name, content) => {
+    writeFileSync(join(files, name), content)
+    return join(files, name)
+  }
+  const TEXT = 'textarea[aria-label="The text of your CV"]'
+  const until = async (what, test) => {
+    for (let i = 0; i < 40; i++) {
+      if (await evaluate(test)) return
+      await sleep(250)
+    }
+    errors.push(`${what}: never happened`)
+  }
+  const choose = async (path) => {
+    const { result } = await send('Runtime.evaluate', { expression: `document.querySelector('input[type=file]')` })
+    await send('DOM.setFileInputFiles', { files: [path], objectId: result.objectId })
+  }
+  const refused = async (what, path, says) => {
+    await choose(path)
+    await until(`${what} is refused`, `document.body.innerText.includes(${JSON.stringify(says)})`)
+    await until(`${what} leaves the text field to paste into`, `!!document.querySelector('${TEXT}') && document.body.innerText.includes('Paste the text of your CV instead.')`)
+    await holds(`the text field after ${what}`, TEXT, '')
+  }
+  await send('Network.enable')
+  await send('Page.setInterceptFileChooserDialog', { enabled: true })
+  await open('#/me')
+  await enter()
+  posts.length = 0
+  await expect('the first card', 'Add your CV as a PDF')
+  await expect('the first card', 'Paste CV text instead')
+  // the chooser is reached and opened from the keyboard, and Enter on it does not start the reading
+  await evaluate(`document.querySelector('input[type=file]').focus()`)
+  await enter()
+  if (choosers !== 1) errors.push(`Enter on the file chooser opened it ${String(choosers)} times, not once`)
+  await expect('the first card after Enter on the chooser', 'Add your CV as a PDF')
+  await shot('me-cv-empty')
+  await refused('a text file', file('notes.txt', CV.join('\n')), 'Only a PDF can be read here.')
+  await shot('me-cv-refused')
+  await refused('an empty file', file('empty.pdf', ''), 'That file is empty.')
+  await refused('a file that only has the name of a PDF', file('renamed.pdf', CV.join('\n')), 'That file is not a PDF')
+  await refused('a file that is too large', file('large.pdf', Buffer.concat([Buffer.from('%PDF-1.4\n'), Buffer.alloc(10 * 1024 * 1024)])), 'larger than 10 MB')
+  await refused('a PDF with no text in it', file('scan.pdf', pdf([])), 'No text could be read from that PDF.')
+  // the way on after a file that could not be read: the text, typed or pasted
+  await type(TEXT, 'Process engineer. ')
+  await evaluate(`document.querySelector('${TEXT}').focus()`)
+  await send('Input.insertText', { text: CV.join('\n') })
+  await until('pasted text is offered for reading', `document.querySelector('button[aria-label="Read my CV"]').getAttribute('aria-checked') === 'true'`)
+  await holds('the text field after typing and pasting', TEXT, `Process engineer. ${CV.join('\n')}`)
+  if ((await text()).includes('could be read from that PDF')) errors.push('a refusal is still shown once the text is typed instead')
+  await empty(TEXT)
+  // a PDF with text: its name, its text in the field to check and change, and a way to take it out again
+  await choose(file('aino-example-cv.pdf', pdf(CV)))
+  await until('the text of a PDF arrives in the field', `(document.querySelector('${TEXT}')?.value ?? '').includes('Process engineer, thin films')`)
+  await expect('a PDF that was read', 'aino-example-cv.pdf')
+  await expect('a PDF that was read', 'this text, not the file, is what gets read')
+  if ((await text()).includes('could be read from that PDF')) errors.push('the last refusal is still shown after a PDF was read')
+  if ((await evaluate(`document.querySelector('button[aria-label="Read my CV"]').getAttribute('aria-checked')`)) !== 'true') errors.push('a PDF that was read is not offered for reading')
+  await evaluate(`(() => { const f = document.querySelector('${TEXT}'); f.focus(); f.setSelectionRange(f.value.length, f.value.length) })()`)
+  await type(TEXT, ' Also Swedish.')
+  if (!(await field(TEXT)).endsWith('Finnish, English Also Swedish.')) errors.push('the text read from a PDF cannot be changed')
+  await shot('me-cv-read')
+  await evaluate(`[...document.querySelectorAll('button')].find((b) => b.textContent === 'Remove').click()`)
+  await until('a removed CV is gone', `!document.querySelector('${TEXT}') && !document.body.innerText.includes('aino-example-cv.pdf')`)
+  // dropped on the card, even off the box, a file is taken and not opened in the tab
+  await evaluate(`(() => {
+    const data = new DataTransfer()
+    data.items.add(new File([${JSON.stringify(pdf(CV))}], 'dropped-cv.pdf', { type: 'application/pdf' }))
+    document.querySelector('${LINK}').dispatchEvent(new DragEvent('drop', { dataTransfer: data, bubbles: true, cancelable: true }))
+  })()`)
+  await until('a dropped PDF is read', `(document.querySelector('${TEXT}')?.value ?? '').includes('Process engineer, thin films') && document.body.innerText.includes('dropped-cv.pdf')`)
+  // none of that left the browser: a file is not sent, and text is sent only when the person says read
+  if (posts.length) errors.push(`handing over a CV sent something before anything was read: ${posts.join(', ')}`)
+  await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true })
+  await sleep(300)
+  await evaluate(`document.querySelector('${TEXT}').scrollIntoView({ block: 'center' })`)
+  if (await evaluate('document.documentElement.scrollWidth > innerWidth')) errors.push('the CV row is wider than a phone')
+  await shot('me-cv-phone')
+  await send('Page.setInterceptFileChooserDialog', { enabled: false })
 
   // an invitation from a suggested event names that event, not the upcoming one
   await open('#/join/nitor.com/security')

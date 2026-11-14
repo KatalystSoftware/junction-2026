@@ -5,6 +5,7 @@
   import { confetti } from './confetti'
   import { text } from './editable'
   import { occasionOf, plans } from './events'
+  import { pdfText, Unread } from './cv'
   import { bare, linkedinName, linkedinTyped } from './format'
   import Icon from './Icon.svelte'
   import Logo from './Logo.svelte'
@@ -65,6 +66,53 @@
     m.links[i] = value
     if (field.value !== value) field.value = value
     keep()
+  }
+  // ---- a CV: a PDF, read in this browser, or its text pasted. Either way the text in the field is what gets read.
+  /** the text field opened by hand, or by a file that could not be read */
+  let pasting = $state(false)
+  let extracting = $state(false)
+  let dropping = $state(false)
+  let cvWrong = $state('')
+  let picker = $state<HTMLInputElement>()
+  let cvText = $state<HTMLTextAreaElement>()
+  async function takeCv(file: File | undefined) {
+    if (!file || reading || extracting) return
+    cvWrong = ''
+    extracting = true
+    try {
+      m.cv = await pdfText(file)
+      m.cvFile = file.name
+    } catch (error) {
+      // what was there before stays; the text field is the way on
+      cvWrong = error instanceof Unread ? error.message : 'That file could not be read. Paste the text of your CV instead.'
+      pasting = true
+    }
+    extracting = false
+    // the same file can be chosen again
+    if (picker) picker.value = ''
+    keep()
+  }
+  function removeCv() {
+    ;[m.cv, m.cvFile, cvWrong, pasting] = ['', '', '', false]
+    keep()
+  }
+  async function pasteInstead() {
+    pasting = true
+    await tick()
+    cvText?.focus()
+  }
+  // a file dropped anywhere on the card is taken, so one that misses the box does not open in the tab instead
+  const carriesFile = (e: DragEvent) => !!picker && !!e.dataTransfer?.types.includes('Files')
+  function drag(e: DragEvent) {
+    if (!carriesFile(e)) return
+    e.preventDefault()
+    dropping = true
+  }
+  function drop(e: DragEvent) {
+    if (!carriesFile(e)) return
+    e.preventDefault()
+    dropping = false
+    void takeCv(e.dataTransfer?.files[0])
   }
   // an obviously wrong value is caught here, before a lookup is spent on it
   const wrongLinkedin = $derived(
@@ -191,6 +239,8 @@
   }
   function keys(e: KeyboardEvent) {
     const el = e.target as HTMLElement
+    // the file chooser keeps its own keys: Enter and Space open it
+    if (el instanceof HTMLInputElement && el.type === 'file') return
     const typing = el.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName)
     // Z, or Ctrl/Cmd+Z, takes back the last line taken out; inside a field, z is a letter and Ctrl+Z is the field's own undo
     if (e.key.toLowerCase() === 'z' && !e.altKey && !typing && undo) {
@@ -261,7 +311,7 @@
   })
 </script>
 
-<svelte:window onkeydown={keys} />
+<svelte:window onkeydown={keys} ondragover={drag} ondrop={drop} ondragleave={(e: DragEvent) => { if (!e.relatedTarget) dropping = false }} />
 
 {#snippet says(state: { kind: string; says: string } | undefined)}
   {#if state?.kind === 'busy'}<p class="drafting" role="status"><i></i>{state.says}</p>{:else if state}<p class={state.kind} role={state.kind === 'failed' ? 'alert' : undefined}>{state.says}</p>{/if}
@@ -369,7 +419,28 @@
                     <button class="tick" role="checkbox" data-choice aria-checked={!!m.cv.trim() && sourceOn('cv')} aria-label="Read my CV" disabled={!m.cv.trim() || reading} onclick={() => { switchSource('cv') }}>
                       <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4.5 10.5 8.5 14.5 15.5 6" /></svg>
                     </button>
-                    <label class="field"><textarea rows="2" aria-label="The text of your CV" placeholder="Or paste the text of your CV" bind:value={m.cv} oninput={keep} disabled={reading}></textarea></label>
+                    <!-- the file is read in this browser and never sent; the text below it, which the person can change, is what gets read -->
+                    {#if m.cvFile}
+                      <div class="field file">
+                        <span class="site known" aria-hidden="true"><Icon name="file" /></span>
+                        <span class="name" title={m.cvFile}>{m.cvFile}</span>
+                        <label class="pick">Replace<input bind:this={picker} type="file" accept=".pdf,application/pdf" aria-label="Replace the PDF of your CV" onchange={(e) => { void takeCv(e.currentTarget.files?.[0]) }} disabled={reading || extracting} /></label>
+                        <button class="pick" onclick={removeCv} disabled={reading}>Remove</button>
+                      </div>
+                    {:else}
+                      <label class="field drop" class:over={dropping}>
+                        <span class="site known" aria-hidden="true"><Icon name={extracting ? 'file' : 'up'} /></span>
+                        <span class="ask"><b>{extracting ? 'Reading the PDF in your browser' : 'Add your CV as a PDF'}</b><small>Choose a file or drop it here. It is read in your browser; the file is not sent.</small></span>
+                        <input bind:this={picker} type="file" accept=".pdf,application/pdf" aria-label="Add your CV as a PDF" onchange={(e) => { void takeCv(e.currentTarget.files?.[0]) }} disabled={reading || extracting} />
+                      </label>
+                    {/if}
+                    {#if cvWrong}<p class="failed" role="alert">{cvWrong}</p>{/if}
+                    {#if m.cvFile || pasting || m.cv}
+                      <label class="field text"><textarea bind:this={cvText} rows={m.cvFile ? 5 : 3} aria-label="The text of your CV" placeholder="Paste the text of your CV" bind:value={m.cv} oninput={() => { cvWrong = ''; keep() }} disabled={reading}></textarea></label>
+                      {#if m.cvFile}<p class="done">Read from the file. Change anything that came out wrong: this text, not the file, is what gets read.</p>{/if}
+                    {:else}
+                      <p><button class="rest" onclick={pasteInstead}><Icon name="pen" size={14} />Paste CV text instead</button></p>
+                    {/if}
                     {#if m.cv.length > CV_MOST}<p class="done">Only the first {CV_MOST.toLocaleString('en')} characters are read.</p>{:else}{@render says(status('cv', 'your CV'))}{/if}
                   </li>
                 </ul>
@@ -384,7 +455,8 @@
               <button class="rest" aria-expanded={where} onclick={() => (where = !where)}><Icon name={where ? 'x' : 'plus'} size={14} />Where it goes</button>
               {#if where}
                 <p class="facts where">
-                  What you give is sent to this site's server (a pasted CV up to {CV_MOST.toLocaleString('en')} characters), which keeps none of it: no file, no log. An
+                  What you give is sent to this site's server (the text of a CV up to {CV_MOST.toLocaleString('en')} characters; a PDF is read in your browser and the file itself is never
+                  sent), which keeps none of it: no file, no log. An
                   address is read by Context.dev, a service that fetches public pages; a LinkedIn profile comes from its own record of it. The text, all of it, then goes to
                   a language model run by Anthropic, which writes the lines. So give only what you want read, and only pages about you. Those two companies receive it, and
                   this demo cannot make them delete it. Your draft lives in this browser tab and is gone when you close it. Employer logos later on are loaded from
@@ -677,6 +749,78 @@
   .words {
     margin-top: var(--s4);
   }
+  /* a CV: the box that takes a file, the file once taken, and the text under either, all in the tick's second column */
+  .source > .text,
+  .source > .field ~ .field {
+    grid-column: 2;
+    margin-top: var(--s2);
+  }
+  .drop,
+  .file {
+    position: relative;
+  }
+  .drop {
+    border-style: dashed;
+    cursor: pointer;
+  }
+  .drop.over {
+    border-color: var(--ink);
+    border-style: solid;
+  }
+  .ask {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+    padding: var(--s3) 0;
+    line-height: 1.3;
+  }
+  .ask b {
+    color: var(--ink);
+    font-size: var(--t-md);
+    font-weight: 600;
+  }
+  .ask small {
+    font-size: var(--t-sm);
+  }
+  /* the chooser itself is not drawn, and is still what the keyboard lands on and a screen reader names */
+  .field input[type='file'] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    color: var(--ink);
+    font-size: var(--t-md);
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .pick {
+    flex: none;
+    min-height: 2.75rem;
+    display: inline-flex;
+    align-items: center;
+    padding: 0 var(--s2);
+    border: 0;
+    border-radius: var(--r1);
+    background: none;
+    color: var(--ink-2);
+    font-size: var(--t-sm);
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .pick:hover,
+  .pick:focus-within,
+  .pick:focus-visible {
+    color: var(--ink);
+    text-decoration: underline;
+  }
   .source p {
     grid-column: 2;
     margin: var(--s1) 0 0;
@@ -790,6 +934,18 @@
     }
     .field {
       font-size: var(--t-md);
+    }
+    /* a file's name has the line to itself; what can be done with the file goes under it */
+    .file {
+      flex-wrap: wrap;
+      row-gap: 0;
+      padding-top: var(--s1);
+    }
+    .name {
+      flex-basis: calc(100% - 3rem);
+    }
+    .file .pick:first-of-type {
+      padding-left: 0;
     }
   }
 </style>

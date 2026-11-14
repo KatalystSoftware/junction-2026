@@ -18,6 +18,7 @@
     "eslint": "^9.39.5",
     "eslint-plugin-svelte": "^3.24.1",
     "globals": "^17.14.0",
+    "pdfjs-dist": "6.5.438",
     "svelte": "^5.57.3",
     "svelte-check": "^4.7.7",
     "typescript": "~6.0.3",

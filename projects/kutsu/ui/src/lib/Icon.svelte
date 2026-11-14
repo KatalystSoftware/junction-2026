@@ -13,6 +13,7 @@
     back: 'M16 10H4M8 6l-4 4 4 4',
     search: 'M13 13l4 4M9 14.5a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z',
     undo: 'M7 5 3.5 8.5 7 12M3.5 8.5H12a4.5 4.5 0 0 1 0 9H9',
+    file: 'M5.5 3.5h6l3.5 3.5v9.5h-9.5zM11.5 3.5V7H15M8 11h4.5M8 13.5h4.5',
     pen: 'M4 16l.8-3.6L13.6 3.6l2.8 2.8-8.8 8.8L4 16zM11.8 5.4l2.8 2.8',
   }
   let { name, size = 20 }: { name: keyof typeof PATHS; size?: number } = $props()

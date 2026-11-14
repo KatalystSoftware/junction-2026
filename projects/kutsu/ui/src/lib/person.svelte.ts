@@ -28,6 +28,8 @@ export type Me = {
   linkedin: string
   links: string[]
   cv: string
+  /** the name of the PDF the CV's text was read from, in the browser; empty when the text was pasted */
+  cvFile: string
   /** sources the person switched off without emptying them, and links they took off their profile */
   off: string[]
   hidden: string[]
@@ -65,6 +67,7 @@ const blank = (): Me => ({
   linkedin: '',
   links: [''],
   cv: '',
+  cvFile: '',
   off: [],
   hidden: [],
   read: {},

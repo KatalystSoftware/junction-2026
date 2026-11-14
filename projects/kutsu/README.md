@@ -77,7 +77,11 @@ and stops if it fails. It runs, in order:
   person's profile writes no file and prints nothing of the person.
 
 `walk` needs `serve.py` running: it opens every screen in a headless Chromium, signs one company up
-by pressing Enter until the finished page, and fails on any error the page reports.
+by pressing Enter until the finished page, and fails on any error the page reports. On a person's
+sign-up it types addresses one key at a time (slashes, Backspace, an edit at the start, a paste), and
+hands over a CV every way it can go: a PDF with text, one with none, a file that is not a PDF, an
+empty one, one too large, the text typed instead, a file dropped, and the chooser opened from the
+keyboard. It fails if any of that sends anything to the server before the person says read.
 
 ## A person's profile, filled in from what they hand over
 
@@ -95,11 +99,19 @@ explicit choices: "Type it in myself", with nothing read at all, and "Try it wit
 a made-up person whose page ends in `.example`.
 
 - **What is handed over:** a LinkedIn username (the field holds `linkedin.com/in/` as a fixed prefix
-  and cuts a pasted address down to the name), any number of links, and a pasted CV. A link's site is
+  and cuts a pasted address down to the name), any number of links, and a CV. A field is never
+  rewritten while it is typed in: an address is tidied when it is pasted or the field is left. A
+  link's site is
   recognised from its address and gets its icon (`sites.ts`: GitHub, GitLab, X, Instagram, Bluesky,
   Mastodon, Threads, YouTube, Behance, Dribbble, Google Scholar, ORCID, Kaggle, Stack Overflow, a
   PDF, anything else). Icons are drawn in the app, most after Feather (MIT); nothing is fetched to
   show one. Pages about work are read; social feeds are shown on the profile and not read.
+- **A CV is a PDF or its text.** A PDF is chosen or dropped and read in the browser by pdf.js
+  (`cv.ts`), fetched only when a file is chosen: the file is never sent, and the server has no upload
+  path and nothing to delete. Its text lands in a field under the file's name, to check and change;
+  that text is what is read, the same way as text pasted under "Paste CV text instead". A file that
+  is not a PDF, is empty, is over 10 MB, is locked, or holds no text (a scan: there is no OCR) is
+  refused with a sentence that says so, and the text field opens as the way on.
 - **What the person decides:** every line can be kept, taken out, reworded or added to; three things
   they can do are kept by default and the rest are opt-in. The field and level are a reading the
   person can change. No employer is ticked for them.
