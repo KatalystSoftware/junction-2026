@@ -12,8 +12,8 @@ set -euo pipefail
 cd "$(dirname "$0")"
 ./sync.sh
 if command -v python3 >/dev/null; then python=(python3)
-elif command -v uv >/dev/null; then python=(uv run --no-project --python 3.13 python3)
-else python=(nix shell nixpkgs#python313 -c python3); fi
+elif command -v nix >/dev/null; then python=(nix shell nixpkgs#python313 -c python3)
+else python=(uv run --no-project --python 3.13 python3); fi
 
 if [ $# -le 1 ]; then
   [ $# -eq 1 ] && [ "$1" != 4 ] && { echo "custom episodes need seeds: $0 <level> <seed>..." >&2; exit 2; }
