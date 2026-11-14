@@ -562,8 +562,36 @@ The same on 40 seeds (10 tune, 10 holdout, `fresh-001` to `fresh-020`), where th
 - `rescue-*` and `late-225-cost-1.19` switch a late cost on from a point of the week; they are there
   for a comparison and are not candidates.
 
-None of these is the default. The default changes when a candidate has at most 3 weeks under 90% on
-each of two sets of 60 seeds that nothing else has played. [`scratch/search.py`](scratch/search.py)
+**The default is `slow-friday-late-150-kinds-limits`** since Saturday 10:47 UTC. The rule for it: the highest mean margin
+among the variants with at most 3 of 60 weeks under 90% on time on a set of seeds that nothing had
+played, confirmed by at most 3 of 60 on a second such set. Six variants played the first set
+(`fresh-1301` to `fresh-1360`); the best of them and the reference played the second (`fresh-1401`
+to `fresh-1460`).
+
+| Seeds | Variant | Margin against the reference | The same, a week under 90% as no margin | Orders, late | Weeks under 90% | Lowest week |
+| --- | --- | --- | --- | --- | --- | --- |
+| First 60 | reference | 11,093 | | 265, 12.1 | 1 | 87.7% |
+| | `slow-step-gate-25` | +691 (472 to 943) | +475 (-7 to 853) | 296, 11.7 | 2 | 89.2% |
+| | `slow-step-gate-25-kinds` | +1,171 (896 to 1,459) | +1,352 (941 to 1,873) | 307, 13.4 | 0 | 90.7% |
+| | `search-16-kinds` | +1,301 (1,022 to 1,614) | +1,482 (1,050 to 2,030) | 310, 11.8 | 0 | 90.1% |
+| | `slow-friday-late-150-kinds` | +1,354 (1,104 to 1,648) | +1,534 (1,136 to 2,064) | 314, 12.2 | 0 | 90.9% |
+| | `slow-friday-late-150-kinds-limits` | +1,601 (1,341 to 1,894) | +1,782 (1,376 to 2,331) | 316, 11.2 | 0 | 90.5% |
+| Second 60 | reference | 10,688 | | 259, 12.1 | 1 | 89.4% |
+| | `slow-friday-late-150-kinds-limits` | +1,370 (1,118 to 1,636) | +1,463 (1,141 to 1,826) | 309, 11.2 | 0 | 91.5% |
+| 38 thin worlds | reference | 10,153 | | 246, 16.0 | 5 | 83.2% |
+| | `slow-friday-late-150-kinds-limits` | +1,830 (1,398 to 2,268) | +2,679 (1,783 to 3,765) | 292, 12.2 | 0 | 90.2% |
+
+- The thin worlds are 38 worlds, 35 of them with under 720 drivers and the reference's lowest
+  among them; they are reported beside the rule and are not part of it.
+- On the first set the note limits add +247 (80 to 408) to `slow-friday-late-150-kinds`; on the 40
+  seeds above they added nothing to the kinds.
+- [`replay.py`](spreadlab/replay.py) with this default: `fresh-001` at 20 times the final's speed
+  gives 1,030 of 1,030 quotes and 308 of 308 gigs equal to the recording, and with a crash at
+  Tue 12:40 no request is missed while the desk runs and no car is in two live gigs.
+- `steep-notes-offers-8` stays the reference that new ideas are compared with (`REFERENCE` in
+  `variants.py`). `python -m spreadlab.live final --variant steep-notes-offers-8` plays it.
+
+[`scratch/search.py`](scratch/search.py)
 searches the parameters above together on 30 tune seeds; [`scratch/search_check.py`](scratch/search_check.py)
 plays its best trials on other seeds. After 25 trials, 11 of them played in full, its best point is
 of the same family (`search-16`: `slow_step` 0.8, the gate at 40, `cost` 1.22, a small late cost):
@@ -571,7 +599,7 @@ of the same family (`search-16`: `slow_step` 0.8, the gate at 40, `cost` 1.22, a
 
 ## The final
 
-[`live.py`](spreadlab/live.py) plays the final, or a test final, with the reference policy from the live stream.
+[`live.py`](spreadlab/live.py) plays the final, or a test final, with the default variant (`VARIANT`) from the live stream.
 Run it on the runner in Helsinki, from a clean checkout of `origin/main`, so no experiment in a working tree plays:
 
 ```bash
@@ -584,7 +612,7 @@ uv run python -m spreadlab.live report <world id>                        # after
 Start it at any time before the start. The organisers set a test final 15 minutes before it begins (14:00 and
 20:00 on Saturday), and the final at 07:30. The desk acts only on the world that `GET /v1/final` names. When it
 stops, by Ctrl-C, a crash or a reboot, the world goes on, and the same command goes on from `data/live/<world id>/`.
-`--variant <name>` plays another variant from `variants.py`; the default is `steep-notes-offers-8`. A second desk on
+`--variant <name>` plays another variant from `variants.py`; the default is `slow-friday-late-150-kinds-limits`. A second desk on
 the same world and machine stops at once, so two terminals cannot both post the cars.
 
 In the final the clock moves by itself, `advance` is closed, and a request gives 4.5 real seconds. What the live
