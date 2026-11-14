@@ -82,11 +82,19 @@ ladder's seven pair variants (`ladder1-rows.csv`, 40 played weeks; the stand-in 
 | Typical miss of a gain, euros a week | 880 to 910 | 1,200 to 1,450 |
 | Weeks under 90% per 60, played against stand-in | 0.33 against 0.42, 0.14 against 0.88 | 2.30 against 0.72, 1.05 against 0.66 |
 | Weeks under 92% per 60, played against stand-in | 1.59 against 1.34, 1.16 against 3.06 | 8.78 against 5.04, 4.75 against 3.96 |
+| One week against the played week of the same policy and seed: margin | off by 1,290 to 1,330 (13%), correlation 0.90 to 0.91 | off by 1,440 to 1,740 (16 to 19%), correlation 0.82 to 0.86 |
+| ... orders | off by 22 to 24, correlation 0.92 | off by 21 to 23, correlation 0.88 to 0.91 |
+| ... on-time share | off by 2.0 points, correlation 0.11 to 0.13 | off by 1.9 to 2.0 points, correlation 0.26 to 0.27 |
 
 Trust it for:
 - **Order.** Which of two variants is ahead, when the stand-in's gap is clear. On natural worlds it agreed with every
   pair play decided against the reference and 93% against the default; on the pair ladder with all of them.
 - **Dropping a variant that loses or does nothing.**
+
+A single stand-in week says little: it is 13 to 19% off in margin, and its on-time share barely follows the played week's
+(the week-by-week rows are 3,092 weeks of CI run 43636949086, the base policy's own weeks left out). The agreement is in
+paired differences over many seeds. A second calibration round of 14 designs found none clearly nearer to play; two draws a
+seed raise the natural ranking agreement to 44 of 46 and 34 of 35.
 
 Do not trust it for:
 - **The size of a gain.** Between pair variants it reads gaps about twice as wide as play (fee16 to q24: 2,486 against
