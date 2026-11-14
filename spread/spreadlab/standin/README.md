@@ -1,0 +1,101 @@
+# The stand-in: screen a Spread variant offline before it costs play time
+
+A simulated week that the real desk code plays. It reads saved weeks only: no team key, no practice world, no secret.
+Use it to rank ideas and drop weak ones. It does not replace a played exam (see "How far to trust it").
+
+## Screen a variant (one step)
+
+Push the branch that has the variant in its `spread/spreadlab/variants.py`, then:
+
+```bash
+gh workflow run standin-screen.yml --repo katalystsoftware/junction2026 --ref spread-standin \
+  -f ref=<your branch> -f arms=<variant>,<variant>,...
+```
+
+- It plays every arm and the baseline on the same 206 saved seeds (114 natural, 92 thin, under 720 drivers) on one
+  32-core CRACI runner, with the desk code of `ref`. The baseline is merge 1
+  (`fee16-80-q24-wide-pairs-0.6-return-0.75`); `-f baseline=<variant>` changes it, `-f draws=2` narrows the intervals.
+- Time: 7 arms took 4 min 41 s to play (1,442 weeks), about 5.5 minutes with the runner's start. Two arms and the
+  baseline take about 2.5 minutes. Several runs go at once, each on its own runner.
+- Result: the run's summary page, and the artifact `standin-screen` with `rows.csv` (one row a variant, seed and draw,
+  in the columns of the `trackb-rounds` row files plus the money lines) and `summary.md` (natural and thin apart, a
+  PASS or FAIL for each arm with its reasons).
+
+```bash
+gh run list --repo katalystsoftware/junction2026 --workflow standin-screen.yml -L 3     # find the run
+gh run download <run id> --repo katalystsoftware/junction2026 -n standin-screen -D out   # rows.csv, summary.md
+```
+
+On a machine with the packed weeks (release `spread-standin-screen`, unpacked into the data folder):
+
+```bash
+cd spread && uv run --with numpy python -m spreadlab.standin.screen --arms <variant> <variant> --out out
+```
+
+## Climbing on it
+
+A search that keeps the best of many variants on the same seeds fits those seeds and the stand-in's own errors. Rules
+that keep the climb honest, the same ones the played exams use plus what the stand-in's error asks for:
+
+- Climb on half the seeds (`-f half=a`, 57 natural and 46 thin) and confirm the winner once on the other half
+  (`-f half=b`). A gain that does not hold on `b` was noise.
+- A step counts only when its paired 95% interval against the current best is above zero on natural worlds and not below
+  zero on thin worlds. The screen's PASS says this.
+- Two variants within about 500 euros a week are a tie here: play did not decide such pairs either.
+- The 90% rule: at most 1 week in 60 under 90%, natural and thin apart, as in the played exam. On thin worlds the
+  stand-in sees about a third of play's weeks under 90%, so also hold thin weeks under 92% at the baseline's count.
+- Expect about three quarters of a natural-world gain in play, and less of a gain that comes from winning more orders.
+- What comes out of the climb still plays an exam on unseen seeds before it is used. The stand-in chooses what to play.
+
+## How it is built
+
+- `world.py`: `StandIn` has the routes a desk uses of Bahn's practice world (`advance`, `act`, `snapshot`, `roster`,
+  `score`). `play.policy_class` gives the same desk class that plays on Bahn's server, unchanged.
+- Dealers: a quote wins by the team's win curve at each day's level, measured on the default desk's played week of the
+  same seed. A request the played week answered keeps a hidden draw that agrees with that answer at that price.
+- Drivers: an open gig is booked by a fitted chance a minute (`model.py`, `fit.py`: a Poisson regression on 4.6 million
+  slices of 2,771 played weeks), moved by each day's own booking speed on the seed's played week. Drops, the night the
+  drivers drop out, the time a booked driver collects the car and the drive come from fitted tables.
+- Rules: fee schedules, stop windows, expiry, the deadline warning, direct offers and the account follow RULES.md.
+- Not in it: cancelled and changed orders, failed visits, fines, snow's slower drives, and drivers as people with a day.
+  No pair gig was in the weeks it was fitted on: a gig with two cars is booked like a one-car gig with its fee, drive
+  and places.
+- Parallel: each (variant, seed, draw) is one independent week in a process pool, one a core. A week takes 3 to 6 CPU
+  seconds, 97% of it in the desk's own code (`notes.near` most of all) and 3% in the world.
+
+`pack.py` packs recordings into the small files it reads, `run.py` compares arms, `check.py` sets one arm beside its
+played weeks, `validate.py` scores it on played paired checks, `screen.py` is the lanes' entry.
+`.github/workflows/standin.yml` fits and checks each design of `designs.json` on its own runner (push to `standin-ci`).
+
+## How far to trust it
+
+Measured on seeds the fit never saw (`fresh-`), on 150 played paired checks of 60 policies against two baselines,
+1,658 and 1,434 played weeks (CI run 43635516836, design `react-0-fee-common`, which is what ships), and on the window
+ladder's seven pair variants (`ladder1-rows.csv`, 40 played weeks; the stand-in played other seeds, 206).
+
+| Question | Natural worlds | Thin worlds |
+| --- | --- | --- |
+| Which of two policies is ahead, where play decides it (played 95% interval excludes zero) | 43 of 46 and 35 of 35 pairs agree | 18 of 21 and 6 of 9 |
+| The same on the ladder's pair variants | 17 of 17 (19 of 21 with the undecided) | 13 of 13 (20 of 21) |
+| Keep or reject (gain above zero, at most 1 week in 60 under 90%) | 92% and 86% agree | 92% and 78% |
+| Size of the gain: correlation with play, played gain per unit of stand-in gain | 0.96 to 0.97, 0.78 to 0.80 | 0.37, 0.18 to 0.39 |
+| Typical miss of a gain, euros a week | 880 to 910 | 1,200 to 1,450 |
+| Weeks under 90% per 60, played against stand-in | 0.33 against 0.42, 0.14 against 0.88 | 2.30 against 0.72, 1.05 against 0.66 |
+| Weeks under 92% per 60, played against stand-in | 1.59 against 1.34, 1.16 against 3.06 | 8.78 against 5.04, 4.75 against 3.96 |
+
+Trust it for:
+- **Order.** Which of two variants is ahead, when the stand-in's gap is clear. On natural worlds it agreed with every
+  pair play decided against the reference and 93% against the default; on the pair ladder with all of them.
+- **Dropping a variant that loses or does nothing.**
+
+Do not trust it for:
+- **The size of a gain.** Between pair variants it reads gaps about twice as wide as play (fee16 to q24: 2,486 against
+  876). Against the default it reads q24, q12 and merge 1 at 2,692, 3,169 and 2,740 where play has 1,914, 2,121 and
+  2,167, and the all-hours ladder at 206 where play has 1,038. Two variants within about 500 of each other in the
+  stand-in are a tie: it puts q12 first where play has merge 1 46 ahead, undecided.
+- **Thin worlds' sizes.** The order holds, the numbers do not (correlation 0.37).
+- **Weeks under 90% on thin worlds.** It sees about a third of play's. Merge 1 has 1 thin week in 92 under 90% here and
+  3 in 60 in its played exam. It does mark merge 1 as the riskiest of the ladder by thin weeks under 92% (11 of 92
+  against the default's 4), so read that count against the baseline's, and keep the played exam for the 90% rule.
+- **Anything it has no mechanism for**: note reading, failed visits, cancellations, snow, the competitor's answer to
+  what the desk wins (off by default: with it the gains were about 700 a week further from play's).

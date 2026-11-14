@@ -4,7 +4,8 @@ seeds offline, and the result is one row a week and a summary with natural and t
     python -m spreadlab.standin.screen --arms my-variant other-variant [--baseline fee16-80-q24-wide-pairs-0.6-return-0.75] --out out
 
 The seeds are those the default desk has a played week on (`seeds-natural.txt`, 114 worlds with 720 drivers or more, and
-`seeds-thin.txt`, 92 with fewer); each seed's market is measured on that played week. Arms are names in variants.py of the
+`seeds-thin.txt`, 92 with fewer); each seed's market is measured on that played week. `--half a` and `--half b` take every other
+seed of each set: a search climbs on one half and confirms on the other. Arms are names in variants.py of the
 checkout that runs this, so a lane's branch screens its own desk code. Nothing here reaches Bahn's server or needs the team key.
 
 `out/rows.csv` has a row for each arm, seed and draw; `out/summary.md` has, for each group, the margin a week (a week under 90% on
@@ -61,6 +62,7 @@ def main() -> None:
     parser.add_argument("--baseline", default="", help=f"default: {MERGE_1}, or {DEFAULT} where variants.py lacks it")
     parser.add_argument("--sets", nargs="+", default=["natural", "thin"], help="natural, thin, or files with a seed a line")
     parser.add_argument("--limit", type=int, default=0, help="at most this many seeds a set")
+    parser.add_argument("--half", default="", choices=["", "a", "b"], help="every other seed of each set: climb on a, confirm on b, so a search does not fit its own seeds")
     parser.add_argument("--draws", type=int, default=1)
     parser.add_argument("--jobs", type=int, default=os.cpu_count() or 2)
     parser.add_argument("--design", default="{}")
@@ -76,6 +78,7 @@ def main() -> None:
     for name in args.sets:
         path = HERE / f"seeds-{name}.txt" if name in ("natural", "thin") else Path(name)
         found = [line.strip() for line in path.read_text().splitlines() if line.strip()]
+        found = found[{"": slice(None), "a": slice(0, None, 2), "b": slice(1, None, 2)}[args.half]]
         seeds += found[: args.limit] if args.limit else found
     seeds = list(dict.fromkeys(seeds))
     started = time.time()
