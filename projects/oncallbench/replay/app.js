@@ -256,13 +256,24 @@
       return here ? h("button", { type: "button", class: `chip ${r.how || ""}`, "aria-pressed": String(here === state.run), title: "Show this run",
         onclick: () => { state.run = here; state.pin = null; renderAll(); } }, label) : h("span", { class: `chip ${r.how || ""}` }, label);
     };
-    $("#results-body").replaceChildren(
+    $("#results-body").replaceChildren(...[
       h("p", { class: "lead" }, "Mean ", h("b", { text: head.mean.toFixed(2) }), `, median ${head.median.toFixed(2)}, range ${head.low.toFixed(2)} to ${head.high.toFixed(2)}. The reference is 1, doing nothing is 0.`),
       h("table", {}, seeds.map((seed) => h("tr", {}, h("th", { text: `Seed ${seed}` }), h("td", {}, head.runs.filter((r) => r.seed === seed).map(chip))))),
       h("ul", { class: "split" }, groups.map(([how, list]) => h("li", { class: how },
         h("b", { text: `${list.length} run${list.length === 1 ? "" : "s"}` }), ` ${HOW[how]}: `, h("b", { text: range(list) })))),
       head.others.length ? h("p", { class: "quiet", text: `Other models, one run each on seed ${head.others[0].seed}: ${head.others.map((o) => `${o.label} ${o.score.toFixed(2)}`).join(", ")}.` }) : null,
-      h("p", { class: "quiet", text: `${head.source}. Scores with a border are the runs on this seed: click one to watch it.` }));
+      h("p", { class: "quiet", text: `${head.source}.` }),
+      head.fresh ? [
+        h("h4", {}, `${head.label} on ${head.fresh.runs.length} seeds no task ships, one run each: mean `, h("b", { text: head.fresh.mean.toFixed(2) })),
+        h("table", { class: "fresh" },
+          h("tr", {}, head.fresh.runs.map((r) => h("th", { text: `Seed ${r.seed}` }))),
+          h("tr", {}, head.fresh.runs.map((r) => {
+            const here = r.seed === ses.seed && ses.runs.find((run) => run.kind === "trial");
+            return h("td", {}, chip({ ...r, trial: here ? here.id : null }));
+          }))),
+        h("p", { class: "quiet", text: `${head.fresh.source}. The replays here are of these seeds: the shipped tasks' episodes are never published. Click the score with a border to watch this seed's run.` }),
+      ] : null,
+    ].flat().filter(Boolean));
   }
 
   // --- one run: heading, till and graph ----------------------------------------------
@@ -1146,7 +1157,7 @@
   function start() {
     if (!sessions.length) {
       document.body.classList.remove("loading");
-      document.body.replaceChildren(h("p", { style: "padding:2rem", text: "No runs found. Run `python3 export.py --level 4 --seeds 101` in this folder, then reload." }));
+      document.body.replaceChildren(h("p", { style: "padding:2rem", text: "No runs found. Run `python3 export.py --level 4 --seeds 109` in this folder, then reload." }));
       return;
     }
     if (params.has("still")) document.documentElement.classList.add("still");  // no motion: for screenshots

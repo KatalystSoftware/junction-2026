@@ -9,9 +9,12 @@ the bundles for the page. A bundle keeps the action logs of its trials, so it ca
 without the Harbor folders they came from.
 
 python3 export.py                                   every bundle in data/ again, with this simulator
-python3 export.py --level 4 --seeds 101 --jobs ../jobs   add or replace one episode, with its trials
-python3 export.py --level 5 --seeds 101,102 --policies reference,unprotected,nothing
-python3 export.py --level 4 --seeds 101 --out shift.json  plain JSON, no bundle
+python3 export.py --level 4 --seeds 109 --jobs ../jobs   add or replace one episode, with its trials
+python3 export.py --level 5 --seeds 109,110 --policies reference,unprotected,nothing
+python3 export.py --level 4 --seeds 109 --out shift.json  plain JSON, no bundle
+
+A bundle is an answer key: it holds the faults of its seed and every call of the reference. The
+seeds of the shipped tasks (../tasks) are never exported, at any level, to a bundle or a file.
 """
 
 import argparse
@@ -27,6 +30,19 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 DATA = HERE / "data"
 PRE = 30  # minutes before the page that the viewer can scrub back to (not charged)
+DEFAULT_SEED = 109  # a fresh seed no shipped task uses
+# A bundle is an answer key: the faults, and the reference's calls that fix them. The judged tasks run
+# on these seeds, and an agent in the task's container can reach a public site, so they are never
+# exported. Levels share a seed's estate and most of its faults, so the rule holds at every level.
+SHIPPED = {101, 102, 103}
+
+
+def shipped_seeds():
+    """The seeds no bundle may be made for: the fixed list, and whatever ../tasks ships today."""
+    found = set(SHIPPED)
+    for server in (HERE.parent / "tasks").glob("*/environment/mcp-server/server.py"):
+        found |= {int(m) for m in re.findall(r"^SEED = (\d+)", server.read_text(), re.M)}
+    return found
 POLICIES = ["unprotected", "no-drain", "forgetful", "loudest-first", "alerts-only", "no-late", "nothing"]
 POLICY_LABELS = {
     "reference": "Scripted reference", "nothing": "Do nothing", "stop-early": "Stop early",
@@ -587,9 +603,15 @@ def results(incident, level, cfg):
     scores = sorted(r["new"] for r in rows if r["run"] == cfg["run"])
     others = [dict(label=cfg["others"].get(r["run"], r["run"]), score=round(r["new"], 2), seed=r["seed"])
               for r in rows if r["run"] != cfg["run"]]
+    fresh = cfg.get("fresh")  # the same model on seeds no task ships: one score a seed, from the loop's metrics
+    if fresh and (HERE / fresh["file"]).exists():
+        got = sorted((r for r in json.loads((HERE / fresh["file"]).read_text())
+                      if (r["round"], r["run"], r["level"]) == (fresh["round"], cfg["run"], level)), key=lambda r: r["seed"])
+        fresh = got and dict(mean=round(sum(r["score"] for r in got) / len(got), 2), source=fresh.get("source", ""),
+                             runs=[dict(seed=r["seed"], score=round(r["score"], 2)) for r in got])
     return dict(label=cfg["label"], mean=round(sum(scores) / len(scores), 2), median=round(scores[len(scores) // 2], 2),
                 low=round(scores[0], 2), high=round(scores[-1], 2), count=len(scores), runs=runs, others=others,
-                source=cfg.get("source", ""))
+                source=cfg.get("source", ""), **({"fresh": fresh} if fresh else {}))
 
 
 def session(incident, policies, seed, level, names, trials, notes):
@@ -685,10 +707,11 @@ def session(incident, policies, seed, level, names, trials, notes):
         services=services, faults=faults, decoy=decoy or None, runs=runs)
 
 
-def write_index():
-    """data/index.js: the bundles the page loads, newest level first; the first one opens."""
+def write_index(first=None):
+    """data/index.js: the bundles the page loads. The first one opens: the episode the notes name under
+    "open", then the newest level."""
     found = sorted((p for p in DATA.glob("l*-s*.js") if re.fullmatch(r"l\d+-s\d+\.js", p.name)),
-                   key=lambda p: [-int(n) if i == 0 else int(n) for i, n in enumerate(re.findall(r"\d+", p.name))])
+                   key=lambda p: [p.stem != first] + [-int(n) if i == 0 else int(n) for i, n in enumerate(re.findall(r"\d+", p.name))])
     (DATA / "index.js").write_text(f"window.REPLAY_FILES = {json.dumps([p.name for p in found])};\n")
     return found
 
@@ -696,7 +719,7 @@ def write_index():
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--level", type=int, help="default: the simulator's newest level")
-    ap.add_argument("--seeds", help="comma-separated seeds (default 101)")
+    ap.add_argument("--seeds", help=f"comma-separated seeds (default {DEFAULT_SEED}); never a shipped task's seed")
     ap.add_argument("--policies", help="scripted policies to play next to the reference")
     ap.add_argument("--jobs", action="append", default=[], help="a Harbor jobs folder; adds its agent trials")
     ap.add_argument("--trial", action="append", default=[], help="one Harbor trial folder (repeatable)")
@@ -714,6 +737,9 @@ def main():
     stamp = hashlib.sha256((Path(opts.sim) / "incident.py").read_bytes()).hexdigest()[:12]
     picked = [p for p in (opts.policies or ",".join(POLICIES)).split(",") if p in policies.POLICIES and p != "reference"]
 
+    for stale in DATA.glob("l*-s*.js"):  # a bundle of a shipped seed must not sit in data/, whoever put it there
+        if int(re.fullmatch(r"l\d+-s(\d+)\.js", stale.name)[1]) in shipped_seeds():
+            sys.exit(f"refused: {stale.relative_to(HERE)} is the bundle of a shipped task's seed. Delete it before exporting.")
     existing = {p.stem: read_bundle(p) for p in DATA.glob("l*-s*.js")}
     existing = {k: v for k, v in existing.items() if v}
     again = not (opts.level is not None or opts.seeds or opts.jobs or opts.trial or opts.out or opts.policies) and existing
@@ -721,7 +747,11 @@ def main():
         todo = [(old["level"], old["seed"]) for old in existing.values()]
     else:
         level = max(incident.LEVELS) if opts.level is None else opts.level
-        todo = [(level, int(s)) for s in (opts.seeds or "101").split(",")]
+        todo = [(level, int(s)) for s in (opts.seeds or str(DEFAULT_SEED)).split(",")]
+    barred = sorted({seed for _, seed in todo} & shipped_seeds())
+    if barred:
+        sys.exit(f"refused: seed {', '.join(map(str, barred))} is a shipped task's seed. Its bundle would be that "
+                 f"task's answer key (faults and the reference's calls). Use a fresh seed, for example {DEFAULT_SEED}.")
 
     known = variants(incident)
     asked = [Path(t) for t in opts.trial]
@@ -761,7 +791,7 @@ def main():
         out = DATA / f"{s['id']}.js"
         out.write_text(f"(window.REPLAY_BUNDLES = window.REPLAY_BUNDLES || []).push({body});\n")
         print(f"wrote {out.relative_to(HERE)} ({out.stat().st_size / 1024:.0f} KB)")
-    print("data/index.js lists " + ", ".join(p.name for p in write_index()))
+    print("data/index.js lists " + ", ".join(p.name for p in write_index(notes.get("open"))))
 
 
 if __name__ == "__main__":
