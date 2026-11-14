@@ -257,6 +257,34 @@ late); a gig holds its opening fee until the car's late chance with the hours le
 alone, `risk-open` the lower opening alone, and `-due-24` counts only the waiting cars due within 24 hours in
 `slow_step` and the gate.
 
+**The offline screen** ([`scratch/risk_screen.py`](scratch/risk_screen.py)). A recording cannot score a policy that acts
+otherwise, so this says only which schedules are worth playing. It fits, on 5.7 million car-hours of the 6,503 saved
+weeks, the chance that a waiting car gets its first driver in the next hour, by the fee over its lane's usual fee
+(lane noise varies it in every week), the hours on the board and left, the clock hour, the drivers notified and the
+car, and the chance of ending late by the hours left at that booking. It then replays every one-car order of the
+default's 266 saved weeks under each schedule, from the models alone, so their bias cancels. Left out of the fit, the
+paired weeks at openings 0.9 and 1.0 paid 0.085 x the typical fee less at 0.9 where the models say 0.071, and were
+booked within the hour 13 points less where they say 9: they understate how much a lower fee slows the booking by about
+a third. It cannot see that a car which waits longer counts in the next quotes and in the gate.
+
+| Schedule on the default | Fees saved a week | Late orders a week | Net at 150 a late order | Paid over typical | Booked within the hour | Weeks under 90% of 266 |
+| --- | --- | --- | --- | --- | --- | --- |
+| default (as played) | | | | 1.061 | 75.7% | 2 |
+| `risk-hold` | +484 | +0.14 | +462 (450 to 475) | 1.036 | 75.7% | 2 |
+| `risk-fees-open-0.95` | +1,181 | +0.53 | +1,102 (1,074 to 1,130) | 1.000 | 72.2% | 2 |
+| `risk-fees` | +1,852 | +0.97 | +1,706 (1,662 to 1,751) | 0.965 | 68.1% | 3 |
+| `risk-fees` opening only from 24 hours | +1,776 | +0.86 | +1,646 | 0.969 | 68.7% | 3 |
+| `risk-fees` rising at 3% / 6% | +1,670 / +2,034 | +0.89 / +1.07 | +1,536 / +1,873 | 0.974 / 0.955 | 68.1% | 3 |
+| `risk-open`: 0.9 x for safe cars, the default's rises | +992 | +0.69 | +889 | 1.009 | 68.1% | 3 |
+| `risk-fees` at 0.85 x / 0.8 x | +2,496 / +3,110 | +1.48 / +2.06 | +2,274 / +2,801 | 0.931 / 0.899 | 63.5% / 58.4% | 4 / 4 |
+| `fee16`: 0.9 x from 16 hours, rising 0.1 an hour | +1,049 | +0.83 | +924 | 1.006 | 67.7% | 3 |
+| `fee16-80`: the same at 0.8 x | +1,793 | +1.84 | +1,517 | 0.968 | 57.5% | 4 |
+
+The intervals are over the 266 weeks; the models' own error is larger. Weeks under 90% add the expected late orders to
+each played week. Holding the fee until a car is at risk is where the saving is cheapest in late orders: the hold alone
+saves 3,500 a late order, the lower opening alone 1,400, and the two together 1,900. The qualifying track's played
+`outage-fee16` made +772 (487 to 1,069) on 29 weeks against the screen's +924 for `fee16`.
+
 Private addresses (`curve-private`, +246 on tune at the old fees; -38 with opening 1.0, lowest week
 92.0%), a cost that follows the order (`curve-order-cost`, +193, -16 to 411) and counting what an
 order on time is worth in the dealer's later prices (`curve-trust-0.3`, -126; `curve-trust-1`,

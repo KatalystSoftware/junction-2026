@@ -334,6 +334,9 @@ VARIANTS.update({
     "risk-fees-due-24": {**_DEFAULT, "risk_fees": True, "risk_queue_hours": 24},
     "risk-fees-raise-0.06": {**_DEFAULT, "risk_fees": True, "risk_raise_late": 0.06},
     "risk-hold": {**_DEFAULT, "risk_fees": True, "risk_open": 1.0},
+    # The same as `risk-fees` with safe cars opening at 0.95 x: in the offline screen (scratch/risk_screen.py) about half the
+    # added late orders for two thirds of the fees saved.
+    "risk-fees-open-0.95": {**_DEFAULT, "risk_fees": True, "risk_open": 0.95},
     "risk-open": {**_DEFAULT, "risk_fees": True, "risk_raise_late": 0},
     "risk-open-due-24": {**_DEFAULT, "risk_fees": True, "risk_raise_late": 0, "risk_queue_hours": 24},
 })
