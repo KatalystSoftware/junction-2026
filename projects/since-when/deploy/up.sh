@@ -47,5 +47,9 @@ docker compose exec -T -e RO="$(sed -n 's/^DB_RO_PASSWORD=//p' .env)" -e DB="$cu
   ALTER USER since_when_ro@\"%\" IDENTIFIED BY \"$RO\";
   GRANT SELECT ON \`$DB\`.* TO since_when_ro@\"%\";"'
 
+# What a person decided after reading both articles (demo/hand-checked.json): on every deploy, since
+# a snapshot loaded from scratch does not carry it.
+docker compose run --rm -T app python -m gapfinder.checked hand - < ../demo/hand-checked.json
+
 docker compose up -d --remove-orphans
 echo "Since When is up behind the proxy (infra/verda/proxy) as since-when-app:8078"

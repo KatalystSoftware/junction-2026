@@ -3,12 +3,17 @@ finding, in a table the API can join to `finding` by id.
 
     python -m gapfinder.checked schema
     python -m gapfinder.checked load DIR      # DIR as demo/hero-verify.sh wrote it
+    python -m gapfinder.checked hand FILE     # FILE as demo/hand-checked.json, or - for stdin
 
 `load` reads DIR/differences.jsonl, DIR/set-aside.jsonl and DIR/run.json and replaces the rows of their topics
 in checked_finding: one row per finding the check kept, changed, found itself or set aside. The
 table and its columns are described in differences/README.md. Existing tables are only read:
 `finding` to find the id of the finding a row is about, `chunk`, `passage` and `article` as of
 the run's date for sections, revisions and the passage that settled a check.
+
+`hand` applies what a person decided after reading both articles: it closes the rows found false
+(finding.status, or checked_finding.status for a row the check found itself) and puts back a
+summary. Rows are found by their quotes, so it works on any restore; run it after every load.
 """
 
 import json
@@ -16,7 +21,8 @@ import sys
 from datetime import date
 from pathlib import Path
 
-from .align import as_of_sql
+from .align import Run, as_of_sql
+from .api import apply_checks, checks, finding, findings_sql
 from .db import connect
 
 SCHEMA = """
@@ -27,6 +33,7 @@ CREATE TABLE IF NOT EXISTS checked_finding (
   finding_id    INT UNSIGNED NULL,                 -- finding.id this row is about; NULL: the check found it itself
   outcome       ENUM('kept','changed','new','set_aside','unchecked') NOT NULL,
   reason        ENUM('stated_elsewhere','not_confirmed','repeat') NULL,   -- why a row was set aside
+  status        ENUM('open','not_a_difference') NOT NULL DEFAULT 'open',  -- a person's verdict on a `new` row
   -- The finding as it stands after the check, in finding's columns: `lang` is the edition to look
   -- at (the one lacking a missing fact, else the one with fewer passages).
   type          ENUM('missing_fact','contradiction','framing','numbers') NOT NULL,
@@ -293,6 +300,50 @@ def load(run):
     )
 
 
+# Tables made before the status column existed get it here.
+STATUS = (
+    "ALTER TABLE checked_finding ADD COLUMN IF NOT EXISTS "
+    "status ENUM('open','not_a_difference') NOT NULL DEFAULT 'open' AFTER reason"
+)
+
+
+def hand(path):
+    rows = json.load(sys.stdin if path == "-" else open(path, encoding="utf-8"))["rows"]
+    con = connect(autocommit=True)
+    cur = con.cursor()
+    cur.execute(SCHEMA)
+    cur.execute(STATUS)
+    r = Run(con)
+    for qid in sorted({x["topic"] for x in rows}):
+        # The rows as the page shows them: a changed row with the check's quotes.
+        shown, _ = apply_checks([finding(x) for x in r("findings", findings_sql(qid))], checks(r, qid))
+        for x in (x for x in rows if x["topic"] == qid):
+            hits = [
+                f
+                for f in shown
+                if f["type"] == x["type"] and all(w in (f["quotes"].get(lang) or "") for lang, w in x["quotes"].items())
+            ]
+            if not hits:
+                print(f"{qid}: no {x['type']} row quotes {x['quotes']}")
+            for f in hits:
+                ours = f["id"] < 0 or (f["check"] or {}).get("outcome") == "changed"
+                where = f"id = {-f['id']}" if f["id"] < 0 else f"finding_id = {f['id']}"
+                if "close" in x and f["id"] < 0:
+                    cur.execute(f"UPDATE checked_finding SET status = 'not_a_difference' WHERE {where}")
+                elif "close" in x:
+                    cur.execute(
+                        "UPDATE finding SET status = 'not_a_difference', status_url = NULL, status_at = NOW(6) "
+                        "WHERE id = ? AND status <> 'not_a_difference'",
+                        (f["id"],),
+                    )
+                if "summary" in x and ours:
+                    cur.execute(f"UPDATE checked_finding SET summary = ? WHERE {where}", (x["summary"],))
+                elif "summary" in x:
+                    cur.execute("UPDATE finding SET summary = ? WHERE id = ?", (x["summary"], f["id"]))
+                print(f"{qid}: {'closed' if 'close' in x else 'summary of'} {f['id']} {f['type']}: {f['summary'][:90]}")
+    con.close()
+
+
 def main():
     if sys.argv[1:] == ["schema"]:
         con = connect()
@@ -300,6 +351,8 @@ def main():
         con.commit()
     elif len(sys.argv) == 3 and sys.argv[1] == "load":
         load(sys.argv[2])
+    elif len(sys.argv) == 3 and sys.argv[1] == "hand":
+        hand(sys.argv[2])
     else:
         sys.exit(__doc__)
 

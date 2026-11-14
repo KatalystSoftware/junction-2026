@@ -146,9 +146,10 @@ def _row(**over):
             "claim_figure",
             "evidence_figure",
             "judge",
+            "model",
         ]
     )
-    return {**row, "judge": "judge-1", "as_of": "2026-11-14", **over}
+    return {**row, "status": "open", "judge": "judge-1", "as_of": "2026-11-14", **over}
 
 
 class Applied(unittest.TestCase):
@@ -194,6 +195,13 @@ class Applied(unittest.TestCase):
         self.assertEqual(len(findings), 4)
         self.assertEqual((findings[3]["id"], findings[3]["history"], findings[3]["status"]), (-9, False, "open"))
         self.assertEqual(totals["new"], 1)
+
+    def test_a_found_difference_a_person_closed_is_closed(self):
+        k = _row(
+            id=9, outcome="new", type="numbers", lang="fi", other_lang="en", summary="same", status="not_a_difference"
+        )
+        findings, _ = api.apply_checks(self.FINDINGS, [k])
+        self.assertEqual((findings[3]["status"], findings[3]["outcome"]), ("closed", "not_real"))
 
 
 if __name__ == "__main__":

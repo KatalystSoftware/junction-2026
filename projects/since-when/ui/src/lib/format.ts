@@ -53,4 +53,8 @@ export function sectionOf(f: Finding, l: Lang): string | undefined {
 	return (l === f.lang ? f.section : f.other_section) ?? ''
 }
 
+/** The models the API names by id, as a reader knows them. */
+const MODELS: Record<string, string> = { 'nemotron-3.5-super-vl': 'NVIDIA Nemotron 3.5 Super VL' }
+export const modelName = (id: string | null | undefined) => (id ? (MODELS[id] ?? id) : 'a language model')
+
 export const sectionLabel = (s: string) => (s ? s.split(' › ').pop()! : 'Lead')

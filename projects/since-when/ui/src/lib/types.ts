@@ -52,6 +52,8 @@ export interface Finding {
 	distance: number | null
 	weight: number | null
 	status: 'open' | 'reviewed' | 'closed'
+	/** An editor's or a hand check's outcome; `not_real`: a person found it is not a difference. */
+	outcome?: 'edited' | 'talk' | 'intentional' | 'not_real' | null
 	opened_at: string
 	opened_after: string | null
 	closed_at: string | null
@@ -78,7 +80,7 @@ export interface Topic {
 	leads?: PerLang<Lead>
 	findings: Finding[]
 	/** The check's totals for the topic; null when it has not run on it. */
-	checked?: { judge: string; as_of: string; kept?: number; changed?: number; new?: number; set_aside: Record<string, number> } | null
+	checked?: { judge: string; model?: string | null; as_of: string; kept?: number; changed?: number; new?: number; set_aside: Record<string, number> } | null
 	sql: SqlEntry[]
 }
 

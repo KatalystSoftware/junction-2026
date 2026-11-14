@@ -199,11 +199,11 @@ def finding(x):
 # --- The claim check ---------------------------------------------------------------------------
 
 CHECKS_SQL = """
-SELECT id, finding_id, outcome, reason, as_of, type, lang, other_lang, section, other_section, quote, other_quote,
+SELECT id, finding_id, outcome, reason, {status} AS status, as_of, type, lang, other_lang, section, other_section, quote, other_quote,
        rev_id, other_rev_id, summary, verdict, claim_lang, claim_quote, claim_about, searched, read_passages,
        evidence_lang, evidence_rev_id, evidence_section, evidence_quote,
        IF(outcome = 'set_aside', evidence_passage, NULL) AS evidence_passage,
-       claim_figure, evidence_figure, judge
+       claim_figure, evidence_figure, judge, model
 FROM checked_finding
 WHERE wikidata_id = {qid}
 ORDER BY id"""
@@ -278,8 +278,9 @@ def apply_checks(findings, checks):
                     "distance": None,
                     "weight": 0.0,
                     "score": 0,
-                    "status": "open",
-                    "outcome": None,
+                    # A person can close a row the check found itself (checked.py hand).
+                    "status": "closed" if k["status"] == "not_a_difference" else "open",
+                    "outcome": "not_real" if k["status"] == "not_a_difference" else None,
                     "rev_url": None,
                     "opened_at": k["as_of"],
                     "opened_after": None,
@@ -289,7 +290,7 @@ def apply_checks(findings, checks):
                     "check": check_of(k),
                 }
             )
-    totals = {"judge": checks[0]["judge"], "as_of": checks[0]["as_of"], "set_aside": {}}
+    totals = {"judge": checks[0]["judge"], "model": checks[0]["model"], "as_of": checks[0]["as_of"], "set_aside": {}}
     for k in checks:
         if k["outcome"] == "set_aside":
             totals["set_aside"][k["reason"]] = totals["set_aside"].get(k["reason"], 0) + 1
@@ -299,11 +300,15 @@ def apply_checks(findings, checks):
 
 
 def checks(r, qid):
-    """The topic's rows of checked_finding; none on a database loaded before the check existed."""
-    try:
-        return r("What the claim check made of each finding", CHECKS_SQL.format(qid=lit(qid)))
-    except mariadb.ProgrammingError:
-        return []
+    """The topic's rows of checked_finding; none on a database loaded before the check existed. A
+    table made before its status column (checked.py hand adds it) reads as all open."""
+    for status in ("status", "'open'"):
+        try:
+            return r("What the claim check made of each finding", CHECKS_SQL.format(qid=lit(qid), status=status))
+        except mariadb.ProgrammingError as e:
+            if "status" not in str(e):
+                return []
+    return []
 
 
 # --- Endpoints ---------------------------------------------------------------------------------

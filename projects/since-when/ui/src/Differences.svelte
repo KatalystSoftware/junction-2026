@@ -2,7 +2,7 @@
 	// The topic's page: the few places where the editions say different things, each with its time
 	// strip, then, collapsed, what each edition says that another leaves out.
 	import { FIRST, differences, missing, setAside, wording } from './lib/differences'
-	import { DECADES, NAMES, articleUrl, list, plural, revisionUrl, rowDate, sectionLabel } from './lib/format'
+	import { DECADES, NAMES, articleUrl, day, list, modelName, plural, revisionUrl, rowDate, sectionLabel } from './lib/format'
 	import { LANGS, type TimelineEvent, type Topic } from './lib/types'
 	import Difference from './Difference.svelte'
 	import Why from './Why.svelte'
@@ -22,6 +22,18 @@
 	const aside = $derived(setAside(topic))
 	const judge = $derived(topic.checked?.judge)
 	let allAside = $state(false)
+	let asideOpen = $state(false)
+	// What the check did on this topic, in numbers: suggestions it looked up, those it set aside and
+	// why, and those a person closed after reading both articles.
+	const tally = $derived.by(() => {
+		const c = topic.checked
+		if (!c) return null
+		const by = c.set_aside ?? {}
+		const aside = Object.values(by).reduce((a, b) => a + b, 0)
+		const looked = (c.kept ?? 0) + (c.changed ?? 0) + (c.new ?? 0) + aside
+		const closed = topic.findings.filter((f) => f.outcome === 'not_real' && f.check).length
+		return { looked, aside, by, closed }
+	})
 	const lacking = $derived(editions.filter((l) => left[l].length))
 	const most = $derived(Math.max(1, ...lacking.map((l) => left[l].length)))
 </script>
@@ -42,6 +54,18 @@
 			</div>
 		{/if}
 	</header>
+	{#if tally}
+		<p class="tally">
+			{modelName(judge)} looked up {tally.looked} suggestions in the whole other article on {day(topic.checked!.as_of)} and set aside {tally.aside}{#if tally.aside}:
+				{list([
+					tally.by.stated_elsewhere ? `${tally.by.stated_elsewhere} where the other edition states the fact elsewhere` : '',
+					tally.by.repeat ? `${plural(tally.by.repeat, 'repeat', 'repeats')} of another row` : '',
+					tally.by.not_confirmed ? `${tally.by.not_confirmed} not confirmed from both sides` : '',
+				].filter(Boolean))}{/if}.
+			{#if aside.length}<a href="#aside-title" onclick={() => (asideOpen = true)}>{plural(aside.length, 'statement', 'statements')} the other edition states</a>, each with the passage that states it, are listed below.{/if}
+			{#if tally.closed}A person read both articles and closed {tally.closed} more.{/if}
+		</p>
+	{/if}
 	{#if found.length}
 		<div class="rows">
 			{#each shown as d, i (d.id)}
@@ -113,7 +137,7 @@
 
 {#if aside.length}
 	<section class="left" aria-labelledby="aside-title">
-		<details class="cdx-accordion">
+		<details class="cdx-accordion" bind:open={asideOpen}>
 			<summary>
 				<h2 id="aside-title" class="cdx-accordion__header" title="Suggested as missing or different; the check found the fact stated elsewhere in the other article">
 					<span>Set aside by the check</span>
@@ -187,6 +211,12 @@
 
 	.rest {
 		margin-top: var(--spacing-100);
+	}
+
+	.tally {
+		max-width: 48rem;
+		margin: var(--spacing-50) 0 var(--spacing-25);
+		color: var(--color-subtle);
 	}
 
 	.left {

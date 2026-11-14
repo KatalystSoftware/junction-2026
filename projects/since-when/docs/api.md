@@ -110,7 +110,7 @@ One row per (topic, edition to fix), sorted by `score` descending.
  "quality": {"fi": "Suositeltu"},
  "leads": {"fi": {"text": "…", "rev_id": 123, "also": "second lead passage, if any"}},
  "findings": [Finding],
- "checked": {"judge": "nemotron-3.5-super-vl", "as_of": "2026-11-14", "kept": 146, "changed": 3, "new": 2,
+ "checked": {"judge": "nemotron-3.5-super-vl", "model": "nemotron-3.5-super-vl", "as_of": "2026-11-14", "kept": 146, "changed": 3, "new": 2,
              "unchecked": 9, "set_aside": {"stated_elsewhere": 55, "not_confirmed": 1, "repeat": 5}},
  "sql": []}
 ```
@@ -131,6 +131,10 @@ framing rows, coverage rows), else
 and dates), `new` (a difference the check found itself: a negative `id`, no history), `set_aside`
 (with `reason` `stated_elsewhere`, `not_confirmed` or `repeat`; not a difference after all) or
 `unchecked` (framing, passed through). `evidence.passage` is the whole passage, on a set-aside row only.
+`checked.model` is the model that wrote the findings, `checked.judge` the one that checked them.
+
+A row a person read and found false is closed with outcome `not_real`, a `new` row too
+(`python -m gapfinder.checked hand demo/hand-checked.json`, which `deploy/up.sh` runs on every deploy).
 
 A **Finding**:
 
