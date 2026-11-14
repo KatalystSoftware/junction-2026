@@ -233,13 +233,15 @@ class Book:
         return out
 
     def future(self) -> tuple[float, float]:
-        """The orders still to come this week, and their late share: the rate so far pulled towards 0.43 orders a listed driver a week with
-        the weight of one day; the measured late share, which the week's shift moves. The share of the orders resolved so far would say
+        """The orders still to come this week, and their late share. The week's orders are the orders so far over the share of a week's
+        orders won by this hour (`won_after`, won_after.py), pulled towards 0.43 orders a listed driver with the weight of a fifth of a
+        week; the late share is the measured one, which the week's shift moves. The share of the orders resolved so far would say
         less: a late order resolves later than one on time."""
-        today = self.now // DAY
-        elapsed = min(today, DAYS) * OPEN + (min(max(self.now % DAY - OPENS, 0), OPEN) if today < DAYS else 0)
-        rate = (self.orders + M["orders_a_driver"] * self.drivers / DAYS) / (elapsed + OPEN)
-        return rate * max(0, DAYS * OPEN - elapsed), M["late_share"]
+        after = M["won_after"]
+        left = after[int(self.now // HOUR)] if self.now < len(after) * HOUR else 0.0
+        prior = 0.2
+        week = (self.orders + prior * M["orders_a_driver"] * self.drivers) / (1 - left + prior)
+        return week * left, M["late_share"]
 
     def risk(self, day: int | None = None, car: dict | None = None, line: float = 0.10) -> tuple[float, float]:
         """P(week under 90% on time; `line` is the late share) and the expected late count of the book, with `car` added on `day` when given."""
