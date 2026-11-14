@@ -337,3 +337,7 @@ VARIANTS.update({
     "risk-open": {**_DEFAULT, "risk_fees": True, "risk_raise_late": 0},
     "risk-open-due-24": {**_DEFAULT, "risk_fees": True, "risk_raise_late": 0, "risk_queue_hours": 24},
 })
+
+# The live default with a cap on the won orders to collect on one day (daycap.py): a night's wave of dropped gigs then takes
+# down at most that day's cap. An option due on a full day is not quoted; a slower one of the same request still is.
+VARIANTS.update({f"day-cap-{cap}": {**_DEFAULT, "day_cap": cap} for cap in (70, 80)})

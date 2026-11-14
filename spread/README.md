@@ -789,6 +789,58 @@ cars without a return against the same orders in the base variant, return quotes
 The live desk does not take `PairPolicy`: `live final --variant ...-pairs-...` stops at once with unknown parameters. A gig
 with two orders is a new case for its restart logic, and must pass the replays of `replay.py` before it can play live.
 
+## Nights when drivers drop out (`day-cap-*`, off by default, being played)
+
+The default's first week under 90% was `fresh-098` at 88.4% on time (38 late orders), where the reference made 91.6%.
+That week also has the largest bulk order of the stratified seeds on Monday morning: 39 requests from one dealer. The
+bulk order is not what failed. The desk won 12 of them and 1 was late, as for the reference. 30 of the 38 late orders were due
+on Friday, 25 of them won on Thursday. Between 00:00 and 01:00 on Friday, drivers dropped 29 of the desk's booked gigs.
+On other nights the first hour has about 2 drops. The dropped cars, and the next-day cars won on Thursday afternoon, had to
+find a driver on Friday itself, and few booked that day. The gigs that ended late were seen 70 to 150 times each and stayed
+open at 1.5 to 2.5 x the typical fee until they expired at their last pickup minute. The late model put most of them at 1 to
+3%: over 24 hours to find a driver, and many drivers notified.
+
+Such a wave, 10 or more drops in a day's first hour, comes in about one week in five. The desk cannot see it coming:
+the scans do not show it, and it is not tied to the snow forecast. It does bite in proportion to the orders due that day.
+[`scratch/drop_waves.py`](scratch/drop_waves.py) on saved weeks:
+
+| | Weeks | A wave on Tue, Wed, Thu, Fri | Due on Friday, no wave: late | With a Friday wave, 50 to 99 due | With a Friday wave, 100 or more due |
+| --- | --- | --- | --- | --- | --- |
+| reference | 401 | 20, 15, 18, 46 | 3.7 to 6.5% | 11.1% (45 weeks) | 10.0% (1 week) |
+| `slow-step-gate-25` | 167 | 13, 13, 13, 24 | 4.7 to 5.3% | 9.6% (20) | 15.2% (4) |
+| the default | 212 | 13, 19, 23, 40 | 3.8 to 5.1% | 8.2% (30) | 13.2% (10) |
+
+- Without a wave a full Friday is no later than a light one. With one, the late share doubles or triples, and the
+  default carries heavier Fridays than the reference: 102 orders due against 79 on `fresh-098`. Its two lowest weeks are both Friday
+  waves on 100 or more orders due that day: `fresh-098` (29 drops, 102 due, 30 late) and `fresh-053` (30 drops, 105 due, 90.2%).
+  So is `fresh-284`, 89.9% in the R1 hard seeds (30 drops, 101 due).
+- Bulk orders are not the risk. Orders won from a week's largest batch are 5.3% late against 3.7% for all orders under
+  the default (3.9% and 3.9% for `slow-step-gate-25`), about 0.2 late orders a week. With the bulk order on Monday they
+  are 3.2% late, and those weeks average 96.5% on time against 96.2% for the rest. Of the default's
+  65 such weeks only `fresh-098` is under 90%, and 11 of its 12 bulk orders were on time.
+- Prices cannot fix this on the day: no fee booked those gigs. What the desk controls is how many cars wait on one day
+  when a wave comes.
+
+**The cap.** [`daycap.py`](spreadlab/daycap.py) (`DayCapPolicy`, variants `day-cap-70` and `day-cap-80` on the default)
+does not quote an option whose last minute to collect the car falls on a day that already has that many won orders with
+a car still to deliver. A slower option of the same request, due on another day, is still quoted. With no option left, the request is
+declined as `day_full`. On `fresh-098` a cap of 80 first binds on Thursday at 16:00, as the next-day cars that later
+expired begin to be won. A cap of 90 never binds there. On the saved weeks, the orders a cap would have declined are
+10 to 14% late against 4% for all orders. Their margin is an upper bound on the cost, since the desk would still win
+some of them on a slower option:
+
+| Cap | `slow-step-gate-25`, 167 weeks: orders a week, margin | The default, 212 weeks: orders a week, margin |
+| --- | --- | --- |
+| 70 | 14.1, 565 | 3.1, 128 |
+| 80 | 6.5, 265 | 0.9, 39 |
+| 90 | 2.5, 99 | |
+
+```bash
+PYTHONPATH=. uv run python scratch/drop_waves.py --variants slow-friday-late-150-kinds-limits --seeds fresh-1301,... --caps 70,80
+```
+
+The live desk does not take `DayCapPolicy` yet: `live final --variant day-cap-80` stops at once with an unknown parameter.
+
 ## The final
 
 [`live.py`](spreadlab/live.py) plays the final, or a test final, with the default variant (`VARIANT`) from the live stream.
@@ -972,6 +1024,7 @@ request, the driver list, the map and its own history in the week.
 - [`optquote.py`](spreadlab/optquote.py), [`optquote.json`](spreadlab/optquote.json): the quote as one optimisation (`opt`), and its fitted weights.
 - [`lanes.json`](spreadlab/lanes.json): the lanes' usual driver fees, for `lane_fee`.
 - [`pairs.py`](spreadlab/pairs.py), [`returns.json`](spreadlab/returns.json): out-and-back pairs, and the return requests a week on each lane.
+- [`daycap.py`](spreadlab/daycap.py): a cap on the won orders to collect on one day, against nights when many drivers drop their gigs.
 - [`play.py`](spreadlab/play.py), [`sweep.py`](spreadlab/sweep.py), [`report.py`](spreadlab/report.py): play, compare.
 - [`ledger.py`](spreadlab/ledger.py): mistakes by variant and situation.
 - [`live.py`](spreadlab/live.py), [`replay.py`](spreadlab/replay.py): the final from the live stream, and a recorded week as a stand-in for the server.
