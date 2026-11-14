@@ -158,8 +158,10 @@ jobs:
         run: |
           start=$(date +%s)
           # The converter reads the base model's config, not its weights.
-          "$RUNNER_TEMP/venv/bin/hf" download "$BASE_MODEL" --revision "$REV" --local-dir "$RUNNER_TEMP/base-config" \
-            --include '*.json' '*.jinja' --quiet
+          mkdir -p "$RUNNER_TEMP/base-config"
+          for f in config.json tokenizer_config.json tokenizer.json; do
+            curl -fsSL -o "$RUNNER_TEMP/base-config/$f" "https://huggingface.co/$BASE_MODEL/resolve/$REV/$f"
+          done
           "$RUNNER_TEMP/venv/bin/python" "$RUNNER_TEMP/llama.cpp/convert_lora_to_gguf.py" "$RUNNER_TEMP/adapter" \
             --base "$RUNNER_TEMP/base-config" --outtype f16 --outfile "$RUNNER_TEMP/adapter.gguf"
           echo "| Adapter conversion | $(( $(date +%s) - start )) s |" >> "$RUNNER_TEMP/times.md"
