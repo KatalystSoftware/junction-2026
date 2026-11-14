@@ -63,8 +63,9 @@
 <aside>
   <div class="head">
     <a class="name" href="#/">Kutsu</a>
-    <p>Find employers worth inviting, and send each a sign-up that is already filled in.</p>
+    <p>Plan the next event from the last ones: who to invite, and a sign-up that is already filled in.</p>
   </div>
+  <a class="events" href="#/" aria-current={route().id ? undefined : 'page'}>Events</a>
 
   <form onsubmit={submit}>
     <Icon name="search" size={18} />
@@ -125,6 +126,19 @@
     font: 800 1.5rem / 1 var(--display);
     letter-spacing: -0.03em;
     text-decoration: none;
+  }
+  .events {
+    padding: var(--s2) var(--s3);
+    border-radius: var(--r1);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .events:hover {
+    background: var(--city-raise);
+  }
+  .events[aria-current] {
+    background: var(--city-ink);
+    color: var(--city);
   }
   .head p {
     margin-top: var(--s2);

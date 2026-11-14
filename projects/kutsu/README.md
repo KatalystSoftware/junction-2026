@@ -1,14 +1,27 @@
-# Kutsu: a sign-up that is already filled in
+# Kutsu: the next event starts from the last ones
 
-Kutsu is Finnish for invitation. It is for the City of Espoo's recruitment events ("Rethinking
-Recruitment" challenge, Junction 2026). Companies are hard to get to an event and say too late what
-talent they need. Kutsu finds a company worth inviting, reads what it has said in public, and sends it
-a sign-up in its own logo and colours that is already filled in: who it is, what we would tell talent
-about it, and who it wants to meet. The company ticks, corrects and is in.
+Kutsu is Finnish for invitation. It is for the people at the City of Espoo who organise and market
+its recruitment events ("Rethinking Recruitment" challenge, Junction 2026).
+
+Today every event starts from scratch, with a new survey for companies and another for candidates.
+Each side waits for the other: companies ask which candidates will be there, and candidates sign up
+once they know which companies come. Kutsu keeps what past events taught (who came, and what
+employers said they need) and uses it to answer both before either has signed up:
+
+- **Events** (`#/`): the event being prepared, suggested next events, and past events. A suggestion
+  is a field of work where employers have said in public that they need people and the pool of past
+  attendees already has them.
+- **One event** (`#/event/<slug>`): the employers to invite, each with the news that makes now the
+  moment, and the people to invite, as counts. It also writes the sentence each invitation can open
+  with: how many such people there are, and which employers have said what they look for.
+- **The company's sign-up** (`#/join/<id>`): an invitation in the company's own logo and colours that
+  is already filled in. Who it is, what we would tell candidates about it, who it wants to meet, and
+  on each role how many people in the pool do that work. The company agrees, corrects, and is in.
 
 Live: <https://kutsu.katalyst.fyi/> (Espoo's screen) and <https://kutsu.katalyst.fyi/#/join/nitor.com>
-(what a company sees). `PRODUCT.md` says who it is for, `NEXT.md` what the Espoo mentors said and what
-is open.
+(what a company sees). The candidate's side of the same idea is the team's other project, Esittely
+(`../espoo-recruitment/`). `PRODUCT.md` says who Kutsu is for, `NEXT.md` what the Espoo mentors said
+and what is open.
 
 ## Run and test
 
@@ -17,23 +30,49 @@ From this folder, inside the repo's dev shell (`nix develop`):
 ```sh
 npm --prefix ui ci && npm --prefix ui run build                                            # the page (Svelte), into ui/dist
 sops exec-env ../../secrets/secrets.yaml 'python3 serve.py'                                # run: http://127.0.0.1:8046
-npm --prefix ui run check                                                                  # test: type-check the page
+npm --prefix ui run check && npm --prefix ui run walk                                      # test: see below
 sops exec-env ../../secrets/secrets.yaml 'python3 signals.py 2639822-1 Varjo wolt.com'     # research companies from the command line
+python3 pool.py                                                                            # regenerate the sample pool
 ```
 
 `serve.py` without `sops exec-env` still shows every stored company; only new searches need keys.
 
+The test has two parts. `check` type-checks the page and fails on any warning; `deploy.sh` runs it
+first and stops there if it fails. `walk` needs `serve.py` running: it opens every screen in a
+headless Chromium, signs one company up by pressing Enter until the finished page, and fails on any
+error the page reports. `npm --prefix ui run lint` is ESLint with typescript-eslint's strict
+type-checked rules; it still reports 83 findings and is not part of the check yet.
+
+## What is real, what is sample, what is proposed
+
+- **Real:** every employer, and every statement about one. Each statement was found word for word on
+  the public page it links to, and statements that name a person are dropped.
+- **Sample:** the pool of people and the past events. `pool.py` draws 1,140 people from a fixed seed
+  and keeps only counts per field (`pool.json`); nobody in it is real, and the screens mark these
+  numbers as sample data. No screen shows a row for a person, and a count under five is shown as
+  "fewer than 5".
+- **Real about the event:** the Deep Tech Talent Forum's dates, that it is online and free, its list
+  of employers, the presentation times and that places are limited, all from Espoo's event page.
+- **Proposed by us:** that Espoo keeps a pool across events at all, the suggested events, and on the
+  company's finished page that its profile is shown to matching candidates and that its booth is
+  built from the page. These describe what the product would do; Espoo has promised none of them.
+
 ## How it works
 
-There are two screens. The company's sign-up (`#/join/<id>`, or `#/join` to find yourself) is an
-invitation to an event that is already filled in. It shows one card at a time in the centre: who they
-are, then each piece of their news, then each drafted role, then "anyone else?", which drafts a whole
-role from one line or a suggestion. Enter accepts, Backspace leaves out or removes, the left arrow
-goes back. What they accept moves to the side and stays in view, who they are on the left and who
-they want to meet on the right, and any line there opens again in the centre. A job posting can be
-drafted for any role. Espoo's screen (`#/<id>`) lists employers by how fresh their funding and growth news
-is, shows the draft and its sources, and hands out the invitation link. `ui/` is the Svelte app;
-`serve.py` serves it and keeps sign-up state in `reviews.json`.
+Espoo's screen opens on its events. The upcoming event shows how far its invitations are and every
+employer's logo. Suggested events are computed in the page from the drafted roles of every employer
+and the pool: a field is suggested when at least three employers ask for it and the pool has people
+in it, and fields whose employers have funding or growth news from the last year come first. One
+employer (`#/<id>`) shows its draft and sources, and hands out the invitation link; a person sends
+it, as Espoo's account managers do today.
+
+The company's sign-up shows one card at a time in the centre: who they are with three short things
+we would tell candidates, then each drafted role, then "anyone else?", which drafts a whole role
+from one line or a suggestion. Enter accepts, Backspace removes a role, Z takes that back, the left
+arrow goes back. What they accept moves to the side and stays in view, who they are on the left and
+who they want to meet on the right, and any line there opens again in the centre. It ends on the
+company's finished page. `ui/` is the Svelte app; `serve.py` serves it and keeps sign-up state in
+`reviews.json`.
 
 A company is named by its id in `companies.json`, or by any name or domain. One that is not in our
 data takes about 20 seconds; anything asked before answers at once.
@@ -68,7 +107,8 @@ logo from the company's page (Cisco's on hamina.com).
   the company's own site. Social networks are excluded because posts there are people speaking.
 - **Claude Haiku 5.5**, three calls: one writes the statements, one lists the people named so those
   statements can be dropped, and one writes the card from the statements that passed: a one-line
-  pitch and at most four needs. A fourth drafts a job posting when a company asks for one.
+  pitch, up to five things to tell candidates and at most four needs. A fourth drafts a whole role
+  from one line when a company adds one.
 
 What a need asks for, and where each value comes from:
 
@@ -120,8 +160,9 @@ sections from "Headline numbers" on describe that run.
 | `roles.json` | 208 open tech roles: title, location, workplace, language requirement, seniority, contract, working time, role family, must-have and nice-to-have items with skill ids |
 | `esittely-companies.json` | the same roles in the company and job-ad shape of `projects/espoo-recruitment/app/data.js` (role family ids and skill ids are the demo's own); `size`, `stand`, `tradeoffs` and minimum experience are left out because nothing public grounds them |
 | `signals.json`, `signals.md` | per company: identity from Context.dev, what public sources state (claim, verbatim quote, URL) and, kept apart, the inferred card: a pitch and the needs, citing those statements |
-| `ui/`, `serve.py` | the Kutsu app (Svelte) and the small server behind it: live research, progress, sign-up state, drafted postings |
+| `ui/`, `serve.py` | the Kutsu app (Svelte) and the small server behind it: live research, progress, sign-up state, a role drafted from one line |
 | `presets.json` | named lists of employers shown first, such as the Deep Tech Talent Forum's |
+| `pool.py`, `pool.json` | the sample pool: people who came to past events, as counts per field of work; seeded, nobody real |
 | `metrics.jsonl` | one line per round |
 | `LOOP.md` | what each round ran, decisions, spot-check tables, research notes |
 

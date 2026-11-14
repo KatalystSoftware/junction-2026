@@ -32,7 +32,7 @@ HOST, PORT = os.environ.get("HOST", "127.0.0.1"), 8046
 LIVE_LIMIT = int(os.environ.get("LIVE_LIMIT", "300"))  # about $0.03 and 11 Context.dev credits each
 DIST = lib.HERE / "ui" / "dist"
 REVIEWS = lib.HERE / "reviews.json"
-DATA = {"/signals.json": "signals.json", "/presets.json": "presets.json"}
+DATA = {"/signals.json": "signals.json", "/presets.json": "presets.json", "/pool.json": "pool.json"}
 TYPES = {".html": "text/html; charset=utf-8", ".js": "text/javascript", ".css": "text/css", ".json": "application/json",
          ".svg": "image/svg+xml", ".woff2": "font/woff2", ".png": "image/png", ".ico": "image/x-icon"}
 STATUSES = {"draft", "invited", "joined"}

@@ -1,7 +1,9 @@
 <script lang="ts">
   import Cite from './Cite.svelte'
   import { text } from './editable'
+  import { some } from './events'
   import Icon from './Icon.svelte'
+  import { app } from './state.svelte'
   import type { Brief, Need } from './types'
 
   // One role, as a proposal the company can accept in two seconds: who these people are, why we think
@@ -34,6 +36,9 @@
     key === 'workplace' ? (need.workplace ? [need.workplace, need.where].filter(Boolean).join(', ') : null)
     : key === 'abroad' ? (need.abroad == null ? null : need.abroad ? 'Hires from abroad' : 'Only people in Finland')
     : (need[key] ?? null)
+  // the answer to "who will be there": the people in Espoo's pool who do this work, and the asked skill most of them know
+  const pool = $derived(need.family ? app.pool.fields[need.family] : undefined)
+  const known = $derived(need.skills.map((skill) => ({ skill, n: pool?.skills[skill] ?? 0 })).sort((a, b) => b.n - a.n)[0])
   const fromPost = $derived(Object.values(need.sources ?? {}).map((s) => `“${s.quote}”`).join(' '))
 
   const editTask = (j: number, e: FocusEvent) => {
@@ -58,6 +63,13 @@
   {#if need.why || need.signals.length || editing}
     <p class="why">
       <span role={editing ? 'textbox' : undefined} aria-label={editing ? 'Why now' : undefined} contenteditable={editing ? 'plaintext-only' : undefined} data-placeholder="Why now?" onblur={(e) => { reword('why', e) }} onkeydown={enter} use:text={need.why}></span><span class="cites">{#each need.signals.filter(number) as id, k (id)}<Cite signal={brief.signals[number(id) - 1]} n={k + 1} />{/each}</span>
+    </p>
+  {/if}
+
+  {#if pool && pool.people >= 5 && !editing}
+    <p class="pool" title={app.pool.note}>
+      <b>{some(pool.people)}</b> people who came to Espoo's events do this work{known && known.n >= 5 ? `, ${String(known.n)} of them with ${known.skill}` : ''}.
+      <small>Sample numbers</small>
     </p>
   {/if}
 
@@ -91,11 +103,11 @@
     {#if fromPost}<span class="read" title={fromPost}>from your job post</span>{/if}
   </p>
   {#each FACTS.filter((f) => f.key === asking) as fact (fact.key)}
-    <p class="pick" role="radiogroup" aria-label={fact.ask}>
+    <div class="pick" role="radiogroup" aria-label={fact.ask}>
       {#each fact.options as [value, label] (label)}
         <button role="radio" data-choice aria-checked={need[fact.key] === value} onclick={() => { change({ [fact.key]: value }); asking = null }}>{label}</button>
       {/each}
-    </p>
+    </div>
   {/each}
   {#if need.roles.length}<p class="posted">Open now: {need.roles.join(', ')}</p>{/if}
 </div>
@@ -311,5 +323,23 @@
       opacity: 0;
       translate: 0 -6px;
     }
+  }
+  .pool {
+    margin-top: var(--s3);
+    font-size: var(--t-sm);
+    line-height: 1.4;
+    color: var(--ink-2);
+  }
+  .pool b {
+    font-size: var(--t-md);
+    color: var(--ink);
+  }
+  .pool small {
+    margin-left: var(--s1);
+    padding: 0.15em 0.55em;
+    border-radius: 99px;
+    background: var(--wash);
+    font-size: var(--t-xs);
+    white-space: nowrap;
   }
 </style>

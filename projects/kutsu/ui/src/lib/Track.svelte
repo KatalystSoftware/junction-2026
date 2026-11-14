@@ -1,7 +1,7 @@
 <script lang="ts">
   import { clock } from './format'
   import Icon from './Icon.svelte'
-  import { joinLink, nameOf, saveReview } from './state.svelte'
+  import { copyLink, joinLink, nameOf, saveReview } from './state.svelte'
   import type { Brief, Review } from './types'
 
   // Where the brief is on its way to the company and back, and the one thing to do next.
@@ -18,16 +18,7 @@
   const send = () => (saveReview(brief.id, { ...review, status: 'invited', invited_at: now() }), copy())
   const takeBack = () => saveReview(brief.id, { ...review, status: 'draft', invited_at: undefined, joined_at: undefined })
   async function copy() {
-    // the clipboard API needs https; on plain http fall back to selecting a hidden field
-    try {
-      await navigator.clipboard.writeText(joinLink(brief.id))
-    } catch {
-      const field = Object.assign(document.createElement('textarea'), { value: joinLink(brief.id) })
-      document.body.append(field)
-      field.select()
-      document.execCommand('copy')
-      field.remove()
-    }
+    await copyLink(brief.id)
     copied = true
     setTimeout(() => (copied = false), 1600)
   }

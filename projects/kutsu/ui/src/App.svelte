@@ -1,9 +1,12 @@
 <script lang="ts">
   import { brandOf } from './lib/brand'
+  import Events from './lib/Events.svelte'
+  import { plans } from './lib/events'
   import Find from './lib/Find.svelte'
   import Join from './lib/Join.svelte'
   import Ledger from './lib/Ledger.svelte'
   import Needs from './lib/Needs.svelte'
+  import Plan from './lib/Plan.svelte'
   import Rail from './lib/Rail.svelte'
   import Research from './lib/Research.svelte'
   import Stage from './lib/Stage.svelte'
@@ -13,11 +16,9 @@
   load()
 
   const at = $derived(route())
-  // with nothing chosen, the first employer of the event: the screen never opens empty
-  const brief = $derived(
-    app.briefs.find((b) => b.id === at.id) ??
-      (at.join ? undefined : app.briefs.find((b) => b.id === app.presets[0]?.ids.find((id) => id.includes('.'))) ?? app.briefs[0]),
-  )
+  // with no employer chosen, Espoo's screen shows its events
+  const brief = $derived(app.briefs.find((b) => b.id === at.id))
+  const plan = $derived(at.event ? plans().find((p) => p.slug === at.event) : undefined)
   const review = $derived(brief && reviewOf(brief))
   const brand = $derived(
     brandOf(app.research ? ((app.research.steps.findLast((s) => s.stage === 'identity')?.colors as string[]) ?? []) : brief?.identity?.colors),
@@ -41,7 +42,11 @@
         <div class="work">
           {#if app.research}
             <Research />
-          {:else if brief && review}
+          {:else if plan}
+            {#key plan.slug}<Plan {plan} />{/key}
+          {:else if !brief || !review}
+            <Events />
+          {:else}
             <Stage {brief} />
             <Track {brief} {review} />
             <main>

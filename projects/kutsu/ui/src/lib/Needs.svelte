@@ -34,6 +34,7 @@
 <ol bind:this={list} class:editable>
   {#each review.needs as need, i (i)}
     <li style:--i={i}>
+      <!-- svelte-ignore a11y_missing_content (the `text` action writes the title into it) -->
       <h3 contenteditable={editable ? 'plaintext-only' : undefined} spellcheck="false" data-placeholder="Who do they need?" onblur={(e) => edit(i, 'title', e)} onkeydown={enter} use:text={need.title}></h3>
       <p class="why">
         <span role={editable ? 'textbox' : undefined} aria-label="Why" contenteditable={editable ? 'plaintext-only' : undefined} data-placeholder="Why? One line." onblur={(e) => edit(i, 'why', e)} onkeydown={enter} use:text={need.why}></span><span class="cites">{#each need.signals.filter(number) as id}<Cite signal={brief.signals[number(id) - 1]} n={number(id)} />{/each}</span>

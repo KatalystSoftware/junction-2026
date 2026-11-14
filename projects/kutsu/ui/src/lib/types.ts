@@ -88,5 +88,22 @@ export type Review = {
   invited_at?: string
   joined_at?: string
 }
-export type Preset = { title: string; note: string; url: string; ids: string[]; names?: Record<string, string> }
+export type Preset = { title: string; note: string; url: string; date?: string; ids: string[]; names?: Record<string, string> }
+
+/** One field of work in the sample pool, as counts. No row here is a person. */
+export type PoolField = {
+  people: number
+  /** people who do other work today and want to move into this field */
+  wanting: number
+  levels: Record<string, number>
+  english: number
+  finnish: number
+  abroad: number
+  /** how many of them came to each past event, by event id */
+  events: Record<string, number>
+  /** how many know each skill employers ask for */
+  skills: Record<string, number>
+}
+export type PastEvent = { id: string; name: string; date: string; where: string; employers: number; people: number }
+export type Pool = { note: string; people: number; events: PastEvent[]; fields: Record<string, PoolField> }
 export type Step = { stage: 'identity' | 'search' | 'careers' | 'read' | 'check' | 'card'; [fact: string]: unknown }

@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Put Kutsu on the Verda runner: http://31.22.104.106:8046
+# Put Kutsu on the Verda runner: https://kutsu.katalyst.fyi (the shared proxy forwards to port 8046 here)
 #
 #   sops exec-env ../../secrets/secrets.yaml ./deploy.sh
 #
-# Builds the page, copies it with the code, the stored briefs and the request cache to /srv/talent-brief, writes the three API
+# Checks the page and stops if the check fails. Then builds it, copies it with the code, the stored briefs and the request cache to /srv/talent-brief, writes the three API
 # keys from the environment into a root-only file there, and (re)starts a systemd service that runs
 # serve.py as its own user. Ports 80 and 443 on that machine belong to the gap finder, so this stays
 # on plain http on its own port. Temporary: `systemctl disable --now talent-brief` takes it down.
@@ -13,11 +13,13 @@ HOST=root@31.22.104.106
 SSH=(ssh -i "${VERDA_SSH_KEY:-$HOME/.ssh/id_ed25519_verda}" -o BatchMode=yes)
 DIR=/srv/talent-brief
 
-"${SSH[@]}" "$HOST" "id talentbrief >/dev/null 2>&1 || useradd --system --home $DIR --shell /usr/sbin/nologin talentbrief; mkdir -p $DIR/ui; rm -f $DIR/index.html"
+# nothing is built or copied unless the page passes its check: a restart interrupts whoever is on the page
 npm --prefix ui ci --no-audit --no-fund >/dev/null
+npm --prefix ui run check
 npm --prefix ui run build >/dev/null
+"${SSH[@]}" "$HOST" "id talentbrief >/dev/null 2>&1 || useradd --system --home $DIR --shell /usr/sbin/nologin talentbrief; mkdir -p $DIR/ui; rm -f $DIR/index.html"
 rsync -az -e "${SSH[*]}" \
-  lib.py signals.py serve.py presets.json companies.json roles.json api-cache "$HOST:$DIR/"
+  lib.py signals.py serve.py presets.json pool.json companies.json roles.json api-cache "$HOST:$DIR/"
 # No --delete: a tab opened before a redeploy still asks for the old hashed files under assets/, and
 # deleting them leaves that tab blank until it is reloaded.
 rsync -az -e "${SSH[*]}" ui/dist "$HOST:$DIR/ui/"
