@@ -52,7 +52,8 @@ def play(root: str, target: str, variant: str, week_path: str, map_path: str, ou
     module, name = target.split(":")
     cls = getattr(importlib.import_module(module), name)
     params = importlib.import_module("spreadlab.variants").VARIANTS[variant]
-    week = json.load(gzip.open(week_path))
+    with gzip.open(week_path) as f:
+        week = json.load(f)
     # A recorded order carries the delivery times filled in later; the world sent it without them (replay.as_sent).
     delivered = {(e["orderId"], e["leg"]): e["at"] for e in week["events"] if e["kind"] == "delivered"}
     for e in week["events"]:
@@ -81,7 +82,7 @@ def play(root: str, target: str, variant: str, week_path: str, map_path: str, ou
                     results.append({"ok": True})
             return results
 
-    desk = cls(World(), 8, 0, params, week["roster"], json.load(open(map_path)))
+    desk = cls(World(), 8, 0, params, week["roster"], json.loads(Path(map_path).read_text()))
 
     def flush():
         actions, desk.outbox = desk.outbox, []
@@ -102,7 +103,7 @@ def play(root: str, target: str, variant: str, week_path: str, map_path: str, ou
     flush()
     quotes = {rid: {"declined": d.get("declined"), "prices": d.get("prices") or {}} for rid, d in desk.decisions.items()}
     won = [e["order"]["id"] for e in week["events"] if e["kind"] == "order_won"]
-    json.dump({"drivers": len(week["roster"]), "quotes": quotes, "posts": posts, "won": won, **counts}, open(out, "w"))
+    Path(out).write_text(json.dumps({"drivers": len(week["roster"]), "quotes": quotes, "posts": posts, "won": won, **counts}))
 
 
 def run(args) -> None:
@@ -122,7 +123,7 @@ def run(args) -> None:
                 jobs.append([sys.executable, __file__, "_play", root, f"{module}:{cls}", variant, str(week), str(data / "map.json"), str(out)])
     (Path(args.out) / "arms.json").write_text(json.dumps(list(arms)))
     with ThreadPoolExecutor(args.jobs) as pool:
-        for r in pool.map(lambda cmd: subprocess.run(cmd, capture_output=True, text=True), jobs):
+        for r in pool.map(lambda cmd: subprocess.run(cmd, capture_output=True, text=True, check=False), jobs):
             if r.returncode:
                 print(" ".join(r.args[3:7]), r.stderr[-600:], file=sys.stderr)
 
@@ -175,15 +176,15 @@ def read(args) -> None:
                         row["fee"].append(abs(p[1] / p0[1] - 1) <= TOL)
                         row["pair"].append(p[3] == p0[3])
             for i, a in enumerate(chain[1:], 1):
-                for kind, ids, same in (("quote", r0["quotes"], lambda x, k: same_quote(data[x]["quotes"][k], r0["quotes"][k])),
-                                        ("post", r0["won"], lambda x, k: same_post(data[x]["posts"].get(k), r0["posts"].get(k)))):
+                for kind, ids, same in (("quote", r0["quotes"], lambda x, k, data=data, r0=r0: same_quote(data[x]["quotes"][k], r0["quotes"][k])),
+                                        ("post", r0["won"], lambda x, k, data=data, r0=r0: same_post(data[x]["posts"].get(k), r0["posts"].get(k)))):
                     for k in ids:
                         if not same(a, k):
                             first = next(x for x in chain[1:i + 1] if not same(x, k))
                             firsts[a][(kind, first)] = firsts[a].get((kind, first), 0) + 1
         if not weeks:
             continue
-        share = lambda xs: f"{100 * sum(xs) / len(xs):.1f}%" if xs else "-"  # noqa: E731
+        share = lambda xs: f"{100 * sum(xs) / len(xs):.1f}%" if xs else "-"
         print(f"\n{title}: {weeks} weeks; agreement with {ref} (prices and fees within {TOL:.0%})")
         print("| arm | quote or decline | same options | price, all options | median price vs ref | post minute | opening fee | pairing | pair gigs/wk | reprices/wk |")
         print("|---|---|---|---|---|---|---|---|---|---|")
