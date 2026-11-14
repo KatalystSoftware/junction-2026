@@ -34,7 +34,7 @@ WORDS = {
     # The sentence is about the delivery, or about the customer who waits for the car.
     "there": ["perillä", "perille", "perilla", "toimitus", "toimitettava", "kohde", "kohteessa", "destination", "arrival", "arrive", "delivered", "delivery",
               "deliver", "framme", "leverans", "levereras", "mottagning", "vastaanotto", "vastaanottava", "receiving", "there", "där", "silloin"],
-    "closed": ["enää", "anymore", "ingen", "längre", "stänger", "sulkee", "sulkeutuu", "closes", "kiinni", "ketään", "nobody"],
+    "closed": ["enää", "enaa", "anymore", "ingen", "längre", "stänger", "sulkee", "sulkeutuu", "closes", "kiinni", "ketään", "ketaan", "nobody"],
     "correction": ["korjaus", "correction", "sorry", "rättelse", "siis", "eiku", "eikun", "nej", "anteeksi", "oikeasti", "tarkoitan", "mean", "förlåt", "korjaan"],
     "half": ["puoli", "half", "halv"],
     "clock": ["klo", "kello", "kl", "klockan", "at"],
@@ -50,10 +50,14 @@ HOURS = [("kahdentoista", 12), ("kahdeltatoista", 12), ("kahdestatoista", 12), (
          ("twelve", 12), ("eleven", 11), ("ten", 10), ("nine", 9), ("eight", 8), ("one", 13), ("two", 14), ("three", 15), ("four", 16), ("five", 17),
          ("tolv", 12), ("elva", 11), ("tio", 10), ("nio", 9), ("åtta", 8), ("ett", 13), ("två", 14), ("tre", 15), ("fyra", 16), ("fem", 17)]
 ENDINGS = ("ltä", "lta", "stä", "sta", "een", "en", "n", "ksi", "")  # the Finnish cases a clock time comes in
-PLATES = re.compile(r"kilv|kilp|kill?p|ilman k\w{0,2}[il]\w{0,3}ä|rekkar|skylt|\bsk\w{0,2}lt(?:ar|en)|plate|plt|unregist|rekisteröim|rekisterikilv|oregistr|rek\.?kilv")
+PLATES = re.compile(r"kilv|kilp|kill?p|kiilv|ilman kip[iy]?[aä]\b|ilman k\w{0,2}[il]\w{0,3}ä|rekkar|skylt|\bsk\w{0,2}lt(?:ar|en)|plate|plt|unregist|rekisteröim|rekisterikilv|oregistr|rek\.?kilv")
 HAS_PLATES = re.compile(r"kilvet (?:on |ovat )?(?:paikallaan|kiinni|autossa)|plates (?:are )?on\b|skyltar(?:na)? (?:sitter|finns)")
 MANUAL = re.compile(r"m\w?anua|manau|mnaua|manual|manuell|käsiva|keppivaiht|stick shift|ei automaat|inte automat|not automatic|not an automatic")
-NOT_MANUAL = re.compile(r"ei m\w?anua|ei manau|ei mnaua|inte manuell|not (?:a )?manual|no manual")
+NOT_MANUAL = re.compile(r"ei m\w?anua|ei manau|ei mnaua|inte manuell|not (?:an? )?m\w?anual|no manual")
+# A word for a manual gearbox with a typo that MANUAL does not cover ("mnuaali", "maunal", "käivaihteinen"): one edit
+# from one of these, umlauts aside, and not right after a word that denies it.
+MANUAL_WORDS = ("manuaali", "manuaalia", "manuaalivaihteinen", "manuaalivaihteet", "kasivaihteinen", "manual", "manuell")
+DENY = {"ei", "not", "no", "inte", "ej"}
 TOKEN = re.compile(r"\d{1,2}[.:]\d{2}|\d+|[a-zåäö]+|,")
 
 
@@ -156,21 +160,56 @@ SHORT = re.compile(r"\b(viim|kl|klo|n|ma|ti|ke|to|pe|la|mån|tis|ons|tors|fre|l�
 SENTENCE = re.compile(r"[.!?;]+(?:\s+|$)|\n|\s[/|]\s")
 
 
+CALL = {"call", "soita", "ring", "ringa", "phone", "ilmoita"}
+
+
+def plain(text: str) -> str:
+    """The text without its umlauts, as many notes write it: "enaa", "ketaan", "kasivaihteinen"."""
+    return text.translate(str.maketrans("äöå", "aoa"))
+
+
+def named_day(token: str, arrived_at: int) -> Optional[int]:
+    """The day that a word names, counted from the request's arrival: today, tomorrow, the day after, or a weekday."""
+    word = tag(token)
+    if word in ("today", "tomorrow", "overmorrow"):
+        return ("today", "tomorrow", "overmorrow").index(word)
+    named = weekday(token)
+    return None if named is None else (named - arrived_at // DAY % 7 - 2) % 7 + 2
+
+
+def half_hours(text: str) -> str:
+    """A Finnish half hour in the cases a limit comes in, as a clock time: "ennen puolta neljää" is before 15:30,
+    "puoli viiden jälkeen" after 16:30."""
+    return HALF_CASE.sub(lambda m: f"klo {HOUR_CASES[m[1]] - 1}.30", text)
+
+
 def read(note: Optional[dict], arrived_at: int) -> Facts:
     if not note:
         return Facts()
     text = note["text"].lower()
     plates = bool(PLATES.search(text)) and not HAS_PLATES.search(text)
-    manual = bool(MANUAL.search(text)) and not NOT_MANUAL.search(text)
+    words = TOKEN.findall(plain(text))
+    manual = (bool(MANUAL.search(text)) and not NOT_MANUAL.search(text)) or any(
+        len(word) >= 5 and any(near(word, known) for known in MANUAL_WORDS) and not set(words[max(0, j - 2):j]) & DENY for j, word in enumerate(words))
     text = re.sub(r"(?:the )?day after t\w+", "ylihuomenna", text)
     text = re.sub(r"\b(?:hi|hello|hey) there\b", " ", text)  # a greeting, not the delivery place
+    text = half_hours(text)
     picks: list[Time] = []  # of each sentence that says when the car can be collected, the time it says
     last_is_pick = False  # whether the last time of the sentences so far is the last of `picks`
     for sentence in SENTENCE.split(SHORT.sub(r"\1 ", RANGE.sub(" ", text))):
         tokens = TOKEN.findall(sentence)
         tags = [tag(token) for token in tokens]
         found = times(tokens, arrived_at // DAY % 7)
-        about_pickup = "there" not in tags and "closed" not in tags  # not the delivery, and not when the site stops handing cars over
+        # Not the delivery, and not when the site stops handing cars over. A clause that asks for a call ("call the
+        # customer an hour before arrival") names the delivery without being about it.
+        clauses = " ".join(tokens).split(",")
+        about = [tag(token) for clause in clauses if not set(clause.split()) & CALL for token in clause.split()]
+        about_pickup = "there" not in about and "closed" not in about
+        if not found and last_is_pick and picks and (any(t == "correction" for t in tags) or any(a == "ei" and b in ("kun", "ku") for a, b in zip(tokens, tokens[1:]))):
+            day = next((named_day(token, arrived_at) for token in tokens if named_day(token, arrived_at) is not None), None)
+            if day is not None:  # a correction of the day alone, in a sentence of its own: "Valmis torstaina klo 14. Korjaus: perjantaina"
+                picks[-1] = picks[-1]._replace(day=day)
+            continue
 
         def corrects(at: int) -> bool:
             """Whether the words before token `at` say that it corrects what came before: "korjaus: klo 12", "ei kun klo 12", "eikun to"."""
@@ -205,13 +244,36 @@ def read(note: Optional[dict], arrived_at: int) -> Facts:
         if chosen is not None:
             # A day alone can be corrected too: "valmis torstaina klo 14, ei kun perjantaina".
             for j, token in enumerate(tokens):
-                named = weekday(token)
-                if j > chosen.end and named is not None and corrects(j) and not any(t.at - 3 <= j <= t.end for t in found if t.at > chosen.at):
-                    chosen = chosen._replace(day=(named - arrived_at // DAY % 7 - 2) % 7 + 2)
+                day = named_day(token, arrived_at)
+                if j > chosen.end and day is not None and corrects(j) and not any(t.at - 3 <= j <= t.end for t in found if t.at > chosen.at):
+                    chosen = chosen._replace(day=day)
             picks.append(chosen)
             last_is_pick = found[-1].at <= chosen.at or corrects(found[-1].at)
     pickup_from = max(((arrived_at // DAY + (pick.day or 0)) * DAY + pick.minute for pick in picks), default=0)
     return Facts(pickup_from, plates, manual)
+
+
+# Summer tyres: a clause that names them and does not say they travel with the car ("in the trunk", "takakontissa"),
+# or one that says the winter tyres are missing. Stems are matched on a word's start, umlauts aside, with one typo.
+SUMMER_STEMS = ("kesare", "kesakum", "summer", "sommar")
+CARRIED = ("trunk", "boot", "takakontissa", "kontissa", "tavaratilassa", "bakluckan", "mukana", "mukaan", "foljer", "kyydissa", "takapenkilla")
+WINTER = ("talvirenkaita", "talvirenkaat", "talvet", "winters", "winter", "vinterdack", "vinterdacken")
+MISSING = {"ei", "no", "not", "puuttuu", "inte", "saknas", "utan", "ilman"}
+
+
+def summer_tyres(note: Optional[dict]) -> bool:
+    """Whether the car is on summer tyres: "Auto vielä kesärenkailla", "Summer tyres on, no winters", "obs sommardäck på",
+    "talvirenkaita ei vielä vaihdettu"; not "Kesärenkaat vanteineen takakontissa" or "Summer tyres in the trunk"."""
+    if not note:
+        return False
+    for clause in re.split(r",|" + SENTENCE.pattern, plain(note["text"].lower())):
+        words = re.findall(r"[a-z]+", clause or "")
+        names = any(near(word[:n], stem) for word in words for stem in SUMMER_STEMS for n in (len(stem) - 1, len(stem), len(stem) + 1) if len(word) >= n)
+        carried = any(near(word, known) for word in words for known in CARRIED)
+        winterless = any(near(word, known) for word in words for known in WINTER) and bool(set(words) & MISSING)
+        if (names and not carried) or winterless:
+            return True
+    return False
 
 
 class Limits(NamedTuple):
@@ -222,22 +284,24 @@ class Limits(NamedTuple):
 
 # The words of a note's own limits. A word of five letters or more also counts with one typo.
 LIMIT_WORDS = {
-    "delivery": ["perillä", "perille", "perilla", "kohde", "kohteessa", "kohteen", "destination", "vastaanotto", "vastaanottava", "vastaanotetaan", "receiving", "receiver",
+    "delivery": ["perillä", "perille", "perilla", "kohde", "kohteessa", "kohteen", "destination", "vastaanotto", "vastaanottava", "vastaanottaja", "vastaanotetaan", "receiving", "receiver",
                  "mottagaren", "mottagning", "framme", "plats", "toimitus", "toimitukset", "toimitusosoite", "delivery", "deliver", "delivered", "leverans", "levereras",
                  "arrival", "arrive"],
-    "shut": ["kiinni", "sulkee", "sulkeutuu", "suljetaan", "close", "closes", "closed", "stänger", "stängt", "nobody", "ketään", "ingen", "enää", "anymore", "längre"],
+    "shut": ["kiinni", "sulkee", "sulkeutuu", "suljetaan", "close", "closes", "closed", "stänger", "stängt", "nobody", "ketään", "ketaan", "ingen", "enää", "enaa", "anymore", "längre"],
     "until": ["asti", "until", "saakka", "till"],
     "latest": ["viim", "viimeistään", "viimeistaan", "mennessä", "mennessa", "latest", "by", "senast", "later"],
     "before": ["ennen", "before", "före", "innan"],
-    "collect": ["haettava", "nouto", "noudettava", "nouda", "haku", "hakea", "collect", "pickup", "pick", "hämtas", "hämta", "avhämtning"],
+    "collect": ["haettava", "nouto", "noudettava", "nouda", "haku", "hakea", "collect", "pickup", "pick", "hämtas", "hämta", "hämtning", "avhämtning"],
     "customer": ["asiakas", "kunden", "customer"],
     "fetches": ["noutaa", "hämtar", "picks", "hakee"],
 }
 HOURS_RANGE = re.compile(r"\b(\d{1,2})(?:[.:](\d{2}))?\s*(am|pm)?\s*[-–]\s*(\d{1,2})(?:[.:](\d{2}))?\s*(am|pm)?\b|\b(\d{1,2}):st[aä]\s+(\d{1,2}):(?:een|ään|aan)\b")
 # Finnish hours in the cases a limit comes in ("ennen kahta", "kolmeen asti", "neljän jälkeen"), which `times` reads only after a word of time.
-HOUR_CASES = {"yhtä": 13, "yhteen": 13, "kahta": 14, "kahteen": 14, "kahden": 14, "kolmea": 15, "kolmeen": 15, "kolmen": 15, "neljää": 16, "neljään": 16, "neljän": 16,
-              "viittä": 17, "viiteen": 17, "viiden": 17, "kuutta": 18, "kuuteen": 18, "kuuden": 18}
+HOUR_CASES = {"kahdeksaa": 8, "kahdeksaan": 8, "yhdeksää": 9, "yhdeksään": 9, "kymmentä": 10, "kymmeneen": 10, "yhtätoista": 11, "yhteentoista": 11,
+              "kahtatoista": 12, "kahteentoista": 12, "yhtä": 13, "yhteen": 13, "kahta": 14, "kahteen": 14, "kahden": 14, "kolmea": 15, "kolmeen": 15, "kolmen": 15,
+              "neljää": 16, "neljään": 16, "neljän": 16, "viittä": 17, "viiteen": 17, "viiden": 17, "kuutta": 18, "kuuteen": 18, "kuuden": 18}
 HOUR_CASE = re.compile(r"(?<!puoli )\b(" + "|".join(HOUR_CASES) + r")\b")
+HALF_CASE = re.compile(r"\b(?:puolta|poulta|puoli|puolen) (" + "|".join(HOUR_CASES) + r")\b")
 
 
 def limits(note: Optional[dict], arrived_at: int) -> Limits:
@@ -265,7 +329,7 @@ def limits(note: Optional[dict], arrived_at: int) -> Limits:
                 break
             else:
                 opens = closes = 0
-            plain = HOUR_CASE.sub(lambda m: f"klo {HOUR_CASES[m[1]]}", re.sub(r"\b(\d{1,2}):(?:aan|ään|een)\b", r"klo \1", HOURS_RANGE.sub(" ", clause)))
+            plain = HOUR_CASE.sub(lambda m: f"klo {HOUR_CASES[m[1]]}", half_hours(re.sub(r"\b(\d{1,2}):(?:aan|ään|een)\b", r"klo \1", HOURS_RANGE.sub(" ", clause))))
             words = TOKEN.findall(plain)
             tags = [tag(word) for word in words]
             said = {name for name, known in LIMIT_WORDS.items() if any(near(word, k) for word in words for k in known)}

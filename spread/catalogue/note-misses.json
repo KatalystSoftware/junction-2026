@@ -1,0 +1,9 @@
+{
+ "ready": 0,
+ "plates": 0,
+ "manual": 1,
+ "deadline": 1,
+ "pickup_hours": 3,
+ "delivery_hours": 0,
+ "summer_tyres": 0
+}
