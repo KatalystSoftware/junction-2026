@@ -22,6 +22,20 @@ export interface QueueItem {
 	findings: number
 }
 
+/** What the claim check made of a finding: looked up in every passage of the other edition by a second model. */
+export interface Check {
+	outcome: 'kept' | 'changed' | 'new' | 'set_aside' | 'unchecked'
+	reason: 'stated_elsewhere' | 'not_confirmed' | 'repeat' | null
+	verdict: 'not_mentioned' | 'contradicted' | 'supported' | 'unchecked' | null
+	judge: string
+	as_of: string
+	claim: { lang: Lang | null; quote: string | null; about: string | null }
+	searched: number | null
+	read: number | null
+	/** The passage that settled it; `passage` is its whole text, on a set-aside row only. */
+	evidence: { lang: Lang; rev_id: number | null; section: string | null; quote: string | null; passage: string | null } | null
+}
+
 export interface Finding {
 	id: number
 	lang: Lang
@@ -43,6 +57,8 @@ export interface Finding {
 	closed_at: string | null
 	closed_after: string | null
 	history?: boolean
+	/** null: the check did not look at this row. Absent on a database without the check. */
+	check?: Check | null
 }
 
 export interface Lead {
@@ -61,6 +77,8 @@ export interface Topic {
 	quality?: PerLang<string>
 	leads?: PerLang<Lead>
 	findings: Finding[]
+	/** The check's totals for the topic; null when it has not run on it. */
+	checked?: { judge: string; as_of: string; kept?: number; changed?: number; new?: number; set_aside: Record<string, number> } | null
 	sql: SqlEntry[]
 }
 

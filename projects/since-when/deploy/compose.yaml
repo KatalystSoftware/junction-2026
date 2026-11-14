@@ -32,7 +32,7 @@ services:
     restart: unless-stopped
     environment:
       DB_HOST: db
-      DB_NAME: since_when
+      DB_NAME: ${DB_NAME:-since_when}   # up.sh sets it when it loads a snapshot
       DB_USER: since_when
       DB_PASSWORD: ${DB_PASSWORD:?}
       # The Run button's user, SELECT only (up.sh creates it).

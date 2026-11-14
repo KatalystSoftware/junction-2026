@@ -8,7 +8,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from . import checked
+from . import api, checked
 
 FACT = "Marssiin osallistui 12 600 miestä."
 PAIR = "Q1:2026-11-14:fi:10:en:30"
@@ -111,6 +111,89 @@ class Records(unittest.TestCase):
             (Path(run) / "run.json").write_text(json.dumps({"judge": "j"}))
             rows, _ = checked.records(cursor, [row("framing", "kansanliike", "fascist")], [], run)
         self.assertEqual([(r["finding_id"], r["outcome"], r["verdict"]) for r in rows], [(9, "unchecked", None)])
+
+
+def _row(**over):
+    """A checked_finding row as the topic endpoint reads it."""
+    row = dict.fromkeys(
+        [
+            "id",
+            "finding_id",
+            "outcome",
+            "reason",
+            "as_of",
+            "type",
+            "lang",
+            "other_lang",
+            "section",
+            "other_section",
+            "quote",
+            "other_quote",
+            "rev_id",
+            "other_rev_id",
+            "summary",
+            "verdict",
+            "claim_lang",
+            "claim_quote",
+            "claim_about",
+            "searched",
+            "read_passages",
+            "evidence_lang",
+            "evidence_rev_id",
+            "evidence_section",
+            "evidence_quote",
+            "evidence_passage",
+            "claim_figure",
+            "evidence_figure",
+            "judge",
+        ]
+    )
+    return {**row, "judge": "judge-1", "as_of": "2026-11-14", **over}
+
+
+class Applied(unittest.TestCase):
+    """api.apply_checks: what the topic endpoint makes of the findings and their checked rows."""
+
+    FINDINGS = (
+        {"id": 1, "type": "numbers", "lang": "sv", "other_lang": "en", "summary": "old", "quotes": {"sv": "a"}},
+        {"id": 2, "type": "numbers", "lang": "sv", "other_lang": "en", "summary": "aside", "quotes": {"sv": "b"}},
+        {"id": 3, "type": "framing", "lang": "fi", "other_lang": "sv", "summary": "word list", "quotes": {"sv": "c"}},
+    )
+
+    def test_without_checked_rows_every_finding_is_unchecked(self):
+        findings, totals = api.apply_checks(self.FINDINGS, [])
+        self.assertIsNone(totals)
+        self.assertEqual([f["check"] for f in findings], [None, None, None])
+
+    def test_a_changed_finding_is_shown_as_the_check_rewrote_it(self):
+        k = _row(id=7, finding_id=1, outcome="changed", type="contradiction", lang="en", other_lang="sv")
+        k.update(summary="new", quote="x", other_quote="y", rev_id=11, other_rev_id=12, verdict="contradicted")
+        findings, totals = api.apply_checks(self.FINDINGS, [k])
+        self.assertEqual(findings[0]["id"], 1)
+        self.assertEqual((findings[0]["type"], findings[0]["summary"]), ("contradiction", "new"))
+        self.assertEqual(findings[0]["quotes"], {"en": "x", "sv": "y"})
+        self.assertEqual(findings[0]["rev_ids"], {"en": 11, "sv": 12})
+        self.assertEqual(findings[0]["check"]["judge"], "judge-1")
+        self.assertIsNone(findings[2]["check"])
+        self.assertEqual(totals["changed"], 1)
+
+    def test_a_set_aside_finding_keeps_its_text_and_carries_the_passage(self):
+        k = _row(id=8, finding_id=2, outcome="set_aside", reason="stated_elsewhere", verdict="supported")
+        k.update(
+            evidence_lang="en", evidence_rev_id=5, evidence_quote="it is here", evidence_passage="Look, it is here."
+        )
+        findings, totals = api.apply_checks(self.FINDINGS, [k])
+        self.assertEqual(findings[1]["summary"], "aside")
+        self.assertEqual(findings[1]["check"]["outcome"], "set_aside")
+        self.assertEqual(findings[1]["check"]["evidence"]["passage"], "Look, it is here.")
+        self.assertEqual(totals["set_aside"], {"stated_elsewhere": 1})
+
+    def test_a_difference_the_check_found_is_added_without_history(self):
+        k = _row(id=9, outcome="new", type="numbers", lang="fi", other_lang="en", summary="found", quote="3 000")
+        findings, totals = api.apply_checks(self.FINDINGS, [k])
+        self.assertEqual(len(findings), 4)
+        self.assertEqual((findings[3]["id"], findings[3]["history"], findings[3]["status"]), (-9, False, "open"))
+        self.assertEqual(totals["new"], 1)
 
 
 if __name__ == "__main__":

@@ -196,6 +196,116 @@ def finding(x):
     }
 
 
+# --- The claim check ---------------------------------------------------------------------------
+
+CHECKS_SQL = """
+SELECT id, finding_id, outcome, reason, as_of, type, lang, other_lang, section, other_section, quote, other_quote,
+       rev_id, other_rev_id, summary, verdict, claim_lang, claim_quote, claim_about, searched, read_passages,
+       evidence_lang, evidence_rev_id, evidence_section, evidence_quote,
+       IF(outcome = 'set_aside', evidence_passage, NULL) AS evidence_passage,
+       claim_figure, evidence_figure, judge
+FROM checked_finding
+WHERE wikidata_id = {qid}
+ORDER BY id"""
+
+
+def check_of(k):
+    """What the check found for one finding: its outcome, the verdict, the judge and the passage
+    that settled it. A set-aside row carries that passage whole, since it is all the page shows."""
+    evidence = None
+    if k["evidence_quote"] or k["evidence_passage"]:
+        evidence = {
+            "lang": k["evidence_lang"],
+            "rev_id": k["evidence_rev_id"],
+            "section": k["evidence_section"],
+            "quote": k["evidence_quote"],
+            "passage": k["evidence_passage"],
+        }
+    return {
+        "outcome": k["outcome"],
+        "reason": k["reason"],
+        "verdict": k["verdict"],
+        "judge": k["judge"],
+        "as_of": k["as_of"],
+        "claim": {"lang": k["claim_lang"], "quote": k["claim_quote"], "about": k["claim_about"]},
+        "figures": [k["claim_figure"], k["evidence_figure"]] if k["claim_figure"] or k["evidence_figure"] else None,
+        "searched": k["searched"],
+        "read": k["read_passages"],
+        "evidence": evidence,
+    }
+
+
+def _as_checked(k):
+    """The fields of a finding that the check rewrote, for a `changed` or `new` row."""
+    quotes = {lang: q for lang, q in ((k["lang"], k["quote"]), (k["other_lang"], k["other_quote"])) if q}
+    return {
+        "lang": k["lang"],
+        "other_lang": k["other_lang"],
+        "type": k["type"],
+        "section": k["section"],
+        "other_section": k["other_section"],
+        "summary": k["summary"],
+        "quotes": quotes,
+        "citations": {},
+        "paragraph_citations": {},
+        "rev_ids": {k["lang"]: k["rev_id"], k["other_lang"]: k["other_rev_id"]},
+        "terms": [],
+    }
+
+
+def apply_checks(findings, checks):
+    """The findings with the claim check applied, and the check's totals for the topic.
+
+    Each finding gets `check`: None when the check did not look at it (the word list's framing rows,
+    coverage rows), else check_of. A `changed` finding is shown as the check rewrote it, under its own
+    id and dates. A difference the check found itself is added with a negative id and no history."""
+    if not checks:
+        return [dict(f, check=None) for f in findings], None
+    by_finding = {k["finding_id"]: k for k in checks if k["finding_id"] is not None}
+    out = []
+    for f in findings:
+        k = by_finding.get(f["id"])
+        f = dict(f, check=check_of(k) if k else None)
+        if k and k["outcome"] == "changed":
+            f.update(_as_checked(k))
+        out.append(f)
+    for k in checks:
+        if k["finding_id"] is None:
+            out.append(
+                {
+                    "id": -k["id"],
+                    **_as_checked(k),
+                    "distance": None,
+                    "weight": 0.0,
+                    "score": 0,
+                    "status": "open",
+                    "outcome": None,
+                    "rev_url": None,
+                    "opened_at": k["as_of"],
+                    "opened_after": None,
+                    "history": False,
+                    "closed_at": None,
+                    "closed_after": None,
+                    "check": check_of(k),
+                }
+            )
+    totals = {"judge": checks[0]["judge"], "as_of": checks[0]["as_of"], "set_aside": {}}
+    for k in checks:
+        if k["outcome"] == "set_aside":
+            totals["set_aside"][k["reason"]] = totals["set_aside"].get(k["reason"], 0) + 1
+        else:
+            totals[k["outcome"]] = totals.get(k["outcome"], 0) + 1
+    return out, totals
+
+
+def checks(r, qid):
+    """The topic's rows of checked_finding; none on a database loaded before the check existed."""
+    try:
+        return r("What the claim check made of each finding", CHECKS_SQL.format(qid=lit(qid)))
+    except mariadb.ProgrammingError:
+        return []
+
+
 # --- Endpoints ---------------------------------------------------------------------------------
 
 
@@ -245,6 +355,7 @@ ORDER BY c.lang, c.ord""",
         elif "also" not in lead[x["lang"]]:
             lead[x["lang"]]["also"] = x["text"]
     found = r("Findings (latest version of each)", findings_sql(qid))
+    findings, checked = apply_checks([finding(x) for x in found], checks(r, qid))
     return {
         "wikidata_id": qid,
         "topic": t["title_en"],
@@ -254,7 +365,8 @@ ORDER BY c.lang, c.ord""",
         "refs": {a["lang"]: a["refs"] for a in arts},
         "quality": quality((a["lang"], a["quality"]) for a in arts),
         "leads": lead,
-        "findings": [finding(x) for x in found],
+        "findings": findings,
+        "checked": checked,
     }
 
 

@@ -4,7 +4,7 @@
 
 import { NAMES, day, exact, list, when } from './format'
 import { figures } from './text'
-import { LANGS, type Finding, type FindingType, type Lang, type TimelineEvent, type Topic } from './types'
+import { LANGS, type Check, type Finding, type FindingType, type Lang, type TimelineEvent, type Topic } from './types'
 
 /** Rows where both editions say something and the two differ. The rest is content one edition lacks. */
 const DIFFERS: FindingType[] = ['framing', 'numbers', 'contradiction']
@@ -136,14 +136,16 @@ function plain(f: Finding): boolean {
 	return [...tokens(a)].some((t) => other.has(t))
 }
 
+/** A row the claim check looked at and let stand, as it was or rewritten. */
+const stands = (f: Finding) => !!f.check && f.check.outcome !== 'set_aside' && f.check.outcome !== 'unchecked'
+
 /**
- * The topic's differences: open rows merged by claim. In order: a conflicting account that is not
+ * Rows merged by claim into differences. In order: a conflicting account that is not
  * plainly about one thing goes last; a claim quoted from three editions comes before one from two;
  * then the claim seen in more rows; the opening lines before the body; wording, then figures, then
  * conflicting accounts; and the longest-standing first.
  */
-export function differences(topic: Topic): Difference[] {
-	const rows = topic.findings.filter((f) => f.status === 'open' && DIFFERS.includes(f.type))
+function merge(rows: Finding[]): Difference[] {
 	const index = new Map(rows.map((f, i) => [f.id, i]))
 
 	// Rows that are the same claim, directly or through another row, form one group.
@@ -190,6 +192,43 @@ export function differences(topic: Topic): Difference[] {
 			a.primary.opened_at.localeCompare(b.primary.opened_at) ||
 			index.get(a.id)! - index.get(b.id)!,
 	)
+}
+
+/**
+ * The topic's differences. Where the claim check has run, only the rows it let stand: figures and
+ * conflicting accounts, each looked up in the whole other article. Wording was not checked and is
+ * listed apart (`wording`). On other topics, every open row where both editions say something.
+ */
+export function differences(topic: Topic): Difference[] {
+	const open = topic.findings.filter((f) => f.status === 'open' && DIFFERS.includes(f.type))
+	return merge(topic.checked ? open.filter((f) => f.type !== 'framing' && stands(f)) : open)
+}
+
+/** Differences of wording on a checked topic: the check does not cover them. */
+export function wording(topic: Topic): Difference[] {
+	return topic.checked ? merge(topic.findings.filter((f) => f.status === 'open' && f.type === 'framing')) : []
+}
+
+export interface Aside {
+	key: string
+	/** The statement a row was about, and the edition that makes it. */
+	lang: Lang
+	quote: string
+	/** Where the other edition states it after all. */
+	evidence: NonNullable<Check['evidence']>
+}
+
+/** Suggestions the check set aside because the other edition states the fact elsewhere, each once. */
+export function setAside(topic: Topic): Aside[] {
+	const seen = new Set<string>()
+	return topic.findings.flatMap((f) => {
+		const c = f.check
+		if (c?.outcome !== 'set_aside' || c.reason !== 'stated_elsewhere' || !c.evidence || !c.claim.quote || !c.claim.lang) return []
+		const key = `${c.claim.lang}|${squash(c.claim.quote)}`
+		if (seen.has(key)) return []
+		seen.add(key)
+		return [{ key, lang: c.claim.lang, quote: c.claim.quote, evidence: c.evidence }]
+	})
 }
 
 /** For each quote of a difference, the stretches to mark: figures that are not in every quote. */
@@ -334,6 +373,8 @@ export function missing(topic: Topic): Record<Lang, Missing[]> {
 	const seen = new Map<string, Missing>()
 	for (const f of topic.findings) {
 		if (f.status !== 'open' || DIFFERS.includes(f.type)) continue
+		// Where the claim check has run, only what it searched the other article for and did not find.
+		if (topic.checked && !stands(f)) continue
 		const quoted = LANGS.filter((l) => f.quotes[l])
 		const has = quoted.length === 1 ? quoted[0] : f.other_lang
 		const lacks = has === f.lang ? f.other_lang : f.lang

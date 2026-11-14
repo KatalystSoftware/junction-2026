@@ -1,7 +1,7 @@
 <script lang="ts">
 	// The topic's page: the few places where the editions say different things, each with its time
 	// strip, then, collapsed, what each edition says that another leaves out.
-	import { FIRST, differences, missing } from './lib/differences'
+	import { FIRST, differences, missing, setAside, wording } from './lib/differences'
 	import { DECADES, NAMES, articleUrl, list, plural, revisionUrl, rowDate, sectionLabel } from './lib/format'
 	import { LANGS, type TimelineEvent, type Topic } from './lib/types'
 	import Difference from './Difference.svelte'
@@ -17,6 +17,11 @@
 	const found = $derived(differences(topic))
 	const shown = $derived(all ? found : found.slice(0, FIRST))
 	const left = $derived(missing(topic))
+	// On a topic the claim check has run on: wording, which it does not cover, and what it set aside.
+	const words = $derived(wording(topic))
+	const aside = $derived(setAside(topic))
+	const judge = $derived(topic.checked?.judge)
+	let allAside = $state(false)
 	const lacking = $derived(editions.filter((l) => left[l].length))
 	const most = $derived(Math.max(1, ...lacking.map((l) => left[l].length)))
 </script>
@@ -25,7 +30,11 @@
 	<header>
 		<h2 id="list-title">{found.length ? plural(found.length, 'difference', 'differences') : 'No differences found'}</h2>
 		{#if found.length}
-			<Why id="why-list" label="Machine-suggested">A language model suggested these and nobody has checked them. The quotes are word for word: read them to judge.</Why>
+			{#if judge}
+				<Why id="why-list" label="Model-checked">A language model suggested these, and a second one ({judge}) looked each up in the whole other article. No person has checked them. The quotes are word for word: read them to judge.</Why>
+			{:else}
+				<Why id="why-list" label="Machine-suggested">A language model suggested these and nobody has checked them. The quotes are word for word: read them to judge.</Why>
+			{/if}
 			<!-- The scale of every strip below, labelled once. -->
 			<div class="scale num" aria-hidden="true">
 				<span>2001</span>
@@ -45,11 +54,29 @@
 	{/if}
 </section>
 
+{#if words.length}
+	<section class="left" aria-labelledby="wording-title">
+		<header>
+			<h2 id="wording-title">Wording</h2>
+			<Why id="why-wording" label="Unchecked">Differences of wording come from a word list or a language model. The check does not cover them.</Why>
+		</header>
+		<div class="rows">
+			{#each words as d (d.id)}
+				<Difference {d} {topic} {events} />
+			{/each}
+		</div>
+	</section>
+{/if}
+
 {#if lacking.length}
 	<section class="left" aria-labelledby="left-title">
 		<header>
 			<h2 id="left-title">Said in one edition, left out of another</h2>
-			<Why id="why-left" label="Unchecked">Found by comparing passage with passage. Not yet checked against the whole of the other article, so some of these are there under another heading.</Why>
+			{#if judge}
+				<Why id="why-left" label="Model-checked">A language model ({judge}) searched the whole other article for each of these and did not find it. A sentence with several facts is listed when any one of them is missing. No person has checked them.</Why>
+			{:else}
+				<Why id="why-left" label="Unchecked">Found by comparing passage with passage. Not yet checked against the whole of the other article, so some of these are there under another heading.</Why>
+			{/if}
 		</header>
 		{#each lacking as l (l)}
 			{@const items = left[l]}
@@ -81,6 +108,36 @@
 				</div>
 			</details>
 		{/each}
+	</section>
+{/if}
+
+{#if aside.length}
+	<section class="left" aria-labelledby="aside-title">
+		<details class="cdx-accordion">
+			<summary>
+				<h2 id="aside-title" class="cdx-accordion__header" title="Suggested as missing or different; the check found the fact stated elsewhere in the other article">
+					<span>Set aside by the check</span>
+					<span class="count num">{aside.length}</span>
+				</h2>
+			</summary>
+			<div class="cdx-accordion__content">
+				<ul>
+					{#each allAside ? aside : aside.slice(0, SOME) as a (a.key)}
+						<li>
+							<blockquote lang={a.lang}>{a.quote}</blockquote>
+							<p class="small subtle">
+								<span>{NAMES[a.evidence.lang]} states it too:</span>
+								<a href={a.evidence.rev_id ? revisionUrl(a.evidence.lang, a.evidence.rev_id, a.evidence.section) : articleUrl(a.evidence.lang, topic.titles[a.evidence.lang] ?? '')} target="_blank" rel="noopener">{sectionLabel(a.evidence.section ?? '')}</a>
+							</p>
+							<blockquote lang={a.evidence.lang}>{a.evidence.passage ?? a.evidence.quote}</blockquote>
+						</li>
+					{/each}
+				</ul>
+				{#if !allAside && aside.length > SOME}
+					<button class="cdx-button rest" onclick={() => (allAside = true)}>Show all {aside.length}</button>
+				{/if}
+			</div>
+		</details>
 	</section>
 {/if}
 

@@ -9,7 +9,7 @@ Redeploy the committed code (from a checkout with SSH access to the machine):
 
     projects/since-when/deploy/deploy.sh
 
-Replace the database with a snapshot as well (a `mariadb-dump --dump-history` of the scratch
+Load a database snapshot as well, into a new database the app then switches to (a `mariadb-dump --dump-history` of the scratch
 database, such as the demo snapshot named in the [handoff note](../demo/HANDOFF.md)):
 
     projects/since-when/deploy/deploy.sh ~/junction2026-data/mariadb/snapshot-demo-20261114-0730/gapfinder.sql.zst

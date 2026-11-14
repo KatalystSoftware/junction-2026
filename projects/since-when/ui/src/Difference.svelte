@@ -2,11 +2,12 @@
 	// One difference: a headline and its time strip; opened, each edition's own words side by side
 	// and a way to read the text on that date in MariaDB.
 	import { dating, figureMarks, lanes, turns, type Difference } from './lib/differences'
-	import { NAMES, articleUrl, dayAfter, diffUrl, list, plural, revisionUrl, sectionLabel, sectionOf } from './lib/format'
+	import { NAMES, articleUrl, day, dayAfter, diffUrl, list, plural, revisionUrl, sectionLabel, sectionOf } from './lib/format'
 	import { showSql, ui } from './lib/nav.svelte'
 	import type { TimelineEvent, Topic } from './lib/types'
 	import Marked from './Marked.svelte'
 	import Strip from './Strip.svelte'
+	import Why from './Why.svelte'
 
 	let { d, topic, events, open = false }: { d: Difference; topic: Topic; events: Map<number, TimelineEvent[]>; open?: boolean } = $props()
 
@@ -19,6 +20,8 @@
 	// The strip is drawn once the edits have arrived: before that a day has no edition to sit on.
 	const strip = $derived(lanes(d, events.size ? main : []))
 	const cap = (text: string) => text[0].toUpperCase() + text.slice(1)
+	// What the claim check found for the row that speaks for this difference.
+	const check = $derived(d.primary.check && d.primary.check.outcome !== 'unchecked' ? d.primary.check : null)
 	let row: HTMLDetailsElement
 </script>
 
@@ -44,6 +47,14 @@
 				{/each}
 			</div>
 			{#if !began.known}<p class="line small" title="No earlier version was compared">In the current text</p>{/if}
+			{#if check}
+				{@const e = check.evidence}
+				<Why id="why-check-{Math.abs(d.id)}{d.id < 0 ? 'n' : ''}" label="Checked">
+					{check.judge} read {check.read ?? 'the nearest'} of {check.searched ?? 'the'} passages of the other article on {day(check.as_of)}{#if e?.quote}
+						and settled on this in {NAMES[e.lang]}: <q lang={e.lang}>{e.quote}</q>
+						{#if e.rev_id}(<a href={revisionUrl(e.lang, e.rev_id, e.section)} target="_blank" rel="noopener">{sectionLabel(e.section ?? '')}, revision {e.rev_id}</a>){/if}{/if}.
+				</Why>
+			{/if}
 			{#if ui.runnable}
 				<button
 					class="cdx-button cdx-button--action-progressive cdx-button--weight-quiet check"
