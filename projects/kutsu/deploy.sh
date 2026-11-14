@@ -19,10 +19,12 @@ npm --prefix ui run check
 npm --prefix ui run build >/dev/null
 "${SSH[@]}" "$HOST" "id talentbrief >/dev/null 2>&1 || useradd --system --home $DIR --shell /usr/sbin/nologin talentbrief; mkdir -p $DIR/ui; rm -f $DIR/index.html"
 rsync -az -e "${SSH[*]}" \
-  lib.py signals.py serve.py presets.json pool.json companies.json roles.json api-cache "$HOST:$DIR/"
+  lib.py signals.py serve.py monitors.py person.py presets.json pool.json companies.json roles.json api-cache "$HOST:$DIR/"
 # No --delete: a tab opened before a redeploy still asks for the old hashed files under assets/, and
 # deleting them leaves that tab blank until it is reloaded.
 rsync -az -e "${SSH[*]}" ui/dist "$HOST:$DIR/ui/"
+# Esittely (projects/espoo-recruitment/app), the applicant's invitation, which serve.py serves under /esittely/
+rsync -az --delete -e "${SSH[*]}" ../espoo-recruitment/app/ "$HOST:$DIR/esittely/"
 # signals.json grows on the server with every live search: ours replace the same ids, the rest stay
 rsync -az -e "${SSH[*]}" signals.json "$HOST:$DIR/signals.ours.json"
 "${SSH[@]}" "$HOST" "cd $DIR && python3 -" <<'PY'

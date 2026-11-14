@@ -55,12 +55,9 @@
   function route() {
     const h = location.hash.replace(/^#\/?/, "").split("/");
     const k = h[0] || "";
-    const TL = { company: 1, cand: 2, org: 3, log: 3, event: 4, after: 5 }, PH = ["", "company", "cand", "org", "event", "after"];
-    const cur = TL[k] || 0;
-    document.querySelectorAll("#nav a").forEach(a => { const n = PH.indexOf(a.dataset.k); a.classList.toggle("on", n === cur); a.classList.toggle("past", cur > 0 && n < cur); });
-    document.getElementById("aboutlink").classList.toggle("on", ["concept", "responsible", "demo", "mentors"].includes(k));
     if (k === "event") return viewEvent();
-    if (k === "org") return viewOrg(CO[h[1]] ? h[1] : "puro");
+    if (k === "join") return viewJoin(h[1] || "", h[2] || "");
+    if (k === "org") { if (h[1] === "questions") return viewQuestions(); const id = CO[h[1]] ? h[1] : "puro"; return h[2] === "review" ? viewReview(id) : viewOrg(id); }
     if (k === "log") return viewLog();
     if (k === "company") { const id = CO[h[1]] ? h[1] : "puro"; return h[2] === "intros" ? viewIntros(id) : viewCompany(id); }
     if (k === "cand") return h[1] === "stands" ? viewStands() : h[1] === "me" ? viewMe() : h[1] === "evidence" ? viewEvidence() : viewWizard();
@@ -68,8 +65,18 @@
     if (["concept", "responsible", "demo", "mentors"].includes(k)) return viewDoc(k);
     return viewHome();
   }
-  window.addEventListener("hashchange", () => { route(); window.scrollTo(0, 0); });
-  document.getElementById("reset").onclick = () => { if (confirm("Reset all demo decisions, confirmations and edits?")) { S = seed(); save(); route(); toast("Demo reset"); } };
+  // a new screen starts at its top; going back (or forward) through the browser's history returns to where the reader was
+  const scrolls = {}; let at = (history.state && typeof history.state.i === "number") ? history.state.i : 0;
+  if (!history.state) history.replaceState({ i: at }, "");
+  if ("scrollRestoration" in history) history.scrollRestoration = "manual"; // otherwise the browser restores its own position after ours
+  const settle = (y, tries) => { window.scrollTo(0, y); if (Math.abs(window.scrollY - y) > 2 && tries > 0) setTimeout(() => settle(y, tries - 1), 50); };
+  window.addEventListener("hashchange", () => {
+    scrolls[at] = window.scrollY;
+    const st = history.state, back = st && typeof st.i === "number";
+    if (back) at = st.i; else { at += 1; history.replaceState({ i: at }, ""); }
+    route(); settle(back ? (scrolls[at] || 0) : 0, back ? 10 : 0);
+  });
+  document.getElementById("hostev").textContent = `${D.event.name}, ${D.event.date}`;
 
   // ---------------------------------------------------------------- home
   function viewHome() {
@@ -80,7 +87,7 @@
         <h1 style="margin-top:10px">Fewer, better conversations at Espoo's recruitment events.</h1>
         <p class="mut"><b>Esittely</b> (Finnish for “introduction”) is a light layer on top of event registration. Companies say in a minute who they want to meet, candidates answer a few concrete questions, and City organisers hand-pick the introductions, with a reason. Matchmaking platforms let an algorithm rank people; here the organiser decides.</p>
         <div class="principle"><span><b>The software gathers and translates</b> what people said.</span><span><b>People decide</b> who meets whom, with a reason.</span><span><b>No scores, no rankings of people.</b></span></div>
-        <p>The timeline above is one event, left to right. Each tab is one phase, and what you do in one phase shows up in the next.</p>
+        <p>One event, in order: the company confirms its needs, the applicant joins, the organiser hand-picks the introductions, both sides meet on the day, and both say the day after whether it was relevant. What you do in one step shows up in the next.</p>
         <p><a href="#/company/puro"><button style="padding:12px 18px;font-size:16px">Start at 1 · Company confirms its needs →</button></a></p>
       </div>
       <div class="card">
@@ -141,16 +148,10 @@
           </div>
           ${p.confirmed ? "" : `<div class="warnbox" style="margin-top:10px">This company has not confirmed. Everything below is a <b>draft read from its public job ad</b>; job ads often overstate requirements (e.g. Finnish). Treat it as a starting point.</div>`}
           <h3 style="margin-top:14px">What they need, in plain language</h3>
-          <div class="needs">
-            ${p.must.map(g => `<div class="need"><div class="k">Must-have</div><b>${terms(g)}</b><div class="sm mut">${g.map(id => esc(L.SKILL[id]?.plain || "")).join(" Or: ")}</div>${g.map(id => L.SKILL[id]?.esco ? `<div class="xs"><a href="${esc(L.SKILL[id].esco.uri)}" target="_blank" rel="noopener">ESCO: ${esc(L.SKILL[id].esco.title)}</a></div>` : "").join("")}</div>`).join("")}
-            <div class="need"><div class="k">Nice to have</div>${p.nice.map(id => `<div>${term(id)} <span class="sm mut">— ${esc(L.SKILL[id]?.plain || "")}</span></div>`).join("") || '<span class="mut">None stated</span>'}</div>
-            <div class="need"><div class="k">Experience</div><b>${esc(L.EXPMIN[p.exp])}</b><div class="sm mut">in ${esc(D.roles[p.role] || "this field")}</div></div>
-            <div class="need"><div class="k">Language</div><b>Finnish: ${esc(FI[p.finnish])}</b>${p.note ? `<div class="sm">“${esc(p.note)}”</div>` : ""}<div class="sm mut">${p.finnish === "no" ? "Team works in English" : p.english ? "English is also a working language" : ""}</div></div>
-            <div class="need"><div class="k">Practicalities</div><div class="sm">${p.modes.map(m => L.MODE[m]).join(" / ")} · ${p.types.map(t => L.TYPE[t]).join(", ")} · start ${esc(L.START[p.start] || "not stated")}</div><div class="sm">International hires: ${esc(INTL[p.intl].toLowerCase())}</div></div>
-          </div>
+          ${needsGrid(p)}
         </div>
         ${fairness(coId, p, P)}
-        <div class="controls">
+        <div class="controls"><a href="#/org/questions" style="margin-left:auto;order:8"><button class="sm quiet">Event questions</button></a><a href="#/org/${coId}/review" style="order:9"><button class="sm">Review one at a time →</button></a>
           <label>Show ${seg("show", [["asked", "Asked to meet them"], ["all", "Everyone registered"]], ui.show)}</label>
           <label title="The same definition as the company's live count: every must-have skill used at work or in projects, the minimum experience${p.finnish === "required" ? ", and working Finnish" : ""}"><input type="checkbox" data-act="filt" data-v="must" ${ui.f.must ? "checked" : ""}> Meets every stated must-have</label>
           <label><input type="checkbox" data-act="filt" data-v="mode" ${ui.f.mode ? "checked" : ""}> Work mode fits</label>
@@ -163,6 +164,14 @@
       </section></div>`;
   }
 
+  const needsGrid = p => `<div class="needs">
+            ${p.must.map(g => `<div class="need"><div class="k">Must-have</div><b>${terms(g)}</b><div class="sm mut">${g.map(id => esc(L.SKILL[id]?.plain || "")).join(" Or: ")}</div>${g.map(id => L.SKILL[id]?.esco ? `<div class="xs"><a href="${esc(L.SKILL[id].esco.uri)}" target="_blank" rel="noopener">ESCO: ${esc(L.SKILL[id].esco.title)}</a></div>` : "").join("")}</div>`).join("")}
+            <div class="need"><div class="k">Nice to have</div>${p.nice.map(id => `<div>${term(id)} <span class="sm mut">— ${esc(L.SKILL[id]?.plain || "")}</span></div>`).join("") || '<span class="mut">None stated</span>'}</div>
+            <div class="need"><div class="k">Experience</div><b>${esc(L.EXPMIN[p.exp])}</b><div class="sm mut">in ${esc(D.roles[p.role] || "this field")}</div></div>
+            <div class="need"><div class="k">Language</div><b>Finnish: ${esc(FI[p.finnish])}</b>${p.note ? `<div class="sm">“${esc(p.note)}”</div>` : ""}<div class="sm mut">${p.finnish === "no" ? "Team works in English" : p.english ? "English is also a working language" : ""}</div></div>
+            <div class="need"><div class="k">Practicalities</div><div class="sm">${p.modes.map(m => L.MODE[m]).join(" / ")} · ${p.types.map(t => L.TYPE[t]).join(", ")} · start ${esc(L.START[p.start] || "not stated")}</div><div class="sm">International hires: ${esc(INTL[p.intl].toLowerCase())}</div></div>
+          </div>`;
+
   function candRow(coId, p, { k, f, d }) {
     const open = S.ui.open[coId + k.id];
     const corr = (S.corr[k.id] || []).length;
@@ -171,7 +180,7 @@
       <div><div class="pid">${k.id}</div><div class="xs">${name}</div></div>
       <div class="sm">${esc(D.roles[k.roles[0]])} · ${esc(D.exp[k.exp])}<br>
         <span class="mut">${p.must.map(g => { const hit = g.find(id => { const s = k.skills.find(x => x.id === id); return s && s.depth !== "learning"; }); return `${hit ? "✓" : "○"} ${esc(L.skillLabel(hit || g[0]))}`; }).join(" · ")}${p.finnish === "required" ? ` · Finnish ${esc(L.LVTXT[k.langs.fi])}` : ""}</span>
-        ${f.asked ? ' <span class="badge blue">asked to meet</span>' : ""} ${corr ? ' <span class="badge" style="background:var(--violet2);color:var(--violet)">corrected by candidate</span>' : ""}</div>
+        ${f.asked ? ' <span class="badge blue">asked to meet</span>' : ""} ${k.verified ? ` <span class="badge ok" title="The candidate confirmed every gathered line themselves">checked by candidate${k.verified.edited ? `, ${k.verified.edited} corrected` : ""}</span>` : ""}${corr && !k.verified ? ' <span class="badge" style="background:var(--violet2);color:var(--violet)">corrected by candidate</span>' : ""}</div>
       <div style="text-align:right">${decBadge(d)} <span class="mut">${open ? "▲" : "▼"}</span></div></div>`;
     if (!open) return `<div class="cand">${head}</div>`;
     const col = (key, title, icon, empty) => `<div class="fcol"><h4>${icon} ${title} <span class="mut">(${f[key].length})</span></h4>${f[key].map((x, i) => {
@@ -179,6 +188,7 @@
       return `<div class="fact ${key}">${esc(x.text)} <button class="srcbtn" data-act="src" data-id="${esc(sid)}">${so ? "hide source" : "source"}</button>${so ? srcHtml(x.src) : ""}</div>`;
     }).join("") || `<div class="sm mut">${empty}</div>`}</div>`;
     return `<div class="cand">${head}
+      ${k.own && (k.own.about || k.own.looking) ? `<div class="ownq"><b>In their own words:</b> ${k.own.about ? `“${esc(k.own.about)}”` : ""} ${k.own.looking ? `<span class="mut">Looking for:</span> “${esc(k.own.looking)}”` : ""}</div>` : ""}${k.eventAnswers && k.eventAnswers.length ? `<div class="ownq"><b>Event questions:</b> ${k.eventAnswers.map(x => `${esc(x.q)} <b>${esc(x.a)}</b>`).join(" · ")}</div>` : ""}
       <div class="facts">${col("overlap", "Overlaps", "✓", "None found")}${col("gap", "Gaps", "○", "No gaps against the must-haves")}${col("check", "Practical checks", "?", "Nothing to check")}${col("style", "Conversation starters", "☺", "—")}</div>
       <div class="sm mut" style="padding:0 14px 10px">Written from the candidate's own answers${k.evidence ? " and a work-sample summary they approved" : ""}; they can see and correct this text. ${k.evidence ? "" : "Not sharing a work sample is normal and is never shown as a gap."} ${corr ? `<b>The candidate corrected their description ${corr} time(s).</b>` : ""}</div>
       <div class="decide">
@@ -289,6 +299,338 @@
     app.innerHTML = `<div class="wiz" style="max-width:900px"><a href="#/company/${coId}" class="sm">← back to your needs</a>${introsHtml(coId)}</div>`;
   }
 
+
+
+  // ---------------------------------------------------------------- organiser review: one candidate at a time, accept or reject with a reason
+  function viewReview(coId) {
+    const c = CO[coId], p = prof(coId), P = pool();
+    const asked = P.filter(k => k.wants.includes(coId));
+    const queue = asked.filter(k => L.meetsMust(p, k)).sort((a, b) => a.registered.localeCompare(b.registered));
+    const dec = id => decOf(coId, id);
+    const undecided = queue.filter(k => !dec(k.id));
+    const rq = S.ui.rq = S.ui.rq || {};
+    let cur = queue.find(k => k.id === rq[coId]); if (!cur) cur = undecided[0];
+    const n = v => queue.filter(k => dec(k.id) && dec(k.id).d === v).length;
+    const factsCols = (k, f) => {
+      const col = (key, title, icon, empty) => `<div class="fcol"><h4>${icon} ${title} <span class="mut">(${f[key].length})</span></h4>${f[key].map((x, i) => {
+        const sid = `${coId}|${k.id}|${key}|${i}`; const so = S.ui.open["src" + sid];
+        return `<div class="fact ${key}">${esc(x.text)} <button class="srcbtn" data-act="src" data-id="${esc(sid)}">${so ? "hide source" : "source"}</button>${so ? srcHtml(x.src) : ""}</div>`;
+      }).join("") || `<div class="sm mut">${empty}</div>`}</div>`;
+      return `<div class="facts rev">${col("overlap", "Overlaps", "✓", "None found")}${col("gap", "Gaps", "○", "No gaps against the must-haves")}${col("check", "Practical checks", "?", "Nothing to check")}${col("style", "Conversation starters", "💬", "")}</div>`;
+    };
+    let right;
+    if (cur) {
+      const k = cur, f = L.pairFacts(p, k), d = dec(k.id), name = S.ui.reveal[k.id] ? esc(k.name) : '<span class="mut">name hidden until you decide</span>';
+      right = `<div class="card revcard">
+        <div class="row" style="justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">
+          <div><div class="pid" style="font-size:22px">${k.id} <span class="sm" style="font-weight:400">· ${name}</span></div>
+            <div class="sm">${esc(D.roles[k.roles[0]])} · ${esc(D.exp[k.exp])}${k.careerChange ? ` · moving into tech from ${esc(k.careerChange)}` : ""}</div>
+            <div style="margin-top:6px">${f.asked ? '<span class="badge blue">asked to meet this company</span>' : ""} ${k.verified ? `<span class="badge ok">checked by candidate${k.verified.edited ? `, ${k.verified.edited} corrected` : ""}</span>` : ""} ${k.evidence ? '<span class="badge">work sample shared</span>' : ""}</div></div>
+          <div class="sm mut" style="text-align:right">${queue.indexOf(k) + 1} of ${queue.length}<br>registered ${esc(fmtTime(k.registered))}</div></div>
+        ${k.own && (k.own.about || k.own.looking) ? `<div class="ownq" style="margin:10px 0 0"><b>In their own words:</b> ${k.own.about ? `“${esc(k.own.about)}”` : ""} ${k.own.looking ? `<span class="mut">Looking for:</span> “${esc(k.own.looking)}”` : ""}</div>` : ""}${k.eventAnswers && k.eventAnswers.length ? `<div class="ownq"><b>Event questions:</b> ${k.eventAnswers.map(x => `${esc(x.q)} <b>${esc(x.a)}</b>`).join(" · ")}</div>` : ""}
+        <p class="xs mut" style="margin:10px 0 0 14px">Every line below is the candidate's own confirmed answer set against what ${esc(c.name)} stated. Nothing is scored.</p>
+        ${factsCols(k, f)}
+        <div class="decide">
+          <b class="sm">Your decision</b>
+          ${["introduce", "maybe", "no"].map(v => `<button class="${d && d.d === v ? "" : "quiet"} sm" data-act="pick" data-v="${v}" data-id="${k.id}" data-co="${coId}">${{ introduce: "Introduce", maybe: "Maybe later", no: "Not this time" }[v]}</button>`).join("")}
+          <input id="why-${k.id}" placeholder="One line: why? (required, shared with the company if you introduce)" value="${esc(d ? d.reason : "")}" maxlength="160">
+          <button class="sm" data-act="decide" data-id="${k.id}" data-co="${coId}">Save and next</button>
+          ${S.ui.reveal[k.id] ? "" : `<button class="ghost sm" data-act="reveal" data-id="${k.id}" ${d ? "" : "disabled title='Decide first'"}>Show name</button>`}
+          ${undecided.length > 1 || d ? `<button class="quiet sm" data-act="rq-skip" data-co="${coId}" data-id="${k.id}">Skip for now</button>` : ""}
+        </div>
+        ${d ? `<div class="okbox" style="margin:0 14px 14px">Decided: ${decBadge(d)} “${esc(d.reason)}” · ${esc(d.by)}, ${esc(fmtTime(d.at))}. ${d.d === "introduce" ? `The company gets this reason with the introduction; the candidate sees it as the organiser's note.` : ""}</div>` : ""}
+      </div>`;
+    } else {
+      right = `<div class="card"><h2>All ${queue.length} decided</h2>
+        <p class="mut">${n("introduce")} introduced, ${n("maybe")} maybe later, ${n("no")} not this time. Each with your reason, logged under your name.</p>
+        ${queue.map(k => { const d = dec(k.id); return `<div class="sm" style="padding:6px 0;border-bottom:1px solid var(--line)"><b>${k.id}</b> ${decBadge(d)} “${esc(d.reason)}” <button class="link xs" data-act="rq" data-v="${k.id}" data-co="${coId}">revisit</button></div>`; }).join("")}
+        <div class="row" style="gap:8px;margin-top:14px;flex-wrap:wrap"><a href="#/event"><button>Event day: planned conversations →</button></a><a href="#/log"><button class="ghost">Decision log</button></a><a href="#/org/${coId}"><button class="quiet">Back to the list</button></a></div></div>
+        ${fairness(coId, p, P)}`;
+    }
+    app.innerHTML = `
+    <div class="row" style="justify-content:space-between;align-items:flex-end;flex-wrap:wrap;margin-bottom:12px">
+      <div><span class="badge blue">For ${esc(ORGANISER)} · ${esc(c.name)}</span>
+        <h1 style="margin-top:8px">Who should ${esc(c.name)} meet? One person at a time, with a reason.</h1>
+        <p class="mut" style="margin:0">Everyone in this queue asked to meet ${esc(c.name)} and meets its stated must-haves (${queue.length} of the ${asked.length} who asked). The order is registration time; nothing is scored. Names stay hidden until you decide.</p></div>
+      <div class="sm mut">Company: <select data-act="pickrev">${D.companies.map(x => `<option value="${x.id}" ${x.id === coId ? "selected" : ""}>${esc(x.name)}</option>`).join("")}</select> · <a href="#/org/${coId}">list view</a></div>
+    </div>
+    <div class="livecount"><div class="n">${undecided.length}</div><div class="t"><b>still to decide</b><br>${n("introduce")} introduced · ${n("maybe")} maybe later · ${n("no")} not this time. ${p.confirmed ? "The company confirmed its needs." : "The company has not confirmed; its needs are a draft from the job ad, so treat gaps as questions."}</div>
+      <div style="margin-left:auto;text-align:right"><div class="timer">${queue.length - undecided.length} / ${queue.length}</div><div class="xs" style="color:#aab6cf">decided</div></div></div>
+    <div class="cmp rev" style="margin-top:14px">
+      <div class="card"><h3>What ${esc(c.name)} needs</h3>${p.confirmed ? "" : '<div class="warnbox" style="margin:0 0 10px;font-size:13px">Unconfirmed draft from the public job ad.</div>'}${needsGrid(p)}
+        <h3 style="margin-top:16px">Queue</h3>
+        ${queue.map(k => { const d = dec(k.id); return `<div class="qrow ${cur && k.id === cur.id ? "on" : ""} ${d ? "done" : ""}" data-act="rq" data-v="${k.id}" data-co="${coId}"><span>${k.id}</span><span class="xs mut">${esc(D.roles[k.roles[0]])} · ${esc(D.exp[k.exp])}</span><span>${d ? decBadge(d) : '<span class="xs mut">undecided</span>'}</span></div>`; }).join("") || '<div class="sm mut">Nobody who asked meets the stated must-haves. Widen the view in the list.</div>'}
+      </div>
+      <div>${right}</div>
+    </div>`;
+  }
+
+  // ---------------------------------------------------------------- applicant joining: an invitation that is already filled in
+  // Every step is a URL: #/join (what we may read) -> #/join/reading -> #/join/check/general -> #/join/check/event -> #/join/check/you -> #/join/check/confirm -> #/join/done
+  const SRC = window.SOURCES || {};
+  const LANGNAME = { en: "English", fi: "Finnish", sv: "Swedish" };
+  const SRCNAME = { linkedin: "LinkedIn", github: "GitHub", portfolio: "Portfolio" };
+  const DEMO = true; // in the demo every Next and Confirm stays clickable; what is still open is said, never enforced
+  const JSTEPS = [["general", "General information"], ["event", "Questions for this event"], ["you", "In your own words"], ["confirm", "Confirm"]];
+  const firstName = () => (cand(ME).name || "Olena K.").split(" ")[0];
+  function joinState() {
+    if (!S.join) { S.join = { consent: { linkedin: true, github: true, portfolio: false, project: false }, ids: { linkedin: "linkedin.com/in/olena-k", github: "github.com/olena-k", portfolio: "olena-k.example", project: "" }, project: null, facts: null, skipped: [], lines: [], own: { about: "", looking: "" }, trade: {}, types: ["full"], permit: false, ans: {}, wants: null, seen: {}, done: null, started: null }; save(); }
+    if (!S.join.ans) S.join.ans = {}; if (!S.join.seen) S.join.seen = {}; if (!S.join.ids) S.join.ids = { linkedin: "linkedin.com/in/olena-k", github: "github.com/olena-k", portfolio: "olena-k.example", project: "" };
+    return S.join;
+  }
+  function joinScan(J) {
+    const c = J.consent;
+    const r = L.scanSources({ linkedin: c.linkedin ? SRC.linkedin : null, github: c.github ? SRC.github : null, portfolio: c.portfolio ? SRC.portfolio : null });
+    r.facts.forEach(f => { f.status = "ok"; }); // everything starts ticked: the applicant changes or removes what is wrong, instead of clicking every line
+    J.facts = r.facts; J.skipped = r.skipped; J.lines = r.lines; J.started = Date.now(); J.seen = {}; J.ans = {}; save();
+  }
+  const jFact = (J, kind, value) => (J.facts || []).find(f => f.kind === kind && (value === undefined || f.value === value) && f.status !== "removed");
+  function jSet(J, kind, value, patch) {
+    // change a drafted value: the fact becomes "corrected by you"; a value the scan did not find is added by the applicant
+    let f = jFact(J, kind, kind === "skill" || kind === "lang" ? value : undefined);
+    if (!f) { f = { id: "f" + Date.now() + Math.random().toString(36).slice(2, 6), kind, value, from: "You", where: "", quote: "", li: null, lis: [], status: "edited" }; (J.facts = J.facts || []).push(f); }
+    Object.assign(f, patch || {}); if (f.status !== "removed") f.status = "edited"; save();
+  }
+  const jGo = s => { location.hash = "#/join/" + s; };
+  const isOpenJ = (J, id) => !!(J.open && J.open[id]);
+
+  // The event's questions to applicants. Suggested from what the attending companies said they need; the organiser rewords, switches off or adds.
+  const QKIND = { skills: "pick many", lang: "level", ynl: "yes / learning / no", trade: "either / or", wants: "pick companies", text: "free text" };
+  function eventQuestions() { if (!S.evq) { S.evq = { qs: suggestQuestions() }; save(); } return S.evq; }
+  function suggestQuestions() {
+    const P = profiles(), who = {};
+    P.forEach(p => new Set(p.must.flat().concat(p.nice)).forEach(id => (who[id] = who[id] || []).push(p.company.name)));
+    const ranked = Object.entries(who).sort((a, b) => b[1].length - a[1].length);
+    const qs = [{ id: "skills", kind: "skills", on: true, text: "Which of these do you use, at work or in your own projects?", why: `The ${P.length} companies at this event named these most often`, opts: ranked.slice(0, 10).map(([v, names]) => ({ v, who: names })) }];
+    const fiReq = P.filter(p => p.finnish === "required"), fiHelp = P.filter(p => p.finnish === "helpful");
+    if (fiReq.length || fiHelp.length) qs.push({ id: "finnish", kind: "lang", lang: "fi", on: true, text: "How is your Finnish at work?", why: `${fiReq.length} compan${fiReq.length === 1 ? "y needs" : "ies need"} Finnish, ${fiHelp.length} say it helps but is not required` });
+    ranked.filter(([id, names]) => names.length === 1 && P.find(p => p.company.name === names[0]).must.flat().includes(id)).slice(0, 3)
+      .forEach(([id, names]) => qs.push({ id: "must-" + id, kind: "ynl", skill: id, on: true, text: `Have you worked with ${L.skillLabel(id)}?`, why: `${names[0]} asks for it as a must-have` }));
+    D.tradeoffs.forEach(t => qs.push({ id: "trade-" + t.id, kind: "trade", t: t.id, a: t.a, b: t.b, on: true, text: t.q, why: "Every company here answered the same question about itself" }));
+    qs.push({ id: "wants", kind: "wants", on: true, text: "Which companies would you like to meet?", why: "Helps the organiser plan introductions; you can still visit any stand" });
+    return qs;
+  }
+  function evAnswer(J, q) {
+    // what the applicant sees ticked: their own click first, otherwise what their sources gave
+    if (q.kind === "skills") return (J.facts || []).filter(f => f.kind === "skill" && f.status !== "removed").map(f => f.value);
+    if (q.kind === "lang") { const f = jFact(J, "lang", q.lang); return f ? f.level : "none"; }
+    if (q.kind === "trade") return J.trade[q.t] || "";
+    if (q.kind === "wants") return J.wants || cand(ME).wants || [];
+    if (J.ans[q.id] !== undefined) return J.ans[q.id];
+    if (q.kind === "ynl") { const f = jFact(J, "skill", q.skill); return f ? (f.depth === "learning" ? "learning" : "yes") : ""; }
+    return "";
+  }
+  function evPrefilled(J, q) {
+    if (q.kind === "skills") return (J.facts || []).some(f => f.kind === "skill" && f.from !== "You" && f.status !== "removed");
+    if (q.kind === "lang") { const f = jFact(J, "lang", q.lang); return !!(f && f.from !== "You"); }
+    if (q.kind === "ynl") return J.ans[q.id] === undefined && !!jFact(J, "skill", q.skill);
+    return false;
+  }
+  const YNL = { yes: "Yes, at work", learning: "Learning it now", no: "Not yet" };
+
+  function viewJoin(step, sec) {
+    const J = joinState();
+    if (!step) return joinInvite(J);
+    if (step === "reading") return joinReading(J);
+    if (!J.facts) joinScan(J); // a deep link straight to a check page still gets a draft
+    if (step === "done") return J.done ? joinDone(J) : joinCheck(J, "confirm");
+    return joinCheck(J, JSTEPS.some(([k]) => k === sec) ? sec : "general");
+  }
+  function joinInvite(J) {
+    const c = J.consent;
+    const row = (k, title, sub, field) => `<div class="srcrow ${c[k] ? "on" : ""}"><label><input type="checkbox" data-act="jn-consent" data-v="${k}" ${c[k] ? "checked" : ""}><span><b>${title}</b><small>${sub}</small></span></label><span class="fld">${field}</span></div>`;
+    const idField = (k, label) => `<input type="text" data-act="jn-srcid" data-v="${k}" value="${esc(J.ids[k] || "")}" aria-label="${label}" placeholder="${label}">`;
+    const pr = J.project;
+    app.innerHTML = `<div class="wiz join">
+      <p class="eyebrow">${esc(D.event.name)} · ${esc(D.event.date)} · ${esc(D.event.format)}</p>
+      <h1>${esc(firstName())}, you're invited.</h1>
+      <p class="mut" style="font-size:1.0625rem;max-width:60ch">Your profile is drafted from what you already have online, the way companies get theirs drafted from their job ads. We read it once, and <b>you see every line before anyone else does</b>.</p>
+      <div class="jcard srcs">
+        <h2>What may we read?</h2>
+        ${row("linkedin", "LinkedIn profile", "Headline, experience, skills and languages.", idField("linkedin", "LinkedIn address"))}
+        ${row("github", "GitHub", "Public repositories only: what they do and in which language.", idField("github", "GitHub user or address"))}
+        ${row("portfolio", "Portfolio or website", "One page you choose.", idField("portfolio", "Web address"))}
+        ${row("project", "A project of mine", "A report, notebook, repository or slides. Shown to organisers as your work sample, summarised in your words.", `${pr ? `<span class="attached">✓ ${esc(pr.name)} <small>(${Math.max(1, Math.round(pr.size / 1024))} KB, stays in this browser)</small></span><button class="quiet sm" data-act="jn-project-rm">Remove</button>` : `<label class="upl"><input type="file" data-act="jn-project"> Upload a file</label><span class="xs mut">or</span> ${idField("project", "Link to the project")}`}`)}
+      </div>
+      <div class="promise">
+        <div><b>Read once</b> to make the draft, then the raw files are deleted.</div>
+        <div><b>You decide</b> what stays: confirm, correct or remove each line.</div>
+        <div><b>Never used:</b> photo, age, gender, nationality, school names.</div>
+        <div><b>No scores.</b> A named organiser introduces people, with a written reason.</div>
+      </div>
+      <div class="jnav"><a href="#/cand" class="back">Prefer to type everything yourself? →</a><button data-act="jn-scan" ${DEMO || Object.values(c).some(Boolean) ? "" : "disabled"}>Draft my profile →</button></div>
+      <p class="xs mut" style="margin-top:14px">Demo applicant ${esc(cand(ME).name)} (${ME}), synthetic sources. Nothing leaves this browser.</p></div>`;
+  }
+  function joinReading(J) {
+    const rows = Object.keys(SRCNAME).filter(k => J.consent[k]).map(k => [k, SRCNAME[k]]).concat(J.consent.project && (J.project || J.ids.project) ? [["project", "Your project"]] : []);
+    const n = k => k === "project" ? "attached as your work sample" : (x => `${x} line${x === 1 ? "" : "s"} used`)((J.facts || []).filter(f => f.from === SRCNAME[k] || (f.lis || []).some(i => (J.lines[i] || {}).from === SRCNAME[k])).length);
+    app.innerHTML = `<div class="wiz join"><p class="eyebrow">${esc(D.event.name)}</p><h1>Reading what you chose…</h1><p class="mut">Only these sources, only once. Every line we keep will show where it came from.</p>
+      ${rows.map(([k, t]) => `<div class="scanrow" id="scan-${k}"><span class="spin"></span> ${t}<span class="st">reading…</span></div>`).join("") || `<p class="note">No source chosen: the draft starts empty and you fill it in by hand.</p>`}
+      <div id="scandone" style="display:none"><div class="cheer" style="margin-top:14px">Found <b>${(J.facts || []).length} things</b> about you. Now the important part: you decide what is true.</div><div class="jnav"><a class="back" href="#/join">← Change what we may read</a><button data-act="jn-go" data-v="check/general">Check the draft →</button></div></div></div>`;
+    rows.forEach(([k], i) => setTimeout(() => { const el = document.getElementById("scan-" + k); if (!el) return; el.classList.add("done"); el.querySelector(".spin").outerHTML = "✓"; el.querySelector(".st").textContent = n(k); }, 700 + i * 650));
+    setTimeout(() => { const d = document.getElementById("scandone"); if (d) d.style.display = "block"; }, 900 + rows.length * 650);
+  }
+  function joinCheck(J, sec) {
+    const me = cand(ME);
+    const F = (J.facts || []).filter(f => f.status !== "removed"), gathered = (J.facts || []).filter(f => f.from !== "You" && f.status !== "removed");
+    const edited = gathered.filter(f => f.status === "edited").length, removed = (J.facts || []).filter(f => f.from !== "You" && f.status === "removed").length;
+    const role = jFact(J, "role"), exp = jFact(J, "exp"), skills = F.filter(f => f.kind === "skill"), langs = Object.fromEntries(F.filter(f => f.kind === "lang").map(f => [f.value, f]));
+    const modes = F.filter(f => f.kind === "mode").map(f => f.value), start = jFact(J, "start");
+    const confirmedSkills = new Set(skills.map(f => f.value));
+    const stands = profiles().filter(p => p.must.flat().concat(p.nice).some(id => confirmedSkills.has(id))).length;
+    J.seen[sec] = true; save();
+    const i = JSTEPS.findIndex(([k]) => k === sec), prev = JSTEPS[i - 1], next = JSTEPS[i + 1];
+    const steps = `<ol class="jsteps">${JSTEPS.map(([k, t], n) => `<li><a href="#/join/check/${k}" class="${k === sec ? "on" : J.seen[k] ? "done" : ""}">${n + 1}. ${t}</a></li>`).join("")}</ol>`;
+    const nav = hint => `<div class="jnav"><a class="back" href="${prev ? "#/join/check/" + prev[0] : "#/join/reading"}">← ${prev ? prev[1] : "Back"}</a>${next ? `<button data-act="jn-go" data-v="check/${next[0]}">Next: ${next[1]} →</button>` : ""}</div>${hint ? `<p class="jhint">${hint}</p>` : ""}`;
+    const check = f => f && f.from !== "You" && f.status === "edited" ? `<span class="jbadge edited">corrected by you</span>` : "";
+    const short = q => q.length > 90 ? q.slice(0, 88) + "…" : q;
+    const fromTxt = f => !f ? `<div class="from">Not in your sources: pick one.</div>` : f.from === "You" ? `<div class="from you">Added by you</div>` : `<div class="from ok" title="${esc(f.quote || f.where)}">${esc(f.from)} · <q>${esc(short(f.quote || f.where))}</q></div>`;
+    // one line per fact: value, where it came from, ✓ Correct; the controls appear only when the applicant presses Change (or the fact is missing)
+    const isOpen = id => !!(J.open && J.open[id]);
+    const row = (f, label, value, control, extra, o = {}) => { const key = f ? f.id : o.key, open = !f && !o.key ? true : isOpen(key);
+      return `<div class="jf ${f ? f.status : "new"}"><div><div class="val">${label}<small>${value}</small></div>${o.from ? `<div class="from">${o.from}</div>` : fromTxt(f)}</div><div class="acts">${check(f)}${control && key ? `<button class="quiet sm" data-act="jn-edit" data-id="${key}">${open ? "Done" : "Change"}</button>` : ""}${extra || ""}</div>${control && open ? `<div class="edit">${control}</div>` : ""}</div>`; };
+    const where = kinds => {
+      const idx = new Set(F.filter(f => kinds.includes(f.kind)).flatMap(f => (f.lis && f.lis.length ? f.lis : [f.li]).filter(x => x !== null && x !== undefined)));
+      const ls = [...idx].sort((a, b) => a - b).map(x => J.lines[x]).filter(Boolean); if (!ls.length) return "";
+      return `<details class="where"><summary>Where this came from: ${ls.length} line${ls.length === 1 ? "" : "s"} of your sources</summary><ul>${ls.map(l => `<li><b>${esc(l.from)}:</b> ${esc(l.text)}</li>`).join("")}</ul>${J.skipped.length ? `<p style="margin:8px 0 0"><b>Left out on purpose:</b> ${J.skipped.map(x => esc(x.what)).join(", ")}. You are introduced for what you can do.</p>` : ""}</details>`;
+    };
+    let h1, lead, body, hint = "", wh = "";
+    if (sec === "general") {
+      h1 = "Is this you?"; lead = `Read from ${esc(Object.keys(SRCNAME).filter(k => J.consent[k]).map(k => "your " + SRCNAME[k]).join(" and ") || "nothing yet")}, each line with its source. Everything is ticked for you: change or remove what is wrong.`;
+      const group = t => `<div class="jgroup">${t}</div>`;
+      const ms = F.filter(f => f.kind === "mode" || f.kind === "start"), mf = ms.length ? Object.assign({}, ms.find(f => f.from !== "You") || ms[0], { id: "modes", status: ms.some(f => f.status === "new") ? "new" : ms.some(f => f.status === "edited") ? "edited" : "ok" }) : null;
+      body = group("Your work") + row(role, "Field", role ? esc(D.roles[role.value]) : "—", `<div class="opts">${Object.entries(D.roles).map(([r, t]) => `<span class="opt ${role && role.value === r ? "on" : ""}" data-act="jn-role" data-v="${r}">${esc(t)}</span>`).join("")}</div>`)
+        + row(exp, "Experience", exp ? esc(D.exp[exp.value]) : "—", seg("jn-exp", D.exp.map((t, n) => [n, esc(t)]), exp ? exp.value : -1))
+        + group("Tools and skills") + (skills.map(f => row(f, term(f.value), `${L.DEPTH[f.depth]}${f.years ? `, ${f.years} yr` : ""}`, `${seg("jn-depth", Object.entries(L.DEPTH).map(([v, t]) => [v, t]), f.depth, `data-id="${f.id}"`)} <label class="xs">years <input type="number" min="0" max="40" data-act="jn-years" data-id="${f.id}" value="${f.years || ""}" style="width:58px"></label>`, `<button class="quiet sm" data-act="jn-rm" data-id="${f.id}" title="Remove this skill">✕</button>`)).join("")
+          || `<div class="jf"><div class="val">Tools and skills<small>none found yet</small></div></div>`)
+        + `<div style="margin:10px 0 4px"><select data-act="jn-addskill"><option value="">+ add a tool or skill…</option>${D.skills.filter(sk => !skills.some(f => f.value === sk.id)).map(sk => `<option value="${sk.id}">${esc(sk.label)}</option>`).join("")}</select> ${(J.facts || []).some(f => f.status === "removed") ? `<button class="quiet sm" data-act="jn-undo">Undo last removal</button>` : ""}</div>`
+        + group("Languages") + ["en", "fi", "sv"].map(k => row(langs[k], LANGNAME[k], langs[k] ? L.LVTXT[langs[k].level] : "not mentioned", seg("jn-lang", Object.entries(L.LVTXT).map(([v, t]) => [v, t]), langs[k] ? langs[k].level : "none", `data-id="${k}"`))).join("")
+        + group("Practicalities") + row(mf, "Work", `${modes.map(m => L.MODE[m]).join(" or ") || "—"}${start ? `, ${L.START[start.value]}` : ""}`, `<div class="opts">${Object.entries(L.MODE).map(([m, t]) => `<span class="opt ${modes.includes(m) ? "on" : ""}" data-act="jn-mode" data-v="${m}">${t}</span>`).join("")}</div> ${seg("jn-start", Object.entries(L.START).map(([v, t]) => [v, t]), start ? start.value : "")}`)
+        + row(null, "Type of work", `${J.types.map(v => L.TYPE[v]).join(", ") || "—"}${J.permit ? ", work-permit support needed" : ""}`, `<div class="opts">${Object.entries(L.TYPE).map(([v, t]) => `<span class="opt ${J.types.includes(v) ? "on" : ""}" data-act="jn-type" data-v="${v}">${esc(t)}</span>`).join("")}</div><label class="sm" style="display:flex;gap:8px;align-items:center"><input type="checkbox" data-act="jn-permit" ${J.permit ? "checked" : ""}> I would need work-permit support <span class="mut xs">(optional; it never counts against you)</span></label>`, "", { key: "types", from: "Not read from any source: your choice." });
+      hint = `${gathered.length} lines from your sources${edited ? `, ${edited} corrected by you` : ""}${removed ? `, ${removed} removed` : ""}. Nothing is used until you confirm.`;
+      wh = where(["role", "exp", "skill", "lang", "mode", "start"]);
+    } else if (sec === "event") {
+      const Q = eventQuestions().qs.filter(q => q.on);
+      h1 = "Questions for this event"; lead = `The ${D.companies.length} companies coming to ${esc(D.event.name)} said what they look for. These questions come from their answers, chosen by Espoo's organiser. Where your sources already answer one, it is filled in.`;
+      const ctl = q => {
+        const a = evAnswer(J, q);
+        if (q.kind === "skills") return `<div class="opts">${q.opts.map(o => `<span class="opt ${a.includes(o.v) ? "on" : ""}" data-act="jn-evskill" data-v="${o.v}" title="Asked for by ${esc(o.who.join(", "))}">${esc(L.skillLabel(o.v))}</span>`).join("")}</div><div class="xs mut" style="margin-top:6px">Hover one to see which companies ask for it.</div>`;
+        if (q.kind === "lang") return seg("jn-lang", Object.entries(L.LVTXT).map(([v, t]) => [v, t]), a, `data-id="${q.lang}"`);
+        if (q.kind === "ynl") return seg("jn-ans", Object.entries(YNL), a, `data-id="${q.id}"`);
+        if (q.kind === "trade") return seg("jn-trade", [["a", esc(q.a)], ["b", esc(q.b)]], a, `data-t="${q.t}"`);
+        if (q.kind === "wants") return `<div class="opts">${D.companies.map(c => `<span class="opt ${a.includes(c.id) ? "on" : ""}" data-act="jn-want" data-v="${c.id}">${esc(c.name)}</span>`).join("")}</div>`;
+        return `<input type="text" data-act="jn-anstext" data-id="${q.id}" value="${esc(a)}" placeholder="Your answer" style="width:100%">`;
+      };
+      body = Q.map(q => `<div class="evq"><div class="q">${esc(q.text)}</div><div class="asked">${esc(q.why)}</div>${ctl(q)}${evPrefilled(J, q) ? `<div class="pre">✓ Filled in from your sources. Change it if it is wrong.</div>` : ""}</div>`).join("")
+        || `<p class="note">The organiser has switched every question off for this event.</p>`;
+      const open = Q.filter(q => { const a = evAnswer(J, q); return Array.isArray(a) ? !a.length : !a; }).length;
+      hint = open ? `${open} question${open === 1 ? "" : "s"} still open. You can skip them for now.` : "All answered.";
+      hint += ` <span class="mut">Organiser: <a href="#/org/questions">edit these questions</a>.</span>`;
+      wh = where(["skill", "lang"]);
+    } else if (sec === "you") {
+      h1 = "In your own words"; lead = "No document can tell this. What you write here is shown to the organiser exactly as you write it, marked as yours.";
+      body = `<div class="own"><label class="sm" style="font-weight:600">What should companies know about you that no document shows?</label><textarea data-act="jn-own" data-v="about" placeholder="e.g. I like being the person who explains the numbers to people who hate numbers.">${esc(J.own.about)}</textarea>
+        <label class="sm" style="display:block;margin-top:12px;font-weight:600">What are you looking for next?</label><textarea data-act="jn-own" data-v="looking" placeholder="e.g. A team where I can grow from reporting into forecasting." style="min-height:64px">${esc(J.own.looking)}</textarea></div>`;
+      hint = "Optional, and often the most useful part for the organiser.";
+    } else {
+      const Q = eventQuestions().qs.filter(q => q.on && (q.kind === "ynl" || q.kind === "text")), wants = J.wants || me.wants || [];
+      const sum = (k, v) => `<div class="sumrow"><span>${k}</span><span>${v}</span></div>`;
+      h1 = J.done ? "Confirmed, and all yours." : "Confirm: this is me"; lead = J.done ? `Checked by you on ${esc(fmtTime(J.done))}. You can change it until the event.` : "This is what Espoo's organiser will see, marked “checked by the candidate”. Nothing is used before you confirm.";
+      body = sum("Field", role ? esc(D.roles[role.value]) : "—") + sum("Experience", exp ? esc(D.exp[exp.value]) : "—")
+        + sum("Tools and skills", skills.map(f => `${esc(L.skillLabel(f.value))} <span class="mut">(${L.DEPTH[f.depth]}${f.years ? `, ${f.years} yr` : ""})</span>`).join(", ") || "—")
+        + sum("Languages", ["en", "fi", "sv"].filter(k => langs[k]).map(k => `${LANGNAME[k]} ${L.LVTXT[langs[k].level]}`).join(", ") || "—")
+        + sum("Work", `${modes.map(m => L.MODE[m]).join(" or ") || "—"}${start ? `, ${L.START[start.value]}` : ""}; ${J.types.map(v => L.TYPE[v]).join(", ")}${J.permit ? "; work-permit support needed" : ""}`)
+        + sum("Would like to meet", wants.map(id => esc(CO[id] ? CO[id].name : id)).join(", ") || "no preference")
+        + (J.consent.project && (J.project || J.ids.project) ? sum("Work sample", `${esc(J.project ? J.project.name : J.ids.project)} <span class="mut">shared with organisers, in your words</span>`) : "")
+        + Q.map(q => { const a = evAnswer(J, q); return a ? sum(esc(q.text), esc(q.kind === "ynl" ? YNL[a] : a)) : ""; }).join("")
+        + (J.own.about || J.own.looking ? sum("In your words", `<span class="own-q">${esc(J.own.about)}${J.own.looking ? ` <span class="mut">Looking for:</span> ${esc(J.own.looking)}` : ""}</span>`) : "")
+        + (J.done ? `<div class="okbox" style="margin-top:16px"><b>Confirmed.</b> ${F.length} lines, checked by you. <a href="#/join/done">What happens next →</a></div>`
+          : `<div style="margin-top:18px"><button style="width:100%;min-height:3rem;font-size:1.0625rem" data-act="jn-confirm">Confirm: this is me</button>
+             <p class="jhint" style="text-align:center">${gathered.length} lines from your sources${edited ? `, ${edited} corrected by you` : ""}${removed ? `, ${removed} removed` : ""}.</p></div>`);
+    }
+    app.innerHTML = `<div class="wiz join">
+      <p class="eyebrow">${esc(D.event.name)} · ${esc(firstName())}'s invitation</p>
+      ${steps}
+      <div class="jcard"><h1>${h1}</h1><p class="lead">${lead}</p>${body}${sec === "confirm" ? `<div class="jnav"><a class="back" href="#/join/check/${prev[0]}">← ${prev[1]}</a>${J.done ? `<a href="#/join/done"><button>Done →</button></a>` : ""}</div>` : nav(hint)}</div>
+      ${wh}
+      <div class="livemini"><b>${stands}</b> of ${D.companies.length} stands look for something you have confirmed. <span class="mut">Grows as you tick lines; nobody is ranked, and you can visit any stand.</span></div>
+    </div>`;
+  }
+  function joinDone(J) {
+    const F = (J.facts || []).filter(f => f.status !== "removed"), edited = F.filter(f => f.status === "edited").length;
+    app.innerHTML = `<div class="wiz join"><p class="eyebrow">${esc(D.event.name)} · ${esc(D.event.date)}</p><h1>You're in, ${esc(firstName())}.</h1>
+      <p class="mut" style="font-size:1.0625rem;max-width:60ch">Confirmed on ${esc(fmtTime(J.done))}. Only what you checked is used, and the organiser sees that you checked it.</p>
+      <div class="jcard">
+        <div class="sumrow"><span>Today</span><span><b>Your profile goes to Espoo's event team</b><br><span class="mut">${F.length} lines, checked by you${edited ? `, ${edited} corrected` : ""}. Marked “checked by the candidate”.</span></span></div>
+        <div class="sumrow"><span>Before the event</span><span><b>A named organiser picks introductions, with a reason</b><br><span class="mut">No scores, no ranking. You see every planned conversation with the organiser's note.</span></span></div>
+        <div class="sumrow"><span>${esc(D.event.date)}</span><span><b>Short 1:1 conversations at the stands</b><br><span class="mut">And you can still visit any stand you like.</span></span></div>
+        <div class="jnav"><a class="back" href="#/join/check/general">← Change my answers</a><a href="#/cand/me"><button>How organisers see you →</button></a></div>
+      </div></div>`;
+  }
+  function joinApply(J) {
+    const F = (J.facts || []).filter(f => f.status !== "removed"), me = cand(ME), patch = {};
+    const roles = F.filter(f => f.kind === "role").map(f => f.value); if (roles.length) patch.roles = roles.slice(0, 2);
+    const ex = F.find(f => f.kind === "exp"); if (ex) patch.exp = +ex.value;
+    const skills = F.filter(f => f.kind === "skill").map(f => ({ id: f.value, depth: f.depth, years: f.years || undefined, example: f.example || undefined })); if (skills.length) patch.skills = skills;
+    const langs = { en: "none", fi: "none", sv: "none" }; F.filter(f => f.kind === "lang").forEach(f => langs[f.value] = f.level); patch.langs = langs;
+    const modes = F.filter(f => f.kind === "mode").map(f => f.value); if (modes.length) patch.mode = modes;
+    const stf = F.find(f => f.kind === "start"); if (stf) patch.start = stf.value;
+    patch.types = J.types.length ? J.types : ["full"]; patch.permit = !!J.permit; patch.tradeoffs = Object.assign({}, me.tradeoffs, J.trade); patch.own = { about: J.own.about.trim(), looking: J.own.looking.trim() };
+    if (J.wants) patch.wants = J.wants;
+    if (J.consent.project && (J.project || J.ids.project)) { const sk = F.find(f => f.kind === "skill"); patch.evidence = { skill: sk ? sk.value : "analytics", link: J.project ? J.project.name : J.ids.project, summary: `Project shared by the candidate: ${J.project ? J.project.name : J.ids.project}. ${J.own.about ? "" : "Summarised by the candidate before the event."}`.trim(), status: "approved" }; }
+    patch.eventAnswers = eventQuestions().qs.filter(q => q.on && (q.kind === "ynl" || q.kind === "text")).map(q => ({ q: q.text, a: evAnswer(J, q) })).filter(x => x.a).map(x => ({ q: x.q, a: YNL[x.a] || x.a }));
+    const edited = F.filter(f => f.status === "edited").length, removed = (J.facts || []).length - F.length;
+    patch.verified = { at: new Date().toISOString(), n: F.length, edited };
+    setMe(patch);
+    (S.corr[ME] = S.corr[ME] || []).push({ at: patch.verified.at, what: `Checked all ${F.length} gathered lines${edited ? `, corrected ${edited}` : ""}${removed ? `, removed ${removed}` : ""}` });
+    J.done = patch.verified.at; save();
+  }
+  function joinAction(a, t, v) {
+    const J = joinState(), id = t.dataset.id, f = (J.facts || []).find(x => x.id === id);
+    if (a === "jn-consent") { J.consent[v] = t.checked; save(); return route(); }
+    if (a === "jn-scan") { joinScan(J); J.done = null; save(); return jGo("reading"); }
+    if (a === "jn-go") return jGo(v);
+    if (a === "jn-project-rm") { J.project = null; save(); return route(); }
+    if (a === "jn-edit") { (J.open = J.open || {})[id] = !isOpenJ(J, id); save(); return route(); }
+    if (a === "jn-rm") { f.status = "removed"; J.lastRemoved = f.id; save(); return route(); }
+    if (a === "jn-undo") { const r = (J.facts || []).find(x => x.id === J.lastRemoved); if (r) r.status = "ok"; J.lastRemoved = null; save(); return route(); }
+    if (a === "jn-role") { jSet(J, "role", v, { value: v }); return route(); }
+    if (a === "jn-exp") { jSet(J, "exp", +v, { value: +v }); return route(); }
+    if (a === "jn-depth") { jSet(J, "skill", f.value, { depth: v }); return route(); }
+    if (a === "jn-lang") { jSet(J, "lang", id, { level: v }); return route(); }
+    if (a === "jn-mode") { const m = jFact(J, "mode", v); if (m) { m.status = "removed"; save(); } else jSet(J, "mode", v, {}); return route(); }
+    if (a === "jn-start") { jSet(J, "start", v, { value: v }); return route(); }
+    if (a === "jn-trade") { J.trade[t.dataset.t] = v; save(); return route(); }
+    if (a === "jn-type") { J.types = J.types.includes(v) ? J.types.filter(x => x !== v) : J.types.concat(v); save(); return route(); }
+    if (a === "jn-evskill") { const m = jFact(J, "skill", v); if (m) { m.status = "removed"; J.lastRemoved = m.id; save(); } else jSet(J, "skill", v, { depth: "work", years: null }); return route(); }
+    if (a === "jn-ans") { J.ans[id] = v; save(); return route(); }
+    if (a === "jn-want") { const w = J.wants || (cand(ME).wants || []).slice(); J.wants = w.includes(v) ? w.filter(x => x !== v) : w.concat(v); save(); return route(); }
+    if (a === "jn-confirm") { joinApply(J); jGo("done"); return toast("Confirmed. Only what you checked is used, and organisers see that you checked it."); }
+  }
+  function joinChange(t) {
+    const J = joinState(), a = t.dataset.act, id = t.dataset.id, f = (J.facts || []).find(x => x.id === id);
+    if (a === "jn-consent") return joinAction(a, t, t.dataset.v);
+    if (a === "jn-permit") { J.permit = t.checked; save(); return; }
+    if (a === "jn-srcid") { J.ids[t.dataset.v] = t.value.trim(); save(); return; }
+    if (a === "jn-project") { const f = t.files && t.files[0]; if (!f) return; J.project = { name: f.name, size: f.size }; J.consent.project = true; save(); return route(); } // the file itself never leaves the browser
+    if (a === "jn-own") { J.own[t.dataset.v] = t.value; save(); return; }
+    if (a === "jn-anstext") { J.ans[id] = t.value.trim(); save(); return; }
+    if (a === "jn-years") { jSet(J, "skill", f.value, { years: +t.value || null }); return route(); }
+    if (a === "jn-addskill" && t.value) { jSet(J, "skill", t.value, { depth: "work", years: null, example: null }); return route(); }
+  }
+
+  // ---------------------------------------------------------------- organiser: the event's questions to applicants
+  function viewQuestions() {
+    const E = eventQuestions(), P = profiles();
+    app.innerHTML = `<div class="wiz"><p class="eyebrow mut" style="font-weight:700;font-size:.875rem">Organiser · ${esc(D.event.name)}</p><h1>Questions for this event</h1>
+      <p class="mut" style="font-size:1.0625rem;max-width:62ch">Applicants see these on the second page of their invitation, after their general information. They are suggested from what the ${P.length} attending companies said they need (${P.filter(p => p.confirmed).length} confirmed, the rest drafted from their job ads). Change the wording, switch any off, or add your own.</p>
+      <div class="jcard">
+        ${E.qs.map((q, i) => `<div class="qedit ${q.on ? "" : "off"}"><input type="checkbox" data-act="qe-on" data-i="${i}" ${q.on ? "checked" : ""} title="Ask this question" style="margin-top:10px"><div><input type="text" data-act="qe-text" data-i="${i}" value="${esc(q.text)}" aria-label="Question text"><div class="why"><span class="kind">${QKIND[q.kind]}</span> · ${esc(q.why)}${q.kind === "skills" ? ": " + q.opts.map(o => esc(L.skillLabel(o.v))).join(", ") : ""}</div></div>${q.kind === "text" ? `<button class="quiet sm" data-act="qe-rm" data-i="${i}">Remove</button>` : "<span></span>"}</div>`).join("")}
+        <div class="row" style="margin-top:14px;flex-wrap:wrap;align-items:center;gap:8px"><input type="text" id="qe-new" placeholder="Add your own question (free-text answer)" style="flex:1;min-width:240px"><button class="quiet" data-act="qe-add">Add</button><button class="quiet" data-act="qe-reset" title="Back to the questions suggested from the companies' needs">Reset to suggested</button></div>
+        <div class="jnav"><a class="back" href="#/org/puro">← Organiser list</a><a href="#/join/check/event"><button>Preview as an applicant →</button></a></div>
+      </div></div>`;
+  }
+
   // ---------------------------------------------------------------- candidate questionnaire
   const STEPS = ["Start", "Your field", "Tools and skills", "Languages", "Practicalities", "Trade-offs", "Work sample", ];
   function setMe(patch, field) {
@@ -382,7 +724,7 @@
     const me = cand(ME), corr = S.corr[ME] || []; S.ui.correcting = null; save();
     const line = (q, a, act) => `<div class="line"><div><div class="q">${q}</div><div>${a}</div></div><div>${act || ""}</div></div>`;
     app.innerHTML = `<div class="wiz me"><h1>How organisers see you</h1>
-      <p class="mut">This is exactly the information Espoo's organisers use to suggest introductions. It comes only from your answers. If anything is wrong or unfair, correct it: corrections are logged and organisers see that you checked.</p>
+      <p class="mut">This is exactly the information Espoo's organisers use to suggest introductions. It comes only from what you confirmed${me.verified ? ` (checked by you on ${esc(fmtTime(me.verified.at))})` : ""}. If anything is wrong or unfair, correct it: corrections are logged and organisers see that you checked.</p>
       <div class="card">
         ${line("Field", me.roles.map(r => esc(D.roles[r])).join("; "), `<button class="ghost sm" data-act="goto" data-v="1">Correct</button>`)}
         ${line("Experience in that field", esc(D.exp[me.exp]) + (me.careerChange ? ` · moving into tech from ${esc(me.careerChange)}` : ""), `<button class="ghost sm" data-act="goto" data-v="1">Correct</button>`)}
@@ -391,6 +733,7 @@
         ${line("Working languages", `English ${esc(L.LVTXT[me.langs.en])} · Finnish ${esc(L.LVTXT[me.langs.fi])} · Swedish ${esc(L.LVTXT[me.langs.sv])}`, `<button class="ghost sm" data-act="goto" data-v="3">Correct</button>`)}
         ${line("Practicalities", `${me.mode.map(m => L.MODE[m]).join(" / ")} · ${me.types.map(t => L.TYPE[t]).join(", ")} · start ${esc(L.START[me.start])}${me.permit ? " · would need work-permit support" : ""}`, `<button class="ghost sm" data-act="goto" data-v="4">Correct</button>`)}
         ${line("Work style", D.tradeoffs.map(t => esc(me.tradeoffs[t.id] === "a" ? t.a : t.b)).join(" · "), `<button class="ghost sm" data-act="goto" data-v="5">Correct</button>`)}
+        ${me.own && (me.own.about || me.own.looking) ? line("In your own words", `${esc(me.own.about || "")}${me.own.looking ? `<div class="sm mut">Looking for: ${esc(me.own.looking)}</div>` : ""}`, `<a href="#/join"><button class="ghost sm">Edit</button></a>`) : ""}
         ${line("Work sample", me.evidence ? esc(me.evidence.summary) + ` <span class="badge ok">approved by you</span>` : '<span class="mut">None shared (never counts against you)</span>', `<a href="#/cand/evidence"><button class="ghost sm">Review</button></a>`)}
       </div>
       <div class="note" style="margin-top:12px"><b>Never collected:</b> photo, age, gender, nationality, school or university names, CV file. <b>Kept:</b> until 30 days after the event. <b>Decisions about you</b> are made by a named organiser with a written reason; you can ask to see them.</div>
@@ -456,6 +799,12 @@
     const t = ev.target.closest("[data-act]"); if (!t) return;
     const a = t.dataset.act, v = t.dataset.v, ui = S.ui;
     const co = t.dataset.co || curCo();
+    if (a.startsWith("jn-") && !["jn-consent", "jn-permit", "jn-own", "jn-addskill", "jn-years", "jn-anstext", "jn-srcid", "jn-project"].includes(a)) return joinAction(a, t, v);
+    if (a === "qe-add") { const inp = document.getElementById("qe-new"), txt = inp.value.trim(); if (!txt) { inp.focus(); return toast("Write the question first."); } eventQuestions().qs.push({ id: "q" + Date.now(), kind: "text", on: true, text: txt, why: "Added by the organiser" }); save(); return route(); }
+    if (a === "qe-rm") { eventQuestions().qs.splice(+t.dataset.i, 1); save(); return route(); }
+    if (a === "qe-reset") { S.evq = null; eventQuestions(); toast("Back to the suggested questions."); return route(); }
+    if (a === "rq") { (ui.rq = ui.rq || {})[co] = v; save(); return route(); }
+    if (a === "rq-skip") { const ids = [...document.querySelectorAll(".qrow:not(.done)")].map(e => e.dataset.v); const i = ids.indexOf(t.dataset.id); (ui.rq = ui.rq || {})[co] = ids[(i + 1) % ids.length] || null; save(); return route(); }
     if (a === "toggle") { ui.open[co + t.dataset.id] = !ui.open[co + t.dataset.id]; save(); return route(); }
     if (a === "src") { ui.open["src" + t.dataset.id] = !ui.open["src" + t.dataset.id]; save(); return route(); }
     if (a === "show") { ui.show = v; ui.more = false; save(); return route(); }
@@ -466,7 +815,7 @@
       const pick = inp.dataset.pick || (d && d.d); const reason = inp.value.trim();
       if (!pick) return toast("Choose Introduce, Maybe later or Not this time first.");
       if (reason.length < 8) { inp.focus(); return toast("Write one line explaining why (it is part of the record)."); }
-      (S.dec[co] = S.dec[co] || {})[t.dataset.id] = { d: pick, reason, at: new Date().toISOString(), by: ORGANISER }; save(); route();
+      (S.dec[co] = S.dec[co] || {})[t.dataset.id] = { d: pick, reason, at: new Date().toISOString(), by: ORGANISER }; if (ui.rq && ui.rq[co] === t.dataset.id) ui.rq[co] = null; save(); route();
       return toast(pick === "introduce" ? "Introduction saved. The company gets it with your reason." : "Decision saved with your reason.");
     }
     if (a === "reveal") { ui.reveal[t.dataset.id] = true; save(); return route(); }
@@ -524,6 +873,10 @@
     if (a === "fb") { S.fb[t.dataset.side] = v; save(); return route(); }
   });
   app.addEventListener("change", ev => {
+    const jt = ev.target.closest("[data-act]"); if (jt && jt.dataset.act.startsWith("jn-")) return joinChange(jt);
+    if (jt && jt.dataset.act === "pickrev") { location.hash = "#/org/" + jt.value + "/review"; return; }
+    if (jt && jt.dataset.act === "qe-on") { eventQuestions().qs[+jt.dataset.i].on = jt.checked; save(); return route(); }
+    if (jt && jt.dataset.act === "qe-text") { eventQuestions().qs[+jt.dataset.i].text = jt.value.trim() || eventQuestions().qs[+jt.dataset.i].text; save(); return; }
     const t = ev.target, a = t.dataset.act, v = t.value; if (!a) return;
     const co = curCo();
     if (a === "filt") { S.ui.f[t.dataset.v] = t.checked; save(); return route(); }
@@ -547,4 +900,26 @@
     if (f && f.dataset.src) f.dataset.src.split(",").filter(Boolean).forEach(i => { const ln = document.querySelector(`.ad .ln[data-ln="${i}"]`); if (ln) ln.classList.add("hl"); });
   });
   route();
+
+  // ---------------------------------------------------------------- demo control panel
+  const goTo = h => { if (location.hash === h) route(); else location.hash = h; };
+  document.addEventListener("click", ev => { const d = document.getElementById("demo"); if (d && d.open && !d.contains(ev.target)) d.open = false; });
+  document.getElementById("demo").addEventListener("click", ev => {
+    if (ev.target.closest("a[href]")) { document.getElementById("demo").open = false; const h = ev.target.closest("a[href]").getAttribute("href"); if (location.hash === h) route(); return; } // a plain link in the menu: close it, and re-render when already there
+    const b = ev.target.closest("[data-dbg]"); if (!b) return; const k = b.dataset.dbg, now = new Date().toISOString();
+    document.getElementById("demo").open = false;
+    if (k === "reset") { S = seed(); save(); toast("Demo reset"); return goTo("#/"); }
+    if (k === "co-draft") { delete S.comp.puro; save(); return goTo("#/company/puro"); }
+    if (k === "co-ok") { S.comp.puro = { finnish: "helpful", confirmedAt: now }; save(); return goTo("#/company/puro"); }
+    if (k === "jn-0") { S.join = null; joinState(); save(); return goTo("#/join"); }
+    if (k === "jn-2") { S.join = null; const J = joinState(); joinScan(J); save(); return goTo("#/join/check/general"); }
+    if (k === "jn-done") { S.join = null; const J = joinState(); joinScan(J); J.trade = { build: "b", depth: "a", pace: "b" }; J.own = { about: "I like being the person who explains the numbers to people who hate numbers.", looking: "A team where I can grow from reporting into forecasting." }; joinApply(J); return goTo("#/join/done"); }
+    if (k === "org-questions") return goTo("#/org/questions");
+    if (k === "org-puro") { S.ui.open = {}; S.ui.f = {}; if (S.dec.puro) delete S.dec.puro[ME]; save(); return goTo("#/org/puro"); }
+    if (k === "org-intro") { (S.dec.puro = S.dec.puro || {})[ME] = { d: "introduce", reason: "Power BI and SQL at work for 4–5 years; their exact stack. Finnish only helpful.", at: now, by: ORGANISER }; S.ui.open["puro" + ME] = true; save(); return goTo("#/org/puro"); }
+    if (k === "org-lahde") return goTo("#/org/lahde");
+    if (k === "org-review") { S.ui.rq = {}; if (S.dec.puro) delete S.dec.puro[ME]; save(); return goTo("#/org/puro/review"); }
+    if (k === "event") return goTo("#/event");
+    if (k === "after") return goTo("#/after");
+  });
 })();

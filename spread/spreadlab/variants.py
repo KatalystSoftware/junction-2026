@@ -2,7 +2,7 @@
 compare it with the others on the same seeds."""
 from __future__ import annotations
 
-from . import late_wide, pairs
+from . import exposure, late_wide, pairs
 
 GATE_10 = {"same_day": True, "floor": 1.7, "quote_share": 1, "max_unbooked": 10}  # `gate-10`
 # `curve-live-surcharge`: the win curve sets the price, the day's answers correct it, and the backlog raises the cost
@@ -361,5 +361,10 @@ VARIANTS.update({
 # down at most that day's cap. An option due on a full day is not quoted; a slower one of the same request still is. The cap
 # lifts for the rest of the week after the first night with 10 drops in its first hour (`due_cap_wave`).
 VARIANTS.update({f"day-cap-{cap}": {**_DEFAULT, "due_cap": cap, "due_cap_wave": 10} for cap in (70, 80)})
+# The live default with the quote's cost by the book's exposure to drops (exposure.py) in place of the waiting-car surcharge, the
+# late cost, the Friday terms of the late chance and the day cap: €82 a late order that the order adds to the book, and kappa x
+# the week's value x its change to the chance of a week under 90%. No quote while 40 cars wait (`-g25`: 25, as the default).
+VARIANTS.update({f"exposure-k{k}{gate}": {**_DEFAULT, **exposure.REPLACES, "exposure": True, "exposure_kappa": k, "exposure_version": exposure.VERSION,
+                                          "max_unbooked": 25 if gate else 40} for k in (1, 2, 4, 8) for gate in ("", "-g25")})
 # ... and the charging stop of a low-charge electric car only where RULES.md needs it, on a route over 200 km.
 VARIANTS["charge-200"] = {**_DEFAULT, "charge_km": 200}

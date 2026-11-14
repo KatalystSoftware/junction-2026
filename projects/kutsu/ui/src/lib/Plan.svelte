@@ -1,42 +1,58 @@
 <script lang="ts">
   import Cite from './Cite.svelte'
-  import { daysTo, some, type Invitee, type Plan } from './events'
+  import { asking, daysTo, some, sourceOf, type Invitee, type Plan } from './events'
   import { when } from './format'
   import Icon from './Icon.svelte'
   import Logo from './Logo.svelte'
-  import { app, copyLink, joinLink, nameOf, reviewOf, saveReview } from './state.svelte'
+  import Progress from './Progress.svelte'
+  import { app, copyText, joinLink, nameOf, reviewOf, saveReview } from './state.svelte'
+  import type { Status } from './types'
+  import Wall from './Wall.svelte'
 
-  // One event, as the two lists Espoo has to build for it: the employers to invite, each with the
-  // reason to invite it now, and the people in the pool who do the work those employers ask for.
-  // The people side is counts only. Each side is what the other asks about before it commits.
+  // One event, as the two lists Espoo has to build for it: its employers, each with the news that
+  // makes now the moment, and the people in the pool who do the work those employers look for.
+  // The people side is counts only. An event across many fields has no single count of people, so
+  // it lists its fields and each opens in place.
   let { plan }: { plan: Plan } = $props()
+  const FIRST = 6
+  let all = $state(false)
+  let open = $state('')
   let copied = $state('')
+  let sent = $state(false)
+  // the person's invitation is Esittely, served next to this page by serve.py; in development, the hosted copy
+  const esittely = import.meta.env.DEV ? 'https://esittely.duckymcduck2.workers.dev/esittely/#/join' : './esittely/#/join'
 
-  const people = $derived(plan.people)
-  const joined = $derived(plan.employers.filter((e) => reviewOf(e.brief).status === 'joined').length)
-  const levels = $derived(Object.entries(people.levels).filter(([, n]) => n))
-  const events = $derived(app.pool.events.map((e) => ({ ...e, came: people.events[e.id] ?? 0 })).filter((e) => e.came).sort((a, b) => b.came - a.came))
-  const most = $derived(Math.max(1, ...plan.rows.map((r) => r.have)))
-  const names = $derived(plan.employers.slice(0, 3).map((e) => nameOf(e.brief)))
-  // An event in one field has one count of people. An event whose employers ask across many fields has
-  // none: adding the fields up gives nearly the whole pool, which says nothing, so it is shown field by field.
-  const oneField = $derived(plan.kind === 'suggested')
-  // what each side asks before it commits, answered from the other side
-  const toEmployers = $derived(
-    oneField
-      ? `${some(people.people)} people who came to Espoo's events work in ${plan.title.toLowerCase()}` +
-          (events[0] ? `; ${some(events[0].came)} of them came to ${events[0].name} in ${when(events[0].date.slice(0, 7))}.` : '.')
-      : `Of the people who came to Espoo's events, ${plan.rows.slice(0, 3).map((r) => `${some(r.have)} work in ${r.label.toLowerCase()}`).join(', ')}.`,
-  )
-  const toPeople = $derived(
-    `${String(plan.employers.length)} employers have said what they are looking for` + (names.length ? `, among them ${names.join(', ')}.` : '.'),
-  )
+  // the forum's employers are coming already, so their link needs no event; any other invitation names its own
+  const link = $derived(plan.coming ? '' : plan.slug)
+  /** Where an employer stands for this event, in words: its profile is one for all events, an invitation and a sign-up are for this one. */
+  const standing = (e: Invitee): { status: Status; says: string } | undefined => {
+    const review = reviewOf(e.brief)
+    if (plan.coming) return review.status === 'joined' ? { status: 'joined', says: 'Profile confirmed' } : review.status === 'invited' ? { status: 'invited', says: 'Profile sent' } : undefined
+    if (review.status === 'joined' && review.signed?.includes(plan.slug)) return { status: 'joined', says: 'Signed up' }
+    if (review.events?.includes(plan.slug)) return { status: 'invited', says: 'Invited' }
+    return review.status === 'joined' ? { status: 'joined', says: 'Profile confirmed' } : undefined
+  }
+  /** What the person pastes into their own message: why now, and the link to a sign-up that is already filled in. */
+  const message = (e: Invitee) =>
+    plan.coming
+      ? `Your profile for the ${plan.title} (${plan.when}) is filled in from what ${nameOf(e.brief)} has said in public. Checking it takes a minute: ${joinLink(e.brief.id, link)}`
+      : `The City of Espoo is planning a ${plan.title.replace(/^[A-Z](?=[a-z])/, (c) => c.toLowerCase())} talent event. ${some(field?.people.people ?? 0)} people who came to our earlier events work in this field. Your sign-up is filled in from what ${nameOf(e.brief)} has said in public: ${joinLink(e.brief.id, link)}`
+  const listed = $derived(all ? plan.employers : plan.employers.slice(0, FIRST))
+  const rest = $derived(all ? [] : plan.employers.slice(FIRST))
+  // the one field whose people are shown: the event's own, or the one opened from its list
+  const field = $derived(plan.fields.length === 1 ? plan.fields[0] : plan.fields.find((f) => f.name === open))
+  const people = $derived(field?.people)
+  const levels = $derived(Object.entries(people?.levels ?? {}).filter(([, n]) => n))
+  const came = $derived(app.pool.events.map((e) => ({ ...e, n: people?.events[e.id] ?? 0 })).filter((e) => e.n).sort((a, b) => b.n - a.n))
+  const most = $derived(Math.max(1, ...(field ? field.rows.map((r) => r.have) : plan.fields.map((f) => f.people.people))))
 
-  const signal = (e: Invitee) => e.brief.signals.find((s) => s.id === e.news?.signals[0])
+  /** An invitation leaves this screen as text to paste: a person sends it. Copying it is what marks the employer as invited. */
   async function invite(e: Invitee) {
     const review = reviewOf(e.brief)
-    if (review.status === 'draft') await saveReview(e.brief.id, { ...review, status: 'invited', invited_at: new Date().toISOString() })
-    await copyLink(e.brief.id)
+    const events = plan.coming ? review.events : [...new Set([...(review.events ?? []), plan.slug])]
+    if (review.status === 'draft') await saveReview(e.brief.id, { ...review, status: 'invited', invited_at: new Date().toISOString(), events })
+    else if (!plan.coming && !review.events?.includes(plan.slug)) await saveReview(e.brief.id, { ...review, events })
+    await copyText(message(e))
     copied = e.brief.id
     setTimeout(() => (copied = ''), 1600)
   }
@@ -46,105 +62,116 @@
   <a class="back" href="#/"><Icon name="back" size={16} />Events</a>
   <header>
     <h1>{plan.title}</h1>
-    <p>
-      {#if plan.kind === 'upcoming'}
-        {when(plan.date)}{daysTo(plan.date) > 1 ? `, in ${String(daysTo(plan.date))} days` : ''}. {joined} of {plan.employers.length} employers have signed up.
-      {:else}
-        {plan.employers.length} employers have said they need these people. {some(people.people)} people in the pool do this work{people.wanting ? `, and ${some(people.wanting)} more want to move into it` : ''}.
-      {/if}
-    </p>
+    {#if plan.date}
+      <p>
+        {plan.when}{daysTo(plan.date) > 1 ? `, in ${String(daysTo(plan.date))} days` : ''}
+        {#if plan.url}<a href={plan.url} target="_blank" rel="noopener">Espoo's event page<Icon name="out" size={14} /></a>{/if}
+      </p>
+    {/if}
   </header>
 
   <div class="sides">
     <section>
-      <h2>Employers to invite <span>{plan.employers.length}</span></h2>
+      <h2>{plan.coming ? 'Employers coming' : 'Employers to invite'} <span>{plan.employers.length}</span></h2>
+      {#if plan.coming}<div class="progress"><Progress employers={plan.employers} coming /></div>{/if}
       <ul class="employers">
-        {#each plan.employers as e (e.brief.id)}
-          {@const status = reviewOf(e.brief).status}
-          {@const source = signal(e)}
+        {#each listed as e (e.brief.id)}
+          {@const status = standing(e)}
+          {@const source = sourceOf(e)}
           <li>
             <a class="tile" href="#/{encodeURIComponent(e.brief.id)}" aria-label={nameOf(e.brief)}><Logo brief={e.brief} small /></a>
-            <div class="who">
+            <div>
               <a class="name" href="#/{encodeURIComponent(e.brief.id)}">{nameOf(e.brief)}</a>
-              <p class="roles">{e.roles.map((r) => r.title).join(', ') || 'No role drafted yet'}</p>
-              {#if e.news}
-                <p class="why">{e.news.line}{#if source}<Cite signal={source} label={when(e.news.date)} />{/if}</p>
-              {/if}
+              <p class="roles" title={e.roles.map((r) => r.title).join(', ')}>
+                {e.roles[0]?.title ?? 'No role drafted'}{#if e.roles.length > 1}{' '}<span>+{e.roles.length - 1}</span>{/if}
+              </p>
+              {#if e.news}<p class="why">{e.news.line}, {when(e.news.date)}{#if source}<Cite signal={source} n={1} />{/if}</p>{/if}
+              <a class="see" href={joinLink(e.brief.id, link)} target="_blank" rel="noopener">Their sign-up<Icon name="out" size={14} /></a>
             </div>
             <div class="act">
-              {#if status === 'joined'}
-                <span class="state joined"><Icon name="check" size={14} />Signed up</span>
-              {:else}
+              {#if status}<span class="state {status.status}">{status.says}</span>{/if}
+              {#if status?.says !== 'Signed up' && status?.says !== 'Profile confirmed' || !plan.coming && status?.says === 'Profile confirmed'}
                 <button class="btn" onclick={() => invite(e)}>
-                  <Icon name={copied === e.brief.id ? 'check' : status === 'draft' ? 'send' : 'copy'} size={16} />{copied === e.brief.id ? 'Link copied' : status === 'draft' ? 'Invite' : 'Copy link'}
+                  <Icon name={copied === e.brief.id ? 'check' : 'copy'} size={16} />{copied === e.brief.id ? 'Copied, ready to paste' : 'Copy invitation'}
                 </button>
               {/if}
-              <a class="see" href={joinLink(e.brief.id)} target="_blank" rel="noopener">Their sign-up<Icon name="out" size={14} /></a>
             </div>
           </li>
         {/each}
       </ul>
+      {#if rest.length}
+        <div class="rest">
+          <Wall briefs={rest.map((e) => e.brief)} />
+          <button class="btn quiet" onclick={() => (all = true)}><Icon name="plus" size={16} />List all {plan.employers.length}</button>
+        </div>
+      {/if}
     </section>
 
     <section class="people">
       <h2>People to invite <span class="sample">sample data</span></h2>
-      {#if oneField}
-      <p class="count"><b>{some(people.people)}</b> do this work{#if people.wanting}<span>+{some(people.wanting)} want to move into it</span>{/if}</p>
+      <div class="go">
+        <a class="btn" href={esittely} target="_blank" rel="noopener"><Icon name="out" size={16} />Preview invitation form</a>
+        <button class="btn primary" onclick={() => (sent = true)} disabled={sent}><Icon name={sent ? 'check' : 'send'} size={16} />{sent ? 'Invitations sent' : 'Send invitations'}</button>
+      </div>
+      {#if sent}<p class="sentnote">Each person gets the invitation below, already filled in from what they agreed we may read. Sample data: nothing was sent.</p>{/if}
 
-      {#if levels.length}
-        <div class="levels" aria-hidden="true">
-          {#each levels as [level, n], i (level)}<span style:flex-grow={n} style:--step={i} title="{level}: {some(n)}"></span>{/each}
-        </div>
+      {#if field && people}
+        {#if plan.fields.length > 1}
+          <button class="up" onclick={() => (open = '')}><Icon name="back" size={16} />{field.name}</button>
+        {/if}
+        <p class="count"><b>{some(people.people)}</b> do this work{#if people.wanting}<span>+{some(people.wanting)} want to move into it</span>{/if}</p>
+
+        {#if levels.length}
+          <div class="levels" aria-hidden="true">
+            {#each levels as [level, n], i (level)}<span style:flex-grow={n} style:--step={i} title="{level}: {some(n)}"></span>{/each}
+          </div>
+          <p class="facts">
+            {#each levels as [level, n] (level)}<span><b>{some(n)}</b> {level.toLowerCase()}</span>{/each}
+          </p>
+        {/if}
         <p class="facts">
-          {#each levels as [level, n] (level)}<span><b>{some(n)}</b> {level.toLowerCase()}</span>{/each}
+          <span><b>{some(people.english)}</b> work in English</span>
+          <span><b>{some(people.finnish)}</b> in Finnish</span>
+          <span><b>{some(people.abroad)}</b> live abroad</span>
         </p>
-      {/if}
 
-      <p class="facts">
-        <span><b>{some(people.english)}</b> work in English</span>
-        <span><b>{some(people.finnish)}</b> in Finnish</span>
-        <span><b>{some(people.abroad)}</b> live abroad</span>
-      </p>
+        {#if field.rows.length}
+          <h3>Skills the roles ask for</h3>
+          <ul class="rows">
+            {#each field.rows as row (row.label)}
+              <li>
+                <span>{row.label}</span>
+                <small>{asking(row.asked, row.confirmed)}</small>
+                <span class="meter"><span style:width="{(row.have / most) * 100}%"></span></span>
+                <b class:few={row.have < 5}>{row.have < 5 ? 'few' : row.have}</b>
+              </li>
+            {/each}
+          </ul>
+        {/if}
+
+        {#if came.length}
+          <h3>They came to</h3>
+          <ul class="came">
+            {#each came as event (event.id)}
+              <li><b>{some(event.n)}</b><a href={event.url} target="_blank" rel="noopener">{event.name}</a>, {when(event.date.slice(0, 7))}</li>
+            {/each}
+          </ul>
+        {/if}
       {:else}
-        <p class="by">By the work these employers ask for, most asked first. Open a field for its people.</p>
-      {/if}
-
-      {#if plan.rows.length}
-        {#if oneField}<h3>What employers ask for</h3>{/if}
-        <ul class="rows">
-          {#each plan.rows as row (row.label)}
+        <ul class="rows fields">
+          {#each plan.fields as f (f.name)}
             <li>
-              {#if row.href}<a href={row.href}>{row.label}</a>{:else}<span>{row.label}</span>{/if}
-              <small>{row.asked} {row.asked === 1 ? 'employer asks' : 'employers ask'}</small>
-              <span class="meter" title="{row.have} in the pool"><span style:width="{(row.have / most) * 100}%"></span></span>
-              <b class:few={row.have < 5}>{row.have < 5 ? 'few' : row.have}</b>
+              <button onclick={() => (open = f.name)}>{f.name}<Icon name="flat" size={14} /></button>
+              <small>{asking(f.employers.length, f.employers.filter((e) => reviewOf(e.brief).status === 'joined').length)}</small>
+              <span class="meter"><span style:width="{(f.people.people / most) * 100}%"></span></span>
+              <b>{f.people.people}</b>
             </li>
           {/each}
         </ul>
       {/if}
 
-      {#if oneField && events.length}
-        <h3>They came to</h3>
-        <ul class="came">
-          {#each events as event (event.id)}
-            <li><b>{some(event.came)}</b><a href={event.url} target="_blank" rel="noopener">{event.name}</a>, {when(event.date.slice(0, 7))}</li>
-          {/each}
-        </ul>
-      {/if}
     </section>
   </div>
-
-  <section class="say">
-    <h2>What each invitation can say</h2>
-    <div>
-      <p><b>To an employer asking who will be there</b>{toEmployers}</p>
-      <p><b>To a person asking which employers come</b>{toPeople}</p>
-    </div>
-    <p class="note">
-      Each employer's invitation is already filled in; press "Their sign-up" to see it. A person's invitation works the same way in
-      <a href="https://esittely.duckymcduck2.workers.dev/#/cand" target="_blank" rel="noopener">Esittely</a>. {app.pool.note}
-    </p>
-  </section>
 </main>
 
 <style>
@@ -153,7 +180,7 @@
     --brand-ink: var(--city-ink);
     display: grid;
     gap: var(--s6);
-    max-width: 78rem;
+    max-width: 76rem;
     padding: var(--s6) var(--s7) var(--s8) var(--s6);
   }
   .back {
@@ -161,6 +188,7 @@
     align-items: center;
     gap: var(--s1);
     justify-self: start;
+    min-height: 2.75rem;
     font-size: var(--t-sm);
     font-weight: 600;
     color: var(--ink-2);
@@ -170,14 +198,29 @@
     color: var(--ink);
   }
   h1 {
-    font-size: var(--t-2xl);
+    font: 800 var(--t-2xl) / 0.95 var(--display);
+    letter-spacing: -0.035em;
   }
   header p {
-    max-width: 60ch;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s1) var(--s5);
     margin-top: var(--s3);
     font-size: var(--t-lg);
-    line-height: 1.4;
     color: var(--ink-2);
+  }
+  header a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s1);
+    min-height: 2.75rem;
+    font-size: var(--t-sm);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  header a:hover {
+    color: var(--ink);
   }
   h2 {
     font-size: var(--t-lg);
@@ -201,12 +244,15 @@
     align-items: start;
   }
 
-  .employers {
+  .progress {
     margin-top: var(--s3);
+  }
+  .employers {
+    margin-top: var(--s4);
   }
   .employers li {
     display: grid;
-    grid-template-columns: 3rem minmax(0, 1fr) auto;
+    grid-template-columns: 4rem minmax(0, 1fr) auto;
     gap: var(--s4);
     align-items: start;
     padding: var(--s4) 0;
@@ -214,9 +260,9 @@
   }
   .tile {
     display: block;
-    width: 3rem;
-    height: 3rem;
-    padding: 6px;
+    width: 4rem;
+    height: 4rem;
+    padding: 8px;
     border-radius: var(--r1);
     overflow: hidden;
     background: #fff;
@@ -239,34 +285,14 @@
     margin-top: 2px;
     line-height: 1.35;
   }
-  .why {
-    margin-top: var(--s1);
-    font-size: var(--t-sm);
-    line-height: 1.4;
+  .roles span {
     color: var(--ink-2);
-  }
-  .why :global(.cite) {
-    margin-left: var(--s2);
-    white-space: nowrap;
-  }
-  .act {
-    display: grid;
-    justify-items: end;
-    gap: var(--s2);
-  }
-  .state {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--s1);
-    min-height: 2.5rem;
-    font-size: var(--t-sm);
-    font-weight: 600;
-    color: var(--ok);
   }
   .see {
     display: inline-flex;
     align-items: center;
     gap: var(--s1);
+    min-height: 2rem;
     font-size: var(--t-sm);
     color: var(--ink-2);
     text-decoration: none;
@@ -274,24 +300,106 @@
   .see:hover {
     color: var(--ink);
   }
+  .why {
+    margin-top: var(--s1);
+    font-size: var(--t-sm);
+    line-height: 1.4;
+    color: var(--ink-2);
+  }
+  .act {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: end;
+    align-items: center;
+    gap: var(--s2) var(--s3);
+  }
+  .state {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s2);
+    padding: 0 var(--s2);
+    min-height: 2.25rem;
+    font-size: var(--t-sm);
+    font-weight: 600;
+  }
+  .state::before {
+    content: '';
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--wait);
+  }
+  .state.joined {
+    color: var(--ok);
+  }
+  .state.joined::before {
+    background: var(--ok);
+  }
+  .rest {
+    display: grid;
+    justify-items: start;
+    gap: var(--s3);
+    padding-top: var(--s4);
+    border-top: 1px solid var(--line);
+  }
+  .rest > :global(ul) {
+    width: 100%;
+  }
+  .rest .btn {
+    margin-left: calc(-1 * var(--s2));
+  }
 
   /* the people side is numbers, never rows */
   .people {
     position: sticky;
     top: var(--s5);
-    padding: var(--s5);
-    border-radius: var(--r2);
-    background: var(--wash);
+  }
+  /* the two actions of the people side, one row, the same size, the send as the city's step */
+  .go {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    gap: var(--s2);
+    margin: var(--s3) 0 var(--s4);
+  }
+  .go .btn,
+  .go .btn.primary {
+    min-width: 0;
+    justify-content: center;
+    min-height: 2.5rem;
+    padding: 0 var(--s3);
+    font-size: var(--t-sm);
+    background-color: var(--ground);
+  }
+  .go .btn.primary {
+    background-color: var(--brand);
+  }
+  .sentnote {
+    margin: calc(-1 * var(--s2)) 0 var(--s4);
+    font-size: var(--t-sm);
+    line-height: 1.4;
+    color: var(--ok);
   }
   .sample {
     margin-left: var(--s2);
     padding: 0.2em 0.6em;
     border-radius: 99px;
-    background: var(--ground);
+    background: var(--wash);
     font: 600 var(--t-xs) / 1.4 var(--text);
     letter-spacing: 0;
     color: var(--ink-2);
     vertical-align: middle;
+    white-space: nowrap;
+  }
+  .up {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s1);
+    min-height: 2.75rem;
+    margin: var(--s2) 0 0 calc(-1 * var(--s1));
+    padding: 0 var(--s1);
+    border: 0;
+    background: none;
+    font-weight: 700;
   }
   .count {
     display: flex;
@@ -301,18 +409,15 @@
     margin-top: var(--s3);
     font-size: var(--t-lg);
   }
+  .up + .count {
+    margin-top: 0;
+  }
   .count b {
-    font: 800 var(--t-2xl) / 1 var(--display);
+    font: 800 var(--t-xl) / 1 var(--display);
     letter-spacing: -0.03em;
-    color: var(--city);
   }
   .count span {
     flex-basis: 100%;
-    font-size: var(--t-sm);
-    color: var(--ink-2);
-  }
-  .by {
-    margin: var(--s2) 0 var(--s4);
     font-size: var(--t-sm);
     color: var(--ink-2);
   }
@@ -343,37 +448,55 @@
   .facts b {
     color: var(--ink);
   }
+  .rows.fields {
+    margin-top: var(--s3);
+  }
   .rows li {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 5rem 2.25rem;
+    grid-template-columns: minmax(0, 1fr) auto;
     gap: 0 var(--s3);
     align-items: center;
-    padding: var(--s2) 0;
+    padding: var(--s2) 0 var(--s3);
     border-top: 1px solid var(--line);
     line-height: 1.25;
   }
-  .rows a {
-    text-decoration: none;
-  }
-  .rows a:hover {
-    text-decoration: underline;
-  }
   .rows li > :first-child {
     font-weight: 600;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  }
+  .rows button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s2);
+    width: 100%;
+    min-height: 2.25rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    text-align: left;
+  }
+  .rows button :global(svg) {
+    flex: none;
+    color: var(--ink-2);
+    transition: transform 0.2s var(--ease);
+  }
+  .rows button:hover :global(svg) {
+    transform: translateX(3px);
+    color: var(--ink);
+  }
+  .rows.fields li {
+    min-height: 2.75rem;
   }
   .rows small {
-    grid-column: 1;
+    grid-column: 1 / -1;
     grid-row: 2;
     font-size: var(--t-xs);
     color: var(--ink-2);
   }
   .meter {
-    grid-row: 1 / 3;
-    grid-column: 2;
-    height: 0.5rem;
+    grid-row: 3;
+    grid-column: 1 / -1;
+    margin-top: var(--s2);
+    height: 0.375rem;
     border-radius: 99px;
     background: var(--line);
   }
@@ -385,14 +508,14 @@
     background: var(--city);
   }
   .rows b {
-    grid-row: 1 / 3;
-    grid-column: 3;
+    grid-row: 1;
+    grid-column: 2;
     text-align: right;
     font-size: var(--t-sm);
   }
   .rows b.few {
-    font-weight: 600;
-    color: var(--stop);
+    font-weight: 500;
+    color: var(--ink-2);
   }
   .came {
     display: grid;
@@ -411,35 +534,6 @@
     margin-right: var(--s2);
   }
 
-  .say {
-    padding-top: var(--s5);
-    border-top: 1px solid var(--line);
-  }
-  .say div {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--s6);
-    margin-top: var(--s4);
-  }
-  .say div p {
-    max-width: 46ch;
-    font-size: var(--t-lg);
-    line-height: 1.4;
-  }
-  .say div b {
-    display: block;
-    margin-bottom: var(--s1);
-    font-size: var(--t-sm);
-    font-weight: 600;
-    color: var(--ink-2);
-  }
-  .note {
-    max-width: 78ch;
-    margin-top: var(--s5);
-    font-size: var(--t-sm);
-    color: var(--ink-2);
-  }
-
   @media (max-width: 1100px) {
     .sides {
       grid-template-columns: 1fr;
@@ -447,7 +541,6 @@
     }
     .people {
       position: static;
-      order: -1;
     }
   }
   @media (max-width: 820px) {
@@ -455,22 +548,20 @@
       padding: var(--s5) var(--s4) var(--s7);
     }
     .employers li {
-      grid-template-columns: 2.5rem minmax(0, 1fr);
+      grid-template-columns: 3rem minmax(0, 1fr);
     }
     .tile {
-      width: 2.5rem;
-      height: 2.5rem;
+      width: 3rem;
+      height: 3rem;
+      padding: 6px;
     }
     .act {
       grid-column: 2;
-      grid-auto-flow: column;
       justify-content: start;
-      align-items: center;
-      gap: var(--s4);
     }
-    .say div {
-      grid-template-columns: 1fr;
-      gap: var(--s4);
+    .act .btn,
+    .see {
+      min-height: 2.75rem;
     }
   }
 </style>

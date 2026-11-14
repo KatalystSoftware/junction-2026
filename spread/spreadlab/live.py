@@ -45,6 +45,7 @@ from spread.client import Client, SpreadError, Unreachable, World
 from spread.starter import DAY, HOUR, WEEKDAYS, Retry, pickups, undelivered
 
 from . import notes, watch
+from .exposure import ExposurePolicy
 from .late_wide import WideLate
 from .pairs import PairPolicy
 from .policy import DECLINE, Policy
@@ -551,6 +552,32 @@ class LivePairDesk(LiveDesk, PairPolicy):
         if gig_id in self.pair_gigs and gig_id not in self.gigs_of(result["orderId"]) and gig_id not in self.booked:
             self.split(gig_id, "note", withdraw=False)
 
+    def catch_up(self, events: list[dict]) -> tuple[dict[str, int], dict[str, int]]:
+        self.read_pairs = []  # wins read offline that would go back with a held car: reconcile gives them their first post
+        return super().catch_up(events)
+
+    def pair_up(self, order) -> bool:
+        """Offline a pair gig cannot be posted, and pairs.py would take it for refused and post both cars alone. So a win
+        read at a join that pairs leaves the held car held and its own car unposted, for `reconcile` to pair them online."""
+        if not self.offline:
+            return super().pair_up(order)
+        if self.best_pair(order, at=self.now) is None:
+            return False
+        self.read_pairs.append(order["id"])
+        return True
+
+    def reconcile(self, snapshot: dict, changed: dict[str, int], dropped: dict[str, int]) -> None:
+        for order_id in self.read_pairs:  # first, so that the cars they pair with are still held
+            order = self.orders.get(order_id)
+            if order is not None and undelivered(order) and not self.gigs_of(order_id) and order_id not in self.pair_wait:
+                self.first = order_id
+                try:
+                    self.safely("post", order_id, self.post, order, undelivered(order))
+                finally:
+                    self.first = None
+        self.read_pairs = []
+        super().reconcile(snapshot, changed, dropped)
+
     def steepen(self, order_id: str) -> None:
         """A deadline warning that came while the desk was away: an open pair gig goes as two gigs, as pairs.py does."""
         gig_id = self.pair_of(order_id)
@@ -588,7 +615,13 @@ class LiveWidePairDesk(WideLate, LivePairDesk):
     """... and with out-and-back pairs."""
 
 
+class LiveExposureDesk(ExposurePolicy, LiveDesk):
+    """The live desk with the quote's cost by the book's exposure to drops (exposure.py), for a variant that sets `exposure`."""
+
+
 def desk_class(params: dict) -> type:
+    if params.get("exposure"):
+        return LiveExposureDesk
     if params.get("late_wide"):
         return LiveWidePairDesk if params.get("pair_hold") else LiveWideDesk
     return LivePairDesk if params.get("pair_hold") else LiveDesk

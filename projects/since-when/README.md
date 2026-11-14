@@ -38,7 +38,7 @@ The six tests that run the SQL presets skip without a database login; `docker co
 runs them against the scratch database. The torch and DuckDB wheels don't load on NixOS outside a container, so the
 embedder and the loaders run in the image.
 
-Dependencies are pinned in `uv.lock` and the image installs from it. `ty check` passes with 21 warnings, left in
+Dependencies are pinned in `uv.lock` and the image installs from it. `ty check` passes with 33 warnings (21 are listed here; the claim check's modules added the rest), left in
 place because the fix is a restructure or ty is wrong ([`pyproject.toml`](pyproject.toml) keeps them as warnings
 per file, so a new finding still fails):
 
@@ -119,9 +119,11 @@ in, and nothing runs before **Run** is clicked.
 - **Usefulness for readers and editors.** A reader sees each edition's exact words side by side, and the
   date links to the Wikipedia edit that began the difference:
   [Lapua Movement](https://since-when.katalyst.fyi/#/Q1412941), where Swedish and English Wikipedia say
-  "fascist" in the first sentence and Finnish does not. The differences are suggested by a language model
-  and marked so; [`demo/hero-findings-notes.md`](demo/hero-findings-notes.md) is the hand check of how
-  often they are right.
+  "fascist" in the first sentence and Finnish does not. NVIDIA Nemotron 3.5 Super VL suggests the
+  differences and then checks each one against the whole other article, and the page says so;
+  [`demo/hero-findings-notes.md`](demo/hero-findings-notes.md) and [`demo/hero-verify-notes.md`](demo/hero-verify-notes.md)
+  are the hand checks of how often they are right before and after, and
+  [`demo/nvidia-submission.md`](demo/nvidia-submission.md) the text for NVIDIA's prize.
 - **Design and demo quality.** The [front page](https://since-when.katalyst.fyi/) leads with three topics,
   each difference shows since when as a time strip, and the look is Wikipedia's own (Wikimedia Codex).
   [`demo/WALKTHROUGH.md`](demo/WALKTHROUGH.md) is the two-minute script, link by link.

@@ -267,7 +267,12 @@ def apply_checks(findings, checks):
         k = by_finding.get(f["id"])
         f = dict(f, check=check_of(k) if k else None)
         if k and k["outcome"] == "changed":
+            before = f["quotes"], f.get("citations") or {}, f.get("paragraph_citations") or {}
             f.update(_as_checked(k))
+            # A quote the check kept from the finding, whole or in part, keeps the finding's source.
+            for lang, quote in f["quotes"].items():
+                if quote in (before[0].get(lang) or "") and lang in before[1]:
+                    f["citations"][lang], f["paragraph_citations"][lang] = before[1][lang], before[2].get(lang)
         out.append(f)
     for k in checks:
         if k["finding_id"] is None:
@@ -324,10 +329,23 @@ def queue(r, q):
             None if lang == "all" else lang, limit=_int(q, "limit", 50, 1, 500), offset=_int(q, "offset", 0, 0, 10**6)
         ),
     )
+    db = r(
+        "The database and its versioned passages",
+        """
+SELECT VERSION() AS version,
+       (SELECT COUNT(*) FROM chunk FOR SYSTEM_TIME ALL) AS versions,
+       (SELECT COUNT(*) FROM chunk) AS passages""",
+    )[0]
     return {
         "as_of": date.today(),
         "total": int(rows[0]["total"]) if rows else 0,
         "items": [queue_item(x) for x in rows],
+        "database": {
+            "version": db["version"].split("-")[0],
+            "table": "chunk",
+            "versions": int(db["versions"]),
+            "passages": int(db["passages"]),
+        },
     }
 
 
@@ -563,35 +581,41 @@ def search(r, q):
     lang = q.get("lang", "all")
     if lang not in LANGS + ("all",):
         raise ApiError(400, "lang must be all, fi, sv or en")
-    if not _embedder:
-        from .embed import Embedder
-
-        _embedder.append(Embedder(threads=2))
-    vec = _embedder[0]([text])[0]
-    r.cur.execute("SET @q = VEC_FromText(?)", (json.dumps([round(v, 6) for v in vec]),))
-    r.log.append(
-        {
-            "label": "The question's bge-m3 vector",
-            "query": f"SET @q = VEC_FromText('[…1024 numbers…]')  -- {text}",
-            "ms": 0,
-            "rows": 0,
-        }
-    )
-    hits = r(
-        "Nearest current passages (vector index on chunk_now)",
+    # A title in any edition comes first, an exact one before one that contains the words: vectors
+    # favour passages over names. Without the embedding model on disk, titles are the whole search.
+    words = re.sub(r"([\\%_])", r"\\\1", text)
+    named = r(
+        "Topics by title",
         f"""
+SELECT wikidata_id FROM topic
+WHERE CONCAT_WS('|', title_fi, title_sv, title_en) LIKE {lit("%" + words + "%")}
+ORDER BY {lit(text)} NOT IN (title_fi, title_sv, title_en), title_en
+LIMIT {limit}""",
+    )
+    hits = []
+    if search_enabled():
+        if not _embedder:
+            from .embed import Embedder
+
+            _embedder.append(Embedder(threads=2))
+        vec = _embedder[0]([text])[0]
+        r.cur.execute("SET @q = VEC_FromText(?)", (json.dumps([round(v, 6) for v in vec]),))
+        r.log.append(
+            {
+                "label": "The question's bge-m3 vector",
+                "query": f"SET @q = VEC_FromText('[…1024 numbers…]')  -- {text}",
+                "ms": 0,
+                "rows": 0,
+            }
+        )
+        hits = r(
+            "Nearest current passages (vector index on chunk_now)",
+            f"""
 SELECT n.wikidata_id, n.lang, n.section, VEC_DISTANCE_COSINE(n.embedding, @q) AS distance
 FROM chunk_now AS n
 ORDER BY VEC_DISTANCE_COSINE(n.embedding, @q)
 LIMIT {limit * 5}""",
-    )
-    # An exact title in any edition comes first: vectors favour passages over names.
-    named = r(
-        "Topics with this exact title",
-        f"""
-SELECT wikidata_id FROM topic
-WHERE {lit(text)} IN (title_fi, title_sv, title_en)""",
-    )
+        )
     # Farther than this, bge-m3 matches anything: "zzzzqqq" is 0.64 from its nearest passage and
     # "Olof Palme" (not a topic) 0.56, while "Talvisota" is 0.54 from Winter War.
     near = [h["wikidata_id"] for h in hits if float(h["distance"]) <= SEARCH_MAX_DISTANCE]
@@ -613,7 +637,7 @@ def _int(q, name, default, lo, hi):
     return max(lo, min(hi, v))
 
 
-# ---------- live SQL: three preset statements, run as the SELECT-only user ----------
+# ---------- live SQL: four preset statements, run as the SELECT-only user ----------
 # The caller picks a preset and its parameters, never SQL text. Every statement comes from the
 # templates below and runs on a connection of DB_RO_USER with a time limit and a row cap.
 
@@ -628,6 +652,24 @@ SELECT @@system_versioning_asof AS session_as_of, c.rev_id, c.row_start,
 FROM chunk AS c
 JOIN passage AS p ON p.sha = c.sha
 WHERE c.wikidata_id = ? AND c.lang = ? AND c.ord = 0"""
+# With a finding: the passage that holds the words the page quotes for that finding and edition. The
+# words are read first, from the tables as they are today, into a user variable; the passage is then
+# read under the session's date.
+ASOF_QUOTE = """
+SELECT IF(k.outcome IN ('changed', 'new'),
+          IF(k.lang = ?, k.quote, k.other_quote),
+          IF(f.lang = ?, f.quote, f.other_quote))
+INTO @quote
+FROM (SELECT ? AS id) AS x
+LEFT JOIN finding AS f ON f.id = x.id
+LEFT JOIN checked_finding AS k ON k.finding_id = x.id OR (x.id < 0 AND k.id = -x.id)"""
+ASOF_PASSAGE_SQL = """
+SELECT @@system_versioning_asof AS session_as_of, c.rev_id, c.row_start, c.section, p.text
+FROM chunk AS c
+JOIN passage AS p ON p.sha = c.sha
+WHERE c.wikidata_id = ? AND c.lang = ? AND INSTR(p.text, @quote) > 0
+ORDER BY c.ord
+LIMIT 1"""
 HISTORY_SQL = """
 SELECT c.rev_id, c.row_start, c.row_end, LEFT(p.text, 200) AS text
 FROM chunk FOR SYSTEM_TIME ALL AS c
@@ -635,9 +677,16 @@ JOIN passage AS p ON p.sha = c.sha
 WHERE c.wikidata_id = ? AND c.lang = ? AND c.ord = 0
 ORDER BY c.row_start DESC"""
 
+CHECK_SQL = """
+SELECT id, finding_id, outcome, verdict, claim_lang, claim_quote, evidence_lang, evidence_quote, judge, search_sql
+FROM checked_finding
+WHERE finding_id = ? OR (? < 0 AND id = -?)"""
+
 # name -> title, description, [(parameter, kind, default)] and the statements to run, each
 # (label, text, values to bind). `nearest` is the tool's own alignment query, its text built by
-# align.py from the validated values; the other two bind theirs.
+# align.py from the validated values; `asof` and `history` bind theirs. `check` runs the statement
+# the claim check stored for a finding (evidence.search_sql), as the check ran it: its text comes
+# from the table, written by the check's loader, never from the request.
 PRESETS = {
     "nearest": {
         "title": "Time travel + vector search",
@@ -661,13 +710,15 @@ PRESETS = {
     "asof": {
         "title": "system_versioning_asof",
         "description": "Set the session variable to a date, then run a plain query with no time "
-        "clause: it returns the first passage as it stood on that date. Change "
-        "the date and run the same statement again.",
-        "params": [("qid", "qid", "Q1412941"), ("date", "date", "2026-10-22"), ("lang", "lang", "sv")],
-        "statements": lambda v: [
-            ("Set the session's point in time", ASOF_SET, (v["date"] + " 00:00:00",)),
-            ("First passage, no time clause", ASOF_SQL, (v["qid"], v["lang"])),
+        "clause: it returns the first passage as it stood on that date, or, for a finding, the "
+        "passage that holds the words the page quotes. Change the date and run the same statement again.",
+        "params": [
+            ("qid", "qid", "Q1412941"),
+            ("date", "date", "2026-10-22"),
+            ("lang", "lang", "sv"),
+            ("finding", "finding", "0"),
         ],
+        "statements": lambda v: _asof(v),
     },
     "history": {
         "title": "FOR SYSTEM_TIME ALL",
@@ -676,7 +727,45 @@ PRESETS = {
         "params": [("qid", "qid", "Q1412941"), ("lang", "lang", "en")],
         "statements": lambda v: [("Every version of the first passage", HISTORY_SQL, (v["qid"], v["lang"]))],
     },
+    "check": {
+        "title": "The claim check",
+        "description": "How a difference was checked: the other article as it stood on the day "
+        "(FOR SYSTEM_TIME AS OF), each of its sentences ranked by VEC_DISTANCE_COSINE to the claim, "
+        "and dates, numbers and names matched with REGEXP. The statement the check ran, from the "
+        "table it stored it in.",
+        "params": [("finding", "finding", "14115")],
+        "statements": lambda v: [
+            ("The claim, the verdict and the statement the check ran", CHECK_SQL, (int(v["finding"]),) * 3),
+            ("The other article's passages nearest the claim, sentence by sentence", _stored, ()),
+        ],
+    },
 }
+
+
+def _asof(v):
+    """The statements of `asof`: the first passage, or with a finding the passage holding its quote."""
+    set_date = ("Set the session's point in time", ASOF_SET, (v["date"] + " 00:00:00",))
+    fid = int(v["finding"])
+    if not fid:
+        return [set_date, ("First passage, no time clause", ASOF_SQL, (v["qid"], v["lang"]))]
+    return [
+        ("The words the page quotes for this finding", ASOF_QUOTE, (v["lang"], v["lang"], fid)),
+        set_date,
+        ("The passage that holds them, no time clause", ASOF_PASSAGE_SQL, (v["qid"], v["lang"])),
+    ]
+
+
+def _stored(rows):
+    """The statement the check stored, from the previous statement's last column, unchanged inside a
+    SELECT that leads with what the judge read: each passage's nearest sentence, its distance to
+    the claim and how many of the claim's dates, numbers and names it matched."""
+    if not rows or not rows[0][-1]:
+        raise ApiError(404, "the claim check has no statement for this finding")
+    return f"""SELECT ord, section, sentence, distance, term_hits, by_vector, by_terms, searched
+FROM (
+{rows[0][-1].strip()}
+) AS checked
+ORDER BY distance"""
 
 
 def live_enabled():
@@ -730,6 +819,8 @@ def live_params(body):
             raise ApiError(400, f"{n} must be a string")
         if kind == "qid" and not QID.fullmatch(v):
             raise ApiError(400, f"{n} must be a Wikidata id like Q1412941")
+        if kind == "finding" and not re.fullmatch(r"-?[0-9]{1,9}", v):
+            raise ApiError(400, f"{n} must be a finding id like 14115")
         if kind == "lang" and v not in LANGS:
             raise ApiError(400, f"{n} must be one of {', '.join(LANGS)}")
         if kind == "date":
@@ -758,14 +849,20 @@ def live_run(body):
     try:
         con = live_connect()
         cur = con.cursor()
-        log, columns, rows = [], [], []
+        log, columns, rows, got = [], [], [], []
         for label, sql, binds in PRESETS[name]["statements"](values):
+            if callable(sql):  # a statement read from the previous one's rows
+                sql = sql(got)
             t0 = time.perf_counter()
-            cur.execute(sql, binds)
+            cur.execute(sql, binds) if binds else cur.execute(sql)  # a stored REGEXP may hold a "?"
             got = cur.fetchall() if cur.description else []
             ms = round((time.perf_counter() - t0) * 1000, 1)
             # As sent: the connector writes the bound values into the text as literals.
-            shown = "".join(part + (lit(binds[i]) if i < len(binds) else "") for i, part in enumerate(sql.split("?")))
+            shown = (
+                "".join(part + (lit(binds[i]) if i < len(binds) else "") for i, part in enumerate(sql.split("?")))
+                if binds
+                else sql
+            )
             log.append({"label": label, "query": shown.strip(), "ms": ms, "rows": len(got)})
             if cur.description:
                 columns, rows = [d[0] for d in cur.description], [list(x) for x in got]
@@ -877,8 +974,8 @@ def get_queue(request: Request):
 
 @app.get("/api/search")
 def get_search(request: Request):
-    if USE_FIXTURES or not search_enabled():
-        raise ApiError(503, "search is off: this API has no embedding model on disk")
+    if USE_FIXTURES:
+        raise ApiError(503, "search is off on the fixtures")
     return _answer(search, dict(request.query_params))
 
 

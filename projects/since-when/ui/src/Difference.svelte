@@ -2,7 +2,7 @@
 	// One difference: a headline and its time strip; opened, each edition's own words side by side
 	// and a way to read the text on that date in MariaDB.
 	import { dating, figureMarks, lanes, turns, type Difference } from './lib/differences'
-	import { NAMES, articleUrl, day, dayAfter, diffUrl, list, plural, revisionUrl, sectionLabel, sectionOf } from './lib/format'
+	import { NAMES, articleUrl, day, dayAfter, diffUrl, linkParts, list, modelName, plural, revisionUrl, sectionLabel, sectionOf, sourceOf } from './lib/format'
 	import { showSql, ui } from './lib/nav.svelte'
 	import type { TimelineEvent, Topic } from './lib/types'
 	import Marked from './Marked.svelte'
@@ -22,6 +22,13 @@
 	const cap = (text: string) => text[0].toUpperCase() + text.slice(1)
 	// What the claim check found for the row that speaks for this difference.
 	const check = $derived(d.primary.check && d.primary.check.outcome !== 'unchecked' ? d.primary.check : null)
+	// "Check in MariaDB": for a checked difference, the passage that holds the quoted words, on the
+	// day of the check; otherwise the article's first passage the day after the edit that began it.
+	const asof = $derived.by(() => {
+		const q = d.quotes.find((x) => x.lang === began.lang) ?? d.quotes[0]
+		if (check && check.outcome !== 'set_aside' && q) return { qid: topic.wikidata_id, date: check.as_of.slice(0, 10), lang: q.lang, finding: String((q.from ?? d.primary).id) }
+		return { qid: topic.wikidata_id, date: dayAfter(began.at), lang: began.lang, finding: '0' }
+	})
 	let row: HTMLDetailsElement
 </script>
 
@@ -38,11 +45,16 @@
 				{#each d.quotes as q (q.lang)}
 					{@const section = q.from ? sectionOf(q.from, q.lang) : ''}
 					{@const rev = q.from?.rev_ids?.[q.lang]}
+					{@const src = sourceOf(q.from, q.lang)}
 					<figure>
 						<figcaption class="small">
 							<a href={rev ? revisionUrl(q.lang, rev, section) : articleUrl(q.lang, topic.titles[q.lang] ?? '')} target="_blank" rel="noopener" title="Opens the {NAMES[q.lang]} article at {section ? `“${sectionLabel(section)}”` : 'its opening'}, as it was compared">{NAMES[q.lang]}</a>
 						</figcaption>
 						<blockquote lang={q.lang}><Marked text={q.text} {terms} ranges={marks.get(q.lang) ?? []} /></blockquote>
+						{#if src}
+							<p class="source small"><span class="subtle">{src.where}{src.text ? ':' : ` in the ${NAMES[q.lang]} article for this sentence or its paragraph`}</span>
+								{#each linkParts(src.text) as p}{#if p.url}<a href={p.part} target="_blank" rel="noopener">{p.part}</a>{:else}{p.part}{/if}{/each}</p>
+						{/if}
 					</figure>
 				{/each}
 			</div>
@@ -50,7 +62,7 @@
 			{#if check}
 				{@const e = check.evidence}
 				<Why id="why-check-{Math.abs(d.id)}{d.id < 0 ? 'n' : ''}" label="Checked">
-					{check.judge} read {check.read ?? 'the nearest'} of {check.searched ?? 'the'} passages of the other article on {day(check.as_of)}{#if e?.quote}
+					{modelName(check.judge)} read {check.read ?? 'the nearest'} of {check.searched ?? 'the'} passages of the other article on {day(check.as_of)}{#if e?.quote}
 						and settled on this in {NAMES[e.lang]}: <q lang={e.lang}>{e.quote}</q>
 						{#if e.rev_id}(<a href={revisionUrl(e.lang, e.rev_id, e.section)} target="_blank" rel="noopener">{sectionLabel(e.section ?? '')}, revision {e.rev_id}</a>){/if}{/if}.
 				</Why>
@@ -59,9 +71,19 @@
 				<button
 					class="cdx-button cdx-button--action-progressive cdx-button--weight-quiet check"
 					aria-haspopup="dialog"
-					title="Opens the statement that reads the {NAMES[began.lang]} article as it stood after that day. Nothing runs until you click Run."
-					onclick={() => showSql('asof', { qid: topic.wikidata_id, date: dayAfter(began.at), lang: began.lang })}>Check in MariaDB</button
+					title={asof.finding === '0'
+						? `Opens the statement that reads the ${NAMES[asof.lang]} article as it stood after that day. Nothing runs until you click Run.`
+						: `Opens the statement that reads the passage of the ${NAMES[asof.lang]} article holding the quoted words, as it stood on the day of the check. Nothing runs until you click Run.`}
+					onclick={() => showSql('asof', asof)}>Check in MariaDB</button
 				>
+				{#if check}
+					<button
+						class="cdx-button cdx-button--action-progressive cdx-button--weight-quiet check"
+						aria-haspopup="dialog"
+						title="Opens the statement the claim check ran for this difference. Nothing runs until you click Run."
+						onclick={() => showSql('check', { finding: String(d.primary.id) })}>How it was checked</button
+					>
+				{/if}
 			{/if}
 			{#if related.length}
 				<details class="cdx-accordion cdx-accordion--separation-minimal related">
@@ -169,6 +191,11 @@
 
 	.line {
 		margin-top: var(--spacing-50);
+	}
+
+	.source {
+		margin-top: var(--spacing-50);
+		overflow-wrap: anywhere;
 	}
 
 	.related li {

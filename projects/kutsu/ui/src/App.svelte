@@ -1,5 +1,6 @@
 <script lang="ts">
   import { brandOf } from './lib/brand'
+  import Demo from './lib/Demo.svelte'
   import Events from './lib/Events.svelte'
   import { plans } from './lib/events'
   import Find from './lib/Find.svelte'
@@ -11,6 +12,7 @@
   import Research from './lib/Research.svelte'
   import Stage from './lib/Stage.svelte'
   import Track from './lib/Track.svelte'
+  import Watch from './lib/Watch.svelte'
   import { app, load, reviewOf, route } from './lib/state.svelte'
 
   load()
@@ -25,7 +27,9 @@
   )
   const state = $derived(
     review?.status === 'joined'
-      ? 'Signed up. These are the company\'s own answers.'
+      ? review.example
+        ? 'An example sign-up, filled in for the demo. The company has not seen it.'
+        : 'Signed up. These are the company\'s own answers.'
       : review?.status === 'invited'
         ? 'Invited. Waiting for the company to sign up.'
         : `Drafted from ${brief?.signals.length} public ${brief?.signals.length === 1 ? 'statement' : 'statements'}. Not confirmed by the company.`,
@@ -33,6 +37,7 @@
 </script>
 
 {#if app.ready}
+  <Demo />
   <div class="page" style:--brand={brand.field} style:--brand-ink={brand.ink}>
     {#if at.join}
       {#if app.research}<Research />{:else if brief}<Join {brief} />{:else if at.id}<p class="missing">This invitation does not point to a company we know.</p>{:else}<Find />{/if}
@@ -62,6 +67,7 @@
                     </p>
                   {/if}
                 </section>
+                <Watch {brief} />
                 {#if brief.signals.length}<Ledger {brief} />{/if}
               {/key}
             </main>

@@ -2,14 +2,14 @@
   import { host, terms, when } from './format'
   import Icon from './Icon.svelte'
   import Logo from './Logo.svelte'
-  import { app, joinLink, saveReview } from './state.svelte'
+  import type { Occasion } from './events'
+  import { joinLink, saveReview } from './state.svelte'
   import type { Brief, Need, Review, Told } from './types'
 
   // The company's finished page: who it is, who it is looking for, and what Espoo does for it,
   // which follows from what it picked. This is what it would screenshot or pass on.
-  let { brief, review, about, told }: { brief: Brief; review: Review; about: (key: string) => string; told: Told[] } = $props()
+  let { brief, review, about, told, event }: { brief: Brief; review: Review; about: (key: string) => string; told: Told[]; event: Occasion } = $props()
   const identity = $derived(brief.identity)
-  const event = $derived(app.presets.find((p) => p.ids.includes(brief.id)) ?? app.presets[0])
   const roles = $derived(review.needs.filter((n) => n.ok))
   const source = (t: Told) => brief.signals.find((s) => t.signals.includes(s.id))
   const wants = $derived(review.wants ?? [])
@@ -26,23 +26,29 @@
   const steps = $derived(
     [
       { when: 'Today', what: "Your page goes to Espoo's event team", detail: `${count(roles.length, 'role')} and ${count(told.length, 'thing')} about you, as you left them.` },
-      { when: 'By 18 Nov', what: 'Your place is confirmed', detail: 'Meeting and booth places are limited. The organisers choose and tell you.' },
+      event.dated
+        ? { when: 'By 18 Nov', what: 'Your place is confirmed', detail: 'Meeting and booth places are limited. The organisers choose and tell you.' }
+        : { when: 'Next', what: 'You hear the date first', detail: 'The event is being planned. You choose whether to come once the date is set.' },
       wants.some((w) => w.includes('meetings')) && {
-        when: '26–27 Nov',
+        when: event.dated ? '26–27 Nov' : 'At the event',
         what: '1:1 meetings with candidates',
         detail: `Offered to candidates who fit your roles${abroad ? `, ${abroad} of them open to people abroad` : ''}.`,
       },
-      wants.some((w) => w.includes('booth')) && { when: '26–27 Nov', what: 'A virtual booth', detail: 'Built from this page. Nothing more to prepare.' },
-      wants.some((w) => w.includes('presentation')) && { when: '26 Nov', what: 'A company presentation', detail: 'You asked for a slot between 12:00 and 17:00. The organisers confirm it.' },
+      wants.some((w) => w.includes('booth')) && { when: event.dated ? '26–27 Nov' : 'At the event', what: 'A virtual booth', detail: 'Built from this page. Nothing more to prepare.' },
+      wants.some((w) => w.includes('presentation')) && {
+        when: event.dated ? '26 Nov' : 'At the event',
+        what: 'A company presentation',
+        detail: event.dated ? 'You asked for a slot between 12:00 and 17:00. The organisers confirm it.' : 'You asked for a slot. The organisers confirm it.',
+      },
     ].filter((s) => !!s),
   )
 
   let copied = $state(false)
   async function share() {
     try {
-      await navigator.clipboard.writeText(joinLink(brief.id))
+      await navigator.clipboard.writeText(joinLink(brief.id, event.slug))
     } catch {
-      const field = Object.assign(document.createElement('textarea'), { value: joinLink(brief.id) })
+      const field = Object.assign(document.createElement('textarea'), { value: joinLink(brief.id, event.slug) })
       document.body.append(field)
       field.select()
       document.execCommand('copy')
@@ -56,7 +62,7 @@
 <section class="finished">
   <header>
     <h1>You're in, {about('Company')}.</h1>
-    <p class="event">{event?.title}, {event?.note.split(',')[0]}</p>
+    <p class="event">{event.name}, {event.when}</p>
     <p class="acts">
       <button onclick={share}><Icon name={copied ? 'check' : 'copy'} size={16} />{copied ? 'Link copied' : 'Copy the link to this page'}</button>
       <button onclick={() => saveReview(brief.id, { ...review, status: 'invited' })}><Icon name="undo" size={16} />Change my answers</button>

@@ -53,8 +53,30 @@ export function sectionOf(f: Finding, l: Lang): string | undefined {
 	return (l === f.lang ? f.section : f.other_section) ?? ''
 }
 
+/**
+ * Where an edition's quote of a finding is sourced: the reference in or right after the sentence,
+ * else the one that ends its paragraph. `text` is empty when the article cites neither; null when
+ * the finding does not say (a row the check found itself).
+ */
+export function sourceOf(f: Finding | null, l: Lang): { where: string; text: string } | null {
+	if (!f?.citations || !(l in f.citations)) return null
+	const own = f.citations[l]
+	const paragraph = f.paragraph_citations?.[l]
+	if (own) return { where: 'Source', text: own }
+	if (paragraph) return { where: 'Source at the end of the paragraph', text: paragraph }
+	return { where: 'No source', text: '' }
+}
+
+/** A reference's text, split around its web addresses so they can be links. */
+export const linkParts = (text: string) => text.split(/(https?:\/\/[^\s,;]+)/).map((part, i) => ({ part, url: i % 2 === 1 }))
+
 /** The models the API names by id, as a reader knows them. */
-const MODELS: Record<string, string> = { 'nemotron-3.5-super-vl': 'NVIDIA Nemotron 3.5 Super VL' }
-export const modelName = (id: string | null | undefined) => (id ? (MODELS[id] ?? id) : 'a language model')
+const MODELS: Record<string, string> = {
+	'nemotron-3.5-super-vl': 'NVIDIA Nemotron 3.5 Super VL',
+	'nvidia/nemotron-3.5-super-vl-120b-a12b': 'NVIDIA Nemotron 3.5 Super VL',
+}
+/** The model that wrote every suggested difference in the database (finding.model). */
+export const CLASSIFIER = 'nvidia/nemotron-3.5-super-vl-120b-a12b'
+export const modelName = (id: string | null | undefined) => MODELS[id ?? CLASSIFIER] ?? id!
 
 export const sectionLabel = (s: string) => (s ? s.split(' › ').pop()! : 'Lead')

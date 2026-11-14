@@ -43,6 +43,35 @@ headless Chromium, signs one company up by pressing Enter until the finished pag
 error the page reports. `npm --prefix ui run lint` is ESLint with typescript-eslint's strict
 type-checked rules; it still reports 83 findings and is not part of the check yet.
 
+The **Demo** button belongs to the demo, not the product. It is out of sight until the pointer is in
+the top right corner (on a phone it stays faintly visible). It moves between the
+three people Kutsu is for (Espoo's organiser, an invited company, a candidate), fills in example
+sign-ups so the screens can be seen in use, and clears every sign-up. An example sign-up is marked
+as one wherever it shows: no company did it.
+
+## A person's profile, filled in from what they hand over
+
+`POST /person` with `{"kind": "linkedin" | "portfolio" | "cv", "value": "<address or text>"}` answers
+with the skill part of a profile: a headline, a field of work, a level, up to six things the person can
+do, their skills, roles, studies and languages. Each item has `from`, the words it was read from, and
+an item whose words are not in the material is dropped (`dropped` says how many). The person's
+invitation form (Esittely, served under `/esittely/`) can call it and show every line to agree with or
+strike. What a person wants and what would suit them are asked, never read.
+
+- `linkedin`: Context.dev `POST /v1/people/enrich` with the profile address, 20 credits a match. A
+  match scored under 90 of 100 is refused. It reads Context.dev's record of the profile, which can be
+  weeks old. (`web/scrape` on a LinkedIn address is blocked for most profiles.)
+- `portfolio`: Context.dev `POST /v1/web/scrape` of any public page, 1 credit.
+- `cv`: the pasted text.
+
+Handing it over is the consent. Nothing is stored, cached or logged on our side; the material does
+go to Context.dev and to the model. The address is public, so anyone could ask it about any profile:
+it reads at most 60 profiles per start (`PEOPLE_LIMIT`), and that is a reason this stays a demo.
+
+```sh
+curl -s https://kutsu.katalyst.fyi/person -d '{"kind": "linkedin", "value": "https://www.linkedin.com/in/<you>"}'
+```
+
 ## What is real, what is sample, what is proposed
 
 - **Real:** every employer, and every statement about one. Each statement was found word for word on
@@ -57,6 +86,13 @@ type-checked rules; it still reports 83 findings and is not part of the check ye
   the figure that page gives. Espoo publishes no attendance numbers.
 - **Real about the event:** the Deep Tech Talent Forum's dates, that it is online and free, its list
   of employers, the presentation times and that places are limited, all from Espoo's event page.
+- **Drafted until confirmed:** the roles an employer looks for are drafted from its public
+  statements. Counts of employers say how many have confirmed ("9 employers, 2 confirmed").
+- **One profile, many events:** a company confirms its profile once. An invitation and a sign-up are
+  for one event (`#/join/<company>/<event>`), and "Copy invitation" puts a short message on the
+  clipboard, with the link, for a person to send.
+- **Already coming:** the Deep Tech Talent Forum's 27 employers are the ones on Espoo's event page,
+  so the screen does not invite them; it sends each its profile to confirm.
 - **Proposed by us:** that Espoo keeps a pool across events at all, the suggested events, and on the
   company's finished page that its profile is shown to matching candidates and that its booth is
   built from the page. These describe what the product would do; Espoo has promised none of them.
@@ -90,13 +126,25 @@ four at a time, because each one spends our credits.
 ## Context.dev endpoints: what each gives Kutsu and where you see it
 
 Context.dev is the first call for every company and it decides how the whole sign-up looks. Three
-endpoints, all in the core flow:
+endpoints are in the core flow, and monitors keep the picture current afterwards. All of these are
+live in the demo; nothing below is only described.
 
 | Endpoint | Why Kutsu calls it | Where a viewer sees it |
 |---|---|---|
 | `GET /v1/brand/search` | A person types "nitor" or "hamina wireless". This turns the words into the right company and its domain (Finnish matches first; a match must carry the first word typed). | The company's proper name appears within a second or two of pressing Enter, on `#/join` and in Espoo's search box. |
 | `POST /v1/brand/retrieve` (by domain) | The company's identity: name, logo, square icon, brand colours, field, size, city, careers link. The domain it confirms also scopes every web search that follows, so namesakes stay out. | Everything branded: the invitation floods with the company's colour from its logo; "Is this you?" is this record, line by line; the square icons in Espoo's list; the logo on the finished card. |
 | `POST /v1/web/scrape` (markdown) | Reads the company's careers page, script-rendered ones included, as one more page to quote from: what the company tells candidates itself. | Statements and needs that cite the company's own careers page, with the quoted sentence on hover. |
+| `POST /v1/monitors` (page target, with instructions) | Watches each company's careers page for a job opening added or removed. 42 of the 74 companies have a careers link. 1 credit a run. | "Changed lately" on Espoo's events screen, and "Changed since the draft" on an employer. |
+| `POST /v1/monitors` (search target) | Watches the web for news that a company is growing: funding, an acquisition, a new site, a hiring plan. One per company, 74. 2 credits a run. | The same two places. |
+| `POST /v1/people/enrich` | A person pastes their own LinkedIn address; this returns their roles and studies, which become profile lines they agree with or strike. 20 credits a match. | The person's invitation form, once it calls `POST /person`; today from the command line. |
+| `GET /v1/monitors`, `GET /v1/monitors/changes` | Reads back what is watched and what changed, at most every five minutes. | The line "Watching 42 careers pages and news about 74 employers, next at 20:34". |
+
+Monitors (`monitors.py`): 116 of them, every six hours, tagged `kutsu`. One run of all costs 190
+credits, 760 a day; `python3 monitors.py delete` removes them and should be run after the event. The
+page polls instead of taking webhooks, so there is no public endpoint to protect. A change whose
+title or summary names a person is dropped, as everywhere else. Not used: the LinkedIn profile read
+for a candidate's prefill was tested once (`web/scrape` returns a public profile, 1 credit) and is
+not built.
 
 How it is used: every response is checked before use (`status` on the brand record, `success` on the
 scrape output), and stored in `api-cache/` so no call is paid twice, as their brief advises. We keep
@@ -165,6 +213,8 @@ sections from "Headline numbers" on describe that run.
 | `esittely-companies.json` | the same roles in the company and job-ad shape of `projects/espoo-recruitment/app/data.js` (role family ids and skill ids are the demo's own); `size`, `stand`, `tradeoffs` and minimum experience are left out because nothing public grounds them |
 | `signals.json`, `signals.md` | per company: identity from Context.dev, what public sources state (claim, verbatim quote, URL) and, kept apart, the inferred card: a pitch and the needs, citing those statements |
 | `ui/`, `serve.py` | the Kutsu app (Svelte) and the small server behind it: live research, progress, sign-up state, a role drafted from one line |
+| `person.py` | a person's profile from their LinkedIn, a portfolio page or their CV, each line with the words it rests on; keeps nothing |
+| `monitors.py` | creates, lists and deletes the Context.dev monitors, and reads back what changed |
 | `presets.json` | named lists of employers shown first, such as the Deep Tech Talent Forum's |
 | `pool.py`, `pool.json` | the sample pool: people who came to past events, as counts per field of work; seeded, nobody real |
 | `metrics.jsonl` | one line per round |

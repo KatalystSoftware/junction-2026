@@ -87,8 +87,15 @@ export type Review = {
   note?: string
   invited_at?: string
   joined_at?: string
+  /** the events the company has been invited to, by slug; its profile is one and the same for all of them */
+  events?: string[]
+  /** the events the company has signed up for, by slug */
+  signed?: string[]
+  /** filled in by the demo control to show a screen in use; no company did this */
+  example?: boolean
 }
-export type Preset = { title: string; note: string; url: string; date?: string; ids: string[]; names?: Record<string, string> }
+/** A named list of employers. `coming` says they are already on the event's public page, so nobody has to be invited: only their profiles confirmed. */
+export type Preset = { title: string; note: string; url: string; date?: string; coming?: boolean; facts?: string; ids: string[]; names?: Record<string, string> }
 
 /** One field of work in the sample pool, as counts. No row here is a person. */
 export type PoolField = {
@@ -107,4 +114,8 @@ export type PoolField = {
 /** A real past event with its public page. `published` is a figure that page gives; `people` is how many of the sample pool came. */
 export type PastEvent = { id: string; name: string; date: string; where: string; published: string; url: string; people: number }
 export type Pool = { note: string; people: number; events: PastEvent[]; fields: Record<string, PoolField> }
+/** Something a Context.dev monitor saw change for a company: a job opening on its careers page, or news about it. */
+export type Change = { id: string; brief: string; kind: 'careers' | 'news'; title: string; summary: string; url: string; detected_at: string; importance: string }
+type Watched = { last_run_at: string | null; next_run_at: string | null; last_change_at: string | null }
+export type Watch = { watched: Record<string, { careers?: Watched; news?: Watched }>; changes: Change[]; checked_at: string }
 export type Step = { stage: 'identity' | 'search' | 'careers' | 'read' | 'check' | 'card'; [fact: string]: unknown }

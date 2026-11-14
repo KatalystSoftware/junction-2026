@@ -23,18 +23,24 @@ import os
 import re
 import sys
 import threading
+import time
 import urllib.parse
 
 import lib
+import monitors
+import person
 import signals
 
 HOST, PORT = os.environ.get("HOST", "127.0.0.1"), 8046
 LIVE_LIMIT = int(os.environ.get("LIVE_LIMIT", "300"))  # about $0.03 and 11 Context.dev credits each
 DIST = lib.HERE / "ui" / "dist"
+# Esittely, the applicant's side of the same idea (projects/espoo-recruitment), served under /esittely/ so the organiser's
+# screen can open the invitation form: a copy next to this file on the server, the sibling project in the repo
+ESITTELY = next((d for d in (lib.HERE / "esittely", lib.HERE.parent / "espoo-recruitment" / "app") if d.is_dir()), None)
 REVIEWS = lib.HERE / "reviews.json"
 DATA = {"/signals.json": "signals.json", "/presets.json": "presets.json", "/pool.json": "pool.json"}
 TYPES = {".html": "text/html; charset=utf-8", ".js": "text/javascript", ".css": "text/css", ".json": "application/json",
-         ".svg": "image/svg+xml", ".woff2": "font/woff2", ".png": "image/png", ".ico": "image/x-icon"}
+         ".svg": "image/svg+xml", ".woff2": "font/woff2", ".png": "image/png", ".ico": "image/x-icon", ".md": "text/markdown; charset=utf-8"}
 STATUSES = {"draft", "invited", "joined"}
 # What a saved sign-up holds. Raise it whenever that changes: a file saved in another shape is set aside
 # at start, never read, because the page keys its lists by what is in it and must not meet an old one.
@@ -44,6 +50,11 @@ saving = threading.Lock()
 asked = {x.lower() for b in json.loads(signals.OUT.read_text()) for x in (b["id"], b["name"])}
 START = len(asked)
 researching = threading.BoundedSemaphore(4)
+# a person's profile read costs up to 20 Context.dev credits, and the address is public: a small budget per start
+PEOPLE_LIMIT = int(os.environ.get("PEOPLE_LIMIT", "60"))
+people = {"read": 0}
+watching = threading.Lock()
+watch = {"read": 0.0, "seen": {"watched": {}, "changes": [], "checked_at": ""}}
 progress = {}  # query -> the steps its research has taken
 
 
@@ -58,6 +69,18 @@ def reviews():
         print(f"sign-ups saved in another shape were set aside as {aside.name}; starting with none", file=sys.stderr)
         return {}
     return saved["reviews"]
+
+
+def changes():
+    """What Context.dev's monitors saw change, read from it at most every five minutes. Without a key nothing is watched."""
+    with watching:
+        if "CONTEXT_DEV_API_KEY" in os.environ and time.time() - watch["read"] > 300:
+            watch["read"] = time.time()
+            try:
+                watch["seen"] = {**monitors.changes(), "checked_at": lib.now_iso()}
+            except (RuntimeError, OSError) as error:  # their side is down: the last answer stands until the next try
+                print(f"monitors: {error}", file=sys.stderr)
+        return watch["seen"]
 
 
 def well_formed(review):
@@ -92,12 +115,22 @@ class Handler(http.server.BaseHTTPRequestHandler):
         q = urllib.parse.parse_qs(url.query).get("q", [""])[0].strip()[:100]
         if url.path == "/reviews.json":
             return self.json(reviews())
+        if url.path == "/changes.json":
+            return self.json(changes())
         if url.path in DATA:
             return self.reply(200, (lib.HERE / DATA[url.path]).read_bytes(), "application/json")
         if url.path == "/progress":
             return self.json(progress.get(q.lower(), []))
         if url.path == "/brief" and q:
             return self.research(q)
+        if url.path == "/esittely":
+            self.send_response(301); self.send_header("location", "/esittely/"); self.end_headers(); return
+        if url.path.startswith("/esittely/") and ESITTELY:
+            rel = url.path[len("/esittely/"):] or "index.html"
+            path = ESITTELY / rel
+            if not re.fullmatch(r"[\w.-]+(/[\w.-]+)*", rel) or ".." in rel or not path.is_file():
+                return self.text(404, "not found")
+            return self.reply(200, path.read_bytes(), TYPES.get(path.suffix, "application/octet-stream"))
         # the built page: index.html, and files under assets/ whose names the build chose
         name = "index.html" if url.path == "/" else url.path.lstrip("/")
         path = DIST / name
@@ -126,6 +159,26 @@ class Handler(http.server.BaseHTTPRequestHandler):
             signals.save([b])
         self.json(b)
 
+    def person(self, handed):
+        """A person's profile from what they handed over: {kind: linkedin | portfolio | cv, value}. Nothing of it is kept or logged."""
+        if not isinstance(handed, dict):
+            return self.text(400, "Choose your LinkedIn, a portfolio page or your CV.")
+        with saving:
+            if people["read"] >= PEOPLE_LIMIT:
+                return self.text(429, "This demo has read as many profiles as it may. Type yours in instead.")
+            people["read"] += 1
+        if not researching.acquire(blocking=False):
+            return self.text(429, "Busy. Try again in a minute.")
+        try:
+            self.json(person.profile(handed.get("kind"), handed.get("value")))
+        except person.Unreadable as unreadable:
+            self.text(422, str(unreadable))
+        except (KeyError, OSError, ValueError, StopIteration) as error:  # a missing key, their side down, an answer in no shape
+            print(f"a profile could not be read: {type(error).__name__}", file=sys.stderr)
+            self.text(502, "We could not fill this in just now. Type it in yourself, or try again in a minute.")
+        finally:
+            researching.release()
+
     def draft(self, write):
         """One model draft, a few at a time, as JSON."""
         if not researching.acquire(blocking=False):
@@ -139,16 +192,26 @@ class Handler(http.server.BaseHTTPRequestHandler):
             researching.release()
         self.json(draft) if draft else self.text(502, "The model gave no draft.")
 
+    def do_DELETE(self):
+        """Take out every saved sign-up: the demo's reset."""
+        if urllib.parse.urlsplit(self.path).path != "/reviews":
+            return self.text(404, "not found")
+        with saving:
+            REVIEWS.write_text(json.dumps({"shape": REVIEW_SHAPE, "reviews": {}}))
+        self.json({})
+
     def do_POST(self):
         url = urllib.parse.urlsplit(self.path)
         brief_id = urllib.parse.parse_qs(url.query).get("id", [""])[0]
         length = int(self.headers.get("content-length") or 0)
-        if url.path not in ("/review", "/role") or not 0 < length < 50_000:
+        if url.path not in ("/review", "/role", "/person") or not 0 < length < 50_000:
             return self.text(404, "not found")
         try:
             review = json.loads(self.rfile.read(length))
         except ValueError:
             return self.text(400, "The body is not JSON.")
+        if url.path == "/person":
+            return self.person(review)
         briefs = {b["id"]: b for b in json.loads(signals.OUT.read_text())}
         if url.path == "/role":
             line = str(review.get("line") or "").strip()[:200] if isinstance(review, dict) else ""

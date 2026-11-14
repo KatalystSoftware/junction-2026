@@ -306,7 +306,11 @@ orders. `screen openings` reads the qualifying track's lower openings for cars w
 None is worth playing, in rich weeks either: under 0.8 x the cars book so much later that the raises take back most of
 the opening's saving (fees paid 0.973 x typical at 0.8, 0.960 at 0.7, 0.958 at 0.6). What pays on top of 0.8 x is the
 hold: `risk-fees` with safe cars at 0.8 x nets +2,683 at +2.39 late orders against the default, `fee16-80` +1,381 at
-+2.02, so the hold adds about 1,300 for 0.37 late orders.
++2.02, so the hold adds about 1,300 for 0.37 late orders. In play it did not hold: on the qualifying track's candidate
+(`cand-hold`, `risk_open` 0.8, 9 weeks of `confirm-30`) it made -1,132 a week (-1,540 to -616), and raising at 3%
+-647, with 259 and 268 orders against 303. Fees fell 3,460 a week and revenue 4,830: held cars wait longer, and while
+due within 24 hours each one raises every new quote through `slow_step`. The screen does not see that, so it can pass a
+fee schedule only together with a played check of the orders won.
 
 Private addresses (`curve-private`, +246 on tune at the old fees; -38 with opening 1.0, lowest week
 92.0%), a cost that follows the order (`curve-order-cost`, +193, -16 to 411) and counting what an
@@ -809,6 +813,78 @@ searches the parameters above together on 30 tune seeds; [`scratch/search_check.
 plays its best trials on other seeds. After 25 trials, 11 of them played in full, its best point is
 of the same family (`search-16`: `slow_step` 0.8, the gate at 40, `cost` 1.22, a small late cost):
 +1,192 with a lowest week of 93.6%. A late cost alone on the reference's backlog rules is worth +72.
+
+## The on-time target (`target-*`, screened offline, not played)
+
+`target-85` to `target-93` take the orders that the top teams win and the default does not: the default with half the
+waiting-car surcharge (`slow_step` 0.4), a late cost of 85 in place of 150 and the gate at 40. Once 40 orders are won and
+the projected on-time share (`Policy.on_time`) is under the target, new quotes go back to the default's surcharge and
+late cost with a gate of 12, and price the 90% rule (`rule_cost` 800), which makes risky orders dearer and safe ones
+cheaper.
+
+**The offline screen** ([`scratch/target/screen.py`](scratch/target/screen.py)) replays recorded weeks in the stand-in of
+[`scratch/opt/sim.py`](scratch/opt/sim.py) under the default's quote cost and under each target's, on the same luck:
+the dealers answer by the win curve with each quote's hidden draw held to its recorded answer, the competitor answers what
+the desk wins (0.6, as calibrated in `scratch/opt/`), what is won fills the backlog, and a new order ends late by a late
+model fitted on the base's weeks with an intercept for its week and one for the day its car must be collected. That day's
+intercept carries a night of dropped gigs into the orders due that day; the rules price with `slow.py`'s late chance and
+never see it, as the live desk would not. A recording cannot score a policy that quotes otherwise, so the screen says
+whether a variant is worth playing, not what it earns. The default's rule gives its recorded weeks back: 96.5% on time
+against 96.2% recorded.
+
+On the default's 266 recorded weeks (`cat-` tune and `fresh-` seeds, two draws each; a week under 90% counts as no margin;
+"under 90%" is per 60 weeks):
+
+| Rule | Margin against the default | Orders, late | Under 90% per 60: all, thin, Friday-heavy | Weeks under 92% | Lowest |
+| --- | --- | --- | --- | --- | --- |
+| default | 11,976 | 300, 10.3 | 0.34, 0.25, 1.9 | 18 of 532 | 88.9% |
+| `target-93` | +125 (-81 to 300) | 347, 14.9 | 1.47, 1.78, 3.8 | 54 | 87.4% |
+| `target-91` | +280 (75 to 452) | 350, 15.2 | 1.80, 2.03, 3.8 | 60 | 87.4% |
+| the same pricing without the guard | +260 (52 to 435) | 351, 15.3 | 2.03, 2.54, 3.8 | 62 | 87.4% |
+
+On the whole archive: 5,873 recorded weeks of 167 variants, each variant's weeks replayed with a late model fitted on
+them, one draw. 15 variants whose late model cannot be fitted (too few won orders, or a fit that diverges) are left out, and 3 (`floor-1.9`, `curve-fee-1.3`,
+`opt-mu-0.4`, 30 weeks) where the default's rule ends under 90% on average, so the late model does not fit them.
+Seed-level intervals: a seed's weeks under several variants are drawn together.
+
+| Weeks | Rule | Margin against the default | Under 90% per 60 | Weeks under 92% |
+| --- | --- | --- | --- | --- |
+| natural (`fresh-`), 3,389 | default | 11,060 | 0.27 | 79 |
+| | `target-93` | +61 (-54 to 162) | 1.13 | 238 |
+| | `target-91` | +210 (93 to 309) | 1.45 | 255 |
+| thin (under 720 drivers), 2,727 | default | 10,475 | 0.29 | 56 |
+| | `target-93` | +38 (-93 to 147) | 1.03 | 172 |
+| | `target-91` | +250 (131 to 351) | 1.34 | 194 |
+| Friday-heavy (100 or more due on the Friday), 550 | default | 13,043 | 0.44 | 9 |
+| | `target-93` | +123 (-166 to 321) | 1.20 | 33 |
+| a night of 10 or more dropped gigs before the Friday, 537 | default | 11,213 | 0.67 | 30 |
+| | `target-93` | -275 (-624 to 36) | 3.35 | 92 |
+
+- Neither passes the screen: each puts about four times the default's weeks under 90%, over the limit of 1 in 60 on the
+  natural mix and on thin worlds, and three times its weeks under 92%, for a gain whose interval reaches zero at 93% and
+  is under 300 a week at 91%. They are not played.
+- The guard is behind on 5% of `target-93`'s quotes and 1% of `target-91`'s, and saves 5 of 18 weeks under 90% against the
+  unguarded pricing. The share it projects stays high until the week's late orders arrive, and they arrive at the end:
+  the lowest weeks have 94 to 101 orders due on the Friday, most with a night of dropped gigs (`fresh-284`, `fresh-098`,
+  `fresh-1410`, `fresh-1439`; `fresh-1304` without one). The orders that the cheaper quotes added were won before the
+  guard could see them go late.
+- Without the competitor's answer (`react-0 week-only`, one draw) the gain is +879 (626 to 1,101), and still 1.13 weeks
+  under 90% per 60 (thin 1.53) against none for the default. The stand-in overstated the margin of extra orders by two to
+  five times without that answer (`scratch/opt/validate.py`), so the on-time result is the one that holds across settings.
+- A static repricing of the five ranking-round recordings, which holds the queue as played, puts the target's pricing at
+  415 orders and 16.4k a week (the top-10 gap analysis). In the closed loop the longer queue raises the late chance of the
+  next orders and the competitor answers, which leaves +46 orders and +125.
+- Two neighbours, on the same 266 weeks and two draws (`extra`), and neither clears the default's 0.34 weeks under 90% per
+  60. A guard that acts earlier, `target-95`: -514 (-733 to -318), 1.02 per 60. The default's surcharge counting only the
+  waiting cars due within 24 hours, which `policy.py` cannot do yet: +435 (273 to 558), 1.02 per 60 and 1.53 on thin
+  worlds, 40 weeks under 92% against 18; with the 93% guard on top, +290 (122 to 416), 0.79 per 60, thin 1.02, 40 under
+  92%. The extra orders are there to take; what the screen does not find is a guard that holds the weeks they break.
+
+```bash
+PYTHONPATH=. uv run --with numpy python scratch/target/screen.py extract all       # each base's weeks as rows, once
+PYTHONPATH=. uv run --with numpy python scratch/target/screen.py screen slow-friday-late-150-kinds-limits 2
+PYTHONPATH=. uv run --with numpy python scratch/target/screen.py screen all 1 quick  # every base, each with its own late model
+```
 
 ## Out-and-back pairs (off by default)
 

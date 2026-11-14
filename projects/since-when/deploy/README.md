@@ -21,7 +21,7 @@ What the instance is:
 - **Read-only:** `SINCE_WHEN_READ_ONLY=1` turns off `POST /api/findings/<id>/status`, the only
   endpoint that writes. The Run button uses a SELECT-only user with presets only, 5 seconds and
   500 rows.
-- **No keys:** no API key is on the machine. With no embedding model there, search answers 503.
+- **No keys:** no API key is on the machine. With no embedding model there, search finds topics by title alone.
 - **Passwords** are generated on the machine on the first run and stay in
   `/srv/katalyst/since-when/deploy/.env`.
 

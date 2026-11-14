@@ -87,7 +87,7 @@ try {
   await fetch(`${base}/review?id=${COMPANY}`, { method: 'POST', body: JSON.stringify(draft) })
 
   await open('#/')
-  await expect('events', 'Suggested next')
+  await expect('events', 'Suggested event ideas')
   await shot('events')
   await open('#/event/semiconductors-and-photonics')
   await expect('a suggested event', 'Employers to invite')
@@ -98,6 +98,10 @@ try {
   await open(`#/${COMPANY}`)
   await expect('an employer', 'Looking for')
 
+  // an invitation from a suggested event names that event, not the upcoming one
+  await open('#/join/nitor.com/security')
+  await expect('an invitation to a suggested event', 'Security talent event')
+  await shot('join-suggested-cover')
   await open(`#/join/${COMPANY}`)
   await shot('join-1-cover')
   let presses = 0

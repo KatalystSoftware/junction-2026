@@ -68,7 +68,9 @@ score = readers × weight of the most checkable open finding
 months (0 until that article's page views are loaded). `coverage` is the share of `rich_lang`
 passages with a close match in `lang`, a partly matched passage counting half. It is shown, not
 scored: editors do not read a shorter article as a defect. The queue lists only pairs with an
-open finding. A finding's own score is `readers × weight`.
+open finding. The queue's answer also has `"database": {"version": "11.8.9", "table": "chunk",
+"versions": 225816, "passages": 39330}`: every row version the system-versioned passage table has
+kept (`FOR SYSTEM_TIME ALL`), and the passages current today. A finding's own score is `readers × weight`.
 
 Passages match by cosine distance between their bge-m3 vectors: `covered` at most 0.30,
 `partly` at most 0.38, else `missing` (calibrated on leads of the same topic against leads of
@@ -232,13 +234,13 @@ The change is an ordinary `UPDATE`, so the old outcome stays in the table's hist
 
 ### `GET /api/search?q=...&lang=all|fi|sv|en&limit=20`
 
-Topics whose current passages are nearest to the query text, from the vector index on
-`chunk_now`: `{"items": [QueueItem], "sql": []}`. A topic whose title in any edition equals the
-query exactly comes first. Passages farther than cosine distance 0.55 from the query do not count,
+Topics whose title in any edition contains the query (`LIKE`), an exact title first, then those
+whose current passages are nearest to the query text, from the vector index on `chunk_now`:
+`{"items": [QueueItem], "sql": []}`. Passages farther than cosine distance 0.55 from the query do not count,
 so a query that matches nothing returns no items. One item per topic, nearest first: its row for `lang`, or with
 `lang=all` (the default) its highest-scoring edition. A topic with no open finding in `lang` is
 left out. The first search after a restart loads the model (about 10 s).
-When the embedding model is not on disk (`HF_HOME`), search answers 503 and downloads nothing.
+When the embedding model is not on disk (`HF_HOME`), search is by title alone and downloads nothing.
 
 ### `GET /api/sql/presets`
 
@@ -247,7 +249,7 @@ The statements the SQL panel's Run button can run:
 
 ```
 Preset {
-  "name": "nearest" | "asof" | "history",
+  "name": "nearest" | "asof" | "history" | "check",
   "title": str, "description": str,
   "params": [{"name": str, "kind": "qid" | "date" | "lang", "default": str}]
 }
@@ -259,8 +261,9 @@ Preset {
 | Preset    | Parameters             | Statement |
 |-----------|------------------------|-----------|
 | `nearest` | `qid`, `date`, `a`, `b` | Time travel and vector search in one statement: the passages of `a` as of `date` (`chunk FOR SYSTEM_TIME AS OF`), each with its nearest passage in `b` (`VEC_DISTANCE_COSINE`). The query the aligner uses (`align.nearest_sql`). |
-| `asof`    | `qid`, `date`, `lang`  | `SET SESSION system_versioning_asof` to `date`, then a plain `SELECT` of the first passage with no time clause. Same statement, another date, another revision. |
+| `asof`    | `qid`, `date`, `lang`, `finding` | `SET SESSION system_versioning_asof` to `date`, then a plain `SELECT` with no time clause: the first passage, or with a `finding` (its id; `0` for none) the passage that holds the words the page quotes for that finding in `lang`, which are first read into `@quote` from the tables as they are today. Same statement, another date, another revision. |
 | `history` | `qid`, `lang`          | Every version of the first passage (`chunk FOR SYSTEM_TIME ALL`) with its `row_start` and `row_end`, newest first. |
+| `check`   | `finding`              | The claim check of one finding (its id, or a check-found row's negative id): its row of `checked_finding`, then the statement the check stored in `search_sql`, unchanged inside a `SELECT` of each passage's nearest sentence, its distance and its `REGEXP` hits. The other article `FOR SYSTEM_TIME AS OF` the day, each sentence ranked by `VEC_DISTANCE_COSINE` to the claim, dates, numbers and names counted with `REGEXP`. Its text comes from the table, never from the request. |
 
 ### `POST /api/sql/run`
 

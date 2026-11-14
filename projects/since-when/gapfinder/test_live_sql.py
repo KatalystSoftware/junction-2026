@@ -108,6 +108,8 @@ class Refused(Served):
                 self.refused({"preset": "asof", "params": params})
         self.refused({"preset": "nearest", "params": {"a": "fi", "b": "en' OR 1=1 --"}})
         self.refused({"preset": "nearest", "params": {"a": "fi", "b": "fi"}})
+        self.refused({"preset": "check", "params": {"finding": "1 OR 1=1"}})
+        self.refused({"preset": "check", "params": {"finding": "SELECT 1"}})
 
     def test_extra_fields(self):
         self.refused({"preset": "asof", "params": {}, "limit": 100000})
@@ -126,9 +128,23 @@ class Refused(Served):
         for name, preset in api.PRESETS.items():
             _, values = api.live_params({"preset": name})
             for _, sql, binds in preset["statements"](values):
+                if callable(sql):  # check: the statement the claim check stored, read by the one before
+                    self.assertIs(sql, api._stored)
+                    continue
                 self.assertRegex(sql.strip(), r"^(WITH|SELECT|SET SESSION system_versioning_asof = \?$)")
                 self.assertNotRegex(sql, r"(?i)\b(insert|update|delete|replace|drop|alter|create|grant|call|into)\b")
                 self.assertEqual(sql.count("?"), len(binds))
+
+    def test_asof_for_a_finding_writes_only_a_session_variable(self):
+        # With a finding, the quoted words are read into @quote first; nothing else is new.
+        _, values = api.live_params({"preset": "asof", "params": {"finding": "14115"}})
+        texts = [sql for _, sql, _ in api.PRESETS["asof"]["statements"](values)]
+        self.assertEqual(len(texts), 3)
+        self.assertEqual(texts[0].count("INTO"), 1)
+        self.assertIn("INTO @quote", texts[0])
+        for sql in texts:
+            self.assertRegex(sql.strip(), r"^(SELECT|SET SESSION system_versioning_asof = \?$)")
+            self.assertNotRegex(sql, r"(?i)\b(insert|update|delete|replace|drop|alter|create|grant|call)\b")
 
 
 class Off(Served):
@@ -210,6 +226,51 @@ class OnTheDatabase(Served):
                     self.assertEqual(len(out["rows"][0]), len(out["columns"]))
                     self.assertGreater(out["ms"], 0)
                     self.assertEqual(out["sql"][-1]["rows"], len(out["rows"]))
+
+    def test_check_runs_the_statement_the_check_stored(self):
+        self.cur.execute(
+            "SELECT COALESCE(finding_id, -id), search_sql FROM checked_finding WHERE search_sql > '' LIMIT 1"
+        )
+        found = self.cur.fetchall()
+        if not found:
+            self.skipTest("no checked_finding rows in this database")
+        status, out = call(
+            self.port, "POST", "/api/sql/run", {"preset": "check", "params": {"finding": str(found[0][0])}}
+        )
+        self.assertEqual(status, 200, out)
+        self.assertIn(found[0][1].strip(), out["sql"][1]["query"])
+        self.assertGreater(len(out["rows"]), 0)
+        self.assertEqual(out["columns"][:4], ["ord", "section", "sentence", "distance"])
+
+    def test_check_in_mariadb_returns_the_passage_with_the_quote(self):
+        # What "Check in MariaDB" opens on a checked difference: for every difference the check let
+        # stand on the demo topics and each edition it quotes, the passage MariaDB returns for the day
+        # of the check holds the words the page shows.
+        self.cur.execute(
+            """
+SELECT k.wikidata_id, COALESCE(k.finding_id, -CAST(k.id AS SIGNED)), k.as_of,
+       IF(k.outcome = 'kept', f.lang, k.lang), IF(k.outcome = 'kept', f.quote, k.quote),
+       IF(k.outcome = 'kept', f.other_lang, k.other_lang), IF(k.outcome = 'kept', f.other_quote, k.other_quote)
+FROM checked_finding AS k LEFT JOIN finding AS f ON f.id = k.finding_id
+WHERE k.wikidata_id IN ('Q1412941', 'Q736268', 'Q2457646')
+  AND k.outcome IN ('kept', 'changed', 'new') AND k.type <> 'missing_fact'"""
+        )
+        found = self.cur.fetchall()
+        if not found:
+            self.skipTest("no checked_finding rows in this database")
+        asked = 0
+        for qid, fid, as_of, lang, quote, other_lang, other_quote in found:
+            for edition, words in ((lang, quote), (other_lang, other_quote)):
+                if not words:
+                    continue
+                params = {"qid": qid, "date": str(as_of), "lang": edition, "finding": str(fid)}
+                with self.subTest(**params):
+                    status, out = call(self.port, "POST", "/api/sql/run", {"preset": "asof", "params": params})
+                    self.assertEqual(status, 200, out)
+                    self.assertEqual(len(out["rows"]), 1)
+                    self.assertIn(words, out["rows"][0][-1])
+                    asked += 1
+        self.assertGreater(asked, 0)
 
     def test_asof_is_the_same_statement_on_another_date(self):
         runs = [

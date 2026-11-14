@@ -132,6 +132,24 @@ def test_a_desk_that_joins_from_the_history_alone_does_not_redo_a_change_that_wa
     assert second.desk.leg_gigs["R1"] == {0: "g2"}
 
 
+def test_a_replay_from_thursday_holds_a_pair_gig_with_both_cars_until_a_cancellation_shortens_it():
+    won = lambda order_id, seq, at: {"seq": seq, "at": at, "kind": "order_won", "order": {  # noqa: E731
+        "id": order_id, "dealerId": "D01", "option": "next_day", "priceCents": 15000, "deadline": 2640, "legs": request(order_id)["legs"],
+        "lastPickupAt": 2400, "status": "waiting", "deliveredAt": [None]}}
+    events = [won("R1", 0, 100), won("R2", 1, 110),
+              {"seq": 2, "at": 700, "kind": "order_cancelled", "orderId": "R2", "gigs": [{"gigId": "g1", "outcome": "shortened"}]}]
+    # The recording keeps a gig's last stops: the pair gig of R1 and R2 is left with R1's alone.
+    recorded = [{"id": "g1", "postedAt": 110, "status": "done", "audience": {},
+                 "stops": [{"orderId": "R1", "leg": 0, "kind": "pickup", "withPlates": False, "withCharging": False},
+                           {"orderId": "R1", "leg": 0, "kind": "delivery"}]}]
+    world = replay.Replay(events, ROSTER, ends_at=20000, start=506, speed=0.001)
+    world.resume_from(recorded, 506)
+    cars = lambda: {s["orderId"] for s in world.snapshot()["gigs"][0]["stops"]}  # noqa: E731
+    assert cars() == {"R1", "R2"}, "a desk that joins on Thursday sees R2 on its gig, as the world showed it"
+    world.clock.saw(701)
+    assert cars() == {"R1"}
+
+
 def test_a_desk_that_starts_again_from_books_older_code_wrote_gets_what_the_desk_has_gained_since(tmp_path):
     asked = request("R1")
     order = {"id": "R1", "dealerId": "D01", "option": "next_day", "priceCents": 15000, "deadline": 2640, "legs": asked["legs"],
@@ -270,6 +288,40 @@ def test_a_pair_desk_that_dies_after_the_world_took_a_pair_gig_finds_both_cars_o
     assert type(second.desk) is type(first.desk), "the books bring back the same desk, with the wide late chance when the variant has it"
     assert list(world.gigs) == ["g1"], "no car of the pair gets a second gig"
     assert second.desk.gigs_of("R1") == second.desk.gigs_of("R2") == ["g1"]
+    assert "g1" in second.desk.pair_gigs and not second.desk.pair_wait
+
+
+def test_a_pair_desk_that_was_down_when_a_return_was_won_posts_the_pair_at_its_restart(tmp_path, monkeypatch):
+    from spreadlab import pairs
+    monkeypatch.setattr(pairs, "RETURNS", {"helsinki>tampere": 20, "tampere>helsinki": 20})
+    out = request("R1", pickup="helsinki")
+    out["legs"] = [{**out["legs"][0], "delivery": {**out["legs"][0]["delivery"], "placeId": "tampere"}}]
+    back = request("R2", pickup="tampere", arrivedAt=520, respondBy=535, options=(("next_day", 2640),))
+    won = lambda r: {"id": r["id"], "dealerId": "D01", "option": "next_day", "priceCents": 15000, "deadline": 2640,  # noqa: E731
+                     "legs": r["legs"], "lastPickupAt": 2520, "status": "waiting", "deliveredAt": [None]}
+    events = [{"seq": 0, "at": 500, "kind": "price_request", "request": out},
+              {"seq": 1, "at": 515, "kind": "order_won", "order": won(out)},
+              {"seq": 2, "at": 520, "kind": "price_request", "request": back},
+              {"seq": 3, "at": 535, "kind": "order_won", "order": won(back)}]
+    world = replay.Replay(events, ROSTER, ends_at=20000, start=506, speed=0.001)
+    desk = lambda: live.Live(world, world.guard_act, world.minute, 8, VARIANTS["slow-friday-late-150-kinds-limits-pairs-0.7"], MAP, tmp_path, echo=False)  # noqa: E731
+    first = desk()
+    first.join()
+    for minute in (516, 521):  # R1 is won and held; R2, which runs back, is quoted
+        world.clock.saw(minute)
+        for event in world.events(after=first.desk.seq):
+            first.desk.take(event)
+        first.desk.send()
+    first.store.save(first.desk)
+    first.stop()
+    assert list(world.gigs) == [] and "R1" in first.desk.pair_wait
+    world.clock.saw(536)  # R2 is won while the desk is down
+
+    second = desk()
+    second.join()  # reads R2's win from the history, with R1 still held
+    second.stop()
+    assert list(world.gigs) == ["g1"], "the two cars go in one gig, not alone"
+    assert {s["orderId"] for s in world.gigs["g1"]["stops"]} == {"R1", "R2"}
     assert "g1" in second.desk.pair_gigs and not second.desk.pair_wait
 
 

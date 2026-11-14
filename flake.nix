@@ -28,6 +28,7 @@
             uv
             mariadb-connector-c # the mariadb Python driver in projects/since-when builds against it
             nodejs
+            ffmpeg # projects/videos: encodes the screen captures and checks the rendered length
           ];
         };
       });

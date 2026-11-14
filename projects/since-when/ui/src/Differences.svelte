@@ -1,8 +1,8 @@
 <script lang="ts">
 	// The topic's page: the few places where the editions say different things, each with its time
 	// strip, then, collapsed, what each edition says that another leaves out.
-	import { FIRST, differences, missing, setAside, wording } from './lib/differences'
-	import { DECADES, NAMES, articleUrl, day, list, modelName, plural, revisionUrl, rowDate, sectionLabel } from './lib/format'
+	import { FIRST, differences, missing, setAside, wordList, wording } from './lib/differences'
+	import { DECADES, NAMES, articleUrl, day, linkParts, list, modelName, plural, revisionUrl, rowDate, sectionLabel, sourceOf } from './lib/format'
 	import { LANGS, type TimelineEvent, type Topic } from './lib/types'
 	import Difference from './Difference.svelte'
 	import Why from './Why.svelte'
@@ -15,9 +15,13 @@
 
 	const editions = $derived(LANGS.filter((l) => topic.titles[l]))
 	const found = $derived(differences(topic))
+	// Whether a language model has read this topic at all: the alignment alone writes coverage rows.
+	const compared = $derived(!!topic.checked || topic.findings.some((f) => f.type !== 'coverage'))
 	const shown = $derived(all ? found : found.slice(0, FIRST))
 	const left = $derived(missing(topic))
-	// On a topic the claim check has run on: wording, which it does not cover, and what it set aside.
+	// On a topic the claim check has run on: the word list's loaded words, which lead the page, the
+	// model's wording rows, which the check does not cover, and what the check set aside.
+	const loaded = $derived(wordList(topic))
 	const words = $derived(wording(topic))
 	const aside = $derived(setAside(topic))
 	const judge = $derived(topic.checked?.judge)
@@ -38,20 +42,42 @@
 	const most = $derived(Math.max(1, ...lacking.map((l) => left[l].length)))
 </script>
 
-<section aria-labelledby="list-title">
+{#snippet scale()}
+	<!-- The scale of every strip below, labelled once. -->
+	<div class="scale num" aria-hidden="true">
+		<span>2001</span>
+		{#each DECADES as y}<span style:left="{y.at}%">{y.year}</span>{/each}
+	</div>
+{/snippet}
+
+{#if loaded.length}
+	<section aria-labelledby="words-title">
+		<header>
+			<h2 id="words-title">Loaded words</h2>
+			<Why id="why-words" label="Word list">Found by a fixed list of loaded words, not by a language model: the word is in the first sentence of the editions named and not in the others'. The sentences are quoted word for word.</Why>
+			{@render scale()}
+		</header>
+		<div class="rows">
+			{#each loaded as d, i (d.id)}
+				<Difference {d} {topic} {events} open={i === 0} />
+			{/each}
+		</div>
+	</section>
+{/if}
+
+<section class:left={loaded.length > 0} aria-labelledby="list-title">
 	<header>
-		<h2 id="list-title">{found.length ? plural(found.length, 'difference', 'differences') : 'No differences found'}</h2>
+		<h2 id="list-title">{found.length ? plural(found.length, 'difference', 'differences') : compared ? 'No differences found' : 'Not compared yet'}</h2>
+		{#if !found.length && !compared}
+			<Why id="why-list" label="Alignment only">{modelName(null)} has not compared this topic's articles yet, so there are no differences of fact or wording to show. What follows comes from the vector alignment alone: passages of one edition with no close passage in another.</Why>
+		{/if}
 		{#if found.length}
 			{#if judge}
-				<Why id="why-list" label="Model-checked">A language model suggested these, and a second one ({judge}) looked each up in the whole other article. No person has checked them. The quotes are word for word: read them to judge.</Why>
+				<Why id="why-list" label="Checked by Nemotron">{modelName(topic.checked?.model)} suggested these by comparing the articles passage by passage{#if modelName(topic.checked?.model) === modelName(judge)}, then looked each one up in the whole other article{:else}; {modelName(judge)} looked each one up in the whole other article{/if}. A person closed the rows found false on reading; the rest no person has checked. The quotes are word for word: read them to judge.</Why>
 			{:else}
-				<Why id="why-list" label="Machine-suggested">A language model suggested these and nobody has checked them. The quotes are word for word: read them to judge.</Why>
+				<Why id="why-list" label="Suggested by Nemotron">{modelName(null)} suggested these by comparing passage with passage. They have not been looked up in the whole other article, and no person has checked them. The quotes are word for word: read them to judge.</Why>
 			{/if}
-			<!-- The scale of every strip below, labelled once. -->
-			<div class="scale num" aria-hidden="true">
-				<span>2001</span>
-				{#each DECADES as y}<span style:left="{y.at}%">{y.year}</span>{/each}
-			</div>
+			{#if !loaded.length}{@render scale()}{/if}
 		{/if}
 	</header>
 	{#if tally}
@@ -69,7 +95,7 @@
 	{#if found.length}
 		<div class="rows">
 			{#each shown as d, i (d.id)}
-				<Difference {d} {topic} {events} open={i === 0} />
+				<Difference {d} {topic} {events} open={i === 0 && !loaded.length} />
 			{/each}
 		</div>
 		{#if found.length > shown.length}
@@ -82,7 +108,7 @@
 	<section class="left" aria-labelledby="wording-title">
 		<header>
 			<h2 id="wording-title">Wording</h2>
-			<Why id="why-wording" label="Unchecked">Differences of wording come from a word list or a language model. The check does not cover them.</Why>
+			<Why id="why-wording" label="Unchecked">{modelName(null)} suggested these differences of wording. The check does not cover them, and no person has checked them.</Why>
 		</header>
 		<div class="rows">
 			{#each words as d (d.id)}
@@ -97,7 +123,7 @@
 		<header>
 			<h2 id="left-title">Said in one edition, left out of another</h2>
 			{#if judge}
-				<Why id="why-left" label="Model-checked">A language model ({judge}) searched the whole other article for each of these and did not find it. A sentence with several facts is listed when any one of them is missing. No person has checked them.</Why>
+				<Why id="why-left" label="Checked by Nemotron">{modelName(judge)} searched the whole other article for each of these and did not find it. A sentence with several facts is listed when any one of them is missing. No person has checked them.</Why>
 			{:else}
 				<Why id="why-left" label="Unchecked">Found by comparing passage with passage. Not yet checked against the whole of the other article, so some of these are there under another heading.</Why>
 			{/if}
@@ -116,6 +142,7 @@
 					<ul>
 						{#each whole[l] ? items : items.slice(0, SOME) as m (m.key)}
 							{@const rev = m.row.rev_ids?.[l]}
+							{@const src = sourceOf(m.row, l)}
 							<li>
 								<blockquote lang={l}>{m.quote || m.row.summary}</blockquote>
 								<p class="small subtle">
@@ -123,6 +150,9 @@
 									<span class="num">{rowDate(m.row)}</span>
 									<span>Not in {list(m.lacks.map((x) => NAMES[x]), 'or')}</span>
 								</p>
+								{#if src?.text}
+									<p class="small source"><span class="subtle">{src.where}:</span> {#each linkParts(src.text) as p}{#if p.url}<a href={p.part} target="_blank" rel="noopener">{p.part}</a>{:else}{p.part}{/if}{/each}</p>
+								{/if}
 							</li>
 						{/each}
 					</ul>
@@ -253,7 +283,11 @@
 		overflow-wrap: anywhere;
 	}
 
-	li p {
+	.source {
+		overflow-wrap: anywhere;
+	}
+
+	li p:not(.source) {
 		display: flex;
 		flex-wrap: wrap;
 		gap: 0 var(--spacing-75);

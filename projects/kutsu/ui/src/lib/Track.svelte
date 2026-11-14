@@ -1,17 +1,20 @@
 <script lang="ts">
   import { clock } from './format'
   import Icon from './Icon.svelte'
-  import { copyLink, joinLink, nameOf, saveReview } from './state.svelte'
+  import { copyLink, isComing, joinLink, nameOf, saveReview, stateNames } from './state.svelte'
   import type { Brief, Review } from './types'
 
   // Where the brief is on its way to the company and back, and the one thing to do next.
   let { brief, review }: { brief: Brief; review: Review } = $props()
   let copied = $state(false)
   const at = $derived({ draft: 0, invited: 1, joined: 2 }[review.status] ?? 0)
+  const coming = $derived(isComing(brief.id))
+  const names = $derived(stateNames(coming))
   const stops = $derived([
     ['Drafted', `from ${brief.stats.results_read} public pages`],
-    ['Invited', review.invited_at ? `at ${clock(review.invited_at)}` : 'not yet'],
-    ['Signed up', review.joined_at ? `at ${clock(review.joined_at)}` : 'by the company'],
+    [names.invited, review.invited_at ? `at ${clock(review.invited_at)}` : review.status === 'draft' ? 'not yet' : ''],
+    // a company that reopened its answers is invited again, whatever time it first finished
+    [names.joined, review.status !== 'joined' ? 'by the company' : review.example ? 'an example' : `at ${clock(review.joined_at)}`],
   ])
   const now = () => new Date().toISOString()
   // inviting only makes the link live here; a real one would send it by email
@@ -35,7 +38,7 @@
   </ol>
   <div class="act">
     {#if review.status === 'draft'}
-      <button class="btn primary" onclick={send}><Icon name="send" size={18} />Invite {nameOf(brief)}</button>
+      <button class="btn primary" onclick={send}><Icon name="send" size={18} />{coming ? `Send ${nameOf(brief)} its profile` : `Invite ${nameOf(brief)}`}</button>
     {:else}
       <button class="btn" onclick={copy}><Icon name={copied ? 'check' : 'copy'} size={16} />{copied ? 'Link copied' : 'Copy the invitation link'}</button>
       <a class="btn" href={joinLink(brief.id)} target="_blank" rel="noopener">Open their sign-up<Icon name="out" size={16} /></a>

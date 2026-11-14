@@ -1,11 +1,11 @@
 // The topic list: the API's queue, or its search when there is a query.
 import { api, ApiError } from './api.svelte'
 import { log, nav, syncSearch } from './nav.svelte'
-import type { QueueItem, SqlEntry } from './types'
+import type { Database, QueueItem, SqlEntry } from './types'
 
 const PAGE = 100
 
-export const queue = $state({ items: [] as QueueItem[], total: 0, loading: true, error: '', searchable: true })
+export const queue = $state({ items: [] as QueueItem[], total: 0, loading: true, error: '', searchable: true, database: null as Database | null })
 
 let seq = 0
 
@@ -22,13 +22,14 @@ export async function loadQueue(more = false): Promise<void> {
 	queue.error = ''
 	try {
 		const offset = more ? queue.items.length : 0
-		const data = await api<{ items: QueueItem[]; total?: number; sql?: SqlEntry[] }>(
+		const data = await api<{ items: QueueItem[]; total?: number; database?: Database; sql?: SqlEntry[] }>(
 			nav.q ? `/search?q=${encodeURIComponent(nav.q)}&lang=${nav.lang}` : `/queue?lang=${nav.lang}&limit=${PAGE}&offset=${offset}`,
 		)
 		if (token !== seq) return
 		const items = nav.q ? data.items.map(asEdition) : data.items
 		queue.items = more ? [...queue.items, ...items] : items
 		queue.total = data.total ?? queue.items.length
+		queue.database = data.database ?? queue.database
 		log.list = data.sql ?? []
 		log.listLabel = nav.q ? 'Search' : 'Topic list'
 	} catch (e) {

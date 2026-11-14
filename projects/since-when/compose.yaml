@@ -15,7 +15,7 @@ services:
       DB_HOST: gapfinder-scratch-db
       DB_PORT: 3306
     ports: ["127.0.0.1:8078:8078"]
-    # No embedding model is mounted, so /api/search answers 503 and the app hides its search box.
+    # No embedding model is mounted, so /api/search finds topics by title alone.
     mem_limit: 1500m
     cpus: 4
 
