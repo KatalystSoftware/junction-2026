@@ -75,12 +75,23 @@ class Replay:
     def resume_from(self, gigs: list[dict], start: int) -> None:
         """The recorded gigs posted before `start`, for a desk that joins in the middle of the week without its books:
         the world holds them, and the events published at the first read update them. A gig that the recorded desk
-        withdrew has no event for it: it counts as withdrawn from the minute a later gig took one of its cars."""
+        withdrew has no event for it: it counts as withdrawn from the minute a later gig took one of its cars.
+        A recorded gig keeps its last stops: a pair gig that a cancellation shortened later in the week gets the cancelled
+        car's stops back, after the other car's, since the recording does not say which car went first."""
         ended = {e["gigId"] for e in self.all if e["kind"] == "gig_expired"}
         ended |= {o["gigId"] for e in self.all if e["kind"] == "order_cancelled" for o in e["gigs"]}
+        won = {e["order"]["id"]: e["order"] for e in self.all if e["kind"] == "order_won"}
+        shortened = {o["gigId"]: e["orderId"] for e in self.all if e["kind"] == "order_cancelled" and e["at"] >= start
+                     for o in e["gigs"] if o["outcome"] == "shortened"}
         cars = lambda gig: {(stop["orderId"], stop["leg"]) for stop in gig["stops"]}
         for gig in sorted((g for g in gigs if g["postedAt"] < start), key=lambda g: int(g["id"][1:])):
             self.gigs[gig["id"]] = {**gig, "status": "open", "driverId": None}
+            order_id = shortened.get(gig["id"])
+            if order_id in won and order_id not in {stop["orderId"] for stop in gig["stops"]}:
+                self.gigs[gig["id"]]["stops"] = gig["stops"] + [
+                    stop for leg in range(len(won[order_id]["legs"]))
+                    for stop in ({"orderId": order_id, "leg": leg, "kind": "pickup", "withPlates": False, "withCharging": False},
+                                 {"orderId": order_id, "leg": leg, "kind": "delivery"})]
             if gig["status"] == "withdrawn" and gig["id"] not in ended:
                 later = [g["postedAt"] for g in gigs if int(g["id"][1:]) > int(gig["id"][1:]) and cars(g) & cars(gig)]
                 if later:
@@ -111,6 +122,9 @@ class Replay:
                 for outcome in event["gigs"]:
                     if outcome["gigId"] in self.gigs and outcome["outcome"] in ("withdrawn", "released"):
                         self.gigs[outcome["gigId"]]["status"] = "withdrawn"
+                    elif outcome["gigId"] in self.gigs and outcome["outcome"] == "shortened":
+                        shortened = self.gigs[outcome["gigId"]]
+                        shortened["stops"] = [s for s in shortened["stops"] if s["orderId"] != event["orderId"]]
             elif kind == "ledger":
                 self.margin += event["line"]["cents"]
             elif kind == "visit_failed":
