@@ -357,12 +357,13 @@
   /* the two actions of the people side, one row, the same size, the send as the city's step */
   .go {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
     gap: var(--s2);
     margin: var(--s3) 0 var(--s4);
   }
   .go .btn,
   .go .btn.primary {
+    min-width: 0;
     justify-content: center;
     min-height: 2.5rem;
     padding: 0 var(--s3);
