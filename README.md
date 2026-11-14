@@ -61,5 +61,7 @@ sample data, and a person makes every decision. Its first invitee pages and its 
 
 ## Working in it
 
-The tools come from Nix: `direnv allow`, or `nix develop`. How the agents work in this repository, and
-where things go: [`AGENTS.md`](AGENTS.md).
+The tools come from Nix: `direnv allow`, or `nix develop`. Each project's README has its own run and test
+commands; anything that needs the team's API keys says so and has a no-key path. `AGENTS.md` holds the
+instructions our coding agents worked under during the event, including paths to notes and machines that
+are not part of this copy.
