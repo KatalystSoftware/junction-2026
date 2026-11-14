@@ -6,3 +6,4 @@ measurements
 .venv
 ui/node_modules
 ui/dist
+deploy

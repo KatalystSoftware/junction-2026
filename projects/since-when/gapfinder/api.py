@@ -28,6 +28,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 UI = os.environ.get("SINCE_WHEN_UI") or os.path.join(HERE, "..", "ui", "dist")
 FIXTURES = os.path.join(HERE, "..", "ui", "fixtures")
 USE_FIXTURES = os.environ.get("SINCE_WHEN_FIXTURES") == "1"
+# A public instance takes no writes.
+READ_ONLY = os.environ.get("SINCE_WHEN_READ_ONLY") == "1"
 
 SEQ = f"seq_{YEARS[0]}_to_{YEARS[-1]}"
 # Editor outcomes: the API's name, the stored status, and the coarse status the UI also reads.
@@ -791,6 +793,8 @@ def get_timeline(request: Request, qid: str):
 async def post_status(request: Request, fid: str):
     if not fid.isdigit():
         raise _no_route(request)
+    if READ_ONLY:
+        raise ApiError(403, "this instance is read-only")
     if USE_FIXTURES:
         raise ApiError(503, "the fixtures are read-only")
     return await run_in_threadpool(_answer, set_status, int(fid), await _body(request))

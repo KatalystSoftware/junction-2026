@@ -14,6 +14,8 @@ python -m gapfinder serve --port 8078
 With `SINCE_WHEN_FIXTURES=1` it needs no database: the queue, a topic and its timeline are answered
 from `ui/fixtures/` with `"fixture": true`, and search and status changes answer 503.
 
+With `SINCE_WHEN_READ_ONLY=1`, as on the public instance, status changes answer 403.
+
 It reads `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD` and `DB_NAME` from the environment
 (defaults: `127.0.0.1`, `3306`, `gapfinder`, `gapfinder`, `gapfinder`). `DB_RO_USER` and
 `DB_RO_PASSWORD` name a SELECT-only user for `POST /api/sql/run`; without them that endpoint is
