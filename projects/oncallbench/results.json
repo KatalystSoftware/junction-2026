@@ -1,0 +1,113 @@
+{
+ "level": 4,
+ "seeds": "200000-200023",
+ "solved_threshold": 0.95,
+ "ci": "cluster bootstrap over seeds, 10000 resamples",
+ "definitions": "- score: (cost_do_nothing - cost) / (cost_do_nothing - cost_reference), clipped to 0..1.\n- solve rate: share of runs scoring at least SOLVED (0.95) of the expert's score.\n- worse than doing nothing: the run's cost is strictly above the do-nothing cost on its seed.\n- 95% CI: cluster bootstrap over seeds (draw seeds with replacement, keep every run of each drawn\n  seed), 10,000 resamples, fixed random seed; runs on one seed are not independent.",
+ "rows": [
+  {
+   "label": "Reference (expert script)",
+   "harness": "scripted, replayed in the simulator",
+   "runs": 24,
+   "seeds": 24,
+   "mean": 1.0,
+   "ci95": [
+    1.0,
+    1.0
+   ],
+   "median": 1.0,
+   "solve_rate": 1.0,
+   "worse_than_nothing": 0.0
+  },
+  {
+   "label": "Fable 5.2",
+   "harness": "Harbor + OpenCode",
+   "runs": 13,
+   "seeds": 13,
+   "mean": 0.876,
+   "ci95": [
+    0.812,
+    0.933
+   ],
+   "median": 0.898,
+   "solve_rate": 0.308,
+   "worse_than_nothing": 0.0
+  },
+  {
+   "label": "Opus 5.5",
+   "harness": "Harbor + OpenCode",
+   "runs": 48,
+   "seeds": 24,
+   "mean": 0.448,
+   "ci95": [
+    0.351,
+    0.542
+   ],
+   "median": 0.54,
+   "solve_rate": 0.021,
+   "worse_than_nothing": 0.208
+  },
+  {
+   "label": "`shotgun` script: finds the cause, guesses the fix",
+   "harness": "scripted, replayed in the simulator",
+   "runs": 24,
+   "seeds": 24,
+   "mean": 0.469,
+   "ci95": [
+    0.359,
+    0.571
+   ],
+   "median": 0.551,
+   "solve_rate": 0.0,
+   "worse_than_nothing": 0.125
+  },
+  {
+   "label": "Do-nothing",
+   "harness": "scripted, replayed in the simulator",
+   "runs": 24,
+   "seeds": 24,
+   "mean": 0.0,
+   "ci95": [
+    0.0,
+    0.0
+   ],
+   "median": 0.0,
+   "solve_rate": 0.0,
+   "worse_than_nothing": 0.0
+  }
+ ],
+ "separate": [
+  {
+   "label": "Gemma 4 26B-A4B, untrained",
+   "harness": "Harbor + OpenCode",
+   "seeds": "101-103",
+   "runs": 9,
+   "mean": 0.06,
+   "note": "the seeds the level was built on; Opus 5.5 scores 0.32 there"
+  },
+  {
+   "label": "Gemma 4 26B-A4B + our adapter",
+   "harness": "Harbor + OpenCode",
+   "seeds": "101-103",
+   "runs": 9,
+   "mean": 0.26,
+   "note": "the seeds the level was built on; Opus 5.5 scores 0.32 there"
+  },
+  {
+   "label": "Gemma 4 26B-A4B, untrained",
+   "harness": "own runner (rl/env.py), not comparable with Harbor",
+   "seeds": "200000-200023",
+   "runs": 96,
+   "mean": 0.067,
+   "note": "4 samples per seed"
+  },
+  {
+   "label": "Gemma 4 26B-A4B + our adapter",
+   "harness": "own runner (rl/env.py), not comparable with Harbor",
+   "seeds": "200000-200023",
+   "runs": 96,
+   "mean": 0.587,
+   "note": "4 samples per seed"
+  }
+ ]
+}
