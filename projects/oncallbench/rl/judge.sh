@@ -15,6 +15,8 @@ while [ "$1" != "--" ]; do models="$models $1"; shift; done
 shift
 here=$(cd "$(dirname "$0")" && pwd)
 port=${PORT:-8100}
+# the agent containers reach the host over the Docker bridge, wherever the daemon put it
+bridge=$(ip -4 -o addr show docker0 | awk '{print $4}' | cut -d/ -f1)
 export PATH="$HOME/.local/bin:$PATH" UV_PYTHON_PREFERENCE=only-system
 pids=""
 for task in "$@"; do
@@ -22,7 +24,7 @@ for task in "$@"; do
     curl -sf "localhost:$port/v1/models" | grep -q "\"$m\"" || { echo "$m is not served on $port" >&2; exit 1; }
     (cd "$(dirname "$task")/.." && uvx --from harbor==0.25.0 harbor run -p "$task" -o jobs \
       --job-name "$prefix-$m-$(basename "$task")" -a opencode -m "vllm/$m" -k "${ATTEMPTS:-3}" -n "${ATTEMPTS:-3}" \
-      --base-url "http://172.17.0.1:$port/v1" --api-format openai_chat_completions --api-key-name VLLM_API_KEY \
+      --base-url "http://$bridge:$port/v1" --api-format openai_chat_completions --api-key-name VLLM_API_KEY \
       --ae VLLM_API_KEY=local --agent-setup-timeout-multiplier 3 > "$here/judge-$prefix-$m-$(basename "$task").log" 2>&1) &
     pids="$pids $!"
     sleep 5
