@@ -75,7 +75,9 @@ OPENINGS = {
 # away (`hold_hours`, screen only: the rises after the first step move later), against `fee16-80`.
 F80 = {"fee_rules": [[0, 10 ** 6, 16, 10 ** 6, 0.8, 0.1, 1.2]]}
 TIMEHOLD = {"f80": F80, **{f"f80-hold-{h}h": {**F80, "hold_hours": h} for h in (24, 16, 12)}}
-SETS = {"risk": SCHEDULES, "openings": OPENINGS, "timehold": TIMEHOLD}
+# ... and lower openings with the same hold to 24 hours, against the 0.8 x hold (B3's `-time`).
+HOLD_OPENINGS = {f"f{round(100 * m)}-hold-24h": {"fee_rules": [[0, 10 ** 6, 16, 10 ** 6, m, 0.1, 1.2]], "hold_hours": 24} for m in (0.8, 0.75, 0.7, 0.6)}
+SETS = {"risk": SCHEDULES, "openings": OPENINGS, "timehold": TIMEHOLD, "holdopen": HOLD_OPENINGS}
 RICH = 790  # drivers on the list: the weeks where the top teams' driver cost is lower
 
 
