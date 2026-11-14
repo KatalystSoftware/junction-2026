@@ -1,8 +1,9 @@
 <script lang="ts">
 	// One difference: its summary on a line; opened, the two quotes word for word and where they sit.
-	import { NAMES, TYPES, articleUrl, revisionUrl, rowDate, sectionLabel, sectionOf, shortDay, since, when } from './lib/format'
+	import { NAMES, articleUrl, revisionUrl, rowDate, sectionLabel, sectionOf, shortDay, since, when } from './lib/format'
 	import type { Finding, Lang, Topic } from './lib/types'
 	import Marked from './Marked.svelte'
+	import TypeChip from './TypeChip.svelte'
 
 	let { f, topic }: { f: Finding; topic: Topic } = $props()
 
@@ -19,14 +20,15 @@
 	}
 </script>
 
-<details>
+<details class="cdx-accordion">
 	<summary>
-		<span class="tag {f.type}">{TYPES[f.type] ?? f.type}</span>
-		<span class="sum">{f.summary}</span>
-		<span class="date subtle small num">{rowDate(f)}</span>
-		<span class="caret subtle" aria-hidden="true">›</span>
+		<h3 class="cdx-accordion__header">
+			<TypeChip type={f.type} />
+			<span class="cdx-accordion__header__title">{f.summary}</span>
+			<span class="date subtle small num">{rowDate(f)}</span>
+		</h3>
 	</summary>
-	<div class="body">
+	<div class="cdx-accordion__content">
 		<div class="quotes">
 			{#each sides as l}
 				{@const section = sectionOf(f, l)}
@@ -58,46 +60,22 @@
 </details>
 
 <style>
-	details {
-		border-bottom: 1px solid var(--border-color-muted);
-	}
-
-	summary {
+	/* The row's heading on one line: the type, the summary, the date. The summary is a sentence, so
+	   it is set in the regular weight instead of the bold of a Codex accordion title. */
+	summary > .cdx-accordion__header {
 		display: grid;
-		grid-template-columns: 7.5rem 1fr auto var(--spacing-75);
+		grid-template-columns: 7.5rem 1fr auto;
 		align-items: baseline;
 		gap: var(--spacing-75);
-		padding: var(--spacing-50) 0;
-		cursor: pointer;
-		list-style: none;
+		font-weight: var(--font-weight-normal);
 	}
 
-	summary::-webkit-details-marker {
-		display: none;
-	}
-
-	summary:hover .sum {
-		color: var(--color-progressive);
-	}
-
-	.tag {
+	.cdx-accordion__header :global(.cdx-info-chip) {
 		justify-self: start;
 	}
 
 	.date {
 		white-space: nowrap;
-	}
-
-	.caret {
-		transition: transform var(--transition-duration-base);
-	}
-
-	details[open] .caret {
-		transform: rotate(90deg);
-	}
-
-	.body {
-		padding: 0 0 var(--spacing-100) calc(7.5rem + var(--spacing-75));
 	}
 
 	.quotes {
@@ -136,18 +114,14 @@
 	}
 
 	@media (max-width: 640px) {
-		summary {
-			grid-template-columns: 1fr auto var(--spacing-75);
+		summary > .cdx-accordion__header {
+			grid-template-columns: 1fr auto;
 			gap: var(--spacing-25) var(--spacing-75);
 		}
 
-		.sum {
+		.cdx-accordion__header__title {
 			grid-column: 1 / -1;
 			grid-row: 2;
-		}
-
-		.body {
-			padding-left: 0;
 		}
 
 		.quotes {

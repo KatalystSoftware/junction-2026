@@ -8,6 +8,7 @@
 	import type { Finding, FindingType, Lang, Topic } from './lib/types'
 	import FindingRow from './FindingRow.svelte'
 	import Marked from './Marked.svelte'
+	import TypeChip from './TypeChip.svelte'
 
 	let { topic, route, lang, rich }: { topic: Topic; route: Route; lang: Lang; rich: Lang } = $props()
 
@@ -68,7 +69,7 @@
 			<a href={href(route, { tab: 'timeline' })} title="See when each difference opened and closed">{since(headline, day)}</a>
 		</p>
 		<p id="claim" class="claim">{headline.summary}</p>
-		<p class="label small subtle">Machine suggestion <span class="tag {headline.type}">{TYPES[headline.type] ?? headline.type}</span></p>
+		<div class="label small subtle">Machine suggestion <TypeChip type={headline.type} /></div>
 	{:else}
 		<p id="claim" class="claim">No open difference found between these articles.</p>
 	{/if}
@@ -93,7 +94,7 @@
 		{/each}
 	</div>
 	{#if canExpand}
-		<button class="btn quiet more" aria-expanded={whole} onclick={() => (whole = !whole)}>{whole ? 'Opening sentences only' : 'Show the full leads'}</button>
+		<button class="cdx-button cdx-button--action-progressive cdx-button--weight-quiet more" aria-expanded={whole} onclick={() => (whole = !whole)}>{whole ? 'Opening sentences only' : 'Show the full leads'}</button>
 	{/if}
 </section>
 
@@ -104,7 +105,7 @@
 			{#if types.length > 1}
 				<div class="chips" role="group" aria-label="Type of difference">
 					{#each types as t}
-						<button class="btn" aria-pressed={only === t} onclick={() => ((only = only === t ? null : t), (all = false))}>
+						<button class="cdx-button" aria-pressed={only === t} onclick={() => ((only = only === t ? null : t), (all = false))}>
 							{TYPES[t]} <span class="count num">{open.filter((f) => f.type === t).length}</span>
 						</button>
 					{/each}
@@ -112,23 +113,23 @@
 			{/if}
 			<p class="small subtle">Machine-suggested summaries. Open one for the quotes.</p>
 		</div>
-		<ul>
+		<div class="rows">
 			{#each shown as f (f.id)}
-				<li><FindingRow {f} {topic} /></li>
+				<FindingRow {f} {topic} />
 			{/each}
-		</ul>
+		</div>
 		{#if listed.length > shown.length}
-			<button class="btn rest" onclick={() => (all = true)}>Show all {listed.length}</button>
+			<button class="cdx-button rest" onclick={() => (all = true)}>Show all {listed.length}</button>
 		{/if}
 	{/if}
 	{#if closed.length}
-		<details class="closed">
-			<summary class="small">{closed.length} closed</summary>
-			<ul>
+		<details class="cdx-accordion closed">
+			<summary><h3 class="cdx-accordion__header">{closed.length} closed</h3></summary>
+			<div class="cdx-accordion__content">
 				{#each closed as f (f.id)}
-					<li><FindingRow {f} {topic} /></li>
+					<FindingRow {f} {topic} />
 				{/each}
-			</ul>
+			</div>
 		</details>
 	{/if}
 </section>
@@ -155,12 +156,11 @@
 	}
 
 	.label {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: var(--spacing-25) var(--spacing-50);
 		margin-top: var(--spacing-50);
-	}
-
-	.label .tag {
-		margin-left: var(--spacing-25);
-		color: var(--color-base);
 	}
 
 	.where {
@@ -227,7 +227,7 @@
 
 	.more {
 		margin-top: var(--spacing-50);
-		margin-left: calc(-1 * var(--spacing-50));
+		margin-left: calc(-1 * var(--spacing-75));
 	}
 
 	.list h2 {
@@ -252,11 +252,6 @@
 		gap: var(--spacing-35);
 	}
 
-	.chips .btn {
-		gap: var(--spacing-35);
-		font-weight: var(--font-weight-normal);
-	}
-
 	.count {
 		color: var(--color-subtle);
 	}
@@ -267,11 +262,6 @@
 
 	.closed {
 		margin-top: var(--spacing-150);
-	}
-
-	.closed > summary {
-		color: var(--color-subtle);
-		cursor: pointer;
 	}
 
 	@media (max-width: 640px) {

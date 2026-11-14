@@ -4,9 +4,10 @@ The web page of Since When: for one topic, what the Finnish, Swedish and English
 say differently, the date and the edit each difference began with, and the MariaDB statement behind
 each screen, which the viewer can run.
 
-A Svelte 5 single-page app built with Vite and TypeScript. Styles are component-scoped CSS on
-Wikimedia's Codex design tokens (`@wikimedia/codex-design-tokens`, CSS variables only). It talks
-only to `/api/*`; the contract is [`../docs/api.md`](../docs/api.md).
+A Svelte 5 single-page app built with Vite and TypeScript. The controls are Wikimedia Codex's
+CSS-only components on native HTML elements (see [Controls](#controls)); layout is
+component-scoped CSS on the Codex design tokens (`@wikimedia/codex-design-tokens`, CSS variables
+only). It talks only to `/api/*`; the contract is [`../docs/api.md`](../docs/api.md).
 
 ## Run
 
@@ -57,10 +58,39 @@ builds the bundle in a Node stage. `fixtures/` holds the answers it gives when s
 - `src/Findings.svelte`, `src/FindingRow.svelte`: the headline difference, the editions' opening
   sentences, the list of differences.
 - `src/Timeline.svelte`: each difference with the periods it held and the edit behind every turn.
-- `src/SqlPanel.svelte`: the runnable presets and the queries each response reported.
-- `src/TopicList.svelte`: the topic picker.
+- `src/TypeChip.svelte`: the type of a difference ("Framing") as a chip.
+- `src/SqlPanel.svelte`: the runnable presets and the queries each response reported, in a dialog.
+- `src/TopicList.svelte`: the topic picker, in a dialog.
+- `src/main.ts`, `src/app.css`: the Codex stylesheets the app imports, and the base styles.
 - `src/lib/`: the API types and fetch, the address state, the headline rule (`headline.ts`), text
   marking and sentence cutting (`text.ts`), dates and links (`format.ts`).
+
+## Controls
+
+A control is a native element with the markup and classes Codex documents under "CSS-only version"
+on the component's page at <https://doc.wikimedia.org/codex/latest/>. `@wikimedia/codex` is a dev
+dependency for its stylesheets alone: `src/main.ts` imports one stylesheet for each component in
+use, and none of Codex's Vue code is in the bundle. A new kind of control needs its stylesheet
+imported there.
+
+| Control | Codex component |
+| --- | --- |
+| Buttons | Button: default, progressive quiet for text buttons, progressive primary for Run |
+| Filter chips (`aria-pressed`) | Button, with one rule in `app.css` for the switched-on state |
+| Selects, the date input, the topic search | Select, TextInput, SearchInput; Field and Label in the SQL form |
+| Errors (`role="alert"`) | Message of the error type |
+| Type of a difference | InfoChip |
+| Result rows, article sizes | Table |
+| `<details>` | Accordion |
+
+Codex documents no CSS-only version of three things, and those stay native:
+
+- A toggle button. A filter chip is a Codex button with `aria-pressed`.
+- Tabs over links. Codex's CSS-only tabs are form buttons with `role="tab"`; Differences and
+  Timeline are links to two addresses with `aria-current`, styled in `App.svelte`.
+- A dialog. The SQL panel and the topic list are native `<dialog>` elements opened with
+  `showModal()`, so the browser keeps focus inside, closes on Escape and returns focus to the
+  button that opened it. A click on the backdrop closes them.
 
 ## Rules the page keeps
 

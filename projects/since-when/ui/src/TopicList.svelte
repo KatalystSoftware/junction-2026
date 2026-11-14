@@ -36,21 +36,28 @@
 	<div class="sheet">
 		<header>
 			<h2 id="topics-title">Topics</h2>
-			<button class="btn quiet" onclick={() => dialog.close()}>Close</button>
+			<button class="cdx-button cdx-button--action-progressive cdx-button--weight-quiet" onclick={() => dialog.close()}>Close</button>
 		</header>
 		{#if queue.searchable}
 			<form role="search" onsubmit={search}>
-				<input class="field" type="search" name="q" placeholder="Search topics" aria-label="Search topics" value={nav.q} autocomplete="off" />
-				<button class="btn" type="submit">Search</button>
+				<div class="cdx-search-input cdx-search-input--has-end-button">
+					<div class="cdx-search-input__input-wrapper">
+						<div class="cdx-text-input cdx-text-input--has-start-icon">
+							<input class="cdx-text-input__input" type="search" name="q" placeholder="Search topics" aria-label="Search topics" value={nav.q} autocomplete="off" />
+							<span class="cdx-text-input__icon cdx-text-input__start-icon"></span>
+						</div>
+					</div>
+					<button class="cdx-button cdx-search-input__end-button" type="submit">Search</button>
+				</div>
 			</form>
 		{/if}
 		<div class="filters" role="group" aria-label="Edition">
 			{#each FILTERS as l}
-				<button class="btn" aria-pressed={nav.lang === l} onclick={() => filter(l)}>{l === 'all' ? 'All' : NAMES[l]}</button>
+				<button class="cdx-button" aria-pressed={nav.lang === l} onclick={() => filter(l)}>{l === 'all' ? 'All' : NAMES[l]}</button>
 			{/each}
 		</div>
 		{#if queue.error}
-			<p class="note error" role="alert">Could not load the topics: {queue.error}</p>
+			<div class="cdx-message cdx-message--block cdx-message--error" role="alert"><span class="cdx-message__icon"></span><div class="cdx-message__content">Could not load the topics: {queue.error}</div></div>
 		{:else if !queue.items.length}
 			<p class="note subtle">{queue.loading ? 'Loading…' : nav.q ? `No topic matches "${nav.q}".` : 'No topics yet.'}</p>
 		{/if}
@@ -67,7 +74,7 @@
 			{/each}
 		</ul>
 		{#if !nav.q && queue.items.length < queue.total}
-			<button class="btn more" disabled={queue.loading} onclick={() => loadQueue(true)}>Show {Math.min(pageSize, queue.total - queue.items.length)} more</button>
+			<button class="cdx-button more" disabled={queue.loading} onclick={() => loadQueue(true)}>Show {Math.min(pageSize, queue.total - queue.items.length)} more</button>
 		{/if}
 	</div>
 </dialog>
@@ -109,24 +116,13 @@
 		font-size: var(--font-size-xx-large);
 	}
 
-	form {
-		display: flex;
-		gap: var(--spacing-35);
-	}
-
-	form .field {
-		flex: 1;
-		min-width: 0;
-	}
-
 	.filters {
 		display: flex;
 		gap: var(--spacing-35);
 	}
 
-	.filters .btn {
+	.filters .cdx-button {
 		flex: 1;
-		font-weight: var(--font-weight-normal);
 	}
 
 	li a {

@@ -6,6 +6,7 @@
 	import { DIFFERS } from './lib/headline'
 	import { log, type Route } from './lib/nav.svelte'
 	import type { FindingType, Lang, Timeline, TimelineEvent, Topic } from './lib/types'
+	import TypeChip from './TypeChip.svelte'
 
 	let { topic, route, lang, rich }: { topic: Topic; route: Route; lang: Lang; rich: Lang } = $props()
 
@@ -108,7 +109,7 @@
 <section aria-labelledby="timeline-title">
 	<h2 id="timeline-title">When each difference opened and closed</h2>
 	{#if failure}
-		<p class="state error" role="alert">{failure}</p>
+		<div class="cdx-message cdx-message--block cdx-message--error" role="alert"><span class="cdx-message__icon"></span><div class="cdx-message__content">{failure}</div></div>
 	{:else if !data}
 		<p class="state subtle">Reading the history…</p>
 	{:else if !stories.length}
@@ -118,7 +119,7 @@
 			{#if types.length > 1}
 				<div class="chips" role="group" aria-label="Type of difference">
 					{#each types as t}
-						<button class="btn" aria-pressed={only === t} onclick={() => ((only = only === t ? null : t), (all = false))}>
+						<button class="cdx-button" aria-pressed={only === t} onclick={() => ((only = only === t ? null : t), (all = false))}>
 							{TYPES[t]} <span class="count num">{stories.filter((s) => s.type === t).length}</span>
 						</button>
 					{/each}
@@ -133,10 +134,10 @@
 		<ol class="stories">
 			{#each shown as s (s.id)}
 				<li class="story">
-					<p class="sum">
-						{#if s.type}<span class="tag {s.type}">{TYPES[s.type] ?? s.type}</span>{/if}
+					<div class="sum">
+						{#if s.type}<TypeChip type={s.type} />{/if}
 						{s.summary}
-					</p>
+					</div>
 					<div class="bar" role="img" aria-label="Held: {years(s.events)}">
 						{#each spans(s.events) as p}<i style:left="{p.left}%" style:width="{p.width}%"></i>{/each}
 					</div>
@@ -162,22 +163,35 @@
 			{/each}
 		</ol>
 		{#if listed.length > shown.length}
-			<button class="btn rest" onclick={() => (all = true)}>Show all {listed.length}</button>
+			<button class="cdx-button rest" onclick={() => (all = true)}>Show all {listed.length}</button>
 		{/if}
 
-		<details class="years small">
-			<summary>Article size on each 1 January</summary>
-			<div class="scroll">
-				<table class="num">
-					<thead>
-						<tr><th scope="col">Year</th>{#each [lang, rich] as l}<th scope="col">{NAMES[l]}</th>{/each}<th scope="col">Open differences</th></tr>
-					</thead>
-					<tbody>
-						{#each data.years.toReversed() as y}
-							<tr><th scope="row">{y.year}</th>{#each [lang, rich] as l}<td>{y.size[l] ? kb(y.size[l]!) : '–'}</td>{/each}<td>{y.open_findings}</td></tr>
-						{/each}
-					</tbody>
-				</table>
+		<details class="cdx-accordion cdx-accordion--separation-minimal years">
+			<summary><h3 class="cdx-accordion__header">Article size on each 1 January</h3></summary>
+			<div class="cdx-accordion__content">
+				<div class="cdx-table">
+					<div class="cdx-table__table-wrapper">
+						<table class="cdx-table__table num">
+							<caption>Article size on each 1 January</caption>
+							<thead>
+								<tr>
+									<th scope="col"><span class="cdx-table__th-content">Year</span></th>
+									{#each [lang, rich] as l}<th scope="col" class="cdx-table__table__cell--align-number"><span class="cdx-table__th-content">{NAMES[l]}</span></th>{/each}
+									<th scope="col" class="cdx-table__table__cell--align-number"><span class="cdx-table__th-content">Open differences</span></th>
+								</tr>
+							</thead>
+							<tbody>
+								{#each data.years.toReversed() as y}
+									<tr>
+										<th scope="row">{y.year}</th>
+										{#each [lang, rich] as l}<td class="cdx-table__table__cell--align-number">{y.size[l] ? kb(y.size[l]!) : '–'}</td>{/each}
+										<td class="cdx-table__table__cell--align-number">{y.open_findings}</td>
+									</tr>
+								{/each}
+							</tbody>
+						</table>
+					</div>
+				</div>
 			</div>
 		</details>
 	{/if}
@@ -199,6 +213,10 @@
 		padding: var(--spacing-150) 0;
 	}
 
+	.cdx-message {
+		margin-top: var(--spacing-100);
+	}
+
 	.tools {
 		display: flex;
 		flex-wrap: wrap;
@@ -212,11 +230,6 @@
 		display: flex;
 		flex-wrap: wrap;
 		gap: var(--spacing-35);
-	}
-
-	.chips .btn {
-		gap: var(--spacing-35);
-		font-weight: var(--font-weight-normal);
 	}
 
 	.count {
@@ -240,7 +253,7 @@
 		border-bottom: 1px solid var(--border-color-muted);
 	}
 
-	.sum .tag {
+	.sum :global(.cdx-info-chip) {
 		margin-right: var(--spacing-35);
 	}
 
@@ -294,33 +307,7 @@
 		margin-top: var(--spacing-200);
 	}
 
-	.years summary {
-		color: var(--color-subtle);
-		cursor: pointer;
-	}
-
-	.scroll {
-		overflow-x: auto;
-	}
-
-	table {
+	.years .cdx-table {
 		margin-top: var(--spacing-50);
-		border-collapse: collapse;
-	}
-
-	th,
-	td {
-		padding: var(--spacing-12) var(--spacing-100) var(--spacing-12) 0;
-		text-align: right;
-		font-weight: var(--font-weight-normal);
-	}
-
-	thead th {
-		border-bottom: 1px solid var(--border-color-subtle);
-		color: var(--color-subtle);
-	}
-
-	th:first-child {
-		text-align: left;
 	}
 </style>

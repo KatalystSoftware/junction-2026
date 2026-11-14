@@ -1,5 +1,6 @@
-/* Base styles and the few shared pieces (buttons, tags, marks). Every value comes from the Codex
-   design tokens; components carry their own scoped styles on top. */
+/* Base styles and the few shared pieces (marks, text helpers). The controls are Codex's CSS-only
+   components, whose stylesheets main.ts imports. Every value here comes from the Codex design
+   tokens; components carry their own scoped layout on top. */
 
 *,
 *::before,
@@ -70,88 +71,22 @@ select {
 	color: inherit;
 }
 
-.btn {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	min-height: var(--size-200);
-	padding: 0 var(--spacing-75);
-	border: 1px solid var(--border-color-interactive);
-	border-radius: var(--border-radius-base);
-	background: var(--background-color-interactive-subtle);
-	font-weight: var(--font-weight-bold);
-	font-size: var(--font-size-small);
-	cursor: pointer;
-}
-
-.btn:hover {
-	background: var(--background-color-base);
-	border-color: var(--border-color-interactive);
-}
-
-.btn[aria-pressed='true'],
-.btn[aria-expanded='true'] {
-	background: var(--background-color-progressive-subtle);
+/* A filter that is switched on. Codex has no CSS-only toggle button, so a filter is a Codex button
+   with `aria-pressed`, and this is the one state added to it. Focus keeps Codex's own ring. */
+.cdx-button[aria-pressed='true']:enabled {
+	background-color: var(--background-color-progressive-subtle);
 	border-color: var(--border-color-progressive);
 	color: var(--color-progressive--active);
 }
 
-.btn.primary {
-	background: var(--background-color-progressive);
-	border-color: var(--border-color-progressive);
-	color: var(--color-inverted);
+.cdx-button[aria-pressed='true']:enabled:hover {
+	background-color: var(--background-color-progressive-subtle--hover);
 }
 
-.btn.primary:hover {
-	background: var(--background-color-progressive--hover);
-}
-
-.btn.quiet {
-	border-color: transparent;
-	background: transparent;
-	color: var(--color-progressive);
-	padding: 0 var(--spacing-50);
-}
-
-.btn.quiet:hover {
-	background: var(--background-color-interactive-subtle);
-}
-
-.btn:disabled {
-	background: var(--background-color-neutral);
-	border-color: var(--border-color-subtle);
-	color: var(--color-subtle);
-	cursor: default;
-}
-
-.field {
-	min-height: var(--size-200);
-	padding: 0 var(--spacing-50);
-	border: 1px solid var(--border-color-interactive);
-	border-radius: var(--border-radius-base);
-	background: var(--background-color-base);
-	font-size: var(--font-size-small);
-}
-
-/* Type of difference. The label carries the meaning; the tint only groups. */
-.tag {
-	display: inline-block;
-	padding: 0 var(--spacing-35);
-	border-radius: var(--border-radius-base);
-	background: var(--background-color-neutral);
-	font-size: var(--font-size-x-small);
-	line-height: var(--line-height-x-small);
-	font-weight: var(--font-weight-semi-bold);
-	white-space: nowrap;
-}
-
-.tag.contradiction,
-.tag.numbers {
-	background: var(--background-color-error-subtle);
-}
-
-.tag.framing {
-	background: var(--background-color-warning-subtle);
+/* Codex sets what an accordion holds in the generic sans-serif, MediaWiki's body font. Here it
+   keeps the page's own. */
+.cdx-accordion__content {
+	font-family: inherit;
 }
 
 /* A word the findings single out, and (softer) the quoted stretch around it. */
@@ -178,10 +113,6 @@ mark.term {
 
 .num {
 	font-variant-numeric: tabular-nums;
-}
-
-.error {
-	color: var(--color-error);
 }
 
 .sr-only {

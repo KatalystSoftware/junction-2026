@@ -1,7 +1,7 @@
 <script lang="ts">
 	// The SQL behind the page: three preset statements the server runs as a SELECT-only user, and
 	// the queries each response reported. The app sends a preset name and its values, never SQL.
-	import { onMount, tick } from 'svelte'
+	import { onMount } from 'svelte'
 	import { api } from './lib/api.svelte'
 	import { NAMES, plural } from './lib/format'
 	import { log, nav, syncSearch, ui } from './lib/nav.svelte'
@@ -23,7 +23,7 @@
 	let running = $state(false)
 	let failure = $state('')
 	let ready = $state(false) // the presets have answered, one way or the other
-	let panel: HTMLElement
+	let dialog: HTMLDialogElement
 
 	const preset = $derived(presets.find((p) => p.name === name))
 	const topics = $derived({ ...DEMO, ...(topic ? { [topic.wikidata_id]: topic.topic } : {}) })
@@ -59,12 +59,11 @@
 		syncSearch()
 	})
 
-	// Focus follows the panel: into it when it opens, back to its button when it closes.
-	let wasOpen = false
+	// The panel is a modal dialog: the browser keeps focus inside it, closes it on Escape and gives
+	// focus back to the SQL button.
 	$effect(() => {
-		if (ui.sql) void tick().then(() => panel?.focus())
-		else if (wasOpen) document.querySelector<HTMLElement>('[aria-controls="sql-panel"]')?.focus()
-		wasOpen = ui.sql
+		if (ui.sql && !dialog.open) dialog.showModal()
+		if (!ui.sql && dialog.open) dialog.close()
 	})
 
 	// A pair never matches an edition with itself: choosing the other side's edition swaps the two.
@@ -91,135 +90,161 @@
 
 	function cell(column: string, x: string | number | null): { text: string; cls: string; note?: string } {
 		if (x === null) return { text: 'NULL', cls: 'null' }
-		if (typeof x === 'number') return { text: Number.isInteger(x) ? String(x) : x.toFixed(4), cls: 'n' }
+		if (typeof x === 'number') return { text: Number.isInteger(x) ? String(x) : x.toFixed(4), cls: 'num' }
 		if (/^\d{4}-\d\d-\d\dT/.test(x)) return { text: x.replace('T', ' '), cls: 'when', note: column === 'row_end' && x.startsWith('2106-') ? 'current' : undefined }
 		return { text: x, cls: x.length > 40 ? 'txt' : '' }
 	}
 </script>
-
-<svelte:window onkeydown={(e) => e.key === 'Escape' && ui.sql && !document.querySelector('dialog[open]') && (ui.sql = false)} />
 
 {#snippet statement(q: SqlEntry)}
 	<pre>{@html sqlHtml(q.query)}</pre>
 {/snippet}
 
 {#snippet result(r: Run)}
-	<!-- svelte-ignore a11y_no_noninteractive_tabindex (a scrolling region has to take keyboard focus to be scrolled) -->
-	<div class="result" tabindex="0" role="region" aria-label="Result rows">
-		<table>
-			<thead>
-				<tr>{#each r.columns as c}<th scope="col">{c}</th>{/each}</tr>
-			</thead>
-			<tbody>
-				{#each r.rows as row}
+	<!-- A column of numbers is set to the right, header and all. -->
+	{@const numeric = r.columns.map((_, i) => r.rows.some((row) => typeof row[i] === 'number'))}
+	<div class="cdx-table result">
+		<!-- svelte-ignore a11y_no_noninteractive_tabindex (a scrolling region has to take keyboard focus to be scrolled) -->
+		<div class="cdx-table__table-wrapper" tabindex="0" role="region" aria-label="Result rows">
+			<table class="cdx-table__table">
+				<caption>Result rows</caption>
+				<thead>
 					<tr>
-						{#each row as x, i}
-							{@const c = cell(r.columns[i], x)}
-							<td class={c.cls}>{c.text}{#if c.note}<span class="subtle"> {c.note}</span>{/if}</td>
+						{#each r.columns as c, i}
+							<th scope="col" class={[numeric[i] && 'cdx-table__table__cell--align-number']}><span class="cdx-table__th-content">{c}</span></th>
 						{/each}
 					</tr>
-				{:else}
-					<tr><td class="null" colspan={r.columns.length}>No rows.</td></tr>
-				{/each}
-			</tbody>
-		</table>
+				</thead>
+				<tbody>
+					{#each r.rows as row}
+						<tr>
+							{#each row as x, i}
+								{@const c = cell(r.columns[i], x)}
+								<td class={[c.cls, numeric[i] && 'cdx-table__table__cell--align-number']}>{c.text}{#if c.note}<span class="subtle"> {c.note}</span>{/if}</td>
+							{/each}
+						</tr>
+					{:else}
+						<tr class="cdx-table__table__empty-state"><td class="cdx-table__table__empty-state-content" colspan={r.columns.length}>No rows.</td></tr>
+					{/each}
+				</tbody>
+			</table>
+		</div>
 	</div>
 {/snippet}
 
-<aside id="sql-panel" class="panel" class:open={ui.sql} hidden={!ui.sql} aria-labelledby="sql-title" tabindex="-1" bind:this={panel}>
-	<header>
-		<h2 id="sql-title">SQL behind this page</h2>
-		<button class="btn quiet" onclick={() => (ui.sql = false)}>Close</button>
-	</header>
+<!-- A click on the backdrop lands on the dialog element itself and closes it. -->
+<dialog id="sql-panel" bind:this={dialog} aria-labelledby="sql-title" onclose={() => (ui.sql = false)} onclick={(e) => e.target === dialog && dialog.close()}>
+	<div class="sheet">
+		<header>
+			<h2 id="sql-title">SQL behind this page</h2>
+			<button class="cdx-button cdx-button--action-progressive cdx-button--weight-quiet" onclick={() => dialog.close()}>Close</button>
+		</header>
 
-	{#if preset}
-		<section class="live" aria-label="Run a statement on MariaDB">
-			<div class="presets" role="group" aria-label="Statement">
-				{#each presets as p}
-					<button class="btn" aria-pressed={p.name === name} onclick={() => ((name = p.name), (failure = ''))}>{p.title}</button>
-				{/each}
-			</div>
-			<p class="small subtle">{preset.description}</p>
-			<form onsubmit={run}>
-				{#each preset.params as x}
-					{@const v = values[preset.name]}
-					<label class="small">
-						<span>{LABEL[x.name] ?? x.name}</span>
-						{#if x.kind === 'date'}
-							<input class="field" type="date" value={v[x.name]} min="2001-01-15" max={today} required onchange={(e) => set(x.name, e.currentTarget.value)} />
-						{:else}
-							<select class="field" value={v[x.name]} onchange={(e) => set(x.name, e.currentTarget.value)}>
-								{#if x.kind === 'lang'}
-									{#each LANGS as l}<option value={l}>{NAMES[l]}</option>{/each}
+		{#if preset}
+			<section class="live" aria-label="Run a statement on MariaDB">
+				<div class="presets" role="group" aria-label="Statement">
+					{#each presets as p}
+						<button class="cdx-button" aria-pressed={p.name === name} onclick={() => ((name = p.name), (failure = ''))}>{p.title}</button>
+					{/each}
+				</div>
+				<p class="small subtle">{preset.description}</p>
+				<form onsubmit={run}>
+					{#each preset.params as x}
+						{@const v = values[preset.name]}
+						<div class="cdx-field">
+							<div class="cdx-label">
+								<label class="cdx-label__label" for="sql-{x.name}"><span class="cdx-label__label__text">{LABEL[x.name] ?? x.name}</span></label>
+							</div>
+							<div class="cdx-field__control">
+								{#if x.kind === 'date'}
+									<div class="cdx-text-input">
+										<input id="sql-{x.name}" class="cdx-text-input__input" type="date" value={v[x.name]} min="2001-01-15" max={today} required onchange={(e) => set(x.name, e.currentTarget.value)} />
+									</div>
 								{:else}
-									{#each Object.entries({ ...topics, [v.qid]: topics[v.qid] ?? v.qid }) as [id, title]}<option value={id}>{title}</option>{/each}
+									<select id="sql-{x.name}" class="cdx-select" value={v[x.name]} onchange={(e) => set(x.name, e.currentTarget.value)}>
+										{#if x.kind === 'lang'}
+											{#each LANGS as l}<option value={l}>{NAMES[l]}</option>{/each}
+										{:else}
+											{#each Object.entries({ ...topics, [v.qid]: topics[v.qid] ?? v.qid }) as [id, title]}<option value={id}>{title}</option>{/each}
+										{/if}
+									</select>
 								{/if}
-							</select>
-						{/if}
-					</label>
-				{/each}
-				<button class="btn primary" type="submit" disabled={running}>{running ? 'Running…' : 'Run'}</button>
-			</form>
-			{#if failure}<p class="small error" role="alert">{failure}</p>{/if}
+							</div>
+						</div>
+					{/each}
+					<button class="cdx-button cdx-button--action-progressive cdx-button--weight-primary" type="submit" disabled={running}>{running ? 'Running…' : 'Run'}</button>
+				</form>
+				{#if failure}<div class="cdx-message cdx-message--inline cdx-message--error" role="alert"><span class="cdx-message__icon"></span><div class="cdx-message__content">{failure}</div></div>{/if}
 
-			<div aria-live="polite">
-				{#each runs[preset.name] ?? [] as r, i}
-					<div class="run" class:previous={i > 0}>
-						{#if i > 0}<p class="label small">Previous run</p>{/if}
-						<p class="ran">
-							<strong class="num">{plural(r.rows.length, 'row', 'rows')}</strong>
-							<strong class="num">{r.ms} ms</strong>
-							<span class="small subtle">{Object.values(r.params).join(', ')}{r.capped ? `, first ${r.limits.rows} rows` : ''}</span>
-						</p>
-						{#if i === 0}
-							{#each r.sql as q}
-								<p class="qhead small"><span>{q.label}</span><span class="subtle num">{q.ms} ms, {plural(q.rows, 'row', 'rows')}</span></p>
-								{@render statement(q)}
-							{/each}
-						{/if}
-						{@render result(r)}
-					</div>
-				{/each}
-			</div>
-			<p class="small subtle">Runs as a read-only user, for {limits.seconds} s and {limits.rows} rows at most.</p>
-		</section>
-	{/if}
+				<div aria-live="polite">
+					{#each runs[preset.name] ?? [] as r, i}
+						<div class="run" class:previous={i > 0}>
+							{#if i > 0}<p class="label small">Previous run</p>{/if}
+							<p class="ran">
+								<strong class="num">{plural(r.rows.length, 'row', 'rows')}</strong>
+								<strong class="num">{r.ms} ms</strong>
+								<span class="small subtle">{Object.values(r.params).join(', ')}{r.capped ? `, first ${r.limits.rows} rows` : ''}</span>
+							</p>
+							{#if i === 0}
+								{#each r.sql as q}
+									<p class="qhead small"><span>{q.label}</span><span class="subtle num">{q.ms} ms, {plural(q.rows, 'row', 'rows')}</span></p>
+									{@render statement(q)}
+								{/each}
+							{/if}
+							{@render result(r)}
+						</div>
+					{/each}
+				</div>
+				<p class="small subtle">Runs as a read-only user, for {limits.seconds} s and {limits.rows} rows at most.</p>
+			</section>
+		{/if}
 
-	{#if groups.length}
-		<section class="log" aria-labelledby="log-title">
-			<h3 id="log-title" class="small">Queries this page ran</h3>
-			{#each groups as [group, qs]}
-				{#each qs as q}
-					<details>
-						<summary class="small"><span>{q.label} <span class="subtle">{group}</span></span><span class="subtle num">{q.ms} ms, {plural(q.rows, 'row', 'rows')}</span></summary>
-						{@render statement(q)}
-					</details>
+		{#if groups.length}
+			<section class="log" aria-labelledby="log-title">
+				<h3 id="log-title" class="small">Queries this page ran</h3>
+				{#each groups as [group, qs]}
+					{#each qs as q}
+						<details class="cdx-accordion">
+							<summary>
+								<h4 class="cdx-accordion__header">
+									<span class="cdx-accordion__header__title">{q.label} <span class="subtle">{group}</span></span>
+									<span class="cdx-accordion__header__description num">{q.ms} ms, {plural(q.rows, 'row', 'rows')}</span>
+								</h4>
+							</summary>
+							<div class="cdx-accordion__content">{@render statement(q)}</div>
+						</details>
+					{/each}
 				{/each}
-			{/each}
-		</section>
-	{/if}
-</aside>
+			</section>
+		{/if}
+	</div>
+</dialog>
 
 <style>
-	/* Laid over the page's right edge, so opening it moves nothing underneath. */
-	.panel {
-		position: fixed;
-		top: 0;
-		right: 0;
-		bottom: 0;
-		z-index: var(--z-index-overlay);
+	/* A sheet over the page's right edge. It is a modal dialog, so the browser keeps focus inside
+	   it and closes it on Escape. */
+	dialog {
 		width: min(40rem, 100vw);
-		padding: var(--spacing-75) var(--spacing-125) var(--spacing-300);
-		overflow-y: auto;
+		max-width: none;
+		height: 100dvh;
+		max-height: none;
+		margin: 0 0 0 auto;
+		padding: 0;
 		overscroll-behavior: contain;
+		border: 0;
 		border-left: 1px solid var(--border-color-subtle);
 		background: var(--background-color-base);
+		color: var(--color-base);
 		box-shadow: var(--box-shadow-large);
 	}
 
-	.panel:focus-visible {
-		outline-offset: -2px;
-		border-radius: 0;
+	dialog::backdrop {
+		background: var(--background-color-backdrop-light);
+	}
+
+	.sheet {
+		min-height: 100%;
+		padding: var(--spacing-75) var(--spacing-125) var(--spacing-300);
 	}
 
 	header {
@@ -245,11 +270,6 @@
 		gap: var(--spacing-35);
 	}
 
-	.presets .btn {
-		font-family: var(--font-family-system-sans);
-		font-weight: var(--font-weight-normal);
-	}
-
 	form {
 		display: flex;
 		flex-wrap: wrap;
@@ -257,14 +277,15 @@
 		gap: var(--spacing-75);
 	}
 
-	label {
-		display: flex;
-		flex-direction: column;
-		color: var(--color-subtle);
+	/* The fields sit side by side, so Codex's space between stacked fields and its 256px minimum
+	   width give way to the row. */
+	form .cdx-field {
+		margin: 0;
 	}
 
-	label .field {
-		color: var(--color-base);
+	form .cdx-select,
+	form .cdx-text-input {
+		min-width: 9rem;
 	}
 
 	.run {
@@ -301,14 +322,10 @@
 		line-height: var(--line-height-medium);
 	}
 
-	.qhead,
-	summary {
+	.qhead {
 		display: flex;
 		justify-content: space-between;
 		gap: var(--spacing-100);
-	}
-
-	.qhead {
 		margin-top: var(--spacing-50);
 		font-weight: var(--font-weight-bold);
 	}
@@ -345,40 +362,29 @@
 		color: var(--color-subtle);
 	}
 
-	.result {
+	/* Codex's table, set tighter than its default: the panel is narrow and a result is read row
+	   against row. It scrolls inside its own frame, under a header that stays in view. */
+	.result .cdx-table__table-wrapper {
 		max-height: 22rem;
 		overflow: auto;
-		border: 1px solid var(--border-color-muted);
-		border-radius: var(--border-radius-base);
 	}
 
-	table {
-		width: 100%;
-		border-collapse: collapse;
+	.result table {
 		font-size: var(--font-size-x-small);
 		line-height: var(--line-height-x-small);
 	}
 
-	th,
-	td {
+	.result th,
+	.result td {
 		padding: var(--spacing-25) var(--spacing-50);
-		border-bottom: 1px solid var(--border-color-muted);
-		text-align: left;
-		vertical-align: top;
 	}
 
-	th {
+	.result thead th {
 		position: sticky;
 		top: 0;
+		border-bottom: 0;
 		background: var(--background-color-neutral-subtle);
-		font-family: var(--font-family-monospace);
-		font-weight: var(--font-weight-normal);
-		color: var(--color-subtle);
-	}
-
-	td.n {
-		text-align: right;
-		font-variant-numeric: tabular-nums;
+		box-shadow: inset 0 -1px 0 var(--border-color-base);
 	}
 
 	td.null {
@@ -402,18 +408,5 @@
 		padding-bottom: var(--spacing-25);
 		border-bottom: 1px solid var(--border-color-subtle);
 		color: var(--color-subtle);
-	}
-
-	details {
-		border-bottom: 1px solid var(--border-color-muted);
-	}
-
-	summary {
-		padding: var(--spacing-35) 0;
-		cursor: pointer;
-	}
-
-	summary .num {
-		white-space: nowrap;
 	}
 </style>
