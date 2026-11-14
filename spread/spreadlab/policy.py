@@ -16,7 +16,7 @@ import sys
 from pathlib import Path
 from typing import Optional
 
-from spread.starter import DAY, HOUR, WAKE_ON, Desk, Retry, pickups, rising, steep
+from spread.starter import DAY, HOUR, WAKE_ON, Desk, Retry, pickups, rising, steep, stops_for, without_windows
 
 from . import curve, notes
 from .server import drivers_near, near_places
@@ -26,6 +26,7 @@ DEFAULTS = {
     "floor": 0,           # the lowest quote, as a multiple of the request's typical fee; 0 is no floor
     "quote_share": 0.6,   # the share of acceptable requests that get a serious quote, to limit the cars won
     "same_day": False,    # offer the same_day option
+    "same_day_extra": 0,  # quote same_day this share over the policy's price when the request has a slower option too: it leaves the least time for a driver
     "trade_in": False,    # quote requests with two cars
     "private": False,     # quote requests with a private address
     "min_slack": 300,     # offer an option only with this many minutes between the first possible pickup and the last one that is on time
@@ -47,6 +48,7 @@ DEFAULTS = {
     # Direct offers. A driver who reads one takes it when the fee pays, and does not wait for a rise (RULES.md, Direct offers).
     "offer_hours": 0,     # an open gig gets direct offers once its order must be collected within this many hours; 0 sends none
     "offer_fee": 1.3,     # ... at this multiple of the typical fee, or at the fee in the app when that is higher
+    "private_cost": 0,    # a request with a private address is taken to cost this multiple of its typical fee; 0 is `cost`
     "read_notes": False,  # read the note before the first posting (notes.py): the first minute to collect the car, plates, a manual licence
     # What the floor follows. Each is off at its default.
     "dealer_steps": [],   # [[share, floor], ...]: the floor at a dealer once the desk has won this share of its quotes there in the week
@@ -55,11 +57,19 @@ DEFAULTS = {
     "backlog_from": 0,    # ... beyond this many
     "trust": 0,           # the quote rises by this share for each order the dealer has had on time, up to 25 (RULES.md, Dealer trust)
     "explore": [],        # [low, high]: quote a random multiple of the list price in this range, to learn what dealers accept
+    # The same for the two kinds of request that no curve has answers for. The other requests stay on the policy.
+    "explore_private": [],   # [low, high] for one-car requests with a private address, never under 1.3 x the typical fee
+    "explore_trade_in": [],  # [low, high] for requests with two cars
+    # The kinds of request that are not one car between two dealer sites: "private_pickup", "private_delivery" and "trade_in".
+    # A kind that is named here is quoted, with what differs for it: {"cost": .., "fee": .., "odds": ..} are the cost in
+    # the quote and the opening fee, as multiples of the typical fee, and what the curve's log odds are off by for the kind.
+    "kinds": {},
     # The win curve (curve.py) replaces `price`: the quote with the highest (price - cost) x chance that the dealer buys.
     "curve": False,
     "model": "",          # the curve's weights (curve.MODELS): "" is the fit over all days, "day" the fit with a level for each day
     "cost": 1.4,          # what an order costs, as a multiple of its typical fee: fees, failed visits and refunds
     "learn": 0,           # how far a day's prices usually are from the curve, in log price; 0 does not correct the curve by the day's answers
+    "learn_pickup": 0,    # the same for the pickup town, on top of the day's correction and new each morning: an outage raises the prices of one region
     "cost_by_order": False,  # the cost follows the order (curve.cost: long lanes, few drivers, a note) and replaces `cost`
     "trust_value": 0,     # the share to count of what an order on time, or a late one, is worth in the dealer's later prices; 0 counts none
     # Two rules change the parameters above. Each names the parameters it replaces while it applies.
@@ -76,6 +86,7 @@ DECLINE = 10  # times the list price: a quote that loses costs nothing, and no q
 # 12 to 15% while a car waits for a driver, and 34 to 39% once it has waited two hours.
 LATE_HELD, LATE_WAITING, LATE_WAITING_LONG = 0.03, 0.15, 0.40
 LONG_WAIT = 120  # minutes
+EXPLORE_FLOOR = 1.3  # a random price for a kind of request is never under this multiple of the typical fee
 MIN_ANSWERS = 5  # a dealer's win share counts once it has answered this many quotes
 MAX_TRUST = 25  # a dealer counts at most this many orders on time (RULES.md)
 # Drivers book open gigs mostly when they plan: early in the morning for the day, and in the late afternoon for the next.
@@ -109,6 +120,8 @@ class Policy(Desk):
         self.late: set[str] = set()  # the orders that the account has refunded or fined for lateness
         self.asked: dict[str, tuple[str, int, float]] = {}  # request id -> dealer, day and the curve's log odds, for each serious quote without an answer
         self.today: tuple[int, list[tuple[float, bool]]] = (0, [])  # the day, and the answers to its quotes: the curve's log odds and whether the dealer bought
+        self.today_at: dict[str, list[tuple[float, bool]]] = {}  # pickup place -> today's answers to the quotes for cars from there
+        self.asked_at: dict[str, str] = {}  # request id -> the pickup place, for each serious quote without an answer
         self.answers: dict[str, list[int]] = {}  # dealer -> [serious quotes answered, of which won]
         self.requested: dict[str, int] = {}  # dealer -> its requests so far
         self.trust: dict[str, int] = {}  # dealer -> the orders it counts as on time, as the dealer counts them
@@ -153,18 +166,24 @@ class Policy(Desk):
         self.requested[request["dealerId"]] = self.requested.get(request["dealerId"], 0) + 1
         p = self.params()
         reason, options = self.choose(request, p)
+        explored = self.explored(request, p)
         if reason:
             first = request["options"][0]
             prices = {first["kind"]: first["listPriceCents"] * DECLINE}
+        elif explored:  # a random price; its answer says nothing about the day's level, so it is not counted there
+            multiple = self.draw(request, *p["explore_" + explored])
+            prices = {o["kind"]: int(round(max(o["listPriceCents"] * multiple, request["referenceFeeCents"] * EXPLORE_FLOOR))) for o in options}
         else:
             fee, day, on_time = request["referenceFeeCents"], request["arrivedAt"] // DAY, self.trust.get(request["dealerId"], 0)
             surcharge = p["backlog_step"] * max(0, self.unbooked() - p["backlog_from"])
             log_odds = 0.0
             if p["curve"]:
-                at_list, first, slope = curve.at_list(request, options, on_time, self.model), curve.fastest(options), self.model["slope"]
+                own = p["kinds"].get(kind(request), {})
+                at_list, first, slope = curve.at_list(request, options, on_time, self.model) + own.get("odds", 0), curve.fastest(options), self.model["slope"]
                 known = curve.known(request, options, min(self.notified[leg["pickup"]["placeId"]] for leg in request["legs"]), self.unbooked())
-                flat = p["long_cost"] if p["long_cost"] and self.long(request, p) else p["cost"]
-                cost, shift = self.usual_fee(request, p) * ((curve.cost(known) if p["cost_by_order"] else flat) + surcharge), self.shift(day, p)
+                private = any(leg["pickup"]["privateAddress"] or leg["delivery"]["privateAddress"] for leg in request["legs"])
+                flat = own["cost"] if own.get("cost") else p["long_cost"] if p["long_cost"] and self.long(request, p) else p["private_cost"] if p["private_cost"] and private else p["cost"]
+                cost, shift = self.usual_fee(request, p) * ((curve.cost(known) if p["cost_by_order"] else flat) + surcharge), self.shift(day, p, request["legs"][0]["pickup"]["placeId"])
                 multiple = curve.best(at_list, shift, first["listPriceCents"], cost, slope)
                 if p["trust_value"]:  # an order on time raises what the dealer accepts later, and a late one lowers it
                     revenue = multiple * first["listPriceCents"] * curve.chance(at_list, multiple, shift, slope)
@@ -177,13 +196,25 @@ class Policy(Desk):
                 floor = fee * (self.floor(request, p) + surcharge)
                 prices = {o["kind"]: int(round(max(o["listPriceCents"] * multiple, floor) * (1 + p["trust"] * on_time))) for o in options}
             self.asked[request["id"]] = (request["dealerId"], day, log_odds)
+            self.asked_at[request["id"]] = request["legs"][0]["pickup"]["placeId"]
+        if p["same_day_extra"] and not reason and not explored and len(prices) > 1 and "same_day" in prices:
+            prices["same_day"] = int(round(prices["same_day"] * (1 + p["same_day_extra"])))
         self.decisions[request["id"]] = {"declined": reason, "prices": prices}
-        if p["explore"]:  # what the desk knew at the quote, for the fit of the win curve
+        if explored:
+            self.decisions[request["id"]]["explored"] = explored
+        if p["explore"] or explored:  # what the desk knew at the quote, for the fit of the win curve
             self.decisions[request["id"]]["seen"] = {"trust": self.trust.get(request["dealerId"], 0), "unbooked": self.unbooked(),
-                                                     "answers": list(self.answers.get(request["dealerId"], [0, 0]))}
+                                                     "answers": list(self.answers.get(request["dealerId"], [0, 0])),
+                                                     "shift": round(self.shift(request["arrivedAt"] // DAY, p, request["legs"][0]["pickup"]["placeId"]), 4)}
         if p["min_on_time"]:
             self.decisions[request["id"]]["onTime"] = round(self.on_time(), 4)
         self.outbox.append({"type": "quote", "requestId": request["id"], "prices": prices})
+
+    @staticmethod
+    def explored(request, p: dict) -> str:
+        """The kind of a request that gets a random price: "private", "trade_in", or "" for the others."""
+        own = kind(request)
+        return "trade_in" if own == "trade_in" and p["explore_trade_in"] else "private" if own.startswith("private") and p["explore_private"] else ""
 
     def floor(self, request, p: dict) -> float:
         """The lowest quote for the request, as a multiple of its typical fee."""
@@ -206,10 +237,17 @@ class Policy(Desk):
         counts = (1 - late) * (on_time < MAX_TRUST) - late * (on_time - on_time // 2)
         return 0.01 * later * revenue * counts
 
-    def shift(self, day: int, p: dict) -> float:
-        """How far today's dealers are from the curve, from their answers so far today."""
-        answers = self.today[1] if self.today[0] == day else []
-        return curve.shift(answers, p["learn"], self.model["slope"]) if p["learn"] and answers else 0.0
+    def shift(self, day: int, p: dict, place: str = "") -> float:
+        """How far today's dealers are from the curve, from their answers so far today, and how much further those
+        with cars in the pickup town are."""
+        if self.today[0] != day or not p["learn"] or not self.today[1]:
+            return 0.0
+        slope = self.model["slope"]
+        shift = curve.shift(self.today[1], p["learn"], slope)
+        here = self.today_at.get(place, [])
+        if p["learn_pickup"] and here:
+            shift += curve.shift([(log_odds + slope * shift, won) for log_odds, won in here], p["learn_pickup"], slope)
+        return shift
 
     @staticmethod
     def draw(request, low: float, high: float) -> float:
@@ -219,9 +257,10 @@ class Policy(Desk):
     def choose(self, request, p: dict) -> tuple[Optional[str], list[dict]]:
         """The options to quote under the parameters `p`, or the reason to decline the request."""
         legs = request["legs"]
-        if len(legs) > 1 and not p["trade_in"]:
+        named = self.explored(request, p) or kind(request) in p["kinds"]
+        if len(legs) > 1 and not (p["trade_in"] or named):
             return "trade_in", []
-        if not p["private"] and any(leg["pickup"]["privateAddress"] or leg["delivery"]["privateAddress"] for leg in legs):
+        if not (p["private"] or named) and any(leg["pickup"]["privateAddress"] or leg["delivery"]["privateAddress"] for leg in legs):
             return "private", []
         if min(self.notified[leg["pickup"]["placeId"]] for leg in legs) < p["min_notified"]:
             return "few_drivers", []
@@ -231,8 +270,7 @@ class Policy(Desk):
         drive = self.drive(request)
         if p["max_drive"] and drive > p["max_drive"]:
             return "long", []
-        ready = max(request["respondBy"], max(leg["pickup"]["window"]["from"] for leg in legs))
-        options = [o for o in options if o["deadline"] - drive - ready >= p["min_slack"]]
+        options = [o for o in options if self.slack(request, o) >= p["min_slack"]]
         if not options:
             return "slack", []
         if p["max_unbooked"] and self.unbooked() >= p["max_unbooked"]:
@@ -240,6 +278,18 @@ class Policy(Desk):
         if share(request["id"]) >= p["quote_share"]:
             return "volume", []
         return None, options
+
+    def slack(self, request, option) -> int:
+        """The minutes the desk has to find a driver: from the first minute a driver can set out with the first car to
+        the last minute that is still on time."""
+        legs = request["legs"]
+        drives = [self.minutes[(leg["pickup"]["placeId"], leg["delivery"]["placeId"])] for leg in legs]
+        if len(legs) == 1:
+            return option["deadline"] - drives[0] - max(request["respondBy"], legs[0]["pickup"]["window"]["from"])
+        # A trade-in: the new car must reach the customer inside their slot, and the old car comes back in the same
+        # visit. The old car's pickup window is that slot, not a time the desk has to wait for.
+        ready = max(request["respondBy"], legs[0]["pickup"]["window"]["from"])
+        return min(legs[0]["delivery"]["window"]["to"], option["deadline"] - drives[1]) - drives[0] - ready
 
     def unbooked(self) -> int:
         """The won cars that no driver holds now: just won, dropped, or posted again after a failed visit."""
@@ -255,6 +305,8 @@ class Policy(Desk):
 
     def opening(self, request, p: dict) -> float:
         """The opening fee of the request's gigs, as a multiple of its typical fee."""
+        if p["kinds"].get(kind(request), {}).get("fee"):
+            return p["kinds"][kind(request)]["fee"]
         if p["long_fee"] and self.long(request, p):
             return p["long_fee"]
         if p["deep_drivers"] and min(self.notified[leg["pickup"]["placeId"]] for leg in request["legs"]) >= p["deep_drivers"]:
@@ -264,17 +316,30 @@ class Policy(Desk):
     def post(self, order, legs, retry: Retry = Retry()) -> None:
         if not self.params()["read_notes"]:
             return super().post(order, legs, retry)
-        # What the note says goes into the first posting. The starter learns it from a failed visit, which costs half the fee.
+        # The starter's post, with what the note says in the first posting. The starter learns that from a failed visit,
+        # which costs half the fee.
         request = self.requests[order["id"]]
         facts = notes.read(request["note"], request["arrivedAt"])
-        first = len(self.outbox)
-        super().post(order, legs, Retry(max(retry.pickup_from, facts.pickup_from), retry.manual_licence or facts.manual, retry.plates or facts.plates))
-        for action in self.outbox[first:]:
-            for stop in action["stops"]:
-                # The starter reads a closing time on the day the window starts. When the car is ready on a later day,
-                # that leaves no time to collect it: the pickup then runs to the end of the request's window.
-                if stop["kind"] == "pickup" and "window" in stop and stop["window"]["to"] < stop["window"]["from"] + HOUR:
-                    stop["window"] = {"from": stop["window"]["from"], "to": max(stop["window"]["from"], order["legs"][stop["leg"]]["pickup"]["window"]["to"])}
+        retry = Retry(max(retry.pickup_from, facts.pickup_from), retry.manual_licence or facts.manual, retry.plates or facts.plates)
+        audience = {"experienced": any(leg["car"]["premium"] for leg in order["legs"]), "manualLicence": retry.manual_licence}
+        stops = without_windows(stops_for(order, legs, request["note"], retry), self.now)
+        for stop in stops:
+            leg = order["legs"][stop["leg"]]
+            # The starter reads a closing time on the day the window starts. When the car is ready on a later day,
+            # that leaves no time to collect it: the pickup then runs to the end of the request's window.
+            if stop["kind"] == "pickup" and "window" in stop and stop["window"]["to"] < stop["window"]["from"] + HOUR:
+                stop["window"] = {"from": stop["window"]["from"], "to": max(stop["window"]["from"], leg["pickup"]["window"]["to"])}
+            # A trade-in's new car is due in the customer's slot, hours before the order's deadline, by which the old car
+            # is back. Without a window of its own the world plans that delivery by the order's deadline.
+            elif (stop["kind"] == "delivery" and "window" not in stop and len(order["legs"]) > 1 and leg["delivery"]["privateAddress"]
+                  and leg["delivery"]["window"]["to"] >= self.now):
+                stop["window"] = dict(leg["delivery"]["window"])
+        self.outbox.append({"type": "post", "stops": stops, "audience": audience, "schedule": self.fees_for(order, len(legs))})
+        if len(legs) > 1:  # a trade-in over the 12-hour limit for a gig with two cars goes as one gig per car
+            self.send()
+            if not self.gigs_of(order["id"]):
+                for leg in legs:
+                    self.post(order, [leg], retry)
 
     def usual_fee(self, request, p: dict) -> float:
         """What drivers usually take for the request, in cents: its typical fee, or its lane's usual fee."""
@@ -373,8 +438,9 @@ class Policy(Desk):
                 answers[0] += 1
                 answers[1] += event["kind"] == "order_won"
                 if self.today[0] != day:
-                    self.today = (day, [])
+                    self.today, self.today_at = (day, []), {}
                 self.today[1].append((log_odds, event["kind"] == "order_won"))
+                self.today_at.setdefault(self.asked_at.pop(event["order"]["id"] if event["kind"] == "order_won" else event["requestId"]), []).append((log_odds, event["kind"] == "order_won"))
         elif event["kind"] in ("gig_viewed", "gig_booked"):
             self.seen[event["driverId"]] = event["at"] // DAY
         elif event["kind"] == "gig_dropped":
@@ -401,6 +467,15 @@ class Policy(Desk):
                 self.opened[result["id"]], self.fees[result["id"]] = self.now, action["schedule"]
             elif action["type"] == "reprice":
                 self.fees[action["gigId"]] = action["schedule"]
+
+
+def kind(request) -> str:
+    """The kind of a request that is not one car between two dealer sites: "trade_in", "private_pickup" or
+    "private_delivery"; "" for the others."""
+    if len(request["legs"]) > 1:
+        return "trade_in"
+    leg = request["legs"][0]
+    return "private_pickup" if leg["pickup"]["privateAddress"] else "private_delivery" if leg["delivery"]["privateAddress"] else ""
 
 
 def lane(request) -> str:

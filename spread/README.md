@@ -281,6 +281,69 @@ PYTHONPATH=. uv run --with scikit-learn python scratch/curve_day.py --write     
 Random prices lose money on purpose, so `explore` is never a candidate. It is safe only because
 practice weeks do not count for the ranking.
 
+## Private addresses and trade-ins
+
+The desk declines requests with a private address (11% of requests) and with two cars (2%). No curve
+had answers for them, so two batches of weeks quoted them a random multiple of the list price and
+kept the dealer requests on the reference (`learn-kinds`, `learn-kinds-2`, seeds `kinds-001` to
+`kinds-020`). The second batch, 20 weeks, with private pickups opening at 1.2 x the typical fee and
+trade-ins at 1.4 x:
+
+| Kind | Won a week | Fees paid over typical | Booked within an hour | Late | Margin an order |
+| --- | --- | --- | --- | --- | --- |
+| dealer sites | 234.6 | 1.07 | 77.6% | 4.2% | +42.7 |
+| private pickup | 26.1 | 1.57 | 71.4% | 9.2% | -8.3 |
+| private delivery | 9.9 | 1.15 | 65.3% | 9.5% | +14.6 |
+| trade-in | 8.0 | 1.84 | 58.1% | 25.6% | -7.9 |
+
+- Dealers buy them about as dealer requests: 82% of private requests under 1.3 x list, 45% at 1.4 to
+  1.5 x, 20% at 1.6 to 1.8 x. A trade-in's list price is 1.63 x its typical fee, and 79% are bought at
+  1.2 to 1.3 x list.
+- Drivers charge for them. At the reference's 1.0 x opening (first batch) a private pickup still paid
+  1.35 x and a trade-in 1.6 x. A late private pickup is mostly a missed slot that the dealer rebooks
+  for the next business day.
+- A trade-in's new car is due in the customer's slot, not by the order's deadline. Posted without a
+  window for that stop, 46% were late; with it, 26%: half of those had no driver before the slot.
+- Only private deliveries pay by the order, so they got policy variants (`kinds`), priced by the curve
+  at their own cost: `delivery-1.3` is -139 (-464 to 216) on tune and -8 (-353 to 374) on holdout,
+  `delivery-1.4` +268 (5 to 522) and -93 (-368 to 215). They win 7 to 8 such orders a week at about
+  36 to 40 an order, and the dealer orders give that back: the total stays at 275 and 253. Not kept.
+- With the dealer curve and a cost of 1.5 x or 1.7 x for every private request (`private-1.5`,
+  `private-1.7`): -112 and -232 on tune.
+- Two won orders that run out and back between two places could go as one gig. There are 20 such
+  pairs a week, but only 2.1 where the first still has no driver when the second is won
+  (`scratch/pairs_count.py`, 60 weeks of the reference); the others would need the desk to hold
+  postings for hours. Not built.
+
+```bash
+PYTHONPATH=. uv run python scratch/kinds_report.py --variant learn-kinds-2 --seeds kinds-001,...   # answers, fees and margin by kind
+PYTHONPATH=. uv run python scratch/kinds_fit.py --seeds kinds-001,...                             # what the curve is off by for each kind
+```
+
+## Short time and the menu
+
+Late orders are the ones with little time to find a driver. Under the reference, 13% of the orders
+won with 5 to 6 hours between the first possible pickup and the last one that is on time are late
+(14 orders a week), 7.6% of those with 6 to 8 hours (34 a week) and 3% of the rest. `same_day`
+orders are 135 a week and 5.6% late, `next_day` 3.3%, `within_3_days` 0.8%
+(`scratch/slack_report.py`, 40 fresh weeks). Two ways to win fewer of them, against
+`steep-notes-offers-8`:
+
+| Variant | Idea | Tune | Holdout | Fresh, 40 | Late orders a week | Lowest week on time |
+| --- | --- | --- | --- | --- | --- | --- |
+| reference | 5 hours at least | | | | 11.3, 12.6, 11.2 | 93.8%, 92.7%, 92.0% |
+| `slack-6` | 6 hours at least | -274 (-680 to 89) | -190 (-860 to 396) | -100 (-339 to 150) | 8.3, 10.3, 8.8 | 95.0%, 92.8%, 91.6% |
+| `slack-7` | 7 hours at least | -561 (-965 to -156) | -165 (-909 to 556) | -287 (-564 to 1) | 7.6, 7.5, 8.1 | 94.9%, 94.5%, 92.2% |
+| `slack-8` | 8 hours at least | -745 (-1,679 to 167) | -732 (-1,638 to 167) | not played | 7.5, 7.6 | 95.3%, 94.0% |
+| `same-day-5`, `same-day-10` | `same_day` quoted 5% or 10% over the slower options | -195 (-856 to 496) and -631 (-1,080 to -184) | not played | not played | 8.5 and 8.1 | 92.4% and 94.8% |
+
+Neither is kept. More time lifts the mean on-time share by a point and costs 100 to 400 a week,
+because those orders still earn about 34 each after their refunds. It does not lift the lowest
+week on the fresh seeds, so it is no insurance for the 90% rule either: the lowest weeks are the
+ones with few drivers, not the ones with many short orders. A dearer `same_day` loses the order
+to the competitor more often than it moves the dealer to `next_day` (264 and 256 orders a week
+against 275).
+
 ## Rules for policy code
 
 The final is one secret week. A policy may use only what the live system sees at that minute: the

@@ -131,6 +131,30 @@ VARIANTS: dict[str, dict] = {
                                       "when_behind": {"same_day": False, "fee": 1.2, "cost": 1.6}},
     "steep-notes-offers-8-guard-93": {**CAPPED, "model": "day", "read_notes": True, "offer_hours": 8, "min_on_time": 0.93, "behind_from": 40,
                                       "when_behind": {"same_day": False, "fee": 1.2, "cost": 1.6}},
+    # Requests with a private address, which the desk has declined so far, at a cost of their own.
+    "private-1.5": {**REFERENCE, "private": True, "private_cost": 1.5},
+    "private-1.7": {**REFERENCE, "private": True, "private_cost": 1.7},
+    # Not a candidate: random prices for the requests with a private address and with two cars, which no curve has answers for.
+    "learn-kinds": {**REFERENCE, "explore_private": [1.1, 2.4], "explore_trade_in": [1.0, 2.0]},
+    # The same with what the first batch showed: a trade-in's new car is due in the customer's slot, and drivers ask more for
+    # a private pickup (paid 1.35 x) and for a trade-in (paid 1.6 x) than their typical fee.
+    "learn-kinds-2": {**REFERENCE, "explore_private": [1.1, 2.0], "explore_trade_in": [1.0, 1.8],
+                      "kinds": {"private_pickup": {"fee": 1.2}, "trade_in": {"fee": 1.4}}},
+    # One-car requests with a private delivery, by the learning weeks: drivers are paid 1.15 x the typical fee and 9.5% are
+    # late, so the cost is 1.3 x or 1.4 x; dealers buy a little more readily than the curve says.
+    "delivery-1.3": {**REFERENCE, "kinds": {"private_delivery": {"cost": 1.3, "odds": 0.37}}},
+    "delivery-1.4": {**REFERENCE, "kinds": {"private_delivery": {"cost": 1.4, "odds": 0.37}}},
+    # The time to find a driver. Under the reference 13% of the orders won with 5 to 6 hours of it are late, 7.6% of
+    # those with 6 to 8 hours and 3% of the rest; `min_slack` is 5 hours there.
+    "slack-6": {**REFERENCE, "min_slack": 360},
+    "slack-7": {**REFERENCE, "min_slack": 420},
+    "slack-8": {**REFERENCE, "min_slack": 480},
+    # The menu. At one multiple of the list price dealers take `same_day` 6 times in 7, and those orders are late most
+    # often (5.6% against 3.3% for `next_day`). A dearer `same_day` leaves the choice to the dealer.
+    "same-day-5": {**REFERENCE, "same_day_extra": 0.05},
+    "same-day-10": {**REFERENCE, "same_day_extra": 0.10},
+    # The day's correction of the curve, and on top of it one for the pickup town that starts again each morning.
+    "pickup-0.10": {**REFERENCE, "learn_pickup": 0.10},
     # A week with a short driver list has more late orders: under 720 drivers, gigs open at 1.2 x and an order is taken to cost 1.5 x.
     "tight-720": {**CAPPED, "tight_drivers": 720, "when_tight": {"fee": 1.2, "cost": 1.5}},
     "tight-720-mild": {**CAPPED, "tight_drivers": 720, "when_tight": {"fee": 1.1, "cost": 1.4}},

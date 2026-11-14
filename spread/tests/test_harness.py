@@ -56,6 +56,14 @@ def test_policy_quotes_only_the_options_it_accepts():
     assert d.decisions["R1"] == {"declined": None, "prices": {"next_day": 15000}}
 
 
+def test_same_day_is_quoted_dearer_only_beside_a_slower_option():
+    d = desk(price=1.5, same_day=True, same_day_extra=0.1)
+    d.quote(request("R1", options=(("same_day", 2640), ("next_day", 4080))))
+    d.quote(request("R2", options=(("same_day", 2640),)))
+    assert d.decisions["R1"]["prices"] == {"same_day": 16500, "next_day": 15000}
+    assert d.decisions["R2"]["prices"] == {"same_day": 15000}
+
+
 def test_floor_raises_only_the_quotes_that_are_under_it():
     # 1.5 x list is 15000. The typical fee of 9000 puts a floor of 1.5 at 13500, under the quote, and 12000 puts it at 18000, over it.
     d = desk(price=1.5, floor=1.5)
@@ -209,7 +217,7 @@ def test_random_quotes_stay_in_their_range_cover_it_and_differ_between_weeks():
         d.quote(request(f"R{n}", referenceFeeCents=5000))  # the floor of 6500 is under every random quote
         multiples.append(d.decisions[f"R{n}"]["prices"]["next_day"] / 10000)
     assert 1.1 <= min(multiples) < 1.2 and 2.3 < max(multiples) <= 2.4
-    assert d.decisions["R0"]["seen"] == {"trust": 0, "unbooked": 0, "answers": [0, 0]}
+    assert d.decisions["R0"]["seen"] == {"trust": 0, "unbooked": 0, "answers": [0, 0], "shift": 0.0}
     other_week = desk(explore=[1.1, 2.4])
     other_week.quote(request("R0", arrivedAt=501, referenceFeeCents=5000))
     assert other_week.decisions["R0"]["prices"] != d.decisions["R0"]["prices"]
@@ -248,6 +256,19 @@ def test_curve_price_follows_the_answers_of_the_day_and_starts_each_day_from_the
     assert price(refused, "R1") < price(plain, "R1") < price(bought, "R1")
     assert price(deaf, "R1") == price(plain, "R1")  # without `learn` the answers change nothing
     assert price(refused, "R2") == price(bought, "R2") == price(plain, "R2")  # Tuesday has no answers yet
+
+
+def test_curve_price_follows_the_answers_for_the_pickup_town_on_top_of_those_of_the_day():
+    day, town = desk(curve=True, learn=0.16), desk(curve=True, learn=0.16, learn_pickup=0.10)
+    for d in (day, town):
+        for n in range(12):  # today the dealers refuse cars from Vantaa and buy cars from Tampere
+            answer(d, f"A{n}", False, dealerId=f"D{n}", pickup="vantaa")
+            answer(d, f"B{n}", True, dealerId=f"E{n}", pickup="tampere")
+        d.quote(request("R1", dealerId="D99", pickup="vantaa"))
+        d.quote(request("R2", dealerId="D99", pickup="tampere"))
+        d.quote(request("R3", dealerId="D99", pickup="helsinki"))  # no answers for cars from there: the day's level alone
+    price = lambda d, id_: d.decisions[id_]["prices"]["next_day"]
+    assert price(town, "R1") < price(day, "R1") and price(town, "R2") > price(day, "R2") and price(town, "R3") == price(day, "R3")
 
 
 def test_cost_by_order_is_higher_for_a_long_lane_a_note_and_few_drivers():
@@ -353,6 +374,12 @@ def test_long_drives_and_pickups_with_many_drivers_open_at_their_own_fee_and_lon
         d.quote(request())
         quotes.append(d.decisions["R1"]["prices"]["next_day"])
     assert quotes[1] > quotes[0]
+    quotes = []
+    for params in ({}, {"private_cost": 1.7}):
+        d = desk(curve=True, cost=1.2, private=True, **params)
+        d.quote(request(private=True))
+        quotes.append(d.decisions["R1"]["prices"]["next_day"])
+    assert quotes[1] > quotes[0]
 
 
 TUESDAY_NOON = 24 * 60 + 12 * 60
@@ -452,6 +479,21 @@ def test_direct_offers_go_to_the_nearest_drivers_who_used_the_app_today_for_gigs
     assert [action["driverId"] for action in far.outbox] == ["d1"]
 
 
+def test_random_prices_for_a_kind_of_request_leave_the_other_requests_on_the_policy():
+    d = desk(explore_private=[1.1, 2.4], explore_trade_in=[1.0, 2.0])
+    d.quote(request("R1"))
+    assert d.decisions["R1"] == {"declined": None, "prices": {"next_day": 15000}} and "R1" in d.asked
+    d.quote(request("R2", private=True))
+    d.quote(request("R3", private=True, legs=2))
+    assert (d.decisions["R2"]["explored"], d.decisions["R3"]["explored"]) == ("private", "trade_in")
+    assert 11700 <= d.decisions["R2"]["prices"]["next_day"] <= 24000 and 11700 <= d.decisions["R3"]["prices"]["next_day"] <= 20000
+    assert "R2" not in d.asked and "R3" not in d.asked  # their answers do not move the day's level
+    only = desk(explore_trade_in=[1.0, 2.0])
+    only.quote(request("R2", private=True))
+    only.quote(request("R3", private=True, legs=2))
+    assert (only.decisions["R2"]["declined"], only.decisions["R3"]["declined"]) == ("private", None)
+
+
 def test_a_rule_cannot_set_a_rule():
     with pytest.raises(ValueError, match="when_behind cannot set .*min_on_time"):
         desk(when_behind={"min_on_time": 0.5})
@@ -471,6 +513,60 @@ def test_policy_decline_reasons(params, made, reason):
     d = desk(**params)
     d.quote(request("R1", **made))
     assert d.decisions["R1"]["declined"] == reason
+
+
+def test_slack_of_a_trade_in_runs_to_the_customers_slot_and_does_not_wait_for_it():
+    site = lambda place, start=500, end=3000: {"placeId": place, "privateAddress": False, "window": {"from": start, "to": end}, "hours": None}  # noqa: E731
+    home = {"placeId": "helsinki", "privateAddress": True, "window": {"from": 900, "to": 960}, "hours": None}  # the customer is home from 15:00 to 16:00
+    car = {"premium": False, "electric": False, "chargePercent": None}
+    trade_in = request(options=(("same_day", 1200),))
+    trade_in["legs"] = [{"car": car, "pickup": site("vantaa"), "delivery": home}, {"car": car, "pickup": home, "delivery": site("vantaa", 900, 1200)}]
+    # A driver can set out at 08:35 and must by 14:00 to reach the slot's end after 120 minutes: 325 minutes.
+    d = desk(trade_in=True, private=True, same_day=True)
+    assert d.slack(trade_in, trade_in["options"][0]) == 325
+    d.quote(trade_in)
+    assert d.decisions["R1"]["declined"] is None
+    tight = desk(trade_in=True, private=True, same_day=True, min_slack=330)
+    tight.quote(trade_in)
+    assert tight.decisions["R1"]["declined"] == "slack"
+
+
+def test_a_kind_of_request_is_quoted_with_its_own_cost_fee_and_odds_and_a_trade_in_is_due_in_the_customers_slot():
+    assert [policy.kind(q) for q in (request(), request(private=True), request(private=True, legs=2))] == ["", "private_delivery", "trade_in"]
+    plain = desk(curve=True, cost=1.2)
+    plain.quote(request("R1", private=True))
+    assert plain.decisions["R1"]["declined"] == "private"
+    price = {}
+    for name, own in (("same", {}), ("dear", {"cost": 1.7}), ("unlikely", {"odds": -1.0})):
+        d = desk(curve=True, cost=1.2, kinds={"private_delivery": own})
+        d.quote(request("R1", private=True))
+        d.quote(request("R2", private=True, legs=2))
+        assert d.decisions["R2"]["declined"] == "trade_in"  # a kind that is not named stays declined
+        price[name] = d.decisions["R1"]["prices"]["next_day"]
+    assert price["dear"] > price["same"] > price["unlikely"]
+    # The opening fee of the kind, and the customer's slot as the window of the new car's delivery.
+    site = lambda place, start=500, end=3000: {"placeId": place, "privateAddress": False, "window": {"from": start, "to": end}, "hours": None}  # noqa: E731
+    home = {"placeId": "helsinki", "privateAddress": True, "window": {"from": 900, "to": 960}, "hours": None}
+    car = {"premium": False, "electric": False, "chargePercent": None}
+    trade_in = request(options=(("same_day", 1200),))
+    trade_in["legs"] = [{"car": car, "pickup": site("vantaa"), "delivery": home}, {"car": car, "pickup": home, "delivery": site("vantaa", 900, 1200)}]
+
+    class World:
+        def act(self, actions):
+            return [{"ok": True, "id": "G1"} for _ in actions]
+
+    d = desk(fee=1.0, fee_cap=1.0, same_day=True, read_notes=True, kinds={"trade_in": {"fee": 1.4}})
+    d.world = World()
+    d.quote(trade_in)
+    assert d.decisions["R1"]["declined"] is None
+    d.outbox = []
+    sent = []
+    d.read_results = lambda actions, results: sent.extend(actions) or policy.Desk.read_results(d, actions, results)
+    d.win({"id": "R1", "legs": trade_in["legs"], "deliveredAt": [None, None], "deadline": 1200, "option": "same_day", "lastPickupAt": 840})
+    stops = sent[0]["stops"]
+    assert [stop["kind"] for stop in stops] == ["pickup", "delivery", "pickup", "delivery"]
+    assert stops[1]["window"] == {"from": 900, "to": 960} and "window" not in stops[3]
+    assert sent[0]["schedule"] == [{"at": 500, "feeCents": 12600}]  # one gig for both cars at 1.4 x the typical fee of 9000
 
 
 def test_slack_at_the_limit_is_quoted():
