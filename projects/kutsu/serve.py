@@ -23,9 +23,11 @@ import os
 import re
 import sys
 import threading
+import time
 import urllib.parse
 
 import lib
+import monitors
 import signals
 
 HOST, PORT = os.environ.get("HOST", "127.0.0.1"), 8046
@@ -44,6 +46,8 @@ saving = threading.Lock()
 asked = {x.lower() for b in json.loads(signals.OUT.read_text()) for x in (b["id"], b["name"])}
 START = len(asked)
 researching = threading.BoundedSemaphore(4)
+watching = threading.Lock()
+watch = {"read": 0.0, "seen": {"watched": {}, "changes": [], "checked_at": ""}}
 progress = {}  # query -> the steps its research has taken
 
 
@@ -58,6 +62,18 @@ def reviews():
         print(f"sign-ups saved in another shape were set aside as {aside.name}; starting with none", file=sys.stderr)
         return {}
     return saved["reviews"]
+
+
+def changes():
+    """What Context.dev's monitors saw change, read from it at most every five minutes. Without a key nothing is watched."""
+    with watching:
+        if "CONTEXT_DEV_API_KEY" in os.environ and time.time() - watch["read"] > 300:
+            watch["read"] = time.time()
+            try:
+                watch["seen"] = {**monitors.changes(), "checked_at": lib.now_iso()}
+            except (RuntimeError, OSError) as error:  # their side is down: the last answer stands until the next try
+                print(f"monitors: {error}", file=sys.stderr)
+        return watch["seen"]
 
 
 def well_formed(review):
@@ -92,6 +108,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
         q = urllib.parse.parse_qs(url.query).get("q", [""])[0].strip()[:100]
         if url.path == "/reviews.json":
             return self.json(reviews())
+        if url.path == "/changes.json":
+            return self.json(changes())
         if url.path in DATA:
             return self.reply(200, (lib.HERE / DATA[url.path]).read_bytes(), "application/json")
         if url.path == "/progress":

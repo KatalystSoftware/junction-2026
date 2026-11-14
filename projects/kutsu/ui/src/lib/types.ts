@@ -110,4 +110,8 @@ export type PoolField = {
 /** A real past event with its public page. `published` is a figure that page gives; `people` is how many of the sample pool came. */
 export type PastEvent = { id: string; name: string; date: string; where: string; published: string; url: string; people: number }
 export type Pool = { note: string; people: number; events: PastEvent[]; fields: Record<string, PoolField> }
+/** Something a Context.dev monitor saw change for a company: a job opening on its careers page, or news about it. */
+export type Change = { id: string; brief: string; kind: 'careers' | 'news'; title: string; summary: string; url: string; detected_at: string; importance: string }
+type Watched = { last_run_at: string | null; next_run_at: string | null; last_change_at: string | null }
+export type Watch = { watched: Record<string, { careers?: Watched; news?: Watched }>; changes: Change[]; checked_at: string }
 export type Step = { stage: 'identity' | 'search' | 'careers' | 'read' | 'check' | 'card'; [fact: string]: unknown }

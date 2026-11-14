@@ -7,6 +7,7 @@
   import Progress from './Progress.svelte'
   import { app, nameOf } from './state.svelte'
   import Wall from './Wall.svelte'
+  import Watch from './Watch.svelte'
 
   // Where Espoo starts: the event being prepared, the events worth holding next, and the past events
   // whose people make up the pool every suggestion draws on.
@@ -41,6 +42,8 @@
       <a class="btn primary" href="#/event/{plan.slug}">Open the event<Icon name="flat" size={18} /></a>
     </section>
   {/each}
+
+  <Watch />
 
   <section>
     <h2>Suggested next</h2>

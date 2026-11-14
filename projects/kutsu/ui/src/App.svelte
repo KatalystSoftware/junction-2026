@@ -12,6 +12,7 @@
   import Research from './lib/Research.svelte'
   import Stage from './lib/Stage.svelte'
   import Track from './lib/Track.svelte'
+  import Watch from './lib/Watch.svelte'
   import { app, load, reviewOf, route } from './lib/state.svelte'
 
   load()
@@ -66,6 +67,7 @@
                     </p>
                   {/if}
                 </section>
+                <Watch {brief} />
                 {#if brief.signals.length}<Ledger {brief} />{/if}
               {/key}
             </main>

@@ -99,13 +99,24 @@ four at a time, because each one spends our credits.
 ## Context.dev endpoints: what each gives Kutsu and where you see it
 
 Context.dev is the first call for every company and it decides how the whole sign-up looks. Three
-endpoints, all in the core flow:
+endpoints are in the core flow, and monitors keep the picture current afterwards. All of these are
+live in the demo; nothing below is only described.
 
 | Endpoint | Why Kutsu calls it | Where a viewer sees it |
 |---|---|---|
 | `GET /v1/brand/search` | A person types "nitor" or "hamina wireless". This turns the words into the right company and its domain (Finnish matches first; a match must carry the first word typed). | The company's proper name appears within a second or two of pressing Enter, on `#/join` and in Espoo's search box. |
 | `POST /v1/brand/retrieve` (by domain) | The company's identity: name, logo, square icon, brand colours, field, size, city, careers link. The domain it confirms also scopes every web search that follows, so namesakes stay out. | Everything branded: the invitation floods with the company's colour from its logo; "Is this you?" is this record, line by line; the square icons in Espoo's list; the logo on the finished card. |
 | `POST /v1/web/scrape` (markdown) | Reads the company's careers page, script-rendered ones included, as one more page to quote from: what the company tells candidates itself. | Statements and needs that cite the company's own careers page, with the quoted sentence on hover. |
+| `POST /v1/monitors` (page target, with instructions) | Watches each company's careers page for a job opening added or removed. 42 of the 74 companies have a careers link. 1 credit a run. | "Changed lately" on Espoo's events screen, and "Changed since the draft" on an employer. |
+| `POST /v1/monitors` (search target) | Watches the web for news that a company is growing: funding, an acquisition, a new site, a hiring plan. One per company, 74. 2 credits a run. | The same two places. |
+| `GET /v1/monitors`, `GET /v1/monitors/changes` | Reads back what is watched and what changed, at most every five minutes. | The line "Watching 42 careers pages and news about 74 employers, next at 20:34". |
+
+Monitors (`monitors.py`): 116 of them, every six hours, tagged `kutsu`. One run of all costs 190
+credits, 760 a day; `python3 monitors.py delete` removes them and should be run after the event. The
+page polls instead of taking webhooks, so there is no public endpoint to protect. A change whose
+title or summary names a person is dropped, as everywhere else. Not used: the LinkedIn profile read
+for a candidate's prefill was tested once (`web/scrape` returns a public profile, 1 credit) and is
+not built.
 
 How it is used: every response is checked before use (`status` on the brand record, `success` on the
 scrape output), and stored in `api-cache/` so no call is paid twice, as their brief advises. We keep
@@ -174,6 +185,7 @@ sections from "Headline numbers" on describe that run.
 | `esittely-companies.json` | the same roles in the company and job-ad shape of `projects/espoo-recruitment/app/data.js` (role family ids and skill ids are the demo's own); `size`, `stand`, `tradeoffs` and minimum experience are left out because nothing public grounds them |
 | `signals.json`, `signals.md` | per company: identity from Context.dev, what public sources state (claim, verbatim quote, URL) and, kept apart, the inferred card: a pitch and the needs, citing those statements |
 | `ui/`, `serve.py` | the Kutsu app (Svelte) and the small server behind it: live research, progress, sign-up state, a role drafted from one line |
+| `monitors.py` | creates, lists and deletes the Context.dev monitors, and reads back what changed |
 | `presets.json` | named lists of employers shown first, such as the Deep Tech Talent Forum's |
 | `pool.py`, `pool.json` | the sample pool: people who came to past events, as counts per field of work; seeded, nobody real |
 | `metrics.jsonl` | one line per round |

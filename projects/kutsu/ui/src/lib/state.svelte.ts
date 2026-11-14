@@ -1,4 +1,4 @@
-import type { Brief, Pool, Preset, Review, Status, Step } from './types'
+import type { Brief, Pool, Preset, Review, Status, Step, Watch } from './types'
 
 /** Everything the page shows. Reviews are polled, so a company's reply arrives without a reload. */
 export const app = $state({
@@ -6,6 +6,7 @@ export const app = $state({
   presets: [] as Preset[],
   reviews: {} as Record<string, Review>,
   pool: { note: '', people: 0, events: [], fields: {} } as Pool,
+  watch: { watched: {}, changes: [], checked_at: '' } as Watch,
   hash: location.hash,
   ready: false,
   research: null as null | { query: string; steps: Step[]; error: string },
@@ -14,8 +15,10 @@ export const app = $state({
 const get = (path: string) => fetch(path).then((r) => r.json())
 
 export async function load() {
-  const [briefs, presets, reviews, pool] = await Promise.all(['signals.json', 'presets.json', 'reviews.json', 'pool.json'].map(get))
-  Object.assign(app, { briefs, presets, reviews, pool, ready: true })
+  const [briefs, presets, reviews, pool, watch] = await Promise.all(['signals.json', 'presets.json', 'reviews.json', 'pool.json', 'changes.json'].map(get))
+  Object.assign(app, { briefs, presets, reviews, pool, watch, ready: true })
+  // the server asks Context.dev at most every five minutes, so asking it once a minute is cheap
+  setInterval(async () => (app.watch = await get('changes.json')), 60_000)
   addEventListener('hashchange', () => (app.hash = location.hash))
   // a field being typed in would lose its text to a poll, so polls wait for the typing to end
   setInterval(async () => {

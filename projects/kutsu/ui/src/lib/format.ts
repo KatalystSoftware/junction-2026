@@ -24,5 +24,13 @@ export const terms = (n: { seniority: string; language?: string | null; workplac
     n.abroad == null ? '' : n.abroad ? 'Hires from abroad' : 'Only people already in Finland',
   ].filter(Boolean)
 
+/** How long ago a moment was, in the coarsest unit that is still true: "20 min ago", "3 h ago", "2 days ago". */
+export const ago = (iso: string) => {
+  const minutes = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 60000))
+  if (minutes < 60) return `${String(minutes)} min ago`
+  if (minutes < 60 * 24) return `${String(Math.round(minutes / 60))} h ago`
+  return `${String(Math.round(minutes / 1440))} days ago`
+}
+
 export const clock = (iso?: string) =>
-  iso ? new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''
+  iso ? new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }) : ''
