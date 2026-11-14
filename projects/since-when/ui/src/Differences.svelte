@@ -78,14 +78,14 @@
 		{/if}
 		{#if found.length}
 			{#if judge}
-				<Why id="why-list" label="Checked by Nemotron">{modelName(topic.checked?.model)} suggested these by comparing the articles passage by passage{#if modelName(topic.checked?.model) === modelName(judge)}, then looked each one up in the whole other article{:else}; {modelName(judge)} looked each one up in the whole other article{/if}. A person closed the rows found false on reading; the rest no person has checked. The quotes are word for word: read them to judge.{#if tally}<br /><br />{modelName(judge)} looked up {tally.looked} suggestions in the whole other article on {day(topic.checked!.as_of)} and set aside {tally.aside}{#if tally.aside}:
+				<Why id="why-list" label="Checked by Nemotron">{modelName(topic.checked?.model)} suggested these by comparing the articles passage by passage{#if modelName(topic.checked?.model) === modelName(judge)}, then looked each one up in the whole other article{:else}; {modelName(judge)} looked each one up in the whole other article{/if}. Rows that a further review, by language models reading both articles, found false are closed; no person has checked any of them. The quotes are word for word: read them to judge.{#if tally}<br /><br />{modelName(judge)} looked up {tally.looked} suggestions in the whole other article on {day(topic.checked!.as_of)} and set aside {tally.aside}{#if tally.aside}:
 				{list([
 					tally.by.stated_elsewhere ? `${tally.by.stated_elsewhere} where the other edition states the fact elsewhere` : '',
 					tally.by.repeat ? `${plural(tally.by.repeat, 'repeat', 'repeats')} of another row` : '',
 					tally.by.not_confirmed ? `${tally.by.not_confirmed} not confirmed from both sides` : '',
 				].filter(Boolean))}{/if}.
 			{#if aside.length}<a href="#aside-title" onclick={() => (asideOpen = true)}>{plural(aside.length, 'statement', 'statements')} the other edition states</a>, each with the passage that states it, are listed below; a statement set aside more than once is listed once.{/if}
-			{#if tally.closed}A person read both articles and closed {tally.closed} more.{/if}{/if}</Why>
+			{#if tally.closed}That review closed {tally.closed} more.{/if}{/if}</Why>
 			{:else}
 				<Why id="why-list" label="Suggested by Nemotron">{modelName(null)} suggested these by comparing passage with passage. They have not been looked up in the whole other article, and no person has checked them. The quotes are word for word: read them to judge.</Why>
 			{/if}

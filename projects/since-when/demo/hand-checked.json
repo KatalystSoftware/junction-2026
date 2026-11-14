@@ -1,5 +1,5 @@
 {
-  "about": "What a person decided after reading both articles, for rows the claim check let stand. Applied with `python -m gapfinder.checked hand demo/hand-checked.json`, after every load: a row is found by its topic, type and the words of its quotes as the page shows them, since finding ids change with each restore. An optional `outcome` limits a row to findings the check gave that outcome. `close` marks the row not a difference (finding.status, or checked_finding.status for a row the check found itself), with the reason; `summary` replaces the check's one-line summary with the classifier's own, where the check's rewrite lost the point; `quote` puts back an edition's words as the article has them, where an older cleaner of the text cut them. The reasons are those of hero-labels.json and hero-verify-notes.md.",
+  "about": "What a review decided after reading both articles (language-model reviewers given the cited revisions, each reason naming its review), for rows the claim check let stand. Applied with `python -m gapfinder.checked hand demo/hand-checked.json`, after every load: a row is found by its topic, type and the words of its quotes as the page shows them, since finding ids change with each restore. An optional `outcome` limits a row to findings the check gave that outcome. `close` marks the row not a difference (finding.status, or checked_finding.status for a row the check found itself), with the reason; `summary` replaces the check's one-line summary with the classifier's own, where the check's rewrite lost the point; `quote` puts back an edition's words as the article has them, where an older cleaner of the text cut them. The reasons are those of hero-labels.json and hero-verify-notes.md.",
   "rows": [
     {
       "topic": "Q1412941",
@@ -308,6 +308,14 @@
         "fi": "vaikutus jäi psykologiselle tasolle"
       },
       "close": "Compatible: a victory of psychological effect and a chance for a counter-offensive are not opposed. (round 3 of the blind review, editor reviewer)"
+    },
+    {
+      "topic": "Q1412941",
+      "type": "numbers",
+      "quotes": {
+        "en": "attracting more than 1,000 people"
+      },
+      "close": "Two different meetings: the English 'more than 1,000' is the 1 December meeting, the Finnish 'up to 3,000' the Lapua meeting (review of the pitch, MariaDB-judge reviewers)."
     }
   ]
 }
