@@ -80,8 +80,9 @@ line for each claim (`src/lib/differences.ts`):
 
 - **A difference** is made of the open rows where both editions say something and the two differ
   (the API's `framing`, `numbers` and `contradiction`). Rows are one difference when they are of the
-  same type and name the same loaded word, or quote the same words of an edition (the same quote,
-  or one inside the other). It shows one quote for each edition, up to three.
+  same type and name the same loaded word, quote the same words of an edition (the same quote, or
+  one inside the other and most of it), or single out the same figures between the same two
+  editions. It shows one quote for each edition, up to three.
 - **Its sentence** is the classifier's summary with "the Swedish passage" turned into "Swedish
   Wikipedia". When a third edition's quote comes from another row, that row's clause is added. For
   a loaded word the lexicon found, the sentence is built from the rows: who uses the word and who

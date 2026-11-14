@@ -30,12 +30,25 @@ const inLead = (f: Finding) => f.section === '' && f.other_section === ''
 const dated = (f: Finding) => f.history !== false && !!f.opened_after && Date.parse(f.opened_at) - Date.parse(f.opened_after) <= 86_400_000
 const squash = (s: string) => s.replace(/\s+/g, ' ').trim().toLowerCase()
 
-// The same words: equal, or one quote inside the other (a clause and its sentence).
-const sameWords = (a: string, b: string) => a === b || (Math.min(a.length, b.length) >= 12 && (a.includes(b) || b.includes(a)))
+// The same words: equal, or one quote inside the other and most of it. A clause inside a long
+// sentence is not enough: one sentence can hold two claims.
+const sameWords = (a: string, b: string) => a === b || (Math.min(a.length, b.length) >= 0.6 * Math.max(a.length, b.length) && (a.includes(b) || b.includes(a)))
 const sharedQuote = (a: Finding, b: Finding) => LANGS.some((l) => a.quotes[l] && b.quotes[l] && sameWords(squash(a.quotes[l]!), squash(b.quotes[l]!)))
 
-/** Two rows are one claim when they are of one type and name the same loaded word or quote the same words of an edition. */
-const sameClaim = (a: Finding, b: Finding) => a.type === b.type && ((a.type === 'framing' && !!a.terms?.some((t) => b.terms?.includes(t))) || sharedQuote(a, b))
+// The figures a row singles out in an edition: those of its quote that the other quote does not have.
+function singled(f: Finding, l: Lang): string {
+	const other = new Set(figures(f.quotes[l === f.lang ? f.other_lang : f.lang] ?? '').map((n) => n.value))
+	return [...new Set(figures(f.quotes[l] ?? '').map((n) => n.value))].filter((v) => !other.has(v)).sort().join()
+}
+// Two rows about figures, between the same two editions, that single out the same figures on both sides.
+const sameFigures = (a: Finding, b: Finding) =>
+	a.type === 'numbers' && [a.lang, a.other_lang].every((l) => (l === b.lang || l === b.other_lang) && !!singled(a, l) && singled(a, l) === singled(b, l))
+
+/**
+ * Two rows are one claim when they are of one type and name the same loaded word, quote the same
+ * words of an edition, or single out the same figures.
+ */
+const sameClaim = (a: Finding, b: Finding) => a.type === b.type && ((a.type === 'framing' && !!a.terms?.some((t) => b.terms?.includes(t))) || sharedQuote(a, b) || sameFigures(a, b))
 
 // The lexicon writes one fixed sentence per loaded word.
 const LEXICON = /^The (Finnish|Swedish|English) first sentence uses .+; the (Finnish|Swedish|English) first sentence uses other words for the same thing\.$/

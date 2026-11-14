@@ -113,7 +113,7 @@ Same steps, same clicks. Only the opening sentence of step 1 changes:
 
 What comes back:
 
-- Step 1, Finnish War: "18 differences"; the first, open, is the surrender of Sveaborg (early May
+- Step 1, Finnish War: "19 differences"; the first, open, is the surrender of Sveaborg (early May
   in Finnish, 3 May in Swedish, 6 May in English, dated "since 24 May 2015"; findings 14353 and
   14474 as one difference). Diet of Porvoo: "5 differences"; the first is the emperor's pledge
   (29 March 1809 in Finnish and Swedish, "15th/27th day of March" in English, dated "since 16 June
