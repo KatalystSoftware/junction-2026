@@ -1013,6 +1013,129 @@ It is a small part of the cap's cost: of cap 70's 3.1 declined orders a week, it
 The live desk plays it: the cap and the lift are parameters of `Policy`, and the live desk counts the drops of the
 events it missed while it was down, as it learns the rest.
 
+## Pricing the drop exposure of the book (`exposure-k*`, screened offline, not played)
+
+`exposure-k*` ([`exposure.py`](spreadlab/exposure.py), `ExposurePolicy`, off by default) prices each quote by what its
+order adds to the book of won orders not yet delivered, in place of the waiting-car surcharge (`slow_step`), the late cost,
+the day cap and the Friday terms of the late model; the class refuses those together with `exposure`. The cost in the quote
+is the typical fee x 1.2, plus €82 for each late order the order adds to the book's expected count, plus κ x the week's
+value x the chance it adds of a week under 90% on time, never under the typical fee. Each menu (all options, then without
+the fastest, ...) is priced on its fastest option and the one with the highest expected margin is quoted.
+
+- **The book.** Each car: its due day, held or waiting, hours left, how long it has waited, and `need`, a logistic for the
+  chance that a car needing a driver now ends late: bands of hours left and of daytime (06:00 to 18:00) hours left,
+  `slow.py`'s car terms without the Friday ones, the drivers near the pickup and near the delivery, whether it was dropped,
+  night, and the load, ln(1 + waiting cars due the same day, and on other days, per 100 listed drivers). Fitted on the
+  rows of 854 saved weeks of the default, `steep-notes-offers-8` and `thin-premium-0.4` without `fresh-1301`-`1460`
+  (left-out AUC 0.827, log loss 0.195). A held car drops at 0.107 a day; ε, the late chance of a car that keeps its
+  driver, is measured at 1 to 2.4%.
+- **The flu day.** Each day still to come may be the week's one flu day. Its weight starts at 1 over the days of the week and
+  each past night's first hour moves it by a likelihood ratio: its drops of the held cars due that day under a wave's share
+  (0.26, 0.33, 0.50) against a calm night's (0.0275). On the flu day 34% of that day's held cars drop at once. No weekday,
+  car count or drop count is a parameter.
+- **The tail.** The week's late count is a mixture: a shift of every car's log odds for the week (sd 0.40), a further one
+  shared by the flu day's cars (sd 0.69, measured as the day's spread beyond the cars' own), 5 x 5 Gauss-Hermite nodes,
+  a normal count within a node. A variance alone gave weeks that ended at 87.7% a chance of 0.000. The orders still to come
+  follow the share of a week's orders won after each hour (`won_after`): 14.6% are still to come on Thursday at 20:00.
+
+**Calibration** ([`checks.py`](scratch/exposure/checks.py), the books at 20:00):
+
+- Passed on the recorded books: expected against actual late orders among the next day's cars within a fifth up to 10
+  cars due per 100 drivers, calm days and wave days alike. The weight of Friday at Thursday 20:00 is 0.40 (0.41 on the
+  left-out weeks), against a wave on 27% of those Fridays and 0.43 by the nights' own ratio. P(week under 92%) and under
+  94% fall in the right bands.
+- Missed: above 10 cars due per 100 drivers the expected count is 20 to 25% low, and on the 11 heavy Friday-wave weeks
+  (100 or more due) the chance of a week under 90% at Thursday 20:00 averages 0.005 where 2 ended under 90%.
+- On 197 played weeks of 13 high-volume desks (314 to 438 one-car orders a week, below), none in the fit: the body of the
+  bands holds (P under 92% of 0.027 ended under in 2.3% of evenings, 0.074 in 7.2%), but two things are short in play
+  too. The top of the tail: P of 0.15 or more runs 2 to 3 x low (38 evenings). And the calm-day mean at volume: 16 to 18%
+  low at 4 to 10 cars due per 100 drivers. The residual variance is 1.61 there against 1.24 on the fit variants.
+
+**The screen** ([`sim_screen.py`](scratch/exposure/sim_screen.py)) is the on-time target's closed-loop stand-in above,
+with one more term: a day's cars crowd each other, so each order's log odds of ending late move by 0.052 (0.136 on a day
+with a drop wave) for each car due that day per 100 drivers beyond the recorded week's. The default's 266 recorded weeks,
+one draw, a week under 90% counted as no margin. V, the week's value, runs about 1.3 x the realised margin, so each κ is
+about 1.3 x its label.
+
+| Rule, with the congestion term | Margin against the default | Orders, late | Under 90%: all, natural, thin, Friday wave 100+ due | Under 92% |
+| --- | --- | --- | --- | --- |
+| default | 12,013 | 300.5, 10.5 | 1 of 266; 0.53, 0, 6.67 per 60 | 11 |
+| `day-cap-70` | +17 (-45 to 123) | 299.5, 10.3 | 0; 0, 0, 0 | 11 |
+| default, surcharge on cars due within 24 h | +216 (-53 to 434) | 339.3, 15.2 | 9; 1.05, 3.91, 6.67 | 31 |
+| κ 2 | +222 (-163 to 565) | 375.7, 20.3 | 15; 4.74, 3.26, 20 | 50 |
+| κ 4 | +173 (-168 to 482) | 369.0, 18.8 | 12; 3.68, 2.61, 13.3 | 40 |
+| κ 8 | +52 (-268 to 334) | 358.7, 16.8 | 9; 2.63, 2.61, 6.67 | 27 |
+| κ 16 | -201 (-479 to 47) | 346.8, 14.8 | 6; 2.11, 1.30, 0 | 18 |
+| κ 32 | -543 (-727 to -356) | 332.2, 12.9 | 2; 1.05, 0, 0 | 12 |
+| κ 8, gate 25 | +74 (-198 to 324) | 353.4, 16.0 | 5; 1.58, 1.30, 6.67 | 24 |
+| κ 16, gate 25 | -204 (-421 to 4) | 341.9, 14.2 | 3; 1.05, 0.65, 0 | 15 |
+| κ 1 without the tail term | -1,525 | 391.2, 26.1 | 51 | 78 |
+| κ 1 without the flu-day scenarios | -1,074 | 395.8, 24.4 | 40 | 73 |
+
+| Rule, without the congestion term | Margin against the default | Orders, late | Under 90%: all, natural, thin, Friday wave 100+ due | Under 92% |
+| --- | --- | --- | --- | --- |
+| default | 12,018 | 300.5, 10.3 | 1; 0.53, 0, 6.67 | 10 |
+| `day-cap-70` | +14 (-49 to 120) | 299.5, 10.2 | 0; 0, 0, 0 | 10 |
+| κ 8 | +248 (-44 to 498) | 358.7, 15.5 | 6; 1.58, 1.96, 0 | 20 |
+| κ 16, gate 25 | -82 (-258 to 86) | 341.9, 13.3 | 1; 0.53, 0, 0 | 13 |
+| κ 32 | -523 (-707 to -334) | 332.2, 12.3 | 2; 1.05, 0, 0 | 13 |
+
+**The check on played high-volume weeks.** The stand-in's arms read 3 to 7 x thinner tails than the model gives (κ 8:
+P under 92% of 0.026 ended under in 13% of evenings), where on the default's own weeks in the stand-in the bands hold
+(0.026 in 3.1%). To tell the model's error from the stand-in's, the same checks ran on the recorded books of every
+played desk with 350 or more orders a week in the archive: `opt-mu-0`, `opt-mu-0.1`, `opt-mu-0.3-lambda-100` (the `opt`
+quote, cost 1.3, gate 25, no surcharge or late cost), `hours-due-24-gate-25` (cost by hours to find a driver, a backlog
+step on cars due within 24 h) and nine `s1-*` search points (cost 1.10 to 1.22, late cost 14 to 365, `slow_step` 0 to
+0.86, gates 20 to 40, openings 0.95 to 1.09 and dearer short orders, four with the on-time guard). 197 weeks on 60 seeds,
+40 `cat-` and 20 `fresh-001`-`020`:
+
+| Weeks | Played | Under 90% | Under 92% |
+| --- | --- | --- | --- |
+| `cat-` | 177 | 2 | 9 |
+| `fresh-` | 20 | 1 | 3 |
+| thin (under 720 drivers) | 69 | 2 (1.7 per 60) | 9 |
+| the rest | 128 | 1 | 3 |
+
+Split by world, the stand-in's arms are about calibrated on the 28 `cat-` tune weeks (P under 92% of 0.028 ended under in
+4.5 to 4.7% of evenings) and thin only on `fresh-` natural and thin weeks (14 to 23%). On thin worlds play agrees with the
+stand-in: high-volume desks put 1.7 weeks per 60 under 90%, κ 8 in the stand-in 2.6 (2.0 without the congestion term).
+That the stand-in reads volume high can hold only for worlds that are not thin, where the counts are too few to tell.
+
+**Why it failed.** The rule does win volume: 32 to 75 more orders a week, at 0.06 to 0.13 late orders for each. At the κ
+that holds the tail (16 with the gate at 25, 32) the extra orders carry no margin: -82 to -543 a week, where cap 70 makes
++14 to +17. At the κ that earns margin (2 to 8) thin worlds fall under 90% more than once in 60, in the screen and in play
+alike. The waiting-car surcharge it replaces is a brake that bites hardest where cars wait, which is the hard weeks; the
+fitted load weight adds €2 to €3 where `slow_step` adds about €20, so κ can only buy the tail back by cutting volume in
+every week. The heavy Friday-wave weeks are not what failed: the arms lose on ordinary hard weeks (`fresh-1439`, a wave of
+15 drops and 94 due, 91.5% to 84-86%; `fresh-1304`, no wave and 98 due, 91.5% to 89-90%) and thin worlds. The team
+stopped it after the screen; `exposure` stays off and `day-cap-70` stays the on-time rule.
+
+**What holds up for later use.**
+- The flu-day weights: a night's first-hour drops of the held cars due that day, as a likelihood ratio, tell a wave from a
+  calm night at any size of book, and give Thursday 20:00 a weight of 0.40 to 0.41 for Friday.
+- Pricing the tail of the week (κ 16 and up) holds the heavy Friday-wave weeks without a count of cars: 0 of 9 under 90%
+  (default 1), +1,431 to +1,759 a week on them against cap 70's +1,289 to +1,326, with or without the congestion term.
+- The measured rates (`measure.py report`): drops 0.107 a held car-day; a wave drops 34% (26 to 50%) of that day's held
+  gigs, 98% of its drops are due that day, and no week of 1,094 has two; a dropped car's late chance by hours left and load.
+- `need` with drivers near the delivery place and daytime hours in hand: left-out AUC 0.809 to 0.827.
+
+```bash
+# the inputs and fits (data/exposure/; each reads the saved weeks under data/runs/)
+PYTHONPATH=. uv run --with numpy python scratch/exposure/measure.py rows slow-friday-late-150-kinds-limits,steep-notes-offers-8,thin-premium-0.4
+PYTHONPATH=. uv run --with numpy python scratch/exposure/measure.py report
+PYTHONPATH=. uv run --with numpy python scratch/exposure/book_rows.py slow-friday-late-150-kinds-limits,steep-notes-offers-8,thin-premium-0.4
+PYTHONPATH=. uv run --with numpy python scratch/exposure/need_fit.py          # weights for exposure.json
+PYTHONPATH=. uv run --with numpy python scratch/exposure/won_after.py write   # won_after for exposure.json
+PYTHONPATH=. uv run --with numpy python scratch/exposure/checks.py [all]      # the calibration checks; `dispersion` for the day spreads
+# the 13 played high-volume desks: their book rows, then the checks on them
+HV=opt-mu-0,opt-mu-0.1,hours-due-24-gate-25,opt-mu-0.3-lambda-100,s1-4aea72ec4a,s1-20d9bca525,s1-7f6978f1a0,s1-9e1f48c0fe,s1-caf06699ea,s1-a75fecb071,s1-0ce111d5b3,s1-9baeca2d42,s1-798807055e
+PYTHONPATH=. uv run --with numpy python scratch/exposure/book_rows.py $HV
+PYTHONPATH=. uv run --with numpy python scratch/exposure/checks.py all $HV
+# the screen (scratch/target/screen.py extract first); --watch records the model's view of the default's quotes, --save every week
+PYTHONPATH=. uv run --with numpy python scratch/exposure/sim_screen.py 1 crowd k8-l1 k16-l1-g25 --watch
+PYTHONPATH=. uv run --with numpy python scratch/exposure/sim_screen.py 1 nocrowd k8-l1 k16-l1-g25 k32-l1
+```
+
 ## The charging stop by route (`charge-200`, off by default, being played)
 
 The starter plans a 40-minute charging stop for every electric car under 30% charge. RULES.md needs one only on a route over
@@ -1264,6 +1387,7 @@ request, the driver list, the map and its own history in the week.
 - [`optquote.py`](spreadlab/optquote.py), [`optquote.json`](spreadlab/optquote.json): the quote as one optimisation (`opt`), and its fitted weights.
 - [`lanes.json`](spreadlab/lanes.json): the lanes' usual driver fees, for `lane_fee`.
 - [`pairs.py`](spreadlab/pairs.py), [`returns.json`](spreadlab/returns.json): out-and-back pairs, and the return requests a week on each lane.
+- [`exposure.py`](spreadlab/exposure.py), [`exposure.json`](spreadlab/exposure.json): the quote priced by the book's drop exposure (off by default, not played), and its fitted and measured inputs.
 - [`play.py`](spreadlab/play.py), [`sweep.py`](spreadlab/sweep.py), [`report.py`](spreadlab/report.py): play, compare.
 - [`ledger.py`](spreadlab/ledger.py): mistakes by variant and situation.
 - [`live.py`](spreadlab/live.py), [`replay.py`](spreadlab/replay.py): the final from the live stream, and a recorded week as a stand-in for the server.
