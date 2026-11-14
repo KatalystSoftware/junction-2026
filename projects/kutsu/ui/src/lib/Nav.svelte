@@ -3,8 +3,9 @@
   import { app, route } from './state.svelte'
 
   // The primary navigation of Espoo's side: what the product holds, in the order an organiser thinks.
-  // Each item is a real page with its own address, and the one you are in is marked. The two sign-ups
-  // are not here: a company or a person opening an invitation sees their own flow, not the back office.
+  // Each item is a real page with its own address, and the one you are in is marked. The name is the
+  // way home, as on most sites, so home has no item of its own. The two sign-ups are not here: a company
+  // or a person opening an invitation sees their own flow, not the back office.
   const at = $derived(route())
   const here = $derived(
     at.page === 'applications' || at.tab === 'applications'
@@ -19,7 +20,6 @@
   )
   const waiting = $derived(applications.list.filter((a) => !decisionOf('espoo', a.id)).length)
   const items = $derived([
-    { key: 'home', label: 'Home', href: '#/', count: '' },
     { key: 'events', label: 'Events', href: '#/events', count: '' },
     { key: 'companies', label: 'Companies', href: '#/companies', count: String(app.briefs.length) },
     { key: 'pool', label: 'Talent pool', href: '#/pool', count: app.pool.people ? app.pool.people.toLocaleString('en') : '' },
@@ -28,7 +28,7 @@
 </script>
 
 <nav aria-label="Kutsu">
-  <a class="name" href="#/">Kutsu</a>
+  <a class="name" href="#/" aria-current={here === 'home' ? 'page' : undefined} aria-label="Kutsu, home">Kutsu</a>
   <ul>
     {#each items as item (item.key)}
       <li>

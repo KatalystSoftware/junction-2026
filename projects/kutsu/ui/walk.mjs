@@ -87,7 +87,7 @@ try {
   await fetch(`${base}/review?id=${COMPANY}`, { method: 'POST', body: JSON.stringify(draft) })
 
   await open('#/')
-  await expect('home', 'Waiting for you')
+  await expect('home', 'Their profiles')
   await shot('home')
   await open('#/events')
   await expect('events', 'Proposed events')

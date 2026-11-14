@@ -4,7 +4,8 @@
   import type { Status } from './types'
 
   // How far an event's sign-ups are: one bar in three parts, and the count of each beside its colour.
-  let { employers, coming }: { employers: Invitee[]; coming: boolean } = $props()
+  // `legend` off draws the bar alone, for a place that says the counts in its own words
+  let { employers, coming, legend = true }: { employers: Invitee[]; coming: boolean; legend?: boolean } = $props()
   const ORDER: Status[] = ['joined', 'invited', 'draft']
   const parts = $derived(
     ORDER.map((status) => ({
@@ -19,9 +20,11 @@
   <div class="bar" role="img" aria-label={parts.map((p) => `${String(p.n)} ${p.label}`).join(', ')}>
     {#each parts.filter((p) => p.n) as part (part.status)}<span class={part.status} style:flex-grow={part.n}></span>{/each}
   </div>
+  {#if legend}
   <p>
     {#if coming}<span class="what">Profiles</span>{/if}{#each parts as part (part.status)}<span class={part.status}><b>{part.n}</b> {part.label}</span>{/each}
   </p>
+  {/if}
 </div>
 
 <style>
