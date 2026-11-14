@@ -28,6 +28,7 @@ import urllib.parse
 
 import lib
 import monitors
+import person
 import signals
 
 HOST, PORT = os.environ.get("HOST", "127.0.0.1"), 8046
@@ -49,6 +50,9 @@ saving = threading.Lock()
 asked = {x.lower() for b in json.loads(signals.OUT.read_text()) for x in (b["id"], b["name"])}
 START = len(asked)
 researching = threading.BoundedSemaphore(4)
+# a person's profile read costs up to 20 Context.dev credits, and the address is public: a small budget per start
+PEOPLE_LIMIT = int(os.environ.get("PEOPLE_LIMIT", "60"))
+people = {"read": 0}
 watching = threading.Lock()
 watch = {"read": 0.0, "seen": {"watched": {}, "changes": [], "checked_at": ""}}
 progress = {}  # query -> the steps its research has taken
@@ -155,6 +159,26 @@ class Handler(http.server.BaseHTTPRequestHandler):
             signals.save([b])
         self.json(b)
 
+    def person(self, handed):
+        """A person's profile from what they handed over: {kind: linkedin | portfolio | cv, value}. Nothing of it is kept or logged."""
+        if not isinstance(handed, dict):
+            return self.text(400, "Choose your LinkedIn, a portfolio page or your CV.")
+        with saving:
+            if people["read"] >= PEOPLE_LIMIT:
+                return self.text(429, "This demo has read as many profiles as it may. Type yours in instead.")
+            people["read"] += 1
+        if not researching.acquire(blocking=False):
+            return self.text(429, "Busy. Try again in a minute.")
+        try:
+            self.json(person.profile(handed.get("kind"), handed.get("value")))
+        except person.Unreadable as unreadable:
+            self.text(422, str(unreadable))
+        except (KeyError, OSError, ValueError, StopIteration) as error:  # a missing key, their side down, an answer in no shape
+            print(f"a profile could not be read: {type(error).__name__}", file=sys.stderr)
+            self.text(502, "We could not fill this in just now. Type it in yourself, or try again in a minute.")
+        finally:
+            researching.release()
+
     def draft(self, write):
         """One model draft, a few at a time, as JSON."""
         if not researching.acquire(blocking=False):
@@ -180,12 +204,14 @@ class Handler(http.server.BaseHTTPRequestHandler):
         url = urllib.parse.urlsplit(self.path)
         brief_id = urllib.parse.parse_qs(url.query).get("id", [""])[0]
         length = int(self.headers.get("content-length") or 0)
-        if url.path not in ("/review", "/role") or not 0 < length < 50_000:
+        if url.path not in ("/review", "/role", "/person") or not 0 < length < 50_000:
             return self.text(404, "not found")
         try:
             review = json.loads(self.rfile.read(length))
         except ValueError:
             return self.text(400, "The body is not JSON.")
+        if url.path == "/person":
+            return self.person(review)
         briefs = {b["id"]: b for b in json.loads(signals.OUT.read_text())}
         if url.path == "/role":
             line = str(review.get("line") or "").strip()[:200] if isinstance(review, dict) else ""
