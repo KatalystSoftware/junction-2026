@@ -41,10 +41,14 @@ and Since When `site/logos/since-when.svg`, the same file as `projects/since-whe
 
 ## The Spread pitch
 
-[`site/spread/index.html`](site/spread/index.html), at <https://katalyst.fyi/spread/>, is the Spread desk's
+[`site/spread/index.html`](site/spread/index.html), at <https://spread.katalyst.fyi/>, is the Spread desk's
 jury deck: one self-contained page in the site's typeface and colours, five slides by default. `#7`, `#9`
 or `#10` in the address opens a longer cut; the arrow keys step through it, and Print or Save as PDF gives
 one 16:9 slide a page. The "See the pitch" link under "Also built" points at it.
+
+It ships with the rest of `site/` (`./deploy.sh`). The proxy serves it on its own name through
+[`infra/verda/proxy/sites/spread.caddy`](../../infra/verda/proxy/sites/spread.caddy), which reads the same
+folder, and sends the first address, `katalyst.fyi/spread/`, there.
 
 ## Where each claim comes from
 

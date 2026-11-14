@@ -11,6 +11,7 @@ Docker network `proxy` and publishes no ports.
 | On-call shift replay | `https://incident.<base domain>/` | static files in `static/incident`, shipped by `projects/oncallbench/replay/deploy.sh` |
 | Kutsu | `https://kutsu.<base domain>/` | `172.19.0.1:8046`: a systemd service on the machine, not a container, listening only on the `proxy` network's gateway; shipped by `projects/kutsu/deploy.sh` |
 | Index page | `https://<base domain>/` | static files in `static/index`, shipped by `projects/index/deploy.sh` |
+| Spread pitch | `https://spread.<base domain>/` (`<base domain>/spread/` redirects there) | `static/index/spread/index.html` and `static/index/fonts`, shipped with the index page |
 
 Edition Ledger is the one exception to "apps join the `proxy` network": it was live first, so the
 proxy joins its network `gapfinder_default` and its deploys need no change. If that project is ever

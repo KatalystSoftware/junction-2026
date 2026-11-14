@@ -3,6 +3,9 @@
 # through the mount it already has.
 {$BASE_DOMAIN} {
 	encode zstd gzip
+	# The Spread pitch lives on its own name now (spread.caddy); its first address sends people there.
+	redir /spread https://spread.{$BASE_DOMAIN}/
+	redir /spread/* https://spread.{$BASE_DOMAIN}/
 	root * /etc/caddy/static/index
 	file_server
 }

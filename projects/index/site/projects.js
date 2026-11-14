@@ -76,6 +76,6 @@ window.KATALYST = {
   also: {
     name: "Also built: Spread desk.",
     what: "A pricing desk for Bahn Express's Spread competition. It runs a simulated car transport company for a week, quoting dealers and paying drivers; every quote is one formula, with no model on the quote path.",
-    link: ["See the pitch", "spread/"],
+    link: ["See the pitch", "https://spread.katalyst.fyi/"],
   },
 };

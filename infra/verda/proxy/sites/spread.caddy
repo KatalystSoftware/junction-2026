@@ -1,0 +1,17 @@
+# The Spread desk's pitch deck: one page from the index's static files (projects/index/site/spread/),
+# shipped by projects/index/deploy.sh. The page loads its font from /fonts/, which the index folder has;
+# any other path goes back to the deck.
+spread.{$BASE_DOMAIN} {
+	encode zstd gzip
+	root * /etc/caddy/static/index
+	handle / {
+		rewrite * /spread/index.html
+		file_server
+	}
+	handle /fonts/* {
+		file_server
+	}
+	handle {
+		redir * / 302
+	}
+}
