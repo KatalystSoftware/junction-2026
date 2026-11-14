@@ -25,6 +25,8 @@
 	/* Under the chip, from its left edge; flipped when there is no room. Where anchors are not
 	   supported the browser centres it. */
 	[popover] {
+		/* Its own width, so that near the right edge it flips instead of being squeezed. */
+		width: max-content;
 		max-width: min(24rem, calc(100vw - 2 * var(--spacing-100)));
 		padding: var(--spacing-50) var(--spacing-75);
 		border: 1px solid var(--border-color-base);
@@ -41,6 +43,16 @@
 			left: anchor(left);
 			margin: 0;
 			position-try-fallbacks: flip-inline, flip-block;
+		}
+
+		/* Narrow: under the chip, from one side of the screen to the other. */
+		@media (max-width: 640px) {
+			[popover] {
+				left: var(--spacing-100);
+				right: var(--spacing-100);
+				width: auto;
+				max-width: none;
+			}
 		}
 	}
 </style>

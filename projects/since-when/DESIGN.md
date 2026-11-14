@@ -116,7 +116,8 @@ One accent, used for one thing each.
 - **Text** (`text`, `text-emphasized` for headings, `text-subtle` for labels and dates).
 - **Surface** (`surface` for the page, `surface-quote` behind quoted article text and code).
 - **Rules** (`rule` for hairlines and the strip's empty lanes, `rule-strong` on top of a quote).
-- **Lane past** (`lane-past`): a period that has ended, on the time strip.
+- **Lane past** (`lane-past`): a period that has ended, on the time strip, and the plain lengths
+  that draw a count or an article's size.
 
 **The Quote Surface Rule.** The grey surface means "these are the article's words, or the
 database's". Nothing the app wrote sits on it.
@@ -197,7 +198,13 @@ The page's signature. One lane for each edition quoted, on a shared scale from 2
 lane is a hairline; a bar on it is the period that edition has said what the difference is about,
 drawn in `mark-line`, starting at a dot. A period that ended is drawn in `lane-past`. The lane's
 name is at its left and the date the current period began at its right, as a link to the edit that
-began it. The scale is labelled once, above the list.
+began it. The scale is labelled once, above the list. A lane is 18rem of track beside the headline;
+under 640px it takes the row's width and sits under the headline.
+
+### Lengths
+
+A count or a size drawn as a 6px bar in `lane-past` next to its number: the statements each
+edition has that another leaves out, and the articles' sizes. The number is always printed.
 
 ### Marked words
 
