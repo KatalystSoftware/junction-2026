@@ -7,6 +7,7 @@
 	import { loadQueue, queue } from './lib/queue.svelte'
 	import { LANGS, isLang, type Lang, type Topic } from './lib/types'
 	import Findings from './Findings.svelte'
+	import Timeline from './Timeline.svelte'
 	import TopicList from './TopicList.svelte'
 
 	let loaded = $state<{ qid: string; topic: Topic } | null>(null)
@@ -120,7 +121,11 @@
 			</label>
 		</nav>
 		{#key `${route.qid}/${pair.lang}/${pair.rich}`}
-			<Findings {topic} {route} lang={pair.lang} rich={pair.rich} />
+			{#if route.tab === 'timeline'}
+				<Timeline {topic} {route} lang={pair.lang} rich={pair.rich} />
+			{:else}
+				<Findings {topic} {route} lang={pair.lang} rich={pair.rich} />
+			{/if}
 		{/key}
 	{/if}
 </main>

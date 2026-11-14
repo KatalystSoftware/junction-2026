@@ -2,7 +2,7 @@ import { LANGS, type Finding, type FindingType, type Lang } from './types'
 
 const inLead = (f: Finding) => f.section === '' && f.other_section === ''
 // Types where both editions say something and the two differ, as opposed to one lacking content.
-const DIFFERS: FindingType[] = ['contradiction', 'numbers', 'framing']
+export const DIFFERS: FindingType[] = ['contradiction', 'numbers', 'framing']
 
 /**
  * The one finding a topic's page leads with. Open findings only, in this order of preference:
