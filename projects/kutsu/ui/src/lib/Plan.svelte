@@ -22,13 +22,13 @@
   let open = $state('')
   let copied = $state('')
   let sending = $state(false)
-  // the person's invitation is Esittely, served next to this page by serve.py; in development, the hosted copy
-  const esittely = import.meta.env.DEV ? 'https://esittely.duckymcduck2.workers.dev/esittely/#/join' : './esittely/#/join'
+  // the person's invitation is their own sign-up in this app, for this event
+  const invitation = $derived(`#/me/${plan.slug}`)
   // the invitation is an open link; copying it is how it leaves this screen
+  const regularLink = $derived(`${location.origin}${location.pathname}${invitation}`)
   // whom a send reaches before the organiser narrows it in the modal: everyone in the pool who came to an earlier event and
   // works in one of this event's fields (a person who came twice is counted twice; the pool keeps counts, not people)
   const reach = $derived(plan.fields.reduce((sum, f) => sum + Object.values(f.people.events).reduce((a, b) => a + b, 0), 0))
-  const regularLink = `${location.origin}${location.pathname}${esittely.startsWith('./') ? esittely.slice(2) : esittely}`
   async function copyRegular() {
     await copyText(regularLink)
     countCopy()
@@ -133,7 +133,7 @@
         <div class="kind">
           <div class="what"><b>Invitation</b><small>An open link to apply, drafted from what the person agrees we may read. Share the link, or send it to the people who came to Espoo's earlier events; you choose which events and fields first. Every application is reviewed separately.</small></div>
           <div class="go">
-            <a class="btn" href={esittely} target="_blank" rel="noopener"><Icon name="out" size={16} />Preview form</a>
+            <a class="btn" href={invitation} target="_blank" rel="noopener"><Icon name="out" size={16} />Preview form</a>
             <button class="btn" onclick={copyRegular}><Icon name={copied === 'regular' ? 'check' : 'copy'} size={16} />{copied === 'regular' ? 'Link copied' : 'Copy link'}</button>
             <button class="btn primary wide" onclick={() => (sending = true)}><Icon name="send" size={16} />{manage.sent ? 'Send again to past attendees…' : `Send to ${some(reach)} past attendees…`}</button>
           </div>
