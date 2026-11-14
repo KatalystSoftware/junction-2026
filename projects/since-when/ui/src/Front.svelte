@@ -4,6 +4,7 @@
 	import { onMount } from 'svelte'
 	import { api } from './lib/api.svelte'
 	import { dating, differences, lanes, turns, type Difference, type Lane } from './lib/differences'
+	import { modelName } from './lib/format'
 	import { href, ui } from './lib/nav.svelte'
 	import { LANGS, type Timeline, type TimelineEvent, type Topic } from './lib/types'
 	import Strip from './Strip.svelte'
@@ -42,7 +43,7 @@
 <h1>What three Wikipedias say differently, and since when</h1>
 
 <section class="start" aria-label="Topics to start from">
-	<Why id="why-start" label="Machine-suggested">A language model suggested these differences and nobody has checked them. Open a topic to read each edition's own words.</Why>
+	<Why id="why-start" label="Found and checked by Nemotron">{modelName(null)} compared each topic's articles passage by passage and suggested these differences, then looked each one up in the whole other article and set aside those it found stated there. A person closed the ones found false on reading both articles. Open a topic to read each edition's own words.</Why>
 	<div class="cards">
 		{#each START as qid}
 			{@const c = cards[qid]}

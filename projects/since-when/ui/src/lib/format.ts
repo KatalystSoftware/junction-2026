@@ -54,7 +54,12 @@ export function sectionOf(f: Finding, l: Lang): string | undefined {
 }
 
 /** The models the API names by id, as a reader knows them. */
-const MODELS: Record<string, string> = { 'nemotron-3.5-super-vl': 'NVIDIA Nemotron 3.5 Super VL' }
-export const modelName = (id: string | null | undefined) => (id ? (MODELS[id] ?? id) : 'a language model')
+const MODELS: Record<string, string> = {
+	'nemotron-3.5-super-vl': 'NVIDIA Nemotron 3.5 Super VL',
+	'nvidia/nemotron-3.5-super-vl-120b-a12b': 'NVIDIA Nemotron 3.5 Super VL',
+}
+/** The model that wrote every suggested difference in the database (finding.model). */
+export const CLASSIFIER = 'nvidia/nemotron-3.5-super-vl-120b-a12b'
+export const modelName = (id: string | null | undefined) => MODELS[id ?? CLASSIFIER] ?? id!
 
 export const sectionLabel = (s: string) => (s ? s.split(' › ').pop()! : 'Lead')

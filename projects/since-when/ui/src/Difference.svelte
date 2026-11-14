@@ -2,7 +2,7 @@
 	// One difference: a headline and its time strip; opened, each edition's own words side by side
 	// and a way to read the text on that date in MariaDB.
 	import { dating, figureMarks, lanes, turns, type Difference } from './lib/differences'
-	import { NAMES, articleUrl, day, dayAfter, diffUrl, list, plural, revisionUrl, sectionLabel, sectionOf } from './lib/format'
+	import { NAMES, articleUrl, day, dayAfter, diffUrl, list, modelName, plural, revisionUrl, sectionLabel, sectionOf } from './lib/format'
 	import { showSql, ui } from './lib/nav.svelte'
 	import type { TimelineEvent, Topic } from './lib/types'
 	import Marked from './Marked.svelte'
@@ -50,7 +50,7 @@
 			{#if check}
 				{@const e = check.evidence}
 				<Why id="why-check-{Math.abs(d.id)}{d.id < 0 ? 'n' : ''}" label="Checked">
-					{check.judge} read {check.read ?? 'the nearest'} of {check.searched ?? 'the'} passages of the other article on {day(check.as_of)}{#if e?.quote}
+					{modelName(check.judge)} read {check.read ?? 'the nearest'} of {check.searched ?? 'the'} passages of the other article on {day(check.as_of)}{#if e?.quote}
 						and settled on this in {NAMES[e.lang]}: <q lang={e.lang}>{e.quote}</q>
 						{#if e.rev_id}(<a href={revisionUrl(e.lang, e.rev_id, e.section)} target="_blank" rel="noopener">{sectionLabel(e.section ?? '')}, revision {e.rev_id}</a>){/if}{/if}.
 				</Why>

@@ -43,9 +43,9 @@
 		<h2 id="list-title">{found.length ? plural(found.length, 'difference', 'differences') : 'No differences found'}</h2>
 		{#if found.length}
 			{#if judge}
-				<Why id="why-list" label="Model-checked">A language model suggested these, and a second one ({judge}) looked each up in the whole other article. No person has checked them. The quotes are word for word: read them to judge.</Why>
+				<Why id="why-list" label="Checked by Nemotron">{modelName(topic.checked?.model)} suggested these by comparing the articles passage by passage{#if modelName(topic.checked?.model) === modelName(judge)}, then looked each one up in the whole other article{:else}; {modelName(judge)} looked each one up in the whole other article{/if}. A person closed the rows found false on reading; the rest no person has checked. The quotes are word for word: read them to judge.</Why>
 			{:else}
-				<Why id="why-list" label="Machine-suggested">A language model suggested these and nobody has checked them. The quotes are word for word: read them to judge.</Why>
+				<Why id="why-list" label="Suggested by Nemotron">{modelName(null)} suggested these by comparing passage with passage. They have not been looked up in the whole other article, and no person has checked them. The quotes are word for word: read them to judge.</Why>
 			{/if}
 			<!-- The scale of every strip below, labelled once. -->
 			<div class="scale num" aria-hidden="true">
@@ -82,7 +82,7 @@
 	<section class="left" aria-labelledby="wording-title">
 		<header>
 			<h2 id="wording-title">Wording</h2>
-			<Why id="why-wording" label="Unchecked">Differences of wording come from a word list or a language model. The check does not cover them.</Why>
+			<Why id="why-wording" label="Unchecked">Differences of wording come from a word list or from {modelName(null)}. The check does not cover them.</Why>
 		</header>
 		<div class="rows">
 			{#each words as d (d.id)}
@@ -97,7 +97,7 @@
 		<header>
 			<h2 id="left-title">Said in one edition, left out of another</h2>
 			{#if judge}
-				<Why id="why-left" label="Model-checked">A language model ({judge}) searched the whole other article for each of these and did not find it. A sentence with several facts is listed when any one of them is missing. No person has checked them.</Why>
+				<Why id="why-left" label="Checked by Nemotron">{modelName(judge)} searched the whole other article for each of these and did not find it. A sentence with several facts is listed when any one of them is missing. No person has checked them.</Why>
 			{:else}
 				<Why id="why-left" label="Unchecked">Found by comparing passage with passage. Not yet checked against the whole of the other article, so some of these are there under another heading.</Why>
 			{/if}
