@@ -25,6 +25,7 @@
             git-lfs
             python3
             uv
+            mariadb-connector-c # the mariadb Python driver in projects/since-when builds against it
           ];
         };
       });

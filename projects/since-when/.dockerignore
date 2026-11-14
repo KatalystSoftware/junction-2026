@@ -3,3 +3,4 @@ demo
 docs
 measurements
 **/__pycache__
+.venv

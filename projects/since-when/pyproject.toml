@@ -1,0 +1,33 @@
+[project]
+name = "since-when"
+version = "0.1.0"
+description = "What the Finnish, Swedish and English Wikipedia articles on a topic say differently, and since when"
+requires-python = ">=3.13"
+dependencies = [
+    "mariadb==1.1.15",
+    "mwparserfromhell==0.7.2",
+    "torch==2.15.0",
+    "transformers==5.23.0",
+]
+
+[dependency-groups]
+# The loaders read the dump files with DuckDB; the app image has no use for it.
+load = ["duckdb>=1.5"]
+dev = [
+    { include-group = "load" },
+    "ruff",
+    "ty",
+]
+
+[tool.uv]
+# gapfinder/ and differences/ run from this directory with python -m; nothing is installed as a package.
+package = false
+
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
+
+[[tool.uv.index]]
+# CPU torch only: the API embeds one search question at a time.
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
