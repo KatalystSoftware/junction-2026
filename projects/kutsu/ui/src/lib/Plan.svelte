@@ -22,7 +22,7 @@
   // what each side asks before it commits, answered from the other side
   const toEmployers = $derived(
     `${some(people.people)} people who came to Espoo's events work in ${work}` +
-      (events[0] ? `; ${some(events[0].came)} of them came to the ${events[0].name.toLowerCase()} in ${when(events[0].date.slice(0, 7))}.` : '.'),
+      (events[0] ? `; ${some(events[0].came)} of them came to ${events[0].name} in ${when(events[0].date.slice(0, 7))}.` : '.'),
   )
   const toPeople = $derived(
     `${String(plan.employers.length)} employers have said what they are looking for` + (names.length ? `, among them ${names.join(', ')}.` : '.'),
@@ -119,7 +119,7 @@
         <h3>They came to</h3>
         <ul class="came">
           {#each events as event (event.id)}
-            <li><b>{some(event.came)}</b>{event.name}, {when(event.date.slice(0, 7))}</li>
+            <li><b>{some(event.came)}</b><a href={event.url} target="_blank" rel="noopener">{event.name}</a>, {when(event.date.slice(0, 7))}</li>
           {/each}
         </ul>
       {/if}
@@ -385,6 +385,12 @@
     display: grid;
     gap: var(--s1);
     font-size: var(--t-sm);
+  }
+  .came a {
+    text-decoration: none;
+  }
+  .came a:hover {
+    text-decoration: underline;
   }
   .came b {
     display: inline-block;

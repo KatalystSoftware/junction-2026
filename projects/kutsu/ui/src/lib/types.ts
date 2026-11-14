@@ -104,6 +104,7 @@ export type PoolField = {
   /** how many know each skill employers ask for */
   skills: Record<string, number>
 }
-export type PastEvent = { id: string; name: string; date: string; where: string; employers: number; people: number }
+/** A real past event with its public page. `published` is a figure that page gives; `people` is how many of the sample pool came. */
+export type PastEvent = { id: string; name: string; date: string; where: string; published: string; url: string; people: number }
 export type Pool = { note: string; people: number; events: PastEvent[]; fields: Record<string, PoolField> }
 export type Step = { stage: 'identity' | 'search' | 'careers' | 'read' | 'check' | 'card'; [fact: string]: unknown }

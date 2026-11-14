@@ -1,4 +1,4 @@
-"""A sample pool: who came to Espoo's past events, as counts. Nobody in it is real.
+"""A sample pool: who came to Espoo's past events, as counts. The events are real; nobody in the pool is.
 
 Espoo plans the next event from the people who came to earlier ones. Kutsu has no such people and
 must not collect any for a demo, so this draws them from a fixed seed and keeps only the counts the
@@ -21,15 +21,20 @@ FIELDS = {
     "Security": 5, "Product and design": 7, "Sales and business": 6, "Operations and support": 5, "Leadership": 2,
 }
 LEVELS = {"Early career": 30, "Experienced": 40, "Senior": 22, "Lead": 8}
-# past events, each with the fields it drew most; None draws from every field alike
+# Past events. These are real: each has a public page, and `published` is the one figure that page gives.
+# How many of the sample pool came to each is made up: `share` is the chance that a person came, and
+# `fields` are the fields an event was aimed at, where it had any.
+TECH = ["Software", "AI and data", "Security", "Semiconductors and photonics", "Quantum", "Embedded and electronics"]
 EVENTS = [
-    {"id": "talent-2025", "name": "International talent evening", "date": "2025-11-20", "where": "Online", "employers": 31, "fields": None},
-    {"id": "cloud-2026", "name": "Security and cloud morning", "date": "2026-03-12", "where": "Otaniemi", "employers": 14,
-     "fields": ["Security", "Software", "Operations and support"]},
-    {"id": "deep-2026", "name": "Deep tech evening", "date": "2026-05-21", "where": "Otaniemi", "employers": 19,
-     "fields": ["Semiconductors and photonics", "Quantum", "Space and RF", "Embedded and electronics", "Research and science"]},
-    {"id": "ai-2026", "name": "Software and AI day", "date": "2026-09-10", "where": "Online", "employers": 26,
-     "fields": ["Software", "AI and data", "Product and design"]},
+    {"id": "talentmatch-2022", "name": "TalentMatch", "date": "2022-10-11", "where": "", "published": "24 employers",
+     "url": "https://www.espoo.fi/en/articles/withsecure-gains-both-exposure-and-leads-talentmatch", "fields": None, "share": 0.2},
+    {"id": "talentmatch-2025", "name": "Espoo TalentMatch", "date": "2025-03-28", "where": "Innopoli 2, Otaniemi", "published": "",
+     "url": "https://www.espoo.fi/en/working-life/espoo-talent-hub/talentmatch-recruitment-events", "fields": None, "share": 0.35},
+    {"id": "finland-talentmatch-2025", "name": "Finland TalentMatch x Tech and IT", "date": "2025-11-04", "where": "Online",
+     "published": "with Helsinki, Oulu, Tampere, Turku and Vantaa",
+     "url": "https://www.workinfinland.com/en/events/finland-talent-match-autumn/", "fields": TECH, "share": 0.55},
+    {"id": "tyonantajatreffit-2026", "name": "Työnantajatreffit", "date": "2026-10-08", "where": "", "published": "",
+     "url": "https://www.espoo.fi/en/events/espooevents:agqj677ttm", "fields": None, "share": 0.15},
 ]
 
 
@@ -65,16 +70,16 @@ def main():
         at["english"] += rng.random() < 0.9
         at["finnish"] += (not abroad) and rng.random() < 0.55
         at["skills"].update(s for s, share in common.get(field, {}).items() if rng.random() < share)
-        events = [e["id"] for e in EVENTS if rng.random() < (0.3 if e["fields"] is None else 0.55 if field in e["fields"] else 0.06)]
+        events = [e["id"] for e in EVENTS if rng.random() < (e["share"] if e["fields"] is None or field in e["fields"] else 0.04)]
         for event in events or [rng.choice(EVENTS)["id"]]:
             at["events"][event] += 1
             came[event] += 1
     for at in fields.values():
         at["skills"] = dict(at["skills"].most_common())
     pool = {
-        "note": "Sample data. Nobody counted here is a real person, and the past events and their numbers are made up.",
+        "note": "The people are sample data: nobody counted here is real, and how many came to each past event is made up.",
         "people": PEOPLE,
-        "events": [{**{k: e[k] for k in ("id", "name", "date", "where", "employers")}, "people": came[e["id"]]} for e in EVENTS],
+        "events": [{**{k: e[k] for k in ("id", "name", "date", "where", "published", "url")}, "people": came[e["id"]]} for e in EVENTS],
         "fields": fields,
     }
     (HERE / "pool.json").write_text(json.dumps(pool, indent=1, ensure_ascii=False) + "\n")

@@ -47,10 +47,14 @@ type-checked rules; it still reports 83 findings and is not part of the check ye
 
 - **Real:** every employer, and every statement about one. Each statement was found word for word on
   the public page it links to, and statements that name a person are dropped.
-- **Sample:** the pool of people and the past events. `pool.py` draws 1,140 people from a fixed seed
-  and keeps only counts per field (`pool.json`); nobody in it is real, and the screens mark these
-  numbers as sample data. No screen shows a row for a person, and a count under five is shown as
+- **Sample:** the pool of people. `pool.py` draws 1,140 people from a fixed seed and keeps only
+  counts per field (`pool.json`); nobody in it is real, how many of them came to each past event is
+  made up, and the screens mark these numbers as sample data. No screen shows a row for a person, and a count under five is shown as
   "fewer than 5".
+- **Real past events:** TalentMatch (11 Oct 2022, 24 employers), Espoo TalentMatch (28 Mar 2025,
+  Otaniemi), Finland TalentMatch x Tech and IT (4–5 Nov 2025, online, with five other cities) and
+  Työnantajatreffit (8 Oct 2026). Each links to its public page, and the only figure shown for one is
+  the figure that page gives. Espoo publishes no attendance numbers.
 - **Real about the event:** the Deep Tech Talent Forum's dates, that it is online and free, its list
   of employers, the presentation times and that places are limited, all from Espoo's event page.
 - **Proposed by us:** that Espoo keeps a pool across events at all, the suggested events, and on the

@@ -10,7 +10,6 @@
   // whose people make up the pool every suggestion draws on.
   const next = $derived(app.presets.map(upcoming))
   const ideas = $derived(suggested().slice(0, 6))
-  const tallest = $derived(Math.max(1, ...app.pool.events.map((e) => e.people)))
 
   const STATES: [Status, string][] = [['joined', 'signed up'], ['invited', 'invited'], ['draft', 'to invite']]
   const left = (date: string) => {
@@ -23,8 +22,8 @@
   <header>
     <h1>Events</h1>
     <p>
-      {app.pool.people.toLocaleString('en')} people have come to Espoo's events. Each new event starts from them, and from what employers
-      have said in public.
+      Each new event starts from the {app.pool.people.toLocaleString('en')} people who came to earlier ones, and from what employers have
+      said in public. <span class="sample">people are sample data</span>
     </p>
   </header>
 
@@ -90,18 +89,16 @@
   </section>
 
   <section>
-    <h2>Past events <span class="sample">sample data</span></h2>
+    <h2>Past events</h2>
     <ol class="past">
-      {#each app.pool.events as event (event.id)}
-        <li title="{event.name}: {event.people} people, {event.employers} employers">
-          <span class="column"><span style:height="{(event.people / tallest) * 100}%"></span></span>
-          <b>{event.people}</b>
-          <span class="name">{event.name}</span>
-          <small>{when(event.date)}, {event.where === 'Online' ? 'online' : event.where}, {event.employers} employers</small>
+      {#each app.pool.events.toReversed() as event (event.id)}
+        <li>
+          <a href={event.url} target="_blank" rel="noopener">{event.name}<Icon name="out" size={14} /></a>
+          <small>{[when(event.date), event.where === 'Online' ? 'online' : event.where, event.published].filter(Boolean).join(', ')}</small>
         </li>
       {/each}
     </ol>
-    <p class="note">{app.pool.note} Employers, and everything quoted from them, are real.</p>
+    <p class="note">These events are real and link to their pages. {app.pool.note} Employers, and everything quoted from them, are real.</p>
   </section>
 </main>
 
@@ -349,29 +346,25 @@
   }
   .past li {
     display: grid;
+    align-content: start;
+    gap: var(--s1);
+    padding-top: var(--s3);
+    border-top: 2px solid var(--city);
     line-height: 1.3;
   }
-  .column {
-    display: flex;
-    align-items: flex-end;
-    height: 5rem;
-    margin-bottom: var(--s2);
-    border-bottom: 1px solid var(--line);
+  .past a {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--s1);
+    font-weight: 600;
+    text-decoration: none;
   }
-  .column span {
-    width: 2.5rem;
-    border-radius: 4px 4px 0 0;
-    background: var(--city);
-  }
-  .past b {
-    font: 700 var(--t-lg) / 1.2 var(--display);
+  .past a:hover {
+    text-decoration: underline;
   }
   .past small {
-    font-size: var(--t-xs);
+    font-size: var(--t-sm);
     color: var(--ink-2);
-  }
-  .name {
-    font-weight: 600;
   }
   .note {
     max-width: 70ch;
