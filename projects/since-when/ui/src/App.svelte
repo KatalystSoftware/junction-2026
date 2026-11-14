@@ -7,6 +7,7 @@
 	import { loadQueue, queue } from './lib/queue.svelte'
 	import { LANGS, isLang, type Lang, type Topic } from './lib/types'
 	import Findings from './Findings.svelte'
+	import TopicList from './TopicList.svelte'
 
 	let loaded = $state<{ qid: string; topic: Topic } | null>(null)
 	let failure = $state('')
@@ -123,6 +124,8 @@
 		{/key}
 	{/if}
 </main>
+
+<TopicList />
 
 <style>
 	.bar {
