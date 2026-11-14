@@ -258,7 +258,7 @@
 		top: 0;
 		bottom: 0;
 		border-radius: var(--border-radius-pill);
-		background: var(--border-color-warning);
+		background: var(--color-warning);
 	}
 
 	.turns {

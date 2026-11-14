@@ -59,8 +59,12 @@
 		syncSearch()
 	})
 
+	// Focus follows the panel: into it when it opens, back to its button when it closes.
+	let wasOpen = false
 	$effect(() => {
 		if (ui.sql) void tick().then(() => panel?.focus())
+		else if (wasOpen) document.querySelector<HTMLElement>('[aria-controls="sql-panel"]')?.focus()
+		wasOpen = ui.sql
 	})
 
 	// A pair never matches an edition with itself: choosing the other side's edition swaps the two.
