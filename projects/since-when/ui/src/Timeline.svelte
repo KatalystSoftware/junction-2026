@@ -168,17 +168,28 @@
 
 		<details class="years small">
 			<summary>Article size on each 1 January</summary>
-			<div class="scroll">
-				<table class="num">
-					<thead>
-						<tr><th scope="col">Year</th>{#each [lang, rich] as l}<th scope="col">{NAMES[l]}</th>{/each}<th scope="col">Open differences</th></tr>
-					</thead>
-					<tbody>
-						{#each data.years.toReversed() as y}
-							<tr><th scope="row">{y.year}</th>{#each [lang, rich] as l}<td>{y.size[l] ? kb(y.size[l]!) : '–'}</td>{/each}<td>{y.open_findings}</td></tr>
-						{/each}
-					</tbody>
-				</table>
+			<div class="cdx-table">
+				<div class="cdx-table__table-wrapper">
+					<table class="cdx-table__table num">
+						<caption>Article size on each 1 January</caption>
+						<thead>
+							<tr>
+								<th scope="col"><span class="cdx-table__th-content">Year</span></th>
+								{#each [lang, rich] as l}<th scope="col" class="cdx-table__table__cell--align-number"><span class="cdx-table__th-content">{NAMES[l]}</span></th>{/each}
+								<th scope="col" class="cdx-table__table__cell--align-number"><span class="cdx-table__th-content">Open differences</span></th>
+							</tr>
+						</thead>
+						<tbody>
+							{#each data.years.toReversed() as y}
+								<tr>
+									<th scope="row">{y.year}</th>
+									{#each [lang, rich] as l}<td class="cdx-table__table__cell--align-number">{y.size[l] ? kb(y.size[l]!) : '–'}</td>{/each}
+									<td class="cdx-table__table__cell--align-number">{y.open_findings}</td>
+								</tr>
+							{/each}
+						</tbody>
+					</table>
+				</div>
 			</div>
 		</details>
 	{/if}
@@ -297,30 +308,5 @@
 	.years summary {
 		color: var(--color-subtle);
 		cursor: pointer;
-	}
-
-	.scroll {
-		overflow-x: auto;
-	}
-
-	table {
-		margin-top: var(--spacing-50);
-		border-collapse: collapse;
-	}
-
-	th,
-	td {
-		padding: var(--spacing-12) var(--spacing-100) var(--spacing-12) 0;
-		text-align: right;
-		font-weight: var(--font-weight-normal);
-	}
-
-	thead th {
-		border-bottom: 1px solid var(--border-color-subtle);
-		color: var(--color-subtle);
-	}
-
-	th:first-child {
-		text-align: left;
 	}
 </style>

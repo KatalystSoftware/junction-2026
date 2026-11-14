@@ -91,7 +91,7 @@
 
 	function cell(column: string, x: string | number | null): { text: string; cls: string; note?: string } {
 		if (x === null) return { text: 'NULL', cls: 'null' }
-		if (typeof x === 'number') return { text: Number.isInteger(x) ? String(x) : x.toFixed(4), cls: 'n' }
+		if (typeof x === 'number') return { text: Number.isInteger(x) ? String(x) : x.toFixed(4), cls: 'num' }
 		if (/^\d{4}-\d\d-\d\dT/.test(x)) return { text: x.replace('T', ' '), cls: 'when', note: column === 'row_end' && x.startsWith('2106-') ? 'current' : undefined }
 		return { text: x, cls: x.length > 40 ? 'txt' : '' }
 	}
@@ -104,25 +104,34 @@
 {/snippet}
 
 {#snippet result(r: Run)}
-	<!-- svelte-ignore a11y_no_noninteractive_tabindex (a scrolling region has to take keyboard focus to be scrolled) -->
-	<div class="result" tabindex="0" role="region" aria-label="Result rows">
-		<table>
-			<thead>
-				<tr>{#each r.columns as c}<th scope="col">{c}</th>{/each}</tr>
-			</thead>
-			<tbody>
-				{#each r.rows as row}
+	<!-- A column of numbers is set to the right, header and all. -->
+	{@const numeric = r.columns.map((_, i) => r.rows.some((row) => typeof row[i] === 'number'))}
+	<div class="cdx-table result">
+		<!-- svelte-ignore a11y_no_noninteractive_tabindex (a scrolling region has to take keyboard focus to be scrolled) -->
+		<div class="cdx-table__table-wrapper" tabindex="0" role="region" aria-label="Result rows">
+			<table class="cdx-table__table">
+				<caption>Result rows</caption>
+				<thead>
 					<tr>
-						{#each row as x, i}
-							{@const c = cell(r.columns[i], x)}
-							<td class={c.cls}>{c.text}{#if c.note}<span class="subtle"> {c.note}</span>{/if}</td>
+						{#each r.columns as c, i}
+							<th scope="col" class={[numeric[i] && 'cdx-table__table__cell--align-number']}><span class="cdx-table__th-content">{c}</span></th>
 						{/each}
 					</tr>
-				{:else}
-					<tr><td class="null" colspan={r.columns.length}>No rows.</td></tr>
-				{/each}
-			</tbody>
-		</table>
+				</thead>
+				<tbody>
+					{#each r.rows as row}
+						<tr>
+							{#each row as x, i}
+								{@const c = cell(r.columns[i], x)}
+								<td class={[c.cls, numeric[i] && 'cdx-table__table__cell--align-number']}>{c.text}{#if c.note}<span class="subtle"> {c.note}</span>{/if}</td>
+							{/each}
+						</tr>
+					{:else}
+						<tr class="cdx-table__table__empty-state"><td class="cdx-table__table__empty-state-content" colspan={r.columns.length}>No rows.</td></tr>
+					{/each}
+				</tbody>
+			</table>
+		</div>
 	</div>
 {/snippet}
 
@@ -347,40 +356,29 @@
 		color: var(--color-subtle);
 	}
 
-	.result {
+	/* Codex's table, set tighter than its default: the panel is narrow and a result is read row
+	   against row. It scrolls inside its own frame, under a header that stays in view. */
+	.result .cdx-table__table-wrapper {
 		max-height: 22rem;
 		overflow: auto;
-		border: 1px solid var(--border-color-muted);
-		border-radius: var(--border-radius-base);
 	}
 
-	table {
-		width: 100%;
-		border-collapse: collapse;
+	.result table {
 		font-size: var(--font-size-x-small);
 		line-height: var(--line-height-x-small);
 	}
 
-	th,
-	td {
+	.result th,
+	.result td {
 		padding: var(--spacing-25) var(--spacing-50);
-		border-bottom: 1px solid var(--border-color-muted);
-		text-align: left;
-		vertical-align: top;
 	}
 
-	th {
+	.result thead th {
 		position: sticky;
 		top: 0;
+		border-bottom: 0;
 		background: var(--background-color-neutral-subtle);
-		font-family: var(--font-family-monospace);
-		font-weight: var(--font-weight-normal);
-		color: var(--color-subtle);
-	}
-
-	td.n {
-		text-align: right;
-		font-variant-numeric: tabular-nums;
+		box-shadow: inset 0 -1px 0 var(--border-color-base);
 	}
 
 	td.null {
