@@ -505,7 +505,13 @@ class SlidePresentation{
   update(){const p=this.slides.length>1?this.current/(this.slides.length-1)*100:100;this.bar.style.width=p+'%';this.bar.setAttribute('aria-valuenow',Math.round(p));
     this.dots.forEach((d,i)=>d.classList.toggle('active',i===this.current));document.body.classList.toggle('on-dark',this.slides[this.current].classList.contains('dark'));document.body.classList.toggle('on-split',this.slides[this.current].classList.contains('split'));document.body.classList.toggle('on-first',this.current===0);document.body.dataset.phase=this.slides[this.current].dataset.phase||'none';this.counter.textContent=(this.current+1)+' / '+this.slides.length}
   goTo(i,animate=true){const t=Math.max(0,Math.min(i,this.slides.length-1));this.current=t;const s=this.slides[t];
-    s.scrollIntoView({behavior:'instant'});this.update();this.replay(s);history.replaceState(null,'','#slide-'+(t+1))}
+    this.slideTo(s,animate);this.update();this.replay(s);history.replaceState(null,'','#slide-'+(t+1))}
+  // A short eased glide (260 ms) instead of the browser's smooth scroll, which can take a second and fights the snap points.
+  slideTo(s,animate){const to=s.offsetTop,from=scrollY,d=to-from;cancelAnimationFrame(this.raf);const root=document.documentElement;
+    if(!animate||!d||matchMedia('(prefers-reduced-motion: reduce)').matches){root.style.scrollSnapType='';scrollTo(0,to);return}
+    const t0=performance.now(),dur=260;root.style.scrollSnapType='none';
+    const step=now=>{const k=Math.min(1,(now-t0)/dur),e=1-Math.pow(1-k,3);scrollTo(0,from+d*e);if(k<1)this.raf=requestAnimationFrame(step);else root.style.scrollSnapType=''};
+    this.raf=requestAnimationFrame(step)}
   next(){this.goTo(this.current+1)}prev(){this.goTo(this.current-1)}
   fromHash(){const m=location.hash.match(/#slide-(\d+)/);return m?+m[1]-1:0}
   keys(){document.addEventListener('keydown',e=>{if(e.target.matches('input,textarea,[contenteditable]'))return;switch(e.key){
