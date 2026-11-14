@@ -2,7 +2,7 @@
 // reader wants one line per claim. This file merges the rows into differences, orders them, words
 // them for a reader and collects the content one edition has and another leaves out.
 
-import { NAMES, day, list, when } from './format'
+import { NAMES, day, exact, list, when } from './format'
 import { figures } from './text'
 import { LANGS, type Finding, type FindingType, type Lang, type TimelineEvent, type Topic } from './types'
 
@@ -20,6 +20,10 @@ export interface Difference {
 	members: Finding[]
 	/** The edition each shown quote comes from, with the row it was taken from. */
 	quotes: { lang: Lang; text: string; from: Finding | null }[]
+	/** The headline: a few words that tell this difference from the next, and the edition they are about. */
+	who: string
+	what: string
+	/** The whole difference in one sentence, for a tooltip. */
 	title: string
 	lead: boolean
 	/** A conflicting account whose two quotes are not plainly about the same thing: listed last. */
@@ -104,6 +108,25 @@ function titleOf(primary: Finding, members: Finding[], third: Finding | null): s
 	return clause ? `${title.replace(/\.$/, '')}; ${NAMES[extra]} Wikipedia ${clause}.` : title
 }
 
+/**
+ * The headline of a difference. A loaded word is its own headline. Otherwise it is what the summary
+ * says about the edition it names first, without "Wikipedia": the quotes and the time strip carry
+ * the other editions. A summary that is not written edition by edition is cut at its first break.
+ */
+function headline(primary: Finding, title: string): { who: string; what: string } {
+	const w = word(primary)
+	if (w) return { who: '', what: `“${w.term}”` }
+	const first = [...primary.summary.matchAll(SUBJECT)][0]?.[1]
+	const clause = first && clauses(primary.summary)?.[byName(first)]
+	if (clause) return { who: first, what: clause }
+	const cut = title
+		.split(/[:;]|,? (?:while|whereas|but) /)[0]
+		.replace(/\.$/, '')
+		.trim()
+	const m = /^((?:Finnish|Swedish|English)(?:(?:,| and) (?:Finnish|Swedish|English))*) Wikipedia(?:'s first sentence)? (.+)$/.exec(cut)
+	return m ? { who: m[1], what: m[2] } : { who: '', what: cut }
+}
+
 // A conflicting account is believed only when both quotes are short and share a name or a figure.
 function plain(f: Finding): boolean {
 	const [a, b] = [f.quotes[f.lang], f.quotes[f.other_lang]]
@@ -142,13 +165,15 @@ export function differences(topic: Topic): Difference[] {
 			})
 			.filter((q) => q.text)
 		const third = quotes.find((q) => q.from !== primary)?.from ?? null
+		const title = titleOf(primary, members, third)
 		return {
 			id: primary.id,
 			type: primary.type,
 			primary,
 			members,
 			quotes,
-			title: titleOf(primary, members, third),
+			...headline(primary, title),
+			title,
 			lead: inLead(primary),
 			unsure: primary.type === 'contradiction' && !plain(primary),
 		}
@@ -192,11 +217,18 @@ export interface Turn {
 	term: string
 	/** The edit (or the two candidates) that began it. */
 	edits: { lang: Lang; rev: number; old: number }[]
-	/** Earlier periods the same difference held, as years. */
+	/** Earlier periods the same difference held, as years and as days. */
 	earlier: string[]
+	past: { from: string; to: string }[]
 	/** For the as-of statement: the day of the edit and the edition it was made in. */
 	at: string
 	lang: Lang
+	/** False when no earlier version was compared, so there is no day to draw. */
+	known: boolean
+	/** True when the day is that of one edit, false when it is only the latest it can be. */
+	exact: boolean
+	/** The two editions the row compares. */
+	pair: [Lang, Lang]
 }
 
 const sinceWhen = (after: string | null | undefined, at: string) => {
@@ -215,11 +247,12 @@ export function turns(d: Difference, events: Map<number, TimelineEvent[]>): Turn
 	for (const f of d.members) {
 		const es = [...(events.get(f.id) ?? [])].filter((e) => e.kind !== 'reviewed').sort((a, b) => a.date.localeCompare(b.date))
 		const earlier: string[] = []
+		const past: Turn['past'] = []
 		let from: string | null = null
 		let began: TimelineEvent | null = null
 		for (const e of es) {
 			if (e.kind === 'opened' && from === null) (from = e.date), (began = e)
-			if (e.kind === 'closed' && from !== null) earlier.push(years(from, e.date)), (from = null), (began = null)
+			if (e.kind === 'closed' && from !== null) earlier.push(years(from, e.date)), past.push({ from, to: e.date }), (from = null), (began = null)
 		}
 		const edits = (began?.diffs ?? []).map((x) => ({ lang: x.lang, rev: x.rev_id, old: x.old_rev_id }))
 		const w = word(f)
@@ -241,9 +274,40 @@ export function turns(d: Difference, events: Map<number, TimelineEvent[]>): Turn
 			term: w?.term ?? '',
 			edits,
 			earlier,
+			past,
 			at: began?.date ?? f.opened_at,
 			lang: one ?? edits[0]?.lang ?? f.other_lang,
+			known: f.history !== false,
+			exact: exact(began?.after ?? f.opened_after, began?.date ?? f.opened_at),
+			pair: [f.lang, f.other_lang],
 		})
+	}
+	return out
+}
+
+export interface Lane {
+	lang: Lang
+	/** The periods this edition has said what the difference is about, oldest first. `to` is null while it still does. */
+	spans: { from: string; to: string | null }[]
+	/** The day the period that still runs began, and the edit that began it when it is known. */
+	since: { at: string; exact: boolean; edit: { rev: number; old: number } | null; either: boolean } | null
+}
+
+/**
+ * The time strip of a difference: one lane for each quoted edition. An edit dates the lane of the
+ * edition it was made in; when two editions were edited that day, both; when the edit is not known,
+ * the two editions the row compares.
+ */
+export function lanes(d: Difference, main: Turn[]): Lane[] {
+	const out = d.quotes.map((q): Lane => ({ lang: q.lang, spans: [], since: null }))
+	for (const t of main) {
+		if (!t.known) continue
+		for (const lane of out) {
+			const edit = t.edits.find((e) => e.lang === lane.lang)
+			if (lane.since || (t.edits.length ? !edit : !t.pair.includes(lane.lang))) continue
+			lane.spans = [...t.past, { from: t.at, to: null }]
+			lane.since = { at: t.at, exact: t.exact, edit: edit ? { rev: edit.rev, old: edit.old } : null, either: t.edits.length > 1 }
+		}
 	}
 	return out
 }

@@ -55,7 +55,7 @@
 		if (!nav.route && top) location.replace(href(top.wikidata_id))
 	})
 
-	const views = (n?: number) => (n ? `${n.toLocaleString('en')} views a year` : '')
+	const largest = $derived(Math.max(1, ...Object.values(topic?.size ?? {})))
 </script>
 
 <svelte:head>
@@ -85,18 +85,30 @@
 			<Differences {topic} {events} />
 		{/key}
 		<section class="articles small" aria-labelledby="articles-title">
-			<h2 id="articles-title">The articles compared</h2>
-			<ul>
-				{#each LANGS as l}
-					{#if topic.titles[l]}
-						<li>
-							<a href={articleUrl(l, topic.titles[l]!)} target="_blank" rel="noopener" lang={l}>{topic.titles[l]}</a>
-							<span class="subtle">{[NAMES[l], topic.size[l] ? kb(topic.size[l]!) : '', topic.refs?.[l] != null ? `${topic.refs[l]} references` : '', topic.quality?.[l] ?? '', views(topic.readers[l])].filter(Boolean).join(', ')}</span>
-						</li>
-					{/if}
-				{/each}
-				<li><a href={wikidataUrl(topic.wikidata_id)} target="_blank" rel="noopener">Wikidata {topic.wikidata_id}</a></li>
-			</ul>
+			<h2 id="articles-title">Articles</h2>
+			<table>
+				<thead>
+					<tr><th scope="col">Edition</th><th scope="col">Article</th><th scope="col" class="n" colspan="2">Size</th><th scope="col" class="n">References</th><th scope="col" class="n">Views a year</th></tr>
+				</thead>
+				<tbody>
+					{#each LANGS as l}
+						{#if topic.titles[l]}
+							<tr>
+								<th scope="row">{NAMES[l]}</th>
+								<td>
+									<a href={articleUrl(l, topic.titles[l]!)} target="_blank" rel="noopener" lang={l}>{topic.titles[l]}</a>
+									{#if topic.quality?.[l]}<span class="subtle" lang={l}>{topic.quality[l]}</span>{/if}
+								</td>
+								<td class="n num">{topic.size[l] ? kb(topic.size[l]!) : ''}</td>
+								<td class="meter"><span style:width="{((topic.size[l] ?? 0) / largest) * 100}%"></span></td>
+								<td class="n num" data-unit="references">{topic.refs?.[l] ?? ''}</td>
+								<td class="n num" data-unit="views a year">{topic.readers[l] ? topic.readers[l]!.toLocaleString('en') : ''}</td>
+							</tr>
+						{/if}
+					{/each}
+				</tbody>
+			</table>
+			<a href={wikidataUrl(topic.wikidata_id)} target="_blank" rel="noopener">Wikidata {topic.wikidata_id}</a>
 		</section>
 	{/if}
 </main>
@@ -168,13 +180,67 @@
 		font-weight: var(--font-weight-bold);
 	}
 
-	.articles li {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0 var(--spacing-50);
+	/* One row for each edition; the articles' sizes are also lengths, to compare at a glance. */
+	.articles table {
+		margin: var(--spacing-25) 0;
+		border-collapse: collapse;
+	}
+
+	.articles th,
+	.articles td {
+		padding: 0 var(--spacing-150) 0 0;
+		font-weight: var(--font-weight-normal);
+		text-align: left;
+		vertical-align: baseline;
+	}
+
+	.articles thead th,
+	.articles tbody th {
+		color: var(--color-subtle);
+	}
+
+	.articles .n {
+		text-align: right;
+	}
+
+	.articles td.n + .meter {
+		padding-left: 0;
+	}
+
+	.articles .meter {
+		width: 8rem;
+		vertical-align: middle;
+	}
+
+	.articles .meter span {
+		display: block;
+		min-width: 2px;
+		height: 6px;
+		margin-left: calc(-1 * var(--spacing-100));
+		background: var(--color-placeholder);
 	}
 
 	@media (max-width: 640px) {
+		/* Narrow: each edition's row wraps as a line of text, with the units the headings gave. */
+		.articles thead,
+		.articles .meter {
+			display: none;
+		}
+
+		.articles tr {
+			display: flex;
+			flex-wrap: wrap;
+		}
+
+		.articles th,
+		.articles td {
+			padding-right: var(--spacing-50);
+		}
+
+		.articles td[data-unit]:not(:empty)::after {
+			content: ' ' attr(data-unit);
+		}
+
 		.inner,
 		main {
 			padding-left: var(--spacing-100);
