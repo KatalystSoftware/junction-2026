@@ -240,6 +240,27 @@ Harness errors, all reported, none rerun:
   built-in `openai` provider calls the Responses API. A provider named `vllm` with the
   chat-completions format fixed it.
 
+### Harbor + OpenCode, level 4, seeds 101-103: the same two models served from Modal
+
+The same two models, served instead by `modal_serve.py` from one Modal H200 (vLLM 0.33.0, LoRA on,
+131,072-token context). Harbor ran on the team's Verda CPU runner, against the same three shipped
+shifts, three attempts per shift per model. Every receipt is valid. The run folders are
+`gemma26-<base|sft>-l4-s<101|102|103>`, kept off git (copies in `~/junction2026-data/oncallbench/harbor-gemma/` on hestia).
+
+| Model (Harbor + OpenCode, served from Modal) | Runs | Mean ± s.e. | Median | Range | Seed 101 | Seed 102 | Seed 103 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Gemma 4 26B-A4B, untrained | 9 | 0.07 ± 0.04 | 0.00 | 0.00-0.33 | 0.00 / 0.11 / 0.08 | 0.00 / 0.00 / 0.00 | 0.14 / 0.33 / 0.00 |
+| + SFT adapter | 9 | **0.40 ± 0.10** | 0.34 | 0.00-0.94 | 0.85 / 0.34 / 0.94 | 0.19 / 0.48 / 0.24 | 0.22 / 0.34 / 0.00 |
+
+This third set agrees with the two above: the untrained model fixes almost nothing (2-3 faults left
+in every run), and the adapter lands around Opus's 0.32. Over all 27 adapter runs the mean is 0.33.
+- **The adapter's runs all lasted to the shift's end.** None called `finish`.
+- **Six of its runs then hit the 30-minute agent timeout.** After minute 120 they kept calling
+  `wait` on "the shift is over", which the training harness never showed them. Their scores are
+  those of the finished shift.
+- **No run overflowed its context.**
+- **Wasted mitigations:** the untrained model wasted 3 in 9 runs, the adapter 2 in 9.
+
 ### Which fine-tuned checkpoint runs the scores spread (fixed before those runs)
 
 The spread's seeds were first 404, 418, 500, 502, 503 and 504. Before any run on them finished they
