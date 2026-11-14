@@ -2,6 +2,9 @@
 
 Prep and research for Junction 2026 (13–15 Nov 2026, Hype Areena, Espoo).
 
+This codebase was built and is maintained by AI agents, directed by team Katalyst. The agents write
+the code, tests, docs and commits; the team picks the problems, sets direction and reviews the results.
+
 What we are doing right now: [`TODO.md`](TODO.md).
 
 Layout: projects in `projects/<name>/`, experiments in `spikes/`; agent conventions in [`AGENTS.md`](AGENTS.md).
