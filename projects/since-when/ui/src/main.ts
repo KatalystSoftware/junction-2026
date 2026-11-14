@@ -3,6 +3,7 @@ import '@wikimedia/codex-design-tokens/theme-wikimedia-ui.css'
 // Vue code.
 import '@wikimedia/codex/dist/modules/CdxButton.css'
 import '@wikimedia/codex/dist/modules/CdxField.css'
+import '@wikimedia/codex/dist/modules/CdxInfoChip.css'
 import '@wikimedia/codex/dist/modules/CdxLabel.css'
 import '@wikimedia/codex/dist/modules/CdxMessage.css'
 import '@wikimedia/codex/dist/modules/CdxSearchInput.css'

@@ -8,6 +8,7 @@
 	import type { Finding, FindingType, Lang, Topic } from './lib/types'
 	import FindingRow from './FindingRow.svelte'
 	import Marked from './Marked.svelte'
+	import TypeChip from './TypeChip.svelte'
 
 	let { topic, route, lang, rich }: { topic: Topic; route: Route; lang: Lang; rich: Lang } = $props()
 
@@ -68,7 +69,7 @@
 			<a href={href(route, { tab: 'timeline' })} title="See when each difference opened and closed">{since(headline, day)}</a>
 		</p>
 		<p id="claim" class="claim">{headline.summary}</p>
-		<p class="label small subtle">Machine suggestion <span class="tag {headline.type}">{TYPES[headline.type] ?? headline.type}</span></p>
+		<div class="label small subtle">Machine suggestion <TypeChip type={headline.type} /></div>
 	{:else}
 		<p id="claim" class="claim">No open difference found between these articles.</p>
 	{/if}
@@ -155,12 +156,11 @@
 	}
 
 	.label {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: var(--spacing-25) var(--spacing-50);
 		margin-top: var(--spacing-50);
-	}
-
-	.label .tag {
-		margin-left: var(--spacing-25);
-		color: var(--color-base);
 	}
 
 	.where {

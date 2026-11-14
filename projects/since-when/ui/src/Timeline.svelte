@@ -6,6 +6,7 @@
 	import { DIFFERS } from './lib/headline'
 	import { log, type Route } from './lib/nav.svelte'
 	import type { FindingType, Lang, Timeline, TimelineEvent, Topic } from './lib/types'
+	import TypeChip from './TypeChip.svelte'
 
 	let { topic, route, lang, rich }: { topic: Topic; route: Route; lang: Lang; rich: Lang } = $props()
 
@@ -133,10 +134,10 @@
 		<ol class="stories">
 			{#each shown as s (s.id)}
 				<li class="story">
-					<p class="sum">
-						{#if s.type}<span class="tag {s.type}">{TYPES[s.type] ?? s.type}</span>{/if}
+					<div class="sum">
+						{#if s.type}<TypeChip type={s.type} />{/if}
 						{s.summary}
-					</p>
+					</div>
 					<div class="bar" role="img" aria-label="Held: {years(s.events)}">
 						{#each spans(s.events) as p}<i style:left="{p.left}%" style:width="{p.width}%"></i>{/each}
 					</div>
@@ -239,7 +240,7 @@
 		border-bottom: 1px solid var(--border-color-muted);
 	}
 
-	.sum .tag {
+	.sum :global(.cdx-info-chip) {
 		margin-right: var(--spacing-35);
 	}
 

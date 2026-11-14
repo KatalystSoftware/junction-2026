@@ -1,8 +1,9 @@
 <script lang="ts">
 	// One difference: its summary on a line; opened, the two quotes word for word and where they sit.
-	import { NAMES, TYPES, articleUrl, revisionUrl, rowDate, sectionLabel, sectionOf, shortDay, since, when } from './lib/format'
+	import { NAMES, articleUrl, revisionUrl, rowDate, sectionLabel, sectionOf, shortDay, since, when } from './lib/format'
 	import type { Finding, Lang, Topic } from './lib/types'
 	import Marked from './Marked.svelte'
+	import TypeChip from './TypeChip.svelte'
 
 	let { f, topic }: { f: Finding; topic: Topic } = $props()
 
@@ -21,7 +22,7 @@
 
 <details>
 	<summary>
-		<span class="tag {f.type}">{TYPES[f.type] ?? f.type}</span>
+		<TypeChip type={f.type} />
 		<span class="sum">{f.summary}</span>
 		<span class="date subtle small num">{rowDate(f)}</span>
 		<span class="caret subtle" aria-hidden="true">›</span>
@@ -80,7 +81,7 @@
 		color: var(--color-progressive);
 	}
 
-	.tag {
+	summary :global(.cdx-info-chip) {
 		justify-self: start;
 	}
 

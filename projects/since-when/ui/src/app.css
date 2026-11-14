@@ -83,27 +83,6 @@ select {
 	background-color: var(--background-color-progressive-subtle--hover);
 }
 
-/* Type of difference. The label carries the meaning; the tint only groups. */
-.tag {
-	display: inline-block;
-	padding: 0 var(--spacing-35);
-	border-radius: var(--border-radius-base);
-	background: var(--background-color-neutral);
-	font-size: var(--font-size-x-small);
-	line-height: var(--line-height-x-small);
-	font-weight: var(--font-weight-semi-bold);
-	white-space: nowrap;
-}
-
-.tag.contradiction,
-.tag.numbers {
-	background: var(--background-color-error-subtle);
-}
-
-.tag.framing {
-	background: var(--background-color-warning-subtle);
-}
-
 /* A word the findings single out, and (softer) the quoted stretch around it. */
 mark {
 	background: var(--background-color-warning-subtle);
