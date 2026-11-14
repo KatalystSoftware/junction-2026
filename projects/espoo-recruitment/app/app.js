@@ -905,6 +905,7 @@
   const goTo = h => { if (location.hash === h) route(); else location.hash = h; };
   document.addEventListener("click", ev => { const d = document.getElementById("demo"); if (d && d.open && !d.contains(ev.target)) d.open = false; });
   document.getElementById("demo").addEventListener("click", ev => {
+    if (ev.target.closest("a[href]")) { document.getElementById("demo").open = false; const h = ev.target.closest("a[href]").getAttribute("href"); if (location.hash === h) route(); return; } // a plain link in the menu: close it, and re-render when already there
     const b = ev.target.closest("[data-dbg]"); if (!b) return; const k = b.dataset.dbg, now = new Date().toISOString();
     document.getElementById("demo").open = false;
     if (k === "reset") { S = seed(); save(); toast("Demo reset"); return goTo("#/"); }
