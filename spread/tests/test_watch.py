@@ -41,6 +41,25 @@ def test_an_answer_counts_only_as_a_yes_or_a_no_with_known_facts():
         {"answer": "no", "problems": [{"fact": "manual", "value": True}]}
 
 
+def test_a_claude_model_is_asked_without_a_temperature_which_it_refuses_and_the_others_with_zero(monkeypatch):
+    sent = []
+
+    class Reply:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_):
+            return False
+
+        def read(self):
+            return json.dumps({"choices": [{"message": {"content": '{"answer": "yes"}'}}]}).encode()
+
+    monkeypatch.setattr(watch.urllib.request, "urlopen", lambda req, timeout: sent.append(json.loads(req.data)) or Reply())
+    for model in ("claude-haiku-5-5", "nvidia/nemotron-3.5-lightning-30b-a3b"):
+        assert watch.ask("Auto valmis.", {}, {}, "key", model=model)["answer"] == "yes"
+    assert "temperature" not in sent[0] and sent[1]["temperature"] == 0
+
+
 def test_vocabulary_tells_a_typo_from_a_new_word_and_a_new_sentence_from_a_known_one():
     news = VOCABULARY.score("Auto valmis huomenna klo 14. Kilvett puuttuu, manuaali.")
     assert news == {"typos": ["kilvett"], "newWords": ["puuttuu"], "newSentences": ["kilvett puuttuu, manuaali."]}
