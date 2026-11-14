@@ -456,3 +456,15 @@ VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss
 # The aggressive row A1 on safe row 7: the day cap under 760 drivers and `late_cost` 100 at 760 or more.
 VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100"] = _full_weeks(
     VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62"], late_cost=100)
+# The aggressive line's ladder on safe row 7, heaviest first, each only in a week of 760 drivers or more; a thinner week plays
+# row 7 exactly. R-max, R-mid and R-mild are the stand-in climb's `agg-r-*`, R-high and `-ss0` are lane 1 A's `agg-late100-ss0-cost11` and
+# `agg-late100-ss0`, and the lightest rung is A1 (`…-cap62-late100`). The kinds quoted cheaper: trade-in 2.0, private pickup 1.4, private delivery 1.2.
+_ROW_7 = VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62"]
+_CHEAP_KINDS_760 = {"private_pickup": {**KINDS["private_pickup"], "cost": 1.4}, "private_delivery": {**KINDS["private_delivery"], "cost": 1.2},
+                    "trade_in": {**KINDS["trade_in"], "cost": 2.0}}
+VARIANTS.update({f"aggr7-{tail}": _full_weeks(_ROW_7, **knobs) for tail, knobs in (
+    ("max", {"late_cost": 100, "kinds": _CHEAP_KINDS_760, "slow_step": 0.0, "cost": 1.05, "queue_hours": 6, "max_unbooked": 40, "min_slack": 240}),
+    ("high", {"late_cost": 100, "slow_step": 0.0, "cost": 1.1}),
+    ("ss0", {"late_cost": 100, "slow_step": 0.0}),
+    ("mid", {"late_cost": 100, "kinds": _CHEAP_KINDS_760, "cost": 1.1, "queue_hours": 12}),
+    ("mild", {"late_cost": 100, "kinds": _CHEAP_KINDS_760, "cost": 1.15, "queue_hours": 12}))})
