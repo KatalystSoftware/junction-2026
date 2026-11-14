@@ -5,7 +5,8 @@
 	import { api } from './lib/api.svelte'
 	import { dating, differences, lanes, turns, type Difference, type Lane } from './lib/differences'
 	import { modelName } from './lib/format'
-	import { href, ui } from './lib/nav.svelte'
+	import { href, showSql, ui } from './lib/nav.svelte'
+	import { queue } from './lib/queue.svelte'
 	import { LANGS, type Timeline, type TimelineEvent, type Topic } from './lib/types'
 	import Strip from './Strip.svelte'
 	import TopicList from './TopicList.svelte'
@@ -41,6 +42,15 @@
 </script>
 
 <h1>What three Wikipedias say differently, and since when</h1>
+{#if queue.database}
+	{@const db = queue.database}
+	<p class="db">
+		Read from MariaDB {db.version}: the system-versioned table <code>{db.table}</code> holds
+		<span class="num">{db.versions.toLocaleString('en')}</span> row versions of
+		<span class="num">{db.passages.toLocaleString('en')}</span> passages, each kept from Wikipedia's own edit time.
+		{#if ui.runnable}<button class="cdx-button cdx-button--action-progressive cdx-button--weight-quiet" aria-haspopup="dialog" onclick={() => showSql('history', { qid: START[0], lang: 'en' })}>See the versions of one passage</button>{/if}
+	</p>
+{/if}
 
 <section class="start" aria-label="Topics to start from">
 	<Why id="why-start" label="Found and checked by Nemotron">{modelName(null)} compared each topic's articles passage by passage and suggested these differences, then looked each one up in the whole other article and set aside those it found stated there. A person closed the ones found false on reading both articles. Open a topic to read each edition's own words.</Why>
@@ -66,6 +76,15 @@
 	h1 {
 		margin: var(--spacing-150) 0 var(--spacing-100);
 		line-height: 1.25;
+	}
+
+	.db {
+		margin: 0 0 var(--spacing-100);
+		color: var(--color-subtle);
+	}
+
+	.db button {
+		margin-left: calc(-1 * var(--spacing-25));
 	}
 
 	.start {

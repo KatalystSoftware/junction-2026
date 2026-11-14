@@ -14,6 +14,15 @@ export interface SqlEntry {
 	rows: number
 }
 
+/** The database behind the page: its version and the versioned table of passages. */
+export interface Database {
+	version: string
+	table: string
+	/** Every version of a passage the table has kept, and the passages current today. */
+	versions: number
+	passages: number
+}
+
 export interface QueueItem {
 	wikidata_id: string
 	topic: string

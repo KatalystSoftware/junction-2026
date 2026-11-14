@@ -15,6 +15,8 @@
 
 	const editions = $derived(LANGS.filter((l) => topic.titles[l]))
 	const found = $derived(differences(topic))
+	// Whether a language model has read this topic at all: the alignment alone writes coverage rows.
+	const compared = $derived(!!topic.checked || topic.findings.some((f) => f.type !== 'coverage'))
 	const shown = $derived(all ? found : found.slice(0, FIRST))
 	const left = $derived(missing(topic))
 	// On a topic the claim check has run on: wording, which it does not cover, and what it set aside.
@@ -40,7 +42,10 @@
 
 <section aria-labelledby="list-title">
 	<header>
-		<h2 id="list-title">{found.length ? plural(found.length, 'difference', 'differences') : 'No differences found'}</h2>
+		<h2 id="list-title">{found.length ? plural(found.length, 'difference', 'differences') : compared ? 'No differences found' : 'Not compared yet'}</h2>
+		{#if !found.length && !compared}
+			<Why id="why-list" label="Alignment only">{modelName(null)} has not compared this topic's articles yet, so there are no differences of fact or wording to show. What follows comes from the vector alignment alone: passages of one edition with no close passage in another.</Why>
+		{/if}
 		{#if found.length}
 			{#if judge}
 				<Why id="why-list" label="Checked by Nemotron">{modelName(topic.checked?.model)} suggested these by comparing the articles passage by passage{#if modelName(topic.checked?.model) === modelName(judge)}, then looked each one up in the whole other article{:else}; {modelName(judge)} looked each one up in the whole other article{/if}. A person closed the rows found false on reading; the rest no person has checked. The quotes are word for word: read them to judge.</Why>

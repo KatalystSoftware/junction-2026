@@ -1,47 +1,77 @@
 {
-  "about": "What a person decided after reading both articles, for rows the claim check let stand. Applied with `python -m gapfinder.checked hand demo/hand-checked.json`, after every load: a row is found by its topic, type and the words of its quotes as the page shows them, since finding ids change with each restore. `close` marks the row not a difference (finding.status, or checked_finding.status for a row the check found itself), with the reason; `summary` replaces the check's one-line summary with the classifier's own, where the check's rewrite lost the point. The reasons are those of hero-labels.json and hero-verify-notes.md.",
+  "about": "What a person decided after reading both articles, for rows the claim check let stand. Applied with `python -m gapfinder.checked hand demo/hand-checked.json`, after every load: a row is found by its topic, type and the words of its quotes as the page shows them, since finding ids change with each restore. `close` marks the row not a difference (finding.status, or checked_finding.status for a row the check found itself), with the reason; `summary` replaces the check's one-line summary with the classifier's own, where the check's rewrite lost the point; `quote` puts back an edition's words as the article has them, where an older cleaner of the text cut them. The reasons are those of hero-labels.json and hero-verify-notes.md.",
   "rows": [
     {
       "topic": "Q1412941",
       "type": "numbers",
-      "quotes": {"fi": "Tasavallan suojelulain voimassaolo tosin rajoitettiin viiteen vuoteen"},
+      "quotes": {
+        "fi": "Tasavallan suojelulain voimassaolo tosin rajoitettiin viiteen vuoteen"
+      },
       "close": "A term against a term: the law was limited to five years, and three years is what the Social Democrats would accept (hero-labels.json numbers-02)."
     },
     {
       "topic": "Q1412941",
       "type": "numbers",
-      "quotes": {"sv": "efterträddes den 4 juli", "en": "resigned the following day"},
+      "quotes": {
+        "sv": "efterträddes den 4 juli",
+        "en": "resigned the following day"
+      },
       "close": "Two steps of one course of events: the government resigned on 2 July and its successor took over on 4 July (hero-verify-notes.md, What is still wrong)."
     },
     {
       "topic": "Q1412941",
       "type": "framing",
-      "quotes": {"en": "The event escalated to an attempted coup d'état known as the Mäntsälä rebellion"},
+      "quotes": {
+        "en": "The event escalated to an attempted coup d'état known as the Mäntsälä rebellion"
+      },
       "close": "\"Kapina\" or \"uppror\" against \"coup d'état\": the Finnish introduction itself calls it an attempted coup (hero-labels.json framing-07)."
     },
     {
       "topic": "Q736268",
       "type": "contradiction",
-      "quotes": {"fi": "Ernst von Vegesack", "en": "Eberhard von Vegesack"},
+      "quotes": {
+        "fi": "Ernst von Vegesack",
+        "en": "Eberhard von Vegesack"
+      },
       "close": "One man, Eberhard Ernst Gotthard von Vegesack, under two of his names (hero-labels.json contradiction-04)."
     },
     {
       "topic": "Q736268",
       "type": "numbers",
-      "quotes": {"sv": "den 16 maj", "fi": "14. toukokuuta Gotlantiin nousi"},
+      "quotes": {
+        "sv": "den 16 maj",
+        "fi": "14. toukokuuta Gotlantiin nousi"
+      },
       "close": "Two steps of one course of events: the landing on Gotland on 14 May and the island retaken on the 16th (hero-verify-notes.md, What is still wrong)."
     },
     {
       "topic": "Q2457646",
       "type": "numbers",
-      "quotes": {"fi": "ennen 1800-luvun loppua", "en": "before the late 19th century"},
+      "quotes": {
+        "fi": "ennen 1800-luvun loppua",
+        "en": "before the late 19th century"
+      },
       "close": "The same statement in two languages: \"before the end of the 1800s\" and \"before the late 19th century\" (hero-verify-notes.md, What is still wrong)."
     },
     {
       "topic": "Q2457646",
       "type": "numbers",
-      "quotes": {"fi": "Porvoon valtiopäivät oli kutsuttu koolle 22. maaliskuuta", "en": "between 25 March and 19 July 1809"},
+      "quotes": {
+        "fi": "Porvoon valtiopäivät oli kutsuttu koolle 22. maaliskuuta",
+        "en": "between 25 March and 19 July 1809"
+      },
       "summary": "The Finnish passage gives the Diet's opening date as 22 March (10 March Old Style) 1809, while the English passage gives 25 March 1809."
+    },
+    {
+      "topic": "Q1412941",
+      "type": "framing",
+      "quotes": {
+        "en": "The Lapua Movement (Lapuan liike) was a radical"
+      },
+      "quote": {
+        "en": "The Lapua Movement (Finnish: Lapuanliike or Lapuan liike, Swedish: Lapporörelsen) was a radical Finnish nationalist, fascist, pro-Nazi and anti-communist political movement founded in and named after the town of Lapua."
+      },
+      "why": "The English first sentence word for word: the cleaner the lexicon ran on dropped \"Finnish:\" and \"Swedish: Lapporörelsen\" from the parenthesis. The passage now loaded, and revision 1383067871 the findings cite, read as here."
     }
   ]
 }

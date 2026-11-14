@@ -13,7 +13,7 @@ the run's date for sections, revisions and the passage that settled a check.
 
 `hand` applies what a person decided after reading both articles: it closes the rows found false
 (finding.status, or checked_finding.status for a row the check found itself) and puts back a
-summary. Rows are found by their quotes, so it works on any restore; run it after every load.
+summary or a quote. Rows are found by their quotes, so it works on any restore; run it after every load.
 """
 
 import json
@@ -336,11 +336,16 @@ def hand(path):
                         "WHERE id = ? AND status <> 'not_a_difference'",
                         (f["id"],),
                     )
+                for lang, words in x.get("quote", {}).items():
+                    column = "quote" if f["lang"] == lang else "other_quote"
+                    table, key = ("checked_finding", where) if ours else ("finding", f"id = {f['id']}")
+                    cur.execute(f"UPDATE {table} SET {column} = ? WHERE {key} AND {column} <> ?", (words, words))
                 if "summary" in x and ours:
                     cur.execute(f"UPDATE checked_finding SET summary = ? WHERE {where}", (x["summary"],))
                 elif "summary" in x:
                     cur.execute("UPDATE finding SET summary = ? WHERE id = ?", (x["summary"], f["id"]))
-                print(f"{qid}: {'closed' if 'close' in x else 'summary of'} {f['id']} {f['type']}: {f['summary'][:90]}")
+                done = "closed" if "close" in x else "summary of" if "summary" in x else "quote of"
+                print(f"{qid}: {done} {f['id']} {f['type']}: {f['summary'][:90]}")
     con.close()
 
 

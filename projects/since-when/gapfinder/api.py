@@ -324,10 +324,23 @@ def queue(r, q):
             None if lang == "all" else lang, limit=_int(q, "limit", 50, 1, 500), offset=_int(q, "offset", 0, 0, 10**6)
         ),
     )
+    db = r(
+        "The database and its versioned passages",
+        """
+SELECT VERSION() AS version,
+       (SELECT COUNT(*) FROM chunk FOR SYSTEM_TIME ALL) AS versions,
+       (SELECT COUNT(*) FROM chunk) AS passages""",
+    )[0]
     return {
         "as_of": date.today(),
         "total": int(rows[0]["total"]) if rows else 0,
         "items": [queue_item(x) for x in rows],
+        "database": {
+            "version": db["version"].split("-")[0],
+            "table": "chunk",
+            "versions": int(db["versions"]),
+            "passages": int(db["passages"]),
+        },
     }
 
 
@@ -563,35 +576,41 @@ def search(r, q):
     lang = q.get("lang", "all")
     if lang not in LANGS + ("all",):
         raise ApiError(400, "lang must be all, fi, sv or en")
-    if not _embedder:
-        from .embed import Embedder
-
-        _embedder.append(Embedder(threads=2))
-    vec = _embedder[0]([text])[0]
-    r.cur.execute("SET @q = VEC_FromText(?)", (json.dumps([round(v, 6) for v in vec]),))
-    r.log.append(
-        {
-            "label": "The question's bge-m3 vector",
-            "query": f"SET @q = VEC_FromText('[…1024 numbers…]')  -- {text}",
-            "ms": 0,
-            "rows": 0,
-        }
-    )
-    hits = r(
-        "Nearest current passages (vector index on chunk_now)",
+    # A title in any edition comes first, an exact one before one that contains the words: vectors
+    # favour passages over names. Without the embedding model on disk, titles are the whole search.
+    words = re.sub(r"([\\%_])", r"\\\1", text)
+    named = r(
+        "Topics by title",
         f"""
+SELECT wikidata_id FROM topic
+WHERE CONCAT_WS('|', title_fi, title_sv, title_en) LIKE {lit("%" + words + "%")}
+ORDER BY {lit(text)} NOT IN (title_fi, title_sv, title_en), title_en
+LIMIT {limit}""",
+    )
+    hits = []
+    if search_enabled():
+        if not _embedder:
+            from .embed import Embedder
+
+            _embedder.append(Embedder(threads=2))
+        vec = _embedder[0]([text])[0]
+        r.cur.execute("SET @q = VEC_FromText(?)", (json.dumps([round(v, 6) for v in vec]),))
+        r.log.append(
+            {
+                "label": "The question's bge-m3 vector",
+                "query": f"SET @q = VEC_FromText('[…1024 numbers…]')  -- {text}",
+                "ms": 0,
+                "rows": 0,
+            }
+        )
+        hits = r(
+            "Nearest current passages (vector index on chunk_now)",
+            f"""
 SELECT n.wikidata_id, n.lang, n.section, VEC_DISTANCE_COSINE(n.embedding, @q) AS distance
 FROM chunk_now AS n
 ORDER BY VEC_DISTANCE_COSINE(n.embedding, @q)
 LIMIT {limit * 5}""",
-    )
-    # An exact title in any edition comes first: vectors favour passages over names.
-    named = r(
-        "Topics with this exact title",
-        f"""
-SELECT wikidata_id FROM topic
-WHERE {lit(text)} IN (title_fi, title_sv, title_en)""",
-    )
+        )
     # Farther than this, bge-m3 matches anything: "zzzzqqq" is 0.64 from its nearest passage and
     # "Olof Palme" (not a topic) 0.56, while "Talvisota" is 0.54 from Winter War.
     near = [h["wikidata_id"] for h in hits if float(h["distance"]) <= SEARCH_MAX_DISTANCE]
@@ -917,8 +936,8 @@ def get_queue(request: Request):
 
 @app.get("/api/search")
 def get_search(request: Request):
-    if USE_FIXTURES or not search_enabled():
-        raise ApiError(503, "search is off: this API has no embedding model on disk")
+    if USE_FIXTURES:
+        raise ApiError(503, "search is off on the fixtures")
     return _answer(search, dict(request.query_params))
 
 
