@@ -86,6 +86,33 @@ ladder's seven pair variants (`ladder1-rows.csv`, 40 played weeks; the stand-in 
 | ... orders | off by 22 to 24, correlation 0.92 | off by 21 to 23, correlation 0.88 to 0.91 |
 | ... on-time share | off by 2.0 points, correlation 0.11 to 0.13 | off by 1.9 to 2.0 points, correlation 0.26 to 0.27 |
 
+**Our own progress, played again from scratch** (run 43637692288, `scratch/standin/progress_check.py`): 14 milestones
+from `baseline` to merge 1 on 266 seeds, each beside its played weeks on the same seeds. Gain over the reference
+`steep-notes-offers-8`, euros a week:
+
+| Milestone | Seeds | Played (95% interval) | Stand-in | Orders, played / stand-in |
+| --- | --- | --- | --- | --- |
+| `baseline` | 15 | -10,773 (-11,910 to -9,567) | -11,735 | 153 / 166 |
+| `gate-10` | 42 | -6,068 (-6,541 to -5,569) | -7,221 | 190 / 159 |
+| `curve-live-surcharge` | 40 | -4,189 (-4,541 to -3,831) | -5,847 | 226 / 182 |
+| `curve-fee-1.0-cost-1.2` | 40 | -1,593 (-2,011 to -1,212) | -3,449 | 266 / 229 |
+| `fee-cap-1.2-drop-cost-1.3` | 45 | -1,029 (-1,320 to -723) | -809 | 229 / 229 |
+| `notes-offers-8` | 45 | -418 (-699 to -108) | -766 | 237 / 230 |
+| `steep-notes` | 40 | -155 (-328 to +24) | -266 | 256 / 255 |
+| `slow-step-gate-25` | 151 | +890 (+592 to +1,255) | +609 | 290 / 292 |
+| `slow-step-gate-25-kinds` | 100 | +1,309 (+1,032 to +1,639) | +886 | 304 / 302 |
+| `slow-step-gate-25-kinds-limits` | 40 | +1,211 (+851 to +1,594) | +608 | 300 / 296 |
+| `slow-friday-late-150-kinds` | 60 | +1,534 (+1,152 to +2,072) | +1,423 | 314 / 314 |
+| `slow-friday-late-150-kinds-limits` (default) | 265 | +1,731 (+1,465 to +2,007) | +1,195 | 306 / 304 |
+
+Every milestone is on the same side of the reference as in play, 12 of 12, and the chain comes out in play's order. From
+the fee cap on, the desk family the stand-in was built around, a variant's margin a week is within 500 of play's and its
+orders within 6; the steps since the reference read 10 to 50% low, most on thin worlds (default: +990 against +1,776).
+The three early desks read 1,000 to 1,900 too low, with 15 to 20% too few orders: far from today's prices and fee
+schedules the sizes are off. The default's own played weeks are what each seed's market is measured on, so its row is
+not an independent check. Merge 1 and the first distillation have no played week on these seeds: the stand-in has them
++3,891 and +1,392 over the reference, where play's two steps on other seeds add to about +3,900 and +2,770.
+
 Trust it for:
 - **Order.** Which of two variants is ahead, when the stand-in's gap is clear. On natural worlds it agreed with every
   pair play decided against the reference and 93% against the default; on the pair ladder with all of them.
