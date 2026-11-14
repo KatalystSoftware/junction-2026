@@ -577,3 +577,8 @@ _H30 = VARIANTS[f"{_HEAD}-late100-h30-c11"]
 VARIANTS[f"{_HEAD}-late100-h30-c11-thin-hold12-left6"] = {**_H30, "thin_play": {
     "drivers": 760, "params": {**{k: v for k, v in {**_H30, **_H30["when_tight"]}.items() if k != "when_tight"},
                                "pair_hold": 12, "pair_left": 6}, "version": thin_play.VERSION}}
+# The same two thin knobs on row 11 (`-late80-from820`), the head after row 10: row 12 of the stack.
+_R11 = VARIANTS[f"{_HEAD}-late100-h30-c11-late80-from820"]
+VARIANTS[f"{_HEAD}-late100-h30-c11-late80-from820-thin-hold12-left6"] = {**_R11, "thin_play": {
+    "drivers": 760, "params": {**{k: v for k, v in {**_R11, **_R11["when_tight"]}.items() if k != "when_tight"},
+                               "pair_hold": 12, "pair_left": 6}, "version": thin_play.VERSION}}

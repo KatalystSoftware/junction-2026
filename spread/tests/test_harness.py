@@ -895,3 +895,21 @@ def test_late80_from_820_plays_the_head_below_820_drivers_and_only_a_lower_late_
     rich, base = desk(f"{head}-late80-from820", 820), desk(head, 820)
     assert {k: rich[k] for k in rich if rich[k] != base[k]} == {"late_cost": 80}
     assert rich["cost"] == 1.1 and rich["cost_hours"] == [[30, 1.2]]
+
+
+def test_row_12_changes_only_the_thin_pair_knobs_of_row_11():
+    from spreadlab import play
+    from spreadlab.variants import VARIANTS
+    head = "fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss04-cap62-kindfee-onward-all-late100-h30-c11"
+    roster = lambda n: [{**ROSTER[0], "id": f"x{i}"} for i in range(n)]  # noqa: E731
+
+    def desk(name, n):  # the parameters the week plays with
+        params = VARIANTS[name]
+        played = play.policy_class(params)(None, 8, 0, params, roster(n), MAP).params()
+        return {k: v for k, v in played.items() if k not in ("when_tight", "rich_drivers", "when_rich", "thin_play")}
+
+    def changed(a, b):
+        return {k: a[k] for k in a if a[k] != b[k]}
+    row, base = f"{head}-late80-from820-thin-hold12-left6", f"{head}-late80-from820"
+    assert desk(row, 800) == desk(base, 800)
+    assert changed(desk(row, 700), desk(base, 700)) == {"pair_hold": 12, "pair_left": 6}
