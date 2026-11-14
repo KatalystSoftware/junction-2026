@@ -12,7 +12,8 @@
 //     open    the button's words
 //     more    further links beside the button, as [words, address]
 //     result  optional figures shown as a row, as [figure, what it is]
-//     what    how it works; every claim and number is in the file the README's table names
+//     what    what it does, in a sentence or two; every claim and number is in the file the README's table names
+//     how     optional technical note under it, in smaller type
 //     source  folder in the repo, joined to `repo`
 //     shot    file in shots/ (960 x 600 WebP of the live app)
 //   also     work that is on the team's table but is not one of its entries
@@ -28,10 +29,11 @@ window.KATALYST = {
       for: [["AfterQuery", "Break the Agent"]],
       live: "https://incident.katalyst.fyi/",
       open: "Watch the replay",
+      more: [["Jump to the costly rollback", "https://incident.katalyst.fyi/?session=l4-s200019&t=33&intro=0"]],
       result: [
-        ["0.45", "Claude Opus 5.5, mean of 48 runs on 24 unseen seeds"],
-        ["1.00", "an expert script; doing nothing scores 0"],
-        ["21%", "of Opus runs end worse than doing nothing"],
+        ["45%", "Claude Opus 5.5's mean, as a share of what an expert script saves (48 runs, 24 unseen seeds)"],
+        ["21%", "of its runs cost more than doing nothing at all"],
+        ["2%", "come within 5% of the expert"],
       ],
       what: "An AI agent is paged into a 120-minute shift on a simulated online shop: 60 services, several faults at once, and every failed request costs revenue. Claude Opus 5.5 finds the causes, then loses on judgment.",
       source: "projects/oncallbench",
@@ -44,7 +46,8 @@ window.KATALYST = {
       for: [["MariaDB", "Wikipedia Through Time"]],
       live: "https://since-when.katalyst.fyi/",
       open: "Open Since When",
-      what: "For a topic, what the Finnish, Swedish and English articles say differently, and the edit each difference began with: every revision for three topics, one version a year for the other 2,916. MariaDB 11.8 system-versioned tables keep every version, and one statement pairs passages across editions by vector search as they stood on a past date. The SQL button shows the statement behind each screen and runs it.",
+      what: "Pick a topic and see what the Finnish, Swedish and English articles say differently, with the edit and the date each difference began.",
+      how: "MariaDB 11.8 system-versioned tables keep every version: every revision for three topics, one a year for the other 2,916. One statement pairs passages across the editions by vector search, as they stood on a past date. The SQL button shows the statement behind each screen and runs it.",
       source: "projects/since-when",
       shot: "since-when.webp",
     },
@@ -59,7 +62,8 @@ window.KATALYST = {
         ["Espoo's screen", "https://kutsu.katalyst.fyi/"],
         ["A person's sign-up", "https://kutsu.katalyst.fyi/#/me"],
       ],
-      what: "Today each Espoo recruitment event starts with a new survey for companies and another for candidates, and each side waits for the other to sign up. Kutsu keeps who came and what employers said they need, and sends both an invitation already filled in, to agree with or correct. Context.dev supplies each company's details, brand colours and careers page.",
+      what: "Each Espoo recruitment event starts with new surveys, and companies and candidates each wait for the other to sign up. Kutsu keeps who came and what employers said they need, and drafts each side an invitation already filled in, to agree with or correct.",
+      how: "Context.dev reads each company's brand record and careers page, and every statement about a company is quoted from a public page it links to. The pool of people is sample data.",
       source: "projects/kutsu",
       shot: "kutsu.webp",
     },

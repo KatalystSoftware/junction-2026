@@ -86,8 +86,8 @@ svg.arrow { width: 0.8em; height: 0.8em; flex: none; }
 /* The three entries, listed in the header so all of them are on the first screen. */
 .toc { margin-top: clamp(1.1rem, 3vw, 2rem); display: grid; }
 .toc a {
-  display: grid; gap: 0.1rem;
-  padding-block: 0.7rem;
+  display: flex; align-items: baseline; justify-content: space-between; gap: 0.2rem 1rem; flex-wrap: wrap;
+  padding-block: 0.6rem;
   border-top: 1px solid var(--field-rule);
   color: var(--field-soft); text-decoration: none; line-height: 1.35;
 }
@@ -96,7 +96,7 @@ svg.arrow { width: 0.8em; height: 0.8em; flex: none; }
 .toc a:hover b { color: var(--spark); }
 @media (min-width: 46rem) {
   .toc { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2rem; }
-  .toc a { padding-block: 0.9rem 0; align-content: start; }
+  .toc a { display: grid; align-content: start; padding-block: 0.8rem 0; }
 }
 
 /* One article per entry. */
@@ -120,15 +120,23 @@ svg.arrow { width: 0.8em; height: 0.8em; flex: none; }
   line-height: 1.1; letter-spacing: -0.02em; text-wrap: balance;
 }
 .entry .project-logo { width: 1.15em; height: 1.15em; flex: none; }
-.entry .for { margin-top: 0.3rem; color: var(--soft); font-size: 0.92em; }
+.entry .for { margin-top: 0.3rem; color: var(--soft); font-size: 0.86em; }
 .entry .for + .for { margin-top: 0; }
-.entry .for b { color: var(--ink); font-weight: 650; }
+.entry .for b { font-weight: 600; }
 .entry .pitch { margin-top: 0.7rem; font-size: 1.15em; font-weight: 600; line-height: 1.35; text-wrap: balance; }
-.entry .what { max-width: 34em; color: var(--soft); text-wrap: pretty; }
-.result { margin: 0 0 1rem; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
-.result div { border-top: 2px solid var(--ink); padding-top: 0.45rem; }
-.result dt { font-weight: 800; font-stretch: 112%; font-size: 1.6em; line-height: 1; font-variant-numeric: tabular-nums; }
-.result dd { margin: 0.35rem 0 0; color: var(--soft); font-size: 0.8em; line-height: 1.35; }
+.entry .what { max-width: 34em; text-wrap: pretty; }
+.entry .how { margin-top: 0.6rem; max-width: 38em; color: var(--soft); font-size: 0.86em; line-height: 1.5; text-wrap: pretty; }
+/* Figures: a row on wide screens, a stack of figure-and-label lines on a phone. */
+.result { margin: 0 0 1rem; display: grid; gap: 0.55rem; }
+.result div { display: grid; grid-template-columns: 4.2rem 1fr; align-items: baseline; gap: 0.8rem; border-top: 1px solid var(--rule); padding-top: 0.5rem; }
+.result dt { font-weight: 800; font-stretch: 112%; font-size: 1.5em; line-height: 1; font-variant-numeric: tabular-nums; }
+.result dd { margin: 0; color: var(--soft); font-size: 0.86em; line-height: 1.35; }
+@media (min-width: 46rem) {
+  .result { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+  .result div { display: block; border-top: 2px solid var(--ink); padding-top: 0.45rem; }
+  .result dt { font-size: 1.6em; }
+  .result dd { margin-top: 0.35rem; font-size: 0.8em; }
+}
 .entry .acts { margin-top: 1.15rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem 1.3rem; }
 .btn {
   display: inline-flex; align-items: center; gap: 0.55rem;
@@ -148,10 +156,9 @@ svg.arrow { width: 0.8em; height: 0.8em; flex: none; }
 .entry .head { grid-area: head; }
 .entry .detail { grid-area: detail; }
 @media (min-width: 46rem) {
-  .entry { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); grid-template-areas: "shot head" "shot detail"; row-gap: 1.3rem; }
-  .entry .shot { align-self: center; }
-  .entry .head { align-self: end; }
-  .entry .detail { align-self: start; }
+  /* The screenshot's top lines up with the name beside it. */
+  .entry { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); grid-template-rows: auto 1fr; grid-template-areas: "shot head" "shot detail"; row-gap: 1.3rem; align-items: start; }
+  .entry .shot { margin-top: 0.35rem; }
 }
 
 .also { padding-block: clamp(1.4rem, 3vw, 2rem); border-bottom: 1px solid var(--rule); }
@@ -205,7 +212,7 @@ svg.arrow { width: 0.8em; height: 0.8em; flex: none; }
   var toc = document.getElementById("toc");
   data.projects.forEach(function (entry) {
     var a = link("", "", "#" + entry.id);
-    a.append(el("b", "", entry.name), el("span", "", entry.short), el("span", "who", "For " + entry.for.map(function (f) { return f[0]; }).join(" and ")));
+    a.append(el("b", "", entry.name), el("span", "who", "For " + entry.for.map(function (f) { return f[0]; }).join(" and ")));
     toc.append(a);
   });
 
@@ -220,7 +227,7 @@ svg.arrow { width: 0.8em; height: 0.8em; flex: none; }
     var img = el("img");
     img.src = "shots/" + entry.shot;
     img.alt = "";
-    img.width = 960; img.height = 600; img.decoding = "async";
+    img.width = 960; img.height = 600;
     frame.append(img);
 
     // head: name, challenges, promise and button; detail: figures and how it works.
@@ -253,6 +260,7 @@ svg.arrow { width: 0.8em; height: 0.8em; flex: none; }
       detail.append(figures);
     }
     detail.append(el("p", "what", entry.what));
+    if (entry.how) detail.append(el("p", "how", entry.how));
     var acts = el("div", "acts");
     var open = link("btn", entry.open + " ", entry.live);
     open.insertAdjacentHTML("beforeend", ARROW);
