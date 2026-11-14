@@ -142,6 +142,8 @@ class Screening:
     def quote(self, request) -> None:
         self.requests[request["id"]] = request
         partner = self.partner(request) if self.p["pair_hold"] else None
+        onward = None if partner or not self.p["pair_hold"] else self.onward_partner(request)
+        partner = partner or onward
         if partner is None:
             return super().quote(request)
         dealer = request["dealerId"]
@@ -153,6 +155,7 @@ class Screening:
         super().quote(request)
         lo = self.answer(request, self.decisions[request["id"]]["prices"])
         self.return_quotes.append({"id": request["id"], "partner": partner, "hi": hi, "lo": lo, "typical": request["referenceFeeCents"],
+                                   "rate": self.p["pair_onward"] if onward else None,
                              "partner_typical": self.requests[partner]["referenceFeeCents"]})
 
 
@@ -353,7 +356,7 @@ def read(rows: list[dict]) -> None:
             pp = sum(y["paired"] for y in rets if y["won"]) / max(1, sum(y["won"] for y in rets))  # the share of won returns that pair
             for x in rets:
                 (c_hi, p_hi), (c_lo, p_lo) = x["hi"], x["lo"]
-                paired_cost = fee * (x["typical"] + x["partner_typical"]) - (x["partner_fee"] or 1.08 * x["partner_typical"])
+                paired_cost = (x.get("rate") or fee) * (x["typical"] + x["partner_typical"]) - (x["partner_fee"] or 1.08 * x["partner_typical"])
                 cost = pp * paired_cost + (1 - pp) * 1.2 * x["typical"]
                 gain += c_lo * (p_lo - cost) - c_hi * (p_hi - cost)
             print(f"   pairs-{fee}: 4. trade-ins at {fee * ratio:.2f} x their typical fee ({len(band)} gigs): booked within 1 h {in1:.0%}, 2 h {in2:.0%}; "

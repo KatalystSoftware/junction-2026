@@ -191,3 +191,27 @@ def test_with_pair_late_two_held_cars_released_together_go_once_as_one_onward_gi
     (post,) = d.world.sent
     assert [(s["orderId"], s["kind"]) for s in post["stops"]] == [("R1", "pickup"), ("R1", "delivery"), ("R2", "pickup"), ("R2", "delivery")]
     assert not d.pair_wait
+
+
+def test_an_onward_request_is_quoted_at_the_onward_cost_and_once_won_waits_for_the_held_cars_release(monkeypatch):
+    three = {"places": MAP["places"] + [{"id": "pori", "lat": 61.48, "lon": 21.80}],
+             "roads": [{"from": a, "to": b, "km": 100.0, "minutes": 25 if a == b else 120} for a in ("helsinki", "tampere", "pori") for b in ("helsinki", "tampere", "pori")]}
+    monkeypatch.setattr(pairs, "RETURNS", {"helsinki>tampere": 20})
+    params = {"quote_share": 1, "curve": True, "cost": 1.2, "fee": 1.0, "fee_cap": 1.2, "pair_hold": 4, "pair_onward": 0.8, "pair_late": True}
+    prices = {}
+    for cost in (0, 0.9):
+        d = pairs.PairPolicy(World(), 8, MON_9, {**params, "pair_onward_cost": cost}, ROSTER, three)
+        win(d, request("R1", "helsinki", "tampere", MON_9), MON_9 + 15)
+        win(d, request("R2", "tampere", "pori", MON_9 + 60), MON_9 + 75)  # collected where R1 is delivered, going elsewhere
+        prices[cost] = d.decisions["R2"]["prices"]["next_day"]
+        if cost:
+            assert d.decisions["R2"]["onward"] == "R1" and set(d.pair_wait) == {"R1", "R2"} and d.world.sent == []
+            d.now = MON_9 + 15 + 4 * 60
+            d.look()
+            d.send()
+            (post,) = d.world.sent  # one gig for both, at the onward fee, and no withdrawal
+            assert {s["orderId"] for s in post["stops"]} == {"R1", "R2"} and post["schedule"][0]["feeCents"] == 16000
+            assert not d.pair_wait
+        else:
+            assert "onward" not in d.decisions["R2"] and "R2" not in d.pair_wait
+    assert prices[0.9] < prices[0]
