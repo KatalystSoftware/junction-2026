@@ -28,7 +28,7 @@
   const current = $derived(list.find((a) => a.id === openId) ?? list.find((a) => !decisionOf(by, a.id)) ?? list[0])
   const decision = $derived(current ? decisionOf(by, current.id) : undefined)
   // fit: Espoo sees the closest employers of the event; a company sees each of its roles
-  const fits = $derived<Fit[]>(current ? (brief ? fitCompany(current, brief) : rank(current, plan.employers).slice(0, 4)) : [])
+  const fits = $derived<Fit[]>(current ? (brief ? fitCompany(current, brief) : rank(current, plan.employers).slice(0, 3)) : [])
   const field = $derived(current ? plan.fields.find((f) => f.name === current.field) : undefined)
   const bestOf = (a: Applicant) => (brief ? fitCompany(a, brief)[0] : rank(a, plan.employers)[0])
   const link = (id: string) => `${location.origin}${location.pathname}#/event/${plan.slug}/applications/${encodeURIComponent(id)}`
@@ -45,7 +45,12 @@
     decide(by, me.id, d, reason.trim())
     const next = list.find((a) => a.id !== me.id && !decisionOf(by, a.id))
     if (next) open(next.id)
+    window.scrollTo({ top: 0 })
   }
+  // the drafted lines in one short list: each line's source is kept as a tooltip and a short tag, not a row of its own
+  const srcTag = (src: string) => src.replace(/^linkedin$/i, 'LinkedIn').replace(/^github$/i, 'GitHub')
+  // one line per role: what overlaps, then the gaps in one breath, then what to check in person
+  const gaps = (f: Fit) => f.lines.filter((l) => l.kind === 'gap').map((l) => l.text.replace(/: not mentioned$/, '')).join(', ')
   async function copy(id: string) {
     await copyText(link(id))
     copied = id
@@ -125,28 +130,27 @@
               <h2>{current.handle}</h2>
               <p class="facts">{current.field} · {current.level} · {current.city}{current.abroad ? ' (abroad)' : ''} · English {current.english}, Finnish {current.finnish}{current.project ? ` · work sample: ${current.project.name}` : ''}</p>
             </div>
-            <p class="legend"><span class="tag ai">AI summary</span> drafted from the sources, left as drafted <span class="tag ok">Confirmed</span> answered, corrected or written by the applicant</p>
           </header>
 
           <section class="block ai">
-            <h3><span class="tag ai">AI summary</span> Drafted from {current.sources.join(' and ')}</h3>
+            <h3><span class="tag ai">AI summary</span> Drafted from {current.sources.join(' and ')}, left as drafted</h3>
             <p class="sum">{current.ai_summary}</p>
-            <ul class="lines">
+            <ul class="lines compact">
               {#each current.drafted as l, i (i)}
-                <li title={l.quote}><span>{l.text}</span><small>{l.source} · “{l.quote}”</small></li>
+                <li title="{srcTag(l.source)}: “{l.quote}”"><span>{l.text}</span><small>{srcTag(l.source)}</small></li>
               {/each}
             </ul>
           </section>
 
           <section class="block ok">
-            <h3><span class="tag ok">Confirmed</span> What the applicant answered, corrected or wrote</h3>
+            <h3><span class="tag ok">Confirmed</span> Answered, corrected or written by the applicant</h3>
             {#if current.corrected.length}
-              <ul class="lines">
-                {#each current.corrected as l, i (i)}<li><span>{l.text}</span><small>corrected; was: {l.was}</small></li>{/each}
+              <ul class="lines compact">
+                {#each current.corrected as l, i (i)}<li title="was: {l.was}"><span>{l.text}</span><small>corrected</small></li>{/each}
               </ul>
             {/if}
             <dl class="qa">
-              {#each current.answers as qa, i (i)}<div><dt>{qa.q}</dt><dd>{qa.a || '—'}</dd></div>{/each}
+              {#each current.answers.filter((qa) => qa.a) as qa, i (i)}<div><dt>{qa.q}</dt><dd>{qa.a}</dd></div>{/each}
             </dl>
             <blockquote>
               <p>“{current.own.about}”</p>
@@ -157,13 +161,7 @@
           <section class="block fit">
             <h3>{brief ? `Fit against ${nameOf(brief)}'s roles` : 'Fit against the event and the pool'}</h3>
             {#if !brief && field}
-              <p class="pool">
-                <b>{field.name}:</b> {field.employers.length} {field.employers.length === 1 ? 'employer looks' : 'employers look'} for it at this event, and {some(field.people.people)} people in the pool already do this work
-                {#if field.people.levels[current.level]}, {some(field.people.levels[current.level] ?? 0)} of them {current.level.toLowerCase()}{/if}.
-                {#each current.skills.filter((s) => field.people.skills[s.name]) as s (s.name)}
-                  <span class="chip">{s.name}: {some(field.people.skills[s.name] ?? 0)} in the pool</span>
-                {/each}
-              </p>
+              <p class="pool"><b>{field.name}:</b> {field.employers.length} {field.employers.length === 1 ? 'employer' : 'employers'} at this event, {some(field.people.people)} people in the pool{#if field.people.levels[current.level]}, {some(field.people.levels[current.level] ?? 0)} of them {current.level.toLowerCase()}{/if}.</p>
             {:else if !brief}
               <p class="pool">No employer at this event has a role in {current.field}; the pool is not asked for it here.</p>
             {/if}
@@ -173,7 +171,9 @@
                   <li>
                     <div class="role">{#if !brief}<span class="tile"><Logo brief={f.brief} small /></span>{/if}<div><b>{brief ? f.need.title : nameOf(f.brief)}</b><small>{brief ? f.need.seniority : f.need.title}</small></div></div>
                     <ul class="lines fitlines">
-                      {#each f.lines as l, i (i)}<li class={l.kind}><em>{kinds[l.kind]}</em>{l.text}</li>{/each}
+                      {#each f.lines.filter((l) => l.kind === 'overlap') as l, i (i)}<li class="overlap"><em>{kinds.overlap}</em>{l.text}</li>{/each}
+                      {#if gaps(f)}<li class="gap"><em>{kinds.gap}</em>Not mentioned: {gaps(f)}</li>{/if}
+                      {#each f.lines.filter((l) => l.kind === 'check') as l, i (i)}<li class="check"><em>{kinds.check}</em>{l.text}</li>{/each}
                     </ul>
                   </li>
                 {/each}
@@ -421,14 +421,6 @@
     font-size: var(--t-sm);
     color: var(--ink-2);
   }
-  .legend {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--s2);
-    font-size: var(--t-xs);
-    color: var(--ink-2);
-  }
   .tag {
     display: inline-block;
     padding: 0.1em 0.55em;
@@ -484,9 +476,12 @@
   .lines small {
     font-size: var(--t-xs);
     color: var(--ink-2);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  }
+  .lines.compact li {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: baseline;
+    gap: var(--s3);
+    padding: 3px 0;
   }
   .qa {
     display: grid;
@@ -522,15 +517,6 @@
     color: var(--ink-2);
   }
   .pool b {
-    color: var(--ink);
-  }
-  .chip {
-    display: inline-block;
-    margin: var(--s1) var(--s1) 0 0;
-    padding: 0.1em 0.6em;
-    border-radius: 99px;
-    background: var(--wash);
-    font-size: var(--t-xs);
     color: var(--ink);
   }
   .roles {
