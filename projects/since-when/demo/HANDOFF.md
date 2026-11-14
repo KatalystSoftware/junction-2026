@@ -1,11 +1,26 @@
-# Handoff: MariaDB walkthrough, Saturday 14 November 2026
+# Handoff: Since When, Saturday 14 November 2026
 
-Written by the integrator (builder 5) between 07:01 and 09:00 EET. Branch `demo/mariadb-overnight`.
-All times are EET unless they say UTC. `M` is `~/junction2026-data/mariadb` on hestia.
+Since When is its own project, `projects/since-when/`, on branch `feat/since-when`. It was forked
+on Saturday morning from the overnight branch `demo/mariadb-overnight` at `689a26d`, which had
+built the same work inside the gap finder's folders. Those folders (root `gapfinder/`,
+`differences/`, `ui/`) and `projects/mariadb-wikipedia/` are Kalle's and are as on main again.
+
+The rest was written by the integrator (builder 5) between 07:01 and 09:00 EET on the overnight
+branch and is updated for the fork: every command runs from `projects/since-when/`, in the image
+`since-when` that the first command builds. All times are EET unless they say UTC. `M` is
+`~/junction2026-data/mariadb` on hestia.
 
 ## The two commands
 
-**1. Open the walkthrough instance from a laptop.**
+**1. Start the instance**, from `projects/since-when/` on hestia.
+
+```sh
+docker compose up --build -d
+```
+
+The API is on 8077 and the pages on 8078, both bound to `127.0.0.1`, reading the scratch database.
+
+**2. Open it from a laptop.**
 
 ```sh
 ssh -N -L 8078:127.0.0.1:8078 hestia
@@ -14,68 +29,32 @@ ssh -N -L 8078:127.0.0.1:8078 hestia
 Then open <http://localhost:8078>. Port 8078 is enough: the pages pass `/api/*` on to the API.
 The script to read aloud is [`WALKTHROUGH.md`](WALKTHROUGH.md).
 
-**2. Promote the demo snapshot to live.** Read "Promote or not" below first: I recommend not
-running it before the walkthrough.
+## Never deployed to live
 
-```sh
-sh projects/mariadb-wikipedia/demo/promote.sh --run
-```
+Since When has its own database: the scratch instance on hestia and the demo snapshot below. It
+never deploys to the gap finder's live server (`31.22.104.106`), which is Kalle's. The overnight
+branch carried `demo/promote.sh`, which would have copied this code and the snapshot onto live.
+It never ran there, and the fork removed it; it stays in the history of `demo/mariadb-overnight`.
 
-Run it from a checkout of this branch on hestia. Without `--run` it prints each action and changes
-nothing. To go back:
-
-```sh
-sh projects/mariadb-wikipedia/demo/promote.sh --rollback --run
-```
-
-What `--run` changes on live (`31.22.104.106`):
-
-- Copies into `~/promote/`: the snapshot (520 MB), its checksum, `code.tar` (`gapfinder/`,
-  `differences/`, `ui/` and `deploy.sh`, `compose.yaml`, `Dockerfile` of this branch) and the
-  script.
-- Saves the name of the database live serves now in `~/promote/db-before` and the present code in
-  `~/promote/code-before.tgz`, once.
-- Unpacks `code.tar` over live's checkout, so `git status` there shows changed files.
-- Appends `DB_RO_USER` and `DB_RO_PASSWORD` to the deploy `.env` and creates the database user
-  `gapfinder_ro` (SELECT only, 5 second limit). The Run button needs it.
-- Runs `deploy.sh` with the snapshot: builds the image, loads the snapshot into a new database
-  `gapfinder_<UTC time>`, points the API at it, restarts the containers. `deploy.sh` keeps the new
-  database and the one served until then, and drops the other `gapfinder_*` databases. Today that
-  drops `gapfinder_20261114_0411`.
-- Checks that `/api/sql/presets` says `"enabled": true` and runs `hero-history-check.sh` on live.
-
-What `--rollback --run` does: restores the code from `code-before.tgz`, sets `DB_NAME` back to the
-name in `db-before`, runs `deploy.sh` without a snapshot. The promoted database, the `gapfinder_ro`
-user and the two `.env` lines stay.
-
-The brief named `gapfinder_20261114_0136` as the database to go back to. It no longer exists on
-live, so the rollback goes to whatever live served at the moment of promotion.
-
-**The script has never run on live.** Checked: `sh -n`, shellcheck, the dry run, `bash -n` on the
-part that runs on live, and the copy steps of an earlier version against a stand-in for ssh in
-`/tmp`. Not checked, because live is read-only for me: that `$M/bin/live-ssh` reaches live, that
-the API container on live was started from `projects/mariadb-wikipedia/deploy` (the script stops
-if not), and that live has room for 520 MB plus a second database. The copy and the load are not
-timed; restoring the same amount on hestia took 141 s.
 
 ## State
 
 ### What works on scratch
 
-The instance runs in two containers, `gapfinder-demo-api` (8077) and `gapfinder-demo-ui` (8078),
-both bound to `127.0.0.1`, both `--restart unless-stopped`, reading the scratch database
-(`gapfinder-scratch-db`, database `gapfinder`). They mount this worktree read-only
-(`~/.t3/worktrees/junction2026/t3-9fef3258`), so the worktree must stay where it is until after
-the walkthrough.
+The instance is the compose project `since-when` ([`../compose.yaml`](../compose.yaml)): containers
+`since-when-api-1` (8077) and `since-when-ui-1` (8078), both bound to `127.0.0.1`, both
+`restart: unless-stopped`, reading the scratch database (`gapfinder-scratch-db`, database
+`gapfinder`). The code is copied into the image, so no worktree has to stay in place; after a
+change, run the first command again.
 
 | What | Where | Checked with |
 | --- | --- | --- |
 | Lapua Movement findings, first sentences of three editions | <http://localhost:8078/#/Q1412941/sv/en/findings> | browser, screenshot 1 |
 | The four dates of the first-sentence finding: Swedish gains "fascist" in 59790252 on 2026-10-23; English drops it in 294882000 on 2009-06-07, restores it in 1090675024 on 2022-05-30, gains "pro-Nazi" in 1347550072 on 2026-04-07 | <http://localhost:8078/#/Q1412941/sv/en/timeline> | browser and `/api/topics/Q1412941/timeline?lang=sv&rich_lang=en` |
-| Every revision of the three hero topics, 54 compare views, 8 first sentences | all routes of the three topics | `sh projects/mariadb-wikipedia/demo/hero-history-check.sh http://127.0.0.1:8078` (rc 0 at 07:37) |
+| Every revision of the three hero topics, 54 compare views, 8 first sentences | all routes of the three topics | `sh demo/hero-history-check.sh http://127.0.0.1:8078` (rc 0 at 07:37) |
 | Run button, three presets, SELECT-only user, 5 s and 500 rows | <http://localhost:8078/?sql=asof,Q1412941,2026-10-22,sv#/Q1412941/sv/en/findings> | `curl http://127.0.0.1:8078/api/sql/presets` says `"enabled": true`; screenshot 2 |
 | Shortlist of 17 findings, each opens in the tool | links in [`hero-findings.md`](hero-findings.md) | each tool id fetched from `/api/topics/<qid>`: exists, open, right pair, quote matches; 0 problems |
-| Every quote of the shortlist is in the article text | | `nix develop -c python3 projects/mariadb-wikipedia/demo/check_quotes.py --offline`: 51 of 51 quotes pass |
+| Every quote of the shortlist is in the article text | | `nix develop -c python3 demo/check_quotes.py --offline`: 51 of 51 quotes pass |
 | Fallback topics | links in `WALKTHROUGH.md`, "Fallback" | each link opened, row counts in the script |
 
 Search (`/api/search`) is not part of this instance: the API container has no embedding model. The
@@ -85,19 +64,8 @@ Screenshots (outside git):
 `~/junction2026-data/mariadb/screenshots/01-first-step-lapua-findings.png` and
 `~/junction2026-data/mariadb/screenshots/02-run-panel-asof.png`.
 
-If a container is gone, start it again from the repo root of this worktree:
+If a container is gone, run the first command again.
 
-```sh
-R=$(git rev-parse --show-toplevel); M=$HOME/junction2026-data/mariadb
-docker run -d --name gapfinder-demo-api --restart unless-stopped --network gapfinder-scratch-net \
-  --memory 1500m --cpus 4 -p 127.0.0.1:8077:8077 --env-file $M/scratch.env \
-  -e DB_HOST=gapfinder-scratch-db -e DB_PORT=3306 \
-  -v $R/gapfinder:/app/gapfinder:ro -v $R/differences:/app/differences:ro -v $R/ui:/app/ui:ro \
-  gapfinder-app:live-09f2a79 python -m gapfinder serve --port 8077
-docker run -d --name gapfinder-demo-ui --restart unless-stopped --network gapfinder-scratch-net \
-  --memory 512m -p 127.0.0.1:8078:8078 -e GAPFINDER_API=http://gapfinder-demo-api:8077 \
-  -v $R/ui:/app/ui:ro gapfinder-app:live-09f2a79 python ui/serve.py --port 8078
-```
 
 ### Demo snapshot
 
@@ -120,7 +88,7 @@ Two more snapshots, to go back on scratch:
 
 ### Branches merged
 
-Onto `origin/main` at `ce7ab73`, in this order, then `origin/main` at `133de93` on top:
+On the overnight branch, onto `origin/main` at `ce7ab73`, in this order, then `origin/main` at `133de93` on top:
 
 | Branch | Head | Builder's notes |
 | --- | --- | --- |
@@ -129,25 +97,20 @@ Onto `origin/main` at `ce7ab73`, in this order, then `origin/main` at `133de93` 
 | `feat/mariadb-measurements` | `745bacf` | [`measurements.md`](measurements.md) |
 | `feat/mariadb-hero-findings` | `c5a914f` | [`hero-findings-notes.md`](hero-findings-notes.md) |
 
-### Tests, on the merged branch at 07:37
+### Tests
 
-- Unit tests: `Ran 24 tests in 11.181s`, `OK`. Run in the app image, because the nix shell has
-  neither `mwparserfromhell` nor `mariadb`, so `nix develop -c python3 -m unittest …` fails on
-  import:
+- Unit tests: `Ran 24 tests`, `OK`, at 07:37 on the merged branch and again from this folder
+  after the fork. They run in the image, because the nix shell has neither `mwparserfromhell` nor
+  `mariadb`:
 
   ```sh
-  docker run --rm --network gapfinder-scratch-net --env-file $M/scratch.env \
-    -e DB_HOST=gapfinder-scratch-db -e DB_PORT=3306 \
-    -v $R/gapfinder:/app/gapfinder:ro -v $R/differences:/app/differences:ro -v $R/ui:/app/ui:ro \
-    -w /app --memory 1500m gapfinder-app:live-09f2a79 \
-    python -m unittest differences.test_differences gapfinder.test_wikitext gapfinder.test_live_sql
+  docker compose run --rm api python -m unittest differences.test_differences gapfinder.test_wikitext gapfinder.test_live_sql
   ```
 
-- CI lint, both rc 0: `nix run nixpkgs#shellcheck -- scripts/*.sh spikes/*/*.sh` and
-  `nix develop -c python3 -m compileall -q spikes gapfinder differences ui projects`.
-  `promote.sh` also passes shellcheck. Builder 1's `hero-history-check.sh` and
-  `hero-history-run.sh` get one warning and a few notes; CI does not lint that folder and I left
-  them.
+- CI (`.github/workflows/ci.yml`) has no path filters and already compiles everything under
+  `projects/`, so the fork changed nothing there. It does not lint the scripts in this folder:
+  builder 1's `hero-history-check.sh` and `hero-history-run.sh` get one shellcheck warning and a
+  few notes, and I left them.
 - UI checks: `ui/README.md` lists none. I opened every link of `WALKTHROUGH.md` in a browser
   instead.
 
@@ -155,19 +118,19 @@ Onto `origin/main` at `ce7ab73`, in this order, then `origin/main` at `133de93` 
 
 On the 03:54 snapshot of live, builders 1 and 4 loaded every revision of the three hero topics
 and the classifier's findings. I then redid the findings and their dates with the merged code,
-from the repo root:
+from the code as merged. The commands as they read from `projects/since-when/`:
 
 ```sh
-R=$(git rev-parse --show-toplevel); M=$HOME/junction2026-data/mariadb
-run=projects/mariadb-wikipedia/demo/hero-history-run.sh
+R=$PWD; M=$HOME/junction2026-data/mariadb
+run=demo/hero-history-run.sh
 app="--network gapfinder-scratch-net --env-file $M/scratch.env -e DB_HOST=gapfinder-scratch-db -e DB_PORT=3306
   -v $R/gapfinder:/app/gapfinder:ro -v $R/differences:/app/differences:ro -v $M/classify:/classify:ro
-  --memory 1500m gapfinder-app:live-09f2a79"
+  --memory 1500m since-when"
 
 sh $run schema 1500m gapfinder schema
 docker run --rm --name gapfinder-demo-pairs $app \
   python -m gapfinder pairs --only Q1412941 Q736268 Q2457646 > $M/classify/agent4/pairs.jsonl
-nix develop -c python3 projects/mariadb-wikipedia/demo/hero_classify.py nemotron $M/classify/agent4/pairs.jsonl --offline
+nix develop -c python3 demo/hero_classify.py nemotron $M/classify/agent4/pairs.jsonl --offline
 echo "delete from difference where wikidata_id in ('Q1412941','Q736268','Q2457646') and source in ('llm','both')" | $M/bin/scratch-sql
 docker run --rm --name gapfinder-demo-load $app \
   python -m gapfinder findings load /classify/nemotron/differences.jsonl
@@ -182,8 +145,8 @@ was left uncached.
 
 Mine:
 
-- **The promotion was not run** (by the rules), and its last version was never run end to end,
-  even against the stand-in.
+- **Nothing was promoted to live**, and the script for it is removed (see "Never deployed to
+  live").
 - **The revisions load was not rerun with the merged code.** The articles, passages and vectors
   on scratch are builder 1's load from their branch. All 174 current passages of the hero topics
   hash the same with the merged cleaner, so the texts agree; a rerun would have left 818
@@ -212,7 +175,7 @@ Extras:
 
 - Extra 3, the quiet measurement rerun: done at 07:31 with load 1.4, in `measurements.md`, "Rerun
   on a quiet machine".
-- Extra 1, the three places that quote 0.13 to 0.23: done in commit `aa8f137` (see "The recall
+- Extra 1, the three places that quote 0.13 to 0.23: done, now on its own branch (see "The recall
   correction").
 - Extra 2, the clean-room check: run at 07:46 to 07:54, without `--write`. **203 passed, 8 failed,
   4 warnings.** None stops the walkthrough; one is visible on its first screen. See "The clean-room
@@ -252,55 +215,23 @@ Russia); for 16 of 258 Lapua findings and 6 of 49 Winter War findings the quote 
 edition on the day the finding is said to have opened, so the quote cannot confirm the date; and 12
 of 59 search answers carry fewer rows than their SQL counts (search only).
 
-How it was run, from `projects/mariadb-wikipedia`, under the heavy lock. The search checks load the
-embedding model, and the walkthrough API has neither the model nor the memory for it, so the check
-ran against a second API on port 8079 with the same code and the same scratch database, removed
-afterwards:
+How it was run, under the heavy lock. The check is the gap finder's
+(`projects/mariadb-wikipedia/cleanroom/`). Its search checks load the embedding model, and the
+walkthrough API has neither the model nor the memory for it, so the check ran against a second API
+on port 8079 with the same code and the same scratch database, removed afterwards. As it reads
+from `projects/since-when/`:
 
 ```sh
-R=$(git rev-parse --show-toplevel); M=$HOME/junction2026-data/mariadb
+R=$PWD; M=$HOME/junction2026-data/mariadb
 docker run -d --name gapfinder-cleanroom-api --network gapfinder-scratch-net --memory 3g --cpus 4 \
   -p 127.0.0.1:8079:8079 --env-file $M/scratch.env -e DB_HOST=gapfinder-scratch-db -e DB_PORT=3306 \
-  -v $R/gapfinder:/app/gapfinder:ro -v $R/differences:/app/differences:ro -v $R/ui:/app/ui:ro \
-  -v gapfinder-scratch-models:/models gapfinder-app:live-09f2a79 python -m gapfinder serve --port 8079
-CLEANROOM_CACHE=$M/checks/cleanroom-wiki-cache nix develop $R -c python3 -m cleanroom check \
-  --base http://127.0.0.1:8079 --out $M/checks/cleanroom-integrator-20261114-0545Z
+  -v gapfinder-scratch-models:/models since-when python -m gapfinder serve --port 8079
+(cd $R/../mariadb-wikipedia && CLEANROOM_CACHE=$M/checks/cleanroom-wiki-cache nix develop -c \
+  python3 -m cleanroom check --base http://127.0.0.1:8079 --out $M/checks/cleanroom-integrator-20261114-0545Z)
 docker rm -f gapfinder-cleanroom-api
 ```
 
 ## Open choices for Mikael
-
-### Promote or not
-
-**My recommendation: show the walkthrough from hestia through the tunnel and do not promote
-before it.**
-
-Live moved on during the night. At 07:33 (SELECTs through `$M/bin/live-sql` with
-`LIVE_DB=gapfinder_20261114_0448`, and GETs):
-
-- Live serves `gapfinder_20261114_0448`, created at 06:49. `gapfinder_20261114_0411` (06:11) is
-  beside it. `gapfinder_20261114_0136`, which scratch was copied from, is gone.
-- Live has no Run button (`/api/sql/presets` is not there), no `gapfinder_ro` user and no
-  `full_history` table.
-- Live has more data than the demo snapshot:
-
-  | | Live `…_0448` | Demo snapshot |
-  | --- | ---: | ---: |
-  | Topics | 2,919 | 2,919 |
-  | Topics with coverage | 2,919 | 2,369 |
-  | Articles (current) | 8,752 | 7,653 |
-  | Current passages (`chunk_now`) | 45,664 | 39,330 |
-  | Passages with a vector | 101,306 | 60,594 |
-  | Findings (current rows) | 15,268 | 11,082 |
-  | Rows in `difference` | 2,110 | 813 |
-
-So promoting swaps live's data of 06:49 for the data of 03:54 plus the hero work: the three hero
-topics gain their full history and the Run button, and 550 topics lose their coverage. The
-rollback brings the 06:49 data back.
-
-The other way is to replay the hero work onto live's current database (builder 1's "Rebuild"
-steps, then the commands under "How the scratch data was made"). That needs writes on live and
-the embedding model for whatever live's cleaner made differently, so it was not mine to do.
 
 ### Hero topic
 
@@ -319,10 +250,11 @@ script only; no code renames. The other options were "Wiki Ledger" and "Rinnakka
 
 The research note, `HACKING.md` and the spike's docstring said a vector index on a
 system-versioned table has recall 0.13 to 0.23. **As a claim about versioning this is wrong.**
-All three are corrected on this branch and point to `measurements.md`:
-`docs/research/mariadb-wikipedia.md` (moment 3 and "Biggest risk"),
+The three are outside this project, so their correction is on its own branch,
+`docs/mariadb-recall-correction` (`b86a65d`, one commit on main), and can go to main without Since
+When: `docs/research/mariadb-wikipedia.md` (moment 3 and "Biggest risk"),
 `spikes/mariadb-wikipedia/HACKING.md` and the docstring of
-`spikes/mariadb-wikipedia/svt_vector_recall.py`. Main still has the old text.
+`spikes/mariadb-wikipedia/svt_vector_recall.py`. Main has the old text until that branch lands.
 
 What the measurement found (`measurements.md`; figures from the quiet rerun at 07:31):
 
@@ -354,10 +286,10 @@ The sentence to say:
    `gapfinder/__main__.py` in the measurements merge. At 07:35 I merged main again (`133de93`):
    its one change under the tool's folders is `gapfinder/embed.py` (workers reconnect after a
    dropped connection), and without it a promotion would have taken that fix away from live.
-2. **Live's state decides the promotion advice** (above). `promote.sh` records the database live
-   serves at promotion instead of naming one.
-3. **`promote.sh` ships code with `git archive`** and finds live's deploy directory from the
-   compose label of `gapfinder-api-1`, so it needs no git access on live and no path written down.
+2. **Promotion is dropped.** At 07:33 live had moved on from the database scratch was copied from
+   (newer data for 550 topics, no Run button), which already argued against promoting. Since the
+   fork, Since When never deploys there.
+3. *(Was about `promote.sh`; removed with it.)*
 4. **Tests run in the app image**, shellcheck through `nix run nixpkgs#shellcheck` (hestia has
    neither `python3` nor `shellcheck` outside nix).
 5. **A snapshot of scratch before my first write** (path above).
@@ -376,8 +308,9 @@ The sentence to say:
     keep their figures.
 11. **The ordinary `gapfinder load` does not skip topics listed in `full_history`.** Running it
     on a hero topic would write year-end versions over the full history. Not changed.
-12. **Containers are named `gapfinder-demo-api` and `gapfinder-demo-ui`**; the API is on 8077
-    though only 8078 needs forwarding.
+12. **The containers were named `gapfinder-demo-api` and `gapfinder-demo-ui`** until the fork;
+    they are now the compose project `since-when`. The API is on 8077 though only 8078 needs
+    forwarding.
 13. **Shortlist links point at `http://localhost:8078`**, and finding 1's note says the dates now
     show in the tool.
 14. **The walkthrough opens on the Swedish and English pair**, so all four dates are on one
@@ -414,5 +347,8 @@ Each is in the notes' "Decisions" section: `hero-history.md` (14), `live-sql.md`
 - Scratch holds live's database `gapfinder_20261114_0136` as dumped at 03:54, with history.
 - Builders 1 and 4 both wrote findings for the same topics. Builder 4's loads reverted builder
   1's dates three times, so the integrator redid the dating with the merged code.
-- The 0.13 to 0.23 references are corrected on the demo branch only.
+- The 0.13 to 0.23 references are corrected on branch `docs/mariadb-recall-correction`.
 - `feat/gap-kinds` stayed out; no folders moved; live was not redeployed.
+- The overnight work was built inside the gap finder's folders, because the question of building
+  on it or forking it was never put to Mikael. The fork into this folder on Saturday morning fixes
+  that: one mechanical commit (`a10e9f7`) copies the folders here and restores Kalle's to main.

@@ -3,13 +3,13 @@
 The SQL panel can now run three preset statements on MariaDB. The viewer picks a topic, a date
 and editions; the page shows the exact statement, the rows and the time measured on the server.
 There is no free-text SQL anywhere: `POST /api/sql/run` takes a preset name and parameters,
-validates them and fills fixed templates on the server. Contract: `docs/gap-finder/api.md`.
+validates them and fills fixed templates on the server. Contract: `docs/api.md`.
 
 ## Deep links
 
 Each opens the panel with the preset chosen and its fields filled in. Running is one click on
-**Run** (a link never runs a statement by itself). On scratch the page is `http://127.0.0.1:8378`;
-after promotion the same paths work on `https://31-22-104-106.sslip.io`.
+**Run** (a link never runs a statement by itself). The paths below are on the walkthrough
+instance, `http://127.0.0.1:8078`.
 
 | Preset | Link | What to do |
 | --- | --- | --- |
@@ -39,57 +39,23 @@ Checked on scratch at 04:41 EET through port 8378; builder 1's per-revision load
 - **Diet of Porvoo with Swedish in the pair returns 0 rows** in `nearest`: its Swedish passages
   have no embeddings on scratch. Use fi and en for that topic unless builder 1's load adds them.
 
-## For the integrator: promotion to live
+## The read-only user
 
-Nothing here was run on live.
+The Run button is on when the API has `DB_RO_USER` and `DB_RO_PASSWORD`; with both empty the
+endpoint is off and the page shows no Run section. The scratch database has the user. The demo
+snapshot holds one database and no users, so a server it is restored on needs it made once, as root:
 
-1. **Create the SELECT-only user.** On the server, in the deploy directory (where `.env` is).
-   The password goes into `.env` and reaches the database container by name, never as a value on
-   a command line.
+```sql
+CREATE USER IF NOT EXISTS 'gapfinder_ro'@'%' IDENTIFIED BY '<password>' WITH MAX_STATEMENT_TIME 5;
+GRANT SELECT ON `gapfinder`.* TO 'gapfinder_ro'@'%';
+```
 
-   ```bash
-   grep -q '^DB_RO_PASSWORD=' .env || printf 'DB_RO_USER=gapfinder_ro\nDB_RO_PASSWORD=%s\n' \
-     "$(head -c 24 /dev/urandom | od -An -tx1 | tr -d ' \n')" >> .env
-   set -a; . ./.env; set +a
-   docker exec -i -e DB_RO_USER -e DB_RO_PASSWORD gapfinder-db-1 sh -c 'exec mariadb -uroot -p"$MARIADB_ROOT_PASSWORD" -e "
-     CREATE USER IF NOT EXISTS \"$DB_RO_USER\"@\"%\" IDENTIFIED BY \"$DB_RO_PASSWORD\" WITH MAX_STATEMENT_TIME 5;
-     GRANT SELECT ON \`gapfinder\`.* TO \"$DB_RO_USER\"@\"%\";
-     GRANT SELECT ON \`gapfinder\\_%\`.* TO \"$DB_RO_USER\"@\"%\";
-     SHOW GRANTS FOR \"$DB_RO_USER\"@\"%\";"'
-   ```
+Checked in a throwaway `mariadb:11.8` container (`gapfinder-a2-dbtest`, removed): the user reads
+`gapfinder`, gets error 1142 on other databases and on an `INSERT`, and `SELECT SLEEP(20)` is cut
+off after 5.2 s with error 1969 without any session setting.
 
-   The same as plain SQL:
-
-   ```sql
-   CREATE USER IF NOT EXISTS 'gapfinder_ro'@'%' IDENTIFIED BY '<password>' WITH MAX_STATEMENT_TIME 5;
-   GRANT SELECT ON `gapfinder`.* TO 'gapfinder_ro'@'%';
-   GRANT SELECT ON `gapfinder\_%`.* TO 'gapfinder_ro'@'%';
-   ```
-
-   `deploy.sh` makes a new database `gapfinder_<date>_<time>` on every deploy. The second grant is
-   a name pattern, so it covers the database live serves now (`gapfinder_20261114_0136`) and every
-   later one, and the user needs no change on the next deploy. I ran exactly this command in a
-   throwaway `mariadb:11.8` container (`gapfinder-a2-dbtest`, removed): the user reads
-   `gapfinder`, `gapfinder_20261114_0136` and `gapfinder_20261115_0900`, gets error 1142 on
-   `gapfinderXother`, on `other` and on an `INSERT`, and `SELECT SLEEP(20)` is cut off after 5.2 s
-   with error 1969 without any session setting.
-
-2. **Give the API the user.** `projects/mariadb-wikipedia/deploy/compose.yaml` is outside my row,
-   so this is a request: add two lines to the `api` service's `environment`.
-
-   ```yaml
-         DB_RO_USER: ${DB_RO_USER:-}
-         DB_RO_PASSWORD: ${DB_RO_PASSWORD:-}
-   ```
-
-   With both empty the endpoint is off and the page shows no Run section, so the lines are safe to
-   add before the user exists. Then `docker compose up -d api`.
-
-3. **Check.** `curl -s https://31-22-104-106.sslip.io/api/sql/presets` says `"enabled": true`,
-   and the three deep links above return rows.
-
-No change is needed in `ui/serve.py`, `index.html` or the Caddy config: the two new paths are
-under `/api/`.
+This note first carried steps for adding the user on the gap finder's live server. Since When
+never deploys there, so they are gone; nothing here was ever run on live.
 
 ## Evidence
 
@@ -102,10 +68,10 @@ M=~/junction2026-data/mariadb; R=$PWD
 docker run -d --name gapfinder-a2-api --network gapfinder-scratch-net --memory 1500m --cpus 4 \
   -p 127.0.0.1:8377:8377 --env-file $M/scratch.env -e DB_HOST=gapfinder-scratch-db -e DB_PORT=3306 \
   -v $R/gapfinder:/app/gapfinder:ro -v $R/differences:/app/differences:ro -v $R/ui:/app/ui:ro \
-  gapfinder-app:live-09f2a79 python -m gapfinder serve --port 8377
+  since-when python -m gapfinder serve --port 8377
 docker run -d --name gapfinder-a2-ui --network gapfinder-scratch-net --memory 512m \
   -p 127.0.0.1:8378:8378 -e GAPFINDER_API=http://gapfinder-a2-api:8377 \
-  -v $R/ui:/app/ui:ro gapfinder-app:live-09f2a79 python ui/serve.py --port 8378
+  -v $R/ui:/app/ui:ro since-when python ui/serve.py --port 8378
 ```
 
 ```bash
@@ -177,6 +143,6 @@ the embedding model, and it posts finding outcomes; both are outside what I may 
 - **Two files outside the three named places:** the test `gapfinder/test_live_sql.py` (the
   done-check asks for one, and it sits beside `test_wikitext.py`) and one sentence in
   `ui/README.md` about `sql=` in the address.
-- **`WITH MAX_STATEMENT_TIME 5` on the live user** is an extra on top of the session setting: a
+- **`WITH MAX_STATEMENT_TIME 5` on the read-only user** is an extra on top of the session setting: a
   session can raise its own limit, but the viewer never sends SQL, so only the API's fixed
   statements run.
