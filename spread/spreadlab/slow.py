@@ -30,5 +30,9 @@ def known(request: dict, fastest: dict, notified: int, drive: int, drivers: int)
             max(0, 760 - drivers) / 100, float(friday), float(friday and hours < 12)]
 
 
-def chance(known_: list[float], weights: list[float] = WEIGHTS) -> float:
-    return 1 / (1 + math.exp(-sum(w * v for w, v in zip(weights, known_))))
+def chance(known_: list[float], weights: list[float] = WEIGHTS, odds: float = 0.0) -> float:
+    """`odds` adds to the log odds, for what the desk knows beside `known`, such as snow forecast at the order's places
+    (policy: `snow_odds`). Over the reference's 401 weeks an order whose pickup or delivery place had snow forecast at the
+    quote, for hours between its first pickup minute and its deadline, was 10.4% late where these weights expect 6.1%:
+    0.64 more log odds (scratch/snow_report.py). 0.79 over 167 weeks of `slow-step-gate-25`."""
+    return 1 / (1 + math.exp(-sum(w * v for w, v in zip(weights, known_)) - odds))

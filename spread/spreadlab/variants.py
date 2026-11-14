@@ -262,6 +262,15 @@ VARIANTS: dict[str, dict] = {
                        "kinds": KINDS, "note_limits": True, "min_on_time": t / 100, "behind_from": 40,
                        "when_behind": {"late_cost": 150, "slow_step": 0.8, "max_unbooked": 12, "rule_cost": 800}}
        for t in (85, 87, 89, 91, 93)},
+    # ... with the day-ahead snow forecast. An order with snow forecast at its pickup or delivery place, for hours between its first
+    # pickup minute and its deadline, is late about twice as often as the late chance says (0.64 to 0.92 more log odds by variant,
+    # scratch/snow_report.py): 14 such orders a week, 0.6 more late. Its late chance takes 0.7 more log odds, which `late_cost`
+    # and `slow_step` then price; with `snow_fee` its gigs also pay 1.2 x the usual schedule, since 60% of the late ones are booked
+    # only after the snow has started.
+    "slow-friday-late-150-kinds-limits-snow": {**REFERENCE, "backlog_step": 0, "slow_step": 0.8, "max_unbooked": 25, "slow_model": "friday", "cost": 1.2,
+                                               "late_cost": 150, "kinds": KINDS, "note_limits": True, "snow_odds": 0.7},
+    "slow-friday-late-150-kinds-limits-snow-fee-1.2": {**REFERENCE, "backlog_step": 0, "slow_step": 0.8, "max_unbooked": 25, "slow_model": "friday", "cost": 1.2,
+                                                       "late_cost": 150, "kinds": KINDS, "note_limits": True, "snow_odds": 0.7, "snow_fee": 1.2},
     # ... the same without the note's limits, whose posting changed after its weeks were played.
     "slow-friday-late-150-kinds": {**REFERENCE, "backlog_step": 0, "slow_step": 0.8, "max_unbooked": 25, "slow_model": "friday", "cost": 1.2, "late_cost": 150, "kinds": KINDS},
     # The best point of the search over these parameters together (scratch/search.py, trial 16 of 20, on 30 tune seeds), and with the kinds.
