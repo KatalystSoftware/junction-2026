@@ -72,8 +72,7 @@
 <svelte:window onkeydown={(e: KeyboardEvent) => { if (e.key === 'Escape') open = false }} onclick={() => (open = false)} />
 
 <div class="demo" role="presentation" onclick={(e) => { e.stopPropagation() }}>
-  <!-- while a visitor's own copy holds anything, the button stays faintly in view and says so, so nobody takes it for what everyone sees -->
-  <button class="toggle" class:copy={mine.count && !demo.key} aria-expanded={open} onclick={() => (open = !open)}>{mine.count && !demo.key ? 'Demo · your copy' : 'Demo'}</button>
+  <button class="toggle" aria-expanded={open} onclick={() => (open = !open)}>Demo</button>
   {#if open}
     <div class="menu">
       <p>See it as</p>
@@ -141,9 +140,6 @@
   .toggle:focus-visible,
   .menu :focus-visible {
     outline-color: #fff;
-  }
-  .toggle.copy {
-    opacity: 0.6;
   }
   .menu .note {
     max-width: 16rem;

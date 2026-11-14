@@ -307,7 +307,7 @@ try {
     if (saved?.status === 'joined') errors.push('a sign-up from a link without its token was saved on a server with a key')
     // it is the visitor's own copy instead: still signed up after a reload and on Espoo's screen, said on the page, and cleared from the menu
     await open(`#/${COMPANY}`)
-    await expect("a visitor's own copy after a reload", 'Demo · your copy')
+    await expect("a visitor's own copy after a reload", 'Signed up. These are the company')
     const mineNow = await evaluate(`JSON.parse(localStorage.getItem('kutsu-my-copy') || '{}')[${JSON.stringify(COMPANY)}]?.status`)
     if (mineNow !== 'joined') errors.push(`the visitor's own copy holds ${String(mineNow)} for the company, not joined`)
     await shot('my-copy')
@@ -318,7 +318,8 @@ try {
       await sleep(400)
     }
     if (await evaluate(`localStorage.getItem('kutsu-my-copy')`)) errors.push("Clear my changes left the visitor's copy")
-    if ((await text()).includes('your copy')) errors.push("the page still says it is the visitor's own copy after clearing it")
+    await open(`#/${COMPANY}`)
+    if ((await text()).includes('Signed up. These are the company')) errors.push("the company is still signed up after Clear my changes")
     for (const [method, path] of [['DELETE', '/reviews'], ['POST', `/review?id=${COMPANY}`]]) {
       const r = await fetch(base + path, { method, body: method === 'POST' ? JSON.stringify(draft) : undefined })
       if (r.status !== 403) errors.push(`${method} ${path} without the key answered ${String(r.status)}, not 403`)

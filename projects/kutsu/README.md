@@ -217,9 +217,9 @@ file; a file that cannot be read is set aside, and the server starts with no sig
 (`KUTSU_KEY` set) a sign-up is saved only from Espoo's side unlocked with the demo key, or from a
 company's own invitation link. Without either, a visitor works on their own copy: everything they do on
 Espoo's side or as a company (send, take back, sign up in another tab, fill in or clear the examples) is
-kept in their browser (`localStorage`) over what everyone sees, across reloads and tabs. While it holds
-anything, the Demo button in the top right corner stays faintly in view as "Demo · your copy"; its menu
-says what that means and offers "Clear my changes". A judge can
+kept in their browser (`localStorage`) over what everyone sees, across reloads and tabs. Nothing on the
+page points it out, since each visitor tries the demo alone; the Demo menu says it and offers "Clear my
+changes". A judge can
 use every screen fully, and the next visitor still finds the demo as it was.
 
 - **Unlock:** in the Demo menu (top right corner; it appears on hover), "Unlock with the demo key", and
