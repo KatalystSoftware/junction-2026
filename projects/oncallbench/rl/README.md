@@ -1,7 +1,9 @@
 # aq-incident/rl: can a small open model learn on-call from this environment?
 
-Post-trains Qwen3.5-2B on the aq-incident simulator and measures its score on the held-out seeds
-101-106 before and after. Results: [`RESULTS.md`](RESULTS.md).
+Post-trains open models on the aq-incident simulator and measures their score on the held-out seeds
+101-106 before and after: Qwen3.5-2B (every weight; levels 0-3) and Gemma 4 26B-A4B (a LoRA adapter;
+levels 3-4). Training ran on a Verda GPU instance, and the Gemma adapter's evaluations and RL on Modal.
+Results: [`RESULTS.md`](RESULTS.md).
 
 ## Run
 

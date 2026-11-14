@@ -1,4 +1,4 @@
-# Results: can a small open model learn on-call from aq-incident?
+# Results: can an open model learn on-call from aq-incident?
 
 Yes. Qwen3.5-2B, trained by reinforcement learning on nothing but the environment's own score,
 goes from 0.59 / 0.16 / 0.08 to 0.97 / 0.34 / 0.23 on the held-out seeds at levels 0 / 1 / 2 in 20
@@ -74,7 +74,39 @@ over steps 1-8, 0.26-0.41 over steps 9-21; held-out 0.171 (step 0), 0.346 (step 
 `rl-base-raw` (unclipped score): training reward 0.09-0.18 over 10 steps, no trend; held-out at
 step 10 0.539 / 0.051 / 0.080.
 
-GEMMA_SECTION
+## Gemma 4 26B-A4B (levels 3-4)
+
+Gemma 4 26B-A4B (`google/gemma-4-26B-A4B-it`), post-trained with a rank-32 LoRA adapter on the
+reference's demos, goes from 0.10 / 0.04 to **0.75 / 0.55** on the held-out seeds at levels 3 / 4,
+the two hardest levels, where the untrained Qwen above scores 0.02 at level 3. The adapter was trained
+on Verda and evaluated on Modal. Every Gemma row below uses the same simulator build (`sim`
+`eb8d08f157d7` in `out/evals.jsonl` and in the Modal run summaries), sampling at T 1.0 and a 32k
+context. The mean score is ± one standard error.
+
+| Model | Seeds | Samples per seed | Level 3 | Level 4 |
+| --- | --- | --- | --- | --- |
+| Gemma 4 26B-A4B, untrained (16k context) | held-out 101-106 | 8 | 0.088 ± 0.014 | 0.030 ± 0.007 |
+| Gemma 4 26B-A4B, untrained | held-out 101-106 | 8 | 0.102 ± 0.019 | 0.037 ± 0.009 |
+| Gemma 4 26B-A4B, untrained | fresh 200000+ | 4 | 0.103 ± 0.014 | 0.067 ± 0.008 |
+| + SFT (LoRA) | held-out 101-106 | 8 | **0.749 ± 0.035** | **0.546 ± 0.040** |
+| + SFT (LoRA) | fresh 200000+ | 4 | 0.726 ± 0.026 | 0.587 ± 0.030 |
+| + SFT (LoRA) | its own training seeds 200+ | 4 | 0.772 ± 0.027 | 0.574 ± 0.034 |
+
+The fresh seeds were never in any demo or evaluation before this run. The adapter scores the same
+on its training seeds, the held-out seeds and the fresh ones, so the gain does not come from
+remembering seeds. Whether it reads each incident or replays the reference's routine is a separate
+question. An audit of that (`audit.py`) is in progress beside the Modal runner and is not settled here.
+
+- **SFT:** `run.py sft --model google/gemma-4-26B-A4B-it --lora 32 --train-device cuda:1` on
+  the reference's demos, 2 epochs, 100 optimiser steps. The loss fell from 0.30 at step 5 to 0.011 at
+  step 100 (`out/sft-gemma26-sft.jsonl`). It ran on a Verda GPU instance (`verda.py`, `grab.py`) in
+  about 90 minutes (its log runs from 18:23 to 19:53 on 14 Nov).
+- **Evaluation and RL on Modal:** `modal_app.py` runs `run.py` in a Modal container with two H200s:
+  vLLM on one, the LoRA trainer on the other. The adapter's three evaluations above and the fresh-seed
+  baseline ran there. RL from the untrained model ran 2 steps at level 4 as a smoke test (training
+  reward 0.068, then 0.088). That is too short to claim an RL result for Gemma, and none is claimed.
+- **Where the code is:** `modal_app.py` is on the branch `feat/aq-incident-modal`, not yet merged into `projects/oncallbench/rl/`. The adapter (`ckpt/gemma26-sft`) and the
+  per-episode transcripts are on the Modal Volume `aq-rl`, not in git.
 
 ## Setup
 
@@ -95,4 +127,12 @@ GEMMA_SECTION
 
 ## Compute and cost
 
-COMPUTE_SECTION
+- **Verda:** the Qwen runs (evaluation, SFT and RL) and the Gemma SFT and baselines ran on
+  temporary GPU instances, rented and deleted through the Verda API (`verda.py`, `grab.py`). The Qwen
+  RL runs took about 70 GPU-minutes (from untrained) and 30 (level 3, from SFT). The Gemma SFT took
+  90 minutes, and an untrained Gemma evaluation 9 minutes (16k context) or 35 (32k).
+- **Modal:** two H200s per container ($9.08/h; no B200s were free on 14 Nov, and H200s started in
+  4-12 s). An adapter evaluation of 96-192 episodes took 1.5-2.5 minutes, and the untrained model's
+  192 episodes on fresh seeds took 27 minutes. A Gemma RL
+  step (4 groups × 8 episodes at level 4) took 11-12.5 minutes: 53-66 s of rollouts and 667-758 s
+  of LoRA training, about $1.80 per step.
