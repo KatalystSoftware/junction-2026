@@ -28,6 +28,8 @@
 	// day of the check; otherwise the article's first passage the day after the edit that began it.
 	const asof = $derived.by(() => {
 		const q = d.quotes.find((x) => x.lang === began.lang) ?? d.quotes[0]
+		const firstWords = q && ((q.from ?? d.primary).began?.[q.lang] ?? d.primary.began?.[q.lang])?.quoted
+		if (check && check.outcome !== 'set_aside' && q && firstWords) return { qid: topic.wikidata_id, date: dayAfter(String(firstWords).slice(0, 10)), lang: q.lang, finding: String((q.from ?? d.primary).id) }
 		if (check && check.outcome !== 'set_aside' && q) return { qid: topic.wikidata_id, date: check.as_of.slice(0, 10), lang: q.lang, finding: String((q.from ?? d.primary).id) }
 		// A difference a model wrote, not checked: the edition whose words came last, the day they did.
 		const last = strip.filter((l) => l.since).sort((a, b) => b.since!.at.localeCompare(a.since!.at))[0]

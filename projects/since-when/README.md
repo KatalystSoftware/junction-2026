@@ -88,7 +88,7 @@ Each line points at something to click or run; the links open the public instanc
 in, and nothing runs before **Run** is clicked.
 
 - **Use of MariaDB vector search and system-versioned tables.** Both in one statement:
-  [the nearest English passage for each Finnish one, as of 24 October 2026](https://since-when.katalyst.fyi/?sql=nearest,Q1412941,2026-10-24,fi,en#/Q1412941).
+  [for each Finnish passage, the id of its nearest English passage and their distance, as of 24 October 2026](https://since-when.katalyst.fyi/?sql=nearest,Q1412941,2026-10-24,fi,en#/Q1412941).
   Shortened to its two parts:
 
   ```sql
@@ -113,11 +113,12 @@ in, and nothing runs before **Run** is clicked.
 - **Technical execution and scalability across the provided datasets.** The topics are dataset S's and the
   Finnish history is dataset M's ([the data](#the-data)). [`demo/measurements.md`](demo/measurements.md) has
   the numbers and the runs behind them: recall@10 of 0.987 at `mhnsw_ef_search` 20 with a median index
-  search of 0.56 ms over 39,330 passages, and a topic aligned as of 2010 in a median of 4.7 ms. It also
+  search of 0.56 ms over 39,330 passages, and a topic aligned as of 2010 in a median of 4.7 ms on the measuring machine (the linked statement, run on
+  the public instance with its text and ids, takes about 130 ms). It also
   records what did not scale: a vector index on a versioned table answers past dates 5 to 14 times slower
   than on a plain one, so the index stays on the current rows and a past date searches one topic exactly.
-- **Usefulness for readers and editors.** A reader sees each edition's exact words side by side, and the
-  date links to the Wikipedia edit that began the difference:
+- **Usefulness for readers and editors.** A reader sees each edition's exact words side by side, and each edition's
+  date links to the Wikipedia edit that put its quoted words there:
   [Lapua Movement](https://since-when.katalyst.fyi/#/Q1412941), where Swedish and English Wikipedia say
   "fascist" in the first sentence and Finnish does not. NVIDIA Nemotron 3.5 Super VL suggests the
   differences and then checks each one against the whole other article, and the page says so;
