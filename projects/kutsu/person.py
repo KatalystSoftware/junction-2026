@@ -129,12 +129,17 @@ def cv(text):
 SOURCES = {"linkedin": linkedin, "portfolio": portfolio, "cv": cv}
 
 
-def profile(kind, value):
-    """The skill part of a person's profile from what they handed over, each line with the words it was read from."""
+def profile(kind, value, draft=True):
+    """The skill part of a person's profile from what they handed over, each line with the words it was read from.
+
+    Without `draft` only the text that was read comes back, for a form that fills itself in from it:
+    then the material goes to Context.dev alone, and a pasted CV to nobody."""
     if kind not in SOURCES or not isinstance(value, str) or not value.strip():
         raise Unreadable("Choose your LinkedIn, a portfolio page or your CV.")
     name, material = SOURCES[kind](value.strip())
     material = material[:MOST]
+    if not draft:
+        return {"source": kind, "name": name, "material": material}
     answer = call(signals.ANTHROPIC, {
         "model": signals.MODEL, "max_tokens": 4000, "thinking": {"type": "disabled"},
         "output_config": {"effort": "low", "format": {"type": "json_schema", "schema": SCHEMA}},
@@ -142,17 +147,17 @@ def profile(kind, value):
     }, {"x-api-key": os.environ["ANTHROPIC_API_KEY"], "anthropic-version": "2023-06-01"})
     if answer.get("stop_reason") != "end_turn":
         raise Unreadable("We could not fill this in. Paste your CV instead, or type it in yourself.")
-    draft = json.loads(next(block["text"] for block in answer["content"] if block["type"] == "text"))
+    lines = json.loads(next(block["text"] for block in answer["content"] if block["type"] == "text"))
     # the words each line rests on must be in the material: the same words in the same order, whatever the
     # punctuation and markup between them (a page comes as Markdown, a profile as fields joined by commas)
     words = lambda text: " ".join(re.findall(r"\w+", text.lower()))
     there = f" {words(material)} "
     dropped = 0
     for key in ("can_do", "skills", "experience", "education", "languages"):
-        kept = [item for item in draft[key] if len(words(item["from"]).split()) >= 2 and f" {words(item['from'])} " in there]
-        dropped += len(draft[key]) - len(kept)
-        draft[key] = kept
-    return {"source": kind, "name": name, **draft, "dropped": dropped}
+        kept = [item for item in lines[key] if len(words(item["from"]).split()) >= 2 and f" {words(item['from'])} " in there]
+        dropped += len(lines[key]) - len(kept)
+        lines[key] = kept
+    return {"source": kind, "name": name, "material": material, **lines, "dropped": dropped}
 
 
 if __name__ == "__main__":

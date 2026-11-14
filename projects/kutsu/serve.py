@@ -160,7 +160,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
         self.json(b)
 
     def person(self, handed):
-        """A person's profile from what they handed over: {kind: linkedin | portfolio | cv, value}. Nothing of it is kept or logged."""
+        """A person's profile from what they handed over: {kind: linkedin | portfolio | cv, value, draft?}. Nothing of it is kept or logged."""
         if not isinstance(handed, dict):
             return self.text(400, "Choose your LinkedIn, a portfolio page or your CV.")
         with saving:
@@ -170,7 +170,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
         if not researching.acquire(blocking=False):
             return self.text(429, "Busy. Try again in a minute.")
         try:
-            self.json(person.profile(handed.get("kind"), handed.get("value")))
+            self.json(person.profile(handed.get("kind"), handed.get("value"), draft=handed.get("draft") is not False))
         except person.Unreadable as unreadable:
             self.text(422, str(unreadable))
         except (KeyError, OSError, ValueError, StopIteration) as error:  # a missing key, their side down, an answer in no shape
