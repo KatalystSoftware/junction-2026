@@ -756,3 +756,19 @@ def test_archive_packs_only_what_is_new_and_unpacks_the_newest_copy_of_each_file
     assert (fresh / "runs/b/s1-L8.json.gz").read_bytes() == b"local"  # a file the folder has is kept
     assert archive.unpack(bundles, fresh, force=True) == 4
     assert gzip.decompress((fresh / "runs/b/s1-L8.json.gz").read_bytes()) == b'{"played": "b"}'
+
+
+def test_a_week_notes_the_lowest_and_highest_share_of_the_bucket(monkeypatch):
+    monkeypatch.setenv("SPREAD_KEY", "test")
+    client = play.CountingClient()
+    limits = iter(["180", "150", "175"])
+
+    def send(method, path, payload, headers):
+        limit = next(limits)
+        return 200, {"RateLimit-Policy": f'"practice";q={limit};w=1', "RateLimit-Limit": limit, "RateLimit-Remaining": "3",
+                     "RateLimit-Reset": "0"}, b"{}"
+
+    monkeypatch.setattr(client, "_send", send)
+    for _ in range(3):
+        client.call("GET", "/v1/worlds/w1")
+    assert client.calls == 3 and client.rates == (150, 180)
