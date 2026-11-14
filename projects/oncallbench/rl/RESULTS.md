@@ -163,7 +163,10 @@ T 1.0, 32k context, rollouts overlapped with training (`--overlap`), same simula
 | | 24, second eval | | **0.752 ± 0.041** |
 | `gemma26-rl`: levels 3+4, 60 steps, two RTX PRO 6000 | 0 | 0.739 ± 0.033 | 0.554 ± 0.050 |
 | | 15 | 0.802 ± 0.034 | 0.568 ± 0.039 |
-| | 30 | **0.880 ± 0.019** | **0.643 ± 0.037** |
+| | 30 | 0.880 ± 0.019 | 0.643 ± 0.037 |
+| | 45 | 0.773 ± 0.038 | 0.591 ± 0.051 |
+| | 60 | **0.952 ± 0.009** | **0.808 ± 0.022** |
+| | 60, second eval | 0.874 ± 0.032 | 0.776 ± 0.030 |
 
 - **Level 4 rises from about 0.5 to about 0.7 in 24 steps.** The two step-0 evals of the same
   adapter (0.475 and 0.554) and the two evals of the same step-24 weights (0.640 and 0.752) differ by
@@ -174,8 +177,9 @@ T 1.0, 32k context, rollouts overlapped with training (`--overlap`), same simula
   14 / 6 / 16 / 27 / 34 hit the 48-reply cap at steps 0 / 6 / 12 / 18 / 24 (28 on the second step-24
   eval). The policy spends more replies before the shift ends; whether on queries or on mitigations
   is not yet checked. Episodes cut by the cap are charged for the rest of the shift.
-- **`gemma26-rl` is still running** (60 steps, finishing about 01:10 on 15 Nov); this table stops
-  at its step-30 eval.
+- **`gemma26-rl` ran 60 steps** (20:01 to 00:52, 14-15 Nov). From the same SFT adapter it reached
+  0.81 / 0.78 at level 4 on its two last evals, against 0.55 at step 0; level 3 went from 0.74 to
+  0.87-0.95. Its step-45 eval dipped (0.77 / 0.59) before recovering, so the same noise caveat applies.
 - **Speed:** on one B200 (vLLM at half the memory, the LoRA trainer beside it), a step took about
   200 s, about 3.3 minutes. On two RTX PRO 6000s (vLLM on one, the trainer on the other), about 263 s. On
   Modal's two H200s the same step took 11-12.5 minutes, measured from the untrained model, whose
@@ -277,9 +281,9 @@ end-of-run eval of the same weights, so for both "the last two" are those two ro
 | Candidate | Trained on | Last step eval | End-of-run eval | Mean |
 | --- | --- | --- | --- | --- |
 | `gemma26-rl-l4` (B200) | level 4, 24 steps from the SFT adapter | 0.640 (step 24) | 0.752 | **0.696** |
-| `gemma26-rl` (RTX PRO 6000) | levels 3+4, 60 steps from the SFT adapter | RTX_LAST | RTX_FINAL | RTX_MEAN |
+| `gemma26-rl` (RTX PRO 6000) | levels 3+4, 60 steps from the SFT adapter | 0.808 (step 60) | 0.776 | **0.792** |
 
-Winner: WINNER.
+Winner: **`gemma26-rl`** (0.792 against 0.696). Its adapter runs as `gemma-ft` on the common seeds.
 
 ## Setup
 
