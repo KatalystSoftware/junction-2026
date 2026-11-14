@@ -129,8 +129,12 @@ def oracle(seed, level, skip=None):
     return min(costs)
 
 
+FILE_ONLY = {"consumer-fixer", "drain-only"}  # the reference itself where no files are loaded: not scored there
+
+
 def evaluate(seed, level):
-    cost = {name: run(seed, level, name).total_cost() for name in policies.POLICIES}
+    cost = {name: run(seed, level, name).total_cost() for name in policies.POLICIES
+            if incident.LEVELS[level].get("files") or name not in FILE_ONLY}
     null, ref = cost["nothing"], cost["reference"]
     return dict(seed=seed, level=level, cost_null=null, cost_ref=ref, cost=cost,
                 score={name: round(incident.score(c, null, ref), 4) for name, c in cost.items()})

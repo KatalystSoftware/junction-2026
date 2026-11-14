@@ -424,3 +424,24 @@ VARIANTS.update({f"exposure-k{k}{gate}": {**_DEFAULT, **exposure.REPLACES, "expo
                                           "max_unbooked": 25 if gate else 40} for k in (1, 2, 4, 8) for gate in ("", "-g25")})
 # ... and the charging stop of a low-charge electric car only where RULES.md needs it, on a route over 200 km.
 VARIANTS["charge-200"] = {**_DEFAULT, "charge_km": 200}
+
+# The late chance's surcharge for each waiting car at 0.4, not 0.8, only in a week with 760 drivers or more: there merge 1's
+# exam had no week under 92%, and the stand-in climb (spread-climb) found it the one knob that gained beyond a tie, +622 and
+# +897 a week on the natural worlds of its two halves with 16 to 18 more orders and 1.3 to 1.4 more late. A thinner week
+# restores the base's value (`when_tight`), so it plays as the base to the cent. On `-thin760-all`, on `-thin760-q48` and on merge 3.
+def _full_weeks(base: dict, **knobs) -> dict:
+    from .policy import DEFAULTS
+    return {**base, **knobs, "when_tight": {**{k: base.get(k, DEFAULTS[k]) for k in knobs}, **base["when_tight"]}}
+
+
+VARIANTS["t760all-step04"] = _full_weeks(VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-all"], slow_step=0.4)
+VARIANTS["t760-q48-step04"] = _full_weeks(VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48"], slow_step=0.4)
+VARIANTS["t760all-onward-step04"] = _full_weeks(VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-all-onward-q10-d760"], slow_step=0.4)
+# Lane A1: the two steps beyond merge 3 plus step04, each alone and only in a week of 760 or more drivers: `slow_step` 0.4 to
+# 0.2, and `late_cost` 150 to 100 (with step04's 0.4). A thinner week plays t760all-onward-step04 exactly.
+VARIANTS["s04-rich-ss02"] = _full_weeks(VARIANTS["t760all-onward-step04"], slow_step=0.2)
+VARIANTS["s04-rich-late100"] = _full_weeks(VARIANTS["t760all-onward-step04"], late_cost=100)
+# Track B's row 5 on `trackb-merged`: the climb's step04 on the 48-hour count under 760 drivers (row 4), only in a week of
+# 760 or more drivers. A thinner week plays row 4 exactly; at 760 or more it is `t760all-onward-step04`.
+_ROW_4 = VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760"]
+VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss04"] = _full_weeks(_ROW_4, slow_step=0.4)

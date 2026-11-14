@@ -3,11 +3,10 @@
 # to drop. A `trackb-merge-<n>` tag marks a known-good point (40 window weeks in a row at 90% or more), placed on the
 # runner's word; merge 1 (`trackb-merge-1.x`) failed its thin exam and is no such point. `fingerprint` is the variant's at `commit`; `pairs.py` changed at row 3, so from there on
 # the pair variants have new fingerprints with the same decisions (the base 1f5cc2d99373 -> a273491eedbd).
-# `state`: known-good, window (on `trackb-merged` and in the rolling window), ready (built, not yet on `trackb-merged`), or
-# held (built, not to be played; it is not a base and the runner skips it).
+# `state`: known-good, window (on `trackb-merged` and in the rolling window), or ready (built, not yet on `trackb-merged`).
 # Columns are tab-separated.
 order	tag	commit	variant	fingerprint	state	part
 2	trackb-merge-2	5cbf649	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-all	1f5cc2d99373	known-good	every waiting car counted under 760 drivers (60 of 60 thin weeks at 90% or more)
 3		1e6a8e4	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-all-onward-q10-d760	44409f1cda67	window	lane 2's onward pairs, only at 760 drivers or more
 4		1e924c0	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760	1348152a78f8	window	the waiting-car count of a week under 760 drivers over 48 hours instead of all
--		1e924c0	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-rich-ss02-late100	a49ae65e80d7	held	lane 1 A's lower surcharge and late price at 760 drivers or more; held by the review thread for the climb's step04
+5		-	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss04	5f2044cd7b03	ready	the climb's step04: slow_step 0.4 at 760 drivers or more
