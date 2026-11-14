@@ -61,6 +61,9 @@ DEFAULTS = {
     # With `read_notes`: the note's own deadline and the site hours it gives (notes.limits) count at the quote and in the posting. A desk
     # that rejoins a world takes its orders from the world again, without the note's deadline in its books; the postings keep it.
     "note_limits": False,
+    # RULES.md 3: an electric car below 30% charge needs a charging stop on a route over 200 km. The starter plans one for every such car;
+    # with this, only where the route is longer than this many km. 0 keeps the starter's stop.
+    "charge_km": 0,
     "read_notes": False,  # read the note before the first posting (notes.py): the first minute to collect the car, plates, a manual licence
     # What the floor follows. Each is off at its default.
     "dealer_steps": [],   # [[share, floor], ...]: the floor at a dealer once the desk has won this share of its quotes there in the week
@@ -164,6 +167,7 @@ class Policy(Desk):
         self.requested: dict[str, int] = {}  # dealer -> its requests so far
         self.trust: dict[str, int] = {}  # dealer -> the orders it counts as on time, as the dealer counts them
         self.minutes = {(road["from"], road["to"]): road["minutes"] for road in map_["roads"]}
+        self.km = {(road["from"], road["to"]): road["km"] for road in map_["roads"]}
         self.near = near_places(map_)  # place -> the places within the notification distance of it
         self.notified = drivers_near(roster, self.near)
         self.home: dict[str, int] = {}  # gig id -> the rounds of offers it may still get to drivers who live where the car is going
@@ -411,6 +415,9 @@ class Policy(Desk):
         audience = {"experienced": any(leg["car"]["premium"] for leg in order["legs"]), "manualLicence": retry.manual_licence}
         stops = without_windows(stops_for(order, legs, request["note"], retry), self.now)
         for stop in stops:
+            if stop.get("withCharging") and self.params()["charge_km"]:
+                leg_ = order["legs"][stop["leg"]]
+                stop["withCharging"] = self.km[(leg_["pickup"]["placeId"], leg_["delivery"]["placeId"])] > self.params()["charge_km"]
             leg = order["legs"][stop["leg"]]
             # The starter reads a closing time on the day the window starts. When the car is ready on a later day,
             # that leaves no time to collect it: the pickup then runs to the end of the request's window.
