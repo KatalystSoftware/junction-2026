@@ -1,0 +1,7 @@
+# The on-call shift replay (spikes/aq-incident/replay): static files, no container. Its deploy.sh
+# puts them in /srv/katalyst/proxy/static/incident, which the proxy sees under /etc/caddy.
+incident.{$BASE_DOMAIN} {
+	encode zstd gzip
+	root * /etc/caddy/static/incident
+	file_server
+}

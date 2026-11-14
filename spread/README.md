@@ -62,8 +62,10 @@ heartbeat or when a request reaches its deadline without a quote, and a desk tha
 it did not post stops for good. In the 14:00 test final the alarm watched the whole run and raised no
 false alarm. "The final" has the replays, the rehearsal and the standby's procedure.
 
-**What would break it.** A thin world with an early bulk order: the default's worst practice week is
-88.4%, on a set of seeds chosen to be hard, and 2 of 255 weeks outside the search's seeds are under 90%.
+**What would break it.** A Friday drop wave: on some Fridays 10 or more drivers drop their bookings in
+the night's first hour, and Thursday's wins must find a driver on the day. The default's three lowest weeks
+(88.4%, 89.9% and 90.2%) are such weeks; see "Nights when drivers drop out". 2 of 255 weeks outside the
+search's seeds are under 90%.
 A lost machine with nobody watching, which costs about €2,800 in 5 minutes. A market whose slope differs
 from practice: the day's shift moves the curve's level, not its slope. Note wording that the rules do not
 know, which costs a failed visit and often the deadline.
@@ -831,7 +833,7 @@ It does bite in proportion to the orders due that day.
 - Prices cannot fix this on the day: no fee booked those gigs. What the desk controls is how many cars wait on one day
   when a wave comes.
 
-**The cap.** [`daycap.py`](spreadlab/daycap.py) (`DayCapPolicy`, variants `day-cap-70` and `day-cap-80` on the default)
+**The cap.** `due_cap` in [`policy.py`](spreadlab/policy.py) (variants `day-cap-70` and `day-cap-80` on the default)
 does not quote an option whose last minute to collect the car falls on a day that already has that many won orders with
 a car still to deliver. A slower option of the same request, due on another day, is still quoted. With no option left, the request is
 declined as `day_full`. On `fresh-098` a cap of 80 first binds on Thursday at 16:00, as the next-day cars that later
@@ -849,7 +851,22 @@ some of them on a slower option:
 PYTHONPATH=. uv run python scratch/drop_waves.py --variants slow-friday-late-150-kinds-limits --seeds fresh-1301,... --caps 70,80
 ```
 
-The live desk does not take `DayCapPolicy` yet: `live final --variant day-cap-80` stops at once with an unknown parameter.
+**The cap lifts after the wave** (`due_cap_wave` 10). The level gives one flu day a week, and the drop wave reads as that
+day: in 631 saved weeks (230 of the default, 401 of the reference) no week has two nights with 10 or more first-hour drops,
+and none of the 114 weeks with such a night from Tuesday to Thursday had one on Friday. At 8 drops the reference has two
+weeks with two. So once a night's first hour has had 10 drops of the desk's gigs, the cap no longer applies that week.
+It is a small part of the cap's cost: of cap 70's 3.1 declined orders a week, it keeps 0.5 (24 a week).
+
+The live desk plays it: the cap and the lift are parameters of `Policy`, and the live desk counts the drops of the
+events it missed while it was down, as it learns the rest.
+
+## The charging stop by route (`charge-180`, off by default, being played)
+
+The starter plans a 40-minute charging stop for every electric car under 30% charge. RULES.md needs one only on a route over
+200 km. With `charge_km` 180 the desk plans it only on routes over 180 km, a margin for the difference between the map's km
+and the rule's. On 120 of the default's saved weeks, 7.5 won low-charge cars a week drive 180 km or less, 0.5 drive 180 to 200
+and 4.3 more. Those weeks have no charging fine, because every such car got its stop, so only play can show that 180 is safe.
+It is kept only if no week of `charge-180` gets a charging fine.
 
 ## The final
 
@@ -1089,7 +1106,6 @@ request, the driver list, the map and its own history in the week.
 - [`optquote.py`](spreadlab/optquote.py), [`optquote.json`](spreadlab/optquote.json): the quote as one optimisation (`opt`), and its fitted weights.
 - [`lanes.json`](spreadlab/lanes.json): the lanes' usual driver fees, for `lane_fee`.
 - [`pairs.py`](spreadlab/pairs.py), [`returns.json`](spreadlab/returns.json): out-and-back pairs, and the return requests a week on each lane.
-- [`daycap.py`](spreadlab/daycap.py): a cap on the won orders to collect on one day, against nights when many drivers drop their gigs.
 - [`play.py`](spreadlab/play.py), [`sweep.py`](spreadlab/sweep.py), [`report.py`](spreadlab/report.py): play, compare.
 - [`ledger.py`](spreadlab/ledger.py): mistakes by variant and situation.
 - [`live.py`](spreadlab/live.py), [`replay.py`](spreadlab/replay.py): the final from the live stream, and a recorded week as a stand-in for the server.
