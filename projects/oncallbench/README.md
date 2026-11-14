@@ -40,10 +40,12 @@ than doing nothing. Every rule cites a public postmortem: `postmortems.md`.
 
 ## How it is scored
 
-The MCP server signs a log of every action. The verifier replays that log in the same
-deterministic simulator and totals the shift's cost: lost revenue, extra replica-minutes and
-$10,000 per wasted mitigation. Nothing the agent writes or says is scored, and a missing or
-tampered log grades as doing nothing.
+The MCP server logs every action it accepts to a volume the agent's container mounts read-only.
+The verifier, in its own container, replays that log in the same deterministic simulator and
+totals the shift's cost: lost revenue, extra replica-minutes and $10,000 per wasted mitigation.
+Nothing the agent writes or says is scored, and a missing or corrupted log grades as doing
+nothing. The log's HMAC uses a key that is in the source, so it catches corruption, not forgery;
+what stops a forged log is that only the sidecar can write it.
 
 `score = (cost_do_nothing - cost) / (cost_do_nothing - cost_reference)`, clipped to 0..1, written
 to `/logs/verifier/reward.txt` (the full cost breakdown goes to `reward.json`). The reference is a
@@ -69,10 +71,20 @@ averaged 0.58 on seeds 101-103 (four runs) and 0.45 over seven runs on seeds 101
 
 Every run with its cost: `metrics.json`; how each level was built and checked: `LOOP.md`.
 
+Known limit: the agent's container reaches the internet, because OpenCode calls the model API
+from it. This repository is public, so an agent could download the reference policy and run it
+against the tools; that scores the reference's 1.00 and no more, since the score is clipped at
+1. Harbor 0.25's `allowlist` network mode for the agent phase would close it, but it needs an
+egress sidecar and nftables support on the host's Docker, so the shipped task stays on `public`
+rather than risk failing on a judge's machine.
+
 ## Reproduce
 
-Needs Docker, `uv` and an `ANTHROPIC_API_KEY` in the environment. AfterQuery provides no inference
-credits.
+Needs Docker with Compose v2 (`docker compose version` must work; on Ubuntu's `docker.io` install
+`docker-compose-v2`), `uv`, Harbor 0.25.0 (`uv tool install harbor==0.25.0`; `run.sh` fetches it
+by itself) and an `ANTHROPIC_API_KEY` in the environment. AfterQuery provides no inference
+credits. A run downloads the base images from Docker Hub, `mcp` from PyPI and, for the agent,
+OpenCode through Harbor's installer.
 
 The reported seeds ship as ready-to-run Harbor tasks: `tasks/shift-1`, `shift-2` and `shift-3` are
 seeds 101, 102 and 103 at level 4, with the briefing and the verifier's calibration filled in
@@ -100,9 +112,16 @@ in three runs; 0.32 mean over nine runs on 101-103). Results land in
 with plain Harbor. Stop-early and the other scripted policies run as Harbor's `oracle` agent with
 `POLICY=<name>`. `SEED` picks the episode (held-out 101-106); `ATTEMPTS=3` gives three Opus runs.
 
-Committed run log: `runs/r4-l4-s101-opus-130256/` (Opus 5.5, level 4, seed 101, score 0.5728,
-recorded before the instruction gained its sentence on the healthy baseline;
-transcript in `agent/opencode.txt`, signed action log in `artifacts/ledger/receipt.json`).
+Committed run logs, each trial with its transcript in `agent/opencode.txt`, its action log in
+`artifacts/ledger/receipt.json` and its score in `verifier/reward.txt`:
+
+- `runs/rerun-l4-shift1-opus-x2/`: `harbor run -p tasks/shift-1 -a opencode -m
+  anthropic/claude-opus-5-5 -k 2` on the task as shipped, from a fresh copy of this repository on
+  a machine that had never run it (Sat 14 Nov, 4 vCPU, Harbor 0.25.0): 0.53 and 0.26. On the same
+  machine `run.sh reference nop stop-early opus` gave 1.00, 0.00, 0.00 and 0.20 (5m36s), and the
+  reference again through plain Harbor 1.00 at the same cost to the cent ($85,246.31).
+- `runs/r4-l4-s101-opus-130256/`: Opus 5.5, seed 101, 0.5728, recorded before the instruction
+  gained its sentence on the healthy baseline.
 
 `./eval.sh <round> <level> <seed> <run>...` does the same as `run.sh` and records the result in
 `metrics.json`.
@@ -147,4 +166,5 @@ fixes these faults for free.
 - `runs/`: committed Harbor run logs (the agent's OpenCode state database left out).
 - `parity.py`: fails if any tool reply or cost on levels 0-5 moves; run it after changing the
   simulator or the policies.
-- `explain.py`: prints what an agent did, step by step, from its signed action log.
+- `explain.py`: prints what an agent did, step by step, from its action log, with the episode's
+  hidden faults: `python3 explain.py 101 4 <trial>/artifacts/ledger/receipt.json`.

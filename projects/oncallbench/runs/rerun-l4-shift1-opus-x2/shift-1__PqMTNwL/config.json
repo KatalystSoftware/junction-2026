@@ -1,0 +1,12 @@
+{
+    "task": {
+        "path": "tasks/shift-1"
+    },
+    "trial_name": "shift-1__PqMTNwL",
+    "trials_dir": "/root/plain/opus-x2",
+    "agent": {
+        "name": "opencode",
+        "model_name": "anthropic/claude-opus-5-5"
+    },
+    "job_id": "a6c976ae-b04b-45e6-91ce-4070d375412d"
+}

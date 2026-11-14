@@ -1,0 +1,106 @@
+{
+    "id": "a6c976ae-b04b-45e6-91ce-4070d375412d",
+    "started_at": "2026-11-14T20:26:16.499684",
+    "updated_at": "2026-11-14T20:31:37.105937",
+    "finished_at": "2026-11-14T20:31:37.105937",
+    "n_total_trials": 2,
+    "stats": {
+        "n_completed_trials": 2,
+        "n_errored_trials": 0,
+        "n_running_trials": 0,
+        "n_pending_trials": 0,
+        "n_cancelled_trials": 0,
+        "n_retries": 0,
+        "evals": {
+            "opencode__claude-opus-5-5__adhoc": {
+                "n_trials": 2,
+                "n_errors": 0,
+                "metrics": [
+                    {
+                        "actions": 53.0,
+                        "beats_reference": 0.0,
+                        "cost_outage": 173101.675,
+                        "cost_replicas": 1515.0,
+                        "cost_total": 174616.675,
+                        "cost_wasted": 0.0,
+                        "faults_left": 0.0,
+                        "reward": 0.39318166988362135,
+                        "valid_receipt": 1.0
+                    }
+                ],
+                "pass_at_k": {},
+                "reward_stats": {
+                    "reward": {
+                        "0.2558581290747631": [
+                            "shift-1__gwH8mwq"
+                        ],
+                        "0.5305052106924797": [
+                            "shift-1__PqMTNwL"
+                        ]
+                    },
+                    "cost_total": {
+                        "194841.27": [
+                            "shift-1__gwH8mwq"
+                        ],
+                        "154392.08": [
+                            "shift-1__PqMTNwL"
+                        ]
+                    },
+                    "beats_reference": {
+                        "0.0": [
+                            "shift-1__gwH8mwq",
+                            "shift-1__PqMTNwL"
+                        ]
+                    },
+                    "valid_receipt": {
+                        "1.0": [
+                            "shift-1__gwH8mwq",
+                            "shift-1__PqMTNwL"
+                        ]
+                    },
+                    "actions": {
+                        "52": [
+                            "shift-1__gwH8mwq"
+                        ],
+                        "54": [
+                            "shift-1__PqMTNwL"
+                        ]
+                    },
+                    "faults_left": {
+                        "0": [
+                            "shift-1__gwH8mwq",
+                            "shift-1__PqMTNwL"
+                        ]
+                    },
+                    "cost_outage": {
+                        "193563.27": [
+                            "shift-1__gwH8mwq"
+                        ],
+                        "152640.08": [
+                            "shift-1__PqMTNwL"
+                        ]
+                    },
+                    "cost_replicas": {
+                        "1278": [
+                            "shift-1__gwH8mwq"
+                        ],
+                        "1752": [
+                            "shift-1__PqMTNwL"
+                        ]
+                    },
+                    "cost_wasted": {
+                        "0": [
+                            "shift-1__gwH8mwq",
+                            "shift-1__PqMTNwL"
+                        ]
+                    }
+                },
+                "exception_stats": {}
+            }
+        },
+        "n_input_tokens": 2410459,
+        "n_cache_tokens": 2410305,
+        "n_output_tokens": 8661,
+        "cost_usd": 1.014397
+    }
+}

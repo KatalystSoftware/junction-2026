@@ -1,0 +1,16 @@
+{
+    "job_name": "opus-x2",
+    "jobs_dir": "/root/plain",
+    "n_attempts": 2,
+    "agents": [
+        {
+            "name": "opencode",
+            "model_name": "anthropic/claude-opus-5-5"
+        }
+    ],
+    "tasks": [
+        {
+            "path": "tasks/shift-1"
+        }
+    ]
+}
