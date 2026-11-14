@@ -813,3 +813,18 @@ def test_merge_1_counts_every_waiting_car_only_in_a_week_with_a_short_driver_lis
     roster = lambda n: [{**ROSTER[0], "id": f"x{i}"} for i in range(n)]  # noqa: E731
     short, full = (play.policy_class(params)(None, 8, 0, params, roster(n), MAP) for n in (700, 800))
     assert short.params()["queue_hours"] == 0 and full.params()["queue_hours"] == 24
+
+
+def test_step04_changes_only_weeks_with_760_drivers_or_more():
+    from spreadlab import play
+    from spreadlab.variants import VARIANTS
+    roster = lambda n: [{**ROSTER[0], "id": f"x{i}"} for i in range(n)]  # noqa: E731
+
+    def desk(params, n):  # the parameters the week plays with
+        played = play.policy_class(params)(None, 8, 0, params, roster(n), MAP).params()
+        return {k: v for k, v in played.items() if k != "when_tight"}
+    for name, base in (("t760all-step04", "fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-all"),
+                       ("t760-q48-step04", "fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48"),
+                       ("t760all-onward-step04", "fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-all-onward-q10-d760")):
+        assert desk(VARIANTS[name], 700) == desk(VARIANTS[base], 700), name
+        assert desk(VARIANTS[name], 800) == {**desk(VARIANTS[base], 800), "slow_step": 0.4}, name

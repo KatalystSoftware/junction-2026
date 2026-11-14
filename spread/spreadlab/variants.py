@@ -424,3 +424,16 @@ VARIANTS.update({f"exposure-k{k}{gate}": {**_DEFAULT, **exposure.REPLACES, "expo
                                           "max_unbooked": 25 if gate else 40} for k in (1, 2, 4, 8) for gate in ("", "-g25")})
 # ... and the charging stop of a low-charge electric car only where RULES.md needs it, on a route over 200 km.
 VARIANTS["charge-200"] = {**_DEFAULT, "charge_km": 200}
+
+# The late chance's surcharge for each waiting car at 0.4, not 0.8, only in a week with 760 drivers or more: there merge 1's
+# exam had no week under 92%, and the stand-in climb (spread-climb) found it the one knob that gained beyond a tie, +622 and
+# +897 a week on the natural worlds of its two halves with 16 to 18 more orders and 1.3 to 1.4 more late. A thinner week
+# restores the base's value (`when_tight`), so it plays as the base to the cent. On `-thin760-all`, on `-thin760-q48` and on merge 3.
+def _full_weeks(base: dict, **knobs) -> dict:
+    from .policy import DEFAULTS
+    return {**base, **knobs, "when_tight": {**{k: base.get(k, DEFAULTS[k]) for k in knobs}, **base["when_tight"]}}
+
+
+VARIANTS["t760all-step04"] = _full_weeks(VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-all"], slow_step=0.4)
+VARIANTS["t760-q48-step04"] = _full_weeks(VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48"], slow_step=0.4)
+VARIANTS["t760all-onward-step04"] = _full_weeks(VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-all-onward-q10-d760"], slow_step=0.4)
