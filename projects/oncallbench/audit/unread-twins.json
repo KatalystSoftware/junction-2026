@@ -1,0 +1,942 @@
+[
+  {
+    "seed": 1,
+    "decisions": [
+      {
+        "minute": 8,
+        "service": "risk-svc",
+        "tool": "revert_config",
+        "selected": {
+          "id": "cfg-54",
+          "type": "config",
+          "minute": -12,
+          "summary": "update allowlist",
+          "status": "live"
+        },
+        "read_diff_ids": [
+          "v155"
+        ],
+        "changes": [
+          {
+            "id": "v154",
+            "type": "deploy",
+            "minute": -556,
+            "summary": "add tracing spans",
+            "status": "live"
+          },
+          {
+            "id": "cfg-54",
+            "type": "config",
+            "minute": -12,
+            "summary": "update allowlist",
+            "status": "live"
+          },
+          {
+            "id": "v155",
+            "type": "deploy",
+            "minute": -12,
+            "summary": "logging cleanup",
+            "status": "live"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "seed": 2,
+    "decisions": [
+      {
+        "minute": 60,
+        "service": "invoicing-svc",
+        "tool": "revert_config",
+        "selected": {
+          "id": "cfg-13",
+          "type": "config",
+          "minute": 52,
+          "summary": "rotate credentials",
+          "status": "live"
+        },
+        "read_diff_ids": [
+          "v51"
+        ],
+        "changes": [
+          {
+            "id": "v50",
+            "type": "deploy",
+            "minute": -943,
+            "summary": "query tuning",
+            "status": "live"
+          },
+          {
+            "id": "cfg-13",
+            "type": "config",
+            "minute": 52,
+            "summary": "rotate credentials",
+            "status": "live"
+          },
+          {
+            "id": "v51",
+            "type": "deploy",
+            "minute": 52,
+            "summary": "new endpoint behind a flag",
+            "status": "live"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "seed": 3,
+    "decisions": [
+      {
+        "minute": 67,
+        "service": "giftcards-svc",
+        "tool": "revert_config",
+        "selected": {
+          "id": "cfg-26",
+          "type": "config",
+          "minute": 59,
+          "summary": "update allowlist",
+          "status": "live"
+        },
+        "read_diff_ids": [
+          "v99"
+        ],
+        "changes": [
+          {
+            "id": "v99",
+            "type": "deploy",
+            "minute": 59,
+            "summary": "add tracing spans",
+            "status": "live"
+          },
+          {
+            "id": "cfg-26",
+            "type": "config",
+            "minute": 59,
+            "summary": "update allowlist",
+            "status": "live"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "seed": 4,
+    "decisions": [
+      {
+        "minute": 67,
+        "service": "cart-svc",
+        "tool": "revert_config",
+        "selected": {
+          "id": "cfg-48",
+          "type": "config",
+          "minute": 59,
+          "summary": "update allowlist",
+          "status": "live"
+        },
+        "read_diff_ids": [
+          "v130"
+        ],
+        "changes": [
+          {
+            "id": "v128",
+            "type": "deploy",
+            "minute": -877,
+            "summary": "logging cleanup",
+            "status": "live"
+          },
+          {
+            "id": "v129",
+            "type": "deploy",
+            "minute": -35,
+            "summary": "dependency bump",
+            "status": "live"
+          },
+          {
+            "id": "v130",
+            "type": "deploy",
+            "minute": 59,
+            "summary": "query tuning",
+            "status": "live"
+          },
+          {
+            "id": "cfg-48",
+            "type": "config",
+            "minute": 59,
+            "summary": "update allowlist",
+            "status": "live"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "seed": 5,
+    "decisions": [
+      {
+        "minute": 8,
+        "service": "currency-svc",
+        "tool": "revert_config",
+        "selected": {
+          "id": "cfg-4",
+          "type": "config",
+          "minute": -25,
+          "summary": "adjust cache ttl",
+          "status": "live"
+        },
+        "read_diff_ids": [
+          "v66"
+        ],
+        "changes": [
+          {
+            "id": "v64",
+            "type": "deploy",
+            "minute": -947,
+            "summary": "new endpoint behind a flag",
+            "status": "live"
+          },
+          {
+            "id": "v65",
+            "type": "deploy",
+            "minute": -87,
+            "summary": "query tuning",
+            "status": "live"
+          },
+          {
+            "id": "cfg-4",
+            "type": "config",
+            "minute": -25,
+            "summary": "adjust cache ttl",
+            "status": "live"
+          },
+          {
+            "id": "v66",
+            "type": "deploy",
+            "minute": -25,
+            "summary": "add tracing spans",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "minute": 27,
+        "service": "wishlist-svc",
+        "tool": "rollback",
+        "selected": {
+          "id": "v77",
+          "type": "deploy",
+          "minute": -12,
+          "summary": "query tuning",
+          "status": "live"
+        },
+        "read_diff_ids": [
+          "cfg-53"
+        ],
+        "changes": [
+          {
+            "id": "cfg-50",
+            "type": "config",
+            "minute": -1368,
+            "summary": "tune connection pool",
+            "status": "live"
+          },
+          {
+            "id": "cfg-51",
+            "type": "config",
+            "minute": -1246,
+            "summary": "update allowlist",
+            "status": "live"
+          },
+          {
+            "id": "cfg-52",
+            "type": "config",
+            "minute": -490,
+            "summary": "tune connection pool",
+            "status": "live"
+          },
+          {
+            "id": "cfg-53",
+            "type": "config",
+            "minute": -12,
+            "summary": "change rate limit",
+            "status": "live"
+          },
+          {
+            "id": "v77",
+            "type": "deploy",
+            "minute": -12,
+            "summary": "query tuning",
+            "status": "live"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "seed": 6,
+    "decisions": []
+  },
+  {
+    "seed": 7,
+    "decisions": [
+      {
+        "minute": 33,
+        "service": "profile-db",
+        "tool": "rollback",
+        "selected": {
+          "id": "v29",
+          "type": "deploy",
+          "minute": -21,
+          "summary": "refactor request handlers",
+          "status": "live"
+        },
+        "read_diff_ids": [
+          "cfg-41"
+        ],
+        "changes": [
+          {
+            "id": "cfg-40",
+            "type": "config",
+            "minute": -592,
+            "summary": "adjust cache ttl",
+            "status": "live"
+          },
+          {
+            "id": "cfg-41",
+            "type": "config",
+            "minute": -21,
+            "summary": "rotate credentials",
+            "status": "live"
+          },
+          {
+            "id": "v29",
+            "type": "deploy",
+            "minute": -21,
+            "summary": "refactor request handlers",
+            "status": "live"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "seed": 8,
+    "decisions": [
+      {
+        "minute": 24,
+        "service": "auth-svc",
+        "tool": "rollback",
+        "selected": {
+          "id": "v58",
+          "type": "deploy",
+          "minute": -13,
+          "summary": "query tuning",
+          "status": "live"
+        },
+        "read_diff_ids": [
+          "cfg-49"
+        ],
+        "changes": [
+          {
+            "id": "cfg-48",
+            "type": "config",
+            "minute": -540,
+            "summary": "enable beta cohort 1%",
+            "status": "live"
+          },
+          {
+            "id": "v58",
+            "type": "deploy",
+            "minute": -13,
+            "summary": "query tuning",
+            "status": "live"
+          },
+          {
+            "id": "cfg-49",
+            "type": "config",
+            "minute": -13,
+            "summary": "tune connection pool",
+            "status": "live"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "seed": 9,
+    "decisions": []
+  },
+  {
+    "seed": 10,
+    "decisions": [
+      {
+        "minute": 33,
+        "service": "stock-svc",
+        "tool": "rollback",
+        "selected": {
+          "id": "v43",
+          "type": "deploy",
+          "minute": -20,
+          "summary": "add tracing spans",
+          "status": "live"
+        },
+        "read_diff_ids": [
+          "cfg-56"
+        ],
+        "changes": [
+          {
+            "id": "cfg-53",
+            "type": "config",
+            "minute": -1373,
+            "summary": "raise log level",
+            "status": "live"
+          },
+          {
+            "id": "cfg-54",
+            "type": "config",
+            "minute": -1135,
+            "summary": "tune connection pool",
+            "status": "live"
+          },
+          {
+            "id": "cfg-55",
+            "type": "config",
+            "minute": -235,
+            "summary": "update allowlist",
+            "status": "live"
+          },
+          {
+            "id": "v43",
+            "type": "deploy",
+            "minute": -20,
+            "summary": "add tracing spans",
+            "status": "live"
+          },
+          {
+            "id": "cfg-56",
+            "type": "config",
+            "minute": -20,
+            "summary": "rotate credentials",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "minute": 73,
+        "service": "feeds-svc",
+        "tool": "rollback",
+        "selected": {
+          "id": "v25",
+          "type": "deploy",
+          "minute": 65,
+          "summary": "add tracing spans",
+          "status": "live"
+        },
+        "read_diff_ids": [
+          "cfg-17"
+        ],
+        "changes": [
+          {
+            "id": "cfg-16",
+            "type": "config",
+            "minute": -1338,
+            "summary": "enable beta cohort 1%",
+            "status": "live"
+          },
+          {
+            "id": "v24",
+            "type": "deploy",
+            "minute": -1060,
+            "summary": "library security patch",
+            "status": "live"
+          },
+          {
+            "id": "v25",
+            "type": "deploy",
+            "minute": 65,
+            "summary": "add tracing spans",
+            "status": "live"
+          },
+          {
+            "id": "cfg-17",
+            "type": "config",
+            "minute": 65,
+            "summary": "change rate limit",
+            "status": "live"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "seed": 11,
+    "decisions": [
+      {
+        "minute": 25,
+        "service": "loyalty-svc",
+        "tool": "rollback",
+        "selected": {
+          "id": "v126",
+          "type": "deploy",
+          "minute": -16,
+          "summary": "logging cleanup",
+          "status": "live"
+        },
+        "read_diff_ids": [
+          "cfg-5"
+        ],
+        "changes": [
+          {
+            "id": "cfg-4",
+            "type": "config",
+            "minute": -593,
+            "summary": "enable beta cohort 1%",
+            "status": "live"
+          },
+          {
+            "id": "cfg-5",
+            "type": "config",
+            "minute": -16,
+            "summary": "enable beta cohort 1%",
+            "status": "live"
+          },
+          {
+            "id": "v126",
+            "type": "deploy",
+            "minute": -16,
+            "summary": "logging cleanup",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "minute": 78,
+        "service": "risk-db",
+        "tool": "revert_config",
+        "selected": {
+          "id": "cfg-60",
+          "type": "config",
+          "minute": 70,
+          "summary": "rotate credentials",
+          "status": "live"
+        },
+        "read_diff_ids": [
+          "v99"
+        ],
+        "changes": [
+          {
+            "id": "v98",
+            "type": "deploy",
+            "minute": -331,
+            "summary": "query tuning",
+            "status": "live"
+          },
+          {
+            "id": "cfg-59",
+            "type": "config",
+            "minute": -241,
+            "summary": "adjust cache ttl",
+            "status": "live"
+          },
+          {
+            "id": "v99",
+            "type": "deploy",
+            "minute": 70,
+            "summary": "refactor request handlers",
+            "status": "live"
+          },
+          {
+            "id": "cfg-60",
+            "type": "config",
+            "minute": 70,
+            "summary": "rotate credentials",
+            "status": "live"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "seed": 12,
+    "decisions": [
+      {
+        "minute": 61,
+        "service": "ledger-db",
+        "tool": "revert_config",
+        "selected": {
+          "id": "cfg-47",
+          "type": "config",
+          "minute": 53,
+          "summary": "enable beta cohort 1%",
+          "status": "live"
+        },
+        "read_diff_ids": [
+          "v115"
+        ],
+        "changes": [
+          {
+            "id": "v113",
+            "type": "deploy",
+            "minute": -1356,
+            "summary": "weekly release",
+            "status": "live"
+          },
+          {
+            "id": "v114",
+            "type": "deploy",
+            "minute": -470,
+            "summary": "add tracing spans",
+            "status": "live"
+          },
+          {
+            "id": "cfg-46",
+            "type": "config",
+            "minute": -397,
+            "summary": "tune connection pool",
+            "status": "live"
+          },
+          {
+            "id": "cfg-47",
+            "type": "config",
+            "minute": 53,
+            "summary": "enable beta cohort 1%",
+            "status": "live"
+          },
+          {
+            "id": "v115",
+            "type": "deploy",
+            "minute": 53,
+            "summary": "query tuning",
+            "status": "live"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "seed": 101,
+    "decisions": []
+  },
+  {
+    "seed": 102,
+    "decisions": [
+      {
+        "minute": 77,
+        "service": "geo-svc",
+        "tool": "revert_config",
+        "selected": {
+          "id": "cfg-6",
+          "type": "config",
+          "minute": 69,
+          "summary": "tune connection pool",
+          "status": "live"
+        },
+        "read_diff_ids": [
+          "v180"
+        ],
+        "changes": [
+          {
+            "id": "v180",
+            "type": "deploy",
+            "minute": 69,
+            "summary": "refactor request handlers",
+            "status": "live"
+          },
+          {
+            "id": "cfg-6",
+            "type": "config",
+            "minute": 69,
+            "summary": "tune connection pool",
+            "status": "live"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "seed": 103,
+    "decisions": [
+      {
+        "minute": 24,
+        "service": "inventory-svc",
+        "tool": "rollback",
+        "selected": {
+          "id": "v123",
+          "type": "deploy",
+          "minute": -23,
+          "summary": "logging cleanup",
+          "status": "live"
+        },
+        "read_diff_ids": [
+          "cfg-31"
+        ],
+        "changes": [
+          {
+            "id": "cfg-31",
+            "type": "config",
+            "minute": -23,
+            "summary": "change rate limit",
+            "status": "live"
+          },
+          {
+            "id": "v123",
+            "type": "deploy",
+            "minute": -23,
+            "summary": "logging cleanup",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "minute": 33,
+        "service": "pricing-svc",
+        "tool": "rollback",
+        "selected": {
+          "id": "v105",
+          "type": "deploy",
+          "minute": -14,
+          "summary": "logging cleanup",
+          "status": "live"
+        },
+        "read_diff_ids": [
+          "cfg-23"
+        ],
+        "changes": [
+          {
+            "id": "cfg-21",
+            "type": "config",
+            "minute": -1108,
+            "summary": "rotate credentials",
+            "status": "live"
+          },
+          {
+            "id": "cfg-22",
+            "type": "config",
+            "minute": -986,
+            "summary": "rotate credentials",
+            "status": "live"
+          },
+          {
+            "id": "v104",
+            "type": "deploy",
+            "minute": -540,
+            "summary": "refactor request handlers",
+            "status": "live"
+          },
+          {
+            "id": "cfg-23",
+            "type": "config",
+            "minute": -14,
+            "summary": "adjust cache ttl",
+            "status": "live"
+          },
+          {
+            "id": "v105",
+            "type": "deploy",
+            "minute": -14,
+            "summary": "logging cleanup",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "minute": 63,
+        "service": "labels-svc",
+        "tool": "revert_config",
+        "selected": {
+          "id": "cfg-38",
+          "type": "config",
+          "minute": 55,
+          "summary": "update allowlist",
+          "status": "live"
+        },
+        "read_diff_ids": [
+          "v134"
+        ],
+        "changes": [
+          {
+            "id": "v133",
+            "type": "deploy",
+            "minute": -850,
+            "summary": "logging cleanup",
+            "status": "live"
+          },
+          {
+            "id": "cfg-37",
+            "type": "config",
+            "minute": -684,
+            "summary": "update allowlist",
+            "status": "live"
+          },
+          {
+            "id": "v134",
+            "type": "deploy",
+            "minute": 55,
+            "summary": "library security patch",
+            "status": "live"
+          },
+          {
+            "id": "cfg-38",
+            "type": "config",
+            "minute": 55,
+            "summary": "update allowlist",
+            "status": "live"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "seed": 104,
+    "decisions": [
+      {
+        "minute": 8,
+        "service": "loyalty-svc",
+        "tool": "rollback",
+        "selected": {
+          "id": "v47",
+          "type": "deploy",
+          "minute": -19,
+          "summary": "add tracing spans",
+          "status": "live"
+        },
+        "read_diff_ids": [
+          "cfg-12"
+        ],
+        "changes": [
+          {
+            "id": "cfg-11",
+            "type": "config",
+            "minute": -620,
+            "summary": "tune connection pool",
+            "status": "live"
+          },
+          {
+            "id": "v47",
+            "type": "deploy",
+            "minute": -19,
+            "summary": "add tracing spans",
+            "status": "live"
+          },
+          {
+            "id": "cfg-12",
+            "type": "config",
+            "minute": -19,
+            "summary": "enable beta cohort 1%",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "minute": 28,
+        "service": "checkout-svc",
+        "tool": "rollback",
+        "selected": {
+          "id": "v116",
+          "type": "deploy",
+          "minute": -37,
+          "summary": "weekly release",
+          "status": "live"
+        },
+        "read_diff_ids": [
+          "cfg-19"
+        ],
+        "changes": [
+          {
+            "id": "cfg-19",
+            "type": "config",
+            "minute": -37,
+            "summary": "change rate limit",
+            "status": "live"
+          },
+          {
+            "id": "v116",
+            "type": "deploy",
+            "minute": -37,
+            "summary": "weekly release",
+            "status": "live"
+          }
+        ]
+      },
+      {
+        "minute": 58,
+        "service": "flags-svc",
+        "tool": "revert_config",
+        "selected": {
+          "id": "cfg-14",
+          "type": "config",
+          "minute": 50,
+          "summary": "rotate credentials",
+          "status": "live"
+        },
+        "read_diff_ids": [
+          "v153"
+        ],
+        "changes": [
+          {
+            "id": "v153",
+            "type": "deploy",
+            "minute": 50,
+            "summary": "logging cleanup",
+            "status": "live"
+          },
+          {
+            "id": "cfg-14",
+            "type": "config",
+            "minute": 50,
+            "summary": "rotate credentials",
+            "status": "live"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "seed": 105,
+    "decisions": [
+      {
+        "minute": 54,
+        "service": "currency-svc",
+        "tool": "rollback",
+        "selected": {
+          "id": "v175",
+          "type": "deploy",
+          "minute": 46,
+          "summary": "add tracing spans",
+          "status": "live"
+        },
+        "read_diff_ids": [
+          "cfg-33"
+        ],
+        "changes": [
+          {
+            "id": "cfg-32",
+            "type": "config",
+            "minute": -1402,
+            "summary": "enable beta cohort 1%",
+            "status": "live"
+          },
+          {
+            "id": "v175",
+            "type": "deploy",
+            "minute": 46,
+            "summary": "add tracing spans",
+            "status": "live"
+          },
+          {
+            "id": "cfg-33",
+            "type": "config",
+            "minute": 46,
+            "summary": "rotate credentials",
+            "status": "live"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "seed": 106,
+    "decisions": []
+  }
+]

@@ -1,0 +1,47 @@
+{
+  "job": "audit-r1-l4-s104-stop-early-161401",
+  "repeat": 1,
+  "seed": 104,
+  "policy": "stop-early",
+  "expected": {
+    "cost": 363550.75,
+    "score": 0.0,
+    "components": {
+      "outage": 363550.75,
+      "replicas": 0,
+      "wasted": 0
+    },
+    "actions": 2
+  },
+  "actual": {
+    "reward": 0.0,
+    "cost_total": 363550.75,
+    "beats_reference": 0.0,
+    "valid_receipt": 1.0,
+    "actions": 2,
+    "faults_left": 3,
+    "cost_outage": 363550.75,
+    "cost_replicas": 0,
+    "cost_wasted": 0
+  },
+  "exception_info": null,
+  "cost_matches": true,
+  "score_matches": true,
+  "receipt_matches": true,
+  "timing": {
+    "started_at": "2026-11-14T14:14:03.041260Z",
+    "finished_at": "2026-11-14T14:14:37.508186Z",
+    "environment_setup": {
+      "started_at": "2026-11-14T14:14:03.083560Z",
+      "finished_at": "2026-11-14T14:14:10.835549Z"
+    },
+    "agent_execution": {
+      "started_at": "2026-11-14T14:14:10.835786Z",
+      "finished_at": "2026-11-14T14:14:11.327841Z"
+    },
+    "verifier": {
+      "started_at": "2026-11-14T14:14:23.307965Z",
+      "finished_at": "2026-11-14T14:14:37.508170Z"
+    }
+  }
+}

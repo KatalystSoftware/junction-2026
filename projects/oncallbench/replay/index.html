@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>On-call shift replay</title>
+<meta name="description" content="An AI agent and a scripted expert work the same simulated outage, side by side, minute by minute.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='6' fill='%23d1242c'/%3E%3C/svg%3E">
+<link rel="preload" href="fonts/archivo-latin-wdth-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="style.css">
+<!-- data/index.js names the bundles; each is JSON wrapped in one assignment, so the page also works
+     from file:// where fetch is blocked. export.py writes both. -->
+<script src="data/index.js"></script>
+<script src="app.js" defer></script>
+</head>
+<body class="loading">
+<p class="loading-note" role="status">Loading the shift…</p>
+<header class="bar">
+  <h1>On-call shift replay</h1>
+  <div class="episode" id="episode"></div>
+  <div class="runs" id="runs"></div>
+  <button type="button" class="results" id="open-results" aria-expanded="false" aria-controls="results"></button>
+  <div class="tools">
+    <button type="button" id="open-key" aria-expanded="false" aria-controls="key">Key</button>
+    <button type="button" id="open-runbook" aria-expanded="false" aria-controls="runbook">How the reference decides</button>
+    <button type="button" id="open-help" class="round" aria-label="What is this?">?</button>
+  </div>
+</header>
+
+<main>
+  <section class="panel" id="panel-agent" aria-label="Agent run">
+    <header class="panel-head">
+      <div class="who">
+        <h2></h2>
+        <p class="now"><b class="tag">Now</b><span></span></p>
+        <p class="why"></p>
+      </div>
+      <div class="till">
+        <p class="sum"><span class="sum-label">Lost so far</span><output class="total">$0</output></p>
+        <p class="gap"></p>
+      </div>
+    </header>
+    <div class="graph"><svg role="img" aria-label="Service graph of the agent run: simulator ground truth, which the agent could not see directly"></svg></div>
+  </section>
+
+  <section class="panel" id="panel-ref" aria-label="Reference run">
+    <header class="panel-head">
+      <div class="who">
+        <h2></h2>
+        <p class="now"><b class="tag">Now</b><span></span></p>
+        <p class="why"></p>
+      </div>
+      <div class="till">
+        <p class="sum"><span class="sum-label">Lost so far</span><output class="total">$0</output></p>
+        <p class="gap"></p>
+      </div>
+    </header>
+    <div class="graph"><svg role="img" aria-label="Service graph of the reference run: simulator ground truth, which the reference could not see directly"></svg></div>
+  </section>
+
+  <section class="timeline" aria-label="Timeline">
+    <div class="transport">
+      <button type="button" id="play" aria-label="Play">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><path id="play-icon" d="M6 4l10 6-10 6z"/></svg>
+      </button>
+      <p class="clock" id="clock"></p>
+      <label class="speed">Speed
+        <select id="speed">
+          <option value="0.5">0.5×</option>
+          <option value="1" selected>1×</option>
+          <option value="1.5">1.5×</option>
+          <option value="2">2×</option>
+          <option value="4">4×</option>
+        </select>
+      </label>
+      <button type="button" id="to-moment" class="quiet">Go to the key moment</button>
+      <button type="button" id="open-lanes" class="quiet" aria-expanded="false">Show each fault</button>
+    </div>
+    <div class="track" id="track"><svg role="img" aria-label="Lost revenue and actions over the shift"></svg></div>
+  </section>
+</main>
+
+<!-- details, opened on demand -->
+<aside class="sheet inspector" id="inspector" aria-label="Selected action" aria-live="polite" hidden></aside>
+
+<aside class="sheet" id="runbook" aria-label="How the reference decides" hidden>
+  <div class="top"><h3>How the reference decides</h3><button type="button" class="close" data-close="runbook">Close</button></div>
+  <ol id="runbook-lines"></ol>
+  <p class="quiet">A deterministic script. No LLM, no knowledge of the faults: it sees only the tools the agent has.
+    <a href="https://github.com/KatalystSoftware/junction2026/blob/main/spikes/aq-incident/sim/policies.py" target="_blank" rel="noopener">sim/policies.py</a></p>
+</aside>
+
+<aside class="sheet" id="results" aria-label="All measured runs" hidden>
+  <div class="top"><h3 id="results-title"></h3><button type="button" class="close" data-close="results">Close</button></div>
+  <div id="results-body"></div>
+</aside>
+
+<aside class="sheet wide" id="key" aria-label="Key" hidden>
+  <div class="top"><h3>Key</h3><button type="button" class="close" data-close="key">Close</button></div>
+  <p class="quiet">The graphs show the simulator's hidden state. Neither run sees it: both get only what their tool calls return.</p>
+  <ul class="legend" aria-label="Graph marks">
+    <li><svg viewBox="0 0 20 20"><circle class="k-cause" cx="10" cy="10" r="7"/></svg>cause</li>
+    <li><svg viewBox="0 0 20 20"><circle class="k-quiet" cx="10" cy="10" r="6.5"/><circle class="k-cause" cx="10" cy="10" r="2.6"/></svg>quiet cause: its own telemetry is clean</li>
+    <li><svg viewBox="0 0 20 20"><circle class="k-hurt" cx="10" cy="10" r="6"/></svg>fails through a dependency</li>
+    <li><svg viewBox="0 0 28 20"><path class="k-flow" d="M2 10H26"/></svg>failures passed up to callers</li>
+    <li><svg viewBox="0 0 20 20"><circle class="k-busy" cx="10" cy="10" r="6.5"/></svg>loud, not a cause</li>
+    <li class="only-storms"><svg viewBox="0 0 20 20"><circle class="k-storm" cx="10" cy="10" r="6.5"/></svg>retry storm: over capacity on retries</li>
+    <li class="only-storms"><svg viewBox="0 0 20 20"><circle class="k-node" cx="10" cy="10" r="4"/><circle class="k-gate" cx="10" cy="10" r="8" transform="rotate(-90 10 10)"/></svg>throttled, by that share</li>
+    <li><svg viewBox="0 0 20 20"><circle class="k-node" cx="10" cy="10" r="4.5"/><circle class="k-op" cx="10" cy="10" r="8"/></svg>mitigation running</li>
+    <li><svg viewBox="0 0 20 20"><circle class="k-node" cx="10" cy="10" r="4.5"/><path class="k-look" d="M2 6V2H6M14 2H18V6M18 14V18H14M6 18H2V14"/></svg>being read</li>
+    <li><svg viewBox="0 0 20 20"><path class="k-cross" d="M5 5l10 10M15 5L5 15"/></svg>unneeded mitigation</li>
+  </ul>
+  <ul class="legend" aria-label="Timeline marks">
+    <li><svg viewBox="0 0 20 20"><path class="m-tick" d="M10 4V16"/></svg>query</li>
+    <li><svg viewBox="0 0 20 20"><path class="m-fix" d="M10 3L17 10L10 17L3 10Z"/></svg>mitigation</li>
+    <li><svg viewBox="0 0 20 20"><path class="m-soft" d="M10 3L17 10L10 17L3 10Z"/></svg>relief or undo</li>
+    <li class="only-storms"><svg viewBox="0 0 20 20"><rect class="m-fix" x="5" y="5" width="10" height="10" rx="1"/></svg>sets a throttle</li>
+    <li class="only-storms"><svg viewBox="0 0 20 20"><rect class="m-soft" x="5" y="5" width="10" height="10" rx="1"/></svg>lifts it</li>
+    <li><svg viewBox="0 0 20 20"><path class="m-waste" d="M5 5l10 10M15 5L5 15"/></svg>wasted mitigation</li>
+    <li><svg viewBox="0 0 20 20"><rect class="m-stop" x="5.5" y="5.5" width="9" height="9"/></svg>leaves early</li>
+    <li class="only-storms"><i class="sw sw-storm"></i>retry storm after the fault is removed</li>
+    <li class="only-storms"><i class="sw sw-throttle"></i>throttle on</li>
+  </ul>
+  <p class="quiet" id="key-score"></p>
+  <p class="quiet">Space plays. Arrow keys step through the agent's actions. Drag the timeline to scrub. Click a mark for what the run saw.</p>
+</aside>
+
+<dialog id="onboard" aria-labelledby="onboard-title">
+  <h2 id="onboard-title">An on-call shift, replayed</h2>
+  <dl>
+    <dt>What</dt><dd>An AI agent and an expert script fight the same outage, side by side.</dd>
+    <dt>Watch</dt><dd id="onboard-watch">The red services, the money counter, and the moment the agent rolls back without protecting first.</dd>
+    <dt>Result</dt><dd id="onboard-result"></dd>
+  </dl>
+  <form method="dialog"><button type="submit" autofocus>Watch the shift</button></form>
+</dialog>
+
+<div class="tip" id="tip" hidden></div>
+</body>
+</html>

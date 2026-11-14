@@ -1,0 +1,37 @@
+schema_version = "1.4"
+artifacts = ["/ledger/receipt.json"]
+
+[task]
+name = "katalyst/aq-incident"
+version = "0.1.0"
+description = "An on-call shift on a simulated microservice estate: find every cause of the outage and apply the right mitigations while it keeps costing money."
+authors = []
+keywords = ["incident-response", "sre", "root-cause-analysis", "simulation", "mcp"]
+
+[metadata]
+
+[verifier]
+timeout_sec = 120.0
+environment_mode = "separate"
+collect = []
+
+[verifier.env]
+
+[agent]
+# The shift is bounded by its 120 simulated minutes and 400 tool calls, not by wall time. Level-4
+# agent runs took 5-8 minutes (Opus 5.5 at most 401 s), so 30 minutes never cuts a shift short.
+timeout_sec = 1800.0
+
+[environment]
+network_mode = "public"
+build_timeout_sec = 600.0
+os = "linux"
+
+[[environment.mcp_servers]]
+name = "ops"
+transport = "streamable-http"
+url = "http://mcp-server:8000/mcp"
+
+[environment.env]
+
+[solution.env]

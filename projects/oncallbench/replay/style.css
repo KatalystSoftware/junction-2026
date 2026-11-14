@@ -1,0 +1,504 @@
+/* On-call shift replay. A ledger's two inks on cool paper: blue-black for what is, red for what
+   is lost. Amber marks noise, blue marks the hand at work. Sized for a projector at 1920x1080. */
+
+@font-face {
+  font-family: "Archivo";
+  src: url("fonts/archivo-latin-wdth-normal.woff2") format("woff2");
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
+  font-display: block;
+}
+
+:root {
+  --paper: oklch(0.962 0.009 250);
+  --sheet: oklch(0.995 0.003 250);
+  --ink: oklch(0.25 0.045 265);
+  --ink-2: oklch(0.45 0.04 262);
+  --ink-3: oklch(0.6 0.03 260);
+  --rule: oklch(0.885 0.014 255);
+  --wire: oklch(0.83 0.02 257);
+  --rule-soft: oklch(0.93 0.01 255);
+  --red: oklch(0.56 0.215 27);
+  --red-deep: oklch(0.45 0.18 27);
+  --red-soft: oklch(0.93 0.04 22);
+  --amber: oklch(0.82 0.155 84);
+  --amber-ink: oklch(0.47 0.1 68);
+  --blue: oklch(0.5 0.19 264);
+  --blue-soft: oklch(0.925 0.04 262);
+  --mono: ui-monospace, "SF Mono", "Cascadia Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  --red-pale: oklch(0.87 0.07 24);
+  --deck: 16rem;  /* the timeline: chart and action rows; with each fault's lane open it is taller */
+  font-size: clamp(12.5px, 0.83vw, 18px);
+}
+
+* { box-sizing: border-box; margin: 0; }
+
+html, body { height: 100%; }
+
+body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  background: var(--paper);
+  color: var(--ink);
+  font: 450 1rem/1.35 "Archivo", system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection { background: var(--blue); color: var(--sheet); }
+:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; border-radius: 3px; }
+* { scrollbar-width: thin; scrollbar-color: var(--ink-3) transparent; }
+
+/* until the first picture is drawn there is one line saying so, not an empty frame */
+.loading-note { display: none; }
+.loading .loading-note {
+  display: block; position: fixed; inset: 45% 0 auto; z-index: 3; text-align: center;
+  font: 600 1.3rem system-ui, sans-serif; color: var(--ink-2);  /* a system face: it shows before the page's own has loaded */
+}
+.loading main, .loading .bar > :not(h1) { visibility: hidden; }
+
+/* --- the bar ------------------------------------------------------------------- */
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  padding: 0.55rem 1.4rem;
+  background: var(--ink);
+  color: var(--paper);
+}
+.bar h1 { font-size: 1.2rem; font-weight: 680; font-stretch: 92%; white-space: nowrap; }
+.bar { font-stretch: 94%; }
+.bar :focus-visible { outline-color: var(--paper); }
+.episode { display: flex; gap: 0.25rem; flex: none; color: oklch(0.82 0.03 258); white-space: nowrap;
+  padding-right: 1.1rem; border-right: 1px solid oklch(0.4 0.05 264); }
+.episode select, .runs select {
+  font: inherit; color: var(--paper); background: oklch(0.33 0.05 265);
+  border: 1px solid oklch(0.48 0.05 262); border-radius: 4px; padding: 0.2rem 0.5rem;
+}
+.runs { display: flex; align-items: center; gap: 0.25rem; flex: 0 1 auto; min-width: 0; color: oklch(0.82 0.03 258); white-space: nowrap; }
+.runs label { display: flex; align-items: center; gap: 0.5rem; }
+.tools { display: flex; align-items: center; gap: 0.4rem; flex: none; }
+/* every measured run of the level at a glance; the sheet behind it has the numbers */
+.results {
+  margin-left: auto; display: flex; align-items: center; gap: 0.6rem; flex: none; cursor: pointer; white-space: nowrap;
+  font: inherit; color: oklch(0.9 0.02 258); background: none; border: 1px solid transparent; border-radius: 4px; padding: 0.2rem 0.6rem;
+}
+.results[hidden] { display: none; }
+.results[hidden] + .tools { margin-left: auto; }
+.results:hover, .results[aria-expanded="true"] { border-color: oklch(0.48 0.05 262); }
+.results svg { width: 9.4rem; height: 1.25rem; }
+.results b { color: var(--paper); font-weight: 700; }
+.results .axis { stroke: oklch(0.55 0.04 262); stroke-width: 1; }
+.results .mean { stroke: var(--paper); stroke-width: 1.5; }
+.dot { fill: oklch(0.7 0.17 27); stroke: var(--ink); stroke-width: 1; }
+.dot.protected, .dot.wasted { fill: oklch(0.8 0.1 250); }
+.dot.on { stroke: var(--paper); stroke-width: 1.75; }
+.tools button {
+  font: inherit; font-weight: 560; color: oklch(0.9 0.02 258); background: none; cursor: pointer; white-space: nowrap;
+  border: 1px solid oklch(0.48 0.05 262); border-radius: 4px; padding: 0.28rem 0.7rem;
+}
+.tools button:hover, .tools button[aria-expanded="true"] { background: var(--paper); color: var(--ink); border-color: var(--paper); }
+.tools .round { width: 2rem; height: 2rem; padding: 0; border-radius: 50%; font-weight: 700; }
+/* models and scripted baselines are two groups, each under its own name */
+.group-name { font-size: 0.86rem; font-weight: 560; color: oklch(0.72 0.035 258); white-space: nowrap; margin-right: 0.2rem; }
+.group-name ~ .group-name { margin-left: 0.7rem; padding-left: 1rem; border-left: 1px solid oklch(0.4 0.05 264); line-height: 1.9; }
+.runs button, .episode button {
+  font: inherit; font-weight: 560; color: oklch(0.86 0.025 258); background: none;
+  border: 1px solid transparent; border-radius: 4px; padding: 0.28rem 0.6rem; cursor: pointer;
+  white-space: nowrap;
+}
+.runs button b { font-weight: 560; color: oklch(0.72 0.035 258); margin-left: 0.45rem; }
+.runs button:hover, .episode button:hover { border-color: oklch(0.48 0.05 262); }
+.runs button[aria-selected="true"] { background: var(--paper); color: var(--ink); }
+.episode button { font-weight: 680; }
+.episode button[aria-selected="true"] { border-color: var(--paper); color: var(--paper); }
+.runs button[aria-selected="true"] b { color: var(--ink-2); }
+
+/* --- the two runs -------------------------------------------------------------- */
+
+main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) var(--deck);
+  gap: 0.8rem 0.9rem;
+  padding: 0.9rem 1.4rem 1rem;
+  min-height: 0;
+}
+
+.panel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  background: var(--sheet);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  min-height: 0;
+}
+.panel-head {
+  contain: layout style;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 0.75rem 1.1rem 0.55rem;
+  border-bottom: 1px solid var(--rule-soft);
+}
+.who { min-width: 0; }
+.who h2 { font-size: 1.75rem; line-height: 1.1; font-weight: 700; font-stretch: 92%; white-space: nowrap; }
+.who h2 span { font-size: 1rem; font-weight: 450; font-stretch: 100%; color: var(--ink-2); margin-left: 0.7rem; }
+.who h2 span b { color: var(--ink); font-weight: 700; }
+.who .sub { color: var(--ink-2); margin-top: 0.25rem; }
+.who .sub b { color: var(--ink); font-weight: 680; }
+
+/* what the sentence is about: the whole run in grey, the present moment in blue */
+.tag { display: inline-block; font-size: 0.8rem; font-weight: 680; line-height: 1.35; white-space: nowrap; border: 1px solid; border-radius: 3px; padding: 0 0.35rem; margin-right: 0.45rem; vertical-align: 0.08em; }
+.now .tag { color: var(--sheet); background: var(--blue); border-color: var(--blue); }
+.why .tag { color: var(--ink); border-color: var(--ink-3); }
+/* what the run is doing, and under it why: the reference's rule, or the agent's own words. Two lines each at most. */
+.who .now { color: var(--blue); font-weight: 600; font-size: 1.12rem; line-height: 1.3; margin-top: 0.45rem; text-wrap: pretty;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+.who .why { color: var(--ink); line-height: 1.3; margin-top: 0.3rem; min-height: 2.6em; max-width: 52rem; text-wrap: pretty;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+.till { text-align: right; flex: none; }
+.sum { display: flex; align-items: flex-end; justify-content: flex-end; gap: 0.6rem; }
+.sum-label { white-space: pre-line; text-align: right; color: var(--ink-2); font-weight: 620; font-size: 0.95rem; line-height: 1.1; padding-bottom: 0.3rem; }
+.total {
+  display: block;
+  font-size: 4.7rem; line-height: 0.9; font-weight: 760; font-stretch: 70%;
+  letter-spacing: -0.01em;
+  color: var(--red);
+}
+.total.idle { color: var(--ink-3); }
+.total.hit { animation: hit 0.9s cubic-bezier(0.16, 1, 0.3, 1); }
+@keyframes hit { from { color: var(--ink); transform: translateY(-0.12em); } }
+.gap { color: var(--red-deep); font-weight: 620; white-space: nowrap; min-height: 2.2rem; margin-top: 0.15rem; }
+.who { flex: 1 1 0; }
+.gap b { font-size: 2rem; line-height: 1; font-weight: 760; font-stretch: 72%; color: var(--red); margin-right: 0.15em; }
+.gap.under, .gap.under b { color: var(--blue); }
+
+.graph { position: relative; min-height: 0; contain: layout paint style; }
+.graph svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+/* links */
+.link { fill: none; stroke: var(--wire); stroke-width: 1; }
+.link.soft { stroke-dasharray: 2 3; }
+.link.fail { stroke: var(--red); stroke-dasharray: 9 3; animation: flow 0.7s linear infinite; }
+.link.near { stroke: var(--ink-2); stroke-width: 1.5; }
+.link.fail.near { stroke: var(--red-deep); }
+@keyframes flow { to { stroke-dashoffset: 12; } }
+.paused .link.fail { animation-play-state: paused; }
+
+/* nodes: --e is the square root of the error rate, 0..1 */
+.node { cursor: default; }
+.node .hit { fill: transparent; stroke: none; }
+.node .mark {
+  fill: var(--sheet); stroke: var(--ink-3); stroke-width: 1.25;
+  transition: fill 0.35s, stroke 0.35s, r 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.node.orphan .mark { stroke: var(--wire); }
+.node.story .mark { stroke: var(--ink); stroke-width: 2; }
+.node.hurt .mark {
+  fill: color-mix(in oklab, var(--red) calc(16% + 70% * var(--e)), var(--sheet));
+  stroke: color-mix(in oklab, var(--red-deep) calc(50% + 50% * var(--e)), var(--sheet));
+}
+.node.cause .mark { fill: var(--red); stroke: var(--red-deep); stroke-width: 2; }
+.node.cause.quiet .mark { fill: var(--sheet); stroke: var(--red); stroke-width: 2; }
+.node .core { fill: var(--red); opacity: 0; transition: opacity 0.35s; pointer-events: none; }
+.node.cause.quiet .core { opacity: 1; }
+.node.busy .mark { fill: var(--amber); stroke: var(--amber-ink); stroke-width: 2; }
+.node.busy.hurt .mark { stroke: var(--red-deep); }
+.node .ring { fill: none; stroke: var(--blue); stroke-width: 2; stroke-dasharray: 4 3.5; opacity: 0; pointer-events: none; }
+/* the dashes travel round the ring. Not a rotation: a transform animated inside the graph makes the
+   browser split the whole drawing into layers on every frame */
+.node.op .ring { opacity: 1; animation: round 0.5s linear infinite; }
+@keyframes round { to { stroke-dashoffset: -7.5; } }
+.paused .node.op .ring { animation-play-state: paused; }
+.node.unneeded .ring { stroke: var(--red-deep); }
+/* a retry storm: failing on its own with no fault behind it, the outline broken and circling */
+.node.storm .mark { fill: var(--red); stroke: var(--red-deep); stroke-width: 2.5; stroke-dasharray: 3 2.6; animation: flow 0.9s linear infinite; }
+.node.storm.cause.quiet .mark { fill: var(--sheet); }
+.paused .node.storm .mark { animation-play-state: paused; }
+/* a throttle: an arc as long as the share of requests the run turns away */
+.node .gate { fill: none; stroke: var(--blue); stroke-width: 3.5; opacity: 0; pointer-events: none; }
+.node.throttled .gate { opacity: 1; }
+.node .cross { fill: none; stroke: var(--red-deep); stroke-width: 3; stroke-linecap: round; opacity: 0; pointer-events: none; }
+.node.wasted .cross { opacity: 1; }
+.node.lit .mark { stroke: var(--ink); stroke-width: 2; }
+
+.look { fill: none; stroke: var(--blue); stroke-width: 2.25; stroke-linecap: square; pointer-events: none; }
+.look-name { fill: var(--blue); font-size: 0.95rem; font-weight: 620; font-stretch: 88%; pointer-events: none; paint-order: stroke; stroke: var(--sheet); stroke-width: 4px; stroke-linejoin: round; }
+
+/* edge services: a bar as wide as the revenue is large, filled by the share of requests failing */
+.edge .name { font-size: 1.12rem; font-weight: 680; font-stretch: 84%; fill: var(--ink); }
+.edge .rate { font-size: 1rem; font-stretch: 86%; fill: var(--ink-2); }
+.edge.losing .rate { fill: var(--red-deep); font-weight: 700; }
+.edge .gauge { fill: var(--sheet); stroke: var(--ink-3); stroke-width: 1.25; }
+.edge.losing .gauge { stroke: var(--red-deep); }
+.edge .fill { fill: var(--red); }  /* its width glides in the script, between the minutes */
+
+.tier { font-size: 0.92rem; fill: var(--ink-2); font-weight: 560; }
+.aside-rule { stroke: var(--rule-soft); }
+
+.label text { paint-order: stroke; stroke: var(--sheet); stroke-width: 4px; stroke-linejoin: round; pointer-events: none; }
+.label .name { font-size: 1.12rem; font-weight: 700; font-stretch: 86%; fill: var(--ink); }
+.label .cap { font-size: 1rem; font-weight: 560; font-stretch: 86%; fill: var(--ink-2); }
+.label.is-cause .cap { fill: var(--red-deep); }
+.label.is-busy .cap { fill: var(--amber-ink); }
+.label.is-op .cap { fill: var(--blue); }
+.label.is-wasted .cap { fill: var(--red-deep); font-weight: 700; }
+.label.off { display: none; }
+.leader { stroke: var(--ink-2); stroke-width: 1; }
+
+/* --- legend -------------------------------------------------------------------- */
+
+.legend {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: 0.3rem 1.2rem;
+  list-style: none; padding: 0.6rem 0 0.2rem; border-top: 1px solid var(--rule-soft); margin-top: 0.6rem;
+  color: var(--ink); font-size: 0.95rem;
+}
+.legend li { display: flex; align-items: center; gap: 0.35rem; white-space: nowrap; }
+.legend svg { height: 1.15rem; flex: none; }
+.k-node { fill: var(--sheet); stroke: var(--ink-3); stroke-width: 1.25; }
+.k-cause { fill: var(--red); stroke: var(--red-deep); stroke-width: 1.5; }
+.k-quiet { fill: var(--sheet); stroke: var(--red); stroke-width: 1.75; }
+.k-hurt { fill: color-mix(in oklab, var(--red) 45%, var(--sheet)); stroke: color-mix(in oklab, var(--red-deep) 75%, var(--sheet)); stroke-width: 1.25; }
+.k-flow { fill: none; stroke: var(--red); stroke-width: 3; stroke-dasharray: 9 3; }
+.k-busy { fill: var(--amber); stroke: var(--amber-ink); stroke-width: 1.75; }
+.k-op { fill: none; stroke: var(--blue); stroke-width: 1.75; stroke-dasharray: 3.5 3; }
+.k-look { fill: none; stroke: var(--blue); stroke-width: 2; stroke-linecap: square; }
+.k-cross { fill: none; stroke: var(--red-deep); stroke-width: 2.25; stroke-linecap: round; }
+.k-storm { fill: var(--red); stroke: var(--red-deep); stroke-width: 2.25; stroke-dasharray: 3 2.6; }
+.k-gate { fill: none; stroke: var(--blue); stroke-width: 3; stroke-dasharray: 38 51; }
+.only-storms, .legend .only-storms { display: none; }
+.storms .legend .only-storms { display: flex; }
+.sw { display: inline-block; width: 1.15rem; height: 0.6rem; border-radius: 1px; flex: none; }
+.sw-storm { background: repeating-linear-gradient(135deg, var(--red) 0 2px, var(--red-pale) 2px 5px); }
+.sw-throttle { background: var(--blue); height: 0.3rem; }
+
+/* --- timeline ------------------------------------------------------------------ */
+
+.timeline {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  background: var(--sheet);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  min-height: 0;
+}
+.lanes { --deck: 25.5rem; }
+
+/* --- details on demand: sheets over the page, not part of the first screen ---------- */
+
+.sheet {
+  position: fixed; z-index: 4; right: 1.4rem; bottom: 1rem; width: min(38rem, calc(100vw - 2.8rem)); max-height: min(34rem, 70vh);
+  overflow: auto; padding: 0.8rem 1.1rem 1rem;
+  border: 1px solid var(--ink-3); border-radius: 6px;
+  box-shadow: 0 18px 40px -18px oklch(0.25 0.045 265 / 0.55), 0 2px 6px oklch(0.25 0.045 265 / 0.12);
+  /* a shadow shows at an edge only while there is more to scroll to behind it */
+  background:
+    linear-gradient(var(--sheet) 40%, transparent) top / 100% 2.4rem no-repeat local,
+    linear-gradient(transparent, var(--sheet) 60%) bottom / 100% 2.4rem no-repeat local,
+    linear-gradient(oklch(0.25 0.045 265 / 0.22), transparent) top / 100% 0.7rem no-repeat scroll,
+    linear-gradient(transparent, oklch(0.25 0.045 265 / 0.22)) bottom / 100% 0.7rem no-repeat scroll,
+    var(--sheet);
+}
+.sheet[hidden] { display: none; }
+/* the action's details sit above the timeline, so the playhead and the marks stay in view */
+#inspector { bottom: calc(var(--deck) + 2rem); max-height: calc(100vh - var(--deck) - 7rem); }
+#inspector.left { right: auto; left: 1.4rem; }
+#runbook, #key, #results { top: 4rem; bottom: auto; }
+#key { width: min(52rem, calc(100vw - 2.8rem)); }
+.sheet .top { display: flex; align-items: baseline; gap: 1rem; }
+.sheet h3 { font-size: 1.3rem; font-weight: 700; font-stretch: 92%; line-height: 1.2; }
+.sheet .close, .sheet .link {
+  font: inherit; font-size: 0.95rem; color: var(--blue); background: none; border: 0; padding: 0; cursor: pointer;
+  text-decoration: underline; text-underline-offset: 0.18em; white-space: nowrap;
+}
+.sheet .close { margin-left: auto; flex: none; }
+.sheet .quiet { color: var(--ink-2); margin-top: 0.5rem; }
+.sheet a { color: var(--blue); text-underline-offset: 0.18em; }
+#results .lead { margin-top: 0.5rem; font-size: 1.08rem; }
+#results table { border-collapse: collapse; margin: 0.7rem 0 0.2rem; }
+#results th { text-align: left; font-weight: 600; color: var(--ink-2); padding: 0.25rem 1.2rem 0.25rem 0; white-space: nowrap; }
+#results td { padding: 0.25rem 0; }
+.chip {
+  display: inline-block; min-width: 3.4rem; text-align: center; margin-right: 0.4rem; padding: 0.15rem 0.5rem;
+  font: inherit; color: var(--red-deep); background: var(--red-soft); border: 1px solid transparent; border-radius: 4px;
+}
+.chip.protected, .chip.wasted { color: var(--blue); background: var(--blue-soft); }
+button.chip { cursor: pointer; border-color: currentColor; }
+button.chip[aria-pressed="true"] { color: var(--sheet); background: var(--red-deep); }
+button.chip.protected[aria-pressed="true"], button.chip.wasted[aria-pressed="true"] { background: var(--blue); }
+#results .split { list-style: none; margin-top: 0.6rem; line-height: 1.5; }
+#results .split li b:first-child { color: var(--red-deep); }
+#results .split li.protected b:first-child, #results .split li.wasted b:first-child { color: var(--blue); }
+.inspector .told p { font-size: 1.02rem; line-height: 1.4; }
+#runbook ol { list-style: none; counter-reset: rule; margin-top: 0.6rem; }
+#runbook li { counter-increment: rule; display: grid; grid-template-columns: 1.6rem minmax(0, 1fr); padding: 0.32rem 0.5rem; border-radius: 4px; line-height: 1.35; }
+#runbook li::before { content: counter(rule); color: var(--ink-2); font-weight: 680; }
+#runbook li b { font-family: var(--mono); font-size: 0.92em; font-weight: 700; }
+#runbook li.on { background: var(--blue-soft); }
+#runbook li.on::before { color: var(--blue); }
+
+/* the intro: three lines, once */
+#onboard {
+  margin: auto; width: min(34rem, calc(100vw - 2rem)); padding: 1.5rem 1.7rem 1.4rem;
+  color: var(--ink); background: var(--sheet); border: 1px solid var(--ink-3); border-radius: 8px;
+  box-shadow: 0 30px 70px -25px oklch(0.25 0.045 265 / 0.6);
+}
+#onboard::backdrop { background: oklch(0.25 0.045 265 / 0.45); }
+#onboard h2 { font-size: 1.9rem; line-height: 1.1; font-weight: 720; font-stretch: 92%; }
+#onboard dl { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.7rem 1rem; margin: 1.1rem 0 1.3rem; font-size: 1.15rem; line-height: 1.35; }
+#onboard dt { color: var(--ink-2); font-weight: 680; }
+#onboard dd { text-wrap: pretty; }
+#onboard dd b { color: var(--red-deep); }
+#onboard button {
+  font: inherit; font-size: 1.1rem; font-weight: 680; color: var(--sheet); background: var(--ink); cursor: pointer;
+  border: 0; border-radius: 5px; padding: 0.55rem 1.2rem;
+}
+#onboard button:hover { background: var(--blue); }
+
+.transport { display: flex; align-items: center; gap: 0.9rem; padding: 0.5rem 1rem 0.2rem; }
+#play {
+  display: grid; place-items: center; width: 2.3rem; height: 2.3rem; flex: none;
+  background: var(--ink); border: 0; border-radius: 50%; cursor: pointer;
+}
+#play svg { width: 1.15rem; height: 1.15rem; fill: var(--sheet); }
+#play:hover { background: var(--blue); }
+.speed { display: flex; align-items: center; gap: 0.4rem; color: var(--ink-2); font-size: 0.95rem; }
+.speed select {
+  font: inherit; color: var(--ink); background: var(--sheet);
+  border: 1px solid var(--rule); border-radius: 4px; padding: 0.15rem 0.3rem;
+}
+.clock { font-size: 1.35rem; font-weight: 700; font-stretch: 92%; white-space: nowrap; }
+.clock span { color: var(--ink-2); font-weight: 450; font-size: 0.9rem; margin-left: 0.4rem; }
+.transport .quiet[hidden] { display: none; }
+.transport .quiet ~ .quiet { margin-left: 0; }
+.transport .quiet {
+  margin-left: auto; font: inherit; font-size: 0.95rem; color: var(--blue); background: none; border: 0; padding: 0; cursor: pointer;
+  text-decoration: underline; text-underline-offset: 0.18em;
+}
+.m-tick { stroke: var(--ink-3); stroke-width: 2; fill: none; }
+.m-fix { fill: var(--blue); }
+.m-soft { fill: var(--sheet); stroke: var(--blue); stroke-width: 1.75; }
+.m-waste { stroke: var(--red-deep); stroke-width: 2.75; stroke-linecap: round; fill: none; }
+.m-stop { fill: var(--ink); }
+
+.track { position: relative; min-height: 0; contain: layout paint style; }
+.track svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: ew-resize; touch-action: none; }
+.track text { font-size: 1rem; fill: var(--ink-2); font-stretch: 90%; }
+.track .row-name { fill: var(--ink); font-weight: 660; }
+.track .row-note { fill: var(--ink-2); }
+.track .axis text { font-size: 0.92rem; }
+.track .axis line, .track .grid { stroke: var(--rule-soft); }
+.track .lane-rule { stroke: var(--rule-soft); }
+.track .before { fill: var(--paper); }
+.track .page { stroke: var(--ink-3); stroke-dasharray: 2 3; }
+.track .page-note { fill: var(--ink-2); font-size: 0.92rem; }
+.track .loss-both { fill: var(--red-pale); }
+.track .loss-over { fill: var(--red); }
+.track .onset { stroke: var(--red-deep); stroke-width: 1.5; }
+.track .onset-note { fill: var(--red-deep); font-weight: 620; }
+.track .loss-ref { fill: none; stroke: var(--ink); stroke-width: 1.75; stroke-linejoin: round; }
+.track .bar-agent { fill: var(--red); }
+.track .bar-ref { fill: var(--ink); }
+.track .storm-agent { fill: url(#hatch-agent); }
+.track .storm-ref { fill: url(#hatch-ref); }
+.hatch-agent .ground { fill: var(--red-pale); }
+.hatch-agent .stripe { fill: var(--red); }
+.hatch-ref .ground { fill: oklch(0.86 0.015 260); }
+.hatch-ref .stripe { fill: var(--ink); }
+.track .bar-throttle { fill: var(--blue); }
+.track .act .throttle-on { fill: var(--blue); stroke: var(--sheet); stroke-width: 1; }
+.track .act .throttle-off { fill: var(--sheet); stroke: var(--blue); stroke-width: 1.5; }
+.track .bar-decoy { fill: var(--amber); stroke: var(--amber-ink); stroke-width: 0.75; }
+.track .moment { font-weight: 660; fill: var(--ink); }
+.track .moment.moment-agent { fill: var(--red-deep); }
+.track .moment-tick { stroke: var(--ink-2); stroke-width: 1; }
+.track .moment-tick.moment-agent { stroke: var(--red-deep); }
+.track .end-agent { fill: var(--red-deep); font-weight: 700; }
+.track .end-late { font-weight: 500; }
+.track .end-ref { fill: var(--ink); font-weight: 600; }
+.track .over { paint-order: stroke; stroke: var(--sheet); stroke-width: 5px; stroke-linejoin: round; }
+.track .act { cursor: pointer; }
+.track .act .hit { fill: transparent; }
+.track .act .tick { stroke: var(--ink-3); stroke-width: 1.5; }
+.track .act:hover .tick { stroke: var(--ink); stroke-width: 2.5; }
+.track .act .fix { fill: var(--blue); stroke: var(--sheet); stroke-width: 1; }
+.track .act .soft { fill: var(--sheet); stroke: var(--blue); stroke-width: 1.5; }
+.track .act .waste { stroke: var(--red-deep); stroke-width: 2.5; stroke-linecap: round; fill: none; }
+.track .act .stop { fill: var(--ink); }
+.track .act.on .halo { stroke: var(--blue); }
+.track .halo { fill: none; stroke: transparent; stroke-width: 1.75; }
+.track .head { stroke: var(--ink); stroke-width: 1.5; pointer-events: none; }
+.track .head-knob { fill: var(--ink); pointer-events: none; }
+
+/* --- inspector ----------------------------------------------------------------- */
+
+.inspector .top button {
+  font-family: inherit; color: var(--blue); background: none; border: 0; padding: 0;
+  cursor: pointer; text-decoration: underline; text-underline-offset: 0.18em;
+}
+.inspector .meta { color: var(--ink-2); font-size: 0.95rem; margin-top: 0.15rem; overflow-wrap: anywhere; }
+.inspector code, .inspector pre, .inspector .msg { font-family: var(--mono); font-size: 0.86rem; }
+.inspector .verdict { margin-top: 0.4rem; font-weight: 640; font-size: 1.05rem; }
+.inspector .verdict.bad { color: var(--red-deep); }
+.inspector .verdict.good { color: var(--blue); }
+.inspector .cols { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.2rem 1.1rem; margin-top: 0.55rem; }
+.inspector .cols.two { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); }
+.inspector h4 { font-size: 0.92rem; font-weight: 680; color: var(--ink-2); margin: 0.35rem 0 0.25rem; }
+/* after the shift: our note and the agent's report are two voices, each under its own heading */
+.inspector section { margin-top: 0.6rem; }
+.inspector .ours h4 { color: var(--red-deep); }
+.inspector .reason p:first-of-type { font-size: 1.08rem; line-height: 1.4; }
+.inspector .ours p { font-weight: 600; line-height: 1.35; }
+.inspector .theirs { border-top: 1px solid var(--rule); padding-top: 0.35rem; }
+.inspector table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+.inspector th { text-align: left; font-weight: 600; color: var(--ink-2); border-bottom: 1px solid var(--rule); padding: 0.1rem 0.5rem 0.15rem 0; white-space: nowrap; }
+.inspector td { border-bottom: 1px solid var(--rule-soft); padding: 0.14rem 0.5rem 0.14rem 0; vertical-align: top; }
+.inspector td.num, .inspector th.num { text-align: right; }
+.inspector td.msg { overflow-wrap: anywhere; }
+.inspector tr.hot td { color: var(--red-deep); font-weight: 620; }
+.inspector pre { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.45; }
+.inspector pre .add { color: var(--blue); }
+.inspector pre .del { color: var(--red-deep); }
+.inspector .said { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 1rem; line-height: 1.42; }
+.inspector .said p + p, .inspector .said ul, .inspector .said table { margin-top: 0.4rem; }
+.inspector .said ul { padding-left: 1.1rem; }
+.inspector .said.prose { white-space: normal; }
+.inspector .quiet { color: var(--ink-2); }
+
+.tip {
+  position: fixed; z-index: 5; pointer-events: none; max-width: 22rem;
+  background: var(--ink); color: var(--paper); border-radius: 5px; padding: 0.45rem 0.65rem;
+  font-size: 0.86rem; line-height: 1.35; box-shadow: 0 6px 18px -6px oklch(0.25 0.045 265 / 0.45);
+}
+.tip b { font-weight: 680; }
+.tip span { color: oklch(0.82 0.03 258); }
+
+.still *, .still *::before { transition: none !important; animation: none !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  .link.fail, .node.op .ring, .total.hit { animation: none; }
+  .node .mark { transition: none; }
+  .node.storm .mark { animation: none; }
+}
+
+/* a short window gives the graphs the height first */
+@media (max-height: 820px) {
+  .lanes { --deck: 23.5rem; }
+}
+
+/* below a laptop the two runs stack and the page scrolls */
+@media (max-width: 900px) {
+  body { overflow: auto; height: auto; }
+  .bar { flex-wrap: wrap; gap: 0.5rem 1rem; }
+  main { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; gap: 0.8rem; padding: 0.8rem 1rem; }
+  .panel { height: 34rem; }
+  .timeline { height: 20rem; }
+  .tools { margin-left: 0; }
+}

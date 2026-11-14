@@ -1,0 +1,28 @@
+  1/1 Actions: 401.000 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 0:00:37 0:00:00
+
+adhoc • oracle
+┏━━━━━━┳━━━━━━┳━━━━━━┳━━━━━━┳━━━━━━┳━━━━━━┳━━━━━━┳━━━━━━┳━━━━━━━┳━━━━━━┳━━━━━━━┓
+┃ Tri… ┃ Exc… ┃ Act… ┃ Bea… ┃ Cos… ┃ Cos… ┃ Cos… ┃ Cos… ┃ Faul… ┃ Rew… ┃ Vali… ┃
+┡━━━━━━╇━━━━━━╇━━━━━━╇━━━━━━╇━━━━━━╇━━━━━━╇━━━━━━╇━━━━━━╇━━━━━━━╇━━━━━━╇━━━━━━━┩
+│    1 │    0 │ 401… │ 0.0… │ 232… │ 0.0… │ 232… │ 0.0… │ 3.000 │ 0.0… │ 1.000 │
+└──────┴──────┴──────┴──────┴──────┴──────┴──────┴──────┴───────┴──────┴───────┘
+
+┏━━━━━━━━━━━┳━━━━━━━┓
+┃ Reward    ┃ Count ┃
+┡━━━━━━━━━━━╇━━━━━━━┩
+│ 0.0       │     1 │
+│ 232523.28 │     1 │
+│ 0.0       │     1 │
+│ 1.0       │     1 │
+│ 401       │     1 │
+│ 3         │     1 │
+│ 232523.28 │     1 │
+│ 0         │     1 │
+│ 0         │     1 │
+└───────────┴───────┘
+
+Job Info
+Total runtime: 37s
+Results written to runtime/probe-jobs/boundary-probe/result.json
+Inspect results by running `harbor view runtime/probe-jobs`
+Share results by running `harbor upload runtime/probe-jobs/boundary-probe`

@@ -1,0 +1,1 @@
+{"reward": 0.5727501047855614, "cost_total": 148170.38, "beats_reference": 0.0, "valid_receipt": 1.0, "actions": 56, "faults_left": 0, "cost_outage": 146208.38, "cost_replicas": 1962, "cost_wasted": 0}

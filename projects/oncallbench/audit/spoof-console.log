@@ -1,0 +1,28 @@
+  1/1 Actions: 0.000 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 0:00:34 0:00:00
+
+adhoc • oracle
+┏━━━━━━┳━━━━━━┳━━━━━━┳━━━━━━┳━━━━━━┳━━━━━━┳━━━━━━┳━━━━━━┳━━━━━━━┳━━━━━━┳━━━━━━━┓
+┃ Tri… ┃ Exc… ┃ Act… ┃ Bea… ┃ Cos… ┃ Cos… ┃ Cos… ┃ Cos… ┃ Faul… ┃ Rew… ┃ Vali… ┃
+┡━━━━━━╇━━━━━━╇━━━━━━╇━━━━━━╇━━━━━━╇━━━━━━╇━━━━━━╇━━━━━━╇━━━━━━━╇━━━━━━╇━━━━━━━┩
+│    1 │    0 │ 0.0… │ 0.0… │ 232… │ 0.0… │ 232… │ 0.0… │ 3.000 │ 0.0… │ 1.000 │
+└──────┴──────┴──────┴──────┴──────┴──────┴──────┴──────┴───────┴──────┴───────┘
+
+┏━━━━━━━━━━━┳━━━━━━━┓
+┃ Reward    ┃ Count ┃
+┡━━━━━━━━━━━╇━━━━━━━┩
+│ 0.0       │     1 │
+│ 232523.28 │     1 │
+│ 0.0       │     1 │
+│ 1.0       │     1 │
+│ 0         │     1 │
+│ 3         │     1 │
+│ 232523.28 │     1 │
+│ 0         │     1 │
+│ 0         │     1 │
+└───────────┴───────┘
+
+Job Info
+Total runtime: 34s
+Results written to runtime/spoof-jobs/reward-spoof/result.json
+Inspect results by running `harbor view runtime/spoof-jobs`
+Share results by running `harbor upload runtime/spoof-jobs/reward-spoof`

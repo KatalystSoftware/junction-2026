@@ -1,0 +1,1278 @@
+{
+  "trials": 27,
+  "cost_mismatches": [],
+  "score_mismatches": [],
+  "receipt_mismatches": [],
+  "errors": [],
+  "rows": [
+    {
+      "job": "audit-r1-l4-s101-nop-161310",
+      "repeat": 1,
+      "seed": 101,
+      "policy": "nop",
+      "expected": {
+        "cost": 232523.28,
+        "score": 0.0,
+        "components": {
+          "outage": 232523.28,
+          "replicas": 0,
+          "wasted": 0
+        },
+        "actions": 0
+      },
+      "actual": {
+        "reward": 0.0,
+        "cost_total": 232523.28,
+        "beats_reference": 0.0,
+        "valid_receipt": 1.0,
+        "actions": 0,
+        "faults_left": 3,
+        "cost_outage": 232523.28,
+        "cost_replicas": 0,
+        "cost_wasted": 0
+      },
+      "exception_info": null,
+      "cost_matches": true,
+      "score_matches": true,
+      "receipt_matches": true,
+      "timing": {
+        "started_at": "2026-11-14T14:13:11.784890Z",
+        "finished_at": "2026-11-14T14:13:45.981856Z",
+        "environment_setup": {
+          "started_at": "2026-11-14T14:13:11.828276Z",
+          "finished_at": "2026-11-14T14:13:19.596524Z"
+        },
+        "agent_execution": {
+          "started_at": "2026-11-14T14:13:19.596751Z",
+          "finished_at": "2026-11-14T14:13:19.597527Z"
+        },
+        "verifier": {
+          "started_at": "2026-11-14T14:13:31.594648Z",
+          "finished_at": "2026-11-14T14:13:45.981837Z"
+        }
+      }
+    },
+    {
+      "job": "audit-r1-l4-s101-reference-161308",
+      "repeat": 1,
+      "seed": 101,
+      "policy": "reference",
+      "expected": {
+        "cost": 85246.31,
+        "score": 1.0,
+        "components": {
+          "outage": 83599.31,
+          "replicas": 1647,
+          "wasted": 0
+        },
+        "actions": 98
+      },
+      "actual": {
+        "reward": 1.0,
+        "cost_total": 85246.31,
+        "beats_reference": 0.0,
+        "valid_receipt": 1.0,
+        "actions": 98,
+        "faults_left": 0,
+        "cost_outage": 83599.31,
+        "cost_replicas": 1647,
+        "cost_wasted": 0
+      },
+      "exception_info": null,
+      "cost_matches": true,
+      "score_matches": true,
+      "receipt_matches": true,
+      "timing": {
+        "started_at": "2026-11-14T14:13:09.702471Z",
+        "finished_at": "2026-11-14T14:13:46.158563Z",
+        "environment_setup": {
+          "started_at": "2026-11-14T14:13:09.750452Z",
+          "finished_at": "2026-11-14T14:13:18.119465Z"
+        },
+        "agent_execution": {
+          "started_at": "2026-11-14T14:13:18.119703Z",
+          "finished_at": "2026-11-14T14:13:19.995605Z"
+        },
+        "verifier": {
+          "started_at": "2026-11-14T14:13:31.827134Z",
+          "finished_at": "2026-11-14T14:13:46.158546Z"
+        }
+      }
+    },
+    {
+      "job": "audit-r1-l4-s101-stop-early-161312",
+      "repeat": 1,
+      "seed": 101,
+      "policy": "stop-early",
+      "expected": {
+        "cost": 232523.28,
+        "score": 0.0,
+        "components": {
+          "outage": 232523.28,
+          "replicas": 0,
+          "wasted": 0
+        },
+        "actions": 2
+      },
+      "actual": {
+        "reward": 0.0,
+        "cost_total": 232523.28,
+        "beats_reference": 0.0,
+        "valid_receipt": 1.0,
+        "actions": 2,
+        "faults_left": 3,
+        "cost_outage": 232523.28,
+        "cost_replicas": 0,
+        "cost_wasted": 0
+      },
+      "exception_info": null,
+      "cost_matches": true,
+      "score_matches": true,
+      "receipt_matches": true,
+      "timing": {
+        "started_at": "2026-11-14T14:13:13.814257Z",
+        "finished_at": "2026-11-14T14:13:48.029722Z",
+        "environment_setup": {
+          "started_at": "2026-11-14T14:13:13.857316Z",
+          "finished_at": "2026-11-14T14:13:21.608682Z"
+        },
+        "agent_execution": {
+          "started_at": "2026-11-14T14:13:21.608939Z",
+          "finished_at": "2026-11-14T14:13:22.124062Z"
+        },
+        "verifier": {
+          "started_at": "2026-11-14T14:13:33.938597Z",
+          "finished_at": "2026-11-14T14:13:48.029705Z"
+        }
+      }
+    },
+    {
+      "job": "audit-r1-l4-s104-nop-161359",
+      "repeat": 1,
+      "seed": 104,
+      "policy": "nop",
+      "expected": {
+        "cost": 363550.75,
+        "score": 0.0,
+        "components": {
+          "outage": 363550.75,
+          "replicas": 0,
+          "wasted": 0
+        },
+        "actions": 0
+      },
+      "actual": {
+        "reward": 0.0,
+        "cost_total": 363550.75,
+        "beats_reference": 0.0,
+        "valid_receipt": 1.0,
+        "actions": 0,
+        "faults_left": 3,
+        "cost_outage": 363550.75,
+        "cost_replicas": 0,
+        "cost_wasted": 0
+      },
+      "exception_info": null,
+      "cost_matches": true,
+      "score_matches": true,
+      "receipt_matches": true,
+      "timing": {
+        "started_at": "2026-11-14T14:14:01.014775Z",
+        "finished_at": "2026-11-14T14:14:35.544737Z",
+        "environment_setup": {
+          "started_at": "2026-11-14T14:14:01.062362Z",
+          "finished_at": "2026-11-14T14:14:08.902425Z"
+        },
+        "agent_execution": {
+          "started_at": "2026-11-14T14:14:08.902698Z",
+          "finished_at": "2026-11-14T14:14:08.903580Z"
+        },
+        "verifier": {
+          "started_at": "2026-11-14T14:14:20.890990Z",
+          "finished_at": "2026-11-14T14:14:35.544720Z"
+        }
+      }
+    },
+    {
+      "job": "audit-r1-l4-s104-reference-161357",
+      "repeat": 1,
+      "seed": 104,
+      "policy": "reference",
+      "expected": {
+        "cost": 150590.38,
+        "score": 1.0,
+        "components": {
+          "outage": 147938.38,
+          "replicas": 2652,
+          "wasted": 0
+        },
+        "actions": 100
+      },
+      "actual": {
+        "reward": 1.0,
+        "cost_total": 150590.38,
+        "beats_reference": 0.0,
+        "valid_receipt": 1.0,
+        "actions": 100,
+        "faults_left": 0,
+        "cost_outage": 147938.38,
+        "cost_replicas": 2652,
+        "cost_wasted": 0
+      },
+      "exception_info": null,
+      "cost_matches": true,
+      "score_matches": true,
+      "receipt_matches": true,
+      "timing": {
+        "started_at": "2026-11-14T14:13:58.878831Z",
+        "finished_at": "2026-11-14T14:14:35.659690Z",
+        "environment_setup": {
+          "started_at": "2026-11-14T14:13:58.919910Z",
+          "finished_at": "2026-11-14T14:14:06.932031Z"
+        },
+        "agent_execution": {
+          "started_at": "2026-11-14T14:14:06.932272Z",
+          "finished_at": "2026-11-14T14:14:08.784359Z"
+        },
+        "verifier": {
+          "started_at": "2026-11-14T14:14:20.827756Z",
+          "finished_at": "2026-11-14T14:14:35.659675Z"
+        }
+      }
+    },
+    {
+      "job": "audit-r1-l4-s104-stop-early-161401",
+      "repeat": 1,
+      "seed": 104,
+      "policy": "stop-early",
+      "expected": {
+        "cost": 363550.75,
+        "score": 0.0,
+        "components": {
+          "outage": 363550.75,
+          "replicas": 0,
+          "wasted": 0
+        },
+        "actions": 2
+      },
+      "actual": {
+        "reward": 0.0,
+        "cost_total": 363550.75,
+        "beats_reference": 0.0,
+        "valid_receipt": 1.0,
+        "actions": 2,
+        "faults_left": 3,
+        "cost_outage": 363550.75,
+        "cost_replicas": 0,
+        "cost_wasted": 0
+      },
+      "exception_info": null,
+      "cost_matches": true,
+      "score_matches": true,
+      "receipt_matches": true,
+      "timing": {
+        "started_at": "2026-11-14T14:14:03.041260Z",
+        "finished_at": "2026-11-14T14:14:37.508186Z",
+        "environment_setup": {
+          "started_at": "2026-11-14T14:14:03.083560Z",
+          "finished_at": "2026-11-14T14:14:10.835549Z"
+        },
+        "agent_execution": {
+          "started_at": "2026-11-14T14:14:10.835786Z",
+          "finished_at": "2026-11-14T14:14:11.327841Z"
+        },
+        "verifier": {
+          "started_at": "2026-11-14T14:14:23.307965Z",
+          "finished_at": "2026-11-14T14:14:37.508170Z"
+        }
+      }
+    },
+    {
+      "job": "audit-r1-l4-s105-nop-161449",
+      "repeat": 1,
+      "seed": 105,
+      "policy": "nop",
+      "expected": {
+        "cost": 248253.37,
+        "score": 0.0,
+        "components": {
+          "outage": 248253.37,
+          "replicas": 0,
+          "wasted": 0
+        },
+        "actions": 0
+      },
+      "actual": {
+        "reward": 0.0,
+        "cost_total": 248253.37,
+        "beats_reference": 0.0,
+        "valid_receipt": 1.0,
+        "actions": 0,
+        "faults_left": 3,
+        "cost_outage": 248253.37,
+        "cost_replicas": 0,
+        "cost_wasted": 0
+      },
+      "exception_info": null,
+      "cost_matches": true,
+      "score_matches": true,
+      "receipt_matches": true,
+      "timing": {
+        "started_at": "2026-11-14T14:14:50.608878Z",
+        "finished_at": "2026-11-14T14:15:24.597118Z",
+        "environment_setup": {
+          "started_at": "2026-11-14T14:14:50.652922Z",
+          "finished_at": "2026-11-14T14:14:58.436323Z"
+        },
+        "agent_execution": {
+          "started_at": "2026-11-14T14:14:58.436554Z",
+          "finished_at": "2026-11-14T14:14:58.437296Z"
+        },
+        "verifier": {
+          "started_at": "2026-11-14T14:15:10.344679Z",
+          "finished_at": "2026-11-14T14:15:24.597090Z"
+        }
+      }
+    },
+    {
+      "job": "audit-r1-l4-s105-reference-161447",
+      "repeat": 1,
+      "seed": 105,
+      "policy": "reference",
+      "expected": {
+        "cost": 84079.79,
+        "score": 1.0,
+        "components": {
+          "outage": 81604.79,
+          "replicas": 2475,
+          "wasted": 0
+        },
+        "actions": 96
+      },
+      "actual": {
+        "reward": 1.0,
+        "cost_total": 84079.79,
+        "beats_reference": 0.0,
+        "valid_receipt": 1.0,
+        "actions": 96,
+        "faults_left": 0,
+        "cost_outage": 81604.79,
+        "cost_replicas": 2475,
+        "cost_wasted": 0
+      },
+      "exception_info": null,
+      "cost_matches": true,
+      "score_matches": true,
+      "receipt_matches": true,
+      "timing": {
+        "started_at": "2026-11-14T14:14:48.510595Z",
+        "finished_at": "2026-11-14T14:15:24.477383Z",
+        "environment_setup": {
+          "started_at": "2026-11-14T14:14:48.551966Z",
+          "finished_at": "2026-11-14T14:14:56.349032Z"
+        },
+        "agent_execution": {
+          "started_at": "2026-11-14T14:14:56.349282Z",
+          "finished_at": "2026-11-14T14:14:58.106368Z"
+        },
+        "verifier": {
+          "started_at": "2026-11-14T14:15:10.115184Z",
+          "finished_at": "2026-11-14T14:15:24.477367Z"
+        }
+      }
+    },
+    {
+      "job": "audit-r1-l4-s105-stop-early-161451",
+      "repeat": 1,
+      "seed": 105,
+      "policy": "stop-early",
+      "expected": {
+        "cost": 248253.37,
+        "score": 0.0,
+        "components": {
+          "outage": 248253.37,
+          "replicas": 0,
+          "wasted": 0
+        },
+        "actions": 2
+      },
+      "actual": {
+        "reward": 0.0,
+        "cost_total": 248253.37,
+        "beats_reference": 0.0,
+        "valid_receipt": 1.0,
+        "actions": 2,
+        "faults_left": 3,
+        "cost_outage": 248253.37,
+        "cost_replicas": 0,
+        "cost_wasted": 0
+      },
+      "exception_info": null,
+      "cost_matches": true,
+      "score_matches": true,
+      "receipt_matches": true,
+      "timing": {
+        "started_at": "2026-11-14T14:14:52.570747Z",
+        "finished_at": "2026-11-14T14:15:26.913021Z",
+        "environment_setup": {
+          "started_at": "2026-11-14T14:14:52.615936Z",
+          "finished_at": "2026-11-14T14:15:00.326245Z"
+        },
+        "agent_execution": {
+          "started_at": "2026-11-14T14:15:00.326492Z",
+          "finished_at": "2026-11-14T14:15:00.829108Z"
+        },
+        "verifier": {
+          "started_at": "2026-11-14T14:15:12.803548Z",
+          "finished_at": "2026-11-14T14:15:26.913002Z"
+        }
+      }
+    },
+    {
+      "job": "audit-r2-l4-s101-nop-161538",
+      "repeat": 2,
+      "seed": 101,
+      "policy": "nop",
+      "expected": {
+        "cost": 232523.28,
+        "score": 0.0,
+        "components": {
+          "outage": 232523.28,
+          "replicas": 0,
+          "wasted": 0
+        },
+        "actions": 0
+      },
+      "actual": {
+        "reward": 0.0,
+        "cost_total": 232523.28,
+        "beats_reference": 0.0,
+        "valid_receipt": 1.0,
+        "actions": 0,
+        "faults_left": 3,
+        "cost_outage": 232523.28,
+        "cost_replicas": 0,
+        "cost_wasted": 0
+      },
+      "exception_info": null,
+      "cost_matches": true,
+      "score_matches": true,
+      "receipt_matches": true,
+      "timing": {
+        "started_at": "2026-11-14T14:15:39.586256Z",
+        "finished_at": "2026-11-14T14:16:14.199073Z",
+        "environment_setup": {
+          "started_at": "2026-11-14T14:15:39.625711Z",
+          "finished_at": "2026-11-14T14:15:47.416761Z"
+        },
+        "agent_execution": {
+          "started_at": "2026-11-14T14:15:47.417022Z",
+          "finished_at": "2026-11-14T14:15:47.417747Z"
+        },
+        "verifier": {
+          "started_at": "2026-11-14T14:15:59.462432Z",
+          "finished_at": "2026-11-14T14:16:14.199055Z"
+        }
+      }
+    },
+    {
+      "job": "audit-r2-l4-s101-reference-161536",
+      "repeat": 2,
+      "seed": 101,
+      "policy": "reference",
+      "expected": {
+        "cost": 85246.31,
+        "score": 1.0,
+        "components": {
+          "outage": 83599.31,
+          "replicas": 1647,
+          "wasted": 0
+        },
+        "actions": 98
+      },
+      "actual": {
+        "reward": 1.0,
+        "cost_total": 85246.31,
+        "beats_reference": 0.0,
+        "valid_receipt": 1.0,
+        "actions": 98,
+        "faults_left": 0,
+        "cost_outage": 83599.31,
+        "cost_replicas": 1647,
+        "cost_wasted": 0
+      },
+      "exception_info": null,
+      "cost_matches": true,
+      "score_matches": true,
+      "receipt_matches": true,
+      "timing": {
+        "started_at": "2026-11-14T14:15:37.463288Z",
+        "finished_at": "2026-11-14T14:16:14.053011Z",
+        "environment_setup": {
+          "started_at": "2026-11-14T14:15:37.504637Z",
+          "finished_at": "2026-11-14T14:15:45.527231Z"
+        },
+        "agent_execution": {
+          "started_at": "2026-11-14T14:15:45.527468Z",
+          "finished_at": "2026-11-14T14:15:47.333771Z"
+        },
+        "verifier": {
+          "started_at": "2026-11-14T14:15:59.388888Z",
+          "finished_at": "2026-11-14T14:16:14.052996Z"
+        }
+      }
+    },
+    {
+      "job": "audit-r2-l4-s101-stop-early-161540",
+      "repeat": 2,
+      "seed": 101,
+      "policy": "stop-early",
+      "expected": {
+        "cost": 232523.28,
+        "score": 0.0,
+        "components": {
+          "outage": 232523.28,
+          "replicas": 0,
+          "wasted": 0
+        },
+        "actions": 2
+      },
+      "actual": {
+        "reward": 0.0,
+        "cost_total": 232523.28,
+        "beats_reference": 0.0,
+        "valid_receipt": 1.0,
+        "actions": 2,
+        "faults_left": 3,
+        "cost_outage": 232523.28,
+        "cost_replicas": 0,
+        "cost_wasted": 0
+      },
+      "exception_info": null,
+      "cost_matches": true,
+      "score_matches": true,
+      "receipt_matches": true,
+      "timing": {
+        "started_at": "2026-11-14T14:15:41.561823Z",
+        "finished_at": "2026-11-14T14:16:15.901777Z",
+        "environment_setup": {
+          "started_at": "2026-11-14T14:15:41.601492Z",
+          "finished_at": "2026-11-14T14:15:49.364340Z"
+        },
+        "agent_execution": {
+          "started_at": "2026-11-14T14:15:49.364590Z",
+          "finished_at": "2026-11-14T14:15:49.873080Z"
+        },
+        "verifier": {
+          "started_at": "2026-11-14T14:16:01.776487Z",
+          "finished_at": "2026-11-14T14:16:15.901760Z"
+        }
+      }
+    },
+    {
+      "job": "audit-r2-l4-s104-nop-161627",
+      "repeat": 2,
+      "seed": 104,
+      "policy": "nop",
+      "expected": {
+        "cost": 363550.75,
+        "score": 0.0,
+        "components": {
+          "outage": 363550.75,
+          "replicas": 0,
+          "wasted": 0
+        },
+        "actions": 0
+      },
+      "actual": {
+        "reward": 0.0,
+        "cost_total": 363550.75,
+        "beats_reference": 0.0,
+        "valid_receipt": 1.0,
+        "actions": 0,
+        "faults_left": 3,
+        "cost_outage": 363550.75,
+        "cost_replicas": 0,
+        "cost_wasted": 0
+      },
+      "exception_info": null,
+      "cost_matches": true,
+      "score_matches": true,
+      "receipt_matches": true,
+      "timing": {
+        "started_at": "2026-11-14T14:16:29.073721Z",
+        "finished_at": "2026-11-14T14:17:03.000498Z",
+        "environment_setup": {
+          "started_at": "2026-11-14T14:16:29.118261Z",
+          "finished_at": "2026-11-14T14:16:36.863046Z"
+        },
+        "agent_execution": {
+          "started_at": "2026-11-14T14:16:36.863278Z",
+          "finished_at": "2026-11-14T14:16:36.864099Z"
+        },
+        "verifier": {
+          "started_at": "2026-11-14T14:16:48.704631Z",
+          "finished_at": "2026-11-14T14:17:03.000479Z"
+        }
+      }
+    },
+    {
+      "job": "audit-r2-l4-s104-reference-161625",
+      "repeat": 2,
+      "seed": 104,
+      "policy": "reference",
+      "expected": {
+        "cost": 150590.38,
+        "score": 1.0,
+        "components": {
+          "outage": 147938.38,
+          "replicas": 2652,
+          "wasted": 0
+        },
+        "actions": 100
+      },
+      "actual": {
+        "reward": 1.0,
+        "cost_total": 150590.38,
+        "beats_reference": 0.0,
+        "valid_receipt": 1.0,
+        "actions": 100,
+        "faults_left": 0,
+        "cost_outage": 147938.38,
+        "cost_replicas": 2652,
+        "cost_wasted": 0
+      },
+      "exception_info": null,
+      "cost_matches": true,
+      "score_matches": true,
+      "receipt_matches": true,
+      "timing": {
+        "started_at": "2026-11-14T14:16:26.941395Z",
+        "finished_at": "2026-11-14T14:17:03.231860Z",
+        "environment_setup": {
+          "started_at": "2026-11-14T14:16:26.983513Z",
+          "finished_at": "2026-11-14T14:16:35.107615Z"
+        },
+        "agent_execution": {
+          "started_at": "2026-11-14T14:16:35.107853Z",
+          "finished_at": "2026-11-14T14:16:36.975310Z"
+        },
+        "verifier": {
+          "started_at": "2026-11-14T14:16:48.997791Z",
+          "finished_at": "2026-11-14T14:17:03.231842Z"
+        }
+      }
+    },
+    {
+      "job": "audit-r2-l4-s104-stop-early-161629",
+      "repeat": 2,
+      "seed": 104,
+      "policy": "stop-early",
+      "expected": {
+        "cost": 363550.75,
+        "score": 0.0,
+        "components": {
+          "outage": 363550.75,
+          "replicas": 0,
+          "wasted": 0
+        },
+        "actions": 2
+      },
+      "actual": {
+        "reward": 0.0,
+        "cost_total": 363550.75,
+        "beats_reference": 0.0,
+        "valid_receipt": 1.0,
+        "actions": 2,
+        "faults_left": 3,
+        "cost_outage": 363550.75,
+        "cost_replicas": 0,
+        "cost_wasted": 0
+      },
+      "exception_info": null,
+      "cost_matches": true,
+      "score_matches": true,
+      "receipt_matches": true,
+      "timing": {
+        "started_at": "2026-11-14T14:16:31.042824Z",
+        "finished_at": "2026-11-14T14:17:05.405098Z",
+        "environment_setup": {
+          "started_at": "2026-11-14T14:16:31.081978Z",
+          "finished_at": "2026-11-14T14:16:38.840241Z"
+        },
+        "agent_execution": {
+          "started_at": "2026-11-14T14:16:38.840472Z",
+          "finished_at": "2026-11-14T14:16:39.363467Z"
+        },
+        "verifier": {
+          "started_at": "2026-11-14T14:16:51.248358Z",
+          "finished_at": "2026-11-14T14:17:05.405076Z"
+        }
+      }
+    },
+    {
+      "job": "audit-r2-l4-s105-nop-161717",
+      "repeat": 2,
+      "seed": 105,
+      "policy": "nop",
+      "expected": {
+        "cost": 248253.37,
+        "score": 0.0,
+        "components": {
+          "outage": 248253.37,
+          "replicas": 0,
+          "wasted": 0
+        },
+        "actions": 0
+      },
+      "actual": {
+        "reward": 0.0,
+        "cost_total": 248253.37,
+        "beats_reference": 0.0,
+        "valid_receipt": 1.0,
+        "actions": 0,
+        "faults_left": 3,
+        "cost_outage": 248253.37,
+        "cost_replicas": 0,
+        "cost_wasted": 0
+      },
+      "exception_info": null,
+      "cost_matches": true,
+      "score_matches": true,
+      "receipt_matches": true,
+      "timing": {
+        "started_at": "2026-11-14T14:17:18.571239Z",
+        "finished_at": "2026-11-14T14:17:52.940397Z",
+        "environment_setup": {
+          "started_at": "2026-11-14T14:17:18.614897Z",
+          "finished_at": "2026-11-14T14:17:26.322553Z"
+        },
+        "agent_execution": {
+          "started_at": "2026-11-14T14:17:26.322804Z",
+          "finished_at": "2026-11-14T14:17:26.323559Z"
+        },
+        "verifier": {
+          "started_at": "2026-11-14T14:17:38.532480Z",
+          "finished_at": "2026-11-14T14:17:52.940246Z"
+        }
+      }
+    },
+    {
+      "job": "audit-r2-l4-s105-reference-161715",
+      "repeat": 2,
+      "seed": 105,
+      "policy": "reference",
+      "expected": {
+        "cost": 84079.79,
+        "score": 1.0,
+        "components": {
+          "outage": 81604.79,
+          "replicas": 2475,
+          "wasted": 0
+        },
+        "actions": 96
+      },
+      "actual": {
+        "reward": 1.0,
+        "cost_total": 84079.79,
+        "beats_reference": 0.0,
+        "valid_receipt": 1.0,
+        "actions": 96,
+        "faults_left": 0,
+        "cost_outage": 81604.79,
+        "cost_replicas": 2475,
+        "cost_wasted": 0
+      },
+      "exception_info": null,
+      "cost_matches": true,
+      "score_matches": true,
+      "receipt_matches": true,
+      "timing": {
+        "started_at": "2026-11-14T14:17:16.510436Z",
+        "finished_at": "2026-11-14T14:17:52.777052Z",
+        "environment_setup": {
+          "started_at": "2026-11-14T14:17:16.551251Z",
+          "finished_at": "2026-11-14T14:17:24.540407Z"
+        },
+        "agent_execution": {
+          "started_at": "2026-11-14T14:17:24.540652Z",
+          "finished_at": "2026-11-14T14:17:26.283348Z"
+        },
+        "verifier": {
+          "started_at": "2026-11-14T14:17:38.363343Z",
+          "finished_at": "2026-11-14T14:17:52.777025Z"
+        }
+      }
+    },
+    {
+      "job": "audit-r2-l4-s105-stop-early-161719",
+      "repeat": 2,
+      "seed": 105,
+      "policy": "stop-early",
+      "expected": {
+        "cost": 248253.37,
+        "score": 0.0,
+        "components": {
+          "outage": 248253.37,
+          "replicas": 0,
+          "wasted": 0
+        },
+        "actions": 2
+      },
+      "actual": {
+        "reward": 0.0,
+        "cost_total": 248253.37,
+        "beats_reference": 0.0,
+        "valid_receipt": 1.0,
+        "actions": 2,
+        "faults_left": 3,
+        "cost_outage": 248253.37,
+        "cost_replicas": 0,
+        "cost_wasted": 0
+      },
+      "exception_info": null,
+      "cost_matches": true,
+      "score_matches": true,
+      "receipt_matches": true,
+      "timing": {
+        "started_at": "2026-11-14T14:17:20.660280Z",
+        "finished_at": "2026-11-14T14:17:55.209438Z",
+        "environment_setup": {
+          "started_at": "2026-11-14T14:17:20.702855Z",
+          "finished_at": "2026-11-14T14:17:28.532295Z"
+        },
+        "agent_execution": {
+          "started_at": "2026-11-14T14:17:28.532549Z",
+          "finished_at": "2026-11-14T14:17:29.054525Z"
+        },
+        "verifier": {
+          "started_at": "2026-11-14T14:17:41.052733Z",
+          "finished_at": "2026-11-14T14:17:55.209421Z"
+        }
+      }
+    },
+    {
+      "job": "audit-r3-l4-s101-nop-161806",
+      "repeat": 3,
+      "seed": 101,
+      "policy": "nop",
+      "expected": {
+        "cost": 232523.28,
+        "score": 0.0,
+        "components": {
+          "outage": 232523.28,
+          "replicas": 0,
+          "wasted": 0
+        },
+        "actions": 0
+      },
+      "actual": {
+        "reward": 0.0,
+        "cost_total": 232523.28,
+        "beats_reference": 0.0,
+        "valid_receipt": 1.0,
+        "actions": 0,
+        "faults_left": 3,
+        "cost_outage": 232523.28,
+        "cost_replicas": 0,
+        "cost_wasted": 0
+      },
+      "exception_info": null,
+      "cost_matches": true,
+      "score_matches": true,
+      "receipt_matches": true,
+      "timing": {
+        "started_at": "2026-11-14T14:18:07.762387Z",
+        "finished_at": "2026-11-14T14:18:42.098837Z",
+        "environment_setup": {
+          "started_at": "2026-11-14T14:18:07.808261Z",
+          "finished_at": "2026-11-14T14:18:15.583352Z"
+        },
+        "agent_execution": {
+          "started_at": "2026-11-14T14:18:15.583590Z",
+          "finished_at": "2026-11-14T14:18:15.584326Z"
+        },
+        "verifier": {
+          "started_at": "2026-11-14T14:18:27.608481Z",
+          "finished_at": "2026-11-14T14:18:42.098819Z"
+        }
+      }
+    },
+    {
+      "job": "audit-r3-l4-s101-reference-161804",
+      "repeat": 3,
+      "seed": 101,
+      "policy": "reference",
+      "expected": {
+        "cost": 85246.31,
+        "score": 1.0,
+        "components": {
+          "outage": 83599.31,
+          "replicas": 1647,
+          "wasted": 0
+        },
+        "actions": 98
+      },
+      "actual": {
+        "reward": 1.0,
+        "cost_total": 85246.31,
+        "beats_reference": 0.0,
+        "valid_receipt": 1.0,
+        "actions": 98,
+        "faults_left": 0,
+        "cost_outage": 83599.31,
+        "cost_replicas": 1647,
+        "cost_wasted": 0
+      },
+      "exception_info": null,
+      "cost_matches": true,
+      "score_matches": true,
+      "receipt_matches": true,
+      "timing": {
+        "started_at": "2026-11-14T14:18:05.739744Z",
+        "finished_at": "2026-11-14T14:18:42.341189Z",
+        "environment_setup": {
+          "started_at": "2026-11-14T14:18:05.779701Z",
+          "finished_at": "2026-11-14T14:18:14.014171Z"
+        },
+        "agent_execution": {
+          "started_at": "2026-11-14T14:18:14.014413Z",
+          "finished_at": "2026-11-14T14:18:15.875213Z"
+        },
+        "verifier": {
+          "started_at": "2026-11-14T14:18:27.848023Z",
+          "finished_at": "2026-11-14T14:18:42.341163Z"
+        }
+      }
+    },
+    {
+      "job": "audit-r3-l4-s101-stop-early-161808",
+      "repeat": 3,
+      "seed": 101,
+      "policy": "stop-early",
+      "expected": {
+        "cost": 232523.28,
+        "score": 0.0,
+        "components": {
+          "outage": 232523.28,
+          "replicas": 0,
+          "wasted": 0
+        },
+        "actions": 2
+      },
+      "actual": {
+        "reward": 0.0,
+        "cost_total": 232523.28,
+        "beats_reference": 0.0,
+        "valid_receipt": 1.0,
+        "actions": 2,
+        "faults_left": 3,
+        "cost_outage": 232523.28,
+        "cost_replicas": 0,
+        "cost_wasted": 0
+      },
+      "exception_info": null,
+      "cost_matches": true,
+      "score_matches": true,
+      "receipt_matches": true,
+      "timing": {
+        "started_at": "2026-11-14T14:18:09.857959Z",
+        "finished_at": "2026-11-14T14:18:44.315979Z",
+        "environment_setup": {
+          "started_at": "2026-11-14T14:18:09.899189Z",
+          "finished_at": "2026-11-14T14:18:17.704274Z"
+        },
+        "agent_execution": {
+          "started_at": "2026-11-14T14:18:17.704510Z",
+          "finished_at": "2026-11-14T14:18:18.220287Z"
+        },
+        "verifier": {
+          "started_at": "2026-11-14T14:18:30.083678Z",
+          "finished_at": "2026-11-14T14:18:44.315960Z"
+        }
+      }
+    },
+    {
+      "job": "audit-r3-l4-s104-nop-161855",
+      "repeat": 3,
+      "seed": 104,
+      "policy": "nop",
+      "expected": {
+        "cost": 363550.75,
+        "score": 0.0,
+        "components": {
+          "outage": 363550.75,
+          "replicas": 0,
+          "wasted": 0
+        },
+        "actions": 0
+      },
+      "actual": {
+        "reward": 0.0,
+        "cost_total": 363550.75,
+        "beats_reference": 0.0,
+        "valid_receipt": 1.0,
+        "actions": 0,
+        "faults_left": 3,
+        "cost_outage": 363550.75,
+        "cost_replicas": 0,
+        "cost_wasted": 0
+      },
+      "exception_info": null,
+      "cost_matches": true,
+      "score_matches": true,
+      "receipt_matches": true,
+      "timing": {
+        "started_at": "2026-11-14T14:18:57.419258Z",
+        "finished_at": "2026-11-14T14:19:31.935111Z",
+        "environment_setup": {
+          "started_at": "2026-11-14T14:18:57.465133Z",
+          "finished_at": "2026-11-14T14:19:05.345832Z"
+        },
+        "agent_execution": {
+          "started_at": "2026-11-14T14:19:05.346077Z",
+          "finished_at": "2026-11-14T14:19:05.346799Z"
+        },
+        "verifier": {
+          "started_at": "2026-11-14T14:19:17.464938Z",
+          "finished_at": "2026-11-14T14:19:31.935084Z"
+        }
+      }
+    },
+    {
+      "job": "audit-r3-l4-s104-reference-161853",
+      "repeat": 3,
+      "seed": 104,
+      "policy": "reference",
+      "expected": {
+        "cost": 150590.38,
+        "score": 1.0,
+        "components": {
+          "outage": 147938.38,
+          "replicas": 2652,
+          "wasted": 0
+        },
+        "actions": 100
+      },
+      "actual": {
+        "reward": 1.0,
+        "cost_total": 150590.38,
+        "beats_reference": 0.0,
+        "valid_receipt": 1.0,
+        "actions": 100,
+        "faults_left": 0,
+        "cost_outage": 147938.38,
+        "cost_replicas": 2652,
+        "cost_wasted": 0
+      },
+      "exception_info": null,
+      "cost_matches": true,
+      "score_matches": true,
+      "receipt_matches": true,
+      "timing": {
+        "started_at": "2026-11-14T14:18:55.357077Z",
+        "finished_at": "2026-11-14T14:19:32.063033Z",
+        "environment_setup": {
+          "started_at": "2026-11-14T14:18:55.396018Z",
+          "finished_at": "2026-11-14T14:19:03.455667Z"
+        },
+        "agent_execution": {
+          "started_at": "2026-11-14T14:19:03.455947Z",
+          "finished_at": "2026-11-14T14:19:05.321011Z"
+        },
+        "verifier": {
+          "started_at": "2026-11-14T14:19:17.394800Z",
+          "finished_at": "2026-11-14T14:19:32.063005Z"
+        }
+      }
+    },
+    {
+      "job": "audit-r3-l4-s104-stop-early-161857",
+      "repeat": 3,
+      "seed": 104,
+      "policy": "stop-early",
+      "expected": {
+        "cost": 363550.75,
+        "score": 0.0,
+        "components": {
+          "outage": 363550.75,
+          "replicas": 0,
+          "wasted": 0
+        },
+        "actions": 2
+      },
+      "actual": {
+        "reward": 0.0,
+        "cost_total": 363550.75,
+        "beats_reference": 0.0,
+        "valid_receipt": 1.0,
+        "actions": 2,
+        "faults_left": 3,
+        "cost_outage": 363550.75,
+        "cost_replicas": 0,
+        "cost_wasted": 0
+      },
+      "exception_info": null,
+      "cost_matches": true,
+      "score_matches": true,
+      "receipt_matches": true,
+      "timing": {
+        "started_at": "2026-11-14T14:18:59.371058Z",
+        "finished_at": "2026-11-14T14:19:33.785783Z",
+        "environment_setup": {
+          "started_at": "2026-11-14T14:18:59.412961Z",
+          "finished_at": "2026-11-14T14:19:07.223677Z"
+        },
+        "agent_execution": {
+          "started_at": "2026-11-14T14:19:07.223941Z",
+          "finished_at": "2026-11-14T14:19:07.742783Z"
+        },
+        "verifier": {
+          "started_at": "2026-11-14T14:19:19.711497Z",
+          "finished_at": "2026-11-14T14:19:33.785766Z"
+        }
+      }
+    },
+    {
+      "job": "audit-r3-l4-s105-nop-161945",
+      "repeat": 3,
+      "seed": 105,
+      "policy": "nop",
+      "expected": {
+        "cost": 248253.37,
+        "score": 0.0,
+        "components": {
+          "outage": 248253.37,
+          "replicas": 0,
+          "wasted": 0
+        },
+        "actions": 0
+      },
+      "actual": {
+        "reward": 0.0,
+        "cost_total": 248253.37,
+        "beats_reference": 0.0,
+        "valid_receipt": 1.0,
+        "actions": 0,
+        "faults_left": 3,
+        "cost_outage": 248253.37,
+        "cost_replicas": 0,
+        "cost_wasted": 0
+      },
+      "exception_info": null,
+      "cost_matches": true,
+      "score_matches": true,
+      "receipt_matches": true,
+      "timing": {
+        "started_at": "2026-11-14T14:19:47.018523Z",
+        "finished_at": "2026-11-14T14:20:32.155304Z",
+        "environment_setup": {
+          "started_at": "2026-11-14T14:19:47.137728Z",
+          "finished_at": "2026-11-14T14:19:58.090470Z"
+        },
+        "agent_execution": {
+          "started_at": "2026-11-14T14:19:58.090727Z",
+          "finished_at": "2026-11-14T14:19:58.091570Z"
+        },
+        "verifier": {
+          "started_at": "2026-11-14T14:20:11.892928Z",
+          "finished_at": "2026-11-14T14:20:32.155285Z"
+        }
+      }
+    },
+    {
+      "job": "audit-r3-l4-s105-reference-161943",
+      "repeat": 3,
+      "seed": 105,
+      "policy": "reference",
+      "expected": {
+        "cost": 84079.79,
+        "score": 1.0,
+        "components": {
+          "outage": 81604.79,
+          "replicas": 2475,
+          "wasted": 0
+        },
+        "actions": 96
+      },
+      "actual": {
+        "reward": 1.0,
+        "cost_total": 84079.79,
+        "beats_reference": 0.0,
+        "valid_receipt": 1.0,
+        "actions": 96,
+        "faults_left": 0,
+        "cost_outage": 81604.79,
+        "cost_replicas": 2475,
+        "cost_wasted": 0
+      },
+      "exception_info": null,
+      "cost_matches": true,
+      "score_matches": true,
+      "receipt_matches": true,
+      "timing": {
+        "started_at": "2026-11-14T14:19:45.056526Z",
+        "finished_at": "2026-11-14T14:20:32.240665Z",
+        "environment_setup": {
+          "started_at": "2026-11-14T14:19:45.121262Z",
+          "finished_at": "2026-11-14T14:19:58.270321Z"
+        },
+        "agent_execution": {
+          "started_at": "2026-11-14T14:19:58.270611Z",
+          "finished_at": "2026-11-14T14:20:00.196738Z"
+        },
+        "verifier": {
+          "started_at": "2026-11-14T14:20:13.722075Z",
+          "finished_at": "2026-11-14T14:20:32.240646Z"
+        }
+      }
+    },
+    {
+      "job": "audit-r3-l4-s105-stop-early-161947",
+      "repeat": 3,
+      "seed": 105,
+      "policy": "stop-early",
+      "expected": {
+        "cost": 248253.37,
+        "score": 0.0,
+        "components": {
+          "outage": 248253.37,
+          "replicas": 0,
+          "wasted": 0
+        },
+        "actions": 2
+      },
+      "actual": {
+        "reward": 0.0,
+        "cost_total": 248253.37,
+        "beats_reference": 0.0,
+        "valid_receipt": 1.0,
+        "actions": 2,
+        "faults_left": 3,
+        "cost_outage": 248253.37,
+        "cost_replicas": 0,
+        "cost_wasted": 0
+      },
+      "exception_info": null,
+      "cost_matches": true,
+      "score_matches": true,
+      "receipt_matches": true,
+      "timing": {
+        "started_at": "2026-11-14T14:19:49.070717Z",
+        "finished_at": "2026-11-14T14:20:32.018606Z",
+        "environment_setup": {
+          "started_at": "2026-11-14T14:19:49.117473Z",
+          "finished_at": "2026-11-14T14:19:59.230750Z"
+        },
+        "agent_execution": {
+          "started_at": "2026-11-14T14:19:59.231031Z",
+          "finished_at": "2026-11-14T14:19:59.769261Z"
+        },
+        "verifier": {
+          "started_at": "2026-11-14T14:20:12.969263Z",
+          "finished_at": "2026-11-14T14:20:32.018570Z"
+        }
+      }
+    }
+  ]
+}

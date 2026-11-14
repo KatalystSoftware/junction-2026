@@ -1,0 +1,15 @@
+{
+  "fresh_seeds": 200,
+  "below_075": 39,
+  "harbor_trials": 27,
+  "counterexamples": 39,
+  "source_archive_matches": true,
+  "current_simulator_logic_matches_snapshot": true,
+  "current_level4_briefing_matches_snapshot": true,
+  "current_source_differs_from_snapshot": [
+    "LOOP.md",
+    "sim/incident.py",
+    "task/environment/mcp-server/incident.py",
+    "task/tests/incident.py"
+  ]
+}

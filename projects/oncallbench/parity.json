@@ -1,0 +1,1498 @@
+{
+ "briefing": {
+  "0": "c8e3df7b2028db23",
+  "1": "c8e3df7b2028db23",
+  "2": "97d2e08e99879dab",
+  "3": "844033a5fa98ad86",
+  "4": "9da6b81562d147e9",
+  "5": "0231d73c6ff74761"
+ },
+ "instruction": "06df61f230f76362",
+ "receipts": {
+  "r0-l0-s101-opus-101430__aq-incident-f9a46c09__BNaMz7R.json": [
+   3683.2,
+   {
+    "outage": 2291.2,
+    "replicas": 1392,
+    "wasted": 0
+   }
+  ],
+  "r0-l0-s102-opus-101431__aq-incident-65a4f416__qmRkPfQ.json": [
+   1825.2,
+   {
+    "outage": 1825.2,
+    "replicas": 0,
+    "wasted": 0
+   }
+  ],
+  "r0-l0-s103-opus-101434__aq-incident-3cc33bd8__SBVL3i6.json": [
+   7463.15,
+   {
+    "outage": 7463.15,
+    "replicas": 0,
+    "wasted": 0
+   }
+  ],
+  "r1-l1-s101-opus-104946__aq-incident-62f55852__wVVT9mG.json": [
+   11637.65,
+   {
+    "outage": 8505.65,
+    "replicas": 3132,
+    "wasted": 0
+   }
+  ],
+  "r1-l2-s101-gemini-104903__aq-incident-852f2f0d__gDGwyW7.json": [
+   43120.12,
+   {
+    "outage": 37628.12,
+    "replicas": 3492,
+    "wasted": 2000
+   }
+  ],
+  "r1-l2-s101-opus-104901__aq-incident-852f2f0d__ukBtyNN.json": [
+   23210.26,
+   {
+    "outage": 19940.26,
+    "replicas": 3270,
+    "wasted": 0
+   }
+  ],
+  "r1-l2-s101-sonnet-104859__aq-incident-852f2f0d__kG2zHLh.json": [
+   22856.6,
+   {
+    "outage": 19325.6,
+    "replicas": 3531,
+    "wasted": 0
+   }
+  ],
+  "r10-l4-s101-gemini-153638__aq-incident-ec900b74__zgCuZ3S.json": [
+   470079.06,
+   {
+    "outage": 447343.06,
+    "replicas": 2736,
+    "wasted": 20000
+   }
+  ],
+  "r10-l4-s101-opus-154436__aq-incident-ec900b74__98qAsvP.json": [
+   232523.28,
+   {
+    "outage": 232523.28,
+    "replicas": 0,
+    "wasted": 0
+   }
+  ],
+  "r10-l4-s101-opus-154436__aq-incident-ec900b74__SNibKkg.json": [
+   232523.28,
+   {
+    "outage": 232523.28,
+    "replicas": 0,
+    "wasted": 0
+   }
+  ],
+  "r10-l4-s101-opus-154436__aq-incident-ec900b74__b3qNemV.json": [
+   232523.28,
+   {
+    "outage": 232523.28,
+    "replicas": 0,
+    "wasted": 0
+   }
+  ],
+  "r10-l4-s101-opus-155047__aq-incident-ec900b74__i52GNAA.json": [
+   216893.27,
+   {
+    "outage": 213821.27,
+    "replicas": 3072,
+    "wasted": 0
+   }
+  ],
+  "r10-l4-s101-opus-155047__aq-incident-ec900b74__pKMRL8v.json": [
+   125424.47,
+   {
+    "outage": 122220.47,
+    "replicas": 3204,
+    "wasted": 0
+   }
+  ],
+  "r10-l4-s101-opus-155047__aq-incident-ec900b74__yZYAnrJ.json": [
+   206140.72,
+   {
+    "outage": 190704.72,
+    "replicas": 5436,
+    "wasted": 10000
+   }
+  ],
+  "r10-l4-s101-sonnet-153636__aq-incident-ec900b74__k92rvGH.json": [
+   229426.27,
+   {
+    "outage": 205346.27,
+    "replicas": 4080,
+    "wasted": 20000
+   }
+  ],
+  "r10-l4-s102-opus-155339__aq-incident-cca4a75f__5Cky3w8.json": [
+   191543.09,
+   {
+    "outage": 188891.09,
+    "replicas": 2652,
+    "wasted": 0
+   }
+  ],
+  "r10-l4-s102-opus-155339__aq-incident-cca4a75f__vNjwc2i.json": [
+   192827.78,
+   {
+    "outage": 191027.78,
+    "replicas": 1800,
+    "wasted": 0
+   }
+  ],
+  "r10-l4-s102-opus-155339__aq-incident-cca4a75f__wpcLrrE.json": [
+   93427.01,
+   {
+    "outage": 91411.01,
+    "replicas": 2016,
+    "wasted": 0
+   }
+  ],
+  "r10-l4-s103-opus-153718__aq-incident-cc75b422__E43tFfv.json": [
+   221252.89,
+   {
+    "outage": 218522.89,
+    "replicas": 2730,
+    "wasted": 0
+   }
+  ],
+  "r10-l4-s103-opus-153718__aq-incident-cc75b422__do23f7w.json": [
+   217177.56,
+   {
+    "outage": 214339.56,
+    "replicas": 2838,
+    "wasted": 0
+   }
+  ],
+  "r10-l4-s103-opus-153718__aq-incident-cc75b422__uvjVqe3.json": [
+   158265.65,
+   {
+    "outage": 156249.65,
+    "replicas": 2016,
+    "wasted": 0
+   }
+  ],
+  "r2-l3-s101-gemini-112134__aq-incident-9f15b9fa__VKe6Xof.json": [
+   104268.25,
+   {
+    "outage": 72414.25,
+    "replicas": 1854,
+    "wasted": 30000
+   }
+  ],
+  "r2-l3-s101-opus-112132__aq-incident-9f15b9fa__dUnXTFt.json": [
+   42959.79,
+   {
+    "outage": 39989.79,
+    "replicas": 2970,
+    "wasted": 0
+   }
+  ],
+  "r2-l3-s101-sonnet-112130__aq-incident-9f15b9fa__7MfpnX3.json": [
+   74179.12,
+   {
+    "outage": 62271.12,
+    "replicas": 1908,
+    "wasted": 10000
+   }
+  ],
+  "r3-l3-s101-nop-114217__aq-incident-9f15b9fa__QsSeHXk.json": [
+   158016.73,
+   {
+    "outage": 158016.73,
+    "replicas": 0,
+    "wasted": 0
+   }
+  ],
+  "r3-l3-s101-opus-113200__aq-incident-9f15b9fa__Ft8VHmT.json": [
+   36276.39,
+   {
+    "outage": 32976.39,
+    "replicas": 3300,
+    "wasted": 0
+   }
+  ],
+  "r3-l3-s101-opus-114807__aq-incident-9f15b9fa__KNxjDCY.json": [
+   40208.59,
+   {
+    "outage": 36578.59,
+    "replicas": 3630,
+    "wasted": 0
+   }
+  ],
+  "r3-l3-s101-reference-114215__aq-incident-9f15b9fa__bjMGztb.json": [
+   26949.96,
+   {
+    "outage": 25269.96,
+    "replicas": 1680,
+    "wasted": 0
+   }
+  ],
+  "r3-l3-s101-shotgun-114221__aq-incident-9f15b9fa__cg8HJ7D.json": [
+   85998.89,
+   {
+    "outage": 64306.89,
+    "replicas": 1692,
+    "wasted": 20000
+   }
+  ],
+  "r3-l3-s101-stop-early-114219__aq-incident-9f15b9fa__D7nfM35.json": [
+   158016.73,
+   {
+    "outage": 158016.73,
+    "replicas": 0,
+    "wasted": 0
+   }
+  ],
+  "r3-l3-s102-gemini-113121__aq-incident-dad9f4e6__RFuuUFF.json": [
+   165872.17,
+   {
+    "outage": 122122.17,
+    "replicas": 3750,
+    "wasted": 40000
+   }
+  ],
+  "r3-l3-s102-opus-113119__aq-incident-dad9f4e6__sCRrHsN.json": [
+   52340.83,
+   {
+    "outage": 50360.83,
+    "replicas": 1980,
+    "wasted": 0
+   }
+  ],
+  "r3-l3-s103-gemini-113141__aq-incident-5b188273__9GmzNWp.json": [
+   141672.08,
+   {
+    "outage": 119575.08,
+    "replicas": 2097,
+    "wasted": 20000
+   }
+  ],
+  "r3-l3-s103-opus-113139__aq-incident-5b188273__bWKV3Wi.json": [
+   76835.59,
+   {
+    "outage": 74525.59,
+    "replicas": 2310,
+    "wasted": 0
+   }
+  ],
+  "r4-l4-s101-gemini-130258__aq-incident-ec900b74__2wGGDG5.json": [
+   363515.19,
+   {
+    "outage": 333525.19,
+    "replicas": 9990,
+    "wasted": 20000
+   }
+  ],
+  "r4-l4-s101-opus-130256__aq-incident-ec900b74__Ji5gQUR.json": [
+   148170.38,
+   {
+    "outage": 146208.38,
+    "replicas": 1962,
+    "wasted": 0
+   }
+  ],
+  "r4-l4-s101-opus-131137__aq-incident-ec900b74__F3ec83r.json": [
+   177752.85,
+   {
+    "outage": 175592.85,
+    "replicas": 2160,
+    "wasted": 0
+   }
+  ],
+  "r4-l4-s101-sonnet-130254__aq-incident-ec900b74__vreuMGJ.json": [
+   194844.61,
+   {
+    "outage": 179996.61,
+    "replicas": 4848,
+    "wasted": 10000
+   }
+  ],
+  "r4-l4-s102-gemini-131100__aq-incident-cca4a75f__is5Twiq.json": [
+   347335.34,
+   {
+    "outage": 345865.34,
+    "replicas": 1470,
+    "wasted": 0
+   }
+  ],
+  "r4-l4-s102-opus-131058__aq-incident-cca4a75f__pdyhyMj.json": [
+   111829.0,
+   {
+    "outage": 99741.0,
+    "replicas": 2088,
+    "wasted": 10000
+   }
+  ],
+  "r4-l4-s103-opus-131117__aq-incident-cc75b422__bxcSySG.json": [
+   142961.86,
+   {
+    "outage": 140579.86,
+    "replicas": 2382,
+    "wasted": 0
+   }
+  ],
+  "r6-l4-s103-gemini-140347__aq-incident-cc75b422__dN9pEWj.json": [
+   345618.13,
+   {
+    "outage": 330920.13,
+    "replicas": 4698,
+    "wasted": 10000
+   }
+  ],
+  "r6-l4-s104-opus-140247__aq-incident-7e283ba2__QcKzisE.json": [
+   195041.34,
+   {
+    "outage": 190979.34,
+    "replicas": 4062,
+    "wasted": 0
+   }
+  ],
+  "r6-l4-s105-opus-140306__aq-incident-c448e1e5__quNiZCo.json": [
+   262101.85,
+   {
+    "outage": 250343.85,
+    "replicas": 1758,
+    "wasted": 10000
+   }
+  ],
+  "r6-l4-s106-opus-140329__aq-incident-676b09cc__xa7ztPr.json": [
+   177736.83,
+   {
+    "outage": 165192.83,
+    "replicas": 2544,
+    "wasted": 10000
+   }
+  ],
+  "r7-l5-s101-gemini-143151__aq-incident-5815b038__65XWcTG.json": [
+   482899.49,
+   {
+    "outage": 449011.49,
+    "replicas": 3888,
+    "wasted": 30000
+   }
+  ],
+  "r7-l5-s101-opus-143149__aq-incident-5815b038__MHfW8rF.json": [
+   397589.27,
+   {
+    "outage": 395765.27,
+    "replicas": 1824,
+    "wasted": 0
+   }
+  ],
+  "r7-l5-s101-sonnet-143147__aq-incident-5815b038__9t3WG3W.json": [
+   438885.68,
+   {
+    "outage": 432831.68,
+    "replicas": 6054,
+    "wasted": 0
+   }
+  ],
+  "r7-l5-s102-gemini-143829__aq-incident-07bdf4d8__LnthuE4.json": [
+   157067.8,
+   {
+    "outage": 131433.8,
+    "replicas": 5634,
+    "wasted": 20000
+   }
+  ],
+  "r7-l5-s102-opus-143827__aq-incident-07bdf4d8__tCFmBPo.json": [
+   58062.76,
+   {
+    "outage": 58062.76,
+    "replicas": 0,
+    "wasted": 0
+   }
+  ],
+  "r7-l5-s103-opus-143847__aq-incident-5bac5a85__U3xNj8C.json": [
+   142805.39,
+   {
+    "outage": 141587.39,
+    "replicas": 1218,
+    "wasted": 0
+   }
+  ],
+  "r8-l5-s103-gemini-150055__aq-incident-5bac5a85__4FNm42Y.json": [
+   205478.48,
+   {
+    "outage": 193057.48,
+    "replicas": 2421,
+    "wasted": 10000
+   }
+  ],
+  "r8-l5-s104-opus-145955__aq-incident-65315499__RURn2ua.json": [
+   271092.79,
+   {
+    "outage": 266976.79,
+    "replicas": 4116,
+    "wasted": 0
+   }
+  ],
+  "r8-l5-s105-opus-150015__aq-incident-6ce95e29__uxsFzNZ.json": [
+   94569.68,
+   {
+    "outage": 94449.68,
+    "replicas": 120,
+    "wasted": 0
+   }
+  ],
+  "r8-l5-s106-opus-150036__aq-incident-e4c84f94__mRCYN7P.json": [
+   128535.49,
+   {
+    "outage": 128019.49,
+    "replicas": 516,
+    "wasted": 0
+   }
+  ],
+  "r9-l5-s101-opus-152413__aq-incident-5815b038__uasf6Ke.json": [
+   164825.3,
+   {
+    "outage": 163163.3,
+    "replicas": 1662,
+    "wasted": 0
+   }
+  ],
+  "r9-l5-s102-opus-152434__aq-incident-07bdf4d8__bZWSz6C.json": [
+   56417.21,
+   {
+    "outage": 56417.21,
+    "replicas": 0,
+    "wasted": 0
+   }
+  ],
+  "r9-l5-s103-opus-152453__aq-incident-5bac5a85__dpaS6rC.json": [
+   212225.5,
+   {
+    "outage": 201859.5,
+    "replicas": 366,
+    "wasted": 10000
+   }
+  ]
+ },
+ "server": "85cac9f38668a29b",
+ "shifts": {
+  "0:1": {
+   "consumer-fixer": "7f28b6cdad90c689",
+   "exploiter": "3ca85d4817150e5f",
+   "loudest-first": "b77f9751fdfab675",
+   "random": "8660e52580ff4633",
+   "reference": "7f28b6cdad90c689",
+   "shotgun": "152f8e973709fcb4",
+   "unprotected": "7f28b6cdad90c689"
+  },
+  "0:10": {
+   "consumer-fixer": "54d21cce4d97d79a",
+   "exploiter": "02bbc60b0be523c4",
+   "loudest-first": "64b13766386c809d",
+   "random": "af1d15b280088539",
+   "reference": "54d21cce4d97d79a",
+   "shotgun": "746ac538f116fa9b",
+   "unprotected": "54d21cce4d97d79a"
+  },
+  "0:101": {
+   "consumer-fixer": "77f1af8303365024",
+   "exploiter": "439e6adf31159ee2",
+   "loudest-first": "6b694027a9f79566",
+   "random": "e9effc1443e126e6",
+   "reference": "77f1af8303365024",
+   "shotgun": "7a36f5449367214b",
+   "unprotected": "77f1af8303365024"
+  },
+  "0:102": {
+   "consumer-fixer": "2f7e394cc2b4927e",
+   "exploiter": "942bb42724aac3a8",
+   "loudest-first": "913c22c4e1147523",
+   "random": "19ab62c83846aed0",
+   "reference": "2f7e394cc2b4927e",
+   "shotgun": "7f9d698e565e2623",
+   "unprotected": "2f7e394cc2b4927e"
+  },
+  "0:103": {
+   "consumer-fixer": "20c5fbc8473f76be",
+   "exploiter": "b87e5352a51fb3b2",
+   "loudest-first": "37ebde09041249c9",
+   "random": "1d4075ec29b0825f",
+   "reference": "20c5fbc8473f76be",
+   "shotgun": "64dfbf9c21665e9a",
+   "unprotected": "20c5fbc8473f76be"
+  },
+  "0:104": {
+   "consumer-fixer": "48c1f7f7afc5aec1",
+   "exploiter": "9b365cdbe9691c8e",
+   "loudest-first": "c6159ee243a1e83f",
+   "random": "566f86025dff7cca",
+   "reference": "48c1f7f7afc5aec1",
+   "shotgun": "4c9d6e250d3c55c6",
+   "unprotected": "48c1f7f7afc5aec1"
+  },
+  "0:105": {
+   "consumer-fixer": "339d2688e9f6baa4",
+   "exploiter": "28252bdaf07c6005",
+   "loudest-first": "6e8d4fb034b602c7",
+   "random": "ab47a402b54fa324",
+   "reference": "339d2688e9f6baa4",
+   "shotgun": "67b824e98598334b",
+   "unprotected": "339d2688e9f6baa4"
+  },
+  "0:106": {
+   "consumer-fixer": "fca7bd7885b8fe83",
+   "exploiter": "0261ec6fa38f618f",
+   "loudest-first": "70e2317839f6141a",
+   "random": "e829b9368a135c74",
+   "reference": "fca7bd7885b8fe83",
+   "shotgun": "55c07cfb914b1e96",
+   "unprotected": "fca7bd7885b8fe83"
+  },
+  "0:11": {
+   "consumer-fixer": "e4fe7294094fcc71",
+   "exploiter": "e0aaa753a0eaecd2",
+   "loudest-first": "99267131194b8b57",
+   "random": "eb3cd29ca9b17e88",
+   "reference": "e4fe7294094fcc71",
+   "shotgun": "0df672a8a09a56cc",
+   "unprotected": "e4fe7294094fcc71"
+  },
+  "0:12": {
+   "consumer-fixer": "8ca5676443c1374e",
+   "exploiter": "08bff49c657f20a9",
+   "loudest-first": "24c4a51bb0b37dce",
+   "random": "43ae78af29f77086",
+   "reference": "8ca5676443c1374e",
+   "shotgun": "fab231721b5e5f56",
+   "unprotected": "8ca5676443c1374e"
+  },
+  "0:2": {
+   "consumer-fixer": "2192e1aba0537aff",
+   "exploiter": "9792fae31d8eb615",
+   "loudest-first": "162cdc3d5754cc2b",
+   "random": "34c46c656088bcd6",
+   "reference": "2192e1aba0537aff",
+   "shotgun": "e2ef59c8261b7b36",
+   "unprotected": "2192e1aba0537aff"
+  },
+  "0:3": {
+   "consumer-fixer": "c89349e6c539522d",
+   "exploiter": "0659664ede72d210",
+   "loudest-first": "c95b7aff96e93ccf",
+   "random": "b33865e2447a4329",
+   "reference": "c89349e6c539522d",
+   "shotgun": "b9cd83ac8cb2bc2f",
+   "unprotected": "c89349e6c539522d"
+  },
+  "0:4": {
+   "consumer-fixer": "bbc84ea9d9727ecb",
+   "exploiter": "9878774091e42feb",
+   "loudest-first": "07365a107d6b72bf",
+   "random": "447eb81cad15c612",
+   "reference": "bbc84ea9d9727ecb",
+   "shotgun": "1d8d85f320f9e21b",
+   "unprotected": "bbc84ea9d9727ecb"
+  },
+  "0:5": {
+   "consumer-fixer": "6c0bea814b3644d9",
+   "exploiter": "6d212abae2fb0018",
+   "loudest-first": "2214e00794705549",
+   "random": "3414b2e3c7fa8d63",
+   "reference": "6c0bea814b3644d9",
+   "shotgun": "eb1ff3fd08ea3ef3",
+   "unprotected": "6c0bea814b3644d9"
+  },
+  "0:6": {
+   "consumer-fixer": "18adaeddbf98484e",
+   "exploiter": "dd1f26fa04a52065",
+   "loudest-first": "d6a5ef0cad9cfa56",
+   "random": "827cfd8f5de10ee9",
+   "reference": "18adaeddbf98484e",
+   "shotgun": "6d5db638dc9fb787",
+   "unprotected": "18adaeddbf98484e"
+  },
+  "0:7": {
+   "consumer-fixer": "9480f82492531eb3",
+   "exploiter": "81d6c329b6e677a1",
+   "loudest-first": "cd1adb8f3d04897b",
+   "random": "97f1a1594f8f3719",
+   "reference": "9480f82492531eb3",
+   "shotgun": "e102f46ee3b44ddd",
+   "unprotected": "9480f82492531eb3"
+  },
+  "0:8": {
+   "consumer-fixer": "4343ccc11a571b50",
+   "exploiter": "ab1fb3442b9bcd75",
+   "loudest-first": "3a8f2ea2c0a3de75",
+   "random": "cf4239b72ba2ebe0",
+   "reference": "4343ccc11a571b50",
+   "shotgun": "0caa82dbd8265e46",
+   "unprotected": "4343ccc11a571b50"
+  },
+  "0:9": {
+   "consumer-fixer": "c714e7f5f9b8d669",
+   "exploiter": "d4fe833c23a4031e",
+   "loudest-first": "3960859d81326eb1",
+   "random": "f3bfe8558787925a",
+   "reference": "c714e7f5f9b8d669",
+   "shotgun": "b48d790e158db6f7",
+   "unprotected": "c714e7f5f9b8d669"
+  },
+  "1:1": {
+   "consumer-fixer": "60ddb0fca4460a67",
+   "exploiter": "64975ac94c118b16",
+   "loudest-first": "39986543a3fc6e3b",
+   "random": "02a43c649ce326e2",
+   "reference": "60ddb0fca4460a67",
+   "shotgun": "1f950eb1940c3f2f",
+   "unprotected": "60ddb0fca4460a67"
+  },
+  "1:10": {
+   "consumer-fixer": "c1dbdf345dd6a79b",
+   "exploiter": "f7ed0c611c4beba8",
+   "loudest-first": "60d5a92a91441d3d",
+   "random": "95901b359ea111ea",
+   "reference": "c1dbdf345dd6a79b",
+   "shotgun": "92fb1d909cbe8c7b",
+   "unprotected": "c1dbdf345dd6a79b"
+  },
+  "1:101": {
+   "consumer-fixer": "5f72e23b957e2560",
+   "exploiter": "ce2cc5afeb251e54",
+   "loudest-first": "9f7ef7244f9c343f",
+   "random": "570a228984a047ab",
+   "reference": "5f72e23b957e2560",
+   "shotgun": "a844e8eaaee29ed4",
+   "unprotected": "5f72e23b957e2560"
+  },
+  "1:102": {
+   "consumer-fixer": "89e0518dba603dfa",
+   "exploiter": "1fc514ce21ed8ef5",
+   "loudest-first": "9e5c3be7004cad90",
+   "random": "2268c3ac20f4849e",
+   "reference": "89e0518dba603dfa",
+   "shotgun": "8e1ba8a3734783c3",
+   "unprotected": "89e0518dba603dfa"
+  },
+  "1:103": {
+   "consumer-fixer": "15b2b2693ad016f2",
+   "exploiter": "0dfc30b96e1c1f67",
+   "loudest-first": "4e1621e4a15015d9",
+   "random": "db2dc7632a39a7bb",
+   "reference": "15b2b2693ad016f2",
+   "shotgun": "540c0cbfee2a200a",
+   "unprotected": "15b2b2693ad016f2"
+  },
+  "1:104": {
+   "consumer-fixer": "5d140c94d4c77239",
+   "exploiter": "0fbf04b6fab5bd4a",
+   "loudest-first": "fa77466d79907b1d",
+   "random": "88d8177ef18a824b",
+   "reference": "5d140c94d4c77239",
+   "shotgun": "02220d7f0e588e29",
+   "unprotected": "5d140c94d4c77239"
+  },
+  "1:105": {
+   "consumer-fixer": "67105f621cae51f7",
+   "exploiter": "30c3fd281c2bf5e2",
+   "loudest-first": "7e6f3255d0739d63",
+   "random": "97a39e418a8dfc13",
+   "reference": "67105f621cae51f7",
+   "shotgun": "70ed543dccc88638",
+   "unprotected": "67105f621cae51f7"
+  },
+  "1:106": {
+   "consumer-fixer": "3124d14a35b24461",
+   "exploiter": "30e81b9f215121c1",
+   "loudest-first": "9f712cf42ac08c78",
+   "random": "129f9532a5c9ec1e",
+   "reference": "3124d14a35b24461",
+   "shotgun": "6de04baae4b6ca45",
+   "unprotected": "3124d14a35b24461"
+  },
+  "1:11": {
+   "consumer-fixer": "f1ff8b7e0c4f8580",
+   "exploiter": "0189905fe3da95aa",
+   "loudest-first": "1013b825cc31a454",
+   "random": "d2a7c8ccc21c9598",
+   "reference": "f1ff8b7e0c4f8580",
+   "shotgun": "727a60c931c4b2e7",
+   "unprotected": "f1ff8b7e0c4f8580"
+  },
+  "1:12": {
+   "consumer-fixer": "9d3403199a9aa0e3",
+   "exploiter": "07cfe32aae01b86e",
+   "loudest-first": "c974fa11bbeacde3",
+   "random": "19c5bd66276ec80c",
+   "reference": "9d3403199a9aa0e3",
+   "shotgun": "5b241e8d4fcdbf86",
+   "unprotected": "9d3403199a9aa0e3"
+  },
+  "1:2": {
+   "consumer-fixer": "53910567d6fe6d27",
+   "exploiter": "30e81ab9462f748a",
+   "loudest-first": "102e208bb9d0daf7",
+   "random": "916a34f9fbf579e2",
+   "reference": "53910567d6fe6d27",
+   "shotgun": "206db12495e69220",
+   "unprotected": "53910567d6fe6d27"
+  },
+  "1:3": {
+   "consumer-fixer": "4bc5cb23e8ef62a7",
+   "exploiter": "4cd3d28117447d17",
+   "loudest-first": "1e52e65107827b70",
+   "random": "65baf719e50d1b48",
+   "reference": "4bc5cb23e8ef62a7",
+   "shotgun": "dac21716e6b6d7c3",
+   "unprotected": "4bc5cb23e8ef62a7"
+  },
+  "1:4": {
+   "consumer-fixer": "05e0bfbf5e8b8a48",
+   "exploiter": "a8e04dc0a970a351",
+   "loudest-first": "afd9c6d1dc2d6864",
+   "random": "68bfe5a04e1f35af",
+   "reference": "05e0bfbf5e8b8a48",
+   "shotgun": "4e73a8b73a7682fb",
+   "unprotected": "05e0bfbf5e8b8a48"
+  },
+  "1:5": {
+   "consumer-fixer": "58c2d55ec7a5e849",
+   "exploiter": "346657f5d8b4d60b",
+   "loudest-first": "909a66aae9c560c2",
+   "random": "6d0759417bdc72c8",
+   "reference": "58c2d55ec7a5e849",
+   "shotgun": "ba1be4af4829cad0",
+   "unprotected": "58c2d55ec7a5e849"
+  },
+  "1:6": {
+   "consumer-fixer": "b22795f49bcc699c",
+   "exploiter": "7534df3d775397d5",
+   "loudest-first": "2f97b092bc4b6781",
+   "random": "e7de98ec83471728",
+   "reference": "b22795f49bcc699c",
+   "shotgun": "5a4bc267ad66f8dc",
+   "unprotected": "b22795f49bcc699c"
+  },
+  "1:7": {
+   "consumer-fixer": "a4833f3bd0b3bc5c",
+   "exploiter": "bbc64f36586c889b",
+   "loudest-first": "c71e417f231bbc03",
+   "random": "c9abbaa7135ded70",
+   "reference": "a4833f3bd0b3bc5c",
+   "shotgun": "0b02d555ebec37d4",
+   "unprotected": "a4833f3bd0b3bc5c"
+  },
+  "1:8": {
+   "consumer-fixer": "508922fdff2bb949",
+   "exploiter": "3b008174b3370314",
+   "loudest-first": "bc0262a12c1a56a8",
+   "random": "81791afb7fbebc87",
+   "reference": "508922fdff2bb949",
+   "shotgun": "cca2a383348c35ea",
+   "unprotected": "508922fdff2bb949"
+  },
+  "1:9": {
+   "consumer-fixer": "083f1d9ba87b781d",
+   "exploiter": "1541402cc4a147aa",
+   "loudest-first": "a601dce9fb3f6012",
+   "random": "29db94f5ec3a516e",
+   "reference": "083f1d9ba87b781d",
+   "shotgun": "9b6e15ff5bc4da81",
+   "unprotected": "083f1d9ba87b781d"
+  },
+  "2:1": {
+   "consumer-fixer": "c2278105338710f7",
+   "exploiter": "f06dd174bf5f6277",
+   "loudest-first": "bff77aa4ccd3a7c0",
+   "random": "2dd6ada12bb7bb7a",
+   "reference": "c2278105338710f7",
+   "shotgun": "62b548572055ccd4",
+   "unprotected": "c2278105338710f7"
+  },
+  "2:10": {
+   "consumer-fixer": "35639a8b1a902b1a",
+   "exploiter": "b03f2508bb405ccb",
+   "loudest-first": "1f0cb2706834ae08",
+   "random": "06701546fc653190",
+   "reference": "35639a8b1a902b1a",
+   "shotgun": "2266b5143084d0c9",
+   "unprotected": "35639a8b1a902b1a"
+  },
+  "2:101": {
+   "consumer-fixer": "47d7efb52cd70b86",
+   "exploiter": "10f80479206cecc3",
+   "loudest-first": "4f615b3f7252325d",
+   "random": "88fbb3d34b980ed6",
+   "reference": "47d7efb52cd70b86",
+   "shotgun": "f18f3bcc3be0b5b1",
+   "unprotected": "47d7efb52cd70b86"
+  },
+  "2:102": {
+   "consumer-fixer": "21e94f737f86af78",
+   "exploiter": "2403408ef1364e69",
+   "loudest-first": "4d24da1901391e49",
+   "random": "2ca524ed191e9767",
+   "reference": "21e94f737f86af78",
+   "shotgun": "37579a5c87863125",
+   "unprotected": "21e94f737f86af78"
+  },
+  "2:103": {
+   "consumer-fixer": "d31a0e82dcde387c",
+   "exploiter": "705155b719023c8e",
+   "loudest-first": "f6dbafdb091f14db",
+   "random": "4bdb437e3131adfd",
+   "reference": "d31a0e82dcde387c",
+   "shotgun": "1a4a06f97fe269b3",
+   "unprotected": "d31a0e82dcde387c"
+  },
+  "2:104": {
+   "consumer-fixer": "e7cff97be9f3c3ae",
+   "exploiter": "95a284117806fc3e",
+   "loudest-first": "7b1f0c25be97cbe5",
+   "random": "440dce7263a8fbec",
+   "reference": "e7cff97be9f3c3ae",
+   "shotgun": "8c842e509ca13cbd",
+   "unprotected": "e7cff97be9f3c3ae"
+  },
+  "2:105": {
+   "consumer-fixer": "6219157ceef38ecc",
+   "exploiter": "91df4d313828ecae",
+   "loudest-first": "17c46d868d830a01",
+   "random": "d119267bdbd12f70",
+   "reference": "6219157ceef38ecc",
+   "shotgun": "44862d8eee2d5da7",
+   "unprotected": "6219157ceef38ecc"
+  },
+  "2:106": {
+   "consumer-fixer": "99b6cf101e30d42f",
+   "exploiter": "62082ef1f1e9abc5",
+   "loudest-first": "e240e9605b67de7b",
+   "random": "1e7cf9423d8739a5",
+   "reference": "99b6cf101e30d42f",
+   "shotgun": "282905a4de4b84a6",
+   "unprotected": "99b6cf101e30d42f"
+  },
+  "2:11": {
+   "consumer-fixer": "19bdb01dbc56f145",
+   "exploiter": "63a14dcafa4edc6c",
+   "loudest-first": "37f1d0150609e563",
+   "random": "9919aab54450bf72",
+   "reference": "19bdb01dbc56f145",
+   "shotgun": "1ebf62c56b41951c",
+   "unprotected": "19bdb01dbc56f145"
+  },
+  "2:12": {
+   "consumer-fixer": "5b030fc1cdc8d2f0",
+   "exploiter": "a966725f5f52bd96",
+   "loudest-first": "ed92ed500394bb74",
+   "random": "8e51fc6307653714",
+   "reference": "5b030fc1cdc8d2f0",
+   "shotgun": "abda8ad3d0d97d13",
+   "unprotected": "5b030fc1cdc8d2f0"
+  },
+  "2:2": {
+   "consumer-fixer": "5bcf3d881238b63f",
+   "exploiter": "6f0d05c72a8cc75a",
+   "loudest-first": "b986bf1e71d500e6",
+   "random": "bdc17d18e1c67757",
+   "reference": "5bcf3d881238b63f",
+   "shotgun": "9cf8c367b2bfd5a4",
+   "unprotected": "5bcf3d881238b63f"
+  },
+  "2:3": {
+   "consumer-fixer": "e1da49fd15de85b1",
+   "exploiter": "a916da688dc80c35",
+   "loudest-first": "38940c7c2ce015b2",
+   "random": "26aa140a7906c7eb",
+   "reference": "e1da49fd15de85b1",
+   "shotgun": "9d73f7f88e590149",
+   "unprotected": "e1da49fd15de85b1"
+  },
+  "2:4": {
+   "consumer-fixer": "839d1830f11ee1aa",
+   "exploiter": "c4186fe74ae2d49c",
+   "loudest-first": "6d5d73ec8850f419",
+   "random": "68da98536b409bc8",
+   "reference": "839d1830f11ee1aa",
+   "shotgun": "d5d0274c0ff435e9",
+   "unprotected": "839d1830f11ee1aa"
+  },
+  "2:5": {
+   "consumer-fixer": "f28f72875935e8ca",
+   "exploiter": "04ee37719b3cab97",
+   "loudest-first": "ad7d0c81ba3459b4",
+   "random": "29acc3b7e9bc5cef",
+   "reference": "f28f72875935e8ca",
+   "shotgun": "03b93c27e4881fad",
+   "unprotected": "f28f72875935e8ca"
+  },
+  "2:6": {
+   "consumer-fixer": "99182b7cd30b9e1b",
+   "exploiter": "4b1025707cd641ee",
+   "loudest-first": "a3f379264f26db2a",
+   "random": "87d01c59c6b6ee8e",
+   "reference": "99182b7cd30b9e1b",
+   "shotgun": "56419d375219a43c",
+   "unprotected": "99182b7cd30b9e1b"
+  },
+  "2:7": {
+   "consumer-fixer": "f52b490f1af00dba",
+   "exploiter": "8cc9f875d511366b",
+   "loudest-first": "88eb04a9ef0401c6",
+   "random": "7ca69ef1ee196234",
+   "reference": "f52b490f1af00dba",
+   "shotgun": "ded39ac61f86edb9",
+   "unprotected": "f52b490f1af00dba"
+  },
+  "2:8": {
+   "consumer-fixer": "d12df521ce9d1338",
+   "exploiter": "1aa2cd95d9c4ef63",
+   "loudest-first": "4ad9ca50896fdb7a",
+   "random": "21621730801bfeee",
+   "reference": "d12df521ce9d1338",
+   "shotgun": "5d6b8e7c040a4f3a",
+   "unprotected": "d12df521ce9d1338"
+  },
+  "2:9": {
+   "consumer-fixer": "ab4203a268d93d65",
+   "exploiter": "5987216b63e810bd",
+   "loudest-first": "1e22018c304dabba",
+   "random": "d07af531972ca6f7",
+   "reference": "ab4203a268d93d65",
+   "shotgun": "abdf6dc3ef4b6846",
+   "unprotected": "ab4203a268d93d65"
+  },
+  "3:1": {
+   "consumer-fixer": "963bd8e12b5f3522",
+   "exploiter": "d6a124902bb41fbe",
+   "loudest-first": "2a349226045c1806",
+   "random": "91aee703a4693695",
+   "reference": "963bd8e12b5f3522",
+   "shotgun": "9b9d9143773a25a1",
+   "unprotected": "963bd8e12b5f3522"
+  },
+  "3:10": {
+   "consumer-fixer": "7f3d46672c51de66",
+   "exploiter": "402c017448352c03",
+   "loudest-first": "6bb81437f97632ee",
+   "random": "7f25f0a39f29e23d",
+   "reference": "7f3d46672c51de66",
+   "shotgun": "7af4ed40011c6d8d",
+   "unprotected": "7f3d46672c51de66"
+  },
+  "3:101": {
+   "consumer-fixer": "26fc8e32513b3c1b",
+   "exploiter": "e6b65fc51725d29d",
+   "loudest-first": "179fb32e43ec7f2b",
+   "random": "093c7ce886dee9e2",
+   "reference": "26fc8e32513b3c1b",
+   "shotgun": "9b961e69a1b679e3",
+   "unprotected": "26fc8e32513b3c1b"
+  },
+  "3:102": {
+   "consumer-fixer": "2348a44033cb155e",
+   "exploiter": "46cf82da3c71b5d7",
+   "loudest-first": "49df27e18c811622",
+   "random": "af4f1013cab33baf",
+   "reference": "2348a44033cb155e",
+   "shotgun": "a15e7155e1b902da",
+   "unprotected": "2348a44033cb155e"
+  },
+  "3:103": {
+   "consumer-fixer": "45ede018b52dff6e",
+   "exploiter": "d602d54863f9fe6d",
+   "loudest-first": "45050c0a90e78d1b",
+   "random": "3daa8744457965d4",
+   "reference": "45ede018b52dff6e",
+   "shotgun": "3bd70a6ba292f992",
+   "unprotected": "45ede018b52dff6e"
+  },
+  "3:104": {
+   "consumer-fixer": "a2f25e36131fd40b",
+   "exploiter": "e16477dcdabf3a69",
+   "loudest-first": "f3f6f54604d47c66",
+   "random": "52a3ebdf0f068c1a",
+   "reference": "a2f25e36131fd40b",
+   "shotgun": "125d4867a561c16b",
+   "unprotected": "a2f25e36131fd40b"
+  },
+  "3:105": {
+   "consumer-fixer": "cc7615040596978c",
+   "exploiter": "2e465c6a9d2ed8e1",
+   "loudest-first": "6217feeaea6fe4c0",
+   "random": "5ddb121a7e4963f0",
+   "reference": "cc7615040596978c",
+   "shotgun": "bdf73119632c2c0a",
+   "unprotected": "cc7615040596978c"
+  },
+  "3:106": {
+   "consumer-fixer": "7708d2e0f030ef92",
+   "exploiter": "c1b7f6d022c86c0c",
+   "loudest-first": "d07df308797b518e",
+   "random": "a4523e51f56e1afe",
+   "reference": "7708d2e0f030ef92",
+   "shotgun": "89aba52ca6b68802",
+   "unprotected": "7708d2e0f030ef92"
+  },
+  "3:11": {
+   "consumer-fixer": "f894307c36b1f44c",
+   "exploiter": "e5899839f2cb4068",
+   "loudest-first": "f95f5a3ab2e28784",
+   "random": "e0dabf2e23c437f4",
+   "reference": "f894307c36b1f44c",
+   "shotgun": "b6ebf1d8664cc281",
+   "unprotected": "f894307c36b1f44c"
+  },
+  "3:12": {
+   "consumer-fixer": "683a74af7766b87f",
+   "exploiter": "c53fc06e342a1608",
+   "loudest-first": "78a97a27e6cd8c0f",
+   "random": "c00e4d6a1ca926a9",
+   "reference": "683a74af7766b87f",
+   "shotgun": "ec82217ef0bebbb5",
+   "unprotected": "683a74af7766b87f"
+  },
+  "3:2": {
+   "consumer-fixer": "1d8a1c65ca152546",
+   "exploiter": "f625f8618d2b4b1a",
+   "loudest-first": "4a191557874dfa8e",
+   "random": "84153c86189dde9f",
+   "reference": "1d8a1c65ca152546",
+   "shotgun": "8ca7c1aba86b3bae",
+   "unprotected": "1d8a1c65ca152546"
+  },
+  "3:3": {
+   "consumer-fixer": "5da940d4d1fb7a4f",
+   "exploiter": "be21afba5d3de3ec",
+   "loudest-first": "a077cd20d69dfb3d",
+   "random": "7028228eafdf3133",
+   "reference": "5da940d4d1fb7a4f",
+   "shotgun": "1340d6081b46a991",
+   "unprotected": "5da940d4d1fb7a4f"
+  },
+  "3:4": {
+   "consumer-fixer": "cce209b3b6d11b83",
+   "exploiter": "ce360d1ff45999ff",
+   "loudest-first": "216248e324d2a854",
+   "random": "d77cee9742ba1c3f",
+   "reference": "cce209b3b6d11b83",
+   "shotgun": "4b1b816cad3b0643",
+   "unprotected": "cce209b3b6d11b83"
+  },
+  "3:5": {
+   "consumer-fixer": "94f465504f91bd44",
+   "exploiter": "ccdee25f16714642",
+   "loudest-first": "890f03047dbd6b18",
+   "random": "f71cc6ded04de83c",
+   "reference": "94f465504f91bd44",
+   "shotgun": "2a32c39e391721f2",
+   "unprotected": "94f465504f91bd44"
+  },
+  "3:6": {
+   "consumer-fixer": "f90499fd0c0d8a78",
+   "exploiter": "1912633f5471e7e9",
+   "loudest-first": "63e90d5068332e8c",
+   "random": "9b284de6a64f904b",
+   "reference": "f90499fd0c0d8a78",
+   "shotgun": "607b1e3b4c385726",
+   "unprotected": "f90499fd0c0d8a78"
+  },
+  "3:7": {
+   "consumer-fixer": "9595de1b29cd0a46",
+   "exploiter": "8df2aed596143e06",
+   "loudest-first": "182d4f89a1c9534e",
+   "random": "a939bdc7511b72c9",
+   "reference": "9595de1b29cd0a46",
+   "shotgun": "36c1813c6e8f91dc",
+   "unprotected": "9595de1b29cd0a46"
+  },
+  "3:8": {
+   "consumer-fixer": "8bc35669e5050386",
+   "exploiter": "e2c63cc7b251870a",
+   "loudest-first": "34502fa20a6c2c2e",
+   "random": "bff2b9a69c28e7d0",
+   "reference": "8bc35669e5050386",
+   "shotgun": "318e57e074b5fe4a",
+   "unprotected": "8bc35669e5050386"
+  },
+  "3:9": {
+   "consumer-fixer": "0d8837b06a94097a",
+   "exploiter": "8d5963232e07f93e",
+   "loudest-first": "e2a0eb0063c0d54d",
+   "random": "f7fd322e4a777b53",
+   "reference": "0d8837b06a94097a",
+   "shotgun": "df79423855bce147",
+   "unprotected": "0d8837b06a94097a"
+  },
+  "4:1": {
+   "consumer-fixer": "810bbeb398cde772",
+   "exploiter": "6e84d532932358f5",
+   "loudest-first": "9a3c03923a48407e",
+   "random": "2ab1f8b1f5a711dd",
+   "reference": "810bbeb398cde772",
+   "shotgun": "06045869eb28eef9",
+   "unprotected": "0c8202a4c6a1d555"
+  },
+  "4:10": {
+   "consumer-fixer": "610ae9c4b5b8dd3e",
+   "exploiter": "b00d6f7c580c7747",
+   "loudest-first": "a46811e34a303dee",
+   "random": "afdeeb082f10e26a",
+   "reference": "610ae9c4b5b8dd3e",
+   "shotgun": "2ebca92e28626e86",
+   "unprotected": "6a665f6355fc5d1a"
+  },
+  "4:101": {
+   "consumer-fixer": "5636ff89ba598922",
+   "exploiter": "e87aa338e433ce32",
+   "loudest-first": "259d18c54405a693",
+   "random": "03441285de43b114",
+   "reference": "5636ff89ba598922",
+   "shotgun": "833d75ba6b5c0832",
+   "unprotected": "0d265a98305de390"
+  },
+  "4:102": {
+   "consumer-fixer": "12b268e997b55ba5",
+   "exploiter": "9d42cd12cc535c5d",
+   "loudest-first": "b00e25859bad7965",
+   "random": "13bd98674693d096",
+   "reference": "12b268e997b55ba5",
+   "shotgun": "e708b5aa5bc46174",
+   "unprotected": "a5abba904f619887"
+  },
+  "4:103": {
+   "consumer-fixer": "298fbcea71b41615",
+   "exploiter": "bce7eb1ccd63804c",
+   "loudest-first": "005a75c178aff3ae",
+   "random": "98799f25f958b1e0",
+   "reference": "298fbcea71b41615",
+   "shotgun": "43a02d46e2873b20",
+   "unprotected": "28b02eccc040fb9c"
+  },
+  "4:104": {
+   "consumer-fixer": "154c4adbfca58cf1",
+   "exploiter": "7ceb6e4cf73b7406",
+   "loudest-first": "5e51bf241f58352e",
+   "random": "cfb48345bc4edc3d",
+   "reference": "154c4adbfca58cf1",
+   "shotgun": "d1ef09b7f5a14893",
+   "unprotected": "361921e02602a3d6"
+  },
+  "4:105": {
+   "consumer-fixer": "16234c7fa7652bd3",
+   "exploiter": "c09e3992124084a4",
+   "loudest-first": "28c0577e8f4f296e",
+   "random": "b0553059d1002cb1",
+   "reference": "16234c7fa7652bd3",
+   "shotgun": "9b796c7529b26c91",
+   "unprotected": "251bcd2bb52408a0"
+  },
+  "4:106": {
+   "consumer-fixer": "bca8ea46e65bea4a",
+   "exploiter": "67c417f4a03fd027",
+   "loudest-first": "27e8a8db01369058",
+   "random": "a01084fec547ddd6",
+   "reference": "bca8ea46e65bea4a",
+   "shotgun": "28a3c2c94c3853a4",
+   "unprotected": "39d8e787da731182"
+  },
+  "4:11": {
+   "consumer-fixer": "ae0dd69ae1b00ce7",
+   "exploiter": "25a5d9d8faa538fd",
+   "loudest-first": "17c521d23fdbbd67",
+   "random": "796dafe95c195260",
+   "reference": "ae0dd69ae1b00ce7",
+   "shotgun": "1514c44e7f7df6e0",
+   "unprotected": "ebc0ca8d7acd2867"
+  },
+  "4:12": {
+   "consumer-fixer": "9dc1e6f784b9468b",
+   "exploiter": "5980d834ea2646f5",
+   "loudest-first": "dc7260ddaf2fc5d5",
+   "random": "0c5aee85ef3e0f58",
+   "reference": "9dc1e6f784b9468b",
+   "shotgun": "b73130bf1fd87357",
+   "unprotected": "fd6fea695007b69a"
+  },
+  "4:2": {
+   "consumer-fixer": "fa9d94e1e7c696ff",
+   "exploiter": "cfc4a33ca7778dc1",
+   "loudest-first": "f2ed8fa1f9217428",
+   "random": "47866d695fba976a",
+   "reference": "fa9d94e1e7c696ff",
+   "shotgun": "ad07584efa536b0e",
+   "unprotected": "125e0c6c7a6c02a5"
+  },
+  "4:3": {
+   "consumer-fixer": "a5ac1a85d0760eba",
+   "exploiter": "dc7b11cd262ae75e",
+   "loudest-first": "aac431f725e19ed5",
+   "random": "52db74c84c48eb29",
+   "reference": "a5ac1a85d0760eba",
+   "shotgun": "d6d948eb736f614f",
+   "unprotected": "5988b94102160dc1"
+  },
+  "4:3000": {
+   "consumer-fixer": "e4f4d39b4cec6fa7",
+   "exploiter": "1bb6b796134dc2fc",
+   "loudest-first": "fdd4445275df9224",
+   "random": "54e5f900fd96d15e",
+   "reference": "e4f4d39b4cec6fa7",
+   "shotgun": "6f7b17326b29d3bc",
+   "unprotected": "6c921712cadc5cc5"
+  },
+  "4:3001": {
+   "consumer-fixer": "4924bf5a69160cac",
+   "exploiter": "1a742775ed73dd88",
+   "loudest-first": "0d508c94bfd480fa",
+   "random": "a9c1066f3c025eac",
+   "reference": "4924bf5a69160cac",
+   "shotgun": "4b0eef9854984015",
+   "unprotected": "6f780da4ad739075"
+  },
+  "4:3002": {
+   "consumer-fixer": "2d0da892108643da",
+   "exploiter": "5b6809742980d3b8",
+   "loudest-first": "a885f0be105813d6",
+   "random": "1617cdcae7905efa",
+   "reference": "2d0da892108643da",
+   "shotgun": "ded18c294bbaa81d",
+   "unprotected": "298080ed81507243"
+  },
+  "4:3003": {
+   "consumer-fixer": "b71600138c066b02",
+   "exploiter": "4bb4a3e4825b9546",
+   "loudest-first": "d617aacf6186adc9",
+   "random": "60ab997aba9beb42",
+   "reference": "b71600138c066b02",
+   "shotgun": "d972480cbcd7b5b9",
+   "unprotected": "1183f6abbb779796"
+  },
+  "4:3004": {
+   "consumer-fixer": "64f367f674afa187",
+   "exploiter": "b1d247ec3dc67ae2",
+   "loudest-first": "75bf48f9a6bf80ad",
+   "random": "ff9d9f867387c7ea",
+   "reference": "64f367f674afa187",
+   "shotgun": "1923b1ab62d8652f",
+   "unprotected": "a3c803fad362917e"
+  },
+  "4:4": {
+   "consumer-fixer": "4d09c401e4aa23bd",
+   "exploiter": "eee7b5da24d88eb7",
+   "loudest-first": "1daf62b58964cd0d",
+   "random": "3a8a85f93f5d8344",
+   "reference": "4d09c401e4aa23bd",
+   "shotgun": "ea268cbf753d29c7",
+   "unprotected": "7b6414d8c04032ee"
+  },
+  "4:5": {
+   "consumer-fixer": "fa10ad36d3eceef2",
+   "exploiter": "d193e9e22c8d0186",
+   "loudest-first": "421c35fcaeb7f224",
+   "random": "6dd3a1ee33e54bfb",
+   "reference": "fa10ad36d3eceef2",
+   "shotgun": "1156e23bac4a68e1",
+   "unprotected": "09a687b699e68e76"
+  },
+  "4:6": {
+   "consumer-fixer": "445398a9e16d4993",
+   "exploiter": "679fe37dd5042805",
+   "loudest-first": "69578c189204dacf",
+   "random": "f426404d2a50f71d",
+   "reference": "445398a9e16d4993",
+   "shotgun": "a391fbd6f3f43230",
+   "unprotected": "11b2aea7147fa642"
+  },
+  "4:7": {
+   "consumer-fixer": "2c6cd467a44b408d",
+   "exploiter": "b2d272f6dbfc20c8",
+   "loudest-first": "e7b16dfabbafe82e",
+   "random": "7bccc6cfe51c5d9d",
+   "reference": "2c6cd467a44b408d",
+   "shotgun": "894357bfd1589c96",
+   "unprotected": "34daaaf182c363e2"
+  },
+  "4:8": {
+   "consumer-fixer": "3b0ab1d7d0635a70",
+   "exploiter": "7c4e84384fae406d",
+   "loudest-first": "c4b43308cdcf223d",
+   "random": "ec1193afb69da286",
+   "reference": "3b0ab1d7d0635a70",
+   "shotgun": "635ecad09b3294f2",
+   "unprotected": "f6b3a9643ec1e4df"
+  },
+  "4:9": {
+   "consumer-fixer": "18c7af78ec6d3d0a",
+   "exploiter": "b072bc1c706a48f5",
+   "loudest-first": "693031b7cbf8e32e",
+   "random": "d130a7551becd67b",
+   "reference": "18c7af78ec6d3d0a",
+   "shotgun": "ad05d6c41b9576b4",
+   "unprotected": "91f224aef60a2114"
+  },
+  "5:1": {
+   "consumer-fixer": "2156d59ce7dadaa3",
+   "exploiter": "1261bfde98fa1679",
+   "loudest-first": "dd8fe55c8bebbf60",
+   "random": "7191442fbbe90b9f",
+   "reference": "de4ce100f38ae97c",
+   "shotgun": "fd3c80b5850d0d21",
+   "unprotected": "7d5b3c962c328105"
+  },
+  "5:10": {
+   "consumer-fixer": "ab7a813d360b99a7",
+   "exploiter": "3ec56e688b3e735d",
+   "loudest-first": "af0c973e34f61b76",
+   "random": "07f910fe8a4401b6",
+   "reference": "31ed181b0a4cdccc",
+   "shotgun": "d74a156cc3b27552",
+   "unprotected": "4fe7037d4b9b578b"
+  },
+  "5:101": {
+   "consumer-fixer": "677402a312894944",
+   "exploiter": "fa8be35e3ed854cc",
+   "loudest-first": "fd00ed660310f352",
+   "random": "2449d27d8b8d2462",
+   "reference": "1e34b5e4b0a31b76",
+   "shotgun": "f64592f341817576",
+   "unprotected": "d31b807993587d69"
+  },
+  "5:102": {
+   "consumer-fixer": "a89899fbc3fe33a7",
+   "exploiter": "a3c0997b1babf00a",
+   "loudest-first": "d4d546fc4a410490",
+   "random": "dd21f44154984215",
+   "reference": "4928622a34527add",
+   "shotgun": "eebc2972ef7de2b4",
+   "unprotected": "403dd5ecd6387cae"
+  },
+  "5:103": {
+   "consumer-fixer": "1dd3b32fab98ba03",
+   "exploiter": "1598f7fb802f25b8",
+   "loudest-first": "5b4ed269fe3b194d",
+   "random": "040cd8f8ec5d2840",
+   "reference": "7c8bcb0469283e33",
+   "shotgun": "c07fdba53d0fb0b0",
+   "unprotected": "2be134cc0dc72f01"
+  },
+  "5:104": {
+   "consumer-fixer": "44deb45d78b4342d",
+   "exploiter": "a6584e3d12a200a8",
+   "loudest-first": "fcd0ce29384e0547",
+   "random": "bd317c5940ca6eaf",
+   "reference": "a16f187d077a0a50",
+   "shotgun": "7d77652ed7258aa7",
+   "unprotected": "71db8719269cce73"
+  },
+  "5:105": {
+   "consumer-fixer": "4c826b418285366f",
+   "exploiter": "fdcfa02fcbecfcc4",
+   "loudest-first": "592a0b3f553e2068",
+   "random": "0db682bff06909bb",
+   "reference": "f3fa5a46a0821c4d",
+   "shotgun": "65dd7d18aeb17675",
+   "unprotected": "143cc22f585c2577"
+  },
+  "5:106": {
+   "consumer-fixer": "65eeca46540e7adc",
+   "exploiter": "6e55122499004f2f",
+   "loudest-first": "2a6d04b1f6afa828",
+   "random": "e73124833c76af4c",
+   "reference": "bdeb409bebae4982",
+   "shotgun": "374d65907eea5d9b",
+   "unprotected": "21517cb95e2832b7"
+  },
+  "5:11": {
+   "consumer-fixer": "be8a074e88629471",
+   "exploiter": "c196678417731c26",
+   "loudest-first": "44635a62921e02a6",
+   "random": "8e9457f67cc7b8ba",
+   "reference": "34b19cc28ca4c447",
+   "shotgun": "0d2e6250e5c5fb74",
+   "unprotected": "c90af7d3422d9a4c"
+  },
+  "5:12": {
+   "consumer-fixer": "9924022e68e94573",
+   "exploiter": "6ef42ecf97d0c33e",
+   "loudest-first": "25c7433d25753013",
+   "random": "9658409af65d42ed",
+   "reference": "6ecdb29ac66f35e1",
+   "shotgun": "0fdea512bbe76f82",
+   "unprotected": "319c3a139e2ce5df"
+  },
+  "5:2": {
+   "consumer-fixer": "0ff59c9ab2a6a184",
+   "exploiter": "cc01b0a5e8c35a88",
+   "loudest-first": "48d7e933a1915d1f",
+   "random": "957ee7dde5e1bf51",
+   "reference": "62d133f8dc9574d9",
+   "shotgun": "539ea76aca45f34e",
+   "unprotected": "01cdc107a5e46c40"
+  },
+  "5:3": {
+   "consumer-fixer": "f13bf2e7ce42e80a",
+   "exploiter": "85b29e8c3de39c7e",
+   "loudest-first": "145be1d4d3a0ccc2",
+   "random": "1a24fb44bc75eb67",
+   "reference": "4a87b5059a135b99",
+   "shotgun": "0f40e03d6e0151ab",
+   "unprotected": "72f8a4a8981d7647"
+  },
+  "5:4": {
+   "consumer-fixer": "7266e1a5320f558f",
+   "exploiter": "0dc2a21bfc273d80",
+   "loudest-first": "b81e42c50b1dc46c",
+   "random": "dbe19fecd070d34e",
+   "reference": "26824ba47dfb051a",
+   "shotgun": "5d3ca528bc3e7799",
+   "unprotected": "f29a9e5aa32e480a"
+  },
+  "5:5": {
+   "consumer-fixer": "b3dc2dab4b933fbb",
+   "exploiter": "251ceb1b5f168c5b",
+   "loudest-first": "502795a8121376db",
+   "random": "3d989bd067910232",
+   "reference": "9d7f0f42ea810b55",
+   "shotgun": "ff01c11b75cd2c4a",
+   "unprotected": "45bc59abaca75ac3"
+  },
+  "5:6": {
+   "consumer-fixer": "d7cbf64194741fe5",
+   "exploiter": "4420cfce2d509d24",
+   "loudest-first": "9255ae7aeaafa681",
+   "random": "6827f9e115413d4e",
+   "reference": "57bf7e329463206f",
+   "shotgun": "bff9518453d5c4fa",
+   "unprotected": "69014e0afa6199ea"
+  },
+  "5:7": {
+   "consumer-fixer": "38097deee38643c9",
+   "exploiter": "5c147263d03f066b",
+   "loudest-first": "32c2cbf69c924361",
+   "random": "da587b0bfdac01a1",
+   "reference": "64c1f884702aff76",
+   "shotgun": "508a4e9cbc464499",
+   "unprotected": "0995db811b94c2aa"
+  },
+  "5:8": {
+   "consumer-fixer": "52762dc6d2d0b181",
+   "exploiter": "1463893350161480",
+   "loudest-first": "90eedf1ecf26e076",
+   "random": "2929c6a572fc6218",
+   "reference": "91d1825d2b5e07f1",
+   "shotgun": "ebe936973e9ad4a8",
+   "unprotected": "7bd0df709d1d0bce"
+  },
+  "5:9": {
+   "consumer-fixer": "dbf3a705fb137469",
+   "exploiter": "2d1c688a945d3345",
+   "loudest-first": "4a01ccbcd7c91361",
+   "random": "42e03cd01f5f64aa",
+   "reference": "58edf10499bda7df",
+   "shotgun": "9034eb5126ffcb7e",
+   "unprotected": "562098e2e6be0e0f"
+  }
+ },
+ "submitted": 4
+}

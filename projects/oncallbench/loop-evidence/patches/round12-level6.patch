@@ -1,0 +1,844 @@
+diff --git a/spikes/aq-incident/eval.py b/spikes/aq-incident/eval.py
+index 88b5a45..88f69fe 100644
+--- a/spikes/aq-incident/eval.py
++++ b/spikes/aq-incident/eval.py
+@@ -24,6 +24,25 @@ EXTRA_BUILD_SEEDS = [6, 7, 8, 9, 10, 11, 12]  # more seeds to tune on: --seeds 6
+ UNDOS = {}  # (seed, level) -> the changes the reference undid, each after reading its diff
+ TARGET, UNDER = 0.75, []  # reference/oracle target where views are partial, and the seeds that miss it
+ UNDO = {"rollback": "deploy", "revert_config": "config"}
++MET = set()  # (seed, level) where the reference saw replicas it had asked for stay pending
++BAD = []  # level-6 gates that failed: all are printed before the run fails
++SHARED_BAND = (0.15, 0.35)  # share of what the oracle avoids that leaving the resolver fault alone must cost
++
++
++def same_world(seed, level, base=4):
++    """A level with shared infrastructure is the base level's world, seed by seed: the same services,
++    dependencies, revenue, replicas, hot and retry properties, changes, decoys and faults, once the
++    shared components, the two topology fields and the victims' tempting changes are taken away."""
++    a, b = incident.scenario(seed, level), incident.scenario(seed, base)
++    svc = {n: {k: v for k, v in s.items() if k not in ("resolver", "pool")}
++           for n, s in a["svc"].items() if s["tier"] != "infra"}
++    for s in svc.values():
++        s["changes"] = [c for c in s["changes"] if not c.get("shared")]
++    mine = dict(svc=svc, order=[n for n in a["order"] if a["svc"][n]["tier"] != "infra"], edges=a["edges"],
++                faults=[f for f in a["faults"] if f["kind"] not in ("bad_resolver", "bad_pool")],
++                batch=a["batch"], files=a["files"])
++    assert json.dumps(mine, sort_keys=True) == json.dumps(b, sort_keys=True), f"seed {seed}: level {level} moved level {base}'s world"
++    assert list(svc) == list(b["svc"]) and mine["order"] == b["order"]
+ 
+ 
+ def run(seed, level, policy):
+@@ -37,6 +56,8 @@ def run(seed, level, policy):
+     def call(tool, **args):
+         if tool == "get_diff":
+             read.add((args.get("service"), args.get("change_id")))
++        if tool == "get_status" and estate.get_status().get("pending_replicas"):
++            MET.add((seed, level))
+         if tool in UNDO and args.get("service") in estate.svc:
+             live = [c for c in estate.get_changes(args["service"])["changes"]
+                     if c["type"] == UNDO[tool] and c["status"] == "live"]
+@@ -59,7 +80,7 @@ def run(seed, level, policy):
+ 
+ 
+ FIX = {"bad_deploy": "rollback", "leak": "rollback", "bad_config": "revert_config", "primary_down": "failover",
+-       "bad_file": "revert_config"}
++       "bad_file": "revert_config", "bad_resolver": "revert_config"}
+ 
+ 
+ def oracle(seed, level, skip=None):
+@@ -68,12 +89,29 @@ def oracle(seed, level, skip=None):
+     Where callers retry it reads the hidden load too: a quiet service gets the capacity a
+     disruptive fix needs first and gives it back after, and a storm that would outlive a fix is
+     throttled for the minute the fix lands. A bad file is fixed at its publisher, and a storm on a
+-    consumer is throttled for the minute the next good file lands."""
+-    faults = [i for i in range(len(incident.Estate(seed, level).faults)) if i != skip]
++    consumer is throttled for the minute the next good file lands. A bad resolver is reverted the
++    minute its change lands, and the services behind it that a storm would hold down are throttled
++    one after the other as the revert lands. A broken node pool is not a fault to order: it is
++    reverted at minute 0 whenever a fault's handling may scale a service on it, and anything that
++    waits for capacity waits until it is ready. `skip` on the pool leaves it broken."""
++    known = incident.Estate(seed, level).faults
++    pool = next((i for i, f in enumerate(known) if f["kind"] == "bad_pool"), None)
++    faults = [i for i in range(len(known)) if i not in (skip, pool)]
+     costs = []
+     for order in itertools.permutations(faults):
+         estate = incident.Estate(seed, level)
+         todo, tick = [], itertools.count()  # (minute, tie-break, step): what follows a mitigation
++        broken = estate.faults[pool] if pool is not None else None
++        if broken and skip != pool and any(
++                estate.svc[estate.faults[i]["service"]].get("pool") == broken["service"]
++                and estate.faults[i]["kind"] in ("overload", "bad_deploy", "leak") for i in order):
++            assert estate.call("revert_config", {"service": broken["service"]})["ok"]
++
++        def ready(name, at):
++            """The minute replicas asked for are ready: later than the scale says on a pool just fixed."""
++            if broken and estate.svc[name].get("pool") == broken["service"] and broken["end"] is not None:
++                return max(at, broken["end"] + incident.MITIGATIONS["scale"][0])
++            return at
+ 
+         def later(minute, tool, **args):
+             todo.append((minute, next(tick), lambda: estate.call(tool, args)))
+@@ -107,6 +145,12 @@ def oracle(seed, level, skip=None):
+                     later(tick - 1, "throttle", service=c, percent=min(90, math.ceil(100 * (1 - 1 / estate._state(tick)[c][2]))))
+                     later(tick, "throttle", service=c, percent=0)
+                     tick += 2
++            tick = at
++            for c in f.get("behind", ()):  # the same for a storm that outlives a bad resolver
++                if estate._state(tick)[c][2] > 1:
++                    later(tick - 1, "throttle", service=c, percent=min(90, math.ceil(100 * (1 - 1 / estate._state(tick)[c][2]))))
++                    later(tick, "throttle", service=c, percent=0)
++                    tick += 2
+ 
+         for i in order:
+             f = estate.faults[i]
+@@ -120,7 +164,7 @@ def oracle(seed, level, skip=None):
+             need = (1 + s["retry"] * (1 - (1 - fail) * (1 - sev))) / s["cap"] if estate.storms else 0
+             if sev and fail < 0.1 and need > 1:  # quiet, and its fix would tip it: capacity first
+                 at = estate.call("scale", {"service": f["service"], "replicas": math.ceil(need * s["replicas"])})
+-                todo.append((at["completes_at_minute"], next(tick), lambda f=f: mitigate(f, True)))
++                todo.append((ready(f["service"], at["completes_at_minute"]), next(tick), lambda f=f: mitigate(f, True)))
+             else:
+                 mitigate(f, False)
+         flush(incident.HORIZON)
+@@ -163,6 +207,14 @@ def fuzz(seed, level, episodes, calib):
+                         [-1, 0, 10, 35, 50, 90, 91, 500, True, "9", 2.5])
+             if r.random() < 0.05:
+                 args["extra"] = 1
++            if estate.infra:  # its own draws again: the new tier, and real changes of shared components
++                r2 = random.Random(f"infra:{seed}:{ep}:{len(estate.actions)}:{estate.now}")
++                if tool == "list_alerts" and r2.random() < 0.6:
++                    args["tier"] = r2.choice(["infra", "infra", "app", "edge", 3])
++                if tool in ("get_diff", "revert_config", "get_logs", "scale") and r2.random() < 0.4:
++                    args["service"] = r2.choice([n for n, x in estate.svc.items() if x["tier"] == "infra"])
++                if tool == "get_diff" and isinstance(args["service"], str) and args["service"] in estate.svc and r2.random() < 0.7:
++                    args["change_id"] = r2.choice([c["id"] for c in estate.svc[args["service"]]["changes"]] or ["v1"])
+             estate.call(tool, args)
+         replayed = incident.replay(seed, level, json.loads(json.dumps(estate.actions)))
+         estate.finish()
+@@ -178,7 +230,10 @@ if __name__ == "__main__":
+     ap.add_argument("--fuzz", type=int, default=200)
+     ap.add_argument("--json", action="store_true")
+     opts = ap.parse_args()
++    lever = incident.LEVELS[opts.level]
+     for seed in map(int, opts.seeds.split(",")):
++        if lever.get("shared") or lever.get("pending"):
++            same_world(seed, opts.level)
+         result = evaluate(seed, opts.level)
+         if opts.json:
+             print(json.dumps(result))
+@@ -191,6 +246,29 @@ if __name__ == "__main__":
+               + f"  fuzz-best {best:.2f}  ref/oracle {ratio:.3f}  skip-one {skips}  {faults}"
+               + (f"  undos-read {len(UNDOS[seed, opts.level])}" if (seed, opts.level) in UNDOS else ""))
+         score = result["score"]
++        if lever.get("shared") or lever.get("pending"):
++            # the new level's gates come first and are all printed, so a red gate further down hides none
++            known = len(BAD)
++            for name in ("exploiter", "blanket-scale", "blanket-throttle", "infra-sprayer"):
++                if score[name] > 0.8:
++                    BAD.append(f"seed {seed}: {name} scores {score[name]:.2f}, over 0.8")
++            kinds = [k for k, _ in faults]
++            # undoing unread must not pay, since the reference reads first. Uncapped: the score stops at 1.
++            blind = (result["cost_null"] - result["cost"]["alert-reverter"]) / (result["cost_null"] - result["cost_ref"])
++            if blind > 1.02:
++                BAD.append(f"seed {seed}: alert-reverter avoids {blind:.2f} of what the reference avoids")
++            if lever.get("shared"):
++                if score["victim-fixer"] > 0.85:
++                    BAD.append(f"seed {seed}: victim-fixer scores {score['victim-fixer']:.2f}, over 0.85")
++                left = round(1 - skips[kinds.index("bad_resolver")] * ratio, 2)  # as a share of what the oracle avoids
++                if not SHARED_BAND[0] <= left <= SHARED_BAND[1]:
++                    BAD.append(f"seed {seed}: leaving the resolver alone costs {left} of what the oracle avoids, outside {SHARED_BAND}")
++            if lever.get("pending") and (seed, opts.level) in MET and result["cost"]["unverified"] <= result["cost_ref"]:
++                BAD.append(f"seed {seed}: unverified is not worse than the reference, which met pending capacity")
++            for line in BAD[known:]:
++                print("         FAILED " + line)
++            print(f"         victim-fixer margin {1 - score['victim-fixer']:.2f}  reference met pending capacity: "
++                  f"{(seed, opts.level) in MET}  unverified {score['unverified']:.2f}")
+         assert result["cost_null"] > result["cost_ref"] > 0
+         assert score["stop-early"] <= 0.05 and score["exploiter"] < 0.9
+         assert best <= 1.02, "a random policy beat the reference by more than rounding of replicas"
+@@ -217,3 +295,6 @@ if __name__ == "__main__":
+             assert score["one-fix"] <= 0.75 and score["no-late"] <= 0.9 and score["loudest-first"] < 0.95
+     if UNDER:
+         print(f"reference under {TARGET} of the oracle on {len(UNDER)} seed(s): {UNDER}")
++    if lever.get("pending"):
++        print(f"reference met pending capacity on {len(MET)} seed(s): {sorted(s for s, _ in MET)}")
++    sys.exit(1 if BAD else 0)
+diff --git a/spikes/aq-incident/sim/incident.py b/spikes/aq-incident/sim/incident.py
+index 2d10a35..3293085 100644
+--- a/spikes/aq-incident/sim/incident.py
++++ b/spikes/aq-incident/sim/incident.py
+@@ -70,6 +70,58 @@ FILE_RETRIES = 5
+ EVERY = 5  # minutes between generations of a published file
+ FILE_SYMPTOM = "worker panicked loading rules file: {} entries, limit 200"
+ FILE_DIFF = "rules_source: [features] -> [features, r0.features]"
++# lever 6: the level-4 worlds with shared infrastructure that is not in the call graph, and two
++# faults that sit there. Each has its own switch, so dropping one is one line.
++# `shared`: a correlated failure with one cause. SREGym (arXiv 2605.07161v3) section 2.4 "Failure
++# Modes" names correlated failures, where the symptoms must be linked to the shared cause;
++# postmortems.md: AWS us-east-1 Oct 2025, the DNS record of a shared endpoint. A bad config change on
++# one resolver makes every service behind it fail part of its own requests from the same minute.
++# `pending`: capacity that never arrives. SREGym section 2.4, the concurrent-failure example with a
++# scheduler misconfiguration that leaves a pod unschedulable; postmortems.md: AWS us-east-1 Oct 2025,
++# new capacity could not be launched. A bad quota or placement change on one node pool keeps new
++# replicas there pending; nothing fails because of it until someone relies on a scale.
++# `shared_share`: the resolver fault's static cost as a share of the loud faults' static estimate.
++LEVELS[6] = dict(LEVELS[4], world=3, shared=True, pending=True, shared_share=0.35)
++LOOKUP_SYMPTOM = "NameResolutionError: could not resolve a backend address"
++POOL_LOG = 6  # failed scheduling attempts a pending replica logs per 10 minutes
++# what an ordinary change to a resolver or a node pool did: summary -> config line
++INFRA_NOTES = {
++    "resolver": {
++        "rotate transfer key": "tsig_key_ref: vault:v7 -> vault:v8",
++        "raise query log sampling": "query_log_sample: 0.01 -> 0.05",
++        "add reverse range": "reverse_ranges: + 10.6.0.0/16",
++        "tune answer store": "store_entries: 200000 -> 250000",
++        "bump build tag": "image_tag: 1.19.2 -> 1.19.3",
++        "adjust health probe": "probe_interval_s: 10 -> 5",
++    },
++    "pool": {
++        "rotate base image": "base_image: 2026.10.2 -> 2026.11.1",
++        "raise autoscaler cooldown": "shrink_cooldown_s: 300 -> 600",
++        "label cost centre": "labels: + cost_centre=shop",
++        "kernel parameter": "sysctl net.core.somaxconn: 1024 -> 4096",
++        "adjust eviction threshold": "eviction_memory_mi: 200 -> 300",
++        "rotate kubelet certificate": "kubelet_cert_ref: vault:v3 -> vault:v4",
++    },
++}
++# (what the component itself logs, the harmful config line): the log shows a symptom, the diff the cause
++INFRA_FAULTS = {
++    "resolver": [
++        ("SERVFAIL: no answer from forwarders", "forwarders: [10.0.0.2, 10.0.0.3] -> [10.9.9.9]"),
++        ("NXDOMAIN: record set for zone svc.internal is empty", "zone svc.internal: record_source: registry -> static"),
++        ("answer truncated, tcp fallback refused", "tcp_fallback: on -> off"),
++        ("stale negative answers served: negative_ttl 86400 s", "negative_ttl_s: 30 -> 86400"),
++    ],
++    "pool": [
++        ("FailedScheduling: pod exceeds quota max_pods", "max_pods: 400 -> 40"),
++        ("FailedScheduling: no nodes match selector zone=eu-north-9", "node_selector: zone=eu-north-1 -> zone=eu-north-9"),
++        ("FailedScheduling: untolerated taint dedicated=batch", "taints: [] -> [dedicated=batch:NoSchedule]"),
++    ],
++}
++INFRA_NOISE = {
++    "resolver": [("INFO", "zone transfer completed"), ("WARN", "slow upstream answer took 400 ms"),
++                 ("INFO", "answer store compacted")],
++    "pool": [("INFO", "node heartbeat ok"), ("WARN", "image pull took 40 s"), ("INFO", "node drained and rejoined")],
++}
+ HOT = 1.32  # capacity over normal load of a service that runs hot (cpu 0.76): 3 retries hold it down
+ RETRIES = 3  # times a caller retries a failed call, where callers retry
+ STORM_LOG = 0.2  # share of retries among incoming requests that the service logs
+@@ -414,6 +466,116 @@ def scenario(seed, level):
+                                   p99=r.randrange(40, 240, 10), noise=[], changes=[], cap=HEADROOM, retry=0,
+                                   down=(-r.randint(2, 9), r.randint(85, 110)))
+         order.insert(0, "status-page")
++    if top and (cfg.get("shared") or cfg.get("pending")):
++        members = [n for n in order if svc[n]["tier"] != "external"]
++        used = {f["service"] for f in faults} | {b["service"] for b in (benign, batch, blamed) if b}
++
++        def components(kind, prefix, labels, r, bad, landed):
++            """Shared components of one kind, each with a history of ordinary config changes, some of
++            them recent or landing early in the shift, so a recent change gives nothing away. The
++            harmful change is the last one on its component. Returns the names and the harmful id."""
++            names = [f"{prefix}{x}" for x in labels.split()[: r.randint(8, 10)]]
++            cause = None
++            for i, name in enumerate(names):
++                times = [r.randint(-1440, -45) for _ in range(r.choice([1, 1, 2, 3]))]
++                if r.random() < 0.7:
++                    times.append(r.randint(-40, 40))
++                if i == bad:
++                    times = [t for t in times if t < landed - 5] + [landed]
++                n = r.randint(3, 60)
++                svc[name] = dict(tier="infra", infra=kind, deps=[], revenue=0, rps=r.randrange(200, 2000, 50),
++                                 replicas=r.choice([3, 4, 6]), p99=r.randrange(5, 40, 5),
++                                 noise=r.sample(INFRA_NOISE[kind], r.choice([1, 2])), cap=HEADROOM, retry=0,
++                                 changes=[dict(type="config", minute=t, summary=r.choice(list(INFRA_NOTES[kind])),
++                                               live=True, id=f"cfg-{n + j}") for j, t in enumerate(sorted(times))])
++                if i == bad:
++                    cause = svc[name]["changes"][-1]["id"]
++            return names, cause
++
++        infra = []
++        if cfg.get("shared"):
++            r = rng("shared")
++            onset = r.choice([-r.randint(6, 20), r.randint(5, 40)])  # before the page, or early in the shift
++            bad = r.randrange(8)
++            names, cause = components("resolver", "dns-", "1 2 3 4 5 6 7 8 9 10", r, bad, onset)
++            infra += names
++            # the group behind the bad resolver stays off the richest edge, as the loud faults do, and
++            # so do the groups of two other resolvers, so a group's place in the graph names no resolver
++            clear = [n for n in members if n not in used and svc[n]["tier"] != "edge" and not errs({n: 1.0})[top]]
++            size = max(4, round(len(members) / len(names)))
++            # victims with real edge impact and no path between them: each looks like its own cause
++            victims = []
++            for floor in (200, 1):
++                for n in r.sample(clear, len(clear)):
++                    if (len(victims) < 4 and n not in victims and impact[n] >= floor
++                            and all(not errs({n: 1.0})[v] and not errs({v: 1.0})[n] for v in victims)):
++                        victims.append(n)
++                if len(victims) >= 3:
++                    break
++            victims = victims[: r.choice([3, 4])]
++            rest = [n for n in clear if n not in victims]
++            group = victims + r.sample(rest, min(len(rest), size - len(victims)))
++            groups = {names[bad]: group}
++            others = [n for n in names if n != names[bad]]
++            r.shuffle(others)
++            for twin in others[:2]:
++                rest = [n for n in clear if not any(n in g for g in groups.values())]
++                if len(rest) >= size:
++                    groups[twin] = r.sample(rest, size)
++            left = [n for n in members if not any(n in g for g in groups.values())]
++            r.shuffle(left)
++            free = [n for n in others if n not in groups]
++            for i, n in enumerate(left):
++                groups.setdefault(free[i % len(free)], []).append(n)
++            for name, g in groups.items():
++                for n in g:
++                    svc[n]["resolver"] = name
++            # sized against the loud faults' static estimate, between a share that alerts and one that
++            # would drown the rest
++            def held(n, share):
++                """What a service fails once the retries of that share have settled (as `Estate._state` steps it)."""
++                own = share
++                for _ in range(40):
++                    own = 1 - min(1.0, svc[n]["cap"] / (1 + svc[n]["retry"] * own)) * (1 - share)
++                return own
++
++            lo, hi, span = 0.08, 0.45, HORIZON - max(onset, 0)
++            for _ in range(12):
++                mid = (lo + hi) / 2
++                if lost({n: held(n, mid) for n in group}) * span < cfg["shared_share"] * best[2]:
++                    lo = mid
++                else:
++                    hi = mid
++            share = math.floor(lo * 1000) / 1000  # rounded down: rounding up can cross into a storm
++            # the tempting wrong fix: one or two victims got an ordinary change of their own just before
++            for v in r.sample(victims, min(len(victims), r.choice([1, 2]))):
++                kind = r.choice(["deploy", "config"])
++                ids = [int(c["id"].lstrip("vcfg-")) for c in svc[v]["changes"] if c["type"] == kind]
++                svc[v]["changes"].append(dict(
++                    type=kind, minute=onset - r.randint(3, 8), live=True, shared=True,
++                    summary=r.choice(DEPLOY_NOTES if kind == "deploy" else CONFIG_NOTES),
++                    id=("v{}" if kind == "deploy" else "cfg-{}").format(max(ids) + 1 if ids else r.randint(11, 180))))
++            faults.append(dict(kind="bad_resolver", service=names[bad], start=onset, sev=share, end=None, change=cause,
++                               behind={n: share for n in group}, cause=r.randrange(len(INFRA_FAULTS["resolver"]))))
++        if cfg.get("pending"):
++            r = rng("pending")
++            bad, landed = r.randrange(8), -r.randint(8, 40)
++            names, cause = components("pool", "pool-", "a b c d e f g h i j", r, bad, landed)
++            infra += names
++            # the broken pool is the pool of a service that will need capacity: the quiet fault's service
++            # when a rollback there needs protecting, or one with more traffic than it can serve
++            needy = [f["service"] for f in faults[:4] if f["kind"] == "overload" or (
++                f.get("gray") and f["kind"] == "bad_deploy" and svc[f["service"]]["retry"])]
++            first = r.choice(needy) if needy else r.choice(members)
++            rest = [n for n in members if n != first]
++            r.shuffle(rest)
++            others = [n for n in names if n != names[bad]]
++            for i, n in enumerate(rest):  # dealt in turn, so the pools are the same size
++                svc[n]["pool"] = (others + [names[bad]])[i % len(names)]
++            svc[first]["pool"] = names[bad]
++            faults.append(dict(kind="bad_pool", service=names[bad], start=landed, sev=0.0, end=None, change=cause,
++                               cause=r.randrange(len(INFRA_FAULTS["pool"]))))
++        order[:0] = infra
+     return dict(svc=svc, order=order, edges=edges, faults=faults, batch=batch, files=files)
+ 
+ 
+@@ -439,6 +601,8 @@ class Estate:
+         self.storms = bool(self.cfg.get("storms"))
+         if self.storms:
+             self.TOOLS = dict(self.TOOLS, throttle=("service", "percent"))
++        self.infra = any(s["tier"] == "infra" for s in self.svc.values())
++        self.pools = any("pool" in s for s in self.svc.values())
+         self.throttles = {}  # service -> [(effective minute, share rejected up front)]
+         self._states = []  # per minute from -HISTORY: service -> (own failures, retries per request, utilisation)
+         self.now = 0
+@@ -458,12 +622,20 @@ class Estate:
+         return int.from_bytes(digest, "big") / 65535
+ 
+     def _replicas(self, name, t):
++        """Ready replicas at minute t. On a node pool whose quota or placement is broken, replicas
++        above the ready count stay pending until SCALE minutes after the pool's revert lands."""
+         reps = self.svc[name]["replicas"]
++        stuck = next((f for f in self.faults if f["kind"] == "bad_pool" and f["service"] == self.svc[name].get("pool")), None)
+         for at, n in self.scales.get(name, ()):
+-            if at <= t:
++            if at <= t and (n <= reps or not stuck or (stuck["end"] is not None and stuck["end"] + MITIGATIONS["scale"][0] <= t)):
+                 reps = n
+         return reps
+ 
++    def _pending(self, name, t):
++        """Replicas asked for and not ready at minute t: the latest scale that has completed, less the ready."""
++        asked = [n for at, n in self.scales.get(name, ()) if at <= t]
++        return max(0, asked[-1] - self._replicas(name, t)) if asked else 0
++
+     def _load(self, name, t):
+         load = 1.0
+         for f in self.faults:
+@@ -515,6 +687,8 @@ class Estate:
+                         ok *= 1 - self._fault_sev(f, m)
+                     if name in f.get("hits", ()) and self._bad_file(f, m):
+                         ok *= 1 - f["hits"][name]
++                    if name in f.get("behind", ()):  # every service behind a failing resolver fails its share
++                        ok *= 1 - self._fault_sev(f, m)
+                 for n, t0, t1, sev in self.disrupt:
+                     if n == name and t0 <= m < t1:
+                         ok *= 1 - sev
+@@ -593,6 +767,7 @@ class Estate:
+             cpu=round(cpu, 2),
+             mem=round(min(0.99, 0.42 + 0.56 * min(1.0, fill) + 0.03 * self._noise(name, "mem", t)), 2),
+             replicas=reps, restarts_30m=crashes, **({"retry_share": self._retry_share(name, t, back)} if self.storms else {}),
++            **({"pending_replicas": self._pending(name, t)} if self.pools else {}),
+         )
+ 
+     def _cost(self):
+@@ -616,6 +791,9 @@ class Estate:
+                                     for s, a, at in self.ops if at > self.now],
+             **({"throttles": [dict(service=s, percent=round(100 * ps[-1][1])) for s, ps in self.throttles.items()
+                               if ps[-1][1]]} if self.storms else {}),
++            **({"pending_replicas": [dict(service=s, requested=self._replicas(s, self.now) + self._pending(s, self.now),
++                                          ready=self._replicas(s, self.now))
++                                     for s in self.scales if self._pending(s, self.now)]} if self.pools else {}),
+         )
+ 
+     def get_topology(self):
+@@ -623,6 +801,8 @@ class Estate:
+             dict(name=n, tier=self.svc[n]["tier"], normal_replicas=self.svc[n]["replicas"],
+                  revenue_per_min=self.svc[n]["revenue"], **({"callers_retry": self.svc[n]["retry"]} if self.storms else {}),
+                  **({"file_from": self.files[n]} if n in self.files else {}),
++                 **({"resolver": self.svc[n]["resolver"]} if "resolver" in self.svc[n] else {}),
++                 **({"node_pool": self.svc[n]["pool"]} if "pool" in self.svc[n] else {}),
+                  depends_on=[dict(service=d, kind="hard" if w == 1.0 else "soft") for d, w in self.svc[n]["deps"]])
+             for n in reversed(self.order)])
+ 
+@@ -692,6 +872,15 @@ class Estate:
+             if service in f.get("hits", ()) and self._bad_file(f, t):
+                 lines.append(dict(level="ERROR", count=int(volume * f["hits"][service]),
+                                   message=FILE_SYMPTOM.format(2 * self.svc[f["service"]]["file"])))
++            if service in f.get("behind", ()) and self._fault_sev(f, t):  # the symptom does not name the resolver
++                lines.append(dict(level="ERROR", count=int(volume * f["sev"]), message=LOOKUP_SYMPTOM))
++            if f["service"] == service and f["kind"] == "bad_resolver" and self._fault_sev(f, t):
++                lines.append(dict(level="ERROR", count=int(volume * f["sev"]),
++                                  message=INFRA_FAULTS["resolver"][f["cause"]][0]))
++            if f["service"] == service and f["kind"] == "bad_pool":  # only while something is pending on it
++                stuck = sum(self._pending(n, t) for n in self.scales if self.svc[n].get("pool") == service)
++                if stuck:
++                    lines.append(dict(level="ERROR", count=POOL_LOG * stuck, message=INFRA_FAULTS["pool"][f["cause"]][0]))
+         if "file" in s:  # a publisher logs each generation: two in ten minutes
+             bad = any(f["service"] == service and f["kind"] == "bad_file" and self._bad_file(f, t) for f in self.faults)
+             lines.append(dict(level="INFO", count=2, message=f"rules file generated: {s['file'] * (2 if bad else 1)} entries"))
+@@ -727,6 +916,18 @@ class Estate:
+ 
+     def get_diff(self, service, change_id):
+         for c in self.svc[service]["changes"]:
++            if c["id"] == change_id and c["minute"] <= self.now and "infra" in self.svc[service]:
++                # two config lines, in either order, as for a service
++                book = INFRA_NOTES[self.svc[service]["infra"]]
++                notes = [n for n in book if n != c["summary"]]
++                pick = int(self._noise(service, "diff:" + change_id) * 1000)
++                parts = [book[c["summary"]], book[notes[pick % len(notes)]]]
++                for f in self.faults:
++                    if f["service"] == service and f["change"] == change_id:
++                        parts[1] = INFRA_FAULTS[self.svc[service]["infra"]][f["cause"]][1]
++                if pick % 2:
++                    parts.reverse()
++                return dict(ok=True, service=service, id=change_id, type=c["type"], diff="\n".join(parts))
+             if c["id"] == change_id and c["minute"] <= self.now:
+                 # every change is two hunks, in either order, so the shape of a diff says nothing
+                 notes = [n for n in (DEPLOY_NOTES if c["type"] == "deploy" else CONFIG_NOTES) if n != c["summary"]]
+@@ -782,7 +983,7 @@ class Estate:
+ 
+     def revert_config(self, service):
+         # a bad file already loaded stays until the publisher's next generation (Cloudflare 18 Nov 2025)
+-        return self._revert(service, "revert_config", "config", ("bad_config", "bad_file"))
++        return self._revert(service, "revert_config", "config", ("bad_config", "bad_file", "bad_resolver", "bad_pool"))
+ 
+     def restart(self, service):
+         at = self._start(service, "restart", DATA_RESTART if self.svc[service]["tier"] == "data" else None)
+@@ -847,13 +1048,15 @@ class Estate:
+             return dict(ok=False, error="unknown service")
+         if (tool in MITIGATIONS or tool == "throttle") and self.svc[args["service"]]["tier"] == "external":
+             return dict(ok=False, error=f"{args['service']} is hosted outside this estate: nothing here can act on it")
++        if (tool in MITIGATIONS or tool == "throttle") and tool != "revert_config" and self.svc[args["service"]]["tier"] == "infra":
++            return dict(ok=False, error=f"{args['service']} is shared infrastructure: only revert_config applies to it")
+         for key in ("replicas", "minutes", "until_minute", "percent"):
+             if key in args and type(args[key]) is not int:
+                 return dict(ok=False, error=f"{key} must be an integer")
+         if "until_minute" in args and not WINDOW - HISTORY <= args["until_minute"] <= self.now:
+             return dict(ok=False, error=f"until_minute must be between {WINDOW - HISTORY} and now")
+-        if "tier" in args and args["tier"] not in ("edge", "app", "data"):
+-            return dict(ok=False, error="tier must be edge, app or data")
++        if "tier" in args and args["tier"] not in ("edge", "app", "data") + ("infra",) * self.infra:
++            return dict(ok=False, error="tier must be edge, app or data" if not self.infra else "tier must be edge, app, data or infra")
+         if tool in MITIGATIONS and any(s == args["service"] and at > self.now for s, _, at in self.ops):
+             return dict(ok=False, error="another operation is still in progress on this service")
+         result = getattr(self, tool)(**args)
+@@ -931,6 +1134,31 @@ def briefing(level):
+ - The cause is fixed at the publisher, and the fix takes effect with its next generation: what was
+   already loaded stays until then.
+ - Not every alert belongs to this estate's services, or to a fault.
++"""
++    took_scale = MITIGATIONS["scale"][0]
++    infra = "" if not (cfg.get("shared") or cfg.get("pending")) else f"""
++## Shared infrastructure
++
++- Services also rest on shared components that are not in the call graph: they have tier `infra`
++  in `get_topology`, earn no revenue and are in nobody's `depends_on`.{"""
++  `resolver` names the resolver a service looks its backends up through.""" if cfg.get("shared") else ""}{"""
++  `node_pool` names the pool of machines its replicas run on.""" if cfg.get("pending") else ""}
++- A fault on a shared component shows on every service behind it at once, as their own failures:
++  a resolver that fails a share of its lookups makes each service behind it fail that share of its
++  requests, and its `error_rate` is that share. Their logs show the symptom, not the component.
++  Nothing done to a service behind it removes the cause.
++- Shared components answer `get_metrics`, `get_logs`, `get_changes` and `get_diff`, and alert like
++  services: `list_alerts` takes `tier="infra"`. Their changes are config changes, and the only
++  mitigation they accept is `revert_config` (the latest live config change, {took["revert_config"]} minutes, no
++  disruption; ${cfg["wasted"]:,} if that change was not a cause). Every other mitigation on one is rejected.{f"""
++- A `scale` is always accepted and reports `completes_at_minute`, but on a pool whose quota or
++  placement is broken the new replicas stay pending: the ready count does not rise. `get_metrics`
++  shows the ready `replicas` and `pending_replicas`; `get_status` lists `pending_replicas`
++  (requested and ready) for every service that has some; the pool logs the failed scheduling while
++  something is pending on it. Scaling down always works, and so does a `scale` on a healthy pool.
++- Pending replicas become ready {took_scale} minutes after the pool's `revert_config` lands (or at the
++  scale's own `completes_at_minute`, if that is later), unless a later `scale` asked for fewer.
++  Pending replicas are not charged; ready ones are, as always.""" if cfg.get("pending") else ""}
+ """
+     return f"""## How time works
+ 
+@@ -961,7 +1189,7 @@ better.
+ | Lost revenue | each edge service's revenue per minute × its error rate, every minute of the shift |
+ | Extra replicas | ${REPLICA_COST} per replica above normal per minute, from when the scale lands to the end of the shift |
+ | Wasted mitigation | ${cfg["wasted"]:,} for each mitigation applied to a service that did not need it (setting a service back to its normal replica count is free) |
+-{views}{storms}{files}"""
++{views}{storms}{files}{infra}"""
+ 
+ 
+ def sign(actions):
+diff --git a/spikes/aq-incident/sim/policies.py b/spikes/aq-incident/sim/policies.py
+index 33ef51b..e0ec59e 100644
+--- a/spikes/aq-incident/sim/policies.py
++++ b/spikes/aq-incident/sim/policies.py
+@@ -199,10 +199,14 @@ def diagnose(call, service, signals=(), since=None, logs=None):
+     return None
+ 
+ 
+-def graph(call):
+-    """Topology, weighted dependencies, and the revenue per minute each service can take down."""
++def graph(call, shared=True):
++    """Topology, weighted dependencies, and the revenue per minute each service can take down.
++    Where the topology names a service's resolver, the resolver counts as a hard dependency when
++    failures are explained: the briefing says a resolver that fails a share of its lookups makes
++    each service behind it fail that share. A node pool fails nobody's requests, so it is no dependency."""
+     topo = {s["name"]: s for s in call("get_topology")["services"]}
+     deps = {n: [(d["service"], 1.0 if d["kind"] == "hard" else 0.3) for d in s["depends_on"]]
++            + ([(s["resolver"], 1.0)] if shared and s.get("resolver") in topo else [])
+             for n, s in topo.items()}
+ 
+     def worth(target):
+@@ -229,8 +233,11 @@ def blind(topo, service, n):
+     return (tools[n], {"replicas": 2 * topo[service]["normal_replicas"]} if tools[n] == "scale" else {})
+ 
+ 
++SCALE = 4  # minutes a scale takes; pending replicas become ready this long after their pool's revert lands
++
++
+ def reference(call, max_fixes=None, leave_when_clear=False, thorough=False, descend=True, trusting=False,
+-              guess=False, drain=True, protect=True, lift=True, files="fix"):
++              guess=False, drain=True, protect=True, lift=True, files="fix", shared="fix", verify=True):
+     """An expert on call. A service is a cause when it fails more than its dependencies explain
+     (or its memory is filling up), however loud it is; a busy CPU or a recent change alone is not.
+     Causes are worked in order of the revenue they cost, each from the cheapest evidence that
+@@ -247,11 +254,20 @@ def reference(call, max_fixes=None, leave_when_clear=False, thorough=False, desc
+     that retries hold down are throttled together for the minute the next good file lands. A
+     consumer is never mitigated. There the alert list is read by tier when it would be cut, a
+     queued suspect is dropped when the free status shows its edges healthy again, and a quiet
+-    suspect gets unmeasured spare capacity while its diffs are read."""
+-    topo, deps, worth = graph(call)
++    suspect gets unmeasured spare capacity while its diffs are read.
++    Where the topology names a resolver per service, a failing resolver explains the failures of
++    every service behind it, as a dependency would: it is diagnosed like any cause (its own log,
++    then the diff of the change a revert would undo), nothing is done to the services behind it,
++    and those that retries hold down afterwards are drained. Where it names a node pool, capacity
++    is relied on only once the free status shows it ready: replicas that stay pending send it to
++    the pool's log and diff, and the pool is reverted when that costs less than a throttle would."""
++    topo, deps, worth = graph(call, shared == "fix")
++    pooled = {}  # node pool -> the minute its pending replicas are ready, None when its diff showed no cause
+     began, mended, treated, shed, seen, tiers = {}, {}, set(), {}, {}, None
+     calm, hogs = set(), {}
+     filed = any("file_from" in s for s in topo.values())  # what follows from it applies only where files are loaded
++    resolvers = any("resolver" in s for s in topo.values())  # likewise for shared resolvers
++    checked, calming = {}, {}  # resolver -> the minute its log was read; service -> the throttle that calms it as capacity lands
+     fixes, looked, free, dropped, tried = 0, {}, None, set(), {}
+     retries = {n: s.get("callers_retry", 0) for n, s in topo.items()}
+     fixed, cleared, prepared, timers, clock, raw = set(), set(), {}, [], [0], call
+@@ -265,6 +281,9 @@ def reference(call, max_fixes=None, leave_when_clear=False, thorough=False, desc
+             minute, step, kw = timers.pop(min(range(len(timers)), key=lambda i: timers[i][0]))
+             if minute > clock[0]:
+                 clock[0] = raw("wait", minutes=minute - clock[0]).get("minute", clock[0])
++            if step == "landed":  # not a tool: the free status says whether the replicas asked for are ready
++                arrived(**kw)
++                continue
+             served = raw(step, **kw)
+             clock[0] = served.get("minute", clock[0])
+         if served and tool == "wait":
+@@ -293,16 +312,53 @@ def reference(call, max_fixes=None, leave_when_clear=False, thorough=False, desc
+                 plan += (call("scale", service=service, replicas=plan[1]).get("completes_at_minute", 0),)
+             prepared[service] = plan
+ 
++    def mend(service):
++        """Replicas asked for are pending: the pool's log says why, the diff of its latest config
++        change says what did it, and only then is it reverted. The minute the capacity is ready
++        (the briefing: SCALE minutes after the revert lands), or None when the pool shows no cause."""
++        pool = topo[service].get("node_pool")
++        if pool not in pooled:
++            pooled[pool] = None
++            logs = call("get_logs", service=pool).get("lines", [])
++            symptom = next((line["message"] for line in logs if line["level"] == "ERROR"), None)
++            if symptom and change_fix(call, pool, symptom) == ("revert_config", {}):
++                result = call("revert_config", service=pool)
++                if result["ok"]:
++                    pooled[pool] = result["completes_at_minute"] + SCALE
++        return pooled[pool]
++
++    def stuck(service):
++        return any(p["service"] == service for p in call("get_status").get("pending_replicas", []))
++
++    def arrived(service):
++        """A scale that was the fix is checked the minute it should have landed. Pending: the pool is
++        mended, and the service is calmed again as the capacity arrives, as it was meant to be the
++        first time."""
++        ready = mend(service) if stuck(service) else None
++        if ready:
++            looked[service] = ready - 4  # nothing to diagnose until the capacity is there
++            if service in calming:
++                timers.append((ready - 1, "throttle", dict(service=service, percent=calming[service])))
++                if lift:
++                    timers.append((ready, "throttle", dict(service=service, percent=0)))
++
+     while True:
+         status = call("get_status")
+         if status["shift_over"]:
+             return
+         now = status["minute"]
+         busy = {op["service"]: op["completes_at_minute"] for op in status["operations_in_progress"]}
++        for p in status.get("pending_replicas", []) if verify else ():
++            # a scale that was meant to fix an overload landed nowhere: without the pool it never will
++            if p["service"] not in prepared and topo[p["service"]].get("node_pool") not in pooled:
++                ready = mend(p["service"])
++                if ready:
++                    looked[p["service"]] = ready - 4  # nothing to diagnose until the capacity is there
+         clear = all(e["error_rate"] <= 0.005 for e in status["edge"])
+         if leave_when_clear and fixes and clear and not busy:
+             call("finish")
+             return
++        again, worked, was = False, False, {e["service"]: e["error_rate"] for e in status["edge"]}
+         if free or not clear or free is None:  # status is free; alerts may take clock time
+             # the ten loudest hide the rest when the list was cut last time, or when the failing edges
+             # alone fill a third of it: read it by tier at once, the edge tier is in the status
+@@ -324,7 +380,7 @@ def reference(call, max_fixes=None, leave_when_clear=False, thorough=False, desc
+                 alerts = alerts + more.get("alerts", []) + failing
+             elif partial and result["total"] > len(alerts):  # the list is cut off: read it tier by tier
+                 tiers = True
+-                for tier in ("app", "data"):
++                for tier in ("app", "data") + (("infra",) if resolvers and shared == "fix" else ()):
+                     at, more = clock[0], call("list_alerts", tier=tier)
+                     cut = cut or more.get("total", 0) > len(more.get("alerts", []))
+                     seen.update({a["service"]: at for a in more.get("alerts", []) if a not in alerts})
+@@ -359,11 +415,19 @@ def reference(call, max_fixes=None, leave_when_clear=False, thorough=False, desc
+                     # saturated under retries while a caller fails: the ten shown may hide its error alert
+                     own[n] = max([err[c] for c in err if (n, 1.0) in deps[c]] or [0])
+             suspects = [n for n in signals if n not in busy and worth[n] > 0 and looked.get(n, -99) + 5 <= now
+-                        and (own[n] >= 0.06 or "mem" in signals[n])]
++                        and (own[n] >= 0.06 or "mem" in signals[n])
++                        # behind a resolver that is failing itself: the shared cause comes first, and what a
++                        # service fails beyond the resolver's share is the retries of that share
++                        and not (shared == "fix" and topo[n].get("resolver") in err)]
+             # with partial views the dearest per minute of looking goes first: a saturation or a
+             # leak takes one query to settle, a symptom takes the diffs, a trace takes the path too
+             work = [(-worth[n] * max(own[n], 0.05) / (1 if not partial else 3 if signals[n] & {"cpu", "mem"} else 8), n)
+                     for n in suspects]
++            if resolvers and shared == "fix":
++                # a failing resolver is ranked by the loudest failure it explains: what a service behind
++                # it fails beyond the resolver's own share is the retries of that share
++                work = [(-worth[n] * max([own[n]] + [err[v] for v in err if topo[v].get("resolver") == n]) / 8, n)
++                        if topo[n]["tier"] == "infra" else (w, n) for w, n in work]
+             hidden = set()
+             for e in status["edge"] if partial and descend else ():
+                 up = 1.0
+@@ -385,6 +449,16 @@ def reference(call, max_fixes=None, leave_when_clear=False, thorough=False, desc
+                     fresh = {e["service"]: e["error_rate"] for e in call("get_status")["edge"]}
+                     if all(fresh[e] <= 0.005 for e in fresh if e == service or service in under(e)):
+                         continue
++                if resolvers and shared == "fix" and worked:
++                    # where a shared component can fail many services at once, the free status is read
++                    # between suspects: an edge that fails 5 points more than when the alerts were read,
++                    # with no mitigation running below it, is new trouble, and the list is read again
++                    running = {n for n, at in busy.items() if at > clock[0]}
++                    if any(e["error_rate"] >= was[e["service"]] + 0.05 and not under(e["service"]) & running
++                           for e in call("get_status")["edge"]):
++                        again = True
++                        break
++                worked = True
+                 looked[service], edge = now, None
+                 if service in hidden:
+                     hidden.remove(service)
+@@ -422,9 +496,29 @@ def reference(call, max_fixes=None, leave_when_clear=False, thorough=False, desc
+                                 when, -150) if when is not None else seen.get(service, clock[0])).get("lines", [])
+                             action = next((("file", {"symptom": line["message"]}) for line in logs
+                                            if FILE.search(line["message"])), None)
++                        res = topo[service].get("resolver")
++                        if shared == "fix" and res and logs is None and not action and not known & {"cpu", "mem"}:
++                            logs = call("get_logs", service=service).get("lines", [])  # the read `diagnose` starts with
+                         action = action or diagnose(call, service, known, since.get(service), logs)
+                         if not action and service not in err:
+                             cleared.add(service)
++                        if shared == "fix" and not action and service in err and res and checked.get(res, -99) + 10 <= clock[0] \
++                                and any(line["level"] == "ERROR" and not UPSTREAM.match(line["message"]) for line in logs or ()):
++                            # it logs a failure of its own that none of its changes explains: the resolver it
++                            # shares with others is next. The resolver's own log must show it failing, and the
++                            # diff of the change a revert would undo must touch what that log names.
++                            checked[res] = clock[0]
++                            symptom = next((line["message"] for line in call("get_logs", service=res).get("lines", [])
++                                            if line["level"] == "ERROR"), None)
++                            found = change_fix(call, res, symptom) if symptom else None
++                            if found:
++                                service, action = res, found
++                        if shared == "victim" and not action and service in err and topo[service].get("resolver") \
++                                and service not in treated:
++                            # where it shows: undo the failing service's latest change, or restart it
++                            treated.add(service)
++                            live = [c for c in call("get_changes", service=service).get("changes", []) if c["status"] == "live"]
++                            action = (("rollback" if live[-1]["type"] == "deploy" else "revert_config") if live else "restart", {})
+                 fed = ()
+                 if action and action[0] == "file":
+                     symptom, pub, action = action[1]["symptom"], topo[service].get("file_from"), None
+@@ -463,10 +557,25 @@ def reference(call, max_fixes=None, leave_when_clear=False, thorough=False, desc
+                             "scale", service=service, replicas=plan[1]).get("completes_at_minute", 0)
+                         while not (seen := call("get_status"))["shift_over"] and seen["minute"] < landed:
+                             call("wait", minutes=landed - seen["minute"])
++                        if verify and topo[service].get("node_pool") and stuck(service):
++                            # the capacity is not there. Fixing the pool keeps a quiet fault (under the 5%
++                            # that alerts) for the 13 minutes its log, changes, diff, revert and the new
++                            # replicas take; a throttle instead rejects its share for the mitigation's minutes
++                            share = 1 - 1 / (1 + retries[service] * DISRUPTS[action[0]][1] * 1.15)
++                            ready = mend(service) if 0.05 * 13 <= share * DISRUPTS[action[0]][0] or \
++                                topo[service].get("node_pool") in pooled else None
++                            while ready and not (seen := call("get_status"))["shift_over"] and seen["minute"] < ready:
++                                call("wait", minutes=ready - seen["minute"])
++                            if stuck(service):  # still not there: give the request back and shed load instead
++                                call("scale", service=service, replicas=topo[service]["normal_replicas"])
++                                plan = ("throttle", min(90, math.ceil(100 * share)))
++                                call("throttle", service=service, percent=plan[1])
+                     elif plan:
+                         call("throttle", service=service, percent=plan[1])
+                     result = call(action[0], service=service, **action[1])
+                     at = result.get("completes_at_minute", 0)
++                    if verify and result["ok"] and action[0] == "scale" and topo[service].get("node_pool"):
++                        timers.append((at, "landed", dict(service=service)))
+                     if plan and plan[0] == "scale":  # give it back the minute the mitigation lands
+                         timers.append((at, "scale", dict(service=service, replicas=topo[service]["normal_replicas"])))
+                     elif plan and lift:
+@@ -481,12 +590,26 @@ def reference(call, max_fixes=None, leave_when_clear=False, thorough=False, desc
+                             if action[0] in DISRUPTS:
+                                 failing = 1 - (1 - failing) * (1 - DISRUPTS[action[0]][1])
+                             if not plan and failing >= 0.1:  # held down by retries: calm as the fix lands
++                                calming[service] = min(90, math.ceil(100 * (1 - 1 / (1 + retries[service] * failing))))
+                                 timers.append((at - 1, "throttle", dict(service=service, percent=min(
+                                     90, math.ceil(100 * (1 - 1 / (1 + retries[service] * failing)))))))
+                                 if lift:
+                                     timers.append((at, "throttle", dict(service=service, percent=0)))
+                         looked.pop(service, None)
+                         fixes += 1
++                        if drain and topo[service]["tier"] == "infra":
++                            # those behind it that retries hold down (saturated and failing when the alerts
++                            # were read) are throttled for a minute as the revert lands, one a minute, the
++                            # dearest first; the rest are drained from their metrics if a storm stays
++                            behind = [n for n in topo if topo[n].get("resolver") == service and retries.get(n)]
++                            fixed.update(behind)
++                            hot = sorted((n for n in behind if "cpu" in signals.get(n, ()) and n in err and worth[n] > 0),
++                                         key=lambda n: -worth[n])
++                            for i, n in enumerate(hot):
++                                timers.append((at - 1 + 2 * i, "throttle", dict(service=n, percent=min(
++                                    90, math.ceil(100 * (1 - 1 / (1 + retries[n] * err[n])))))))
++                                if lift:
++                                    timers.append((at + 2 * i, "throttle", dict(service=n, percent=0)))
+                         if fed:  # the file already loaded stays until the next generation
+                             mended[service] = tick = 5 * math.ceil(at / 5)
+                             for c in fed:
+@@ -510,6 +633,8 @@ def reference(call, max_fixes=None, leave_when_clear=False, thorough=False, desc
+                         if max_fixes and fixes >= max_fixes:
+                             call("finish")
+                             return
++        if again:
++            continue
+         now = call("get_status")["minute"]
+         pending = [at - now for at in busy.values() if at > now]
+         call("wait", minutes=max(1, min(pending)) if pending and not free else 1)
+@@ -583,6 +708,59 @@ def drain_only(call):
+     reference(call, files="drain")
+ 
+ 
++def victim_fixer(call):
++    """The reference, but it treats a correlated failure where it shows: on each failing service
++    behind a resolver it undoes the service's latest change, or restarts it, and never looks at
++    the shared component."""
++    reference(call, shared="victim")
++
++
++def unverified(call):
++    """The reference, but it never checks that a scale landed."""
++    reference(call, verify=False)
++
++
++def blanket(call, tool):
++    """No diagnosis: the same generic mitigation once on everything that alerts, to the end of the shift."""
++    topo = {s["name"]: s for s in call("get_topology")["services"]}
++    done = set()
++    while not call("get_status")["shift_over"]:
++        for a in call("list_alerts").get("alerts", []):
++            if a["service"] not in done:
++                done.add(a["service"])
++                extra = {"replicas": 2 * topo[a["service"]]["normal_replicas"]} if tool == "scale" else {"percent": 50}
++                call(tool, service=a["service"], **extra)
++        call("wait", minutes=5)
++
++
++def blanket_scale(call):
++    """Doubles the replicas of everything that alerts."""
++    blanket(call, "scale")
++
++
++def blanket_throttle(call):
++    """Throttles everything that alerts by half."""
++    blanket(call, "throttle")
++
++
++def infra_sprayer(call):
++    """Reverts the latest config change of every shared component at minute 0 without reading
++    anything, then plays the reference."""
++    for s in call("get_topology")["services"]:
++        if s["tier"] == "infra":
++            call("revert_config", service=s["name"])
++    reference(call)
++
++
++def alert_reverter(call):
++    """Reverts the latest config change of whatever shared component alerts at minute 0, without
++    reading its log or diff, then plays the reference. A gamble the reference may not take: it
++    reads before it undoes."""
++    for a in call("list_alerts", tier="infra").get("alerts", []):
++        call("revert_config", service=a["service"])
++    reference(call)
++
++
+ def loudest_first(call):
+     """Works the loudest alert it has not treated yet, where it shows and one at a time, to the
+     end of the shift. Symptoms are louder than causes, so it treats victims and bystanders."""
+@@ -638,6 +816,8 @@ POLICIES = {
+     "trusting": trusting, "alerts-only": alerts_only,
+     "no-drain": no_drain, "unprotected": unprotected, "forgetful": forgetful,
+     "consumer-fixer": consumer_fixer, "surge-responder": surge_responder, "drain-only": drain_only,
++    "victim-fixer": victim_fixer, "unverified": unverified, "blanket-scale": blanket_scale,
++    "blanket-throttle": blanket_throttle, "infra-sprayer": infra_sprayer, "alert-reverter": alert_reverter,
+ }
+ 
+ 

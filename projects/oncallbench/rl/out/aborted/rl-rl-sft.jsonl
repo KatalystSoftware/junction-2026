@@ -1,0 +1,2 @@
+{"step": 1, "reward": 0.8283, "raw": 0.8283, "by_level": {"0": 0.9544, "1": 0.7526, "2": 0.0}, "groups_used": 7, "turns": 28.8, "finish": 0, "cap": 1, "ctx": 0, "nudges": 0, "loss": -9e-05, "grad_norm": 0.051, "roll_s": 19, "train_s": 89, "time": 1794667868}
+{"step": 2, "reward": 0.8277, "raw": 0.8277, "by_level": {"0": 1.0, "1": 0.9231, "2": 0.7552}, "groups_used": 7, "turns": 23.9, "finish": 0, "cap": 0, "ctx": 0, "nudges": 0, "loss": -0.00021, "grad_norm": 0.05, "roll_s": 16, "train_s": 32, "time": 1794667917}

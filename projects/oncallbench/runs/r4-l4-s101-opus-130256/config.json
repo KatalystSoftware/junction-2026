@@ -1,0 +1,14 @@
+{
+    "job_name": "r4-l4-s101-opus-130256",
+    "agents": [
+        {
+            "name": "opencode",
+            "model_name": "anthropic/claude-opus-5-5"
+        }
+    ],
+    "tasks": [
+        {
+            "path": "jobs/variants/aq-incident-ec900b74"
+        }
+    ]
+}

@@ -1,0 +1,1165 @@
+diff --git a/spikes/aq-incident/eval.py b/spikes/aq-incident/eval.py
+index 45461f4..99fc6ba 100644
+--- a/spikes/aq-incident/eval.py
++++ b/spikes/aq-incident/eval.py
+@@ -18,6 +18,7 @@ import policies  # noqa: E402
+ 
+ BUILD_SEEDS = [1, 2, 3, 4, 5]
+ HELD_OUT_SEEDS = [101, 102, 103]
++EXTRA_BUILD_SEEDS = [6, 7, 8, 9, 10, 11, 12]  # more seeds to tune on: --seeds 6,7,8,9,10,11,12
+ 
+ 
+ def run(seed, level, policy):
+@@ -32,7 +33,8 @@ def run(seed, level, policy):
+     return estate
+ 
+ 
+-FIX = {"bad_deploy": "rollback", "leak": "rollback", "bad_config": "revert_config", "primary_down": "failover"}
++FIX = {"bad_deploy": "rollback", "leak": "rollback", "bad_config": "revert_config", "primary_down": "failover",
++       "bad_file": "revert_config"}
+ 
+ 
+ def oracle(seed, level, skip=None):
+@@ -40,7 +42,8 @@ def oracle(seed, level, skip=None):
+     simulator allows. `skip` leaves one fault alone. Returns the cheapest order's cost.
+     Where callers retry it reads the hidden load too: a quiet service gets the capacity a
+     disruptive fix needs first and gives it back after, and a storm that would outlive a fix is
+-    throttled for the minute the fix lands."""
++    throttled for the minute the fix lands. A bad file is fixed at its publisher, and a storm on a
++    consumer is throttled for the minute the next good file lands."""
+     faults = [i for i in range(len(incident.Estate(seed, level).faults)) if i != skip]
+     costs = []
+     for order in itertools.permutations(faults):
+@@ -64,7 +67,7 @@ def oracle(seed, level, skip=None):
+             name, s = f["service"], estate.svc[f["service"]]
+             args = {"service": name}
+             if f["kind"] == "overload":
+-                args["replicas"] = math.ceil(f["load"] * s["replicas"] / s.get("cap", incident.HEADROOM))
++                args["replicas"] = math.ceil(estate._load(name, estate.now) * s["replicas"] / s.get("cap", incident.HEADROOM))
+             result = estate.call(FIX.get(f["kind"], "scale"), args)
+             assert result["ok"]
+             at = result["completes_at_minute"]
+@@ -73,6 +76,12 @@ def oracle(seed, level, skip=None):
+             elif estate.storms and estate._state(at)[name][2] > 1:
+                 later(at - 1, "throttle", service=name, percent=min(90, math.ceil(100 * (1 - 1 / estate._state(at)[name][2]))))
+                 later(at, "throttle", service=name, percent=0)
++            tick = incident.EVERY * math.ceil(at / incident.EVERY)
++            for c in f.get("hits", ()):  # a storm outlives the bad file: one consumer after the other
++                if estate._state(tick)[c][2] > 1:
++                    later(tick - 1, "throttle", service=c, percent=min(90, math.ceil(100 * (1 - 1 / estate._state(tick)[c][2]))))
++                    later(tick, "throttle", service=c, percent=0)
++                    tick += 2
+ 
+         for i in order:
+             f = estate.faults[i]
+@@ -84,6 +93,7 @@ def oracle(seed, level, skip=None):
+             sev = estate.cfg.get("disrupt", {}).get(tool, incident.MITIGATIONS[tool][1])
+             fail = estate._state(estate.now)[f["service"]][0] if estate.storms else 1
+             need = (1 + s["retry"] * (1 - (1 - fail) * (1 - sev))) / s["cap"] if estate.storms else 0
++            need *= estate._load(f["service"], estate.now)  # a campaign's traffic counts too
+             if sev and fail < 0.1 and need > 1:  # quiet, and its fix would tip it: capacity first
+                 at = estate.call("scale", {"service": f["service"], "replicas": math.ceil(need * s["replicas"])})
+                 todo.append((at["completes_at_minute"], next(tick), lambda f=f: mitigate(f, True)))
+@@ -168,7 +178,12 @@ if __name__ == "__main__":
+             assert skips[3] <= 0.75, "the quiet fault on the rich edge can be left alone for more than 0.75"
+             assert score["trusting"] <= 0.85 and score["alerts-only"] <= 0.85 and score["shotgun"] < 0.9
+         if incident.LEVELS[opts.level].get("storms"):
+-            assert score["no-drain"] <= 0.8 and score["unprotected"] <= 0.9 and score["forgetful"] < 0.95
++            assert score["no-drain"] <= 0.8 and score["forgetful"] < 0.95
++            # a quiet fault that sits in a config needs no protection, so there is nothing to get wrong
++            assert score["unprotected"] <= 0.9 or faults[-1][0] == "bad_config"
++        if incident.LEVELS[opts.level].get("files"):
++            assert skips[0] <= 0.8, "the bad file can be left alone for more than 0.8 of what the oracle avoids"
++            assert max(score["consumer-fixer"], score["surge-responder"], score["drain-only"]) <= 0.8
+         if opts.level >= 1:
+             assert max(skips) <= 0.9, "one fault can be left alone for more than 0.9"
+             assert score["one-fix"] <= 0.75 and score["no-late"] <= 0.9 and score["loudest-first"] < 0.95
+diff --git a/spikes/aq-incident/sim/incident.py b/spikes/aq-incident/sim/incident.py
+index a510367..3c4c493 100644
+--- a/spikes/aq-incident/sim/incident.py
++++ b/spikes/aq-incident/sim/incident.py
+@@ -57,6 +57,15 @@ LEVELS = {
+ # The rich edge earns more than at level 3 (gray_share): retries make the loud faults cost more than
+ # the static estimate the share is taken from, and the quiet fault must stay worth a quarter.
+ LEVELS[4] = dict(LEVELS[3], world=3, storms=True, gray_share=0.6)
++# lever 5: the level-4 worlds, but the primary fault is a generated file that is bad on some
++# generations and then on all of them, so the estate fails, recovers and fails again (postmortems.md:
++# Cloudflare 18 Nov 2025; GitHub 7 Oct 2026, a recovery "which looked like a fix"). Two coincidences
++# point at a surge: a campaign within capacity and a status page hosted elsewhere (Cloudflare 18
++# Nov 2025; Microsoft 365 Nov 2026).
++LEVELS[5] = dict(LEVELS[4], files=True)
++EVERY = 5  # minutes between generations of a published file
++FILE_SYMPTOM = "worker panicked loading rules file: {} entries, limit 200"
++FILE_DIFF = "rules_source: [features] -> [features, r0.features]"
+ HOT = 1.32  # capacity over normal load of a service that runs hot (cpu 0.76): 3 retries hold it down
+ RETRIES = 3  # times a caller retries a failed call, where callers retry
+ STORM_LOG = 0.2  # share of retries among incoming requests that the service logs
+@@ -214,6 +223,7 @@ def scenario(seed, level):
+     r = rng("faults")
+     pool = [n for n in apps + datas if impact[n] >= 200]
+     faults, batch, benign, blamed = [], None, None, None
++    files, campaign, quiet_pubs = {}, None, {}
+     if top:
+         # SRE Workbook ch. 5: alert on budget burn, not raw error rate. Loud is not costly: the
+         # loud faults stay off the richest edge where the estate allows it.
+@@ -286,7 +296,7 @@ def scenario(seed, level):
+             gray = dict(kind=r.choice(["bad_deploy", "bad_config"]) if x in apps else "bad_config", service=x,
+                         start=r.randint(-45, -12), sev=sev, end=None, change=None, gray=True)
+             if cfg.get("storms"):  # GitHub 21 Oct 2026 (postmortems.md): the fix itself must be staged
+-                gray["kind"] = "bad_deploy"
++                gray["kind"] = rng("gray-kind").choice(["bad_deploy", "bad_config"]) if cfg.get("files") else "bad_deploy"
+             if gray["kind"] == "bad_deploy":  # a rollback disturbs the rich edge, so it must pay
+                 gray["sev"] = sev = max(sev, 0.04)
+             # the tempting wrong rollback: a caller of X changed a few minutes before X broke
+@@ -298,9 +308,48 @@ def scenario(seed, level):
+             svc[top]["revenue"] = int(max(4 * max(svc[e]["revenue"] for e in edges),
+                                           round(cfg["gray_share"] * best[2] / net, -2)))
+             faults.append(gray)
+-
+-    planted = {f["service"]: ("config" if f["kind"] == "bad_config" else "deploy", f["start"], f)
+-               for f in faults if f["kind"] in ("bad_deploy", "bad_config", "leak")}
++            if cfg.get("files"):
++                # Cloudflare 18 Nov 2025 (postmortems.md): a file "generated every five minutes" was bad
++                # only on some runs, so "the entire system would recover and then fail again", until
++                # "the fluctuation stabilized in the failing state". The primary's service becomes a
++                # consumer of the file; the fault sits at the publisher, which stays healthy.
++                r, old = rng("files"), faults[0]
++                hit, used = old["service"], set(taken) | {x, blamed["service"]}
++                pub = r.choice([n for n in apps if n not in used and n not in dict(svc[hit]["deps"])])
++                rest = [n for n in apps + datas if n not in used and n != pub and pub not in dict(svc[n]["deps"])
++                        and not errs({n: 1.0})[top]]
++                apart = [n for n in rest if impact[n] >= 200 and not errs({hit: 1.0})[n] and not errs({n: 1.0})[hit]]
++                flap = r.choice(apart or [n for n in rest if impact[n]] or rest)  # not hot: it visibly flaps
++                fed = [hit, flap] + r.sample([n for n in rest if n != flap], r.choice([0, 1, 2]))
++                files = {c: pub for c in fed}
++                others = r.sample([n for n in apps if n not in used and n != pub and n not in fed], r.choice([2, 3]))
++                for q in others:  # publishers whose file is fine, so a file relation gives nothing away
++                    open_ = [n for n in apps + datas if n not in files and n != pub and n not in others
++                             and q not in dict(svc[n]["deps"])]
++                    files.update({c: q for c in r.sample(open_, r.choice([2, 3, 4]))})
++                    quiet_pubs[q] = -r.randint(20, 200)
++                for q in [pub] + others:
++                    svc[q]["file"] = r.randint(120, 190)  # entries in a good file; a bad one has twice as many
++                start = old["start"] + old.get("grow", 0)
++                first, stuck = EVERY * math.ceil(start / EVERY), r.randint(15, 40)
++                faults[0] = dict(kind="bad_file", service=pub, start=start, sev=0.0, end=None, change=None, stuck=stuck,
++                                 hits={c: round(r.uniform(0.5, 0.85), 2) for c in fed},
++                                 bad=[first] + [t for t in range(first + EVERY, stuck, EVERY) if r.random() < 0.5])
++                # Microsoft 365 Nov 2026 (postmortems.md): "the elevated load isn't driven by an increase
++                # in traffic". A campaign on an edge above the consumers stays within capacity.
++                r = rng("campaign")
++
++                def below(n):
++                    return {y for d, _ in svc[n]["deps"] for y in {d} | below(d)}
++
++                above = [e for e in edges if hit in below(e)]
++                e = r.choice([e for e in above if e != top and x not in below(e)] or above)
++                campaign = dict(services=({e} | below(e)) - {x}, start=-r.randint(3, 8), end=r.randint(85, 110),
++                                load=round(r.uniform(1.17, 1.19), 2))
++
++    planted = {f["service"]: ("deploy" if f["kind"] in ("bad_deploy", "leak") else "config", f["start"], f)
++               for f in faults if f["kind"] in ("bad_deploy", "bad_config", "leak", "bad_file")}
++    planted.update({q: ("config", minute, None) for q, minute in quiet_pubs.items()})
+     for b in (benign, blamed):
+         if b:
+             planted[b["service"]] = (b["type"], b["minute"], None)
+@@ -342,13 +391,22 @@ def scenario(seed, level):
+     if cfg.get("storms"):
+         # the primary's and the quiet fault's services run hot with retrying callers, and so does
+         # a quarter of the rest, so neither property gives a fault away
+-        r, sure = rng("hot"), (faults[0]["service"], faults[-1]["service"])
++        r, sure = rng("hot"), (next(iter(files), faults[0]["service"]), faults[-1]["service"])
+         for name in order:
+             roll = 0.0 if name in sure else r.random()
+             tier = svc[name]["tier"] != "edge"
+             svc[name].update(cap=HOT if tier and roll < 0.35 else HEADROOM,
+                              retry=RETRIES if tier and (roll < 0.25 or roll >= 0.7) else 0)
+-    return dict(svc=svc, order=order, edges=edges, faults=faults, batch=batch)
++    if files:
++        svc[list(files)[1]].update(cap=HEADROOM, retry=0)
++        # Cloudflare 18 Nov 2025 (postmortems.md): the status page, hosted elsewhere, went down at the
++        # same time; "it turned out to be a coincidence"
++        r = rng("status")
++        svc["status-page"] = dict(tier="external", deps=[], revenue=0, rps=r.randrange(50, 300, 50), replicas=2,
++                                  p99=r.randrange(40, 240, 10), noise=[], changes=[], cap=HEADROOM, retry=0,
++                                  down=(-r.randint(2, 9), r.randint(85, 110)))
++        order.insert(0, "status-page")
++    return dict(svc=svc, order=order, edges=edges, faults=faults, batch=batch, files=files, campaign=campaign)
+ 
+ 
+ class Estate:
+@@ -366,7 +424,7 @@ class Estate:
+         sc = scenario(seed, level)
+         self.seed, self.cfg = seed, LEVELS[level]
+         self.svc, self.order, self.edges, self.faults = sc["svc"], sc["order"], sc["edges"], sc["faults"]
+-        self.batch = sc["batch"]
++        self.batch, self.files, self.campaign = sc["batch"], sc["files"], sc["campaign"]
+         self.partial = bool(self.cfg.get("partial"))
+         if self.partial:
+             self.TOOLS = dict(self.TOOLS, get_diff=("service", "change_id"))
+@@ -403,8 +461,16 @@ class Estate:
+         for f in self.faults:
+             if f["service"] == name and f["kind"] == "overload" and f["start"] <= t:
+                 load *= f["load"]
++        c = self.campaign
++        if c and name in c["services"] and c["start"] <= t < c["end"]:
++            load *= c["load"]
+         return load
+ 
++    def _bad_file(self, f, t):
++        """Whether the generation of the file that is current at minute t is a bad one."""
++        made = EVERY * (t // EVERY)
++        return (f["end"] is None or made < f["end"]) and (made >= f["stuck"] or made in f["bad"])
++
+     def _leak_fill(self, f, t):
+         """0..1+ share of memory a leaking process has filled at minute t."""
+         if t < f["start"] or (f["end"] is not None and t >= f["end"]):
+@@ -442,9 +508,13 @@ class Estate:
+                 for f in self.faults:
+                     if f["service"] == name:
+                         ok *= 1 - self._fault_sev(f, m)
++                    if name in f.get("hits", ()) and self._bad_file(f, m):
++                        ok *= 1 - f["hits"][name]
+                 for n, t0, t1, sev in self.disrupt:
+                     if n == name and t0 <= m < t1:
+                         ok *= 1 - sev
++                if "down" in s and s["down"][0] <= m < s["down"][1]:
++                    ok = 0.0
+                 cur[name] = (1 - ok, back, util)
+             self._states.append(cur)
+         return self._states[t + HISTORY]
+@@ -547,6 +617,7 @@ class Estate:
+         return dict(ok=True, services=[
+             dict(name=n, tier=self.svc[n]["tier"], normal_replicas=self.svc[n]["replicas"],
+                  revenue_per_min=self.svc[n]["revenue"], **({"callers_retry": self.svc[n]["retry"]} if self.storms else {}),
++                 **({"file_from": self.files[n]} if n in self.files else {}),
+                  depends_on=[dict(service=d, kind="hard" if w == 1.0 else "soft") for d, w in self.svc[n]["deps"]])
+             for n in reversed(self.order)])
+ 
+@@ -612,6 +683,15 @@ class Estate:
+                 if sev:
+                     lines.append(dict(level="FATAL", count=self._metrics(service, t)["restarts_30m"],
+                                       message="out of memory: container killed and restarted"))
++        for f in self.faults:
++            if service in f.get("hits", ()) and self._bad_file(f, t):
++                lines.append(dict(level="ERROR", count=int(volume * f["hits"][service]),
++                                  message=FILE_SYMPTOM.format(2 * self.svc[f["service"]]["file"])))
++        if "file" in s:  # a publisher logs each generation: two in ten minutes
++            bad = any(f["service"] == service and f["kind"] == "bad_file" and self._bad_file(f, t) for f in self.faults)
++            lines.append(dict(level="INFO", count=2, message=f"rules file generated: {s['file'] * (2 if bad else 1)} entries"))
++        if "down" in s and s["down"][0] <= t < s["down"][1]:
++            lines.append(dict(level="ERROR", count=volume, message="connection refused by hosting provider"))
+         util = self._load(service, t) * s["replicas"] / (self._replicas(service, t) * HEADROOM)
+         if self.storms:
+             _, back, util = self._state(t)[service]
+@@ -650,6 +730,8 @@ class Estate:
+                 for f in self.faults:
+                     if f["service"] == service and f["change"] == change_id and "flavour" in f:
+                         parts[1] = FLAVOURS[f["flavour"]][1 if c["type"] == "deploy" else 2]
++                    if f["service"] == service and f["change"] == change_id and f["kind"] == "bad_file":
++                        parts[1] = FILE_DIFF
+                 if pick % 2:
+                     parts.reverse()
+                 return dict(ok=True, service=service, id=change_id, type=c["type"], diff="\n".join(parts))
+@@ -694,7 +776,8 @@ class Estate:
+         return self._revert(service, "rollback", "deploy", ("bad_deploy", "leak"))
+ 
+     def revert_config(self, service):
+-        return self._revert(service, "revert_config", "config", ("bad_config",))
++        # a bad file already loaded stays until the publisher's next generation (Cloudflare 18 Nov 2025)
++        return self._revert(service, "revert_config", "config", ("bad_config", "bad_file"))
+ 
+     def restart(self, service):
+         at = self._start(service, "restart", DATA_RESTART if self.svc[service]["tier"] == "data" else None)
+@@ -757,6 +840,8 @@ class Estate:
+             return dict(ok=False, error="call budget exhausted; call finish")
+         if "service" in args and (not isinstance(args["service"], str) or args["service"] not in self.svc):
+             return dict(ok=False, error="unknown service")
++        if (tool in MITIGATIONS or tool == "throttle") and self.svc[args["service"]]["tier"] == "external":
++            return dict(ok=False, error=f"{args['service']} is hosted outside this estate: nothing here can act on it")
+         for key in ("replicas", "minutes", "until_minute", "percent"):
+             if key in args and type(args[key]) is not int:
+                 return dict(ok=False, error=f"{key} must be an integer")
+@@ -829,6 +914,17 @@ def briefing(level):
+   changing one takes {cfg['act_min']} minute.
+ - `scale` is never charged as a wasted mitigation here, whatever the table above says: its cost is
+   the extra replicas, for as long as they stay, and the minute it takes to start.
++"""
++    files = "" if not cfg.get("files") else f"""
++## Generated files
++
++- Some services load a generated file from another service every {EVERY} minutes: `file_from` in
++  `get_topology` names the publisher. This is not a call: the publisher is not in `depends_on`.
++- A bad file makes the services that loaded it fail until the next good one arrives. A fault can
++  therefore come and go, so one healthy reading does not prove that a mitigation worked.
++- The cause is fixed at the publisher, and the fix takes effect with its next generation: what was
++  already loaded stays until then.
++- Not every alert belongs to this estate's services, or to a fault.
+ """
+     return f"""## How time works
+ 
+@@ -859,7 +955,7 @@ better.
+ | Lost revenue | each edge service's revenue per minute × its error rate, every minute of the shift |
+ | Extra replicas | ${REPLICA_COST} per replica above normal per minute, from when the scale lands to the end of the shift |
+ | Wasted mitigation | ${cfg["wasted"]:,} for each mitigation applied to a service that did not need it (setting a service back to its normal replica count is free) |
+-{views}{storms}"""
++{views}{storms}{files}"""
+ 
+ 
+ def sign(actions):
+diff --git a/spikes/aq-incident/sim/policies.py b/spikes/aq-incident/sim/policies.py
+index 91fa7b7..592f1eb 100644
+--- a/spikes/aq-incident/sim/policies.py
++++ b/spikes/aq-incident/sim/policies.py
+@@ -100,6 +100,8 @@ def drain_fix(call, service, retries):
+ 
+ 
+ UPSTREAM = re.compile(r"upstream call to (\S+) failed \((.*)\)")
++FILE = re.compile(r"loading \w+ file: (\d+) entries, limit (\d+)")  # a consumer choking on a generated file
++MADE = re.compile(r"file generated: (\d+) entries")  # the publisher's line for the generation
+ 
+ 
+ def trace(call, edge, explained, busy, trusting=False, ready=None):
+@@ -163,6 +165,8 @@ def diagnose(call, service, signals=(), since=None, logs=None):
+             return action
+     for line in logs:  # a symptom that does not name its change: read the diffs
+         if line["level"] == "ERROR" and not UPSTREAM.match(line["message"]):
++            if FILE.search(line["message"]):  # the file it loaded is bad: the cause is where the file is made
++                return ("file", {"symptom": line["message"]})
+             return change_fix(call, service, line["message"])
+     return None
+ 
+@@ -198,7 +202,7 @@ def blind(topo, service, n):
+ 
+ 
+ def reference(call, max_fixes=None, leave_when_clear=False, thorough=False, descend=True, trusting=False,
+-              guess=False, drain=True, protect=True, lift=True):
++              guess=False, drain=True, protect=True, lift=True, files="fix"):
+     """An expert on call. A service is a cause when it fails more than its dependencies explain
+     (or its memory is filling up), however loud it is; a busy CPU or a recent change alone is not.
+     Causes are worked in order of the revenue they cost, each from the cheapest evidence that
+@@ -208,8 +212,13 @@ def reference(call, max_fixes=None, leave_when_clear=False, thorough=False, desc
+     Where callers retry, a disruptive mitigation on a quiet service gets capacity first (or a
+     throttle, whichever is cheaper by its metrics), a service that retries hold down is throttled
+     for the minute its fix lands so it comes back calm, and every throttle and borrowed replica
+-    is given back the minute it has done its work."""
++    is given back the minute it has done its work.
++    Where services load a generated file, a service that chokes on its file, or whose failure comes
++    and goes, is not the cause: the publisher's log for that minute confirms it, the publisher's
++    diffs name the change, and after the revert the consumers that retries hold down are calmed
++    for the minute the next good file lands. A consumer is never mitigated."""
+     topo, deps, worth = graph(call)
++    began, mended, treated, read, shed, sized = {}, {}, set(), {}, {}, {}
+     fixes, looked, free, dropped, tried = 0, {}, None, set(), {}
+     retries = {n: s.get("callers_retry", 0) for n, s in topo.items()}
+     fixed, cleared, prepared, timers, clock, raw = set(), set(), {}, [], [0], call
+@@ -227,6 +236,8 @@ def reference(call, max_fixes=None, leave_when_clear=False, thorough=False, desc
+             clock[0] = served.get("minute", clock[0])
+         if served and tool == "wait":
+             return served
++        if tool == "get_logs":
++            read[args["service"]] = args.get("until_minute", clock[0])
+         result = raw(tool, **args)
+         clock[0] = result.get("minute", clock[0])
+         return result
+@@ -272,6 +283,17 @@ def reference(call, max_fixes=None, leave_when_clear=False, thorough=False, desc
+                 signals.setdefault(a["service"], set()).add(a["signal"])
+                 if partial and a["signal"] == "cpu" and a["firing_since_minute"] + 5 <= now:
+                     since[a["service"]] = a["firing_since_minute"]
++            began = {a["service"]: a["firing_since_minute"] for a in alerts if a["signal"] == "error_rate"}
++            if files == "surge":  # reads the waves as traffic: capacity where CPU alerts, load shed at the edge
++                for n in sorted(signals):
++                    if "cpu" in signals[n] and n not in treated and worth[n] > 0:
++                        treated.add(n)
++                        call("scale", service=n, replicas=2 * topo[n]["normal_replicas"])
++                for e in status["edge"]:
++                    want = 30 if 1 - (1 - e["error_rate"]) / (1 - shed.get(e["service"], 0) / 100) >= 0.05 else 0
++                    if want != shed.get(e["service"], 0):
++                        shed[e["service"]] = want
++                        call("throttle", service=e["service"], percent=want)
+             own = {}
+             for n in signals:
+                 up = 1.0
+@@ -297,6 +319,8 @@ def reference(call, max_fixes=None, leave_when_clear=False, thorough=False, desc
+                     work.append((-e["revenue_per_min"] * gap / 13, e["service"]))
+                     hidden.add(e["service"])
+             for _, service in sorted(work):
++                if looked.get(service, -99) > now:  # waiting for its publisher's next file
++                    continue
+                 looked[service], edge = now, None
+                 if service in hidden:
+                     hidden.remove(service)
+@@ -322,13 +346,51 @@ def reference(call, max_fixes=None, leave_when_clear=False, thorough=False, desc
+                     else:
+                         # where callers retry, a failing service is saturated whatever the cause: logs first
+                         known = signals[service] - ({"cpu"} if retries.get(service) and service in err else set())
+-                        action = diagnose(call, service, known, since.get(service))
++                        action, logs = None, None
++                        if files and topo[service].get("file_from"):
++                            logs = call("get_logs", service=service).get("lines", [])
++                            when = began.get(service, since.get(service))
++                            if when is not None and not any(
++                                    line["level"] == "ERROR" and not UPSTREAM.match(line["message"]) for line in logs):
++                                # it fails and shows no cause now: look at the minute it began
++                                then = call("get_logs", service=service, until_minute=max(when, -150))
++                                action = next((("file", {"symptom": line["message"]}) for line in then.get("lines", [])
++                                               if FILE.search(line["message"])), None)
++                        action = action or diagnose(call, service, known, since.get(service), logs)
+                         if not action and service not in err:
+                             cleared.add(service)
++                if action and action[0] == "scale":
++                    n = action[1]["replicas"]
++                    if sized.get(service, 0) >= n:  # its old readings give no more than it already has: traffic
++                        # has risen since that window, so size again from the share it sheds now, if it sheds
++                        n = max(sized[service] + 1, math.ceil(sized[service] / (1 - min(own.get(service, 0), 0.7)) / 0.95))
++                        action = ("scale", {"replicas": min(n, 4 * topo[service]["normal_replicas"])}) if (
++                            own.get(service, 0) >= 0.06 and service in err) else None
++                    if action:
++                        sized[service] = action[1]["replicas"]
++                fed = ()
++                if action and action[0] == "file":
++                    symptom, pub, action = action[1]["symptom"], topo[service].get("file_from"), None
++                    if files == "consumer":  # where it shows: undo the consumer's latest change, or restart it
++                        if service not in treated:
++                            treated.add(service)
++                            live = [c for c in call("get_changes", service=service).get("changes", []) if c["status"] == "live"]
++                            action = (("rollback" if live[-1]["type"] == "deploy" else "revert_config") if live else "restart", {})
++                    elif files == "drain" or pub in mended:  # the storm the bad file left behind
++                        if retries.get(service) and (drain or files == "drain") and clock[0] > mended.get(pub, -999):
++                            action = drain_fix(call, service, retries[service])
++                    elif files == "fix" and pub:
++                        made = MADE.search(" | ".join(line["message"] for line in call(
++                            "get_logs", service=pub, until_minute=read[service]).get("lines", [])))
++                        if made and int(made[1]) > int(FILE.search(symptom)[2]):  # it made what the consumer choked on
++                            fed, service = [n for n in topo if topo[n].get("file_from") == pub], pub
++                            action = change_fix(call, pub, symptom)
+                 held = service in prepared
+                 plan = prepared.pop(service, 0)
+                 if plan and plan[0] == "scale" and not (action and action[0] in DISRUPTS):
+-                    timers.append((plan[2], "scale", dict(service=service, replicas=topo[service]["normal_replicas"])))
++                    # given back once it has landed, and after a fix that needs no protection has run
++                    timers.append((max(plan[2], clock[0] + 3 if action else 0), "scale",
++                                   dict(service=service, replicas=topo[service]["normal_replicas"])))
+                 if action and action[0] == "throttle":  # a measured drain: one minute, then lift
+                     if call(action[0], service=service, **action[1])["ok"] and lift:
+                         timers.append((0, "throttle", dict(service=service, percent=0)))
+@@ -367,6 +429,16 @@ def reference(call, max_fixes=None, leave_when_clear=False, thorough=False, desc
+                                     timers.append((at, "throttle", dict(service=service, percent=0)))
+                         looked.pop(service, None)
+                         fixes += 1
++                        if fed:  # the file already loaded stays until the next generation
++                            mended[service] = tick = 5 * math.ceil(at / 5)
++                            for c in sorted(fed, key=lambda c: -worth[c]):
++                                looked[c] = tick - 4
++                                if drain and retries.get(c) and worth[c] > 0:  # retries hold it down: calm as it lands
++                                    fixed.add(c)
++                                    timers.append((tick - 1, "throttle", dict(service=c, percent=75)))
++                                    if lift:
++                                        timers.append((tick, "throttle", dict(service=c, percent=0)))
++                                    tick += 2  # one call a minute: the next consumer's minute comes after
+                         if max_fixes and fixes >= max_fixes:
+                             call("finish")
+                             return
+@@ -425,6 +497,24 @@ def forgetful(call):
+     reference(call, lift=False)
+ 
+ 
++def consumer_fixer(call):
++    """The reference, but it treats a bad file where it shows: it undoes the failing consumer's
++    latest change, or restarts it, and never looks at the publisher."""
++    reference(call, files="consumer")
++
++
++def surge_responder(call):
++    """The reference, but it reads failures that come in waves as a traffic surge: it scales every
++    service with a CPU alert and sheds 30% at each failing edge while it has errors."""
++    reference(call, files="surge")
++
++
++def drain_only(call):
++    """The reference, but it drains the storm on a file's consumers each time and never touches
++    the publisher."""
++    reference(call, files="drain")
++
++
+ def loudest_first(call):
+     """Works the loudest alert it has not treated yet, where it shows and one at a time, to the
+     end of the shift. Symptoms are louder than causes, so it treats victims and bystanders."""
+@@ -479,6 +569,7 @@ POLICIES = {
+     "shotgun": shotgun, "no-late": no_late, "loudest-first": loudest_first, "thorough": thorough,
+     "trusting": trusting, "alerts-only": alerts_only,
+     "no-drain": no_drain, "unprotected": unprotected, "forgetful": forgetful,
++    "consumer-fixer": consumer_fixer, "surge-responder": surge_responder, "drain-only": drain_only,
+ }
+ 
+ 
+diff --git a/spikes/aq-incident/task/environment/mcp-server/incident.py b/spikes/aq-incident/task/environment/mcp-server/incident.py
+index a510367..3c4c493 100644
+--- a/spikes/aq-incident/task/environment/mcp-server/incident.py
++++ b/spikes/aq-incident/task/environment/mcp-server/incident.py
+@@ -57,6 +57,15 @@ LEVELS = {
+ # The rich edge earns more than at level 3 (gray_share): retries make the loud faults cost more than
+ # the static estimate the share is taken from, and the quiet fault must stay worth a quarter.
+ LEVELS[4] = dict(LEVELS[3], world=3, storms=True, gray_share=0.6)
++# lever 5: the level-4 worlds, but the primary fault is a generated file that is bad on some
++# generations and then on all of them, so the estate fails, recovers and fails again (postmortems.md:
++# Cloudflare 18 Nov 2025; GitHub 7 Oct 2026, a recovery "which looked like a fix"). Two coincidences
++# point at a surge: a campaign within capacity and a status page hosted elsewhere (Cloudflare 18
++# Nov 2025; Microsoft 365 Nov 2026).
++LEVELS[5] = dict(LEVELS[4], files=True)
++EVERY = 5  # minutes between generations of a published file
++FILE_SYMPTOM = "worker panicked loading rules file: {} entries, limit 200"
++FILE_DIFF = "rules_source: [features] -> [features, r0.features]"
+ HOT = 1.32  # capacity over normal load of a service that runs hot (cpu 0.76): 3 retries hold it down
+ RETRIES = 3  # times a caller retries a failed call, where callers retry
+ STORM_LOG = 0.2  # share of retries among incoming requests that the service logs
+@@ -214,6 +223,7 @@ def scenario(seed, level):
+     r = rng("faults")
+     pool = [n for n in apps + datas if impact[n] >= 200]
+     faults, batch, benign, blamed = [], None, None, None
++    files, campaign, quiet_pubs = {}, None, {}
+     if top:
+         # SRE Workbook ch. 5: alert on budget burn, not raw error rate. Loud is not costly: the
+         # loud faults stay off the richest edge where the estate allows it.
+@@ -286,7 +296,7 @@ def scenario(seed, level):
+             gray = dict(kind=r.choice(["bad_deploy", "bad_config"]) if x in apps else "bad_config", service=x,
+                         start=r.randint(-45, -12), sev=sev, end=None, change=None, gray=True)
+             if cfg.get("storms"):  # GitHub 21 Oct 2026 (postmortems.md): the fix itself must be staged
+-                gray["kind"] = "bad_deploy"
++                gray["kind"] = rng("gray-kind").choice(["bad_deploy", "bad_config"]) if cfg.get("files") else "bad_deploy"
+             if gray["kind"] == "bad_deploy":  # a rollback disturbs the rich edge, so it must pay
+                 gray["sev"] = sev = max(sev, 0.04)
+             # the tempting wrong rollback: a caller of X changed a few minutes before X broke
+@@ -298,9 +308,48 @@ def scenario(seed, level):
+             svc[top]["revenue"] = int(max(4 * max(svc[e]["revenue"] for e in edges),
+                                           round(cfg["gray_share"] * best[2] / net, -2)))
+             faults.append(gray)
+-
+-    planted = {f["service"]: ("config" if f["kind"] == "bad_config" else "deploy", f["start"], f)
+-               for f in faults if f["kind"] in ("bad_deploy", "bad_config", "leak")}
++            if cfg.get("files"):
++                # Cloudflare 18 Nov 2025 (postmortems.md): a file "generated every five minutes" was bad
++                # only on some runs, so "the entire system would recover and then fail again", until
++                # "the fluctuation stabilized in the failing state". The primary's service becomes a
++                # consumer of the file; the fault sits at the publisher, which stays healthy.
++                r, old = rng("files"), faults[0]
++                hit, used = old["service"], set(taken) | {x, blamed["service"]}
++                pub = r.choice([n for n in apps if n not in used and n not in dict(svc[hit]["deps"])])
++                rest = [n for n in apps + datas if n not in used and n != pub and pub not in dict(svc[n]["deps"])
++                        and not errs({n: 1.0})[top]]
++                apart = [n for n in rest if impact[n] >= 200 and not errs({hit: 1.0})[n] and not errs({n: 1.0})[hit]]
++                flap = r.choice(apart or [n for n in rest if impact[n]] or rest)  # not hot: it visibly flaps
++                fed = [hit, flap] + r.sample([n for n in rest if n != flap], r.choice([0, 1, 2]))
++                files = {c: pub for c in fed}
++                others = r.sample([n for n in apps if n not in used and n != pub and n not in fed], r.choice([2, 3]))
++                for q in others:  # publishers whose file is fine, so a file relation gives nothing away
++                    open_ = [n for n in apps + datas if n not in files and n != pub and n not in others
++                             and q not in dict(svc[n]["deps"])]
++                    files.update({c: q for c in r.sample(open_, r.choice([2, 3, 4]))})
++                    quiet_pubs[q] = -r.randint(20, 200)
++                for q in [pub] + others:
++                    svc[q]["file"] = r.randint(120, 190)  # entries in a good file; a bad one has twice as many
++                start = old["start"] + old.get("grow", 0)
++                first, stuck = EVERY * math.ceil(start / EVERY), r.randint(15, 40)
++                faults[0] = dict(kind="bad_file", service=pub, start=start, sev=0.0, end=None, change=None, stuck=stuck,
++                                 hits={c: round(r.uniform(0.5, 0.85), 2) for c in fed},
++                                 bad=[first] + [t for t in range(first + EVERY, stuck, EVERY) if r.random() < 0.5])
++                # Microsoft 365 Nov 2026 (postmortems.md): "the elevated load isn't driven by an increase
++                # in traffic". A campaign on an edge above the consumers stays within capacity.
++                r = rng("campaign")
++
++                def below(n):
++                    return {y for d, _ in svc[n]["deps"] for y in {d} | below(d)}
++
++                above = [e for e in edges if hit in below(e)]
++                e = r.choice([e for e in above if e != top and x not in below(e)] or above)
++                campaign = dict(services=({e} | below(e)) - {x}, start=-r.randint(3, 8), end=r.randint(85, 110),
++                                load=round(r.uniform(1.17, 1.19), 2))
++
++    planted = {f["service"]: ("deploy" if f["kind"] in ("bad_deploy", "leak") else "config", f["start"], f)
++               for f in faults if f["kind"] in ("bad_deploy", "bad_config", "leak", "bad_file")}
++    planted.update({q: ("config", minute, None) for q, minute in quiet_pubs.items()})
+     for b in (benign, blamed):
+         if b:
+             planted[b["service"]] = (b["type"], b["minute"], None)
+@@ -342,13 +391,22 @@ def scenario(seed, level):
+     if cfg.get("storms"):
+         # the primary's and the quiet fault's services run hot with retrying callers, and so does
+         # a quarter of the rest, so neither property gives a fault away
+-        r, sure = rng("hot"), (faults[0]["service"], faults[-1]["service"])
++        r, sure = rng("hot"), (next(iter(files), faults[0]["service"]), faults[-1]["service"])
+         for name in order:
+             roll = 0.0 if name in sure else r.random()
+             tier = svc[name]["tier"] != "edge"
+             svc[name].update(cap=HOT if tier and roll < 0.35 else HEADROOM,
+                              retry=RETRIES if tier and (roll < 0.25 or roll >= 0.7) else 0)
+-    return dict(svc=svc, order=order, edges=edges, faults=faults, batch=batch)
++    if files:
++        svc[list(files)[1]].update(cap=HEADROOM, retry=0)
++        # Cloudflare 18 Nov 2025 (postmortems.md): the status page, hosted elsewhere, went down at the
++        # same time; "it turned out to be a coincidence"
++        r = rng("status")
++        svc["status-page"] = dict(tier="external", deps=[], revenue=0, rps=r.randrange(50, 300, 50), replicas=2,
++                                  p99=r.randrange(40, 240, 10), noise=[], changes=[], cap=HEADROOM, retry=0,
++                                  down=(-r.randint(2, 9), r.randint(85, 110)))
++        order.insert(0, "status-page")
++    return dict(svc=svc, order=order, edges=edges, faults=faults, batch=batch, files=files, campaign=campaign)
+ 
+ 
+ class Estate:
+@@ -366,7 +424,7 @@ class Estate:
+         sc = scenario(seed, level)
+         self.seed, self.cfg = seed, LEVELS[level]
+         self.svc, self.order, self.edges, self.faults = sc["svc"], sc["order"], sc["edges"], sc["faults"]
+-        self.batch = sc["batch"]
++        self.batch, self.files, self.campaign = sc["batch"], sc["files"], sc["campaign"]
+         self.partial = bool(self.cfg.get("partial"))
+         if self.partial:
+             self.TOOLS = dict(self.TOOLS, get_diff=("service", "change_id"))
+@@ -403,8 +461,16 @@ class Estate:
+         for f in self.faults:
+             if f["service"] == name and f["kind"] == "overload" and f["start"] <= t:
+                 load *= f["load"]
++        c = self.campaign
++        if c and name in c["services"] and c["start"] <= t < c["end"]:
++            load *= c["load"]
+         return load
+ 
++    def _bad_file(self, f, t):
++        """Whether the generation of the file that is current at minute t is a bad one."""
++        made = EVERY * (t // EVERY)
++        return (f["end"] is None or made < f["end"]) and (made >= f["stuck"] or made in f["bad"])
++
+     def _leak_fill(self, f, t):
+         """0..1+ share of memory a leaking process has filled at minute t."""
+         if t < f["start"] or (f["end"] is not None and t >= f["end"]):
+@@ -442,9 +508,13 @@ class Estate:
+                 for f in self.faults:
+                     if f["service"] == name:
+                         ok *= 1 - self._fault_sev(f, m)
++                    if name in f.get("hits", ()) and self._bad_file(f, m):
++                        ok *= 1 - f["hits"][name]
+                 for n, t0, t1, sev in self.disrupt:
+                     if n == name and t0 <= m < t1:
+                         ok *= 1 - sev
++                if "down" in s and s["down"][0] <= m < s["down"][1]:
++                    ok = 0.0
+                 cur[name] = (1 - ok, back, util)
+             self._states.append(cur)
+         return self._states[t + HISTORY]
+@@ -547,6 +617,7 @@ class Estate:
+         return dict(ok=True, services=[
+             dict(name=n, tier=self.svc[n]["tier"], normal_replicas=self.svc[n]["replicas"],
+                  revenue_per_min=self.svc[n]["revenue"], **({"callers_retry": self.svc[n]["retry"]} if self.storms else {}),
++                 **({"file_from": self.files[n]} if n in self.files else {}),
+                  depends_on=[dict(service=d, kind="hard" if w == 1.0 else "soft") for d, w in self.svc[n]["deps"]])
+             for n in reversed(self.order)])
+ 
+@@ -612,6 +683,15 @@ class Estate:
+                 if sev:
+                     lines.append(dict(level="FATAL", count=self._metrics(service, t)["restarts_30m"],
+                                       message="out of memory: container killed and restarted"))
++        for f in self.faults:
++            if service in f.get("hits", ()) and self._bad_file(f, t):
++                lines.append(dict(level="ERROR", count=int(volume * f["hits"][service]),
++                                  message=FILE_SYMPTOM.format(2 * self.svc[f["service"]]["file"])))
++        if "file" in s:  # a publisher logs each generation: two in ten minutes
++            bad = any(f["service"] == service and f["kind"] == "bad_file" and self._bad_file(f, t) for f in self.faults)
++            lines.append(dict(level="INFO", count=2, message=f"rules file generated: {s['file'] * (2 if bad else 1)} entries"))
++        if "down" in s and s["down"][0] <= t < s["down"][1]:
++            lines.append(dict(level="ERROR", count=volume, message="connection refused by hosting provider"))
+         util = self._load(service, t) * s["replicas"] / (self._replicas(service, t) * HEADROOM)
+         if self.storms:
+             _, back, util = self._state(t)[service]
+@@ -650,6 +730,8 @@ class Estate:
+                 for f in self.faults:
+                     if f["service"] == service and f["change"] == change_id and "flavour" in f:
+                         parts[1] = FLAVOURS[f["flavour"]][1 if c["type"] == "deploy" else 2]
++                    if f["service"] == service and f["change"] == change_id and f["kind"] == "bad_file":
++                        parts[1] = FILE_DIFF
+                 if pick % 2:
+                     parts.reverse()
+                 return dict(ok=True, service=service, id=change_id, type=c["type"], diff="\n".join(parts))
+@@ -694,7 +776,8 @@ class Estate:
+         return self._revert(service, "rollback", "deploy", ("bad_deploy", "leak"))
+ 
+     def revert_config(self, service):
+-        return self._revert(service, "revert_config", "config", ("bad_config",))
++        # a bad file already loaded stays until the publisher's next generation (Cloudflare 18 Nov 2025)
++        return self._revert(service, "revert_config", "config", ("bad_config", "bad_file"))
+ 
+     def restart(self, service):
+         at = self._start(service, "restart", DATA_RESTART if self.svc[service]["tier"] == "data" else None)
+@@ -757,6 +840,8 @@ class Estate:
+             return dict(ok=False, error="call budget exhausted; call finish")
+         if "service" in args and (not isinstance(args["service"], str) or args["service"] not in self.svc):
+             return dict(ok=False, error="unknown service")
++        if (tool in MITIGATIONS or tool == "throttle") and self.svc[args["service"]]["tier"] == "external":
++            return dict(ok=False, error=f"{args['service']} is hosted outside this estate: nothing here can act on it")
+         for key in ("replicas", "minutes", "until_minute", "percent"):
+             if key in args and type(args[key]) is not int:
+                 return dict(ok=False, error=f"{key} must be an integer")
+@@ -829,6 +914,17 @@ def briefing(level):
+   changing one takes {cfg['act_min']} minute.
+ - `scale` is never charged as a wasted mitigation here, whatever the table above says: its cost is
+   the extra replicas, for as long as they stay, and the minute it takes to start.
++"""
++    files = "" if not cfg.get("files") else f"""
++## Generated files
++
++- Some services load a generated file from another service every {EVERY} minutes: `file_from` in
++  `get_topology` names the publisher. This is not a call: the publisher is not in `depends_on`.
++- A bad file makes the services that loaded it fail until the next good one arrives. A fault can
++  therefore come and go, so one healthy reading does not prove that a mitigation worked.
++- The cause is fixed at the publisher, and the fix takes effect with its next generation: what was
++  already loaded stays until then.
++- Not every alert belongs to this estate's services, or to a fault.
+ """
+     return f"""## How time works
+ 
+@@ -859,7 +955,7 @@ better.
+ | Lost revenue | each edge service's revenue per minute × its error rate, every minute of the shift |
+ | Extra replicas | ${REPLICA_COST} per replica above normal per minute, from when the scale lands to the end of the shift |
+ | Wasted mitigation | ${cfg["wasted"]:,} for each mitigation applied to a service that did not need it (setting a service back to its normal replica count is free) |
+-{views}{storms}"""
++{views}{storms}{files}"""
+ 
+ 
+ def sign(actions):
+diff --git a/spikes/aq-incident/task/environment/mcp-server/server.py b/spikes/aq-incident/task/environment/mcp-server/server.py
+index 99db958..ba39acd 100644
+--- a/spikes/aq-incident/task/environment/mcp-server/server.py
++++ b/spikes/aq-incident/task/environment/mcp-server/server.py
+@@ -40,9 +40,10 @@ def get_status() -> str:
+ 
+ @mcp.tool()
+ def get_topology() -> str:
+-    """Every service: tier (edge, app, data), normal replica count, and which services it calls.
+-    A hard dependency passes all of its failures to the caller, a soft one about 30%. Where the
+-    instruction covers retries, also how many times callers retry a failed call to it."""
++    """Every service: tier (edge, app, data, or external for one hosted outside the estate), normal
++    replica count, and which services it calls. A hard dependency passes all of its failures to the
++    caller, a soft one about 30%. Where the instruction covers retries, also how many times callers
++    retry a failed call to it; where it covers generated files, also the service it loads one from."""
+     return run("get_topology")
+ 
+ 
+diff --git a/spikes/aq-incident/task/solution/policies.py b/spikes/aq-incident/task/solution/policies.py
+index 91fa7b7..592f1eb 100644
+--- a/spikes/aq-incident/task/solution/policies.py
++++ b/spikes/aq-incident/task/solution/policies.py
+@@ -100,6 +100,8 @@ def drain_fix(call, service, retries):
+ 
+ 
+ UPSTREAM = re.compile(r"upstream call to (\S+) failed \((.*)\)")
++FILE = re.compile(r"loading \w+ file: (\d+) entries, limit (\d+)")  # a consumer choking on a generated file
++MADE = re.compile(r"file generated: (\d+) entries")  # the publisher's line for the generation
+ 
+ 
+ def trace(call, edge, explained, busy, trusting=False, ready=None):
+@@ -163,6 +165,8 @@ def diagnose(call, service, signals=(), since=None, logs=None):
+             return action
+     for line in logs:  # a symptom that does not name its change: read the diffs
+         if line["level"] == "ERROR" and not UPSTREAM.match(line["message"]):
++            if FILE.search(line["message"]):  # the file it loaded is bad: the cause is where the file is made
++                return ("file", {"symptom": line["message"]})
+             return change_fix(call, service, line["message"])
+     return None
+ 
+@@ -198,7 +202,7 @@ def blind(topo, service, n):
+ 
+ 
+ def reference(call, max_fixes=None, leave_when_clear=False, thorough=False, descend=True, trusting=False,
+-              guess=False, drain=True, protect=True, lift=True):
++              guess=False, drain=True, protect=True, lift=True, files="fix"):
+     """An expert on call. A service is a cause when it fails more than its dependencies explain
+     (or its memory is filling up), however loud it is; a busy CPU or a recent change alone is not.
+     Causes are worked in order of the revenue they cost, each from the cheapest evidence that
+@@ -208,8 +212,13 @@ def reference(call, max_fixes=None, leave_when_clear=False, thorough=False, desc
+     Where callers retry, a disruptive mitigation on a quiet service gets capacity first (or a
+     throttle, whichever is cheaper by its metrics), a service that retries hold down is throttled
+     for the minute its fix lands so it comes back calm, and every throttle and borrowed replica
+-    is given back the minute it has done its work."""
++    is given back the minute it has done its work.
++    Where services load a generated file, a service that chokes on its file, or whose failure comes
++    and goes, is not the cause: the publisher's log for that minute confirms it, the publisher's
++    diffs name the change, and after the revert the consumers that retries hold down are calmed
++    for the minute the next good file lands. A consumer is never mitigated."""
+     topo, deps, worth = graph(call)
++    began, mended, treated, read, shed, sized = {}, {}, set(), {}, {}, {}
+     fixes, looked, free, dropped, tried = 0, {}, None, set(), {}
+     retries = {n: s.get("callers_retry", 0) for n, s in topo.items()}
+     fixed, cleared, prepared, timers, clock, raw = set(), set(), {}, [], [0], call
+@@ -227,6 +236,8 @@ def reference(call, max_fixes=None, leave_when_clear=False, thorough=False, desc
+             clock[0] = served.get("minute", clock[0])
+         if served and tool == "wait":
+             return served
++        if tool == "get_logs":
++            read[args["service"]] = args.get("until_minute", clock[0])
+         result = raw(tool, **args)
+         clock[0] = result.get("minute", clock[0])
+         return result
+@@ -272,6 +283,17 @@ def reference(call, max_fixes=None, leave_when_clear=False, thorough=False, desc
+                 signals.setdefault(a["service"], set()).add(a["signal"])
+                 if partial and a["signal"] == "cpu" and a["firing_since_minute"] + 5 <= now:
+                     since[a["service"]] = a["firing_since_minute"]
++            began = {a["service"]: a["firing_since_minute"] for a in alerts if a["signal"] == "error_rate"}
++            if files == "surge":  # reads the waves as traffic: capacity where CPU alerts, load shed at the edge
++                for n in sorted(signals):
++                    if "cpu" in signals[n] and n not in treated and worth[n] > 0:
++                        treated.add(n)
++                        call("scale", service=n, replicas=2 * topo[n]["normal_replicas"])
++                for e in status["edge"]:
++                    want = 30 if 1 - (1 - e["error_rate"]) / (1 - shed.get(e["service"], 0) / 100) >= 0.05 else 0
++                    if want != shed.get(e["service"], 0):
++                        shed[e["service"]] = want
++                        call("throttle", service=e["service"], percent=want)
+             own = {}
+             for n in signals:
+                 up = 1.0
+@@ -297,6 +319,8 @@ def reference(call, max_fixes=None, leave_when_clear=False, thorough=False, desc
+                     work.append((-e["revenue_per_min"] * gap / 13, e["service"]))
+                     hidden.add(e["service"])
+             for _, service in sorted(work):
++                if looked.get(service, -99) > now:  # waiting for its publisher's next file
++                    continue
+                 looked[service], edge = now, None
+                 if service in hidden:
+                     hidden.remove(service)
+@@ -322,13 +346,51 @@ def reference(call, max_fixes=None, leave_when_clear=False, thorough=False, desc
+                     else:
+                         # where callers retry, a failing service is saturated whatever the cause: logs first
+                         known = signals[service] - ({"cpu"} if retries.get(service) and service in err else set())
+-                        action = diagnose(call, service, known, since.get(service))
++                        action, logs = None, None
++                        if files and topo[service].get("file_from"):
++                            logs = call("get_logs", service=service).get("lines", [])
++                            when = began.get(service, since.get(service))
++                            if when is not None and not any(
++                                    line["level"] == "ERROR" and not UPSTREAM.match(line["message"]) for line in logs):
++                                # it fails and shows no cause now: look at the minute it began
++                                then = call("get_logs", service=service, until_minute=max(when, -150))
++                                action = next((("file", {"symptom": line["message"]}) for line in then.get("lines", [])
++                                               if FILE.search(line["message"])), None)
++                        action = action or diagnose(call, service, known, since.get(service), logs)
+                         if not action and service not in err:
+                             cleared.add(service)
++                if action and action[0] == "scale":
++                    n = action[1]["replicas"]
++                    if sized.get(service, 0) >= n:  # its old readings give no more than it already has: traffic
++                        # has risen since that window, so size again from the share it sheds now, if it sheds
++                        n = max(sized[service] + 1, math.ceil(sized[service] / (1 - min(own.get(service, 0), 0.7)) / 0.95))
++                        action = ("scale", {"replicas": min(n, 4 * topo[service]["normal_replicas"])}) if (
++                            own.get(service, 0) >= 0.06 and service in err) else None
++                    if action:
++                        sized[service] = action[1]["replicas"]
++                fed = ()
++                if action and action[0] == "file":
++                    symptom, pub, action = action[1]["symptom"], topo[service].get("file_from"), None
++                    if files == "consumer":  # where it shows: undo the consumer's latest change, or restart it
++                        if service not in treated:
++                            treated.add(service)
++                            live = [c for c in call("get_changes", service=service).get("changes", []) if c["status"] == "live"]
++                            action = (("rollback" if live[-1]["type"] == "deploy" else "revert_config") if live else "restart", {})
++                    elif files == "drain" or pub in mended:  # the storm the bad file left behind
++                        if retries.get(service) and (drain or files == "drain") and clock[0] > mended.get(pub, -999):
++                            action = drain_fix(call, service, retries[service])
++                    elif files == "fix" and pub:
++                        made = MADE.search(" | ".join(line["message"] for line in call(
++                            "get_logs", service=pub, until_minute=read[service]).get("lines", [])))
++                        if made and int(made[1]) > int(FILE.search(symptom)[2]):  # it made what the consumer choked on
++                            fed, service = [n for n in topo if topo[n].get("file_from") == pub], pub
++                            action = change_fix(call, pub, symptom)
+                 held = service in prepared
+                 plan = prepared.pop(service, 0)
+                 if plan and plan[0] == "scale" and not (action and action[0] in DISRUPTS):
+-                    timers.append((plan[2], "scale", dict(service=service, replicas=topo[service]["normal_replicas"])))
++                    # given back once it has landed, and after a fix that needs no protection has run
++                    timers.append((max(plan[2], clock[0] + 3 if action else 0), "scale",
++                                   dict(service=service, replicas=topo[service]["normal_replicas"])))
+                 if action and action[0] == "throttle":  # a measured drain: one minute, then lift
+                     if call(action[0], service=service, **action[1])["ok"] and lift:
+                         timers.append((0, "throttle", dict(service=service, percent=0)))
+@@ -367,6 +429,16 @@ def reference(call, max_fixes=None, leave_when_clear=False, thorough=False, desc
+                                     timers.append((at, "throttle", dict(service=service, percent=0)))
+                         looked.pop(service, None)
+                         fixes += 1
++                        if fed:  # the file already loaded stays until the next generation
++                            mended[service] = tick = 5 * math.ceil(at / 5)
++                            for c in sorted(fed, key=lambda c: -worth[c]):
++                                looked[c] = tick - 4
++                                if drain and retries.get(c) and worth[c] > 0:  # retries hold it down: calm as it lands
++                                    fixed.add(c)
++                                    timers.append((tick - 1, "throttle", dict(service=c, percent=75)))
++                                    if lift:
++                                        timers.append((tick, "throttle", dict(service=c, percent=0)))
++                                    tick += 2  # one call a minute: the next consumer's minute comes after
+                         if max_fixes and fixes >= max_fixes:
+                             call("finish")
+                             return
+@@ -425,6 +497,24 @@ def forgetful(call):
+     reference(call, lift=False)
+ 
+ 
++def consumer_fixer(call):
++    """The reference, but it treats a bad file where it shows: it undoes the failing consumer's
++    latest change, or restarts it, and never looks at the publisher."""
++    reference(call, files="consumer")
++
++
++def surge_responder(call):
++    """The reference, but it reads failures that come in waves as a traffic surge: it scales every
++    service with a CPU alert and sheds 30% at each failing edge while it has errors."""
++    reference(call, files="surge")
++
++
++def drain_only(call):
++    """The reference, but it drains the storm on a file's consumers each time and never touches
++    the publisher."""
++    reference(call, files="drain")
++
++
+ def loudest_first(call):
+     """Works the loudest alert it has not treated yet, where it shows and one at a time, to the
+     end of the shift. Symptoms are louder than causes, so it treats victims and bystanders."""
+@@ -479,6 +569,7 @@ POLICIES = {
+     "shotgun": shotgun, "no-late": no_late, "loudest-first": loudest_first, "thorough": thorough,
+     "trusting": trusting, "alerts-only": alerts_only,
+     "no-drain": no_drain, "unprotected": unprotected, "forgetful": forgetful,
++    "consumer-fixer": consumer_fixer, "surge-responder": surge_responder, "drain-only": drain_only,
+ }
+ 
+ 
+diff --git a/spikes/aq-incident/task/tests/incident.py b/spikes/aq-incident/task/tests/incident.py
+index a510367..3c4c493 100644
+--- a/spikes/aq-incident/task/tests/incident.py
++++ b/spikes/aq-incident/task/tests/incident.py
+@@ -57,6 +57,15 @@ LEVELS = {
+ # The rich edge earns more than at level 3 (gray_share): retries make the loud faults cost more than
+ # the static estimate the share is taken from, and the quiet fault must stay worth a quarter.
+ LEVELS[4] = dict(LEVELS[3], world=3, storms=True, gray_share=0.6)
++# lever 5: the level-4 worlds, but the primary fault is a generated file that is bad on some
++# generations and then on all of them, so the estate fails, recovers and fails again (postmortems.md:
++# Cloudflare 18 Nov 2025; GitHub 7 Oct 2026, a recovery "which looked like a fix"). Two coincidences
++# point at a surge: a campaign within capacity and a status page hosted elsewhere (Cloudflare 18
++# Nov 2025; Microsoft 365 Nov 2026).
++LEVELS[5] = dict(LEVELS[4], files=True)
++EVERY = 5  # minutes between generations of a published file
++FILE_SYMPTOM = "worker panicked loading rules file: {} entries, limit 200"
++FILE_DIFF = "rules_source: [features] -> [features, r0.features]"
+ HOT = 1.32  # capacity over normal load of a service that runs hot (cpu 0.76): 3 retries hold it down
+ RETRIES = 3  # times a caller retries a failed call, where callers retry
+ STORM_LOG = 0.2  # share of retries among incoming requests that the service logs
+@@ -214,6 +223,7 @@ def scenario(seed, level):
+     r = rng("faults")
+     pool = [n for n in apps + datas if impact[n] >= 200]
+     faults, batch, benign, blamed = [], None, None, None
++    files, campaign, quiet_pubs = {}, None, {}
+     if top:
+         # SRE Workbook ch. 5: alert on budget burn, not raw error rate. Loud is not costly: the
+         # loud faults stay off the richest edge where the estate allows it.
+@@ -286,7 +296,7 @@ def scenario(seed, level):
+             gray = dict(kind=r.choice(["bad_deploy", "bad_config"]) if x in apps else "bad_config", service=x,
+                         start=r.randint(-45, -12), sev=sev, end=None, change=None, gray=True)
+             if cfg.get("storms"):  # GitHub 21 Oct 2026 (postmortems.md): the fix itself must be staged
+-                gray["kind"] = "bad_deploy"
++                gray["kind"] = rng("gray-kind").choice(["bad_deploy", "bad_config"]) if cfg.get("files") else "bad_deploy"
+             if gray["kind"] == "bad_deploy":  # a rollback disturbs the rich edge, so it must pay
+                 gray["sev"] = sev = max(sev, 0.04)
+             # the tempting wrong rollback: a caller of X changed a few minutes before X broke
+@@ -298,9 +308,48 @@ def scenario(seed, level):
+             svc[top]["revenue"] = int(max(4 * max(svc[e]["revenue"] for e in edges),
+                                           round(cfg["gray_share"] * best[2] / net, -2)))
+             faults.append(gray)
+-
+-    planted = {f["service"]: ("config" if f["kind"] == "bad_config" else "deploy", f["start"], f)
+-               for f in faults if f["kind"] in ("bad_deploy", "bad_config", "leak")}
++            if cfg.get("files"):
++                # Cloudflare 18 Nov 2025 (postmortems.md): a file "generated every five minutes" was bad
++                # only on some runs, so "the entire system would recover and then fail again", until
++                # "the fluctuation stabilized in the failing state". The primary's service becomes a
++                # consumer of the file; the fault sits at the publisher, which stays healthy.
++                r, old = rng("files"), faults[0]
++                hit, used = old["service"], set(taken) | {x, blamed["service"]}
++                pub = r.choice([n for n in apps if n not in used and n not in dict(svc[hit]["deps"])])
++                rest = [n for n in apps + datas if n not in used and n != pub and pub not in dict(svc[n]["deps"])
++                        and not errs({n: 1.0})[top]]
++                apart = [n for n in rest if impact[n] >= 200 and not errs({hit: 1.0})[n] and not errs({n: 1.0})[hit]]
++                flap = r.choice(apart or [n for n in rest if impact[n]] or rest)  # not hot: it visibly flaps
++                fed = [hit, flap] + r.sample([n for n in rest if n != flap], r.choice([0, 1, 2]))
++                files = {c: pub for c in fed}
++                others = r.sample([n for n in apps if n not in used and n != pub and n not in fed], r.choice([2, 3]))
++                for q in others:  # publishers whose file is fine, so a file relation gives nothing away
++                    open_ = [n for n in apps + datas if n not in files and n != pub and n not in others
++                             and q not in dict(svc[n]["deps"])]
++                    files.update({c: q for c in r.sample(open_, r.choice([2, 3, 4]))})
++                    quiet_pubs[q] = -r.randint(20, 200)
++                for q in [pub] + others:
++                    svc[q]["file"] = r.randint(120, 190)  # entries in a good file; a bad one has twice as many
++                start = old["start"] + old.get("grow", 0)
++                first, stuck = EVERY * math.ceil(start / EVERY), r.randint(15, 40)
++                faults[0] = dict(kind="bad_file", service=pub, start=start, sev=0.0, end=None, change=None, stuck=stuck,
++                                 hits={c: round(r.uniform(0.5, 0.85), 2) for c in fed},
++                                 bad=[first] + [t for t in range(first + EVERY, stuck, EVERY) if r.random() < 0.5])
++                # Microsoft 365 Nov 2026 (postmortems.md): "the elevated load isn't driven by an increase
++                # in traffic". A campaign on an edge above the consumers stays within capacity.
++                r = rng("campaign")
++
++                def below(n):
++                    return {y for d, _ in svc[n]["deps"] for y in {d} | below(d)}
++
++                above = [e for e in edges if hit in below(e)]
++                e = r.choice([e for e in above if e != top and x not in below(e)] or above)
++                campaign = dict(services=({e} | below(e)) - {x}, start=-r.randint(3, 8), end=r.randint(85, 110),
++                                load=round(r.uniform(1.17, 1.19), 2))
++
++    planted = {f["service"]: ("deploy" if f["kind"] in ("bad_deploy", "leak") else "config", f["start"], f)
++               for f in faults if f["kind"] in ("bad_deploy", "bad_config", "leak", "bad_file")}
++    planted.update({q: ("config", minute, None) for q, minute in quiet_pubs.items()})
+     for b in (benign, blamed):
+         if b:
+             planted[b["service"]] = (b["type"], b["minute"], None)
+@@ -342,13 +391,22 @@ def scenario(seed, level):
+     if cfg.get("storms"):
+         # the primary's and the quiet fault's services run hot with retrying callers, and so does
+         # a quarter of the rest, so neither property gives a fault away
+-        r, sure = rng("hot"), (faults[0]["service"], faults[-1]["service"])
++        r, sure = rng("hot"), (next(iter(files), faults[0]["service"]), faults[-1]["service"])
+         for name in order:
+             roll = 0.0 if name in sure else r.random()
+             tier = svc[name]["tier"] != "edge"
+             svc[name].update(cap=HOT if tier and roll < 0.35 else HEADROOM,
+                              retry=RETRIES if tier and (roll < 0.25 or roll >= 0.7) else 0)
+-    return dict(svc=svc, order=order, edges=edges, faults=faults, batch=batch)
++    if files:
++        svc[list(files)[1]].update(cap=HEADROOM, retry=0)
++        # Cloudflare 18 Nov 2025 (postmortems.md): the status page, hosted elsewhere, went down at the
++        # same time; "it turned out to be a coincidence"
++        r = rng("status")
++        svc["status-page"] = dict(tier="external", deps=[], revenue=0, rps=r.randrange(50, 300, 50), replicas=2,
++                                  p99=r.randrange(40, 240, 10), noise=[], changes=[], cap=HEADROOM, retry=0,
++                                  down=(-r.randint(2, 9), r.randint(85, 110)))
++        order.insert(0, "status-page")
++    return dict(svc=svc, order=order, edges=edges, faults=faults, batch=batch, files=files, campaign=campaign)
+ 
+ 
+ class Estate:
+@@ -366,7 +424,7 @@ class Estate:
+         sc = scenario(seed, level)
+         self.seed, self.cfg = seed, LEVELS[level]
+         self.svc, self.order, self.edges, self.faults = sc["svc"], sc["order"], sc["edges"], sc["faults"]
+-        self.batch = sc["batch"]
++        self.batch, self.files, self.campaign = sc["batch"], sc["files"], sc["campaign"]
+         self.partial = bool(self.cfg.get("partial"))
+         if self.partial:
+             self.TOOLS = dict(self.TOOLS, get_diff=("service", "change_id"))
+@@ -403,8 +461,16 @@ class Estate:
+         for f in self.faults:
+             if f["service"] == name and f["kind"] == "overload" and f["start"] <= t:
+                 load *= f["load"]
++        c = self.campaign
++        if c and name in c["services"] and c["start"] <= t < c["end"]:
++            load *= c["load"]
+         return load
+ 
++    def _bad_file(self, f, t):
++        """Whether the generation of the file that is current at minute t is a bad one."""
++        made = EVERY * (t // EVERY)
++        return (f["end"] is None or made < f["end"]) and (made >= f["stuck"] or made in f["bad"])
++
+     def _leak_fill(self, f, t):
+         """0..1+ share of memory a leaking process has filled at minute t."""
+         if t < f["start"] or (f["end"] is not None and t >= f["end"]):
+@@ -442,9 +508,13 @@ class Estate:
+                 for f in self.faults:
+                     if f["service"] == name:
+                         ok *= 1 - self._fault_sev(f, m)
++                    if name in f.get("hits", ()) and self._bad_file(f, m):
++                        ok *= 1 - f["hits"][name]
+                 for n, t0, t1, sev in self.disrupt:
+                     if n == name and t0 <= m < t1:
+                         ok *= 1 - sev
++                if "down" in s and s["down"][0] <= m < s["down"][1]:
++                    ok = 0.0
+                 cur[name] = (1 - ok, back, util)
+             self._states.append(cur)
+         return self._states[t + HISTORY]
+@@ -547,6 +617,7 @@ class Estate:
+         return dict(ok=True, services=[
+             dict(name=n, tier=self.svc[n]["tier"], normal_replicas=self.svc[n]["replicas"],
+                  revenue_per_min=self.svc[n]["revenue"], **({"callers_retry": self.svc[n]["retry"]} if self.storms else {}),
++                 **({"file_from": self.files[n]} if n in self.files else {}),
+                  depends_on=[dict(service=d, kind="hard" if w == 1.0 else "soft") for d, w in self.svc[n]["deps"]])
+             for n in reversed(self.order)])
+ 
+@@ -612,6 +683,15 @@ class Estate:
+                 if sev:
+                     lines.append(dict(level="FATAL", count=self._metrics(service, t)["restarts_30m"],
+                                       message="out of memory: container killed and restarted"))
++        for f in self.faults:
++            if service in f.get("hits", ()) and self._bad_file(f, t):
++                lines.append(dict(level="ERROR", count=int(volume * f["hits"][service]),
++                                  message=FILE_SYMPTOM.format(2 * self.svc[f["service"]]["file"])))
++        if "file" in s:  # a publisher logs each generation: two in ten minutes
++            bad = any(f["service"] == service and f["kind"] == "bad_file" and self._bad_file(f, t) for f in self.faults)
++            lines.append(dict(level="INFO", count=2, message=f"rules file generated: {s['file'] * (2 if bad else 1)} entries"))
++        if "down" in s and s["down"][0] <= t < s["down"][1]:
++            lines.append(dict(level="ERROR", count=volume, message="connection refused by hosting provider"))
+         util = self._load(service, t) * s["replicas"] / (self._replicas(service, t) * HEADROOM)
+         if self.storms:
+             _, back, util = self._state(t)[service]
+@@ -650,6 +730,8 @@ class Estate:
+                 for f in self.faults:
+                     if f["service"] == service and f["change"] == change_id and "flavour" in f:
+                         parts[1] = FLAVOURS[f["flavour"]][1 if c["type"] == "deploy" else 2]
++                    if f["service"] == service and f["change"] == change_id and f["kind"] == "bad_file":
++                        parts[1] = FILE_DIFF
+                 if pick % 2:
+                     parts.reverse()
+                 return dict(ok=True, service=service, id=change_id, type=c["type"], diff="\n".join(parts))
+@@ -694,7 +776,8 @@ class Estate:
+         return self._revert(service, "rollback", "deploy", ("bad_deploy", "leak"))
+ 
+     def revert_config(self, service):
+-        return self._revert(service, "revert_config", "config", ("bad_config",))
++        # a bad file already loaded stays until the publisher's next generation (Cloudflare 18 Nov 2025)
++        return self._revert(service, "revert_config", "config", ("bad_config", "bad_file"))
+ 
+     def restart(self, service):
+         at = self._start(service, "restart", DATA_RESTART if self.svc[service]["tier"] == "data" else None)
+@@ -757,6 +840,8 @@ class Estate:
+             return dict(ok=False, error="call budget exhausted; call finish")
+         if "service" in args and (not isinstance(args["service"], str) or args["service"] not in self.svc):
+             return dict(ok=False, error="unknown service")
++        if (tool in MITIGATIONS or tool == "throttle") and self.svc[args["service"]]["tier"] == "external":
++            return dict(ok=False, error=f"{args['service']} is hosted outside this estate: nothing here can act on it")
+         for key in ("replicas", "minutes", "until_minute", "percent"):
+             if key in args and type(args[key]) is not int:
+                 return dict(ok=False, error=f"{key} must be an integer")
+@@ -829,6 +914,17 @@ def briefing(level):
+   changing one takes {cfg['act_min']} minute.
+ - `scale` is never charged as a wasted mitigation here, whatever the table above says: its cost is
+   the extra replicas, for as long as they stay, and the minute it takes to start.
++"""
++    files = "" if not cfg.get("files") else f"""
++## Generated files
++
++- Some services load a generated file from another service every {EVERY} minutes: `file_from` in
++  `get_topology` names the publisher. This is not a call: the publisher is not in `depends_on`.
++- A bad file makes the services that loaded it fail until the next good one arrives. A fault can
++  therefore come and go, so one healthy reading does not prove that a mitigation worked.
++- The cause is fixed at the publisher, and the fix takes effect with its next generation: what was
++  already loaded stays until then.
++- Not every alert belongs to this estate's services, or to a fault.
+ """
+     return f"""## How time works
+ 
+@@ -859,7 +955,7 @@ better.
+ | Lost revenue | each edge service's revenue per minute × its error rate, every minute of the shift |
+ | Extra replicas | ${REPLICA_COST} per replica above normal per minute, from when the scale lands to the end of the shift |
+ | Wasted mitigation | ${cfg["wasted"]:,} for each mitigation applied to a service that did not need it (setting a service back to its normal replica count is free) |
+-{views}{storms}"""
++{views}{storms}{files}"""
+ 
+ 
+ def sign(actions):

@@ -1,0 +1,26 @@
+{
+  "revision": "aec3d0961cfaddb0c9de86e98d28dd1d0b6cac1a",
+  "captured_utc": "2026-11-14T14:12:32Z",
+  "sha256": {
+    "README.md": "f4d17408bad5e51df0beab168bfa88d0a4bfc5762e06b09ced22e9f50918b8d5",
+    "LOOP.md": "cf82cf627102e215a2b6c6cbbbad51a254b88f81c1f2347027bd6b7bb4935e00",
+    "eval.py": "aecec88cf5f965f7f9965a0a0474b3bcabcccd874dca1cfb6ce0845d5110c77d",
+    "run.sh": "50df6527e578ec7e0dfb19e24f4b8889e5466035bd5595832acc51470423153a",
+    "sync.sh": "70c7e8f7709a9161b27d5078714767277c83b190a59d37ddf1bf66ccbec2ba06",
+    "sim/incident.py": "7eea3e061f8d5fe63efdee6d9261a1128a7b4545a0d60b4be59665fede9e98ce",
+    "sim/policies.py": "40eb44099551a4a6933f6430c646d35061b0bd8905e3ab31929bf5bf25fbfad5",
+    "task/environment/Dockerfile": "f7b66366ffe53ff1d217f89bb78f21bcfa2366f3179b08bc8bab0e47bd61b7cc",
+    "task/environment/docker-compose.yaml": "b31b408373a52ef540ae4c3a4ad3498fe6e2fddb182191425d6a3daef3603a4b",
+    "task/environment/mcp-server/Dockerfile": "654ca8652c1bd2d4bbc710ddb8018f6db178c3c973062e83f53a709109101b81",
+    "task/environment/mcp-server/incident.py": "7eea3e061f8d5fe63efdee6d9261a1128a7b4545a0d60b4be59665fede9e98ce",
+    "task/environment/mcp-server/server.py": "01ca61657e9c6cddb9520258602c7c408df0a7450439e3b26ff0012231bb4610",
+    "task/instruction.md": "a9aa2f999dcc2e146103d5f8998d6b434d14f2699cd50dcc48798d702d2819b1",
+    "task/solution/policies.py": "40eb44099551a4a6933f6430c646d35061b0bd8905e3ab31929bf5bf25fbfad5",
+    "task/solution/solve.sh": "dbe0f41bcce3cc737a8c0caffc3a11656c750a869875e85398401873142c4086",
+    "task/task.toml": "098d14b20f9c902e9cd9c3903074143dd0882f219e3b7abcc882c44434a078a6",
+    "task/tests/Dockerfile": "099bea2461fe6930b3083e6f191a58eb612bc9d637874be001643850ed637fab",
+    "task/tests/grade.py": "cb3cdbb20946434657ea1ef5bd72cb43294df54293baef8d34f9cc738835e4ae",
+    "task/tests/incident.py": "7eea3e061f8d5fe63efdee6d9261a1128a7b4545a0d60b4be59665fede9e98ce",
+    "task/tests/test.sh": "fe431461e3973fafe963e99da9d6ee8fc53f264c1776674a6fff088d3b89d645"
+  }
+}

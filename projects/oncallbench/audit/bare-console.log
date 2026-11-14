@@ -1,0 +1,30 @@
+Downloading aiohttp (1.8MiB)
+Downloading tiktoken (1.1MiB)
+Downloading pydantic-core (2.2MiB)
+ Downloaded tiktoken
+ Downloaded aiohttp
+ Downloaded pydantic-core
+Installed 92 packages in 270ms
+  1/1 Mean: 0.000 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 0:00:48 0:00:00
+
+adhoc • nop
+┏━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━┓
+┃ Trials ┃ Exceptions ┃  Mean ┃
+┡━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━┩
+│      0 │          1 │ 0.000 │
+└────────┴────────────┴───────┘
+
+┏━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━┓
+┃ Exception            ┃ Count ┃
+┡━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━┩
+│ RewardFileEmptyError │     1 │
+└──────────────────────┴───────┘
+
+Job Info
+Total runtime: 48s
+Results written to
+spikes/aq-incident/audit/runtime/bare-jobs/bare-task-nop/result.json
+Inspect results by running `harbor view
+spikes/aq-incident/audit/runtime/bare-jobs`
+Share results by running `harbor upload
+spikes/aq-incident/audit/runtime/bare-jobs/bare-task-nop`

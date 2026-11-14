@@ -1,0 +1,77 @@
+[
+  {
+    "case": "valid",
+    "result": {
+      "reward": 1.0,
+      "cost_total": 85246.31,
+      "beats_reference": 0.0,
+      "valid_receipt": 1.0,
+      "actions": 98,
+      "faults_left": 0,
+      "cost_outage": 83599.31,
+      "cost_replicas": 1647,
+      "cost_wasted": 0
+    },
+    "verifier_output": ""
+  },
+  {
+    "case": "tampered",
+    "result": {
+      "reward": 0.0,
+      "cost_total": 232523.28,
+      "beats_reference": 0.0,
+      "valid_receipt": 0.0,
+      "actions": 0,
+      "faults_left": 3,
+      "cost_outage": 232523.28,
+      "cost_replicas": 0,
+      "cost_wasted": 0
+    },
+    "verifier_output": "receipt rejected, grading as do-nothing: ValueError('bad signature')\n"
+  },
+  {
+    "case": "unsigned",
+    "result": {
+      "reward": 0.0,
+      "cost_total": 232523.28,
+      "beats_reference": 0.0,
+      "valid_receipt": 0.0,
+      "actions": 0,
+      "faults_left": 3,
+      "cost_outage": 232523.28,
+      "cost_replicas": 0,
+      "cost_wasted": 0
+    },
+    "verifier_output": "receipt rejected, grading as do-nothing: KeyError('sig')\n"
+  },
+  {
+    "case": "signed_illegal",
+    "result": {
+      "reward": 0.0,
+      "cost_total": 232523.28,
+      "beats_reference": 0.0,
+      "valid_receipt": 0.0,
+      "actions": 0,
+      "faults_left": 3,
+      "cost_outage": 232523.28,
+      "cost_replicas": 0,
+      "cost_wasted": 0
+    },
+    "verifier_output": "receipt rejected, grading as do-nothing: ValueError(\"action rejected on replay: wait {'minutes': -1}\")\n"
+  },
+  {
+    "case": "missing",
+    "result": {
+      "reward": 0.0,
+      "cost_total": 232523.28,
+      "beats_reference": 0.0,
+      "valid_receipt": 0.0,
+      "actions": 0,
+      "faults_left": 3,
+      "cost_outage": 232523.28,
+      "cost_replicas": 0,
+      "cost_wasted": 0
+    },
+    "verifier_output": "receipt rejected, grading as do-nothing: FileNotFoundError(2, 'No such file or directory')\n"
+  }
+]

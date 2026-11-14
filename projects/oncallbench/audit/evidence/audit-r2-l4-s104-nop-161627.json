@@ -1,0 +1,47 @@
+{
+  "job": "audit-r2-l4-s104-nop-161627",
+  "repeat": 2,
+  "seed": 104,
+  "policy": "nop",
+  "expected": {
+    "cost": 363550.75,
+    "score": 0.0,
+    "components": {
+      "outage": 363550.75,
+      "replicas": 0,
+      "wasted": 0
+    },
+    "actions": 0
+  },
+  "actual": {
+    "reward": 0.0,
+    "cost_total": 363550.75,
+    "beats_reference": 0.0,
+    "valid_receipt": 1.0,
+    "actions": 0,
+    "faults_left": 3,
+    "cost_outage": 363550.75,
+    "cost_replicas": 0,
+    "cost_wasted": 0
+  },
+  "exception_info": null,
+  "cost_matches": true,
+  "score_matches": true,
+  "receipt_matches": true,
+  "timing": {
+    "started_at": "2026-11-14T14:16:29.073721Z",
+    "finished_at": "2026-11-14T14:17:03.000498Z",
+    "environment_setup": {
+      "started_at": "2026-11-14T14:16:29.118261Z",
+      "finished_at": "2026-11-14T14:16:36.863046Z"
+    },
+    "agent_execution": {
+      "started_at": "2026-11-14T14:16:36.863278Z",
+      "finished_at": "2026-11-14T14:16:36.864099Z"
+    },
+    "verifier": {
+      "started_at": "2026-11-14T14:16:48.704631Z",
+      "finished_at": "2026-11-14T14:17:03.000479Z"
+    }
+  }
+}

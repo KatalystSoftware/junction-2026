@@ -1,0 +1,248 @@
+# Replay viewer for aq-incident
+
+One screen for the demo: an agent's on-call shift next to the scripted reference on the same seed.
+The first screen has only what a passer-by needs: the two estates turning red and recovering, the
+money each run has lost so far, what each run is doing now and why, play, and the timeline.
+Everything else opens on a click or a hover.
+
+Live at https://incident.katalyst.fyi/ (see Deploy).
+
+## Run
+
+```
+xdg-open index.html   # macOS: open index.html
+```
+
+The page is static and has no dependencies; it opens straight from disk with the committed
+bundles in `data/`. Level 4 opens first; level 3 is the second tab in the bar.
+
+## Add or refresh an episode
+
+An episode is one level and seed. Each is one bundle, `data/l<level>-s<seed>.js`, and
+`data/index.js` lists them for the page, newest level first; the first one is what opens.
+
+```
+python3 export.py --level 5 --seeds 101 --jobs ../jobs   # add level 5: reference, scripted policies, trials found
+python3 export.py                                        # every bundle again, with the current simulator
+```
+
+That first line is all a new level needs: the exporter writes the bundle and rewrites
+`data/index.js`, and the page picks it up as a new tab that opens by default. To caption it, add
+an entry to `notes.json` (below) and run the second line. In this repo Python comes from the
+flake: `nix develop -c python3 export.py ...`.
+
+- `--jobs <folder>` adds the agent trials of that episode found in a Harbor jobs folder; `--trial
+  <folder>` adds one trial. `--only a,b` keeps the trials whose job name contains one of the strings.
+  A job run with several attempts gives one run per attempt, named `<job>-<attempt>`.
+- `--policies a,b` picks the scripted policies shown next to the reference.
+- A bundle keeps its trials' action logs and words, so later exports of the same episode keep them
+  without the Harbor folders. `--fresh` drops them.
+- `--sim` and `--policy-file` point at another copy of the simulator. `--out shift.json` writes
+  plain JSON and no bundle.
+
+`notes.json` holds, per episode:
+
+- `title`: the tab's name; `order`: the trials in order, the first is the run that opens.
+- `runs.<id>.what`: the sentence shown as the run's outcome when the shift is over, with a `source`.
+- `runs.<id>.moments`: calls the story turns on, matched by `tool` and `service`. A moment can
+  carry a `label` (named on the timeline), a `quote` from the agent's own closing message, and
+  `told`: the first words of the sentence of the task instruction that covers the call. The
+  exporter looks that sentence up in the instruction as shipped (`../task/instruction.md` with the
+  level's briefing) and prints a note if it is not there.
+- `headline`: where the level's result over all measured runs comes from (the regrade file and the
+  receipts under `../loop-evidence/`). The exporter computes the mean, median and range from it,
+  and replays each receipt to see whether capacity went on the quiet fault's service before the
+  rollback.
+
+## Test
+
+```
+python3 export.py && git diff --exit-code data/
+```
+
+Re-exports every bundle from its stored action logs. Every export checks itself: the per-minute
+losses, replica costs and wasted mitigations must add up to the cost the simulator settles, a
+trial's receipt must carry a valid signature, and every logged action must be accepted again on
+replay. A clean diff means the simulator and the reference still give the bundled numbers.
+
+## The bundles
+
+Every number on the page comes from the simulator and reference on `main`, and matches the closing
+report at the top of `../LOOP.md`: level 4 as shipped (round 10's instruction), graded against the
+round-11 reference.
+
+**Level 4, seed 101** (`data/l4-s101.js`). Seed 101 has all three round-10 Opus runs, one Sonnet
+and one Gemini run, and it is the same estate and faults as the level-3 example.
+
+| Run | Score | What happened |
+| --- | --- | --- |
+| Claude Opus 5.5 (`r10-l4-s101-opus-155047-i52GNAA`), opens first | 0.11 | Rolled back quotes-svc without adding capacity first: retries overloaded it and partner-api went to 72% errors. Also rejected 90% of pricing-svc's traffic for 23 minutes. |
+| Claude Opus 5.5 run 2 (`...-yZYAnrJ`) | 0.18 | Added capacity before the rollback, but rolled back the innocent returns-svc first and reached the quiet fault at minute 74. |
+| Claude Opus 5.5 run 3 (`...-pKMRL8v`) | 0.73 | Added capacity before the rollback and wasted nothing. |
+| Claude Sonnet 5.5 (`r10-l4-s101-sonnet-153636`) | 0.02 | One run. |
+| Gemini 3.1 Pro (`r10-l4-s101-gemini-153638`) | 0.00 | One run. |
+| Unprotected rollbacks, Do nothing | 0.69, 0.00 | Scripted baselines. |
+
+The run that opens is one of the six of nine Opus runs that rolled the quiet fault's service back
+unprotected; run 3, one click away in the results, is one of the two that added capacity first
+and wasted nothing. The strip in the bar shows all nine Opus scores on the level (mean 0.32,
+median 0.18, range 0.03 to 0.80); its sheet lists them by seed and by what the run did. One
+number differs from the report's text: it gives the unprotected runs as 0.03 to 0.59, which is
+the highest of them as run; graded against the round-11 reference that run is 0.61, and the page
+shows the regraded score like the report's own table.
+
+**Level 3, seed 101** (`data/l3-s101.js`): the quiet fault. Opus (0.88) finds every cause but
+fixes the quiet fault 28 minutes after the reference. Gemini (0.41) rolls back the innocent
+caller, then reverts and restarts the decoy.
+
+## Using the page
+
+- First visit: a three-line intro (what this is, what to watch, the result). It is shown once;
+  the "?" in the bar reopens it. A link to a moment skips it.
+- Under each run's name: what it is doing now, and why. For the reference that is the runbook
+  rule with the numbers it used; for the agent, its own words about that call from its closing
+  message. When the shift is over the line becomes the run's outcome.
+- Click a mark on the timeline for the details of that call: what it did to the faults, for the
+  reference why, for the agent the sentence of the task instruction that covers it and its own
+  words, and what the call returned. Hover a mark for the short version.
+- "How the reference decides": its seven rules. The rule in use lights up as the shift plays.
+- The strip in the bar: every measured run of the headline model on this level. Its sheet lists
+  the scores by seed; the ones on this seed switch the view to that run.
+- "Show each fault": one lane per fault with how long it stayed live in each run.
+- "Key": every mark on the graphs and the timeline, and how the score is defined.
+- Space plays and pauses. Drag the timeline to scrub. Left and right step through the agent's
+  actions; with Shift they move five minutes. Home and End jump to the ends. Escape closes sheets.
+- Hover a service for its name, error rate, callers and dependencies.
+- "Go to the key moment" jumps to the call the agent's run turns on and pauses there. While that
+  call holds the agent's line, the reference's line shows what it did at its own moment on the
+  same service, so the two decisions sit side by side.
+- Links to a moment: `index.html?session=l3-s101&run=<run id>&t=54`, `&a=<action index>` to open
+  an action (`&side=ref` for the reference), `&lanes=1`, `&sheet=runbook|results|key`,
+  `&intro=1` or `&intro=0`, `&speed=2`, `&still` to switch motion off for screenshots.
+
+### For a screen recording
+
+```
+https://incident.katalyst.fyi/?seed=101&autoplay=1&seconds=25&zoom=1.15
+```
+
+- `seed=101` (with `level=4` if several levels share a seed) opens that episode; `run=<run id>`
+  picks another run than the one that opens.
+- `autoplay=1` plays at once and skips the intro.
+- `seconds=25` plays what is left of the shift in that many seconds; `speed=1.5` sets a multiple
+  of the default instead (1x plays the 132 minutes from the start in 33 seconds). `t=0` starts
+  at the page instead of 12 minutes before it.
+- `pause=key` stops the playback at the key moment (three minutes after the agent's decisive
+  call, when its effect shows); `pause=44` stops at that minute. Space resumes.
+- `t=44` alone opens paused on that minute, for a still.
+- `zoom=1.15` enlarges all type for video compression; the layout holds at 1920x1080 up to 1.2.
+
+## Deploy
+
+```
+./deploy.sh
+```
+
+Copies the page, the font and the bundles to the Verda machine, into the folder the team's shared
+proxy serves as `https://incident.katalyst.fyi/` (`infra/verda/proxy/sites/incident.caddy`). It
+replaces the `data/` folder there, copies files only and restarts nothing; the proxy does not
+need a reload for new files. It needs SSH access to the machine (`VERDA_HOST`, or a
+`junction-runner` entry in `~/.ssh/config`). A change to the site file itself goes out with
+`infra/verda/proxy/deploy.sh`.
+
+## Data
+
+A bundle is JSON wrapped in a single assignment, because a page opened from disk may not fetch
+files. Shape:
+
+- `sessions[0]`: the episode (`seed`, `level`, `title`) with `cost_null` and `cost_ref`, the
+  reference's `runbook` (seven lines) and the level's `headline` (every measured run's score).
+- `services[]`: `name`, `tier`, `revenue`, `deps` (`[index, weight]`), the drawing position
+  (`row`, `x`; a service no edge reaches has `slot` instead), and from level 4 `retries` (how
+  often callers retry it) and `tight` (it runs close to capacity).
+- `faults[]` and `decoy`: the hidden truth of the episode.
+- `runs[]`: `cost`, `score`, `note`, and per minute from 30 minutes before the page to the end of
+  the shift: `err` (`[service, error rate, own share]` in ten-thousandths, failing services only),
+  `hot` (services with a CPU alert), `storm` (services over capacity on retries alone), `loss`
+  (revenue lost in that minute) and `extra` (replica cost). `faults[].live` are the minutes each
+  fault was failing, `throttles[]` what the run rejected up front and when.
+- `runs[].actions[]`: the tool, arguments, result, the minutes before and after, for a mitigation
+  whether it ended a fault or was wasted, for a throttle the span it was in force. The reference's
+  actions carry `rule` (1 to 7) and, where it could be worked out, `why`. A trial's actions carry
+  `say` or `think` (what the agent wrote at the time) and, on pinned moments, `label`, `quote` and
+  `told`. A trial also has the agent's final `report`.
+
+## Decisions
+
+- **The simulator and the reference are imported, never changed.** The export reads a few of the
+  simulator's internals (`_err`, `_own`, `_metrics`, `_fault_sev`, `_replicas`, `_load`, `_state`,
+  `throttles`) to get the per-minute truth. Nothing in `sim/` has a hook for the viewer.
+- **Why the reference acts is worked out in the exporter**, from the reference's own calls and
+  what they returned, with the same arithmetic as `sim/policies.py`: the replicas a rollback's
+  retried failures need, fresh traffic against the calm window, the share a storm sheds, the
+  word a diff and a symptom share. A reason is kept only when it reproduces the call that was
+  made (the replica count, the throttle share, a shared word). Otherwise the action has its
+  rule number at most and the page shows the plain action. On eight episodes (levels 3 and 4,
+  seeds 1 and 101 to 103) all 54 mitigations and throttles of the reference get a reason this way.
+- **Details are on demand.** The first screen is the two estates, the counters, the line on what
+  each run is doing, play and the timeline. The key, the score's definition, each fault's lane,
+  the action details, the runbook and the nine-run results each open from one control.
+- **The intro is a dialog, once.** It pauses the replay until it is dismissed, so the first thing
+  a visitor reads is what they are about to watch. The dismissal is remembered in localStorage
+  where the browser allows it.
+- **The graph shows the truth, not the agent's view.** A cause is drawn differently from a service
+  that fails because of one, and the quiet fault is marked even though its own telemetry is clean.
+  What the agent could see is in the action details.
+- **Two moments per fault, named the same everywhere.** "Fault removed" is the minute the cause is
+  gone; "clear" adds that the retry storm it left has drained and every throttle is lifted.
+- **A retry storm is its own state.** A service over capacity that no surge in customer traffic
+  explains is in a storm: its outline is broken and circling, its lane is hatched after the cause
+  is gone, and its caption says what set it off. A traffic-surge fault counts as live until
+  capacity covers the customer traffic, so throttling it does not end it.
+- **A throttle is an arc.** The blue arc around a service is as long as the share of requests the
+  run turns away; the timeline shows how long it stayed on.
+- **Protected or not is read off the action log.** A run of the headline model counts as
+  "added capacity first" when a scale above the normal replica count was started on the quiet
+  fault's service before its rollback.
+- **Readable at 60 services.** Rows follow the longest call path from an edge, ordered to cut
+  crossings, with edge services on top and data at the bottom. Only the services the story is
+  about are named and ringed in ink. Services no edge reaches sit in their own block without links.
+- **Edge services are bars.** Width grows with the square root of revenue (with a floor so the
+  name fits); the red fill is the share of requests failing, the number is dollars lost a minute.
+- **The counter is the scored cost**, labelled "Lost so far": lost revenue, extra replicas and
+  wasted mitigations; hover it for the split. The 30 minutes before the page are shown but not
+  charged, as in the simulator.
+- **Playback glides, the data does not.** The simulator moves a minute at a time and the bundle is
+  per minute. While playing, what changes by degree (the counter, an edge's bar and figures, how
+  deep a failing service is coloured, how thick a failing link is, the playhead) moves evenly
+  from one minute's value toward the next. Nothing is eased across a minute on which something
+  happens in that run (an action starts or lands, a throttle goes on or off, a fault or a storm
+  begins or ends): the value holds, and the new one eases in once its minute has come. What a
+  service is and every caption change on their minute. Pausing lets the current minute finish
+  (in a fifth of a second) and stops on the next whole minute, and scrubbing moves by whole
+  minutes, so a paused page shows only the bundle's own numbers. With reduced motion, or
+  `&still`, playback steps a minute at a time.
+- **Start-up and frame cost.** Until the first picture is drawn the page shows one line, "Loading
+  the shift", and it starts playing only after that picture is on screen. Only the episode that
+  opens is fetched before the start; the others load behind it. Per frame, the script asks the
+  browser for nothing that forces a style or layout pass (the root font size is read once per
+  window size, text is measured when the graph is built), and nothing inside the graphs animates
+  a transform: a rotating ring made the browser split each drawing into layers on every frame, so
+  the ring's dashes travel instead. Under a four times slower CPU this took playback from about
+  37 to about 50 frames a second and the start from 1.9 to 1.0 seconds.
+- **The timeline is static.** It shows the whole of both runs at once. In the loss chart, what
+  both runs lose is pale and what only the agent loses is full red: the red area is the gap.
+- **Agent's words** during the run are matched to the receipt by walking the trajectory's tool
+  calls in order. Quotes on pinned moments are verbatim from the closing message in
+  `../loop-evidence/final-messages/`.
+- **Look.** A light page, because it is projected in a lit hall. Two inks: blue-black for what is,
+  red for what is lost. Amber marks noise (the decoy), blue marks the run at work. One moving
+  thing: failures flowing up the links toward the edge, as thick as the share of calls failing.
+  Built with the `impeccable` skill's references; its launcher is not vendored, so there is no
+  PRODUCT.md or DESIGN.md.
+- **Known limits.** Where several story services sit close together their labels compete for room;
+  at laptop width one label can end up over a link or a step away from its mark on a leader line.
+  This round's restructuring (sheets, intro, reasons) has not been through an independent design
+  review.
+- **Font.** Archivo variable (width and weight axes), SIL OFL 1.1, vendored in `fonts/` from
+  `@fontsource-variable/archivo@5.2.8`. Nothing loads from a network.

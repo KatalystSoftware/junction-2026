@@ -1,0 +1,1 @@
+Started a detached reward writer; made no estate calls. Correct reward is zero.

@@ -1,0 +1,629 @@
+diff --git a/spikes/aq-incident/eval.py b/spikes/aq-incident/eval.py
+index 362423b..32f0a8c 100644
+--- a/spikes/aq-incident/eval.py
++++ b/spikes/aq-incident/eval.py
+@@ -24,7 +24,7 @@ EXTRA_BUILD_SEEDS = [6, 7, 8, 9, 10, 11, 12]  # more seeds to tune on: --seeds 6
+ def run(seed, level, policy):
+     """Play a policy in-process, settle the shift, and check the replay recomputes the same cost."""
+     estate = incident.Estate(seed, level)
+-    policies.POLICIES[policy](lambda tool, **args: estate.call(tool, args))
++    (policies.POLICIES.get(policy) or EXPLOITS[policy])(lambda tool, **args: estate.call(tool, args))
+     receipt = json.dumps(estate.receipt(), sort_keys=True)
+     estate.finish()
+     again = incident.replay(seed, level, json.loads(receipt)["actions"])
+@@ -33,6 +33,33 @@ def run(seed, level, policy):
+     return estate
+ 
+ 
++def data_tier(call):
++    return [s for s in call("get_topology")["services"] if s["tier"] == "data"]
++
++
++def failover_all(call):
++    """Fails over every data service at once, then works the shift as the reference does."""
++    for s in data_tier(call):
++        call("failover", service=s["name"])
++    policies.reference(call)
++
++
++def scale_all(call):
++    """Every data service and its standby to the maximum at minute 0, then the reference."""
++    for s in data_tier(call):
++        call("scale", service=s["name"], replicas=4 * s["normal_replicas"])
++    policies.reference(call)
++
++
++def throttle_all(call):
++    """Half of every data service's load shed for the whole shift, so nothing can storm, then the reference."""
++    for s in data_tier(call):
++        call("throttle", service=s["name"], percent=50)
++    policies.reference(call)
++
++
++EXPLOITS = {"failover-all": failover_all, "scale-all": scale_all, "throttle-all": throttle_all}
++
+ FIX = {"bad_deploy": "rollback", "leak": "rollback", "bad_config": "revert_config", "primary_down": "failover",
+        "bad_file": "revert_config"}
+ 
+@@ -43,7 +70,8 @@ def oracle(seed, level, skip=None):
+     Where callers retry it reads the hidden load too: a quiet service gets the capacity a
+     disruptive fix needs first and gives it back after, and a storm that would outlive a fix is
+     throttled for the minute the fix lands. A bad file is fixed at its publisher, and a storm on a
+-    consumer is throttled for the minute the next good file lands."""
++    consumer is throttled for the minute the next good file lands. A failover onto a standby that
++    is too small is throttled to what the standby carries until the normal replica count is back."""
+     faults = [i for i in range(len(incident.Estate(seed, level).faults)) if i != skip]
+     costs = []
+     for order in itertools.permutations(faults):
+@@ -71,11 +99,16 @@ def oracle(seed, level, skip=None):
+             result = estate.call(FIX.get(f["kind"], "scale"), args)
+             assert result["ok"]
+             at = result["completes_at_minute"]
++            short = s["replicas"] / (estate._replicas(name, at) * s.get("cap", 1))  # load over what the standby carries
+             if spare:
+                 later(at, "scale", service=name, replicas=s["replicas"])
+             elif estate.storms and estate._state(at)[name][2] > 1:
+                 later(at - 1, "throttle", service=name, percent=min(90, math.ceil(100 * (1 - 1 / estate._state(at)[name][2]))))
+-                later(at, "throttle", service=name, percent=0)
++                later(at, "throttle", service=name, percent=math.ceil(100 * (1 - 1 / short)) if short > 1 else 0)
++            if estate._replicas(name, at) < s["replicas"]:
++                later(at + (short > 1 and s["retry"] > 0), "scale", service=name, replicas=s["replicas"])
++                if short > 1 and s["retry"]:
++                    later(at + 4, "throttle", service=name, percent=0)
+             tick = incident.EVERY * math.ceil(at / incident.EVERY)
+             for c in f.get("hits", ()):  # a storm outlives the bad file: one consumer after the other
+                 if estate._state(tick)[c][2] > 1:
+@@ -183,6 +216,13 @@ if __name__ == "__main__":
+         if incident.LEVELS[opts.level].get("files"):
+             assert skips[0] <= 0.8, "the bad file can be left alone for more than 0.8 of what the oracle avoids"
+             assert max(score["consumer-fixer"], score["surge-responder"], score["drain-only"]) <= 0.8
++        if incident.LEVELS[opts.level].get("standby"):
++            assert score["naive-failover"] <= 0.85, "failing over without looking at the standby scores above 0.85"
++            if seed in BUILD_SEEDS:  # nothing done to every data service may stand in for the judgment
++                cheats = {name: round(incident.score(run(seed, opts.level, name).total_cost(), result["cost_null"],
++                                                     result["cost_ref"]), 2) for name in EXPLOITS}
++                print(f"         exploits {cheats}")
++                assert max(cheats.values()) < 0.9
+         if opts.level >= 1:
+             assert max(skips) <= 0.9, "one fault can be left alone for more than 0.9"
+             assert score["one-fix"] <= 0.75 and score["no-late"] <= 0.9 and score["loudest-first"] < 0.95
+diff --git a/spikes/aq-incident/sim/incident.py b/spikes/aq-incident/sim/incident.py
+index 7b3a16a..bdb87d4 100644
+--- a/spikes/aq-incident/sim/incident.py
++++ b/spikes/aq-incident/sim/incident.py
+@@ -65,6 +65,11 @@ LEVELS[4] = dict(LEVELS[3], world=3, storms=True, gray_share=0.6)
+ # one primary did, and the quiet fault must stay worth a quarter. Callers of the consumer that the
+ # file takes down retry harder (FILE_RETRIES), so the storm it leaves is worth draining.
+ LEVELS[5] = dict(LEVELS[4], files=True, gray_share=0.75)
++# lever 6: the level-5 worlds, but the fault that lands mid-shift is a data service whose primary is
++# gone, and the standby it fails over to is about half its size (postmortems.md: GitHub 5 Oct 2026,
++# the healthy region "did not have enough capacity for the extra demand and began failing too";
++# AWS Oct 2025, failover left "remaining healthy capacity" that "was insufficient").
++LEVELS[6] = dict(LEVELS[5], standby=True, gray_share=1.3)
+ FILE_RETRIES = 5
+ EVERY = 5  # minutes between generations of a published file
+ FILE_SYMPTOM = "worker panicked loading rules file: {} entries, limit 200"
+@@ -413,6 +418,32 @@ def scenario(seed, level):
+                                   p99=r.randrange(40, 240, 10), noise=[], changes=[], cap=HEADROOM, retry=0,
+                                   down=(-r.randint(2, 9), r.randint(85, 110)))
+         order.insert(0, "status-page")
++    if cfg.get("standby"):
++        # GitHub 5 Oct 2026 (postmortems.md): fail over "one service at a time, and added capacity".
++        # The late fault moves to a hot, retried data service off the richest edge, worth about what
++        # the change it replaces was; that change and its twin never land.
++        r, old = rng("standby"), faults[2]
++        svc[old["service"]]["changes"] = [c for c in svc[old["service"]]["changes"] if c["minute"] != old["start"]]
++        used = {f["service"] for f in faults} | set(faults[0]["hits"]) | {batch["service"]}
++        rest = [n for n in datas if n not in used]
++        rest, aim = [n for n in rest if lost({n: 1.0})] or rest, cfg["gray_share"] * best[2]
++
++        def span(n):  # minutes before the end it must start to be worth what the quiet fault is
++            return min(75, max(35, round(aim / max(lost({n: 1.0}), 1))))
++
++        def off(n):  # worth much more than that, it would leave the other faults too small a share
++            over = math.log(max(lost({n: 1.0}), 1) * span(n) / aim)
++            return 1.5 * over if over > 0 else -over
++
++        down = min(rest, key=off)
++        start = HORIZON - span(down) + r.randint(-3, 3)
++        faults[2] = dict(kind="primary_down", service=down, start=start, sev=1.0, end=None, change=None)
++        # a few other standbys are as small, one of them on a hot, retried service too
++        small = r.sample([n for n in datas if n != down], r.choice([2, 3, 4]))
++        for n in datas:
++            svc[n]["standby"] = math.ceil(svc[n]["replicas"] / 2) if n in [down] + small else svc[n]["replicas"]
++        for n in [down] + [n for n in small if n not in used][:1]:
++            svc[n].update(cap=HOT, retry=RETRIES if n == down else max(RETRIES, svc[n]["retry"]))
+     return dict(svc=svc, order=order, edges=edges, faults=faults, batch=batch, files=files)
+ 
+ 
+@@ -463,6 +494,11 @@ class Estate:
+                 reps = n
+         return reps
+ 
++    def _standby(self, name):
++        """Replicas a data service's standby runs: its own, or what the last landed scale set."""
++        landed = [n for at, n in self.scales.get(name, ()) if at <= self.now]
++        return landed[-1] if landed else self.svc[name]["standby"]
++
+     def _load(self, name, t):
+         load = 1.0
+         for f in self.faults:
+@@ -620,6 +656,7 @@ class Estate:
+     def get_topology(self):
+         return dict(ok=True, services=[
+             dict(name=n, tier=self.svc[n]["tier"], normal_replicas=self.svc[n]["replicas"],
++                 **({"standby_replicas": self._standby(n)} if "standby" in self.svc[n] else {}),
+                  revenue_per_min=self.svc[n]["revenue"], **({"callers_retry": self.svc[n]["retry"]} if self.storms else {}),
+                  **({"file_from": self.files[n]} if n in self.files else {}),
+                  depends_on=[dict(service=d, kind="hard" if w == 1.0 else "soft") for d, w in self.svc[n]["deps"]])
+@@ -810,6 +847,8 @@ class Estate:
+             return dict(ok=False, error="failover only applies to data-tier services")
+         at = self._start(service, "failover")
+         self._end_faults(service, at, ("primary_down",))
++        if "standby" in self.svc[service]:  # GitHub 5 Oct 2026 (postmortems.md): it runs on what the standby has
++            self.scales.setdefault(service, []).append((at, self._standby(service)))
+         return dict(ok=True, service=service, completes_at_minute=at)
+ 
+     def throttle(self, service, percent):
+@@ -929,6 +968,16 @@ def briefing(level):
+ - The cause is fixed at the publisher, and the fix takes effect with its next generation: what was
+   already loaded stays until then.
+ - Not every alert belongs to this estate's services, or to a fault.
++"""
++    standby = "" if not cfg.get("standby") else """
++## Standbys
++
++- A data service fails over onto its standby, which runs `standby_replicas` replicas (in
++  `get_topology`) and may be smaller than the primary. After a failover that is the service's
++  replica count.
++- `scale` on a data service sizes the standby too: a scale that has landed before a failover is
++  the count the standby comes up with; after a failover it grows the pool that serves.
++- A pool that is too small for its load sheds requests, and shed requests are retried.
+ """
+     return f"""## How time works
+ 
+@@ -959,7 +1008,7 @@ better.
+ | Lost revenue | each edge service's revenue per minute × its error rate, every minute of the shift |
+ | Extra replicas | ${REPLICA_COST} per replica above normal per minute, from when the scale lands to the end of the shift |
+ | Wasted mitigation | ${cfg["wasted"]:,} for each mitigation applied to a service that did not need it (setting a service back to its normal replica count is free) |
+-{views}{storms}{files}"""
++{views}{storms}{files}{standby}"""
+ 
+ 
+ def sign(actions):
+diff --git a/spikes/aq-incident/sim/policies.py b/spikes/aq-incident/sim/policies.py
+index c7fc9c0..0dce114 100644
+--- a/spikes/aq-incident/sim/policies.py
++++ b/spikes/aq-incident/sim/policies.py
+@@ -201,7 +201,7 @@ def blind(topo, service, n):
+ 
+ 
+ def reference(call, max_fixes=None, leave_when_clear=False, thorough=False, descend=True, trusting=False,
+-              guess=False, drain=True, protect=True, lift=True, files="fix"):
++              guess=False, drain=True, protect=True, lift=True, files="fix", standby=True):
+     """An expert on call. A service is a cause when it fails more than its dependencies explain
+     (or its memory is filling up), however loud it is; a busy CPU or a recent change alone is not.
+     Causes are worked in order of the revenue they cost, each from the cheapest evidence that
+@@ -218,7 +218,13 @@ def reference(call, max_fixes=None, leave_when_clear=False, thorough=False, desc
+     that retries hold down are throttled together for the minute the next good file lands. A
+     consumer is never mitigated. There the alert list is read by tier when it would be cut, a
+     queued suspect is dropped when the free status shows its edges healthy again, and a quiet
+-    suspect gets unmeasured spare capacity while its diffs are read."""
++    suspect gets unmeasured spare capacity while its diffs are read.
++    Where a data service has a standby, a standby that is smaller than the pool and has retrying
++    callers is sized to the normal replica count in a minute that would be spent waiting: it is
++    free, and a failover then needs nothing more. The standby's size is read again before a
++    failover. One that is still too small gets the normal count as soon as the failover has landed,
++    and where callers retry the share it cannot carry is throttled from the minute the failover
++    lands to the minute the replicas do."""
+     topo, deps, worth = graph(call)
+     began, mended, treated, shed, seen, tiers = {}, {}, set(), {}, {}, None
+     calm, hogs = set(), {}
+@@ -226,6 +232,10 @@ def reference(call, max_fixes=None, leave_when_clear=False, thorough=False, desc
+     fixes, looked, free, dropped, tried = 0, {}, None, set(), {}
+     retries = {n: s.get("callers_retry", 0) for n, s in topo.items()}
+     fixed, cleared, prepared, timers, clock, raw = set(), set(), {}, [], [0], call
++    # GitHub 5 Oct 2026 (postmortems.md): they "added capacity" before failing over. Data services
++    # whose standby is smaller than the pool and whose callers retry, the dearest last
++    small = sorted((n for n, s in topo.items() if standby and not leave_when_clear and retries[n]
++                    and s.get("standby_replicas", 99) < s["normal_replicas"]), key=lambda n: worth[n])
+ 
+     def call(tool, **args):
+         """Timed steps go first: the throttle for the minute a fix lands, its lift, replicas to give
+@@ -432,6 +442,15 @@ def reference(call, max_fixes=None, leave_when_clear=False, thorough=False, desc
+                             call("wait", minutes=landed - seen["minute"])
+                     elif plan:
+                         call("throttle", service=service, percent=plan[1])
++                    room = None
++                    if standby and action[0] == "failover":
++                        # GitHub 5 Oct 2026 (postmortems.md): the healthy side "did not have enough capacity
++                        # for the extra demand and began failing too": check what the standby can carry first
++                        spare = next((x.get("standby_replicas") for x in call("get_topology").get("services", []) if x["name"] == service), None)
++                        if spare is not None and spare < topo[service]["normal_replicas"]:
++                            # share of the normal load the standby carries: at least what a pool carries
++                            # that never raised a CPU alert, and reading its metrics would cost two minutes down
++                            room = spare / (0.9 * topo[service]["normal_replicas"])
+                     result = call(action[0], service=service, **action[1])
+                     at = result.get("completes_at_minute", 0)
+                     if plan and plan[0] == "scale":  # give it back the minute the mitigation lands
+@@ -449,9 +468,18 @@ def reference(call, max_fixes=None, leave_when_clear=False, thorough=False, desc
+                                 failing = 1 - (1 - failing) * (1 - DISRUPTS[action[0]][1])
+                             if not plan and failing >= 0.1:  # held down by retries: calm as the fix lands
+                                 timers.append((at - 1, "throttle", dict(service=service, percent=min(
+-                                    90, math.ceil(100 * (1 - 1 / (1 + retries[service] * failing)))))))
+-                                if lift:
++                                    90, math.ceil(100 * (1 - min(1, room or 1) / (1 + retries[service] * failing)))))))
++                                if room and room < 1:
++                                    # AWS Oct 2025 (postmortems.md): throttled until the capacity was back. The
++                                    # standby's shortfall is rejected, not shed and retried, while the replicas land.
++                                    timers.append((at, "throttle", dict(service=service, percent=math.ceil(100 * (1 - room)))))
++                                    timers.append((at + 1, "scale", dict(service=service, replicas=topo[service]["normal_replicas"])))
++                                    timers.append((at + 4, "throttle", dict(service=service, percent=0)))
++                                    room = None
++                                elif lift:
+                                     timers.append((at, "throttle", dict(service=service, percent=0)))
++                        if room and result["ok"]:  # the pool back to its normal size: free, and it is headroom
++                            timers.append((at, "scale", dict(service=service, replicas=topo[service]["normal_replicas"])))
+                         looked.pop(service, None)
+                         fixes += 1
+                         if fed:  # the file already loaded stays until the next generation
+@@ -479,7 +507,15 @@ def reference(call, max_fixes=None, leave_when_clear=False, thorough=False, desc
+                             return
+         now = call("get_status")["minute"]
+         pending = [at - now for at in busy.values() if at > now]
+-        call("wait", minutes=max(1, min(pending)) if pending and not free else 1)
++        idle = max(1, min(pending)) if pending and not free else 1
++        while idle and small and clear and small[-1] not in signals and small[-1] not in busy:
++            # a minute of waiting on a healthy estate sizes one standby instead; the scale disturbs nothing
++            calm.add(small[-1])
++            if not call("scale", service=small[-1], replicas=topo[small.pop()]["normal_replicas"])["ok"]:
++                break
++            idle -= 1
++        if idle:
++            call("wait", minutes=idle)
+ 
+ 
+ def one_fix(call):
+@@ -532,6 +568,12 @@ def forgetful(call):
+     reference(call, lift=False)
+ 
+ 
++def naive_failover(call):
++    """The reference, but it fails over without looking at the standby: it calms the service for
++    the minute the failover lands and drains the storm only when it looks again."""
++    reference(call, standby=False)
++
++
+ def consumer_fixer(call):
+     """The reference, but it treats a bad file where it shows: it undoes the failing consumer's
+     latest change, or restarts it, and never looks at the publisher."""
+@@ -605,6 +647,7 @@ POLICIES = {
+     "trusting": trusting, "alerts-only": alerts_only,
+     "no-drain": no_drain, "unprotected": unprotected, "forgetful": forgetful,
+     "consumer-fixer": consumer_fixer, "surge-responder": surge_responder, "drain-only": drain_only,
++    "naive-failover": naive_failover,
+ }
+ 
+ 
+diff --git a/spikes/aq-incident/task/environment/mcp-server/incident.py b/spikes/aq-incident/task/environment/mcp-server/incident.py
+index 7b3a16a..bdb87d4 100644
+--- a/spikes/aq-incident/task/environment/mcp-server/incident.py
++++ b/spikes/aq-incident/task/environment/mcp-server/incident.py
+@@ -65,6 +65,11 @@ LEVELS[4] = dict(LEVELS[3], world=3, storms=True, gray_share=0.6)
+ # one primary did, and the quiet fault must stay worth a quarter. Callers of the consumer that the
+ # file takes down retry harder (FILE_RETRIES), so the storm it leaves is worth draining.
+ LEVELS[5] = dict(LEVELS[4], files=True, gray_share=0.75)
++# lever 6: the level-5 worlds, but the fault that lands mid-shift is a data service whose primary is
++# gone, and the standby it fails over to is about half its size (postmortems.md: GitHub 5 Oct 2026,
++# the healthy region "did not have enough capacity for the extra demand and began failing too";
++# AWS Oct 2025, failover left "remaining healthy capacity" that "was insufficient").
++LEVELS[6] = dict(LEVELS[5], standby=True, gray_share=1.3)
+ FILE_RETRIES = 5
+ EVERY = 5  # minutes between generations of a published file
+ FILE_SYMPTOM = "worker panicked loading rules file: {} entries, limit 200"
+@@ -413,6 +418,32 @@ def scenario(seed, level):
+                                   p99=r.randrange(40, 240, 10), noise=[], changes=[], cap=HEADROOM, retry=0,
+                                   down=(-r.randint(2, 9), r.randint(85, 110)))
+         order.insert(0, "status-page")
++    if cfg.get("standby"):
++        # GitHub 5 Oct 2026 (postmortems.md): fail over "one service at a time, and added capacity".
++        # The late fault moves to a hot, retried data service off the richest edge, worth about what
++        # the change it replaces was; that change and its twin never land.
++        r, old = rng("standby"), faults[2]
++        svc[old["service"]]["changes"] = [c for c in svc[old["service"]]["changes"] if c["minute"] != old["start"]]
++        used = {f["service"] for f in faults} | set(faults[0]["hits"]) | {batch["service"]}
++        rest = [n for n in datas if n not in used]
++        rest, aim = [n for n in rest if lost({n: 1.0})] or rest, cfg["gray_share"] * best[2]
++
++        def span(n):  # minutes before the end it must start to be worth what the quiet fault is
++            return min(75, max(35, round(aim / max(lost({n: 1.0}), 1))))
++
++        def off(n):  # worth much more than that, it would leave the other faults too small a share
++            over = math.log(max(lost({n: 1.0}), 1) * span(n) / aim)
++            return 1.5 * over if over > 0 else -over
++
++        down = min(rest, key=off)
++        start = HORIZON - span(down) + r.randint(-3, 3)
++        faults[2] = dict(kind="primary_down", service=down, start=start, sev=1.0, end=None, change=None)
++        # a few other standbys are as small, one of them on a hot, retried service too
++        small = r.sample([n for n in datas if n != down], r.choice([2, 3, 4]))
++        for n in datas:
++            svc[n]["standby"] = math.ceil(svc[n]["replicas"] / 2) if n in [down] + small else svc[n]["replicas"]
++        for n in [down] + [n for n in small if n not in used][:1]:
++            svc[n].update(cap=HOT, retry=RETRIES if n == down else max(RETRIES, svc[n]["retry"]))
+     return dict(svc=svc, order=order, edges=edges, faults=faults, batch=batch, files=files)
+ 
+ 
+@@ -463,6 +494,11 @@ class Estate:
+                 reps = n
+         return reps
+ 
++    def _standby(self, name):
++        """Replicas a data service's standby runs: its own, or what the last landed scale set."""
++        landed = [n for at, n in self.scales.get(name, ()) if at <= self.now]
++        return landed[-1] if landed else self.svc[name]["standby"]
++
+     def _load(self, name, t):
+         load = 1.0
+         for f in self.faults:
+@@ -620,6 +656,7 @@ class Estate:
+     def get_topology(self):
+         return dict(ok=True, services=[
+             dict(name=n, tier=self.svc[n]["tier"], normal_replicas=self.svc[n]["replicas"],
++                 **({"standby_replicas": self._standby(n)} if "standby" in self.svc[n] else {}),
+                  revenue_per_min=self.svc[n]["revenue"], **({"callers_retry": self.svc[n]["retry"]} if self.storms else {}),
+                  **({"file_from": self.files[n]} if n in self.files else {}),
+                  depends_on=[dict(service=d, kind="hard" if w == 1.0 else "soft") for d, w in self.svc[n]["deps"]])
+@@ -810,6 +847,8 @@ class Estate:
+             return dict(ok=False, error="failover only applies to data-tier services")
+         at = self._start(service, "failover")
+         self._end_faults(service, at, ("primary_down",))
++        if "standby" in self.svc[service]:  # GitHub 5 Oct 2026 (postmortems.md): it runs on what the standby has
++            self.scales.setdefault(service, []).append((at, self._standby(service)))
+         return dict(ok=True, service=service, completes_at_minute=at)
+ 
+     def throttle(self, service, percent):
+@@ -929,6 +968,16 @@ def briefing(level):
+ - The cause is fixed at the publisher, and the fix takes effect with its next generation: what was
+   already loaded stays until then.
+ - Not every alert belongs to this estate's services, or to a fault.
++"""
++    standby = "" if not cfg.get("standby") else """
++## Standbys
++
++- A data service fails over onto its standby, which runs `standby_replicas` replicas (in
++  `get_topology`) and may be smaller than the primary. After a failover that is the service's
++  replica count.
++- `scale` on a data service sizes the standby too: a scale that has landed before a failover is
++  the count the standby comes up with; after a failover it grows the pool that serves.
++- A pool that is too small for its load sheds requests, and shed requests are retried.
+ """
+     return f"""## How time works
+ 
+@@ -959,7 +1008,7 @@ better.
+ | Lost revenue | each edge service's revenue per minute × its error rate, every minute of the shift |
+ | Extra replicas | ${REPLICA_COST} per replica above normal per minute, from when the scale lands to the end of the shift |
+ | Wasted mitigation | ${cfg["wasted"]:,} for each mitigation applied to a service that did not need it (setting a service back to its normal replica count is free) |
+-{views}{storms}{files}"""
++{views}{storms}{files}{standby}"""
+ 
+ 
+ def sign(actions):
+diff --git a/spikes/aq-incident/task/solution/policies.py b/spikes/aq-incident/task/solution/policies.py
+index c7fc9c0..0dce114 100644
+--- a/spikes/aq-incident/task/solution/policies.py
++++ b/spikes/aq-incident/task/solution/policies.py
+@@ -201,7 +201,7 @@ def blind(topo, service, n):
+ 
+ 
+ def reference(call, max_fixes=None, leave_when_clear=False, thorough=False, descend=True, trusting=False,
+-              guess=False, drain=True, protect=True, lift=True, files="fix"):
++              guess=False, drain=True, protect=True, lift=True, files="fix", standby=True):
+     """An expert on call. A service is a cause when it fails more than its dependencies explain
+     (or its memory is filling up), however loud it is; a busy CPU or a recent change alone is not.
+     Causes are worked in order of the revenue they cost, each from the cheapest evidence that
+@@ -218,7 +218,13 @@ def reference(call, max_fixes=None, leave_when_clear=False, thorough=False, desc
+     that retries hold down are throttled together for the minute the next good file lands. A
+     consumer is never mitigated. There the alert list is read by tier when it would be cut, a
+     queued suspect is dropped when the free status shows its edges healthy again, and a quiet
+-    suspect gets unmeasured spare capacity while its diffs are read."""
++    suspect gets unmeasured spare capacity while its diffs are read.
++    Where a data service has a standby, a standby that is smaller than the pool and has retrying
++    callers is sized to the normal replica count in a minute that would be spent waiting: it is
++    free, and a failover then needs nothing more. The standby's size is read again before a
++    failover. One that is still too small gets the normal count as soon as the failover has landed,
++    and where callers retry the share it cannot carry is throttled from the minute the failover
++    lands to the minute the replicas do."""
+     topo, deps, worth = graph(call)
+     began, mended, treated, shed, seen, tiers = {}, {}, set(), {}, {}, None
+     calm, hogs = set(), {}
+@@ -226,6 +232,10 @@ def reference(call, max_fixes=None, leave_when_clear=False, thorough=False, desc
+     fixes, looked, free, dropped, tried = 0, {}, None, set(), {}
+     retries = {n: s.get("callers_retry", 0) for n, s in topo.items()}
+     fixed, cleared, prepared, timers, clock, raw = set(), set(), {}, [], [0], call
++    # GitHub 5 Oct 2026 (postmortems.md): they "added capacity" before failing over. Data services
++    # whose standby is smaller than the pool and whose callers retry, the dearest last
++    small = sorted((n for n, s in topo.items() if standby and not leave_when_clear and retries[n]
++                    and s.get("standby_replicas", 99) < s["normal_replicas"]), key=lambda n: worth[n])
+ 
+     def call(tool, **args):
+         """Timed steps go first: the throttle for the minute a fix lands, its lift, replicas to give
+@@ -432,6 +442,15 @@ def reference(call, max_fixes=None, leave_when_clear=False, thorough=False, desc
+                             call("wait", minutes=landed - seen["minute"])
+                     elif plan:
+                         call("throttle", service=service, percent=plan[1])
++                    room = None
++                    if standby and action[0] == "failover":
++                        # GitHub 5 Oct 2026 (postmortems.md): the healthy side "did not have enough capacity
++                        # for the extra demand and began failing too": check what the standby can carry first
++                        spare = next((x.get("standby_replicas") for x in call("get_topology").get("services", []) if x["name"] == service), None)
++                        if spare is not None and spare < topo[service]["normal_replicas"]:
++                            # share of the normal load the standby carries: at least what a pool carries
++                            # that never raised a CPU alert, and reading its metrics would cost two minutes down
++                            room = spare / (0.9 * topo[service]["normal_replicas"])
+                     result = call(action[0], service=service, **action[1])
+                     at = result.get("completes_at_minute", 0)
+                     if plan and plan[0] == "scale":  # give it back the minute the mitigation lands
+@@ -449,9 +468,18 @@ def reference(call, max_fixes=None, leave_when_clear=False, thorough=False, desc
+                                 failing = 1 - (1 - failing) * (1 - DISRUPTS[action[0]][1])
+                             if not plan and failing >= 0.1:  # held down by retries: calm as the fix lands
+                                 timers.append((at - 1, "throttle", dict(service=service, percent=min(
+-                                    90, math.ceil(100 * (1 - 1 / (1 + retries[service] * failing)))))))
+-                                if lift:
++                                    90, math.ceil(100 * (1 - min(1, room or 1) / (1 + retries[service] * failing)))))))
++                                if room and room < 1:
++                                    # AWS Oct 2025 (postmortems.md): throttled until the capacity was back. The
++                                    # standby's shortfall is rejected, not shed and retried, while the replicas land.
++                                    timers.append((at, "throttle", dict(service=service, percent=math.ceil(100 * (1 - room)))))
++                                    timers.append((at + 1, "scale", dict(service=service, replicas=topo[service]["normal_replicas"])))
++                                    timers.append((at + 4, "throttle", dict(service=service, percent=0)))
++                                    room = None
++                                elif lift:
+                                     timers.append((at, "throttle", dict(service=service, percent=0)))
++                        if room and result["ok"]:  # the pool back to its normal size: free, and it is headroom
++                            timers.append((at, "scale", dict(service=service, replicas=topo[service]["normal_replicas"])))
+                         looked.pop(service, None)
+                         fixes += 1
+                         if fed:  # the file already loaded stays until the next generation
+@@ -479,7 +507,15 @@ def reference(call, max_fixes=None, leave_when_clear=False, thorough=False, desc
+                             return
+         now = call("get_status")["minute"]
+         pending = [at - now for at in busy.values() if at > now]
+-        call("wait", minutes=max(1, min(pending)) if pending and not free else 1)
++        idle = max(1, min(pending)) if pending and not free else 1
++        while idle and small and clear and small[-1] not in signals and small[-1] not in busy:
++            # a minute of waiting on a healthy estate sizes one standby instead; the scale disturbs nothing
++            calm.add(small[-1])
++            if not call("scale", service=small[-1], replicas=topo[small.pop()]["normal_replicas"])["ok"]:
++                break
++            idle -= 1
++        if idle:
++            call("wait", minutes=idle)
+ 
+ 
+ def one_fix(call):
+@@ -532,6 +568,12 @@ def forgetful(call):
+     reference(call, lift=False)
+ 
+ 
++def naive_failover(call):
++    """The reference, but it fails over without looking at the standby: it calms the service for
++    the minute the failover lands and drains the storm only when it looks again."""
++    reference(call, standby=False)
++
++
+ def consumer_fixer(call):
+     """The reference, but it treats a bad file where it shows: it undoes the failing consumer's
+     latest change, or restarts it, and never looks at the publisher."""
+@@ -605,6 +647,7 @@ POLICIES = {
+     "trusting": trusting, "alerts-only": alerts_only,
+     "no-drain": no_drain, "unprotected": unprotected, "forgetful": forgetful,
+     "consumer-fixer": consumer_fixer, "surge-responder": surge_responder, "drain-only": drain_only,
++    "naive-failover": naive_failover,
+ }
+ 
+ 
+diff --git a/spikes/aq-incident/task/tests/incident.py b/spikes/aq-incident/task/tests/incident.py
+index 7b3a16a..bdb87d4 100644
+--- a/spikes/aq-incident/task/tests/incident.py
++++ b/spikes/aq-incident/task/tests/incident.py
+@@ -65,6 +65,11 @@ LEVELS[4] = dict(LEVELS[3], world=3, storms=True, gray_share=0.6)
+ # one primary did, and the quiet fault must stay worth a quarter. Callers of the consumer that the
+ # file takes down retry harder (FILE_RETRIES), so the storm it leaves is worth draining.
+ LEVELS[5] = dict(LEVELS[4], files=True, gray_share=0.75)
++# lever 6: the level-5 worlds, but the fault that lands mid-shift is a data service whose primary is
++# gone, and the standby it fails over to is about half its size (postmortems.md: GitHub 5 Oct 2026,
++# the healthy region "did not have enough capacity for the extra demand and began failing too";
++# AWS Oct 2025, failover left "remaining healthy capacity" that "was insufficient").
++LEVELS[6] = dict(LEVELS[5], standby=True, gray_share=1.3)
+ FILE_RETRIES = 5
+ EVERY = 5  # minutes between generations of a published file
+ FILE_SYMPTOM = "worker panicked loading rules file: {} entries, limit 200"
+@@ -413,6 +418,32 @@ def scenario(seed, level):
+                                   p99=r.randrange(40, 240, 10), noise=[], changes=[], cap=HEADROOM, retry=0,
+                                   down=(-r.randint(2, 9), r.randint(85, 110)))
+         order.insert(0, "status-page")
++    if cfg.get("standby"):
++        # GitHub 5 Oct 2026 (postmortems.md): fail over "one service at a time, and added capacity".
++        # The late fault moves to a hot, retried data service off the richest edge, worth about what
++        # the change it replaces was; that change and its twin never land.
++        r, old = rng("standby"), faults[2]
++        svc[old["service"]]["changes"] = [c for c in svc[old["service"]]["changes"] if c["minute"] != old["start"]]
++        used = {f["service"] for f in faults} | set(faults[0]["hits"]) | {batch["service"]}
++        rest = [n for n in datas if n not in used]
++        rest, aim = [n for n in rest if lost({n: 1.0})] or rest, cfg["gray_share"] * best[2]
++
++        def span(n):  # minutes before the end it must start to be worth what the quiet fault is
++            return min(75, max(35, round(aim / max(lost({n: 1.0}), 1))))
++
++        def off(n):  # worth much more than that, it would leave the other faults too small a share
++            over = math.log(max(lost({n: 1.0}), 1) * span(n) / aim)
++            return 1.5 * over if over > 0 else -over
++
++        down = min(rest, key=off)
++        start = HORIZON - span(down) + r.randint(-3, 3)
++        faults[2] = dict(kind="primary_down", service=down, start=start, sev=1.0, end=None, change=None)
++        # a few other standbys are as small, one of them on a hot, retried service too
++        small = r.sample([n for n in datas if n != down], r.choice([2, 3, 4]))
++        for n in datas:
++            svc[n]["standby"] = math.ceil(svc[n]["replicas"] / 2) if n in [down] + small else svc[n]["replicas"]
++        for n in [down] + [n for n in small if n not in used][:1]:
++            svc[n].update(cap=HOT, retry=RETRIES if n == down else max(RETRIES, svc[n]["retry"]))
+     return dict(svc=svc, order=order, edges=edges, faults=faults, batch=batch, files=files)
+ 
+ 
+@@ -463,6 +494,11 @@ class Estate:
+                 reps = n
+         return reps
+ 
++    def _standby(self, name):
++        """Replicas a data service's standby runs: its own, or what the last landed scale set."""
++        landed = [n for at, n in self.scales.get(name, ()) if at <= self.now]
++        return landed[-1] if landed else self.svc[name]["standby"]
++
+     def _load(self, name, t):
+         load = 1.0
+         for f in self.faults:
+@@ -620,6 +656,7 @@ class Estate:
+     def get_topology(self):
+         return dict(ok=True, services=[
+             dict(name=n, tier=self.svc[n]["tier"], normal_replicas=self.svc[n]["replicas"],
++                 **({"standby_replicas": self._standby(n)} if "standby" in self.svc[n] else {}),
+                  revenue_per_min=self.svc[n]["revenue"], **({"callers_retry": self.svc[n]["retry"]} if self.storms else {}),
+                  **({"file_from": self.files[n]} if n in self.files else {}),
+                  depends_on=[dict(service=d, kind="hard" if w == 1.0 else "soft") for d, w in self.svc[n]["deps"]])
+@@ -810,6 +847,8 @@ class Estate:
+             return dict(ok=False, error="failover only applies to data-tier services")
+         at = self._start(service, "failover")
+         self._end_faults(service, at, ("primary_down",))
++        if "standby" in self.svc[service]:  # GitHub 5 Oct 2026 (postmortems.md): it runs on what the standby has
++            self.scales.setdefault(service, []).append((at, self._standby(service)))
+         return dict(ok=True, service=service, completes_at_minute=at)
+ 
+     def throttle(self, service, percent):
+@@ -929,6 +968,16 @@ def briefing(level):
+ - The cause is fixed at the publisher, and the fix takes effect with its next generation: what was
+   already loaded stays until then.
+ - Not every alert belongs to this estate's services, or to a fault.
++"""
++    standby = "" if not cfg.get("standby") else """
++## Standbys
++
++- A data service fails over onto its standby, which runs `standby_replicas` replicas (in
++  `get_topology`) and may be smaller than the primary. After a failover that is the service's
++  replica count.
++- `scale` on a data service sizes the standby too: a scale that has landed before a failover is
++  the count the standby comes up with; after a failover it grows the pool that serves.
++- A pool that is too small for its load sheds requests, and shed requests are retried.
+ """
+     return f"""## How time works
+ 
+@@ -959,7 +1008,7 @@ better.
+ | Lost revenue | each edge service's revenue per minute × its error rate, every minute of the shift |
+ | Extra replicas | ${REPLICA_COST} per replica above normal per minute, from when the scale lands to the end of the shift |
+ | Wasted mitigation | ${cfg["wasted"]:,} for each mitigation applied to a service that did not need it (setting a service back to its normal replica count is free) |
+-{views}{storms}{files}"""
++{views}{storms}{files}{standby}"""
+ 
+ 
+ def sign(actions):
