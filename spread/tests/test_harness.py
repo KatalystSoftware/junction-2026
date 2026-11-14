@@ -2,12 +2,14 @@
 from __future__ import annotations
 
 import collections
+import gzip
 import inspect
 import math
+import shutil
 
 import pytest
 
-from spreadlab import catalogue, curve, ledger, play, policy, report
+from spreadlab import archive, catalogue, curve, ledger, play, policy, report
 
 MAP = {
     "places": [
@@ -381,3 +383,37 @@ def test_ledger_counts_the_weeks_a_mistake_occurs_in():
             {"mistake": "fees", "situation": "normal", "eurosPerWeek": 90.0, "weeks": ["s1"]}]
     assert ledger.by(rows, "mistake") == [("fees", 90.0, 1), ("late", 40.0, 3)]  # s2 is one week, not two
     assert ledger.by(rows, "situation") == [("normal", 100.0, 3), ("snow", 30.0, 2)]
+
+
+@pytest.mark.skipif(shutil.which("zstd") is None, reason="needs the zstd command")
+def test_archive_packs_only_what_is_new_and_unpacks_the_newest_copy_of_each_file(tmp_path):
+    data, bundles, fresh = tmp_path / "data", tmp_path / "bundles", tmp_path / "fresh"
+
+    def save(name: str, text: str) -> None:
+        path = data / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(gzip.compress(text.encode()) if name.endswith(".gz") else text.encode())
+
+    save("scans/s1-L8.json.gz", '{"events": [1]}')
+    save("runs/a/s1-L8.json.gz", '{"played": "first"}')
+    save("runs/a/s1-L8.score.json", '{"score": 1}')
+    assert archive.pack(data, bundles, "1")[1] == 3
+    assert archive.pack(data, bundles, "2") is None  # nothing changed, so no second bundle
+    save("runs/a/s1-L8.json.gz", '{"played": "again"}')  # the same week, played again
+    save("runs/b/s1-L8.json.gz", '{"played": "b"}')
+    first = (bundles / "1.tar.zst").read_bytes()
+    assert archive.pack(data, bundles, "2")[1] == 2  # the changed week and the new one, not the scan or the score
+    assert (bundles / "1.tar.zst").read_bytes() == first  # a bundle is never rewritten
+    assert [name for name, _ in archive.members(bundles / "1.tar.zst")] == ["scans/s1-L8.json.gz", "runs/a/s1-L8.json.gz", "runs/a/s1-L8.score.json"]
+
+    assert archive.unpack(bundles, fresh) == 4
+    assert gzip.decompress((fresh / "runs/a/s1-L8.json.gz").read_bytes()) == b'{"played": "again"}'  # from the newer bundle
+    assert gzip.decompress((fresh / "scans/s1-L8.json.gz").read_bytes()) == b'{"events": [1]}'
+    assert (fresh / "runs/a/s1-L8.score.json").read_text() == '{"score": 1}'  # not gzipped in the data folder, so not here
+
+    (fresh / "runs/b/s1-L8.json.gz").write_bytes(b"local")
+    (fresh / "scans/s1-L8.json.gz").unlink()
+    assert archive.unpack(bundles, fresh) == 1  # only the missing scan
+    assert (fresh / "runs/b/s1-L8.json.gz").read_bytes() == b"local"  # a file the folder has is kept
+    assert archive.unpack(bundles, fresh, force=True) == 4
+    assert gzip.decompress((fresh / "runs/b/s1-L8.json.gz").read_bytes()) == b'{"played": "b"}'

@@ -22,15 +22,21 @@ The catalogue in `catalogue/` is committed, so everyone uses the same seed lists
 
 ## Saved weeks
 
-`archive/` holds a copy of the scans, the played weeks and the map, so they survive the machine that
-played them. It is stored with [Git LFS](https://git-lfs.com): without it, the files are short text
-pointers. The harness does not read `archive/`; copy it into the data folder first.
+`archive/bundles/` holds the scans, the played weeks and the map, so they survive the machine that
+played them. The harness does not read it; unpack it into the data folder first.
 
 ```bash
-git lfs install && git lfs pull                                 # fetch the files
-mkdir -p data && cp -rn archive/. "${SPREAD_DATA:-data}/"       # use them; keeps newer local files
-rsync -a "${SPREAD_DATA:-data}"/{runs,scans,map.json} archive/  # add new weeks before a commit
+git lfs install && git lfs pull                # fetch the bundles; without Git LFS they are short text pointers
+uv run python -m spreadlab.archive unpack      # write the files the data folder lacks; --force overwrites
+uv run python -m spreadlab.archive pack        # before a commit: pack what no bundle holds yet, then commit archive/bundles
 ```
+
+A bundle is one tar of the plain JSON, ordered by seed and compressed as a whole with `zstd`, which
+both commands need. The weeks of a seed repeat its scan and each other, so a bundle is about a
+seventh of the size of the same files gzipped one by one. A bundle is never changed, because Git LFS
+stores a changed file again in full: each `pack` writes a new one, named by the UTC time, with a
+`.sha256` list of its files beside it. A week that was played again goes into the new bundle, and
+`unpack` takes each file from the newest bundle that holds it.
 
 A sweep plays a saved week again when the policy code has changed since, so old weeks of a variant
 are a record, not a cache. `scratch/` holds the one-off analysis scripts behind the results; run them
