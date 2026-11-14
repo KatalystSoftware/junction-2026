@@ -34,6 +34,10 @@ on:
         description: "Every other seed of each set: a to climb on, b to confirm on, empty for all 206"
         default: ""
         type: string
+      anchor:
+        description: The variant whose played week of each seed its market is measured on (empty is the default desk; for seeds it never played)
+        default: ""
+        type: string
   push:
     branches: [standin-screen-ci]
 
@@ -75,6 +79,7 @@ jobs:
           SETS: ${{ inputs.sets || 'natural thin' }}
           LIMIT: ${{ github.event_name == 'push' && '8' || '0' }}
           HALF: ${{ inputs.half }}
+          ANCHOR: ${{ inputs.anchor }}
         run: |
           export SPREAD_DATA="$RUNNER_TEMP/spread-data"
           # The stand-in of this workflow's commit plays the desk code of the screened ref.
@@ -82,7 +87,7 @@ jobs:
           cd lane/spread
           echo "desk code $(git rev-parse --short HEAD), stand-in $(git -C "$GITHUB_WORKSPACE/tool" rev-parse --short HEAD), nproc=$(nproc)"
           # shellcheck disable=SC2086
-          python3 -m spreadlab.standin.screen --arms "$ARMS" --baseline "$BASELINE" --draws "$DRAWS" --sets $SETS --limit "$LIMIT" --half "$HALF" --jobs "$(nproc)" --out "$GITHUB_WORKSPACE/out"
+          python3 -m spreadlab.standin.screen --arms "$ARMS" --baseline "$BASELINE" --draws "$DRAWS" --sets $SETS --limit "$LIMIT" --half "$HALF" --anchor "$ANCHOR" --jobs "$(nproc)" --out "$GITHUB_WORKSPACE/out"
           cat "$GITHUB_WORKSPACE/out/summary.md" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         if: always()

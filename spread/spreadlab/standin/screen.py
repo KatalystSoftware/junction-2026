@@ -80,6 +80,8 @@ def main() -> None:
     parser.add_argument("--sets", nargs="+", default=["natural", "thin"], help="natural, thin, cat (60 seeds the fit has seen), or files with a seed a line")
     parser.add_argument("--limit", type=int, default=0, help="at most this many seeds a set")
     parser.add_argument("--half", default="", choices=["", "a", "b"], help="every other seed of each set: climb on a, confirm on b, so a search does not fit its own seeds")
+    parser.add_argument("--anchor", default="", help=f"the variant whose played week of each seed its market is measured on (default: {DEFAULT}); "
+                        "seeds the default never played need another desk's week")
     parser.add_argument("--draws", type=int, default=1)
     parser.add_argument("--bar", type=float, default=500.0, help="euros a week an arm must gain on natural worlds: two variants nearer than this are a tie here")
     parser.add_argument("--jobs", type=int, default=os.cpu_count() or 2)
@@ -100,7 +102,7 @@ def main() -> None:
         seeds += found[: args.limit] if args.limit else found
     seeds = list(dict.fromkeys(seeds))
     started = time.time()
-    out = run.run({n: VARIANTS[n] for n in names}, seeds, DEFAULT, json.loads(Path(args.weights).read_text()), json.loads(args.design), args.draws, args.jobs)
+    out = run.run({n: VARIANTS[n] for n in names}, seeds, args.anchor or DEFAULT, json.loads(Path(args.weights).read_text()), json.loads(args.design), args.draws, args.jobs)
     rows, folder = out["results"], Path(args.out)
     folder.mkdir(parents=True, exist_ok=True)
     with open(folder / "rows.csv", "w", newline="") as f:
@@ -114,6 +116,8 @@ def main() -> None:
                                      round(w["ledger"].get("revenue", 0)), round(-w["ledger"].get("driver_fee", 0)), round(-w["ledger"].get("late_refund", 0))])
     lines = [f"# Stand-in screen: {', '.join(names[1:])} against {first}", "",
              f"{len(seeds)} seeds, {args.draws} draw(s), {time.time() - started:.0f} s on {args.jobs} cores. Stand-in weeks, not played ones: read README.md of spreadlab/standin for how far to trust them.", ""]
+    if args.anchor and args.anchor != DEFAULT:
+        lines += [f"Each seed's market is measured on the played week of {args.anchor}, not of the default desk.", ""]
     if not args.baseline:
         lines += [f"**No baseline was named, so this compares with {first}.** For the merge gate pass the current base: `-f baseline=<base variant>`.", ""]
     for arm in names[1:]:
