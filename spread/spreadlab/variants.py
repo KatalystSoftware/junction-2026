@@ -607,3 +607,12 @@ VARIANTS["m41-g-ss03-760"] = {**VARIANTS["m41-f-h24"], "slow_step": 0.3,
                               "when_rich": {**VARIANTS["m41-f-h24"]["when_rich"], "slow_step": _M41_E["slow_step"]}}
 VARIANTS["m41-h-ss025-820"] = {**VARIANTS["m41-g-ss03-760"],
                                "when_rich": {**VARIANTS["m41-g-ss03-760"]["when_rich"], "slow_step": 0.25}}
+# Then lane 4 B's drives over 300 minutes at cost 1.0, 760+ (`m41-i`); the trade-in fee fix in every week (`m41-j`, on the
+# thin play's parameters too), judged on its own since its margin has never been measured; and lane 4 A's waiting cars counted
+# within 18 hours at 760 to 819 drivers (`m41-k`; `when_rich` keeps 24 from 820).
+VARIANTS["m41-i-long300-c10"] = _full_weeks(VARIANTS["m41-h-ss025-820"], long_drive=300, long_cost=1.0)
+_M41_I = VARIANTS["m41-i-long300-c10"]
+VARIANTS["m41-j-kindfee"] = {**_M41_I, "kind_fees": True,
+                             "thin_play": {**_M41_I["thin_play"], "params": {**_M41_I["thin_play"]["params"], "kind_fees": True}}}
+VARIANTS["m41-k-q18-760"] = {**VARIANTS["m41-j-kindfee"], "queue_hours": 18,
+                             "when_rich": {**VARIANTS["m41-j-kindfee"]["when_rich"], "queue_hours": _M41_I["queue_hours"]}}
