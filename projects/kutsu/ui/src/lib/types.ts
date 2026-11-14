@@ -118,4 +118,27 @@ export type Pool = { note: string; people: number; events: PastEvent[]; fields: 
 export type Change = { id: string; brief: string; kind: 'careers' | 'news'; title: string; summary: string; url: string; detected_at: string; importance: string }
 type Watched = { last_run_at: string | null; next_run_at: string | null; last_change_at: string | null }
 export type Watch = { watched: Record<string, { careers?: Watched; news?: Watched }>; changes: Change[]; checked_at: string }
+/** One application to an event from the regular invitation, in the sample. `drafted` lines are the pipeline's reading of the
+ * applicant's sources, left as drafted (the AI summary); `corrected`, `answers` and `own` are what the applicant explicitly did. */
+export type Applicant = {
+  id: string
+  handle: string
+  field: string
+  level: string
+  skills: { name: string; depth: 'work' | 'project' | 'learning'; years: number | null }[]
+  finnish: string
+  english: string
+  city: string
+  abroad: boolean
+  permit: boolean
+  wants: string[]
+  applied_at: string
+  sources: string[]
+  ai_summary: string
+  drafted: { kind: string; text: string; source: string; quote: string }[]
+  corrected: { kind: string; text: string; was: string }[]
+  answers: { q: string; a: string }[]
+  own: { about: string; looking: string }
+  project: { name: string } | null
+}
 export type Step = { stage: 'identity' | 'search' | 'careers' | 'read' | 'check' | 'card'; [fact: string]: unknown }

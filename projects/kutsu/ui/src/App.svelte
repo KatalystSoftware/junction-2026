@@ -7,6 +7,7 @@
   import Join from './lib/Join.svelte'
   import Ledger from './lib/Ledger.svelte'
   import Needs from './lib/Needs.svelte'
+  import Applications from './lib/Applications.svelte'
   import Plan from './lib/Plan.svelte'
   import Rail from './lib/Rail.svelte'
   import Research from './lib/Research.svelte'
@@ -48,7 +49,7 @@
           {#if app.research}
             <Research />
           {:else if plan}
-            {#key plan.slug}<Plan {plan} />{/key}
+            {#key plan.slug + at.tab + at.company}{#if at.tab === 'applications'}<Applications {plan} company={at.company} />{:else}<Plan {plan} />{/if}{/key}
           {:else if !brief || !review}
             <Events />
           {:else}

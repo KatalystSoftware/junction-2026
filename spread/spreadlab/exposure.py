@@ -45,7 +45,10 @@ TERMS = ["under 2 hours", "2 to 4 hours", "4 to 8 hours", "8 to 16 hours", "16 t
          "hundreds of drivers short of 760", "dropped by a driver",
          "ln(1 + waiting cars due the same day per 100 drivers)", "ln(1 + waiting cars due on other days per 100 drivers)",
          "due on the flu day, from its night on", "needs a driver at night (20:00 to 07:00)", "ln(1 + hours it has waited for a driver)",
-         "dropped x ln(1 + waiting cars due the same day per 100 drivers)", "on the flu day with under 16 hours left"]
+         "dropped x ln(1 + waiting cars due the same day per 100 drivers)", "on the flu day with under 16 hours left",
+         "under 100 drivers near the pickup and under 100 near the delivery", "ln(1 + drivers near the delivery)",
+         "under 6 daytime hours", "6 to 12 daytime hours", "12 to 18 daytime hours", "18 to 30 daytime hours"]
+DAYTIME = (6 * HOUR, 18 * HOUR)  # drivers book in daytime: the hours in hand count from 06:00 to 18:00
 BANDS = (2, 4, 8, 16, 30)
 LOAD = (13, 14, 18)  # the load terms, which `exposure_load` multiplies
 M = FITS["measured"]
@@ -55,37 +58,59 @@ def sig(z: float) -> float:
     return 1 / (1 + math.exp(-max(-40.0, min(40.0, z))))
 
 
+def daylight(start: float, end: float) -> float:
+    """The daytime hours from minute `start` to minute `end`."""
+    total, t = 0.0, start
+    while t < end:
+        day = t // DAY * DAY
+        total += max(0.0, min(end, day + DAYTIME[1]) - max(t, day + DAYTIME[0]))
+        t = day + DAY
+    return total / HOUR
+
+
 def night(minute: int) -> bool:
     return not 7 * HOUR <= minute % DAY < 20 * HOUR
 
 
-def terms(hours: float, car: dict, dropped: bool, same: float, other: float, drivers: int, flu: bool = False, dark: bool = False, waited: float = 0.0) -> list[float]:
-    """The terms of `need` in the order of `TERMS`. `car` has `notified`, `premium`, `drive` (minutes) and `note`."""
+def terms(hours: float, car: dict, dropped: bool, same: float, other: float, drivers: int, flu: bool = False, dark: bool = False, waited: float = 0.0,
+          day_hours: float = 99.0) -> list[float]:
+    """The terms of `need` in the order of `TERMS`. `car` has `notified` (drivers near the pickup), `at_delivery` (near the delivery),
+    `premium`, `drive` (minutes) and `note`; `day_hours` are the daytime hours left."""
     band = sum(hours >= b for b in BANDS)
     per = max(drivers, 1) / 100
     return ([float(band == k) for k in range(6)]
             + [float(car["notified"] < 10), float(10 <= car["notified"] < 40), float(car["premium"]), max(0, car["drive"] - 4 * HOUR) / HOUR,
                float(car["note"]), max(0, 760 - drivers) / 100, float(dropped), math.log(1 + same / per), math.log(1 + other / per), float(flu),
-               float(dark), math.log(1 + max(waited, 0.0)), float(dropped) * math.log(1 + same / per), float(flu and hours < 16)])
+               float(dark), math.log(1 + max(waited, 0.0)), float(dropped) * math.log(1 + same / per), float(flu and hours < 16),
+               float(car["notified"] < 100 and car["at_delivery"] < 100), math.log(1 + car["at_delivery"]),
+               float(day_hours < 6), float(6 <= day_hours < 12), float(12 <= day_hours < 18), float(18 <= day_hours < 30)])
 
 
 def hard(car: dict, drivers: int) -> float:
     """The part of `need`'s log odds that is the car's own: everything but the hours, the drop and the load."""
     w = FITS["weights"]
-    return sum(w[k] * v for k, v in enumerate(terms(0, car, False, 0, 0, drivers)) if 6 <= k < 12)
+    return sum(w[k] * v for k, v in enumerate(terms(0, car, False, 0, 0, drivers)) if 6 <= k < 12 or k in (20, 21))
 
 
 def need(car: dict, hours: float, same: float, other: float, drivers: int, load: float = 1.0, dropped: bool = False, flu: bool = False,
-         dark: bool = False, waited: float = 0.0, shift: float = 0.0) -> float:
+         dark: bool = False, waited: float = 0.0, shift: float = 0.0, day_hours: float = 99.0) -> float:
     """The chance that a car which needs a driver now, with `hours` to its last pickup, ends late (certainly, past its last pickup). `car["hard"]` is `hard(car)`; `flu`
     is for a car due on the flu day, once its night has come: fewer drivers work that day. `dark` when it is night now (drivers plan
-    in the morning), `waited` the hours it has needed a driver already, `shift` a shift of the log odds shared with other cars."""
+    in the morning), `waited` the hours it has needed a driver already, `shift` a shift of the log odds shared with other cars, and
+    `day_hours` the daytime hours left to its last pickup."""
+    z = need_z(car, hours, same, other, drivers, load, dropped, flu, dark, waited, day_hours)
+    return 1.0 if z is None else sig(z + shift)
+
+
+def need_z(car: dict, hours: float, same: float, other: float, drivers: int, load: float = 1.0, dropped: bool = False, flu: bool = False,
+           dark: bool = False, waited: float = 0.0, day_hours: float = 99.0) -> float | None:
+    """`need`'s log odds before the shared shift; None for a car past its last pickup."""
     if hours < 0:
-        return 1.0
+        return None
     w, per = FITS["weights"], max(drivers, 1) / 100
-    z = shift + w[sum(hours >= b for b in BANDS)] + car["hard"] + w[12] * dropped + w[15] * flu + w[16] * dark + w[17] * math.log(1 + max(waited, 0.0)) + w[19] * (flu and hours < 16)
-    z += load * ((w[13] + w[18] * dropped) * math.log(1 + same / per) + w[14] * math.log(1 + other / per))
-    return sig(z)
+    z = w[sum(hours >= b for b in BANDS)] + car["hard"] + w[12] * dropped + w[15] * flu + w[16] * dark + w[17] * math.log(1 + max(waited, 0.0)) + w[19] * (flu and hours < 16)
+    z += w[22] * (day_hours < 6) + w[23] * (6 <= day_hours < 12) + w[24] * (12 <= day_hours < 18) + w[25] * (18 <= day_hours < 30)
+    return z + load * ((w[13] + w[18] * dropped) * math.log(1 + same / per) + w[14] * math.log(1 + other / per))
 
 
 def ratio(held: int, dropped: int) -> float:
@@ -115,11 +140,18 @@ def by_night(hours: float) -> float:
 
 def day_late(cars: list[dict], day: int, flu: bool, drivers: int, other: float, load: float, share: float, seen: bool = False, now: int = 12 * HOUR,
              shift: float = 0.0) -> tuple[float, float]:
-    """The mean and variance of the late count of the cars due on `day`, with that day the flu day still to come or not; `seen` when its
-    night has passed and was the flu day's. Each car: `held` (1 with a driver,
-    0 without), `hours` left, `night` (hours from that day's 00:00 to its last pickup), `picked` (on the road), `hard`, and `weight`, its
-    share of a waiting car (1, less for the candidate), and `waited`, the hours it has needed a driver. A car past its last pickup and not
-    picked up is late. `shift` moves the log odds of every car that needs a driver."""
+    """`day_lates` at one shift."""
+    return day_lates(cars, day, flu, drivers, other, load, share, seen, now, [shift])[0]
+
+
+def day_lates(cars: list[dict], day: int, flu: bool, drivers: int, other: float, load: float, share: float, seen: bool, now: int,
+              shifts: list[float]) -> list[tuple[float, float]]:
+    """The mean and variance of the late count of the cars due on `day`, with that day the flu day still to come or not, at each of
+    `shifts`; `seen` when its night has passed and was the flu day's. Each car: `held` (1 with a driver,
+    0 without), `hours` left, `last` (its last pickup minute), `night` (hours from that day's 00:00 to its last pickup), `picked` (on the
+    road), `hard`, and `weight`, its share of a waiting car (1, less for the candidate), and `waited`, the hours it has needed a driver.
+    A car past its last pickup and not picked up is late. A shift moves the log odds of every car that needs a driver.
+    Each car's chance is a + b x sig(z + shift), so the cars are read once and the shifts cost one sigmoid each."""
     eps, rate = M["held_late"], M["drop_day"]
     if flu:
         held = [1.0 if c["held"] else by_night(c["hours"] - c["night"]) for c in cars]
@@ -128,22 +160,38 @@ def day_late(cars: list[dict], day: int, flu: bool, drivers: int, other: float, 
         held = [1.0 if c["held"] else 0.0 for c in cars]
         n = [(1 - h) * c["weight"] for c, h in zip(cars, held)]
     waiting = sum(n)
-    mean = var = 0.0
+    const, parts = 0.0, []  # cars whose chance is fixed (mean, variance), and (a, b, z) for the rest
+    cvar = 0.0
     for c, k, h in zip(cars, n, held):
         if c["picked"]:
-            p = eps
+            a, b, z = eps, 0.0, None
         elif c["hours"] < 0:
-            p = 1.0
+            a, b, z = 1.0, 0.0, None
         elif flu and c["hours"] > c["night"]:  # the night is still to come
-            p = h * (1 - share) * eps + (1 - h + h * share) * need(c, c["night"], waiting - k, other, drivers, load, True, True, True, shift=shift)
+            a, b = h * (1 - share) * eps, 1 - h + h * share
+            z = need_z(c, c["night"], waiting - k, other, drivers, load, True, True, True, day_hours=daylight(day * DAY, c["last"]))
         elif not c["held"]:
-            p = need(c, c["hours"], waiting - k, other, drivers, load, flu=seen, dark=night(now), waited=c.get("waited", 0.0), shift=shift)
+            a, b = 0.0, 1.0
+            z = need_z(c, c["hours"], waiting - k, other, drivers, load, flu=seen, dark=night(now), waited=c.get("waited", 0.0),
+                       day_hours=daylight(now, c["last"]))
         else:
             x = 1 - math.exp(-rate * max(c["hours"], 0) / 24)
-            p = (1 - x) * eps + x * need(c, c["hours"] / 2, waiting + 1, other, drivers, load, True, seen, shift=shift)
-        mean += p
-        var += p * (1 - p)
-    return mean, var
+            a, b = (1 - x) * eps, x
+            z = need_z(c, c["hours"] / 2, waiting + 1, other, drivers, load, True, seen, day_hours=daylight(now + c["hours"] * HOUR / 2, c["last"]))
+        if z is None:
+            p = a + b
+            const, cvar = const + p, cvar + p * (1 - p)
+        else:
+            parts.append((a, b, z))
+    out = []
+    for shift in shifts:
+        mean, var = const, cvar
+        for a, b, z in parts:
+            p = a + b * sig(z + shift)
+            mean += p
+            var += p * (1 - p)
+        out.append((mean, var))
+    return out
 
 
 # Gauss-Hermite nodes and weights for a standard normal, 5 points
@@ -176,22 +224,24 @@ class Book:
         (day, i, j) for the day the flu day with the flu day's shift at node j."""
         other = sum(n for d, n in self.waiting.items() if d != day)
         week, flu = M["week_sd"], M["flu_sd"]
-        out = {}
-        for i, (x, _) in enumerate(NODES):
-            out[(None, i)] = day_late(cars, day, False, self.drivers, other, self.load, 0, day in self.seen, self.now, week * x)
-            if self.flu_possible(day):
-                for j, (y, _) in enumerate(NODES):
-                    out[(day, i, j)] = day_late(cars, day, True, self.drivers, other, self.load, M["wave_share"], shift=week * x + flu * y)
+        calm = day_lates(cars, day, False, self.drivers, other, self.load, 0, day in self.seen, self.now, [week * x for x, _ in NODES])
+        out = {(None, i): mv for i, mv in enumerate(calm)}
+        if self.flu_possible(day):
+            keys = [(day, i, j) for i in range(len(NODES)) for j in range(len(NODES))]
+            shifts = [week * NODES[i][0] + flu * NODES[j][0] for _, i, j in keys]
+            out.update(zip(keys, day_lates(cars, day, True, self.drivers, other, self.load, M["wave_share"], False, self.now, shifts)))
         return out
 
     def future(self) -> tuple[float, float]:
-        """The orders still to come this week, and their late share: the rate so far pulled towards 0.43 orders a listed driver a week with
-        the weight of one day; the measured late share, which the week's shift moves. The share of the orders resolved so far would say
+        """The orders still to come this week, and their late share. The week's orders are the orders so far over the share of a week's
+        orders won by this hour (`won_after`, won_after.py), pulled towards 0.43 orders a listed driver with the weight of a fifth of a
+        week; the late share is the measured one, which the week's shift moves. The share of the orders resolved so far would say
         less: a late order resolves later than one on time."""
-        today = self.now // DAY
-        elapsed = min(today, DAYS) * OPEN + (min(max(self.now % DAY - OPENS, 0), OPEN) if today < DAYS else 0)
-        rate = (self.orders + M["orders_a_driver"] * self.drivers / DAYS) / (elapsed + OPEN)
-        return rate * max(0, DAYS * OPEN - elapsed), M["late_share"]
+        after = M["won_after"]
+        left = after[int(self.now // HOUR)] if self.now < len(after) * HOUR else 0.0
+        prior = 0.2
+        week = (self.orders + prior * M["orders_a_driver"] * self.drivers) / (1 - left + prior)
+        return week * left, M["late_share"]
 
     def risk(self, day: int | None = None, car: dict | None = None, line: float = 0.10) -> tuple[float, float]:
         """P(week under 90% on time; `line` is the late share) and the expected late count of the book, with `car` added on `day` when given."""
@@ -285,9 +335,9 @@ class ExposurePolicy(Policy):
     def car(self, request, last: int, held: bool, waited: float) -> dict:
         legs = request["legs"]
         car = {"notified": min(self.notified[leg["pickup"]["placeId"]] for leg in legs), "premium": any(leg["car"]["premium"] for leg in legs),
-               "drive": self.drive(request), "note": request["note"] is not None}
+               "at_delivery": min(self.notified[leg["delivery"]["placeId"]] for leg in legs), "drive": self.drive(request), "note": request["note"] is not None}
         hours = (last - self.now) / HOUR
-        return {**car, "hard": hard(car, len(self.roster)), "day": last // DAY, "held": held, "picked": held and hours < 0, "hours": hours,
+        return {**car, "hard": hard(car, len(self.roster)), "day": last // DAY, "last": last, "held": held, "picked": held and hours < 0, "hours": hours,
                 "night": hours - (last // DAY * DAY - self.now) / HOUR, "weight": 1.0, "waited": waited}
 
     def book(self, p: dict) -> Book:

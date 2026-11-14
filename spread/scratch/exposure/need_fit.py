@@ -42,8 +42,8 @@ def flu(r: dict, wave: set[int]) -> bool:
 
 
 def matrix(rows: list[tuple[dict, set]]) -> np.ndarray:
-    return np.array([exposure.terms(r["hours"], r, r["dropped"], r["same"], r["other"], r["drivers"], flu(r, wave), exposure.night(r["at"]), r.get("waited", 0.0))
-                     for r, wave in rows], float)
+    return np.array([exposure.terms(r["hours"], r, r["dropped"], r["same"], r["other"], r["drivers"], flu(r, wave), exposure.night(r["at"]), r.get("waited", 0.0),
+                                    exposure.daylight(r["at"], r["last"])) for r, wave in rows], float)
 
 
 def waiting_rows(w: dict) -> list[dict]:
@@ -121,7 +121,8 @@ def main() -> None:
     Xt, yt = matrix(trw), np.array([r["late"] for r in tr], float)
     pt = 1 / (1 + np.exp(-(Xt @ beta)))
     order = np.argsort(pt); auc = (np.argsort(order)[yt == 1].mean() - (yt.sum() - 1) / 2) / (len(yt) - yt.sum()) if 0 < yt.sum() < len(yt) else float("nan")
-    print(f"\nrows left out: {len(tr)} of {len(test)} weeks; late {yt.mean():.3f}, fit {pt.mean():.3f}; AUC {auc:.3f}")
+    loss = -np.mean(yt * np.log(np.clip(pt, 1e-9, 1)) + (1 - yt) * np.log(np.clip(1 - pt, 1e-9, 1)))
+    print(f"\nrows left out: {len(tr)} of {len(test)} weeks; late {yt.mean():.3f}, fit {pt.mean():.3f}; AUC {auc:.3f}; log loss {loss:.5f}")
     hours = np.array([r["hours"] for r in tr]); drop = np.array([r["dropped"] for r in tr]); same = np.array([r["same"] for r in tr])
     bands = [(0, 2), (2, 4), (4, 8), (8, 16), (16, 30), (30, 999)]
     for label, keep in (("after a drop", drop == 1), ("at the win", drop == 0)):

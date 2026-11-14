@@ -3,6 +3,9 @@
   import { asking, daysTo, some, sourceOf, type Invitee, type Plan } from './events'
   import { when } from './format'
   import Icon from './Icon.svelte'
+  import { applications, countCopy, manage } from './manage.svelte'
+  import SendModal from './SendModal.svelte'
+  import Tabs from './Tabs.svelte'
   import Logo from './Logo.svelte'
   import Progress from './Progress.svelte'
   import { app, copyText, joinLink, nameOf, reviewOf, saveReview } from './state.svelte'
@@ -18,9 +21,17 @@
   let all = $state(false)
   let open = $state('')
   let copied = $state('')
-  let sent = $state(false)
+  let sending = $state(false)
   // the person's invitation is Esittely, served next to this page by serve.py; in development, the hosted copy
   const esittely = import.meta.env.DEV ? 'https://esittely.duckymcduck2.workers.dev/esittely/#/join' : './esittely/#/join'
+  // the invitation is an open link; copying it is how it leaves this screen
+  const regularLink = `${location.origin}${location.pathname}${esittely.startsWith('./') ? esittely.slice(2) : esittely}`
+  async function copyRegular() {
+    await copyText(regularLink)
+    countCopy()
+    copied = 'regular'
+    setTimeout(() => (copied = ''), 1600)
+  }
 
   // the forum's employers are coming already, so their link needs no event; any other invitation names its own
   const link = $derived(plan.coming ? '' : plan.slug)
@@ -74,6 +85,7 @@
       </p>
     {/if}
   </header>
+  <Tabs {plan} tab="invite" />
 
   <div class="sides">
     <section>
@@ -114,11 +126,17 @@
 
     <section class="people">
       <h2>People to invite <span class="sample">sample data</span></h2>
-      <div class="go">
-        <a class="btn" href={esittely} target="_blank" rel="noopener"><Icon name="out" size={16} />Preview invitation form</a>
-        <button class="btn primary" onclick={() => (sent = true)} disabled={sent}><Icon name={sent ? 'check' : 'send'} size={16} />{sent ? 'Invitations sent' : 'Send invitations'}</button>
+      <div class="inv">
+        <div class="kind">
+          <div class="what"><b>Invitation</b><small>An open link to apply, drafted from what the person agrees we may read. The organiser decides who is introduced.</small></div>
+          <div class="go">
+            <a class="btn" href={esittely} target="_blank" rel="noopener"><Icon name="out" size={16} />Preview form</a>
+            <button class="btn" onclick={copyRegular}><Icon name={copied === 'regular' ? 'check' : 'copy'} size={16} />{copied === 'regular' ? 'Link copied' : 'Copy link'}</button>
+            <button class="btn primary" onclick={() => (sending = true)}><Icon name="send" size={16} />{manage.sent ? 'Send again' : 'Send to all'}</button>
+          </div>
+          <p class="sentnote quiet">{manage.sent ? `Sent to ${some(manage.sent.n)} people, ${when(manage.sent.at.slice(0, 10))}. ` : ''}{manage.copies ? `Link copied ${String(manage.copies)} ${manage.copies === 1 ? 'time' : 'times'}. ` : ''}{applications.list.length} applications so far, each reviewed separately. <a href="#/event/{plan.slug}/applications">Manage them<Icon name="flat" size={12} /></a></p>
+        </div>
       </div>
-      {#if sent}<p class="sentnote">Each person gets the invitation below, already filled in from what they agreed we may read. Sample data: nothing was sent.</p>{/if}
 
       {#if field && people}
         {#if plan.fields.length > 1}
@@ -178,6 +196,7 @@
     </section>
   </div>
 </main>
+{#if sending}<SendModal {plan} onclose={() => (sending = false)} />{/if}
 
 <style>
   main {
@@ -363,9 +382,8 @@
   /* the two actions of the people side, one row, the same size, the send as the city's step */
   .go {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
     gap: var(--s2);
-    margin: var(--s3) 0 var(--s4);
   }
   .go .btn,
   .go .btn.primary {
@@ -380,10 +398,39 @@
     background-color: var(--brand);
   }
   .sentnote {
-    margin: calc(-1 * var(--s2)) 0 var(--s4);
-    font-size: var(--t-sm);
+    margin-top: var(--s2);
+    font-size: var(--t-xs);
     line-height: 1.4;
-    color: var(--ok);
+    color: var(--ink-2);
+  }
+  .sentnote a {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    color: var(--ink);
+  }
+  /* the invitation block */
+  .inv {
+    display: grid;
+    gap: var(--s3);
+    margin: var(--s3) 0 var(--s4);
+  }
+  .kind {
+    padding: var(--s3) var(--s4);
+    border: 1px solid var(--line);
+    border-radius: var(--r2);
+    background: var(--ground);
+  }
+  .what b {
+    display: block;
+    font-size: var(--t-md);
+  }
+  .what small {
+    display: block;
+    margin-bottom: var(--s3);
+    font-size: var(--t-xs);
+    line-height: 1.4;
+    color: var(--ink-2);
   }
   .sample {
     margin-left: var(--s2);

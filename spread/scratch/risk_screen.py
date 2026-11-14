@@ -71,7 +71,11 @@ OPENINGS = {
     "f60": {"fee_rules": [[0, 10 ** 6, 16, 10 ** 6, 0.6, 0.1, 1.2]]},
     "f70-8": {"fee_rules": [[0, 10 ** 6, 8, 16, 0.8, 0.1, 1.2], [0, 10 ** 6, 16, 10 ** 6, 0.7, 0.1, 1.2]]},
 }
-SETS = {"risk": SCHEDULES, "openings": OPENINGS}
+# Lane 3: the 0.8 x ladder for cars with 16 hours or more, holding its opening fee until the last pickup is this many hours
+# away (`hold_hours`, screen only: the rises after the first step move later), against `fee16-80`.
+F80 = {"fee_rules": [[0, 10 ** 6, 16, 10 ** 6, 0.8, 0.1, 1.2]]}
+TIMEHOLD = {"f80": F80, **{f"f80-hold-{h}h": {**F80, "hold_hours": h} for h in (24, 16, 12)}}
+SETS = {"risk": SCHEDULES, "openings": OPENINGS, "timehold": TIMEHOLD}
 RICH = 790  # drivers on the list: the weeks where the top teams' driver cost is lower
 
 
@@ -320,7 +324,8 @@ def screen_week(job):
     hazard, lateness, unpaid = fit()
     totals = {}
     for name, extra in {"default": {}, **schedules}.items():
-        params = {**VARIANTS[DEFAULT], **extra}
+        hold = extra.get("hold_hours", 0)
+        params = {**VARIANTS[DEFAULT], **{k: v for k, v in extra.items() if k != "hold_hours"}}
         desk = (RiskFeePolicy if params.get("risk_fees") else policy.Policy)(None, 8, 0, params, [], MAP)
         desk.roster, desk.notified = [None] * week["drivers"], collections.defaultdict(int)
         t = collections.Counter()
@@ -328,6 +333,9 @@ def screen_week(job):
             desk.requests[car["order"]["id"]], desk.now = car["request"], car["posted"]
             desk.notified[car["request"]["legs"][0]["pickup"]["placeId"]] = car["notified"]
             schedule = [(s["at"], s["feeCents"]) for s in desk.fees_for(car["order"], 1)]
+            if hold and len(schedule) > 1:  # the rises start once the last pickup is `hold` hours away, not at the posting
+                delay = max(0, car["last"] - hold * HOUR - car["posted"])
+                schedule = schedule[:1] + [(at + delay, fee) for at, fee in schedule[1:]]
             if name == "default":
                 t["same as played"] += schedule == [tuple(s) for s in car["schedule"]]
             fees, first, late = expect(car, schedule, hazard, lateness, unpaid)

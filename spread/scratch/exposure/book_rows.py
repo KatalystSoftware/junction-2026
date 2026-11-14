@@ -64,7 +64,8 @@ def week(path: str) -> dict | None:
             leg = q["legs"][0]
             drive = MINUTES[(leg["pickup"]["placeId"], leg["delivery"]["placeId"])]
             cars[o["id"]] = {"last": o["lastPickupAt"], "due": o["lastPickupAt"] // DAY, "held": False, "picked": False,
-                             "feats": {"notified": notified[leg["pickup"]["placeId"]], "premium": leg["car"]["premium"], "drive": drive,
+                             "feats": {"notified": notified[leg["pickup"]["placeId"]], "at_delivery": notified[leg["delivery"]["placeId"]],
+                                       "last": o["lastPickupAt"], "premium": leg["car"]["premium"], "drive": drive,
                                        "note": q["note"] is not None, "drivers": drivers, "option": o["option"]}}
             row(o["id"], at, False)
         elif k == "order_changed" and e["order"]["id"] in cars:
