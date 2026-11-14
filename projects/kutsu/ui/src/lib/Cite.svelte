@@ -112,7 +112,16 @@
     align-items: center;
     gap: var(--s1);
     justify-self: start;
+    min-height: 2rem;
+    padding: 0 var(--s3);
+    border: 1px solid var(--line);
+    border-radius: 99px;
+    color: var(--ink);
     font-weight: 600;
+    text-decoration: none;
+  }
+  a:hover {
+    border-color: var(--ink);
   }
   @keyframes pop {
     from {

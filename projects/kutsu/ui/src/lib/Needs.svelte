@@ -33,7 +33,7 @@
 
 <ol bind:this={list} class:editable>
   {#each review.needs as need, i (i)}
-    <li style:--i={i} class:off={need.off}>
+    <li style:--i={i}>
       <h3 contenteditable={editable ? 'plaintext-only' : undefined} spellcheck="false" data-placeholder="Who do they need?" onblur={(e) => edit(i, 'title', e)} onkeydown={enter} use:text={need.title}></h3>
       <p class="why">
         <span role={editable ? 'textbox' : undefined} aria-label="Why" contenteditable={editable ? 'plaintext-only' : undefined} data-placeholder="Why? One line." onblur={(e) => edit(i, 'why', e)} onkeydown={enter} use:text={need.why}></span><span class="cites">{#each need.signals.filter(number) as id}<Cite signal={brief.signals[number(id) - 1]} n={number(id)} />{/each}</span>
@@ -43,8 +43,7 @@
         <span class="level">{terms(need).join(' · ')}</span>
         {#each need.skills as skill}<span class="skill">{skill}</span>{/each}
         {#each need.roles as role}<span class="role">Hiring now: {role}</span>{/each}
-        {#if need.off}<span class="by">The company said no</span>
-        {:else if need.by}<span class="by">{need.signals.length ? BY[need.by] : need.by === 'espoo' ? 'Added by Espoo' : 'Added by the company'}</span>{/if}
+        {#if need.by}<span class="by">{need.signals.length ? BY[need.by] : need.by === 'espoo' ? 'Added by Espoo' : 'Added by the company'}</span>{/if}
       </p>
       {#if editable}
         <button class="remove" aria-label="Remove this need" title="Remove" onclick={() => remove(i)}><Icon name="x" size={16} /></button>
@@ -124,11 +123,6 @@
   .level {
     border-color: var(--ink-2);
     font-weight: 600;
-  }
-  .off h3,
-  .off .why {
-    text-decoration: line-through;
-    color: var(--ink-2);
   }
   .role {
     padding: 0.1rem var(--s2);

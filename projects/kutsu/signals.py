@@ -265,11 +265,25 @@ FAMILIES = ["Software", "AI and data", "Embedded and electronics", "Semiconducto
             "Space and RF", "Mechanical and manufacturing", "Research and science", "Security", "Product and design",
             "Sales and business", "Operations and support", "Leadership"]
 SENIORITY = ["Early career", "Experienced", "Senior", "Lead"]
+# what a candidate cares about, in this order: is the company funded and growing, what is it building,
+# where is it going, and only then where it has been seen
+TELL_KINDS = ["funding", "growth", "product", "customers", "direction", "presence"]
+# why a checked statement is still not told to candidates
+LEFT_OUT = ["a one-off that is over", "says the same as another", "internal finance", "older than two years",
+            "not about this company", "says too little", "used for a role instead"]
 CARD_SCHEMA = {
-    "type": "object", "additionalProperties": False, "required": ["pitch", "momentum", "needs", "also"],
+    "type": "object", "additionalProperties": False, "required": ["pitch", "momentum", "tell", "left_out", "needs", "also"],
     "properties": {
         "pitch": {"type": "string"},
         "also": {"type": "array", "items": {"type": "string"}},
+        "tell": {"type": "array", "items": {
+            "type": "object", "additionalProperties": False, "required": ["line", "detail", "kind", "date", "signals"],
+            "properties": {"line": {"type": "string"}, "detail": {"type": "string"}, "date": {"type": "string"},
+                           "kind": {"type": "string", "enum": TELL_KINDS},
+                           "signals": {"type": "array", "items": {"type": "string"}}}}},
+        "left_out": {"type": "array", "items": {
+            "type": "object", "additionalProperties": False, "required": ["signal", "why"],
+            "properties": {"signal": {"type": "string"}, "why": {"type": "string", "enum": LEFT_OUT}}}},
         "momentum": {"type": "string", "enum": ["growing", "steady", "shrinking", "unclear"]},
         "needs": {"type": "array", "items": {
             "type": "object", "additionalProperties": False,
@@ -288,6 +302,24 @@ pitch: one sentence, at most 18 words, plain words: what the company is doing ri
 candidate would care about. No praise words such as leading, innovative or cutting-edge.
 
 momentum: growing, steady or shrinking by what the statements show; unclear when they do not say.
+
+tell: what the company would want a job seeker to know about it today, at most 5, the one a \
+candidate cares about most first: money and growth, then what it is building and where it is \
+heading, then where it has been seen. Statements about the same thing become one item. Each:
+- line: at most 9 words, the fact as a plain headline with its figure when it has one, such as \
+"Raised EUR 10 million in February" or "Revenue up 48% in 2025".
+- detail: one sentence, at most 28 words, with what the line had no room for.
+- kind: the closest one. date: when it happened, as YYYY-MM or YYYY.
+- signals: the ids of every statement it rests on.
+The statements carry dates and today's date is given. Hold to these:
+- A one-off that is over (an event held, a talk given, a fair attended, a hackathon run) is left \
+out. If it shows something that still holds, tell that instead, and put what happened in the past.
+- Never write something that has already happened as if it were happening now.
+- Leave out internal finance such as profit, loss or EBITDA. Revenue and growth are fine.
+- Leave out what is older than two years, unless nothing newer exists.
+- Leave out a statement that is really about another company, such as a tenant, a customer or an owner.
+
+left_out: every statement id that no item in tell uses, with the reason from the list.
 
 needs: the talent the company most plausibly needs now, strongest first, at most 4. Many needs are \
 never posted as a job, so read them from funding, growth, new sites, new products and new customers \
@@ -343,11 +375,12 @@ def card(company, posts, signals, named):
     roles = [p["title"]["value"] for p in posts]
     must = lambda p: "; ".join(m["value"] for m in p.get("must_have") or [])[:300]
     listed = "\n".join(f"- {p['title']['value']}" + (f" (must have: {must(p)})" if must(p) else "") for p in posts)
-    lines = [f"Company: {company['name']}", f"What it does: {company['what_they_do'] or 'unknown'}",
+    lines = [f"Today: {lib.now_iso()[:10]}", f"Company: {company['name']}",
+             f"What it does: {company['what_they_do'] or 'unknown'}",
              "Open tech roles:" + (f"\n{listed}" if posts else f" {company['no_roles']}"), ""]
     lines += [f"{x['id']} [{x['type']}{', ' + x['date'] if x['date'] else ''}] {x['claim']}" for x in signals]
     answer, usd = ask(CARD_SYSTEM, CARD_SCHEMA, "\n".join(lines)) if signals or roles else (None, 0.0)
-    answer = answer or {"pitch": "", "momentum": "unclear", "needs": [], "also": []}
+    answer = answer or {"pitch": "", "momentum": "unclear", "tell": [], "left_out": [], "needs": [], "also": []}
     ids = {x["id"] for x in signals}
     clean = lambda t: not PERSON.search(t) and not any(p in t for p in named)
     needs = [{**n, "can_do": [k.strip() for k in n["can_do"] if k.strip()][:3],
@@ -355,8 +388,15 @@ def card(company, posts, signals, named):
               "signals": [i for i in n["signals"] if i in ids][:3], "roles": [t for t in n["roles"] if t in roles]}
              for n in answer["needs"][:4]]
     needs = [{**n, **from_posts(n["roles"], posts)} for n in needs]
+    # what to tell candidates: each item rests on at least one checked statement and names nobody
+    tell = [{**t, "signals": [i for i in t["signals"] if i in ids]} for t in answer["tell"][:5]]
+    tell = [{"id": f"t{k + 1}", **t} for k, t in enumerate(t for t in tell if t["signals"] and clean(t["line"] + " " + t["detail"]))]
+    used = {i for t in tell for i in t["signals"]}
+    why = {x["signal"]: x["why"] for x in answer["left_out"]}
+    left_out = [{"signal": i, "why": why.get(i, "says too little")} for i in sorted(ids - used, key=lambda i: int(i[1:]))]
     return {"kind": "inferred", "method": f"{MODEL} reading of the checked statements and open roles",
             "pitch": answer["pitch"] if clean(answer["pitch"]) else "", "momentum": answer["momentum"],
+            "tell": tell, "left_out": left_out,
             "also": [t.strip() for t in answer["also"] if t.strip() and clean(t)][:4],
             "needs": [n for n in needs if (n["signals"] or n["roles"])
                       and clean(" ".join([n["title"], n["why"], *n["can_do"]]))]}, usd
@@ -526,6 +566,9 @@ def markdown(b):
     for s in b["signals"]:
         lines.append(f"- `{s['id']}` [{s['type']}{', ' + s['date'] if s['date'] else ''}] {s['claim']}  \n"
                      f"  > \"{s['quote']}\" ([source]({s['source_url']}))")
+    lines += ["", "**What to tell candidates**", ""]
+    lines += [f"- **{t['line']}** ({t['date']}; {', '.join(t['signals'])}): {t['detail']}" for t in o["tell"]]
+    lines += [f"- left out `{x['signal']}`: {x['why']}" for x in o["left_out"]]
     lines += ["", f"**Likely needs (inferred): {o['momentum']}**", "", o["pitch"], ""]
     for n in o["needs"]:
         cites = n["signals"] + [f"hiring now: {t}" for t in n["roles"]]

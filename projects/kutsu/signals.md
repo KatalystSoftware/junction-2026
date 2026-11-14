@@ -25,22 +25,32 @@ https://www.2ns.fi · open tech roles in our data: 2
 - `s7` [product, 2026] 2NS offers AllSecure, a cybersecurity situational awareness and automated security monitoring product.  
   > "2NS AllSecure – Cybersecurity Situational Awareness" ([source](https://www.2ns.fi/en/latest-news/))
 
+**What to tell candidates**
+
+- **Turnover of 5.4 million euros in 2024** (2024; s2): 2NS reports 2024 turnover of 5.4 million euros and says it has completed over 3,000 information security projects.
+- **Aims to triple turnover in four years** (2025-01; s3): The company's stated goal is to triple turnover over the next four years, led by a new CEO appointed in January 2025.
+- **Approved NATO BOA supplier** (2025-09; s1): 2NS was approved as a supplier to NATO's BOA program, enabling participation in NATO and member-country procurements made through it.
+- **Patent Office contract worth 201,000 euros** (2026-09; s4): Finland's Patent and Registration Office awarded 2NS a cybersecurity expert services contract running to January 2029.
+- **AI security testing and ISO 42001 consulting** (2026-04; s5): 2NS offers testing of AI systems and ISO 42001 management system consulting, and published research on AI-enabled security testing.
+- left out `s6`: used for a role instead
+- left out `s7`: says too little
+
 **Likely needs (inferred): growing**
 
-Winning public and NATO security contracts while tripling turnover and building AI security services.
+Expanding security work into AI systems, NATO procurement and public-sector contracts, with a goal to triple turnover.
 
-- **Microsoft cloud security architects** (Senior; Microsoft Azure, Entra ID, Microsoft 365, Identity and access management, Solution architecture): Open Senior Security Architect role focused on Microsoft Azure and Entra ID security work. (s6, s3, hiring now: Senior Security Architect – Microsoft & Cloud Security)
-  - can do: Design secure, scalable Azure and Microsoft 365 solutions for customers
-  - can do: Configure Entra ID identity and access management controls
-  - can do: Assess Microsoft security posture across cloud environments
-- **AI security testers** (Experienced; AI security testing, ISO 42001, Threat modelling, Penetration testing): Company published AI-enabled security testing research and offers testing of AI systems. (s5)
-  - can do: Test AI systems for security weaknesses and abuse paths
-  - can do: Write up AI security findings for customers
-  - can do: Apply ISO 42001 requirements to AI management systems
-- **Technical security specialists** (Experienced; Authentication testing, Application security, Programming, Infrastructure security): Open Finnish-language technical security role requiring authentication testing and customer communication. (s6, hiring now: Tekninen tietoturva-asiantuntija)
+- **Cloud and Microsoft security architects** (Senior; Microsoft Azure, Entra ID, Microsoft 365, Identity and access management): The company is hiring a senior architect for Microsoft and cloud security while pursuing public-sector and NATO work. (s4, s6, hiring now: Senior Security Architect – Microsoft & Cloud Security)
+  - can do: Design secure cloud architectures on Microsoft Azure
+  - can do: Configure identity and access controls in Entra ID
+  - can do: Assess Microsoft 365 security posture for customers
+- **Technical security testers** (Experienced; Penetration testing, Application security, Scripting, Authentication testing): A stated goal to triple turnover and growing offensive security hiring means more testing capacity is needed. (s2, s3, s6, hiring now: Tekninen tietoturva-asiantuntija)
   - can do: Test authentication and access control in applications
-  - can do: Explain technical security issues to customers
-  - can do: Review application architecture and infrastructure for weaknesses
+  - can do: Explain technical findings clearly to customers
+  - can do: Review application architecture for security weaknesses
+- **AI security specialists** (Experienced; ISO 42001, AI security testing, Threat modelling, Machine learning basics): The company now offers AI system testing and ISO 42001 consulting, a service line that needs dedicated expertise. (s5)
+  - can do: Test AI systems for security and misuse risks
+  - can do: Run ISO 42001 management system assessments
+  - can do: Advise clients on AI governance requirements
 
 ## Aalto-korkeakoulusäätiö sr
 
@@ -73,19 +83,35 @@ https://www.aalto.fi/fi · open tech roles in our data: 5
 - `s11` [hiring] Aalto's careers page lists open research roles including doctoral researcher positions and a postdoctoral researcher in superconducting quantum circuits, plus a Professor of power electronics (Associate Professor) post.  
   > "Väitöskirjatutkija (Human-Centered Security and Digital Deception)" ([source](https://www.aalto.fi/fi/avoimet-tyopaikat))
 
+**What to tell candidates**
+
+- **Nokia pledged EUR 1.5 million and about EUR 1.3 million a year** (2026-11; s2): Joint R&D in AI, 6G, networks and semiconductors, with the donation committed in November 2026.
+- **Wärtsilä gave EUR 200,000 for combustion engine research** (2026-11; s1): Funding supports teaching and research on combustion engine technology, linked to the House of Energy Transition.
+- **Endowment support rose to EUR 42 million in 2025** (2026; s4): Up from EUR 41 million in 2024, with about EUR 45 million expected in 2026.
+- **Student intake may grow up to 40% by 2035** (2025-05; s7, s8): Growth depends on sufficient resources, and state core funding has fallen in real terms over 15 years.
+- **Business School enrolment up 20.4% since 2021** (2026-06; s5): Students reached 4,700 and staff 448, and the school has outgrown its building.
+- left out `s3`: older than two years
+- left out `s6`: says too little
+- left out `s9`: says the same as another
+- left out `s10`: not about this company
+- left out `s11`: used for a role instead
+
 **Likely needs (inferred): growing**
 
-Aalto is growing its student intake and gaining corporate partners like Nokia and Wärtsilä for research.
+Aalto is growing its student intake and drawing new corporate partners, with research roles open across tech fields.
 
-- **Quantum circuit researchers** (Early career; Superconducting devices, Cryogenics, Microwave electronics, Quantum control): Aalto is hiring a postdoctoral researcher in superconducting quantum circuits, a funded research area. (s11, hiring now: Postdoctoral researcher in the field of superconducting quantum circuits)
-  - can do: Design superconducting qubit circuits and microwave readout chains
-  - can do: Run cryogenic measurements and analyse quantum control data
-- **Human-centered security researchers** (Early career; Experimental design, Qualitative interviewing, Questionnaire design, Scientific writing): Aalto is hiring several doctoral researchers in human-centered security and digital deception. (s11, hiring now: Doctoral Researcher (Human-Centered Security and Digital Deception), hiring now: Väitöskirjatutkija (Human-Centered Security and Digital Deception))
-  - can do: Design experiments on how people respond to digital deception
-  - can do: Run qualitative interviews and interactive prototype studies with users
-- **Power electronics researchers** (Senior; Converter topologies, Power electronics modelling, Circuit simulation): Aalto has an open associate professor post in power electronics and a wider research intake. (s11, hiring now: Apulaisprofessori, tehoelektroniikka)
-  - can do: Analyse and model power converter topologies
-  - can do: Supervise doctoral students in power electronics research
+- **Human-centred security researchers** (Early career; Experimental design, Qualitative interviewing, Interactive prototyping, Scientific writing): Partner funding and endowment growth back new security and deception research posts. (s2, s4, hiring now: Doctoral Researcher (Human-Centered Security and Digital Deception), hiring now: Väitöskirjatutkija (Human-Centered Security and Digital Deception))
+  - can do: Design controlled user experiments on security behaviour
+  - can do: Run qualitative interviews on privacy decisions
+  - can do: Write peer-reviewed papers in English
+- **Superconducting quantum circuit researchers** (Experienced; Cryogenics, Microwave electronics, Quantum control, Superconducting devices): Industry partnership funding supports joint research in semiconductors and networks, with an open postdoc in the field. (s2, s11, hiring now: Postdoctoral researcher in the field of superconducting quantum circuits)
+  - can do: Characterise superconducting qubits in dilution refrigerators
+  - can do: Model microwave circuits and their noise
+  - can do: Analyse measurement data from quantum experiments
+- **Power electronics professors** (Senior; Converter topologies, Power electronics modelling, Circuit simulation): A professor of power electronics is being recruited while combustion and energy transition funding grows. (s1, s11, hiring now: Apulaisprofessori, tehoelektroniikka)
+  - can do: Design converter topologies for energy systems
+  - can do: Model and analyse power electronic circuits
+  - can do: Supervise doctoral students in power electronics
 
 ## Accountor
 
@@ -116,22 +142,30 @@ https://www.accountor.com/en · open tech roles in our data: 1
 - `s10` [organisation, 2026-10] Finago, formed from Accountor Software and other KKR-owned firms, serves 170,000 customers and announced its acquisition of Iceland's Regla in October 2026.  
   > "has agreed to acquire all shares in Regla" ([source](https://dealroom.co/news/162913-finago-buys-iceland-s-regla-to-crack-a-new-nordic-market/))
 
-**Likely needs (inferred): steady**
+**What to tell candidates**
 
-Aspia Group is consolidating its brands and building AI services across finance, payroll and HR in four countries.
+- **Group of about 3,100 staff and SEK 3.5 billion revenue** (2025-11; s4): Aspia Group reports roughly 3,100 employees across more than 160 offices and annual turnover of about SEK 3.5 billion.
+- **Acquired Danish accounting firm Financial Outsourcing** (2025-05; s5): The acquisition brings Denmark into the group, with the company saying it would create career opportunities there over time.
+- **Brand consolidation under the Aspia name** (2026-03; s2, s3): Finnish and Norwegian businesses now trade as Aspia, with the Accountor brand phased out in Norway while franchises keep it.
+- **AI Next initiative launched across core services** (2025-05; s6): AI Next explores, prototypes and scales AI across financial management, payroll and HR services.
+- **Payroll and HR linked to Nepton time tracking** (2025-08; s9): A partnership with time-tracking provider Nepton integrates work-hour tracking into payroll and HR services.
+- left out `s1`: not about this company
+- left out `s7`: older than two years
+- left out `s8`: says too little
+- left out `s10`: not about this company
 
-- **AI and automation engineers** (Experienced; Python, LLM APIs, REST APIs, Process automation, Data pipelines): Aspia launched its AI Next initiative to prototype and scale AI across finance, payroll and HR services. (s6, hiring now: Technical Project Manager)
+**Likely needs (inferred): growing**
+
+Aspia is merging its Nordic finance and HR brands and expanding AI and payroll services across Finland, Denmark and Norway.
+
+- **Technical project managers** (Senior; Agile, DevOps, REST APIs, System integration, Stakeholder management): AI Next and Nepton integration work need someone to run delivery across systems and APIs. (s6, s9, hiring now: Technical Project Manager)
+  - can do: Run Agile delivery for payroll and HR system integrations
+  - can do: Coordinate DevOps releases across Nordic service teams
+  - can do: Translate AI prototypes into scoped, funded project plans
+- **Business AI solution engineers** (Experienced; Python, LLM APIs, REST APIs, Data pipelines, Payroll data): AI Next aims to scale AI across financial, payroll and HR services, creating demand for applied builders. (s6)
   - can do: Prototype AI features for payroll and finance workflows
-  - can do: Integrate AI models with existing business systems via APIs
-  - can do: Measure and scale AI pilots across service lines
-- **Technical project managers** (Senior; Agile, DevOps, API integration, Project planning, Stakeholder management): The company is running a Business AI integration program, and the open role asks for someone to manage it. (s6, hiring now: Technical Project Manager)
-  - can do: Run Agile delivery across AI and integration projects
-  - can do: Coordinate DevOps releases with business stakeholders
-  - can do: Manage APIs and system integration timelines
-- **Payroll and HR integration engineers** (Experienced; REST APIs, SQL, Payroll systems, Data mapping, Integration testing): A partnership with Nepton adds work-hour tracking into payroll and HR services, which needs system integration work. (s9)
-  - can do: Build integrations between time-tracking and payroll systems
-  - can do: Map work-hour data to payroll rules and outputs
-  - can do: Test and monitor integration data flows
+  - can do: Connect AI models to existing HR and payroll APIs
+  - can do: Evaluate AI output quality on real customer data
 
 ## AddSearch Oy
 
@@ -158,26 +192,35 @@ https://www.addsearch.com · open tech roles in our data: 6
 - `s8` [hiring, 2024] AddSearch was named Finland's Top International Employer in the SME category in 2024.  
   > "2024: named Finland’s Top International Employer (SME category)." ([source](https://www.addsearch.com/about/))
 
+**What to tell candidates**
+
+- **Launched AI Conversations in January 2026** (2026-07; s1, s2): A conversational website search feature was launched, followed by a unified AddSearch Experience platform in July 2026 combining keyword search, AI Answers and AI Conversations.
+- **Over 1,800 customers including thyssenkrupp** (2026-02; s3): The company reports more than 1,800 customers, among them thyssenkrupp, Lysol and Bitnami.
+- **EU data residency available since September 2026** (2026-09; s4): Search index, queries and analytics can be kept inside the European Union, a capability for customers with data location requirements.
+- **Parent group passed $100 million ARR** (2026-03; s5): saas.group, the parent of AddSearch, reached over $100 million in annual recurring revenue across more than 25 brands and grew headcount by 78 in 2025.
+- **Traditional site search growth slowing** (2026-06; s6): The company described growth in traditional site search as visibly slowing, which prompted its push toward conversational AI.
+- left out `s7`: says the same as another
+- left out `s8`: older than two years
+
 **Likely needs (inferred): growing**
 
-AddSearch now offers conversational AI search that answers visitor questions on customer websites, with EU data residency available.
+AddSearch is moving from site search toward conversational AI answers, with EU data residency now available for customers.
 
-- **AI and LLM engineers** (Experienced; LLM APIs, RAG, Prompt engineering, SQL, Docker): AI Conversations launched in January 2026 and was folded into AddSearch Experience in July 2026, requiring production AI work. (s1, s2, hiring now: AI Lead / Engineering Manager)
-  - can do: Build retrieval-augmented generation pipelines for website search
-  - can do: Ship LLM-backed answer features to production
-  - can do: Evaluate answer accuracy with repeatable tests
-- **Backend engineers for scale** (Senior; TypeScript, Node.js, Postgres, Redis, Kubernetes): Over 1,800 customers and a unified platform launch in 2026 call for scalable backend systems. (s2, s3, hiring now: Staff Software Engineer, hiring now: Senior Software Engineer)
-  - can do: Design distributed backend services in TypeScript or Go
-  - can do: Operate Postgres and Redis at production scale
-  - can do: Run Kubernetes workloads with CI/CD pipelines
-- **Cloud platform engineers** (Senior; Terraform, AWS, Kubernetes, Observability tooling, CI/CD): The EU data residency launch in September 2026 required new regional infrastructure to keep data inside the EU. (s4, hiring now: Senior Platform Engineer)
-  - can do: Manage multi-region cloud infrastructure with Terraform
-  - can do: Build monitoring and observability for production services
-  - can do: Automate deployments across cloud environments
-- **Google search migration specialists** (Experienced; Search indexing, Google Programmable Search, Technical integration): AddSearch published guidance for migrating off Google Programmable Search before its January 2027 deadline, showing active demand. (s7)
-  - can do: Scope search migrations from Google Programmable Search
-  - can do: Advise customers on indexing and relevance setup
-  - can do: Run migration projects to a fixed deadline
+- **AI and LLM engineers** (Experienced; RAG, LLM APIs, Prompt engineering, Python, SQL): Launched conversational AI products in 2026 that need production-grade retrieval and answer quality. (s1, s2, hiring now: AI Lead / Engineering Manager)
+  - can do: Build retrieval pipelines that ground LLM answers in customer content
+  - can do: Ship AI features to production with monitoring and evaluation
+  - can do: Tune prompts and retrieval for answer accuracy at scale
+- **Web crawling and scraping engineers** (Senior; Puppeteer, HTTP and TLS, Node.js, Postgres, Kubernetes): Customer indexing relies on fetching and parsing websites, which the open backend role requires at scale. (s3, hiring now: Senior Software Engineer)
+  - can do: Build crawlers that index customer websites reliably
+  - can do: Handle browser fingerprinting, proxies and anti-bot defenses
+  - can do: Run scraping infrastructure on Kubernetes
+- **Platform and cloud engineers** (Senior; AWS, Terraform, Kubernetes, CI/CD, Observability): Regional data residency means running infrastructure across more than one jurisdiction. (s4, hiring now: Senior Platform Engineer)
+  - can do: Provision multi-region cloud infrastructure with Terraform
+  - can do: Operate CI/CD pipelines and observability for production services
+  - can do: Keep EU-hosted data isolated and auditable
+- **Security and compliance leads** (Lead; ISO 27001, SOC 2, GDPR, Cloud security): Enterprise customers with data location rules require compliance programs such as ISO 27001 or SOC 2 to be owned in-house. (s4, hiring now: Chief Technology Officer)
+  - can do: Run an ISO 27001 or SOC 2 audit across cloud services
+  - can do: Define data residency controls for EU customer data
 
 ## Alaris Cojot OY
 
@@ -204,22 +247,27 @@ https://cojot.alaris.tech/?aff=4 · open tech roles in our data: 1
 - `s8` [technology, 2024-10] Alaris COJOT cut anechoic chamber test times for antennas by 60 to 70 times using new measurement software.  
   > "measure products across their entire operating bands 60-70 times faster than before" ([source](https://cojot.alaris.tech/newsroom/post/cojot-enhances-testing-efficiency-with-new-anechoic-chamber-software?aff=4))
 
+**What to tell candidates**
+
+- **Airbus chose its wideband antenna for Eurodrone** (2026-02; s1): The Wideband VHF/UHF antenna was selected by Airbus Defence and Space for the Eurodrone Ground Station deployment.
+- **New covert and steerable antennas launched in 2026** (2026-10; s2, s3): Covert WB627D and WB1942D antennas target counter-UAS, and direction-finding and steerable beam antennas were introduced after AOC Europe 2026.
+- **Group revenue up 40% to R788 million** (2025-11; s5, s6): The Alaris Group's FY25 revenue rose 40%, its strongest year in company history, with the founding antenna division also growing 23% in 2024.
+- **Drone detection panel antenna launched** (2025-09; s4): A dual-band 2.4/5 GHz steerable beam panel antenna was launched for UAV and drone detection.
+- left out `s7`: a one-off that is over
+- left out `s8`: says too little
+
 **Likely needs (inferred): growing**
 
-Its antennas were picked for the Eurodrone ground station and it is now selling covert counter-drone antennas.
+Supplying wideband and covert antennas for Airbus drone ground stations and counter-drone missions.
 
-- **RF and antenna engineers** (Early career; Antenna design, Microwave simulation, RF measurement, Phased arrays, Electromagnetic modelling): New covert counter-UAS antennas and a steerable beam panel were launched within a year, expanding its product range. (s2, s3, s4, hiring now: RF Engineer - Summer Trainee or Thesis Worker)
-  - can do: Design wideband antenna elements for tactical VHF and UHF bands
-  - can do: Simulate antenna patterns and impedance before prototype build
-  - can do: Support chamber measurements of gain, pattern and match
-- **Test and measurement engineers** (Experienced; Anechoic chamber testing, Python automation, Network analysers, Measurement uncertainty): Anechoic chamber test times were cut 60 to 70 times with new measurement software, so the test team is changing its methods. (s8)
-  - can do: Automate antenna measurement sequences in chamber software
-  - can do: Calibrate chamber systems and check measurement uncertainty
-  - can do: Analyse measured data against customer specifications
-- **Defence sales leads** (Experienced; Defence procurement, Export controls, Technical sales, B2B pipeline management): Revenue rose 40% in FY25 and a major defence prime selected its antenna, so demand from defence customers is growing. (s1, s5)
-  - can do: Win defence programme business with primes and governments
-  - can do: Manage export licensing for tactical communication products
-  - can do: Turn technical requirements into quotations
+- **RF and antenna engineers** (Experienced; Antenna design, Microwave engineering, CST Studio, Anechoic measurement, RF testing): Record order intake and new covert, direction-finding and steerable antennas create demand for RF design capacity. (s2, s3, s6, hiring now: RF Engineer - Summer Trainee or Thesis Worker)
+  - can do: Design wideband antennas for VHF and UHF bands
+  - can do: Characterise antenna patterns in anechoic chamber tests
+  - can do: Model antenna performance with electromagnetic simulation tools
+- **Counter-UAS system engineers** (Senior; Direction finding, Phased arrays, Electronic warfare, RF system integration, Field testing): Covert and steerable antennas aimed at counter-UAS and drone detection missions show growing demand in that segment. (s2, s3, s4)
+  - can do: Define antenna requirements for drone detection systems
+  - can do: Integrate steerable beam antennas into surveillance systems
+  - can do: Verify direction-finding accuracy in field trials
 
 ## Amertate
 
@@ -246,22 +294,29 @@ https://amertate.com · not in our Espoo job data
 - `s8` [technology, 2024-09] Amertate moved its turbine design from eight prototype blades to a six-blade configuration for improved aerodynamic performance.  
   > "The latest versions of the Amertate vertical-axis wind turbine feature a new 6-blade configuration" ([source](https://www.amertate.com/technology/))
 
+**What to tell candidates**
+
+- **Raised $610,414 in seed funding** (2025-12; s1): Seed investment from investors gives the company its first sizeable capital for product development and early expansion.
+- **Selected for SUPERFINNS 2026 sparring program** (2026-02; s2): One of 15 companies chosen for a program aimed at accelerating international expansion.
+- **Headcount up about 20% year over year** (2026; s4): The company has 1-10 employees split between Finland and Armenia, with reported headcount growth of roughly one fifth.
+- **Independent tests show low turbine noise** (2026-05; s5): Acoustic measurements found no measurable turbine noise above wind and background noise at 17 metres, in winds up to about 20 m/s.
+- **AMT6000 blades pass load test** (2026-09; s6): After an earlier failure, blade load testing at Aalto Design Factory was completed on an all-aluminium shell with steel root connection.
+- left out `s3`: not about this company
+- left out `s7`: a one-off that is over
+- left out `s8`: older than two years
+
 **Likely needs (inferred): growing**
 
-Amertate is scaling compact wind turbines, selling at trade fairs and joining an international expansion programme.
+Building compact vertical-axis wind turbines for farms and businesses, with blade tests and noise checks now done.
 
-- **Wind turbine aerodynamics engineers** (Experienced; CFD, FEA, Composite blade design, Aerodynamic modelling): Amertate moved from eight to six blades and is still refining blade design after a blade failure. (s6, s8)
-  - can do: Model blade aerodynamics for low-speed vertical-axis rotors
-  - can do: Run blade load tests and interpret failure modes
-  - can do: Iterate blade geometry for start-up speed and yield
-- **International sales and distribution leads** (Experienced; B2B sales, Channel management, Renewable energy markets, Export compliance): Amertate is seeking customers and distribution partners at European trade fairs and joined an expansion programme. (s2, s7)
-  - can do: Build distributor relationships in European renewable markets
-  - can do: Win commercial and farm customers for turbine installations
-  - can do: Set up partner pricing and channel agreements
-- **Structural test and certification engineers** (Experienced; Load testing, Fatigue analysis, IEC 61400, Material testing): Amertate completed a blade load test on the AMT6000 and needs proof for storm-rated and Arctic-ready claims. (s6)
-  - can do: Plan and run structural load tests on turbine components
-  - can do: Prepare test evidence for certification bodies
-  - can do: Analyse fatigue and failure data from test rigs
+- **Mechanical and blade-structure engineers** (Experienced; FEA, Composite and aluminium structures, Fatigue analysis, CAD): Blade load failure led to a redesign and a new load test, so structural design capacity is needed. (s6)
+  - can do: Run finite element load analysis on turbine blades
+  - can do: Design aluminium shells with steel root joints
+  - can do: Plan and interpret blade load test campaigns
+- **Export and distribution sales managers** (Experienced; Channel sales, Renewable energy markets, B2B negotiation, CRM): Trade fair exhibitions in Munich and Birmingham were held to find customers and distribution partners. (s7, s2)
+  - can do: Build distributor relationships across European markets
+  - can do: Qualify renewable energy installers as channel partners
+  - can do: Negotiate pricing for agricultural and commercial buyers
 
 ## Appmore Oy
 
@@ -296,22 +351,33 @@ https://appmore.com/ · open tech roles in our data: 2
 - `s12` [risk] The company's careers page states that earlier positions have been filled and that it is not currently hiring beyond listed roles.  
   > "All positions have now been filled, and we are not currently hiring." ([source](https://appmore.com/career/))
 
+**What to tell candidates**
+
+- **Signed IAM-as-a-service deal with Certia** (2026-03; s1): Appmore will deliver its IAM Application as a Service to Certia, a move toward recurring managed revenue.
+- **IAM customers across Europe, US and Australia** (2025-05; s6): Appmore's identity management solution is in use by customers on three continents, as reported in 2025.
+- **Launched IAM Learning Management System** (2026-04; s4): A learning platform for customers and partners was launched, extending the company's offering beyond software.
+- **Customer satisfaction score of 4.4 out of 5** (2026-04; s8): Appmore reports this satisfaction score from its customers in 2026.
+- **Sponsoring ServiceNow Knowledge 2026** (2026-01; s10): Appmore is a sponsor at the ServiceNow conference in Las Vegas in May 2026.
+- left out `s2`: older than two years
+- left out `s3`: older than two years
+- left out `s5`: older than two years
+- left out `s7`: older than two years
+- left out `s9`: says too little
+- left out `s11`: used for a role instead
+- left out `s12`: says too little
+
 **Likely needs (inferred): growing**
 
-Appmore is shipping identity management products to customers in Europe, the US and Australia, and signed a Certia deal.
+Appmore is extending its identity management product to customers as a managed service, and selling its AI and learning tools for ServiceNow.
 
-- **ServiceNow implementation consultants** (Experienced; ServiceNow, JavaScript, REST APIs, ITSM): Appmore lists an open ServiceNow Services consultant role while its customer base spans three continents. (s11, s6, hiring now: Consultant, ServiceNow Services)
-  - can do: Configure ServiceNow applications to match customer business processes
-  - can do: Build JavaScript scripts for business rules and workflows
-  - can do: Integrate ServiceNow with external systems and APIs
-- **ServiceNow solution architects** (Senior; ServiceNow, JavaScript, Service integration, Portal design): Appmore lists an open ServiceNow Services architect role alongside its growing IAM customer base. (s11, s6, hiring now: Architect, ServiceNow Services)
-  - can do: Design ServiceNow service integrations for customer environments
-  - can do: Set portal best practices for customer-facing services
-  - can do: Review scripting and integration designs for quality
-- **IAM application engineers** (Experienced; IAM, Identity governance, Access certification, Java): Appmore released IAM Application version 5.0 with new access analysis and recertification features. (s2)
-  - can do: Build access analysis features for identity governance
-  - can do: Implement recertification workflows for access reviews
-  - can do: Support multi-tenant domain separation for service providers
+- **ServiceNow implementation consultants** (Experienced; ServiceNow, JavaScript, REST APIs, Service Portal): Open consultant role for ServiceNow Services work alongside growing customer demand. (s11, hiring now: Consultant, ServiceNow Services)
+  - can do: Implement ServiceNow applications for enterprise customers
+  - can do: Write JavaScript scripts for workflow customisation
+  - can do: Configure service integrations and portal best practices
+- **ServiceNow solution architects** (Senior; ServiceNow, JavaScript, Service integrations, Portal architecture): Open architect role for ServiceNow Services, following the company's managed-service expansion. (s11, s1, hiring now: Architect, ServiceNow Services)
+  - can do: Design ServiceNow solution architecture for customers
+  - can do: Define service integration patterns across platforms
+  - can do: Set portal best practices and governance standards
 
 ## atNorth Oy
 
@@ -342,22 +408,35 @@ https://www.atnorth.com/ · open tech roles in our data: 1
 - `s10` [hiring] atNorth states it is growing and is looking for experts with data center operating skills and project management experience for its Nordic sites.  
   > "atNorth is growing and we’re looking for experts to help us expand our business." ([source](https://www.atnorth.com/about-atnorth/careers/))
 
+**What to tell candidates**
+
+- **Acquired for US$4 billion in September 2026** (2026-09; s1): CPP Investments and Equinix completed the acquisition, with CPP holding about 51% and Equinix about 34%.
+- **Contracted EBITDA doubled since end of 2025** (2026-09; s4): Partners Group reports contracted EBITDA doubled since end of 2025 and rose 14-fold over four years, with over 1.5 GW of secured power.
+- **New €2 billion Salo campus planned in Finland** (2026-10; s2): FIN05 in Salo has 75 MW first-phase power secured and a path to up to 230 MW.
+- **First Norwegian site announced in Haugaland** (2026-06; s3): NOR01 is a campus of up to 350 MW on 36 hectares, initially delivering 120 MW.
+- **Designing for rack densities above 200 kW** (2026-09; s9): atNorth is moving toward 800-volt data center power architectures to support AI workloads.
+- left out `s5`: says the same as another
+- left out `s6`: not about this company
+- left out `s7`: says the same as another
+- left out `s8`: says too little
+- left out `s10`: says the same as another
+
 **Likely needs (inferred): growing**
 
-Building several new Nordic data center campuses, including a new Norwegian site and a Finnish one up to 230 MW.
+Building new Nordic data centers, including a €2 billion Finland campus and first Norwegian site, to serve AI workloads.
 
-- **Senior electrical engineering leads** (Lead; LV/MV distribution, UPS systems, Backup generators, Commissioning, Asset lifecycle management): Several new campuses are under development across the Nordics, each needing electrical infrastructure designed and approved. (s2, s3, s5, hiring now: Senior Technical Lead - Electrical)
-  - can do: Approve electrical designs for LV and MV data center infrastructure
-  - can do: Lead commissioning of UPS and generator systems on new campuses
-  - can do: Manage electrical asset lifecycle across multiple sites
-- **Data center power architects** (Senior; 800 V DC architecture, High-density power, Power distribution design, Electrical codes): atNorth is moving toward 800-volt data center power architectures to support AI workloads. (s9, s4)
-  - can do: Design 800-volt power distribution for high-density AI racks
-  - can do: Specify power systems for racks above 200 kW
-  - can do: Plan power capacity against secured grid supply
-- **Data center project managers** (Experienced; Construction project management, Scheduling, Budget control, Data center construction): The company says it is looking for project management experience for its Nordic sites while building several campuses at once. (s10, s2)
-  - can do: Run construction schedules for multi-phase data center campuses
+- **Electrical infrastructure engineers** (Senior; LV/MV switchgear, UPS systems, Generator sizing, Commissioning, IEC 60364): Eight campuses are under development, including new Finland and Norway sites needing large power capacity. (s2, s3, s5, hiring now: Senior Technical Lead - Electrical)
+  - can do: Design LV and MV distribution for multi-hall campuses
+  - can do: Specify UPS and generator systems for high-density racks
+  - can do: Approve electrical designs as technical authority
+- **Data center construction project managers** (Experienced; Construction scheduling, Primavera P6, Contract management, Commissioning): The company is building new campuses in Finland, Norway and Sweden and says it is growing its project management capacity. (s5, s10)
+  - can do: Run multi-year data center build programmes to schedule
   - can do: Coordinate contractors across electrical and mechanical works
-  - can do: Track budgets for large-scale site builds
+  - can do: Manage commissioning handover to operations
+- **Power and cooling systems engineers** (Senior; Liquid cooling, 800 V DC, CFD modelling, HVAC design): Rack densities above 200 kW and the move to 800-volt architectures require new power and cooling designs. (s9)
+  - can do: Design liquid cooling for high-density AI racks
+  - can do: Integrate 800-volt DC power architectures into facility designs
+  - can do: Model thermal and power loads across campus sites
 
 ## Aveksana
 
@@ -382,18 +461,23 @@ https://aveksana.com · not in our Espoo job data
 - `s7` [other, 2023-08] Aveksana received an Amazing Product award from the Awardin platform.  
   > "Aveksana has won the ‘Amazing Product’ award from the Awardin platform." ([source](https://aveksana.com/blog/aveksana-wins-%E2%80%98amazing-product%E2%80%99-award-from-awardin-platform))
 
+**What to tell candidates**
+
+- **More than 24,000 users worldwide** (2026-05; s2, s4): The company reports over 24,000 users globally, with over ten thousand of them across Finland and Estonia and an international scale-up in preparation.
+- **Business Vantaa piloting its tool for grant proposals** (2026-02; s1): The city is testing the platform to generate proposal structure and content, evaluating time savings and proposal quality.
+- **First move into Japanese academia via ProfBridge** (2025-07; s5): A feasibility collaboration with ProfBridge Commons will assess the platform's potential within Japanese academic institutions.
+- left out `s3`: says too little
+- left out `s6`: says too little
+- left out `s7`: older than two years
+
 **Likely needs (inferred): growing**
 
-Helping universities and R&D teams shape research ideas into defensible proposals, with European data hosting and international expansion underway.
+Helps universities and R&D teams shape research ideas into fundable problem statements, now piloted by a Helsinki city agency for grant proposals.
 
-- **International expansion managers** (Senior; Market entry strategy, Higher education sales, Partner negotiation, EU research funding): The company is preparing to scale internationally after reaching over ten thousand users in Finland and Estonia. (s4, s5)
-  - can do: Plan market entry for universities in new countries
-  - can do: Negotiate pilot agreements with academic institutions
-  - can do: Adapt product offers to foreign research funding systems
-- **Public sector sales leads** (Experienced; Public procurement, Pilot evaluation, Business case modelling, Municipal sales): Business Vantaa is piloting the tool for funding proposals, with the city evaluating time savings and proposal quality. (s1)
-  - can do: Run pilot evaluations with municipal and public bodies
-  - can do: Build business cases around time savings for proposal writing
-  - can do: Manage long procurement cycles with city administrations
+- **Enterprise sales leads** (Experienced; B2B SaaS sales, Public procurement, Higher education markets, Pilot management): Preparing to scale internationally after reaching ten thousand users in Finland and Estonia and a city pilot. (s1, s4, s5)
+  - can do: Sell research tooling to universities and public agencies
+  - can do: Run pilot evaluations with measurable time-saving outcomes
+  - can do: Build partnerships with academic institutions abroad
 
 ## Basware Oy
 
@@ -424,21 +508,33 @@ https://basware.com · open tech roles in our data: 2
 - `s10` [product, 2026-10] Basware is rolling out Process Cost Discovery and SuperCore, a standardised invoice data format, as part of its 2026 product releases.  
   > "SuperCore is the standard document format of the Basware Network" ([source](https://www.basware.com/en/innovation))
 
+**What to tell candidates**
+
+- **Sales up 20% in 2025** (2026-02; s4): Growth was driven mainly by interest in AI-empowered products, according to the company's February 2026 report.
+- **Launched AI agents in its invoice platform** (2026-06; s5, s6): New AI agents were added to the Invoice Lifecycle Management platform, alongside a Governed Autonomy framework announced in June 2026.
+- **Acquired Trustpair in October 2026** (2026-10; s2): The payment fraud prevention platform was acquired and will keep operating independently, adding a new product area.
+- **Acquired Redmap in December 2025** (2025-12; s3): The Australian AP automation vendor extends Basware's reach into the Australian market.
+- **Customers live on France's e-invoicing mandate** (2026-07; s7): Customers went live ahead of the September 2026 deadline, showing the platform works for regulated e-invoicing.
+- left out `s1`: a one-off that is over
+- left out `s8`: used for a role instead
+- left out `s9`: says too little
+- left out `s10`: says the same as another
+
 **Likely needs (inferred): growing**
 
-Basware is adding AI agents to invoice processing and buying fraud-prevention firm Trustpair.
+Basware is rolling out AI agents and autonomy controls for finance teams while absorbing acquisitions.
 
-- **AI product managers** (Senior; AI/ML product strategy, Accuracy measurement, Accounts payable processes, Data analysis): Basware launched AI agents in its invoice platform and sales grew 20% in 2025 on AI-empowered products. (s4, s5, hiring now: Senior Product Manager)
-  - can do: Define accuracy metrics for AI invoice processing agents
-  - can do: Map accounts payable workflows into product requirements
-  - can do: Prioritise AI features with engineering and finance customers
-- **Enterprise architects for AI platforms** (Lead; AWS, Azure, Cloud-native architecture, Responsible AI governance): Basware is rolling out a Governed Autonomy framework and must run AI tooling on cloud infrastructure. (s6, s10, hiring now: Portfolio Architect)
-  - can do: Design cloud-native architecture for AI-enabled finance workflows
-  - can do: Integrate AI tooling into portfolio and product planning
-  - can do: Set governance controls for autonomous AI actions
-- **Integration engineers for acquired products** (Experienced; REST APIs, Data mapping, Cloud integration, Payment systems): Basware acquired Redmap in December 2025 and Trustpair in October 2026, both continuing to run separately. (s2, s3)
-  - can do: Connect acquired payment and AP platforms to core products
-  - can do: Build data mappings between different invoice formats
+- **AI product managers** (Senior; AI/ML product strategy, Accounts payable processes, Data analysis, Accuracy metrics): Sales grew 20% in 2025 on AI-empowered products, and new AI agents launched in February 2026. (s4, s5, hiring now: Senior Product Manager)
+  - can do: Define accuracy targets for AI invoice processing agents
+  - can do: Translate AP workflows into product requirements for AI features
+  - can do: Measure agent performance against finance user outcomes
+- **Cloud solution architects** (Lead; AWS, Azure, Cloud-native architecture, Responsible AI governance, SaaS architecture): New AI agents and the Governed Autonomy framework need architecture across AWS or Azure at scale. (s5, s6, s2, hiring now: Portfolio Architect)
+  - can do: Design cloud-native architecture for AI tooling integration
+  - can do: Set governance controls for autonomous AI workflows
+  - can do: Plan portfolio architecture across acquired platforms
+- **Fraud and payments engineers** (Experienced; Payment fraud detection, API integration, Cloud services): Trustpair was acquired in October 2026 and continues to operate as a separate payment fraud platform. (s2)
+  - can do: Integrate payment fraud detection with invoice workflows
+  - can do: Maintain fraud platform services alongside core products
 
 ## Beneq Oy
 
@@ -465,22 +561,28 @@ https://beneq.com · open tech roles in our data: 2
 - `s8` [hiring, 2026] Beneq's careers page lists open positions including Electrical Engineer roles in Advanced ALD and a Sourcing Manager in Espoo, Finland.  
   > "Electrical EngineerAdvanced ALD - Olarinluoma 9, Espoo, Finland" ([source](https://beneq.com/careers/))
 
+**What to tell candidates**
+
+- **Transform cluster tool qualified for GaN volume production** (2025-05; s3): A Tier 1 Asian GaN power device maker qualified the Transform cluster tool for volume production of GaN devices on 8-inch wafers.
+- **New high-throughput ALD platforms launched** (2025-11; s1, s2): Beneq launched the Transform XP and unveiled the Transmute, aimed at wide bandgap power, RF and microLED device production.
+- **AR optics maker adopted spatial ALD system** (2026-01; s4): Kinko Optical adopted the C2R spatial ALD system for high-volume production of AR waveguide coatings for XR glasses.
+- **Superconducting TiN process scaling to 16 wafers** (2026-09; s6): Beneq reported a superconducting titanium nitride thermal ALD process reaching batch throughput of up to 16 wafers, with critical temperature of 3.87 K.
+- left out `s5`: says the same as another
+- left out `s7`: older than two years
+- left out `s8`: used for a role instead
+
 **Likely needs (inferred): growing**
 
-Beneq is selling high-throughput ALD tools for GaN power, RF, microLED and AR optics production.
+Beneq is scaling its ALD platforms for wide bandgap power, RF and microLED chip production in volume.
 
-- **Electrical engineers for ALD systems** (Experienced; EPLAN, AutoCAD, Electrical safety, EMI/EMC, IEC standards): Beneq is launching new ALD platforms and has open Electrical Engineer roles in Advanced ALD. (s1, s2, s8, hiring now: Electrical Engineer)
-  - can do: Design low-voltage and high-power electrical systems for ALD tools
-  - can do: Build electrical schematics and layouts in EPLAN and AutoCAD
-  - can do: Verify designs against CE, UL, EMI/EMC and IEC requirements
-- **Process engineers for GaN and RF production** (Experienced; ALD process development, GaN devices, Thin film metrology, Yield analysis): A Tier 1 Asian GaN maker qualified the Transform cluster tool for volume GaN production on 8-inch wafers. (s1, s3)
-  - can do: Tune ALD recipes for GaN power devices on 8-inch wafers
-  - can do: Improve throughput and yield on production cluster tools
-  - can do: Troubleshoot deposition process excursions in volume manufacturing
-- **Optical coating engineers for AR waveguides** (Experienced; Spatial ALD, Optical thin films, Ellipsometry, Refractive index control): Kinko Optical adopted the C2R spatial ALD system for high-volume AR waveguide coatings for XR glasses. (s4)
-  - can do: Develop spatial ALD coating processes for AR waveguide optics
-  - can do: Control coating uniformity across high-volume optical production
-  - can do: Characterize optical films for refractive index and transmission
+- **Electrical design engineers** (Experienced; EPLAN, AutoCAD, IEC 61010, EMI/EMC testing, Electrical safety): New tools for power and RF production need electrical systems designed and certified for volume manufacturing. (s1, s2, hiring now: Electrical Engineer, hiring now: Electrical Engineer)
+  - can do: Design low-voltage and high-power systems for ALD tools
+  - can do: Prepare electrical drawings and documentation for CE and UL review
+  - can do: Verify EMI/EMC and IEC compliance before shipment
+- **Process engineers for wide bandgap devices** (Experienced; Thermal ALD, Spatial ALD, GaN epitaxy, Thin-film metrology, Yield analysis): Customers moving GaN and AR optics into volume production need ALD process support on 8-inch wafers and high-throughput systems. (s3, s4)
+  - can do: Tune ALD recipes for GaN power device layers
+  - can do: Support qualification of tools at customer fabs
+  - can do: Improve wafer throughput and film uniformity
 
 ## Certiud
 
@@ -489,6 +591,9 @@ https://certiud.fi · not in our Espoo job data
 <img src="https://media.brand.dev/cd40751a-b9e7-4b64-81dd-5d95e8b8de60.png" height="28"> Your Finnish Growth Partner · Professional Services & Agencies: Management Consulting (identity: Context.dev)
 
 **Stated in public sources**
+
+
+**What to tell candidates**
 
 
 **Likely needs (inferred): unclear**
@@ -525,22 +630,29 @@ https://chipmetrics.com · not in our Espoo job data
 - `s10` [hiring] Chipmetrics' careers page lists a general open-position application form without naming specific roles.  
   > "Fill in the open position application form and we will contact you." ([source](https://chipmetrics.com/careers/))
 
+**What to tell candidates**
+
+- **Targeting Samsung and SK Hynix production lines** (2026-02; s3): Chipmetrics says it is aiming to enter South Korean mass-production lines and that its method is hundreds of times faster than cross-section TEM.
+- **ASD-2 multi-material test chip announced** (2026-05; s1): The new test chip has first configurations available from August 2026, extending the company's product line for thin-film characterization.
+- **Pre-patterned electrical test structure launched** (2026-03; s2): The embedded silicon structure allows electrical characterization of thin films right after deposition, without lithography or etching.
+- **Record sales reported for 2025** (2025-12; s4, s5): Chipmetrics called record 2025 sales its key achievement of the year, after setting up a Dresden subsidiary in January 2025.
+- **Partnerships with Park Systems and Aalto University** (2026-07; s8, s9): Work with Park Systems combines test chips with scanning probe microscopy, and a joint ALD characterization was presented with Aalto University in 2026.
+- left out `s6`: older than two years
+- left out `s7`: older than two years
+- left out `s10`: says too little
+
 **Likely needs (inferred): growing**
 
-Chipmetrics is launching new test chips for faster semiconductor thin-film measurement, aiming for Korean mass-production lines.
+Chipmetrics is launching multi-material test chips and targeting entry into Samsung and SK Hynix mass-production lines.
 
-- **Process integration and measurement engineers** (Experienced; Thin-film deposition, ALD, Electrical characterization, Yield analysis, Statistical process control): Record 2025 sales and a targeted entry into Samsung and SK Hynix mass-production lines require measurement support at production scale. (s3, s4)
-  - can do: Qualify deposition processes on customer production tools
-  - can do: Correlate test chip results with yield and device data
-  - can do: Support customer tool qualification from R&D through volume
-- **Scanning probe microscopy specialists** (Experienced; Scanning probe microscopy, AFM, Semiconductor metrology, Data analysis): The Park Systems collaboration combines Chipmetrics test chips with scanning probe microscopy platforms for semiconductor metrology. (s8)
-  - can do: Operate scanning probe microscopy on semiconductor test structures
-  - can do: Integrate probe measurements with test chip electrical data
-  - can do: Develop measurement recipes for high-aspect-ratio structures
-- **Test chip design engineers** (Experienced; Semiconductor layout, Process design kits, Lithography, Device physics): The ASD-2 multi-material test chip and the pre-patterned embedded silicon structure are new products needing ongoing design work. (s1, s2)
-  - can do: Design multi-material test chip layouts for thin-film metrology
-  - can do: Verify pre-patterned test structures for electrical measurement
-  - can do: Support first-configuration releases of new test chips
+- **Semiconductor process engineers** (Experienced; Thin-film deposition, ALD, Tool qualification, Yield analysis, SPC): Entry into Samsung and SK Hynix mass-production lines requires process support at production scale. (s3, s4)
+  - can do: Qualify deposition tools for high-aspect-ratio thin films
+  - can do: Support yield optimization on 3D NAND production lines
+  - can do: Transfer R&D test results into mass-production recipes
+- **Metrology and test chip engineers** (Experienced; Semiconductor metrology, Electrical characterization, TEM cross-section, Test structure design): Launches of the ASD-2 and pre-patterned test structures expand the product line, which needs design and characterization work. (s1, s2)
+  - can do: Design test structures for conformality measurement
+  - can do: Characterize thin films electrically after deposition
+  - can do: Validate new test chip configurations for customers
 
 ## Companial Oy Ab
 
@@ -567,22 +679,27 @@ https://companial.com/ · open tech roles in our data: 1
 - `s8` [partnership, 2026-09] Companial earned its 12th Microsoft AI Business Solutions Inner Circle selection for 2026–2027.  
   > "Companial has earned the 2026–2027 Microsoft AI Business Solutions Inner Circle award, marking its 12th selection" ([source](https://companial.com/news/companial-named-to-the-2026-2027-inner-circle-for-microsoft-ai-business-solutions/))
 
+**What to tell candidates**
+
+- **Combining three Dynamics partners into Companial** (2026-10; s1): Companial, Ciellos and Simplanova merge under one brand, with around 600 specialists serving more than 1,200 partners worldwide.
+- **Expanded into Brazil and LATAM in April 2026** (2026-04; s4, s2): The firm opened a dedicated local presence in the region and launched a Brazil localization for Business Central, now on AppSource.
+- **Building AI agents for Business Central** (2026-11; s7): The company is developing AI agent capabilities for Business Central and publishes webinars on AI in ERP consultancy and Copilot Studio architecture.
+- **Earned 12th Microsoft AI Business Solutions Inner Circle selection** (2026-09; s8): The Inner Circle selection covers 2026 to 2027, recognising its AI work with Microsoft business solutions.
+- left out `s3`: a one-off that is over
+- left out `s5`: older than two years
+- left out `s6`: says too little
+
 **Likely needs (inferred): growing**
 
-Expanding Microsoft Dynamics partner services into Brazil, LATAM and Portugal, and building AI agents for Business Central.
+Combining three Microsoft Dynamics partners into one global firm while expanding into Brazil and LATAM and building AI agents for Business Central.
 
-- **AI and Azure solution architects** (Senior; Azure OpenAI, Azure AI Search, Copilot Studio, Azure architecture, RAG): Companial is building AI agent capabilities for Business Central and expanding its Azure-based partner offering. (s7, s8, hiring now: Partner Technology Strategist – AI & Azure)
-  - can do: Design Azure OpenAI and RAG architectures for Business Central customers
-  - can do: Advise partners on Copilot Studio integration and data governance
+- **Azure AI solution architects** (Senior; Azure OpenAI, AI Foundry, Azure AI Search, Copilot Studio, RAG): Companial is building AI agents for Business Central and advising partners on Copilot Studio architecture. (s7, s8, hiring now: Partner Technology Strategist – AI & Azure)
+  - can do: Design Azure OpenAI and AI Search architectures for enterprise customers
+  - can do: Advise partners on RAG architecture and data governance
   - can do: Estimate running costs for Azure AI workloads
-- **Business Central localization leads** (Experienced; Business Central, AL development, Tax compliance, AppSource): A Brazil localization for Business Central launched and Softstore, a Portuguese localization partner, was acquired. (s2, s3)
-  - can do: Adapt Business Central to local tax and reporting rules
-  - can do: Manage localization releases on AppSource
-  - can do: Coordinate with local partners on country requirements
-- **Enterprise partner account managers** (Experienced; Microsoft Dynamics, Partner ecosystems, FastTrack): Companial launched an Enterprise Membership programme for partners serving enterprise customers. (s6)
-  - can do: Onboard partners into the Enterprise Membership programme
-  - can do: Connect partners to the FastTrack Gateway
-  - can do: Track partner growth against membership targets
+- **Business Central localization engineers** (Experienced; AL language, Business Central, Localization, Tax compliance): The Brazil localization and the Softstore acquisition show ongoing demand for country-specific Business Central builds. (s2, s3)
+  - can do: Build country-specific tax and compliance features for Business Central
+  - can do: Adapt localizations for new Latin American markets
 
 ## CSC-Tieteen tietotekniikan keskus Oy
 
@@ -613,20 +730,34 @@ https://csc.fi · open tech roles in our data: 4
 - `s10` [partnership, 2025-11] CSC and other Nordic partners are part of a terabit-speed research network connecting Europe's supercomputers, with services gradually available from 2026.  
   > "Initial installations will begin in the coming months, with services gradually becoming available starting in 2026." ([source](https://csc.fi/en/news/terabit-network-connects-europes-supercomputers/))
 
+**What to tell candidates**
+
+- **LUMI-AI contract worth EUR 387.8 million** (2026-08; s1, s2): EuroHPC signed a procurement contract with Bull to deliver LUMI-AI to CSC's Kajaani data centre, with operation expected from late 2027.
+- **Roihu supercomputer in use since May** (2026-05; s9): The CPU-oriented Roihu system replaced the Mahti and Puhti systems, which CSC had been running for its research users.
+- **Staff grew to about 700** (2026-06; s7): CSC reports about 700 staff in its 2026 publications, up from around 567 in its 2022 company data.
+- **Users report 11 to 20 times return on HPC** (2026-04; s8): A Taloustutkimus study of 15 companies found CSC's high-performance computing services returned 11 to 20 times the investment value to users.
+- **AI management services agreement with Sikt** (2026-06; s6): CSC and Norway's Sikt signed a memorandum of understanding to develop AI management services for public sector customers.
+- left out `s3`: says the same as another
+- left out `s4`: not about this company
+- left out `s5`: a one-off that is over
+- left out `s10`: says too little
+
 **Likely needs (inferred): growing**
 
-Building LUMI-AI and a quantum computer in Kajaani, with a tenfold AI capacity increase planned.
+CSC is building LUMI-AI, a supercomputer in Kajaani expected to run from late 2027, with a tenfold AI capacity increase.
 
-- **HPC systems engineers** (Experienced; Linux administration, Slurm, OpenStack, Kubernetes, Bash): EuroHPC contracted Bull for LUMI-AI at Kajaani, and the system needs operating from late 2027. (s2, s1, hiring now: HPC Service Admin, hiring now: HPC System Engineer, hiring now: HPC Platform Specialist)
-  - can do: Administer Linux nodes and batch scheduling for supercomputers
-  - can do: Operate virtualised services on OpenStack and Kubernetes
-  - can do: Apply cybersecurity controls across shared research infrastructure
-- **Quantum computing engineers** (Experienced; Quantum hardware integration, Slurm, Python, Linux): The IQM LUMI-IQ quantum computer will be installed at Kajaani in 2027 and integrated with the AI Factory. (s3)
-  - can do: Integrate quantum hardware with classical HPC job workflows
-  - can do: Support users running hybrid quantum-classical jobs
-- **AI platform engineers** (Experienced; Containers, Kubernetes, Python, GPU computing): CSC is building AI capacity and agreed with Sikt to develop AI management services for public sector customers. (s2, s6, hiring now: HPC Application Specialist)
-  - can do: Deploy and operate AI workloads on shared GPU clusters
-  - can do: Build AI management services for public sector customers
+- **HPC system administrators** (Experienced; Linux administration, Slurm, OpenStack, Kubernetes, Bash): Roihu is in use and LUMI-AI is being built in Kajaani, requiring running and maintaining large systems. (s1, s9, hiring now: HPC Service Admin, hiring now: HPC Platform Specialist)
+  - can do: Administer Linux systems and HPC batch schedulers across clusters
+  - can do: Manage services with OpenStack, VMware, XCP-ng or Kubernetes
+  - can do: Support end users running jobs on production systems
+- **HPC application specialists** (Experienced; Slurm, Apptainer, Python, Build systems, Workflow managers): New systems and a growing user base need support for scientific software, workflows and containers. (s8, s9, hiring now: HPC Application Specialist)
+  - can do: Build and maintain scientific software on HPC systems
+  - can do: Set up reproducible workflows with containers
+  - can do: Support researchers porting applications to new platforms
+- **HPC system engineers** (Senior; Linux administration, Software development, Cybersecurity, Python): Building LUMI-AI and integrating a quantum system in Kajaani requires engineers who can develop and secure HPC systems. (s1, s3, s5, hiring now: HPC System Engineer)
+  - can do: Develop software tools for managing HPC infrastructure
+  - can do: Secure systems against vulnerabilities and incidents
+  - can do: Integrate new hardware with existing HPC platforms
 
 ## Dream Broker Oy
 
@@ -653,22 +784,32 @@ https://onecommunications.io/fi/ · open tech roles in our data: 5
 - `s8` [risk, 2026-05] Revenue fell below 7.5 million euros after the pandemic peak as the Finnish and Swedish economies weakened and public sector cuts hit demand.  
   > "Sen jälkeen tuli vastatuuli: Suomen ja Ruotsin talouden heikkeneminen, julkisen sektorin leikkaukset" ([source](https://podme.com/se/avsnitt/11665311/))
 
+**What to tell candidates**
+
+- **Expanded to eight European countries** (2026-06; s2, s4): The company has subsidiaries and sales across eight European countries after entering Spain through a partner in early 2025.
+- **Launched #One secure meeting platform** (2026-10; s5): An all-in-one video meeting and communication platform hosted in certified Finnish and EU data centres, positioned against Microsoft Teams.
+- **Added eID login and KPMG security audit** (2026-02; s6): Strong electronic identification authentication for video conferencing, with the platform audited for security by KPMG.
+- **Revenue above 10 million euros** (2026-06; s2, s3): Revenue has passed 10 million euros, having fallen below 7.5 million after the pandemic peak and since returned to profitability.
+- left out `s1`: says the same as another
+- left out `s7`: a one-off that is over
+- left out `s8`: says the same as another
+
 **Likely needs (inferred): growing**
 
-Launched #One, a secure, EU-hosted video meeting platform, positioned against Microsoft Teams.
+Launched #One, a Finnish-hosted secure video and communication platform, and expanded into eight European countries.
 
-- **Platform engineers for #One** (Senior; Linux administration, Kubernetes, Docker, Configuration management, Python): The #One platform launched in October 2026 and must run reliably in certified data centres in Finland and the EU. (s5, hiring now: System Administrator)
-  - can do: Operate Linux servers and container platforms in production
-  - can do: Automate deployments and configuration across environments
-  - can do: Keep a live multi-service system stable through maintenance
-- **Web and backend software engineers** (Experienced; React, Next.js, TypeScript, Node.js, Databases): Expansion into eight countries and the new #One product require ongoing development of web and backend services. (s2, s5, hiring now: Software Engineer (Enterprise products), hiring now: Software Engineer (React))
+- **System administrators** (Senior; Linux, Kubernetes, Docker, Ansible, Python): Live #One platform in certified data centres and eight countries needs ongoing operation and maintenance. (s5, s2, hiring now: System Administrator)
+  - can do: Operate Linux servers and containers in production
+  - can do: Automate configuration and deployments across environments
+  - can do: Maintain a live video platform with uptime targets
+- **Full-stack software engineers** (Experienced; Java, Node.js, React, Next.js, SQL): Enterprise product development is open for web and backend engineers to build #One and related products. (s5, hiring now: Software Engineer (Enterprise products), hiring now: Software Engineer (React))
   - can do: Build backend services in Java, Node.js or C++
-  - can do: Develop React and Next.js frontends for web clients
-  - can do: Design and maintain database-backed enterprise features
-- **Security and authentication engineers** (Experienced; eID authentication, Security auditing, Identity protocols): The company added eID authentication to video conferencing and undergoes KPMG security audits. (s6)
-  - can do: Implement strong electronic identification in meeting flows
-  - can do: Prepare systems for independent security audits
-  - can do: Harden video and messaging services against attacks
+  - can do: Develop React and Next.js web interfaces
+  - can do: Design and maintain databases for enterprise customers
+- **Software architects** (Lead; Kubernetes, Databases, Web servers, Security architecture): A new flagship platform with security audits and EU hosting requires senior architecture decisions. (s5, s6, hiring now: Software Architect)
+  - can do: Design scalable architectures for secure video services
+  - can do: Choose orchestration, databases and web server technologies
+  - can do: Lead technical reviews with senior engineers
 
 ## ElFys
 
@@ -699,22 +840,34 @@ https://elfys.fi · not in our Espoo job data
 - `s10` [other, 2026-08] A third-party profile estimates ElFys has 10-20 employees.  
   > "ElFys, Inc. has 10-20 employees, founded in 2017." ([source](https://exa.ai/library/person/51l4zk2b7ht))
 
+**What to tell candidates**
+
+- **Black silicon photodiodes win customer evaluations** (2026-06; s8): An independent OEM field evaluation of ElFys' 4-quadrant detector reported 1.5x longer acquisition distance than other quadrant detectors.
+- **Photoreceiver maker builds product on ElFys photodiodes** (2026-08; s7): FEMTO reported that ElFys black silicon photodiodes enabled its LCA-S-400K-BSI photoreceiver.
+- **Serves over 100 customers in 20+ countries** (2025-11; s4, s5): About 90% of production is exported, and the company holds several granted patent families plus two pending applications.
+- **Extending black silicon into medical and infrared** (2025-11; s6): The technology is moving into medical devices, industrial sensing and scientific instruments, with germanium-based detectors explored for deeper infrared.
+- **Defence programmes backing its products** (2025-08; s2): ElFys products received TEVV Funding and the company was selected for the European Defence Fund 2024.
+- left out `s1`: a one-off that is over
+- left out `s3`: says the same as another
+- left out `s9`: says too little
+- left out `s10`: says too little
+
 **Likely needs (inferred): growing**
 
-Selling black silicon photodiodes to defence, medical and industrial customers in over 20 countries, with new products for deeper infrared.
+Selling black silicon photodiodes to defence and industry, with new sensors for medical and infrared use.
 
-- **Photodetector process engineers** (Experienced; Silicon micro-fabrication, Black silicon etching, Photodiode characterisation, Cleanroom processing): Black silicon photodiode technology is being extended into medical, industrial and scientific products, requiring process scale-up. (s3, s6)
-  - can do: Tune black silicon etching for consistent photodiode responsivity
-  - can do: Develop process steps that move prototypes into repeatable production
-  - can do: Troubleshoot dark current and yield problems on photodiode wafers
-- **Germanium detector researchers** (Senior; Germanium photodetectors, Infrared optics, Semiconductor physics, Noise measurement): ElFys is exploring germanium-based detectors for deeper infrared wavelengths. (s6)
-  - can do: Design germanium photodetector structures for infrared wavelengths
-  - can do: Measure responsivity and noise of infrared detectors
-  - can do: Evaluate germanium material options against silicon for target wavelengths
-- **Defence optronics engineers** (Experienced; Quadrant photodiodes, Laser seekers, Optical tracking, Environmental qualification): ElFys joined the NATO DIANA Accelerator, signed over 10 NDAs with defence players and received European Defence Fund selection. (s1, s2, s8)
-  - can do: Integrate quadrant detectors into laser seeker and tracking systems
-  - can do: Test detector performance against defence-grade requirements
-  - can do: Support customer qualification of detectors for defence programmes
+- **Photodetector process engineers** (Experienced; Black silicon, Semiconductor processing, Photolithography, Dark current analysis): Black silicon is being extended into medical, industrial and infrared products, and export output is high. (s6, s4)
+  - can do: Run black silicon etch and doping processes reliably at volume
+  - can do: Tune responsivity and dark current on new detector designs
+  - can do: Set up yield monitoring for photodiode production lines
+- **Defence optics and seeker engineers** (Experienced; Laser seekers, Quadrant detectors, Optical alignment, MIL-STD testing): Selected for the European Defence Fund and a seeker OEM reported a field evaluation of its quadrant detector. (s2, s8)
+  - can do: Integrate quadrant detectors into laser seeker optics
+  - can do: Validate acquisition range in field trials
+  - can do: Support OEM qualification for defence programmes
+- **Infrared sensor researchers** (Senior; Germanium detectors, Infrared optics, Optoelectronic characterisation): Germanium-based detectors for deeper infrared are being explored as a new product direction. (s6, s5)
+  - can do: Develop germanium-based infrared photodetectors
+  - can do: Characterise responsivity beyond 1.6 µm
+  - can do: Write up test results for patent filings
 
 ## Etteplan Oyj
 
@@ -743,21 +896,33 @@ https://www.etteplan.com/ · open tech roles in our data: 5
 - `s9` [risk, 2026-08] Etteplan's personnel fell to 3,680 at the end of June 2026 from 3,777 at the end of 2025.  
   > "Personnel at end of the period | 3,680 | 3,870 | 3,680 | 3,870 | 3,777 |" ([source](https://www.etteplan.com/about-us/news/2026/08/05/etteplan-q2-2026-demand-shows-first-signs-of-recovery-amid-uncertainty/))
 
+**What to tell candidates**
+
+- **Revenue down 4% in January-September 2026** (2026-10; s2): Revenue reached EUR 257.9 million, while operating profit fell 21.5 percent to EUR 9.9 million over the same period.
+- **Profit warning cut 2026 guidance in September** (2026-09; s1): The company lowered its 2026 revenue estimate to EUR 355-365 million and EBIT to EUR 16.5-20 million, citing slower demand and delayed project start-ups.
+- **AI service solutions at 7% of revenue** (2026-10; s4): AI-driven service solutions made up 7 percent of revenue in January-September 2026, against a stated target of 35 percent by 2027.
+- **Aerospace and defence demand rising** (2026-09; s7): Flight and defence is named the fastest-growing customer segment, while the energy industry remains the largest.
+- **Deeper engineering work with Patria** (2026-06; s5): Etteplan established a competence centre for Patria's vehicle engineering, extending a collaboration that is ongoing.
+- left out `s3`: says the same as another
+- left out `s6`: says too little
+- left out `s8`: older than two years
+- left out `s9`: says the same as another
+
 **Likely needs (inferred): shrinking**
 
-Shifting toward AI-driven industrial and defense engineering services as revenue and profit slipped in 2026.
+Etteplan is pushing AI-driven service solutions and aerospace and defense work while revenue and profit weaken.
 
-- **Industrial digitalization sales leads** (Senior; ERP sales, MES, PLM, SCADA, Industrial IT/OT): AI-driven service solutions reached only 7 percent of revenue against a 35 percent target for 2027. (s4, hiring now: Senior Sales Manager – Industrial Digitalization Solutions)
-  - can do: Sell ERP, MES and PLM solutions to industrial customers
-  - can do: Build B2B pipelines for industrial platform software
-  - can do: Explain OT and IT integration to plant decision makers
-- **Electrical design leads** (Lead; EPLAN, Industrial electrical standards, PLC systems, Industrial networks): Revenue fell 4 percent in January-September 2026, and the company reports delayed project start-ups. (s2, s1, hiring now: Team Manager - Electrical engineering, hiring now: Lead Electrical Engineer, hiring now: Sähkösuunnittelija, teollisuuden kone- ja laitevalmistus)
-  - can do: Lead electrical system design for industrial machinery projects
-  - can do: Size electrical systems and define system architecture
-  - can do: Coordinate a small design team through client projects
-- **Aerospace and defense engineers** (Experienced; Vehicle systems, CAD, Systems engineering): Flight and defense is named the fastest-growing customer segment, and Patria collaboration expanded. (s7, s5)
-  - can do: Design vehicle engineering systems for defense customers
-  - can do: Run multidisciplinary engineering work with client teams
+- **AI and automation solution sales leads** (Senior; ERP, MES, PLM, SCADA, IT/OT): AI service solutions reached only 7 percent of revenue against a 35 percent target for 2027. (s4, hiring now: Senior Sales Manager – Industrial Digitalization Solutions)
+  - can do: Sell industrial digitalization and AI solutions to manufacturing customers
+  - can do: Scope ERP, MES and PLM integrations with engineering teams
+  - can do: Build pipelines for multi-year industrial platform contracts
+- **Aerospace and defence systems engineers** (Experienced; EPLAN, Electrical design, System architecture): Flight and defence is the fastest-growing customer segment, with demand rising. (s7, s5)
+  - can do: Design electrical systems for defence vehicle platforms
+  - can do: Manage engineering scope for aerospace customers
+- **Electrical design leads** (Lead; EPLAN, PLC systems, Industrial networks, Electrical sizing): Several open roles need electrical design leads for industrial automation and machinery. (s1, hiring now: Team Manager - Electrical engineering, hiring now: Lead Electrical Engineer)
+  - can do: Design electrical systems and sizing for industrial automation
+  - can do: Lead a small electrical design team through project delivery
+  - can do: Apply industrial electrical standards across customer projects
 
 ## Finders Seekers
 
@@ -778,18 +943,21 @@ https://findersseekers.io · not in our Espoo job data
 - `s5` [other, 2026-09] Finders Seekers published analysis that deep tech companies face a shortage of available specialists across Northern Europe, with hard roles often requiring talent that is scarce across the whole continent.  
   > "The number of available people with these skills is very low, even across a whole continent" ([source](https://www.findersseekers.io/insights/why-is-deep-tech-talent-so-hard-to-find))
 
-**Likely needs (inferred): growing**
+**What to tell candidates**
 
-Helps deep-tech firms hire scarce engineers and PhDs, and brand themselves to attract them.
+- **Won three Employer Brand Awards in 2026** (2026-09; s2): Two Gold and one Silver at the Employer Brand Management Awards 2026, for its work with IQM Quantum Computers.
+- **Ran employer branding for IQM Quantum Computers** (2026-07; s3): Delivered an employer branding and EVP engagement for IQM, which reports 40% headcount growth and a planned July 2026 IPO.
+- **Positioned as a deep-tech talent partner** (2026-08; s4): The CEO describes the company as a talent partner for scaling deep tech, focused on senior tech recruitment and leadership hiring.
+- left out `s1`: says too little
+- left out `s5`: not about this company
 
-- **Senior tech recruiters** (Senior; Boolean sourcing, Executive search, Offer negotiation, Candidate pipeline tools): Reported growth in client work, with IQM as a recent employer branding account and a shortage of specialists noted across Northern Europe. (s3, s5)
-  - can do: Source senior engineers and PhDs for deep-tech client roles
-  - can do: Run offer negotiations through to acceptance and start date
-  - can do: Map scarce specialist talent pools across Northern Europe
-- **Employer branding strategists** (Experienced; EVP development, Employer brand analytics, Content strategy, Recruitment marketing): Employer branding was run for IQM, which reports 40% headcount growth and a planned IPO, and the firm won awards for the work. (s2, s3)
-  - can do: Build data-driven employer value propositions for deep-tech clients
-  - can do: Plan employer brand campaigns tied to hiring targets
-  - can do: Measure brand impact on application and fill rates
+**Likely needs (inferred): unclear**
+
+Helps deep-tech firms hire scarce engineers and scientists, with employer branding and end-to-end recruitment.
+
+- **Senior recruitment consultants** (Experienced; Technical recruitment, Executive search, Offer negotiation, ATS tools): Positioned around senior tech and leadership hiring, a focus the company names in its own description of its work. (s4)
+  - can do: Source senior engineering and leadership candidates for deep-tech clients
+  - can do: Run offer negotiations from first contact to signed contract
 
 ## Finnplay Technologies Oy
 
@@ -820,22 +988,34 @@ https://www.finnplay.com · open tech roles in our data: 3
 - `s10` [risk, 2026-05] Operators report uncertainty over Finnish technical rules, including limits and self-exclusion details, ahead of the August 2026 licence application deadline.  
   > "Some of the details, such as the information on limits and self-exclusion, are totally missing" ([source](https://next.io/news/regulation/next-valletta-operators-uncertain-finnish-rules/))
 
+**What to tell candidates**
+
+- **Roughly 170 employees, about EUR 20 million revenue** (2026-10; s6): Headcount passed 150 in May 2026, and annual revenue is around 20 million euros.
+- **Finland launch brings new operator partners** (2026-10; s1, s2): Happy Brands Finland and SpinCore Group both signed to launch brands on Titan when Finland regulates.
+- **Titan 3.0 is largest update yet** (2026-02; s4): The release added multiwallet functionality, campaign tools and Optimove integration.
+- **Content deal extends slots to new markets** (2026-08; s3): Peter & Sons gave its slot games access to licensed operators on Titan in the Netherlands, Sweden and Mexico.
+- left out `s5`: says the same as another
+- left out `s7`: older than two years
+- left out `s8`: older than two years
+- left out `s9`: says too little
+- left out `s10`: says too little
+
 **Likely needs (inferred): growing**
 
-Powering new Finnish betting and casino brands ahead of Finland's July 2027 market opening.
+Finnplay is preparing its Titan platform for Finland's regulated market launch in July 2027, with new operators signing on.
 
-- **Java backend engineers** (Experienced; Java, Spring, Hibernate, MySQL, Docker): Several operators signed to launch new brands on Titan, and Titan 3.0 added multiwallet and campaign features. (s1, s2, s4, hiring now: Java Engineer)
-  - can do: Build Java backend services for betting and casino operator systems
-  - can do: Integrate multiwallet and campaign features into platform APIs
-  - can do: Maintain Spring and Hibernate code across live operator deployments
-- **Frontend engineers for operator sites** (Experienced; React.js, TypeScript, Redux, RESTful APIs, Jest): New Finnish brands and content partnerships need player-facing betting and casino sites built on Titan. (s1, s3, hiring now: Frontend Engineer)
-  - can do: Build React and TypeScript interfaces for licensed betting sites
-  - can do: Manage client state for player account and wallet screens
-  - can do: Write unit and frontend tests for operator-facing features
-- **Delivery project managers** (Experienced; Project management, Requirements analysis, Agile delivery): Launches for several new operator brands and a regulated market start need coordinated delivery across multiple projects. (s1, s2, hiring now: Project Manager)
-  - can do: Run requirement gathering with operators before each launch
-  - can do: Coordinate multiple platform projects against a regulatory deadline
-  - can do: Manage delivery schedules for software integrations
+- **Java backend engineers** (Experienced; Java, Spring, Hibernate, MySQL, Docker): Multiple Finland launch partners need the platform live by July 2027, requiring backend capacity. (s1, s2, hiring now: Java Engineer)
+  - can do: Build and maintain Java services for betting platform workloads
+  - can do: Integrate backend services with third-party operator systems
+  - can do: Design RESTful APIs for web-based gaming systems
+- **Frontend engineers** (Experienced; React.js, TypeScript, Redux, RESTful APIs, Jest): New operator brands launching on Titan need customer-facing sites built for the Finnish market. (s1, s2, hiring now: Frontend Engineer)
+  - can do: Build React interfaces for betting and casino sites
+  - can do: Manage application state across complex user flows
+  - can do: Write unit and frontend tests for player-facing features
+- **Project managers for launches** (Experienced; Agile delivery, Requirements analysis, Software project planning): Several operator launches are running in parallel toward the Finland deadline, needing coordination. (s1, s2, s10, hiring now: Project Manager)
+  - can do: Coordinate operator launch schedules across several parties
+  - can do: Gather and document requirements from operators
+  - can do: Track delivery against regulatory deadlines
 
 ## Fiskars Oyj Abp
 
@@ -868,22 +1048,35 @@ https://fiskarsgroup.com · open tech roles in our data: 2
 - `s11` [funding, 2026-06] Fiskars increased its senior unsecured notes maturing in 2028 by EUR 50 million through a tap issue to refinance debt.  
   > "Fiskars Corporation will issue notes in an amount of EUR 50 million as a private placement" ([source](https://fiskarsgroup.com/news/stock-exchange-release/fiskars-corporation-increases-bond-maturing-in-2028-by-eur-50-million/))
 
+**What to tell candidates**
+
+- **Comparable net sales up 2.6% in 2026** (2026-09; s1): Sales reached EUR 812.5 million in January-September 2026, the fifth consecutive quarter of comparable sales growth.
+- **Comparable EBIT up to EUR 52.9 million** (2026-09; s2, s3): Comparable EBIT rose from EUR 43.6 million a year earlier, and management kept 2026 guidance unchanged, expecting improvement.
+- **Moving ecommerce to Shopify and Klaviyo** (2026-06; s8): Gerber is shifting its ecommerce from Salesforce Commerce Cloud to Shopify SaaS, and other brands are moving to Klaviyo in the martech stack.
+- **Expanded battery-powered Power Tools range** (2026-09; s7): The Fiskars business area added an eSnow Shovel and Power Hedge Trimmers in the third quarter of 2026.
+- **Set 2049 net-zero climate targets** (2026-03; s10): Science-based climate targets approved by SBTi include net-zero across the value chain by 2049.
+- left out `s4`: says the same as another
+- left out `s5`: says too little
+- left out `s6`: says the same as another
+- left out `s9`: older than two years
+- left out `s11`: internal finance
+
 **Likely needs (inferred): growing**
 
-Fiskars is growing sales for five quarters while moving its online shops and marketing tools to SaaS platforms.
+Fiskars is growing sales for a fifth straight quarter while rebuilding its digital and ecommerce stack.
 
-- **Cloud and SaaS commerce engineers** (Experienced; Shopify, Salesforce Commerce Cloud, Klaviyo, REST APIs, Data migration): Gerber and other brands are moving ecommerce from Salesforce to Shopify and marketing tools to Klaviyo. (s8, s9)
-  - can do: Migrate storefront and checkout systems onto Shopify without losing order data
-  - can do: Integrate Klaviyo customer data with commerce platforms and reporting
-  - can do: Run secure SaaS integrations across several brands and regions
-- **Security and cyber risk specialists** (Senior; Vulnerability management, Threat modelling, Cloud security, OWASP Top 10): Fiskars is moving its direct-to-consumer business onto SaaS services, which widens its attack surface. (s8, s9, hiring now: Security Testing Engineer)
-  - can do: Find and prioritise vulnerabilities across SaaS and cloud services
-  - can do: Assess cyber risk for new commerce and marketing platforms
-  - can do: Lead remediation with engineering teams after security testing
-- **AI and product prototyping engineers** (Experienced; Power Platform, Copilot, Low-code prototyping, Industrial design tools, Data governance): Fiskars is hiring for AI-assisted R&D and prototyping of physical products. (s4, s7, hiring now: AI & Innovation Engineer – R&D)
-  - can do: Build AI-assisted prototypes of consumer products with low-code tools
-  - can do: Automate design and testing steps with Copilot or Power Platform
-  - can do: Set data governance rules for AI tools in product development
+- **Digital commerce and martech engineers** (Experienced; Shopify, Klaviyo, REST APIs, Salesforce Commerce Cloud): Brands are migrating ecommerce from Salesforce to Shopify and marketing stacks to Klaviyo. (s8)
+  - can do: Migrate storefront and checkout data to Shopify
+  - can do: Build Klaviyo flows linked to commerce events
+  - can do: Design SaaS integrations with the existing data layer
+- **AI and automation engineers** (Experienced; Copilot, Power Platform, Low-code prototyping, Data governance): An open role seeks practical AI and low-code prototyping for product development. (s8, hiring now: AI & Innovation Engineer – R&D)
+  - can do: Prototype AI-assisted tools for product development teams
+  - can do: Automate design and review workflows with Power Platform
+  - can do: Set data governance rules for AI tool use
+- **Security testing engineers** (Senior; Vulnerability management, Cyber risk management, Penetration testing): An open role seeks a security tester to manage vulnerabilities and cyber risk. (s8, hiring now: Security Testing Engineer)
+  - can do: Run vulnerability assessments across company systems
+  - can do: Track remediation of common vulnerabilities to closure
+  - can do: Assess cyber risk for new SaaS platforms
 
 ## Frends Technology Oy
 
@@ -918,22 +1111,35 @@ https://frends.com/ · open tech roles in our data: 4
 - `s12` [technology, 2026-11] Frends updated many of its SQL and Redis integration tasks to .NET 8 and changed connection handling for Windows-authenticated remote connections in late 2026.  
   > "Updated the task to .NET 8, improved failure handling, and added support for cancellation requests." ([source](https://tasks.frends.com/changelog))
 
+**What to tell candidates**
+
+- **Revenue of about €40 million in 2026** (2026-03; s3): Frends reports over 6,000 customers in 16 countries and a team of around 250 integration experts.
+- **Frends MCP connects customers to AI clients** (2026-09; s1, s2): Integrations can be built, changed and diagnosed through conversation, following the Enterprise MCP and MCP Trigger launches earlier in 2026.
+- **Expanding into the Middle East with Nord Group** (2026-01; s4): A strategic partnership aims to extend the integration platform into the Middle East.
+- **Kempower runs 70+ integrations on Frends** (2026-08; s6): The EV charging manufacturer connects 35 systems through its Frends platform.
+- left out `s5`: says the same as another
+- left out `s7`: says the same as another
+- left out `s8`: not about this company
+- left out `s9`: says too little
+- left out `s10`: older than two years
+- left out `s11`: used for a role instead
+- left out `s12`: says too little
+
 **Likely needs (inferred): growing**
 
-Frends is connecting AI tools to enterprise systems, so customers can build and fix integrations through conversation.
+Frends is building AI-driven integration tools so customers can connect and change systems through conversation.
 
-- **AI integration engineers** (Experienced; Enterprise iPaaS, MCP, REST APIs, Git and CI/CD, AI coding agents): Frends launched MCP products connecting customers' integrations to AI clients and an MCP Trigger exposing processes as AI tools. (s1, s2, s11, hiring now: AI Integration Engineer)
-  - can do: Build AI-accessible integration tools on an iPaaS platform
-  - can do: Diagnose and change integrations through AI client conversations
-  - can do: Connect legacy and custom systems to governed AI tools
-- **Integration architects** (Senior; API architecture, System integration, SQL, C#/.NET, Messaging patterns): Customer count and revenue growth to about 6,000 customers and €40 million, plus Kempower's 70-plus integrations, need design capacity for large deployments. (s3, s6)
-  - can do: Design API architectures for multi-system enterprise integrations
-  - can do: Plan integrations between enterprise systems across customers
-  - can do: Lead technical discussions with customers on integration design
-- **Integration developers** (Early career; REST, SQL, C#, Git, Integration platforms): Expansion to 6,000 customers across 16 countries and the Nord Group Middle East partnership create demand for hands-on integration build work. (s3, s4, s12)
-  - can do: Build REST and SQL integrations between enterprise systems
-  - can do: Maintain C# integration logic in customer environments
-  - can do: Migrate integration tasks to .NET 8
+- **AI integration engineers** (Experienced; MCP, iPaaS, REST APIs, C#, CI/CD): Frends is shipping MCP-based AI connectors and hiring for an AI Integration Engineer role. (s1, s2, hiring now: AI Integration Engineer)
+  - can do: Build AI agent connectors on the Frends iPaaS platform
+  - can do: Expose existing processes as governed MCP tools
+  - can do: Diagnose integration failures in customer environments
+- **Integration architects** (Senior; API architecture, SQL, ESB, REST, C#/.NET): Growth to 6,000 customers and Middle East expansion require architects to design enterprise integrations. (s3, s4)
+  - can do: Design API and integration architectures for enterprise customers
+  - can do: Lead system integration projects with customer teams
+  - can do: Guide customers through migrations to new process models
+- **Integration developers** (Early career; REST, SQL, C#, Integration platforms): A large customer base and new long-running process features create steady delivery demand. (s3, s7)
+  - can do: Build REST and SQL integrations on the Frends platform
+  - can do: Support customers' system connections in daily operations
 
 ## Gofore Oyj
 
@@ -962,22 +1168,33 @@ https://gofore.com/en/ · open tech roles in our data: 8
 - `s9` [other, 2026-11] Gofore is finalising a new two-year growth strategy, after its previous strategy update at the end of 2024.  
   > "we are once again in the process of finalising our new growth strategy" ([source](https://www.kauppalehti.fi/porssitiedotteet/a/25a029dc-da49-5bb1-ae52-5b15e281afde))
 
+**What to tell candidates**
+
+- **Net sales up 27.4% in first nine months** (2026-10; s2): Net sales for January to September 2026 reached 167.9 million euros, with organic growth of 1.6% and the rest from acquisitions.
+- **Signed KEHA Centre framework agreement** (2026-10; s1): Gofore was selected as partner in an extensive framework agreement with an estimated minimum contract value of 33 million euros over six years.
+- **Acquired German consultancy Esentri AG** (2026-01; s5): The debt-free acquisition for 10 million euros, completed in January 2026, expanded Gofore's presence in Germany, Austria and Switzerland.
+- **Launched Valimo Studios for applied AI** (2026-02; s8): A new subsidiary focused on applied AI renews and automates business processes for customers.
+- **Microsoft AI and security specializations earned** (2026-11; s7): Gofore achieved the Azure AI Platform specialization and the Solutions Partner for Security designation, extending its Microsoft partnership into AI and cybersecurity.
+- left out `s3`: internal finance
+- left out `s4`: not about this company
+- left out `s6`: says too little
+- left out `s9`: says too little
+
 **Likely needs (inferred): growing**
 
-Growing its consulting business, adding AI and security partnerships, and taking on large public-sector framework deals.
+Gofore is growing through acquisitions and a new AI studio, while selling off a design business to focus its work.
 
-- **AI solutions engineers** (Experienced; Azure AI services, Python, Machine learning, Process automation, Microsoft Azure): Valimo Studios was set up in February 2026 to apply AI to renew customers' business processes. (s8, s7)
-  - can do: Build applied AI features for customers' business processes
-  - can do: Automate existing workflows with machine learning services
-  - can do: Deploy AI models on Microsoft Azure platforms
-- **Security consultants** (Experienced; Threat modeling, IEC 62443, Azure security, ISO 27001, Risk assessment): Gofore earned the Microsoft Solutions Partner for Security designation in November 2026 and has an open defence security role. (s7, hiring now: Industrial Security Expert, hiring now: Ohjelmistoarkkitehti, Defence Security)
-  - can do: Assess security risks across customers' cloud and industrial systems
-  - can do: Design secure architectures for regulated environments
-  - can do: Run threat modeling and risk assessment workshops
-- **Public-sector delivery leads** (Senior; Project delivery, Stakeholder management, Public procurement, Agile delivery): Gofore was selected as KEHA Centre's partner in a framework agreement with an estimated minimum value of 33 million euros over six years. (s1, hiring now: Technical Project Manager, Space)
-  - can do: Lead complex customer projects with several stakeholders
-  - can do: Plan and deliver multi-year public-sector contracts
-  - can do: Report project status and risks to customer steering groups
+- **Cybersecurity and OT security engineers** (Senior; IEC 62443, Threat modeling, Secure boot, Modbus, OPC UA): Gofore's security designation and its defence and industrial security roles point to demand for specialist security work. (s7, hiring now: Industrial Security Expert, hiring now: Senior Secure OT Software Engineer)
+  - can do: Apply IEC 62443 requirements to industrial product development
+  - can do: Run threat modeling and risk assessments on OT systems
+  - can do: Design secure boot and firmware update processes
+- **Software and systems architects** (Senior; Kubernetes, Java, TypeScript, Azure, AWS): Gofore is modernizing large defence systems and taking on a framework agreement that needs long-term delivery capacity. (s1, hiring now: Ohjelmistoarkkitehti, Defence Security, hiring now: Ohjelmistoarkkitehti)
+  - can do: Design system architecture for large-scale legacy modernization
+  - can do: Define Kubernetes-based deployment for secure environments
+  - can do: Guide delivery teams on cloud architecture choices
+- **AI and data engineers** (Experienced; Azure AI, Python, Machine learning, Data pipelines): The launch of Valimo Studios for applied AI and the Azure AI specialization point to growing demand for AI delivery work. (s7, s8)
+  - can do: Build AI features for business process automation
+  - can do: Integrate AI services into existing enterprise systems
 
 ## Hamina
 
@@ -1002,19 +1219,32 @@ https://hamina.com · not in our Espoo job data
 - `s7` [product, 2026-11] Hamina shipped a release that cut simulated heatmap calculation time, reporting up to 4.9x faster than before in its benchmarks.  
   > "We optimized simulatd heatmap calculations. In our benchmark testing, we saw up to 4.9x faster than before." ([source](https://docs.hamina.com/hamina/other/release-notes))
 
+**What to tell candidates**
+
+- **Raised a seed round in July 2025** (2025-07; s1): Inventure led the round, with Superhero Capital and First Fellow co-investing, funding its browser-based wireless planning products.
+- **Clip device launched at $990 in January** (2026-01; s2): A compact Wi-Fi survey and diagnostics device bundled with a six-month Onsite subscription, extending Hamina into hardware-backed field work.
+- **Telonic validated 9,656 access points** (2026-09; s5): A German retail chain used Onsite and Planner to survey and validate about 9,656 access points across 2,476 stores in 80 days.
+- **Material Walls AI went generally available** (2026-04; s3): AI wall detection launched in beta in February 2026 and reached general availability in April 2026.
+- **Heatmap calculation up to 4.9x faster** (2026-11; s7): A November 2026 release cut simulated heatmap calculation time, with up to 4.9x speedups reported in Hamina's own benchmarks.
+- left out `s4`: says the same as another
+- left out `s6`: says too little
+
 **Likely needs (inferred): growing**
 
-Hamina is shipping AI wall detection and a $990 site survey device to help Wi-Fi teams plan faster.
+Hamina ships AI tools for planning and troubleshooting Wi-Fi and private 5G networks, now used across large retail and multifamily rollouts.
 
-- **Computer vision engineers** (Experienced; Computer vision, Python, PyTorch, Point cloud processing): Material Walls AI wall detection went generally available in April 2026 after a February 2026 beta. (s3)
-  - can do: Train models that detect building walls from floor plan and scan data
-  - can do: Measure detection accuracy on real site surveys and fix failure cases
-- **Wireless performance engineers** (Experienced; C++, Performance profiling, Wi-Fi propagation modeling, Parallel computing): A November 2026 release cut simulated heatmap calculation time by up to 4.9x, showing ongoing work on the planning engine. (s7)
-  - can do: Profile and optimize heatmap calculation code paths
-  - can do: Benchmark planner performance against defined test sites
-- **Field validation specialists** (Early career; Wi-Fi site surveys, Spectrum analysis, 802.11ax, Wi-Fi 6E): Telonic used Onsite and Planner to validate about 9,656 access points across 2,476 stores in 80 days. (s5)
-  - can do: Run Wi-Fi surveys and validation across large multi-site rollouts
-  - can do: Coordinate survey crews and track coverage results per store
+- **Embedded and firmware engineers** (Experienced; Embedded C, Wi-Fi 6E, RF measurement, Linux drivers): Hamina launched a hardware measurement device, the Clip, which needs continued firmware and device development. (s2)
+  - can do: Develop firmware for a Wi-Fi measurement device
+  - can do: Integrate hardware with cloud analysis software
+  - can do: Debug radio performance on production units
+- **Software engineers for performance** (Experienced; C++, WebAssembly, TypeScript, Performance profiling): A November 2026 release cut heatmap calculation time by up to 4.9x, so more simulation work is moving into the product. (s7)
+  - can do: Optimize simulation code for large building models
+  - can do: Profile and parallelize heatmap calculations
+  - can do: Ship browser-based 3D visualization features
+- **Enterprise solutions engineers** (Experienced; Wi-Fi design, Network planning, Customer onboarding, Project scoping): Large rollouts such as the 2,476-store Telonic validation need engineers who can scope and support multi-site deployments. (s5)
+  - can do: Scope multi-site wireless survey projects
+  - can do: Run pilot validations for enterprise accounts
+  - can do: Advise customers on access point placement
 
 ## Hilla IT Oy
 
@@ -1027,14 +1257,18 @@ https://hilla.it/ · open tech roles in our data: 1
 - `s1` [customers] Hilla IT says it has about 100 customers and a small team, and works on Microsoft 365, Intune and Entra ID environments of named customers.  
   > "Noin sata asiakasta ja pieni tiimi." ([source](https://hilla.it/rekrytointi/))
 
+**What to tell candidates**
+
+- **Serves about 100 customers from Espoo** (2026; s1): Hilla IT describes itself as an IT partner for growing companies, with about 100 customers and a small team.
+
 **Likely needs (inferred): unclear**
 
-Hilla IT runs complete IT environments for growing Finnish companies from Espoo, with about 100 customers.
+Hilla IT runs complete IT environments for growing Finnish companies from Espoo, built on Microsoft 365, Intune and Entra ID.
 
-- **Senior IT consultants** (Senior; Microsoft 365, Entra ID, Intune, PowerShell, Graph API): About 100 customers rely on a small team to run their Microsoft 365 and Entra ID environments. (s1)
-  - can do: Manage Microsoft 365 and Entra ID tenants for customers
-  - can do: Deploy and govern Intune device policies across fleets
-  - can do: Automate routine admin tasks with PowerShell or Graph API
+- **Senior IT support consultants** (Senior; Entra ID, Intune, Microsoft 365, PowerShell, Graph API): A small team serving about 100 customers, with a senior role open to take over whole customer environments. (s1)
+  - can do: Take over a customer's full Microsoft 365 environment end to end
+  - can do: Manage device fleets and policies through Intune
+  - can do: Automate admin tasks with PowerShell or Graph API
 
 ## Hipped
 
@@ -1051,14 +1285,16 @@ https://hipped.io · not in our Espoo job data
 - `s3` [growth] Hipped has opened an office outside Europe, as indicated by a published lessons-learned article.  
   > "Lessons from Opening an Office Outside Europe" ([source](https://www.hipped.io/resources))
 
+**What to tell candidates**
+
+- **Joined Time 2 Scale scaling programme** (2026-09; s1): Hipped was selected for the 2026-2027 cycle, aimed at growth in the Nordic and Baltic regions.
+- **Rebranded from Löytöi to Hipped** (2025-12; s2): New name, look and domain, with the same team and mission carried over.
+- left out `s3`: says too little
+
 **Likely needs (inferred): growing**
 
-Hipped matches companies with endorsed candidates in 48 hours, and joins a 2026-2027 Nordic and Baltic scaling program.
+Hipped is matching companies with pre-vetted candidates endorsed by recruiters, shortlists within 48 hours, paid only on hire.
 
-- **Business development leads** (Experienced; B2B sales, CRM tools, Pipeline forecasting, Market entry): Hipped opened an office outside Europe and joined a Nordic and Baltic scaling programme in 2026. (s1, s3)
-  - can do: Open and grow hiring-firm accounts in new regions
-  - can do: Qualify inbound leads against the shortlist model
-  - can do: Negotiate pay-on-hire agreements with employers
 
 ## Huhtamäki Oyj
 
@@ -1085,17 +1321,24 @@ https://www.huhtamaki.com/ · open tech roles in our data: 1
 - `s8` [hiring] Huhtamaki's careers page cites a global workforce of around 17,400 people.  
   > "our talented global team of around 17,400 individuals" ([source](https://www.huhtamaki.com/en/careers/))
 
+**What to tell candidates**
+
+- **Q3 2026 net sales up 5%** (2026-10; s1): Net sales rose to EUR 1,017.8 million, with comparable growth of 4% at Group level, after a weaker first half.
+- **Half-year sales down 3% in 2026** (2026-07; s2, s3): H1 2026 net sales fell to EUR 1,955.8 million, though comparable growth was 1%, so underlying trading held roughly flat.
+- **Extended EUR 450 million credit facility to 2031** (2026-10; s6): The sustainability-linked revolving credit facility was extended by one year to November 2031, giving the group longer committed liquidity.
+- **Launched plastic-free cartonboard with Xampla** (2026-02; s7): The folded cartonboard range uses a plant-polymer coating designed for fiber recycling and home composting.
+- **Around 17,400 people globally** (2026; s8): The careers page cites a global workforce of roughly 17,400 people across its packaging operations.
+- left out `s4`: says too little
+- left out `s5`: older than two years
+
 **Likely needs (inferred): steady**
 
-Launching plant-polymer coated cartonboard that avoids plastic and suits fiber recycling and home composting.
+Huhtamaki is shipping plastic-free plant-coated cartonboard while steadying sales after a soft first half.
 
-- **Data platform and integration engineers** (Senior; Azure Integration Services, REST APIs, Data warehousing, Enterprise integration): Group sales were mixed through 2026 and the company runs a global workforce of about 17,400 people, so consolidating enterprise data is a plausible priority. (s2, s3, s8, hiring now: Senior Data Platform Engineer)
-  - can do: Build and maintain enterprise data warehouse pipelines
-  - can do: Connect enterprise systems through REST APIs and integrations
-  - can do: Design integration flows on Azure Integration Services
-- **Packaging materials scientists** (Experienced; Polymer chemistry, Barrier coatings, Cartonboard testing): The company launched a plastic-free plant-polymer coated cartonboard range with Xampla in February 2026. (s7)
-  - can do: Develop coatings for fiber recycling and composting
-  - can do: Test barrier performance of plant-polymer coatings on cartonboard
+- **Data platform engineers** (Senior; Azure Integration Services, REST APIs, Data warehousing, SQL, ETL): Quarterly sales growth and a senior opening for an enterprise data platform point to demand for platform capacity. (s1, hiring now: Senior Data Platform Engineer)
+  - can do: Design and operate enterprise data warehouse pipelines
+  - can do: Build REST and Azure integrations between enterprise systems
+  - can do: Model data for reporting across multiple regional business units
 
 ## ICEYE Oy
 
@@ -1126,22 +1369,34 @@ https://www.iceye.com/ · open tech roles in our data: 60
 - `s10` [technology, 2026-06] ICEYE has launched 84 SAR satellites in total and reached a production rate of one satellite per week, with 25 satellites planned for launch in 2026 and more than 50 in 2027.  
   > "recently reached a production rate of one satellite per week" ([source](https://www.iceye.com/newsroom/press-releases/business-finland-approves-28-million-continuation-grant-for-iceyes-rd-program))
 
+**What to tell candidates**
+
+- **Revenue above EUR 250 million in 2025** (2026-06; s1): ICEYE reported 2025 revenue of over EUR 250 million and a contracted backlog of EUR 1.5 billion.
+- **Production doubling toward 100 satellites a year** (2026-06; s1, s10): Output is rising from 50 satellites a year to a target of 100 by 2028, with 25 launches planned in 2026.
+- **Greek satellite factory planned, 230+ jobs** (2026-11; s2): A factory able to build up to 150 satellites a year is being built in Greece, backed by a EUR 35 million state innovation fund investment.
+- **Sovereign systems sold to seven European governments** (2026-01; s7): ICEYE has sold sovereign satellite systems to seven European governments, with Sweden added in January 2026.
+- **New entities and a Lisbon R&D centre** (2026-09; s3, s4): ICEYE opened local entities in several countries after its Series F and a Lisbon center of excellence for software, systems integration and AI, with active hiring.
+- left out `s5`: says too little
+- left out `s6`: says the same as another
+- left out `s8`: says too little
+- left out `s9`: says the same as another
+
 **Likely needs (inferred): growing**
 
-Building a satellite factory in Greece and opening new sites in several countries to meet sovereign radar demand.
+ICEYE is doubling satellite output and building a Greek factory for up to 150 satellites a year.
 
-- **Satellite production and integration engineers** (Experienced; AIT, Satellite integration, Environmental testing, Test automation): ICEYE is doubling production to 100 satellites a year and opening a Greek factory for up to 150 a year. (s1, s2, hiring now: Senior Satellite Industrialization Engineer, hiring now: Senior AIT Engineer, Electronics, hiring now: AIT Mechanical Test Engineer)
-  - can do: Integrate and test satellite subsystems in production lines
-  - can do: Run verification campaigns before each satellite launch
-  - can do: Scale assembly processes for weekly satellite output
-- **Radar payload RF and electronics engineers** (Senior; RF simulation (ADS), Altium, High-speed design, EMI/EMC): ICEYE is scaling its SAR satellite fleet and building sovereign communications systems with Nokia. (s5, s10, hiring now: Senior RF Engineer, Radar Payload Team, hiring now: Senior Electronics Engineer, Radar Payload Team, hiring now: RF Engineer, Radar Payload Team)
-  - can do: Design RF front ends for SAR payloads
-  - can do: Debug analog power and control circuits on radar boards
-  - can do: Validate RF subsystems in the lab through full lifecycle
-- **Platform and DevOps engineers** (Senior; Kubernetes, Terraform, AWS, Observability (OpenTelemetry)): Growth across new regional entities and a larger satellite fleet needs more production infrastructure. (s8, s9, hiring now: Staff Platform Engineer - Core Platform Engineering, hiring now: Senior DevOps Engineer - Core Platform Engineering)
-  - can do: Run production Kubernetes clusters on AWS
-  - can do: Automate infrastructure with Terraform
-  - can do: Maintain observability with SLOs and alerting
+- **Satellite production and industrialisation engineers** (Experienced; DFM, CAD, Production test jigs, MGSE design, Tolerance analysis): Output is doubling and a 150-a-year Greek factory is being built, so production capacity is the constraint. (s1, s2, hiring now: Smart Manufacturing Engineer, Mechanical, hiring now: Senior Satellite Industrialization Engineer, hiring now: Production Team Lead, Satellite Electronics Subsystems)
+  - can do: Design satellite hardware for repeatable manufacturing and test
+  - can do: Set up production test jigs and fixtures for volume builds
+  - can do: Run tolerancing and integration reviews with AIT teams
+- **Radar payload electronics and RF engineers** (Senior; Altium, RF simulation (ADS), High-speed signal design, EMI/EMC, Hardware testing): Demand for SAR satellites is rising, with 25 launches planned for 2026 and more than 50 in 2027. (s10, s9, hiring now: Senior RF Engineer, Radar Payload Team, hiring now: Senior Electronics Engineer, Radar Payload Team, hiring now: RF Engineer, Radar Payload Team)
+  - can do: Design analog power and control circuits for radar payloads
+  - can do: Debug RF hardware in the lab from prototype to flight
+  - can do: Lead electronics design reviews for a payload subsystem
+- **Platform and DevOps engineers** (Senior; Kubernetes, Terraform, AWS, Observability (OpenTelemetry), Python or Go): A 1,000-plus staff company running production Kubernetes and AWS needs platform capacity as operations scale. (s8, s1, hiring now: Senior DevOps Engineer - Core Platform Engineering, hiring now: Staff Platform Engineer - Core Platform Engineering, hiring now: Senior/Staff Platform Observability Engineer)
+  - can do: Operate production Kubernetes clusters on AWS
+  - can do: Build infrastructure as code with Terraform
+  - can do: Define observability standards with SLOs and alerting
 
 ## ICT Direct
 
@@ -1168,18 +1423,25 @@ https://ictdirect.io · not in our Espoo job data
 - `s8` [hiring, 2026-08] ICT DIRECT's LinkedIn-listed company profile shows 1-10 employees, a reported decline of about 10% year on year.  
   > "ICT DIRECT has 1-10 employees (-10% YoY), founded in 2013." ([source](https://exa.ai/library/person/f1sjwvb4z6b))
 
-**Likely needs (inferred): shrinking**
+**What to tell candidates**
 
-Recruits senior IT and engineering specialists for Finnish and foreign clients, with fixed-fee headhunting and cross-border hiring.
+- **Over 1,000 recruitments for 200-plus clients** (2026-05; s3): Placements span Finland, Sweden, India and North America, as the company reported in May 2026.
+- **Fixed-fee IT headhunting launched in 2026** (2026-05; s7): The service prices by role profile and offers a Rolling Search model for IT hiring needs.
+- **Indian subsidiary run under Finnish management** (2018; s2): The India operation was set up in 2018 and supports cross-border hiring for Finnish clients.
+- **Responsible foreign-worker recruitment certified** (2023-12; s1): Business Finland recognised the company's international recruitment certificate in December 2023.
+- left out `s4`: says the same as another
+- left out `s5`: older than two years
+- left out `s6`: not about this company
+- left out `s8`: internal finance
 
-- **IT headhunting consultants** (Experienced; Direct search, Candidate sourcing, Boolean search, LinkedIn Recruiter, CRM systems): A new fixed-fee IT headhunting service and Rolling Search model were published in May 2026, needing staff to run them. (s7)
-  - can do: Run direct search for senior IT specialists not actively job-seeking
-  - can do: Price headhunting assignments by role profile
-  - can do: Manage Rolling Search pipelines for client hiring needs
-- **Cross-border recruitment specialists** (Experienced; International recruitment, Work permit processes, Responsible recruitment standards, Multilingual sourcing): Over 1,000 recruitments across Finland, Sweden, India and North America need coordinated hiring across borders. (s1, s3, s4)
-  - can do: Coordinate hiring for clients across Finland, Sweden and India
-  - can do: Manage work permit and foreign recruitment compliance
-  - can do: Source candidates from the Mumbai office for European clients
+**Likely needs (inferred): unclear**
+
+Finnish recruiter ICT Direct has placed over 1,000 tech hires for 200-plus clients across four countries.
+
+- **IT recruitment consultants** (Experienced; Direct search, Candidate assessment, ATS systems, Boolean sourcing): Client volume grew to over 1,000 placements across four countries, requiring more recruiters. (s3, s7)
+  - can do: Source senior technical candidates through direct search
+  - can do: Run structured candidate assessments for engineering roles
+  - can do: Manage pipelines for fixed-fee headhunting mandates
 
 ## Ikigaia
 
@@ -1202,22 +1464,27 @@ https://vitalsigns.fi · not in our Espoo job data
 - `s6` [technology] VitalSigns is building a commercial model around SaaS-based diagnostic support with recurring monthly revenue and a proprietary annotated clinical dataset for AI.  
   > "Our biggest long-term asset will be annotated clinical datasets for AI." ([source](https://vitalsigns.fi/))
 
+**What to tell candidates**
+
+- **Pre-seed round closed at €2.2 million** (2026; s1): Private and public investors committed €2.2 million; a seed round of up to €2.5 million is now being raised.
+- **Nordic launch planned for early 2027** (2027; s2): The diagnostic product is planned to launch in the Nordics in early 2027, followed by a full European rollout.
+- **Selected for Business Finland US healthcare programme** (2025-10; s3): One of 11 companies in Business Finland's Health 360 Finland US healthcare access programme, with the Mayo Clinic as partner.
+- **Subscription model with proprietary clinical dataset** (2026; s6): Plans recurring monthly SaaS revenue for diagnostic support and is building an annotated clinical dataset for its AI.
+- left out `s4`: says too little
+- left out `s5`: says the same as another
+
 **Likely needs (inferred): growing**
 
-Building a connected device that captures many vital signs at once, aiming for a 2027 Nordic launch.
+VitalSigns is raising a seed round to build a multi-signal diagnostic device for Nordic launch in 2027.
 
-- **Clinical data scientists** (Experienced; Python, Biosignal processing, Machine learning, ECG analysis, Clinical data curation): VitalSigns is building a proprietary annotated clinical dataset for its AI, which needs people to curate and model it. (s6, s1)
-  - can do: Annotate and validate multi-signal clinical recordings for model training
-  - can do: Build AI models that analyse heart, lung and vital-sign data
-  - can do: Measure model performance against clinical reference standards
-- **Medical device hardware engineers** (Experienced; Embedded C, PCB design, Sensor integration, Bluetooth Low Energy, IEC 60601): The company plans manufacturing for a 2027 launch of its multi-sensor diagnostic device, funded by its seed round. (s2, s1)
-  - can do: Design multi-sensor sensing hardware for a diagnostic device
-  - can do: Prepare electronics for scalable manufacturing
-  - can do: Integrate sensors with wireless connectivity and data storage
-- **Cloud software engineers** (Experienced; Cloud infrastructure, TypeScript, Data security, REST APIs, GDPR compliance): Its business model depends on SaaS diagnostic support billed as recurring monthly revenue for clinicians and home monitoring. (s6, s2)
-  - can do: Build secure cloud services that store and analyse patient data
-  - can do: Deliver SaaS diagnostic dashboards for clinicians
-  - can do: Scale backend services for a European rollout
+- **Embedded firmware engineers** (Experienced; Embedded C, ECG signal acquisition, Bluetooth Low Energy, IEC 62304): Seed funding is being raised to fund manufacturing of a multi-sensor device ahead of a 2027 Nordic launch. (s1, s2)
+  - can do: Write firmware for multi-sensor biosignal acquisition hardware
+  - can do: Integrate ECG and SpO2 sensor front ends with the main board
+  - can do: Bring embedded software through medical device verification
+- **Clinical data scientists** (Experienced; Python, Signal processing, PyTorch, Clinical data annotation): The company is building a proprietary annotated clinical dataset to train its AI diagnostic algorithms. (s6)
+  - can do: Build annotated biosignal datasets from clinical recordings
+  - can do: Train models for ECG and lung sound classification
+  - can do: Validate algorithm performance against clinical reference data
 
 ## Innofactor Oyj
 
@@ -1252,22 +1519,30 @@ https://www.innofactor.com/ · open tech roles in our data: 1
 - `s12` [hiring, unknown] Innofactor employs about 550 experts in Finland, Sweden, Denmark and Norway according to its careers page, and runs a DigiStar programme for people becoming IT professionals.  
   > "We employ nearly 550 professional and enthusiastic experts" ([source](https://www.innofactor.com/join-us/))
 
+**What to tell candidates**
+
+- **Won EUR 3.2 million Finnish Customs framework** (2026-06; s4): A three-year IT consulting framework for Finnish Customs data management, with a possible two-year extension, over about 28 FTE-years.
+- **Several public-sector wins in 2026** (2026-10; s1, s2, s3, s5): Helsinki social services, Tampere, Aalto University and VTT each selected Innofactor for platform, consulting or SaaS work in 2026.
+- **Revenue down 12.9% in 2025** (2026; s7): Net sales fell to EUR 67.6 million in 2025 with EBITDA of EUR 8.5 million, after a weaker 2024.
+- **Building an agentic ERP on Dynamics 365** (2026-05; s11): An internal finance ERP using Dynamics 365 Finance and Copilot Studio agents, targeting a first version by end of 2026.
+- **Growing in Sweden and Microsoft specializations** (2025-11; s10): Innofactor Dynasty grew in Sweden and gained new Microsoft Sales, Service and Low Code specialization recognitions.
+- left out `s6`: older than two years
+- left out `s8`: says too little
+- left out `s9`: older than two years
+- left out `s12`: says too little
+
 **Likely needs (inferred): steady**
 
-Wins public-sector cloud and data contracts in Finland, including Customs, VTT and Helsinki, while rebuilding after weaker results.
+Innofactor is winning public-sector cloud and Microsoft platform contracts across Finland, from customs to universities.
 
-- **Public sector identity consultants** (Senior; Microsoft Entra ID, Conditional Access, Privileged access management, Identity and access management): Recent Finnish public-sector wins such as Customs and Tampere city require secure access to new systems. (s4, s3, hiring now: Senior Identity Security Consultant)
-  - can do: Design identity and access controls for public-sector cloud systems
-  - can do: Configure Conditional Access and MFA policies for large user groups
-  - can do: Run privileged access reviews for government customers
-- **Dynamics 365 and Power Platform consultants** (Experienced; Power Platform, Dynamics 365, Copilot Studio, Low code): Tampere selected Innofactor for Power Platform and Dynamics 365 expert services across all sub-areas. (s3, s10)
-  - can do: Build Power Platform apps for municipal customers
-  - can do: Implement Dynamics 365 modules for client processes
-  - can do: Integrate Dynamics 365 with other enterprise systems
-- **AI agent engineers** (Experienced; Copilot Studio, Dynamics 365 Finance, MCP, Agent design): The company is building an agentic ERP on Dynamics 365 Finance with a first version due end of 2026. (s11)
-  - can do: Build Copilot Studio agents for finance workflows
-  - can do: Connect agents to ERP data through MCP servers
-  - can do: Test agent outputs against finance controls
+- **Identity and access consultants** (Senior; Microsoft Entra ID, Conditional Access, Privileged access management, Identity governance): Public-sector wins in 2026 bring more customers needing secure cloud identity setups. (s1, s2, s4, hiring now: Senior Identity Security Consultant)
+  - can do: Design Entra ID tenant structures for public-sector customers
+  - can do: Implement Conditional Access and MFA policies end to end
+  - can do: Run privileged access reviews with customer security teams
+- **Dynamics 365 and Power Platform developers** (Experienced; Power Platform, Dynamics 365, Copilot Studio, Dataverse): Tampere and VTT contracts and the agentic ERP project all need Dynamics and Power Platform delivery capacity. (s3, s5, s11)
+  - can do: Build Power Apps and Power Automate solutions for public customers
+  - can do: Configure Dynamics 365 Finance modules for ERP projects
+  - can do: Develop Copilot Studio agents connected to Dataverse
 
 ## Insight Questor
 
@@ -1286,18 +1561,20 @@ https://insightquestor.com · not in our Espoo job data
 - `s4` [other, 2025-11] The company's co-founder and chief strategy officer describes it as driving strategic initiatives across GCC, Europe and US markets, with fundraising and partnerships underway.  
   > "Spearheaded fundraising efforts and established key partnerships to enhance product strategy and innovation." ([source](https://exa.ai/library/person/61vgnm3x2y7))
 
+**What to tell candidates**
+
+- **Fundraising and partnerships underway** (2025-11; s4): A co-founder says strategic initiatives across GCC, Europe and US markets are under way, with fundraising and partnerships in progress.
+- **Recruiting a fundraising co-founder** (2026-01; s1, s2): The company sought a Co-Founder and Head of Fundraising and Investor Relations to lead capital acquisition, reposted in January 2026.
+- **Small team across three countries** (2024; s3): The company was founded in 2024, is headquartered in Helsinki and has 1-10 staff spread across the UK, Finland and France.
+
 **Likely needs (inferred): unclear**
 
-Building an AI platform that explains stock and crypto forecasts and portfolio risk for retail investors.
+Insight Questor is building AI-driven portfolio analytics for retail investors, expanding single-asset forecasts into full-portfolio risk reports.
 
-- **Fundraising and investor relations leads** (Lead; Venture fundraising, Investor relations, Financial modelling, Cap table management): A co-founder role to lead capital acquisition was posted in October 2025 and reposted in January 2026. (s1, s2)
-  - can do: Build investor pipelines for a seed or Series A round
-  - can do: Prepare pitch materials and data room for investors
-  - can do: Negotiate equity terms with prospective backers
-- **Fintech and broker partnership leads** (Experienced; B2B partnerships, Fintech sales, API commercial models, Market entry): The chief strategy officer says partnerships are underway across GCC, Europe and US markets, and the company targets B2B API deals with fintechs and brokers. (s4)
-  - can do: Win API and white-label deals with brokers and fintechs
-  - can do: Map partner needs across GCC, Europe and US
-  - can do: Structure revenue-share terms for B2B integrations
+- **Fundraising and investor relations leads** (Lead; Venture fundraising, Investor relations, Financial modelling, Pitch preparation): The company is actively seeking a co-founder to lead capital acquisition and investor relations. (s1, s2)
+  - can do: Build and run an investor pipeline for a seed or Series A round
+  - can do: Prepare pitch materials and data rooms for fintech investors
+  - can do: Negotiate terms and manage ongoing investor relations
 
 ## Insta Group Oy
 
@@ -1326,21 +1603,32 @@ https://www.insta.fi:443/fi/ · open tech roles in our data: 2
 - `s9` [growth, 2026-11] Insta's 2025 research and development spending was EUR 7.4 million, with a company-wide operating profit of EUR 14.6 million.  
   > "Vuonna 2025 konsernin tuotekehitysmenot olivat 7,4 miljoonaa euroa" ([source](https://perheyritys.fi/tiedote/kellarista-kansainvalistyvaksi-teknologiakonserniksi-insta-group-on-vuoden-perheyritys-2026/))
 
+**What to tell candidates**
+
+- **Net sales up 12% to EUR 197.8 million** (2025; s1, s3): 2025 brought a record year and the 15th consecutive year of growth, with the company expecting growth to continue into 2027.
+- **Selected for EUR 500 million NATO framework** (2026-09; s4): Insta was chosen for a five-year multi-supplier NATO NCIA cybersecurity framework agreement.
+- **Hired 230 people in 2025, plans 200+ in 2026** (2026-03; s2): Recruitment continues despite strong competition for technology experts.
+- **Released Insta Certifier 10 with quantum-safe support** (2026-10; s7): The certificate management product supports quantum-safe algorithms and automated certificate lifecycle management.
+- **Acquired Apex Automation in Kokkola and Vaasa** (2025-10; s6): The electrical and automation engineering firm now joins the group, adding capacity in automation design.
+- left out `s5`: a one-off that is over
+- left out `s8`: says too little
+- left out `s9`: internal finance
+
 **Likely needs (inferred): growing**
 
-Insta grew sales to a record EUR 197.8 million in 2025 and wins defence and cybersecurity contracts.
+Insta is winning NATO cybersecurity and defence contracts while growing its team and buying an automation engineering firm.
 
-- **Software security consultants** (Senior; Secure SDL, Threat modelling, Software architecture, Cryptography): NATO cybersecurity framework deal and strong defence and cybersecurity demand drive growth. (s3, s4, hiring now: Senior Cyber Security Consultant, SDL)
-  - can do: Design secure software architectures for defence and industrial customers
-  - can do: Run software security reviews and threat models across development lifecycles
-  - can do: Build secure software solutions that meet customer security requirements
-- **Electrical and automation engineers** (Experienced; Cadmatic, COMOS, EPLAN, Electrical design): Acquisition of Apex Automation and the largest power distribution delivery need engineers for design work. (s5, s6, hiring now: Electrical And Automation Engineer)
-  - can do: Design electrical and automation systems for industrial turnkey projects
-  - can do: Produce electrical drawings in design software for customer approval
-  - can do: Support commissioning of plants at customer sites
-- **Certificate and PKI engineers** (Senior; PKI, Post-quantum cryptography, Certificate lifecycle management): Release of Insta Certifier 10 with quantum-safe algorithms and automated lifecycle management. (s7)
-  - can do: Implement quantum-safe algorithms in certificate management products
-  - can do: Automate certificate lifecycle processes for customer systems
+- **Senior cybersecurity consultants** (Senior; Secure SDLC, Threat modelling, Software security architecture, Penetration testing): NATO framework award and expected defence and cybersecurity demand drive growth into 2027. (s3, s4, hiring now: Senior Cyber Security Consultant, SDL)
+  - can do: Build secure software architectures for defence customers
+  - can do: Lead software security assessments across client projects
+  - can do: Design secure development lifecycle processes for engineering teams
+- **Electrical and automation engineers** (Experienced; Cadmatic, COMOS, EPLAN, PLC automation): Apex Automation acquisition and the largest power distribution delivery expand industrial automation work. (s5, s6, hiring now: Electrical And Automation Engineer)
+  - can do: Produce electrical designs for turnkey industrial plant projects
+  - can do: Support customer commissioning trips a few times a year
+  - can do: Coordinate automation design with customer engineering teams
+- **Certificate and PKI engineers** (Experienced; PKI, Post-quantum cryptography, Certificate lifecycle management): Release of Insta Certifier 10 with quantum-safe algorithms requires engineers to extend the product. (s7)
+  - can do: Implement quantum-safe algorithms in certificate management
+  - can do: Automate certificate lifecycle workflows for customers
 
 ## IQM Quantum Computers Oyj
 
@@ -1367,22 +1655,33 @@ https://iqm.tech · open tech roles in our data: 14
 - `s8` [partnership, 2026-11] IQM and AMD demonstrated a hybrid chemistry workflow splitting a problem between an IQM quantum computer and AMD GPUs.  
   > "Using an IQM quantum computer and an AMD GPU powered by ROCm, the collaboration divides a chemistry problem across quantum and classical compute" ([source](https://iqm.tech/blog/amd-and-iqm-demonstrate-chemistry-simulations-across-quantum-computers-and-gpus/))
 
+**What to tell candidates**
+
+- **Q3 revenue up 51% to EUR 8.9 million** (2026-11; s1): Order backlog reached EUR 102.5 million at September 30, 2026, up 52% since the start of the year.
+- **EUR 42.2 million of new orders in Q3** (2026-11; s2): Led by a EUR 33 million contract with CSC's LUMI AI Factory for an IQM Halocene error-correction system.
+- **Doubled cleanroom capacity with EUR 40 million** (2026-08; s7): The fab expansion enables production of up to 30 full-stack quantum computers per year.
+- **Listed on Nasdaq with EUR 260.4 million cash** (2026-07; s4): The July 2026 merger with Real Asset Acquisition Corp. gave IQM EUR 260.4 million in cash at September 30, 2026.
+- **Full-chip entanglement across 54 qubits** (2026-10; s3): Demonstrated on the cloud-accessible IQM Emerald system, with fidelity 0.516 above the 0.500 threshold.
+- left out `s5`: internal finance
+- left out `s6`: says too little
+- left out `s8`: says the same as another
+
 **Likely needs (inferred): growing**
 
-Shipping quantum computers to customers and pushing error correction, now listed on Nasdaq with a large order backlog.
+IQM is landing large quantum system orders and expanding fab capacity to build up to 30 computers a year.
 
-- **Quantum error correction engineers** (Experienced; Quantum error correction, Superconducting qubits, Python, Jupyter, Qubit calibration): A EUR 33 million LUMI contract for an IQM Halocene error-correction system is now in the order book. (s2, hiring now: Quantum Error Correction Experiment Engineer, hiring now: Product Manager, QEC Software)
+- **Quantum error-correction engineers** (Experienced; Python, Quantum error correction, Qubit calibration, Jupyter): A EUR 33 million error-correction system order for LUMI AI Factory requires delivery now. (s2, hiring now: Quantum Error Correction Experiment Engineer)
   - can do: Run quantum error correction experiments on superconducting qubits
-  - can do: Analyse QEC experiment data and report logical error rates
-  - can do: Make QEC experiments reproducible through code and documentation
-- **Quantum hardware and fabrication engineers** (Senior; Micro- and nanofabrication, Superconducting qubits, Cryogenics, Vacuum systems, RF measurement): IQM expanded fab capacity with over EUR 40 million, doubling cleanroom space to build up to 30 systems a year. (s7, s3, hiring now: Quantum Engineer, Fabrication, hiring now: Quantum Hardware Engineer)
-  - can do: Run micro- and nanofabrication for superconducting quantum chips
-  - can do: Design experiments to improve chip yield and fidelity
-  - can do: Operate cryostats and precision DC or microwave measurements
-- **HPC and quantum software engineers** (Experienced; Python, HPC cluster management, Parallel programming, CI/CD, Docker): A joint hybrid chemistry workflow with AMD GPUs means quantum and HPC software must now work together. (s8, hiring now: Senior Product Manager, HPC, hiring now: Software Engineer, QPU Numerics)
-  - can do: Integrate quantum processors with GPU and HPC job scheduling
-  - can do: Build CI/CD pipelines for quantum control and numerics software
-  - can do: Write parallel Python code for hybrid workloads
+  - can do: Analyze QEC data and make results reproducible through code
+  - can do: Calibrate qubits and QPUs for error-correction runs
+- **Quantum fabrication engineers** (Senior; Micro- and nanofabrication, Cleanroom processes, Superconducting thin films, Yield analysis): Over EUR 40 million invested to double cleanroom capacity for up to 30 systems a year. (s7, hiring now: Quantum Engineer, Fabrication)
+  - can do: Run micro- and nanofabrication processes for quantum chips
+  - can do: Design experiments to improve chip yield
+  - can do: Mentor technicians on cleanroom process steps
+- **Cryogenic hardware engineers** (Experienced; Cryostats, Microwave measurement, Vacuum systems, Low-temperature instrumentation): Higher system output and new orders require more cryostat and low-temperature test setups. (s7, s1, hiring now: Quantum Hardware Engineer)
+  - can do: Set up and operate cryostat experiments near 4 K
+  - can do: Make precision DC and microwave measurements
+  - can do: Build low-temperature instrumentation and vacuum systems
 
 ## Islet Group Oy
 
@@ -1411,21 +1710,33 @@ https://isletgroup.fi/ · open tech roles in our data: 2
 - `s9` [organisation, 2025-06] Islet appointed a new Business Director for Data, Analytics & AI in June 2025 to strengthen its data and AI sales capability.  
   > "Islet is strength­en­ing its exper­tise and sales capa­bil­i­ty in the area of data, ana­lyt­ics, and arti­fi­cial intel­li­gence." ([source](https://isletgroup.fi/en/2025/06/10/mika-pohjola-appointed-business-director-of-data-analytics-ai-at-islet/))
 
+**What to tell candidates**
+
+- **Revenue up 29.1% to EUR 18.62 million** (2025-11; s2): Islet's revenue reached EUR 18.62 million in the year reported in November 2025, growing 29.1% on the year before.
+- **Aims for EUR 50 million turnover by 2030** (2025-11; s3): Islet states it has been profitable for over ten years and sets a goal of EUR 50 million turnover by 2030.
+- **SAP Partner Award 2025 in Finland** (2026-02; s6): SAP cited Islet's strong growth, especially with SAP Cloud ERP, and Islet became an SAP Platinum Partner in 2025.
+- **Moving into AI agents for customers** (2026-10; s7): Islet reports close to 20 AI projects delivered and agents deployed for customers in procurement, data analysis and risk assessment.
+- **Power BI environment for Säästöpankki Group** (2025-11; s8): Islet built a Power BI reporting environment covering more than 1,400 employees of Säästöpankki Group.
+- left out `s1`: not about this company
+- left out `s4`: a one-off that is over
+- left out `s5`: says too little
+- left out `s9`: used for a role instead
+
 **Likely needs (inferred): growing**
 
-Islet is growing fast on SAP Cloud ERP and rolling out AI agents for customers in procurement and risk.
+Islet Group is growing fast on SAP cloud work and moving into AI agents for customers across Finland.
 
-- **Cloud data engineers** (Experienced; SQL, ETL/ELT, Data warehousing, Power BI, Tableau): Revenue grew 29.1% to EUR 18.62 million, and Islet built a Power BI reporting environment for a 1,400-person bank group. (s2, s8, hiring now: CLOUD DATA ENGINEER)
-  - can do: Build ETL and ELT pipelines feeding a cloud data warehouse
-  - can do: Design data models that serve Power BI and Qlik reports
-  - can do: Write fluent SQL to validate and tune data for customer reporting
-- **Cloud data architects** (Lead; Data modelling, Data warehousing methodologies, ETL/ELT, SQL, Project management): Islet targets EUR 50 million turnover by 2030 and is moving into AI implementation for customers, which needs senior design of data platforms. (s3, s7, hiring now: LEAD CLOUD A RCHITECT)
-  - can do: Design data warehouse architecture for multi-customer cloud projects
-  - can do: Lead data integration design across ERP and reporting systems
-  - can do: Select data modelling methods and deliver them with project teams
-- **AI and data sales leads** (Experienced; Enterprise sales, Data analytics, AI solutions, SAP Cloud ERP): Islet appointed a Business Director for Data, Analytics & AI in June 2025 to strengthen data and AI sales. (s9, s7)
-  - can do: Sell data and AI implementation projects to enterprise customers
-  - can do: Scope agent-based solutions for procurement and risk teams
+- **Cloud data engineers** (Experienced; SQL, ETL/ELT, Power BI, Qlik, Data warehousing): Islet's Power BI and data work for large customers is growing alongside its open data roles. (s8, hiring now: CLOUD DATA ENGINEER)
+  - can do: Build ETL and ELT pipelines into cloud warehouses
+  - can do: Model data for Power BI and Qlik reporting
+  - can do: Write and tune complex SQL for reporting layers
+- **Lead cloud architects** (Lead; Data modelling, Data warehousing, ETL/ELT, Project management, SQL): Revenue growth and SAP Cloud ERP demand call for senior people to design and lead large cloud projects. (s2, s6, hiring now: LEAD CLOUD A RCHITECT)
+  - can do: Lead cloud data architecture across client projects
+  - can do: Run project delivery for data integration programmes
+  - can do: Design warehouse models for reporting at scale
+- **AI implementation specialists** (Experienced; AI agents, Data integration, Python): Islet moved into AI agent implementation for customers, a new delivery area. (s7)
+  - can do: Implement AI agents for procurement and risk workflows
+  - can do: Connect AI tools to customer data sources
 
 ## JMP Ventures
 
@@ -1434,6 +1745,9 @@ https://jmpventures.org · not in our Espoo job data
 <img src="https://media.brand.dev/bf8e270b-7ccd-4d77-b58f-288d710d3c72.webp" height="28"> You need better metrics! · Professional Services & Agencies: Management Consulting · 1 to 10 employees (identity: Context.dev)
 
 **Stated in public sources**
+
+
+**What to tell candidates**
 
 
 **Likely needs (inferred): unclear**
@@ -1462,22 +1776,27 @@ https://kuori.tech/ · open tech roles in our data: 2
 - `s6` [hiring, 2026-09] Kuori has open roles for a Project Manager in Espoo, an R&D Director, a Sales Manager DACH and open applications for hardware engineers.  
   > "We are looking for a driven, fast-thinking **R&D Director** to lead our hardware engineering efforts." ([source](https://kuori-1697626074.teamtailor.com/jobs/8394509-r-d-director))
 
+**What to tell candidates**
+
+- **Revenue near 18 million euros** (2026-09; s2): Helsingin Sanomat reported the latest annual revenue at nearly 18 million euros with 66 staff.
+- **Kauppalehti Growth Certificate awarded** (2026-10; s1): Awarded to companies that grew significantly faster than their industry and size-group peers.
+- **UK EV charging rollout underway** (2026-03; s3): Delivered 20 outdoor totem displays to ADI for E.ON Drive sites in the UK, with more projects underway.
+- **Outdoor touch displays for sports tech** (2025-12; s4): Supplied a 21.5-inch outdoor Android touch display to Zenniz for outdoor tennis courts.
+- left out `s5`: older than two years
+- left out `s6`: used for a role instead
+
 **Likely needs (inferred): growing**
 
-Kuori is shipping outdoor displays for UK EV charging sites and growing faster than its peers.
+Kuori is scaling custom outdoor displays, with UK EV charging rollouts and a rapidly growing revenue base.
 
-- **EV charging display integrators** (Experienced; Outdoor display integration, Android touch systems, IP65 enclosure design, EV charger interfaces): Kuori delivered 20 outdoor totem displays to ADI for E.ON Drive EV charging sites in the UK, with more projects underway. (s3, hiring now: Product Development Hardware Engineer - Open Application)
-  - can do: Build outdoor totem displays that meet site power and weather requirements
-  - can do: Integrate Android touch displays into charging station hardware
-  - can do: Coordinate installation schedules across multiple UK charging sites
-- **Hardware product development leads** (Lead; Mechanical and electronics integration, Product lifecycle management, Digital signage platforms, Engineering team leadership): Kuori has an open R&D Director role after launching the R5 and growing to 66 staff. (s2, s5, s6, hiring now: R&D Director)
-  - can do: Lead hardware development teams through high-pressure product launches
-  - can do: Set technical roadmaps spanning mechanics and electronics
-  - can do: Manage engineering budgets and delivery timelines across projects
-- **Outdoor display hardware engineers** (Experienced; Mechanical CAD, Thermal management, Touchscreen integration, Embedded Linux): Kuori has open applications for hardware engineers and supplied a 21.5-inch outdoor touch display to Zenniz. (s4, s6, hiring now: Product Development Hardware Engineer - Open Application)
-  - can do: Design mechanical enclosures for outdoor touch displays
-  - can do: Apply electronics and mechanics principles to product development
-  - can do: Support customer-specific OEM display builds
+- **Hardware product development leads** (Lead; Hardware product development, Mechanical design, Electronics design, Project planning): Open R&D Director role and an open-application hardware engineering pipeline follow rapid growth. (s1, s2, s6, hiring now: R&D Director)
+  - can do: Lead mechanical and electronics teams through high-pressure delivery phases
+  - can do: Set hardware development roadmaps across outdoor display products
+  - can do: Coordinate supplier and certification work for international deployments
+- **Electronics and mechanics engineers** (Experienced; Electronics design, Mechanical CAD, Thermal management, Embedded Android): Multiple large customer deliveries and open applications for hardware engineers indicate build capacity pressure. (s3, s4, s6, hiring now: Product Development Hardware Engineer - Open Application)
+  - can do: Design rugged outdoor display enclosures and thermal layouts
+  - can do: Develop embedded control electronics for touch and display modules
+  - can do: Validate hardware against outdoor environmental requirements
 
 ## Kuva Space Oy
 
@@ -1506,20 +1825,29 @@ https://kuvaspace.com/en · open tech roles in our data: 1
 - `s9` [hiring] Kuva Space has an open Director of Geospatial AI role in Espoo, Remote, and an open application in Espoo.  
   > "Director of Geospatial AI Espoo - Remote" ([source](https://kuvaspace.com/en/careers))
 
+**What to tell candidates**
+
+- **Raised EUR 8m in about 4.5 hours** (2025-11; s1): A private placement and public share issue led by domestic investors and Voima Ventures brought in the funding.
+- **Selected for NASA data acquisition contract** (2026-07; s2): Kuva US is one of eight new awardees under NASA's Commercial Satellite Data Acquisition On-Ramp 2, with an original maximum value of $476 million.
+- **Aiming for about 100 satellites by 2030** (2026-08; s4): Six second-generation Hyperfield-2 satellites were in manufacture as of August 2026 on the way to that constellation.
+- **Copernicus pilot shows better land-cover maps** (2026-10; s8): Combining Hyperfield-1 hyperspectral data with Sentinel-2 gave more accurate maps than either source alone.
+- **Japan sovereign constellation talks with IHI** (2026-07; s3): An MoU with IHI Corporation evaluates a Japanese hyperspectral constellation, including possible domestic satellite manufacturing.
+- left out `s5`: says the same as another
+- left out `s6`: says too little
+- left out `s7`: older than two years
+- left out `s9`: used for a role instead
+
 **Likely needs (inferred): growing**
 
-Building a hyperspectral satellite constellation to deliver near real-time Earth intelligence, now aiming for about 100 satellites by 2030.
+Building a hyperspectral satellite constellation, aiming for about 100 satellites by 2030 and winning NASA and European data contracts.
 
-- **Geospatial AI leaders** (Lead; Computer vision, Remote sensing analytics, Hyperspectral imaging, MLOps, Sentinel-2 data): Kuva is scaling hyperspectral analytics with partners and a Hyperfield-1 pilot, and has an open Director of Geospatial AI role. (s5, s8, s9, hiring now: Director of Geospatial AI)
-  - can do: Lead teams building production computer vision systems on satellite imagery
-  - can do: Own model lifecycle from training through monitoring for geospatial products
-  - can do: Turn hyperspectral and Sentinel-2 fusion research into customer-facing analytics
-- **Hyperspectral remote sensing scientists** (Experienced; Hyperspectral imaging, Land-cover classification, Sentinel-2, Python, Radiometric calibration): Kuva's Copernicus and Hyperfield-1 pilots show it is proving hyperspectral data against Sentinel-2 for land-cover and crop monitoring. (s5, s7, s8)
-  - can do: Validate hyperspectral classifiers against ground truth for land-cover maps
-  - can do: Design fusion methods combining hyperspectral and multispectral satellite data
-- **Satellite manufacturing engineers** (Experienced; Small satellite integration, Thermal vacuum testing, Optical payloads, CAD, Systems engineering): Six second-generation Hyperfield-2 satellites are in manufacture and a Japanese partner is evaluating domestic satellite manufacturing. (s3, s4)
-  - can do: Integrate hyperspectral payloads into small satellite buses
-  - can do: Run environmental and thermal tests on flight hardware
+- **Geospatial AI and computer vision leads** (Lead; Computer vision, Remote sensing analytics, Geospatial AI, Model lifecycle management, Hyperspectral imaging): Hyperspectral pilots combining Kuva data with Sentinel-2 need production AI and a leader to build the team. (s5, s8, s9, hiring now: Director of Geospatial AI)
+  - can do: Lead teams shipping production computer vision models
+  - can do: Design model lifecycle processes for sensor-driven remote sensing
+  - can do: Combine hyperspectral and optical satellite data in analytics
+- **Satellite payload and sensor engineers** (Experienced; Hyperspectral sensors, Satellite integration, Environmental testing): Six Hyperfield-2 satellites in manufacture and a 100-satellite target by 2030 need more payload engineering capacity. (s4)
+  - can do: Build and test hyperspectral payloads for small satellites
+  - can do: Integrate sensors into satellite manufacturing lines
 
 ## Kvanttinova
 
@@ -1550,22 +1878,35 @@ https://kvanttinova.fi · not in our Espoo job data
 - `s10` [partnership, 2026-09] Kvanttinova is a partner in the Finnish Chips Competence Centre (FiCCC), linking Finnish firms to European semiconductor networks.  
   > "Kvanttinova Ltd is also a partner in the Finnish Chips Competence Centre (FiCCC)" ([source](https://www.innovationnewsnetwork.com/kvanttinova-ecosystem-powers-finlands-leadership-in-semiconductors-microelectronics-and-quantum-technologies/73679/))
 
+**What to tell candidates**
+
+- **Building new cleanroom campus in Otaniemi** (2026-06; s1, s4): Construction is due to start in autumn 2026 after a building permit in June, with the building finished by 2028.
+- **Over half a billion euros invested** (2025-12; s2): The total project value including equipment is over half a billion euros, with the state funding pilot lines with 79 million euros.
+- **About 5,000 square metres of cleanroom space** (2026-02; s4): The new building roughly triples manufacturing capacity compared with the predecessor Micronova.
+- **Over 100 companies in the ecosystem** (2026-09; s5): The wider ecosystem has grown from more than 50 companies reported in late 2025.
+- **Quantum chip startup SemiQon relocating in** (2026-02; s8): SemiQon, a 30-person VTT spin-out, is moving into Kvanttinova to scale cryo-electronics manufacturing.
+- left out `s3`: not about this company
+- left out `s6`: says the same as another
+- left out `s7`: says the same as another
+- left out `s9`: a one-off that is over
+- left out `s10`: says too little
+
 **Likely needs (inferred): growing**
 
-Building a new cleanroom campus in Otaniemi for chips, photonics and quantum prototyping and production.
+Building a new Espoo cleanroom campus for microelectronics, photonics and quantum prototyping and production, due 2028.
 
-- **Semiconductor process engineers** (Experienced; Photolithography, Plasma etching, Cleanroom protocols, Process qualification, Yield analysis): A roughly 5,000 square metre cleanroom is planned, with EU-linked equipment required in use from end of 2028. (s4, s6)
-  - can do: Run lithography and etch processes in a cleanroom environment
-  - can do: Set up and qualify new semiconductor processing equipment
-  - can do: Troubleshoot yield loss across fabrication batches
-- **Cryogenic electronics engineers** (Experienced; Cryogenic measurement, Dilution refrigerators, Quantum chip testing, Low-noise electronics): SemiQon, a 30-employee quantum chip startup, is relocating into Kvanttinova to scale cryo-electronics manufacturing. (s8)
-  - can do: Design readout electronics that operate at cryogenic temperatures
-  - can do: Characterise quantum chips in dilution refrigerator setups
-  - can do: Scale test flows from prototype to small-batch production
-- **Industrial partnership managers** (Experienced; Technology partnerships, B2B business development, Research commercialisation, Ecosystem management): The ecosystem grew from over 50 to more than 100 companies, and the new facility is meant to serve them. (s5, s10)
-  - can do: Match member companies with research partners and facilities
-  - can do: Structure pilot-line collaboration agreements
-  - can do: Grow member networks across communications and aerospace sectors
+- **Cleanroom process engineers** (Experienced; Photolithography, Plasma etch, Cleanroom protocols, SPC): Roughly 5,000 square metres of new cleanroom with pilot lines must be running by the end of 2028. (s4, s6)
+  - can do: Run lithography and etch process modules in a cleanroom
+  - can do: Qualify new semiconductor tools against process specifications
+  - can do: Troubleshoot yield loss across wafer fabrication steps
+- **Semiconductor equipment technicians** (Early career; Vacuum systems, Gas handling, Equipment maintenance, Cleanroom protocols): EU Chips Act funding requires newly acquired processing equipment in use in the cleanroom from the end of 2028. (s6)
+  - can do: Install and commission deposition and etch equipment
+  - can do: Maintain vacuum and gas delivery systems
+  - can do: Keep tools within uptime targets for pilot-line runs
+- **Quantum device engineers** (Experienced; Cryogenics, Superconducting circuits, Device characterisation, Cryo-CMOS): SemiQon is scaling cryo-electronics manufacturing after relocating into Kvanttinova. (s8)
+  - can do: Design cryogenic readout circuits for quantum chips
+  - can do: Characterise devices at millikelvin temperatures
+  - can do: Scale fabrication of quantum chip prototypes
 
 ## KYOCERA Technologies Oy
 
@@ -1590,18 +1931,28 @@ https://kyoceratechnologies.com/ · open tech roles in our data: 1
 - `s7` [hiring] Kyocera Technologies' company careers page describes the company as hiring for design, processing and testing roles across its MEMS work and lists open positions.  
   > "Design is where the desired functionality of the device is defined" ([source](https://kyoceratechnologies.com/work-with-us/))
 
-**Likely needs (inferred): growing**
+**What to tell candidates**
 
-Kyocera Technologies is building silicon MEMS resonators for timing and frequency control, using shared cleanroom facilities.
+- **Patent portfolio passed 100 patents** (2025-06; s2): Granted patents and pending applications together passed 100, built from a compact R&D department.
+- **Focused on silicon MEMS resonators** (2026-01; s6): The company concentrates on silicon MEMS resonators for timing and frequency control, using VTT's shared Micronova cleanroom in Otaniemi.
+- **Teams reorganised around three engineering groups** (2025-04; s5): Design, Testing and Processing teams were merged into three mixed engineering teams, each led by an engineering manager.
+- **Leadership bringing R&D closer to the CEO** (2026-10; s1): The new CEO is moving R&D and technical teams closer to the CEO to make the organisation flatter and more agile.
+- left out `s3`: internal finance
+- left out `s4`: not about this company
+- left out `s7`: used for a role instead
 
-- **MEMS modelling engineers** (Senior; COMSOL, Heat transfer modelling, Semiconductor physics, Python, MATLAB): A new senior modelling role is open while the company builds silicon MEMS resonators and its patent portfolio has passed 100. (s2, s6, hiring now: Senior MEMS Modelling Engineer Semiconductor Physics and Thermal Sensing)
-  - can do: Model heat transfer and thermal response of MEMS devices
-  - can do: Build multiphysics FEM simulations of resonator structures
-  - can do: Validate device models against measured sensor data
-- **MEMS design and processing engineers** (Experienced; MEMS design, Cleanroom processing, Silicon microfabrication, Process integration): The company reorganised its Design, Testing and Processing teams into three mixed engineering teams in 2025 and is hiring across these roles. (s5, s7)
-  - can do: Design silicon MEMS resonator structures for timing devices
-  - can do: Run cleanroom process steps for MEMS wafers
-  - can do: Coordinate design and processing across mixed engineering teams
+**Likely needs (inferred): unclear**
+
+Building silicon MEMS resonators for timing and frequency control, moving toward more integrated and compact devices.
+
+- **MEMS modelling engineers** (Senior; COMSOL, Heat transfer modelling, Semiconductor physics, Python, MATLAB): A senior modelling role is open while the company builds more integrated, compact MEMS devices. (s6, s1, hiring now: Senior MEMS Modelling Engineer Semiconductor Physics and Thermal Sensing)
+  - can do: Model thermal behaviour of resonators under transient loads
+  - can do: Build multiphysics FEM simulations of MEMS structures
+  - can do: Validate simulation results against measured device data
+- **MEMS process engineers** (Experienced; MEMS fabrication, Lithography, Plasma etch, Yield analysis): The company runs its resonator processing in a shared external cleanroom and reorganised its processing team in 2025. (s5, s6)
+  - can do: Optimise lithography and etch steps for silicon resonators
+  - can do: Run yield analysis on wafer-level MEMS batches
+  - can do: Coordinate process runs in a shared cleanroom
 
 ## Logex Oy
 
@@ -1626,22 +1977,32 @@ https://www.logex.com · open tech roles in our data: 1
 - `s7` [organisation, 2023] Thoma Bravo acquired a majority stake in LOGEX in 2023, after founders stepped back.  
   > "Thoma Bravo, the world’s largest software-focused private equity firm, acquired a majority stake." ([source](https://www.generalcounsel.nl/diamondbox/natascha-schmitz-logex/))
 
+**What to tell candidates**
+
+- **Agreed to acquire Tiplu GmbH** (2026-07; s1): LOGEX agreed to become sole shareholder of Tiplu GmbH, subject to regulatory approvals.
+- **Reached over 1,000 healthcare providers** (2025-07; s3): LOGEX has over 400 employees and serves over 1,000 public and private healthcare providers.
+- **Income and costing tools now on G-Cloud** (2026; s4): LOGEX income and costing solutions became available to NHS organisations through G-Cloud 15.
+- **Building LLM tools for clinical text** (2026; s5): LOGEX built an internal LLM solution on GPT-4 via Azure to structure clinical text, pseudonymising data before processing.
+- **New CTO and CFO appointed** (2026-06; s2): LOGEX welcomed a new CTO and CFO to its Executive Committee.
+- left out `s6`: says too little
+- left out `s7`: older than two years
+
 **Likely needs (inferred): growing**
 
-Buying Tiplu, opening NHS sales via G-Cloud and adding AI to clinical text for healthcare providers.
+Acquiring Tiplu GmbH and selling income and costing tools to UK NHS organisations through G-Cloud.
 
-- **Healthcare business analysts** (Experienced; Health economics, Cost accounting, Business analytics, German healthcare reimbursement): LOGEX is recruiting a Product Consultant for healthcare analytics alongside growing healthcare customer numbers. (s3, s4, hiring now: Product Consultant (m/w/d) Healthcare Analytics)
-  - can do: Analyse hospital costing and income data for provider clients
-  - can do: Translate clinical and financial requirements into product configuration
-  - can do: Present analytics findings to hospital finance and management teams
-- **Clinical NLP engineers** (Experienced; Python, Large language models, Azure OpenAI, Clinical NLP, Data pseudonymisation): LOGEX built an LLM solution to structure unstructured clinical text using GPT-4 via Azure. (s5)
-  - can do: Build pipelines that structure unstructured clinical text
+- **Business development managers** (Experienced; German and English, Healthcare sales, CRM pipelines, Public procurement, Hospital economics): LOGEX is recruiting a DACH Business Development Manager to grow sales in Germany, Austria and Switzerland. (s6)
+  - can do: Build pipeline with German hospital and clinic buyers
+  - can do: Win multi-year software contracts in DACH healthcare
+  - can do: Negotiate with hospital management and procurement teams
+- **Healthcare product consultants** (Experienced; Hospital economics, Healthcare analytics, German (business level), Cost accounting, DRG systems): LOGEX is hiring a Product Consultant for healthcare analytics, alongside its acquisition of Tiplu GmbH. (s1, s4, hiring now: Product Consultant (m/w/d) Healthcare Analytics)
+  - can do: Translate hospital cost data needs into analytics requirements
+  - can do: Run structured client workshops on healthcare analytics
+  - can do: Advise providers on income and costing decisions
+- **Clinical NLP engineers** (Experienced; Python, LLM prompting, Azure OpenAI, Clinical NLP, Data pseudonymisation): LOGEX built an LLM solution to structure unstructured clinical text, a capability it is extending. (s5)
+  - can do: Build pipelines that structure clinical free text
   - can do: Pseudonymise patient data before model processing
-  - can do: Evaluate LLM output quality on clinical documentation
-- **Enterprise sales leads** (Experienced; B2B sales, Healthcare procurement, German and English business, CRM systems): LOGEX is recruiting a Business Development Manager to grow sales in Germany, Austria and Switzerland. (s6)
-  - can do: Win new healthcare provider accounts across the DACH region
-  - can do: Run long public tender and procurement processes
-  - can do: Grow revenue within existing hospital customer accounts
+  - can do: Evaluate LLM output accuracy on clinical documents
 
 ## Lotus Sirius
 
@@ -1664,22 +2025,27 @@ https://lotussirius.com · not in our Espoo job data
 - `s6` [organisation] Lotus Sirius publishes on its website that it operates with an NCAGE code and states ISO 27001 as a compliance path, though no certification date is given.  
   > "LOTUS SIRIUS NATO NCAGE: A13YG" ([source](https://www.lotussirius.com/insights))
 
-**Likely needs (inferred): growing**
+**What to tell candidates**
 
-Building offline AI and digital-twin command systems for shipyards, navies and critical infrastructure, with data kept on-site.
+- **Naval production platform N-IPPS launched** (2026-07; s1): The main platform, N-IPPS, connects maritime manufacturing components with an AI orchestration engine and a post-quantum secure-chain layer.
+- **Maritime system validated in 28 field operations** (2025-11; s2): The integrated maritime operating system was validated through 28 field operations and received the Yachting Ventures Verified Badge.
+- **Offline-first stack scales to ten thousand nodes** (2026-11; s5): The stack runs from a single operator station to ten-thousand-node deployments with MIL-STD packaging and EU Data Act alignment.
+- **Claims 25% faster production for customers** (2026-11; s3): The website claims first production value within weeks, 25% faster production and 30%+ cost optimisation for customers.
+- **Member of Finnish defence tech networks** (2026-11; s4): The company is part of Business Helsinki, Enter Espoo Defence Tech Hub and the Helsinki University Nexus Incubator.
+- left out `s6`: says too little
 
-- **Edge AI and orchestration engineers** (Experienced; Edge inference, Container orchestration, Distributed systems, Model optimisation): The main platform N-IPPS connects an AI orchestration engine to maritime manufacturing components running on air-gapped hardware. (s1, s5)
-  - can do: Deploy AI models on air-gapped edge hardware
-  - can do: Build orchestration logic across many production nodes
-  - can do: Keep models running without external data dependencies
-- **Post-quantum security engineers** (Senior; Post-quantum cryptography, ISO 27001, Zero-trust architecture, Threat modelling): The company's chain layer uses post-quantum secure-chain protection and it claims ISO 27001 as a compliance path. (s1, s6)
-  - can do: Implement post-quantum key exchange in supply-chain software
-  - can do: Run ISO 27001 controls across defence-grade systems
-  - can do: Threat-model air-gapped production networks
-- **Industrial and cyber-physical systems engineers** (Experienced; PLC programming, Industrial networks, MIL-STD packaging, Field commissioning): N-IPPS integrates physical maritime manufacturing components with software, and the product was validated in 28 field operations. (s1, s2)
-  - can do: Integrate PLCs and sensors with software control layers
-  - can do: Commission systems on shipyard floors
-  - can do: Validate cyber-physical systems in field trials
+**Likely needs (inferred): unclear**
+
+Building offline-first AI and digital-twin command systems for maritime and defence customers, with data staying inside their perimeter.
+
+- **Embedded and edge software engineers** (Experienced; Embedded C, Linux, Real-time systems, MIL-STD-810): N-IPPS and the offline stack run on air-gapped edge hardware from one station up to ten thousand nodes. (s1, s5)
+  - can do: Build edge runtimes that operate without external connectivity
+  - can do: Package software to MIL-STD environmental requirements
+  - can do: Deploy and update fleets of air-gapped nodes
+- **Post-quantum security engineers** (Senior; Post-quantum cryptography, Zero-trust architecture, ISO 27001, Threat modelling): The platform includes a post-quantum secure-chain layer and claims ISO 27001 as a compliance path. (s1, s6)
+  - can do: Implement post-quantum cryptography in supply-chain software
+  - can do: Run threat modelling for classified deployments
+  - can do: Prepare evidence for ISO 27001 audits
 
 ## Matrix42 Oy
 
@@ -1706,25 +2072,32 @@ https://www.matrix42.com/en/ · open tech roles in our data: 3
 - `s8` [organisation, 2024-11] Matrix42 has extended its presence to Spain through the acquisition of Efecte's Spanish operations and the opening of a Madrid office led by a new Iberia sales director.  
   > "Matrix42 has recently established itself in Spain through the acquisition of the Nordic company Efecte" ([source](https://www.matrix42.com/en/pressroom/matrix42-establishes-presence-in-spain))
 
+**What to tell candidates**
+
+- **Launched Neo AI intelligence layer** (2026-10; s1, s2): Neo spans service management, asset and endpoint management, and is offered to customers with a 60-day free trial.
+- **Customers worldwide and about 600 staff** (2025-07; s6): Matrix42 reports more than 5,000 customers and roughly half its employees work in research, development and cloud.
+- **Agentic ticket auto-resolution introduced** (2026-04; s7): Matrix42 introduced agentic ticket auto-resolution, native AI functions, a private cloud option and Software Intelligence to partners.
+- **Agreed to acquire Viio** (2025-10; s4): The Danish SaaS management and procurement provider acquisition is meant to strengthen Matrix42's software asset management offering.
+- left out `s3`: says the same as another
+- left out `s5`: says too little
+- left out `s8`: older than two years
+
 **Likely needs (inferred): growing**
 
-Matrix42 is pushing AI-powered service management, with Neo and agentic ticket resolution now rolling out to customers.
+Matrix42 is pushing AI-driven service management, with Neo and agentic ticket resolution now rolling out to customers worldwide.
 
-- **AI and ML product managers** (Senior; ITSM, AI/ML prototyping, Product analytics, Enterprise SaaS): Neo and AI Core launched across its products in 2026, creating demand for product leads who can ship AI features. (s1, s2, s7, hiring now: Senior Product Manager — Intelligent Service Management)
-  - can do: Define AI features for service management products from prototype to release
-  - can do: Set roadmap priorities with customer and C-level stakeholders
-  - can do: Measure AI feature adoption with analytics and BI data
-- **Identity governance consultants** (Senior; IGA, RBAC, Microsoft Entra ID, Active Directory, PowerShell): The company is expanding its service management offering in identity-related implementation work, which needs hands-on IGA specialists. (s3, hiring now: Senior Identity Governance & Administration (IGA) Consultant – Professional Services)
-  - can do: Implement full identity lifecycle management projects for enterprise customers
-  - can do: Configure role-based access control across directories and HR systems
-  - can do: Automate provisioning workflows with APIs and scripts
-- **Cloud infrastructure leaders** (Lead; AWS, Azure, Google Cloud Platform, Kubernetes, Multi-cloud operations): Half of its roughly 600 employees work in research, development and cloud, and it now offers a private cloud option, so cloud operations need senior leadership. (s6, s7, hiring now: Vice president (VP) Cloud)
-  - can do: Lead enterprise cloud operations across multi-cloud environments
-  - can do: Set reliability and cost targets for Kubernetes-based platforms
-  - can do: Manage large infrastructure teams through delivery cycles
-- **Software asset management specialists** (Experienced; Software asset management, SaaS licensing, Procurement platforms): The agreed acquisition of Viio strengthens its software asset management offering, which needs people who can sell and deliver it. (s4)
-  - can do: Position software asset management offers for enterprise IT buyers
-  - can do: Integrate acquired SaaS management platforms with existing products
+- **AI and ML product engineers** (Experienced; Python, LLM integration, MLOps, Prompt evaluation, REST APIs): Neo and AI Core rolled out to all customers, and an AI-native HR product followed. (s1, s2, s3, hiring now: Senior Product Manager — Intelligent Service Management)
+  - can do: Ship ML features into production service management workflows
+  - can do: Prototype and evaluate LLM-based ticket automation
+  - can do: Monitor model quality and drift in customer deployments
+- **Identity governance consultants** (Senior; IGA platforms, Microsoft Entra ID, Active Directory, RBAC, PowerShell): Matrix42 hired for full lifecycle IGA implementation projects across customers. (s6, hiring now: Senior Identity Governance & Administration (IGA) Consultant – Professional Services)
+  - can do: Implement IGA projects from requirements through go-live
+  - can do: Configure role-based access control across enterprise systems
+  - can do: Automate identity lifecycle workflows with scripts and APIs
+- **Cloud operations leaders** (Lead; AWS, Azure, Kubernetes, Infrastructure as code, Cloud governance): Half of roughly 600 staff work in cloud and development, so the cloud organisation is central to delivery. (s6, hiring now: Vice president (VP) Cloud)
+  - can do: Lead enterprise cloud operations across multiple teams
+  - can do: Own multi-cloud platform strategy and reliability
+  - can do: Govern cloud cost and security across environments
 
 ## Metacell
 
@@ -1745,18 +2118,21 @@ https://metacell.fi · not in our Espoo job data
 - `s5` [other] A separate US company called MetaCell, which builds neuroscience imaging software, is not the same business and its news is not counted here.  
   > "For the last 14 years, MetaCell has helped ambitious life science organizations build custom software" ([source](https://www.metacell.us/newsroom/metacell-updates-neuroglass-scientific-ux-ai-workshop-and-more))
 
+**What to tell candidates**
+
+- **Raising a €500,000 seed round** (2026-09; s2): Metacell is raising a seed round of €500,000 to take its strain engineering platform further.
+- **Platform reached TRL 6 in validation** (2026-09; s1, s3): Validation showed demonstrated yield improvements, and the company now offers a strain improvement service and proprietary strain licensing.
+- **Founded in 2025 as a Turku spin-out** (2025; s4): Metacell is a University of Turku spin-out with 1-10 employees, still at an early stage.
+- left out `s5`: not about this company
+
 **Likely needs (inferred): growing**
 
-Metacell is building a screening platform that finds high-yield microbial strains for bio-based medicines and products.
+Building a fermentation strain platform that raises yields and shortens development for bio-based medicines and products.
 
-- **Strain engineering scientists** (Experienced; Filamentous fungi, Strain engineering, High-throughput screening, Fermentation, CRISPR): Metacell is raising a seed round and has a platform at TRL 6 that it sells as a strain improvement service and through licensing. (s1, s2, s3)
-  - can do: Engineer microbial strains for higher fermentation yield
-  - can do: Design and run high-throughput screening campaigns on filamentous fungi
-  - can do: Validate yield gains and report results to clients
-- **Bioprocess development engineers** (Experienced; Bioprocess development, Fermentation scale-up, Process analytics, DoE): The platform is validated on yield improvements and aims to cut manufacturing costs, which needs scale-up work. (s1, s3)
-  - can do: Scale fermentation processes from lab to pilot volumes
-  - can do: Optimise filamentous fermentation parameters for yield
-  - can do: Document process data for client technology transfer
+- **Strain engineering scientists** (Experienced; Filamentous fungi, High-throughput screening, Strain engineering, Fermentation analytics): Platform reached TRL 6 and the company now offers strain improvement services to customers. (s1, s3)
+  - can do: Design screening workflows to identify high-yield microbial strains
+  - can do: Run strain improvement campaigns for filamentous fermentation
+  - can do: Analyse yield data to guide strain selection decisions
 
 ## Neomore Consulting Oy
 
@@ -1785,22 +2161,29 @@ https://www.neomore.fi · open tech roles in our data: 1
 - `s9` [partnership, 2026-08] Neomore's IT facilities are run by outsourced IT partner Bitmore, which also provides a CISO service.  
   > "Yhteistyötä on laajennettu myös Bitmoren CISO-palveluun" ([source](https://www.bitmore.fi/post/neomore-loysi-bitmoresta-luotettavan-it-kumppanin))
 
+**What to tell candidates**
+
+- **Launched PlantOps AI Assistant in May 2026** (2026-05; s4): The AI tool answers maintenance questions from SAP data, manuals and maintenance history.
+- **Joint maintenance module with SolidComp in March 2026** (2026-03; s1): Reality Twin Maintenance Module integrates with SAP S/4HANA Plant Maintenance as their first joint solution.
+- **Set 2026-2029 strategy around SAP, data and AI** (2026-09; s2): The strategy focuses on SAP, data management, analytics and AI.
+- **Joined Finnish defence industry association in June 2026** (2026-06; s5): Neomore joined PIA to expand its defence business.
+- left out `s3`: says the same as another
+- left out `s6`: older than two years
+- left out `s7`: older than two years
+- left out `s8`: says the same as another
+- left out `s9`: not about this company
+
 **Likely needs (inferred): growing**
 
-Neomore is building AI tools and a defence business on top of SAP systems and data.
+Building SAP, data and AI tools for industry, including a maintenance assistant and a joint solution with SolidComp.
 
-- **AI and SAP solution developers** (Experienced; SAP BTP, SAP S/4HANA, Joule skills, Retrieval-augmented generation, Python): Neomore launched PlantOps AI Assistant and demonstrated SAP Joule extended to on-premise S/4HANA in 2025-2026. (s4, s8)
-  - can do: Build AI assistants that answer questions from SAP data
-  - can do: Extend SAP Joule with custom skills for S/4HANA
-  - can do: Connect maintenance manuals and history to language models
-- **Low-code SAP application developers** (Experienced; SAP BTP, SAP Build Apps, ABAP, SAP S/4HANA, OData APIs): Neomore delivered a low-code SAP BTP application replacing Excel-based material pricing for about 11,000 materials. (s3, s2)
-  - can do: Build low-code SAP BTP applications for business processes
-  - can do: Replace spreadsheet processes with governed SAP data
-  - can do: Integrate applications with S/4HANA master data
-- **Defence industry solution consultants** (Experienced; SAP PM, Defence procurement, Maintenance management, Bid writing): Neomore joined the Finnish Defence and Aerospace Industries association in June 2026 to expand its defence business. (s5)
-  - can do: Map defence customers' maintenance and supply processes to SAP
-  - can do: Prepare bids for defence and aerospace programmes
-  - can do: Build relationships with PIA member companies
+- **SAP AI and integration developers** (Experienced; SAP S/4HANA, SAP BTP, RAG, Python, SAP Joule): PlantOps AI Assistant launched in 2026 and needs SAP data, manuals and maintenance history connected. (s4, s8)
+  - can do: Build retrieval pipelines over SAP and maintenance data
+  - can do: Integrate LLM assistants with SAP S/4HANA systems
+  - can do: Evaluate answer quality on maintenance questions
+- **Defence industry solution consultants** (Experienced; SAP PM, Defence procurement, Requirements analysis): Neomore joined the defence association in June 2026 to expand its defence business. (s5)
+  - can do: Map SAP processes for defence supply chains
+  - can do: Scope maintenance solutions for defence customers
 
 ## Neste Oyj
 
@@ -1823,22 +2206,26 @@ https://www.neste.com/ · open tech roles in our data: 1
 - `s6` [hiring, 2026-08] Neste had about 300 summer trainees working across its operations in summer 2026, and currently employs about 5,200 people.  
   > "Throughout summer 2026, approximately 300 trainees worked across different parts of Neste." ([source](https://www.neste.com/about-neste/people-and-careers/work-with-us))
 
+**What to tell candidates**
+
+- **Capacity to reach 6.8 million tons by 2027** (2026-10; s1): Renewables production capacity is expected to reach 6.8 million tons annually in 2027, a sizeable step up for the company.
+- **EUR 250 million loan from NIB** (2026-08; s3): A 10-year loan finances R&D in lower-quality feedstock processing and the Porvoo liquefied waste plastic investment.
+- **Bayer canola deal for US feedstock** (2026-09; s2): Neste and Bayer agreed commercially to jointly scale Bayer's newgold winter canola in the US Southern Great Plains as renewable feedstock.
+- left out `s4`: internal finance
+- left out `s5`: says too little
+- left out `s6`: says too little
+
 **Likely needs (inferred): growing**
 
-Neste is expanding renewable fuel output toward 6.8 million tons a year by 2027, with new feedstock deals.
+Neste is scaling renewable diesel and SAF output toward 6.8 million tons a year by 2027.
 
-- **Supply chain digitalization leads** (Lead; SCM systems, Data governance, Business intelligence, Data integration, AI implementation): Neste is scaling renewables capacity to 6.8 million tons and has an open role to digitalize supply chain management. (s1, hiring now: Development Manager, SCM Digitalization)
-  - can do: Architect supply chain planning platforms across feedstock and fuel flows
-  - can do: Lead AI implementation projects in business process digitalization
-  - can do: Define data governance rules for supply chain business intelligence
-- **Feedstock sourcing and crop partnership managers** (Experienced; Feedstock sourcing, Commodity markets, Supply chain logistics, Agronomy): Neste agreed with Bayer to scale winter canola feedstock in the US Southern Great Plains. (s2)
-  - can do: Negotiate multi-year feedstock supply agreements with grower partners
-  - can do: Model feedstock availability and cost across growing regions
-  - can do: Coordinate logistics from farm origin to refinery intake
-- **Process R&D engineers** (Experienced; Hydroprocessing, Catalysis, Process simulation, Pilot plant operation): A EUR 250 million NIB loan finances R&D in lower-quality feedstock processing and waste plastic liquefaction. (s3)
-  - can do: Develop processes that convert lower-quality feedstocks into renewable diesel
-  - can do: Scale pilot hydroprocessing results to refinery operations
-  - can do: Test liquefied waste plastic streams for refinery compatibility
+- **Supply chain digitalization leads** (Lead; SCM systems, Data governance, Business intelligence, AI implementation, Data integration): Capacity is set to reach 6.8 million tons by 2027, and the open SCM digitalization role needs someone to run that scale-up. (s1, hiring now: Development Manager, SCM Digitalization)
+  - can do: Lead AI implementation across supply chain planning platforms
+  - can do: Integrate production and logistics data into business intelligence dashboards
+  - can do: Govern data quality across SCM systems and planning tools
+- **Feedstock sourcing specialists** (Experienced; Feedstock sourcing, Lipid chemistry, Supply contracts): The Bayer canola deal and the R&D loan for lower-quality feedstock processing both create demand for people who source and qualify new feedstocks. (s2, s3)
+  - can do: Qualify new oilseed and waste feedstocks for renewable diesel production
+  - can do: Negotiate multi-year feedstock supply agreements with growers
 
 ## Nitor
 
@@ -1865,22 +2252,32 @@ https://nitor.com · not in our Espoo job data
 - `s8` [risk, 2025-06] Nitor's management described the ICT services sector as highly competitive, with aggressive pricing and an oversupply of professionals.  
   > "The ICT sector is experiencing intense competition, driven by aggressive pricing and an oversupply of professionals." ([source](https://nitor.com/en/articles/nitor-continues-profitable-growth-for-the-18th-consecutive-year))
 
+**What to tell candidates**
+
+- **Revenue about EUR 40.2 million in 2025** (2025; s1, s6): Revenue rose about 23 per cent on the previous year, continuing a long run of annual growth.
+- **Client growth in entertainment, retail and healthcare** (2025; s2): Strongest client expansion in 2025 came from entertainment and gaming, retail and healthcare, with new work in defence, health tech and international markets.
+- **ISO/IEC 27001:2022 certification achieved** (2026-06; s4): The certification covers consulting, managed services, internal operations and both offices in Helsinki and Tampere.
+- **Joined CLEAR industrial AI research project** (2026-07; s5): Nitor joined a nine-country project with 29 companies and research organisations and hired a full-time research assistant for it.
+- left out `s3`: says the same as another
+- left out `s7`: older than two years
+- left out `s8`: says too little
+
 **Likely needs (inferred): growing**
 
-Nitor is growing fast, with revenue up 23 percent and new work in defence, health tech and industrial AI.
+Nitor is growing its AI, defence and health tech client work and holding an ISO 27001 security certification.
 
-- **Security and compliance engineers** (Experienced; ISO 27001, Risk assessment, Cloud security, Access control, Audit documentation): Nitor achieved ISO/IEC 27001:2022 certification covering its consulting, managed services and offices in 2026. (s4)
-  - can do: Maintain ISO 27001 controls across consulting and managed services
-  - can do: Run internal risk assessments and audits for client-facing services
-  - can do: Document security processes for certification reviews
-- **Defence and health tech developers** (Experienced; AWS, Microsoft Azure, Google Cloud, Secure software development, Composable architecture): Nitor expanded into defence and health tech clients in 2025, with entertainment, retail and healthcare growing strongest. (s2)
-  - can do: Build regulated software for defence and health tech clients
-  - can do: Integrate client systems with cloud platforms on AWS, Azure or Google Cloud
-  - can do: Support secure delivery processes for sensitive client data
-- **Industrial AI researchers** (Early career; Machine learning, Python, Industrial AI, Research methods): Nitor joined the CLEAR industrial AI research project with 29 partners in nine countries and hired a research assistant for it. (s5)
-  - can do: Prototype machine learning methods for industrial applications
-  - can do: Evaluate AI models against research and client requirements
-  - can do: Contribute results to multi-partner research projects
+- **AI and industrial data engineers** (Experienced; Python, MLOps, Data pipelines, PyTorch, Industrial IoT): Joined a nine-country industrial AI research project and hired a dedicated research assistant for it. (s5, s2)
+  - can do: Build data pipelines for industrial sensor and process data
+  - can do: Evaluate machine learning models against production requirements
+  - can do: Document reproducible experiments for research partners
+- **Security and compliance specialists** (Experienced; ISO 27001, Risk assessment, Cloud security, Incident response): Achieved ISO/IEC 27001:2022 certification and works with defence clients. (s4, s2)
+  - can do: Run ISO 27001 audits across consulting and managed services
+  - can do: Maintain information security controls for client projects
+  - can do: Review access and incident processes for defence work
+- **Cloud platform engineers** (Experienced; AWS, Azure, Terraform, Kubernetes): Growing managed services and delivery across AWS, Azure and Google Cloud. (s1, s2)
+  - can do: Operate production workloads on AWS, Azure and Google Cloud
+  - can do: Automate infrastructure with code for client platforms
+  - can do: Monitor and optimise cloud cost and reliability
 
 ## Nokia Oyj
 
@@ -1913,26 +2310,35 @@ https://nokia.com · open tech roles in our data: 11
 - `s11` [organisation, 2026-04] Inseego agreed to acquire Nokia's Fixed Wireless Access business.  
   > "Inseego to acquire Nokia's Fixed Wireless Access business to create a global wireless broadband leader" ([source](https://www.nokia.com/newsroom/corporate-news/))
 
+**What to tell candidates**
+
+- **Network Infrastructure sales up 15% in Q3** (2026-10; s1): Group net sales grew 9% year-on-year at constant currency in Q3 2026, led by Network Infrastructure.
+- **AI and cloud customer sales up 123%** (2026-10; s2): Group net sales to AI and Cloud customers grew 123% in Q3 2026, with order intake up 118%.
+- **Reorganising into two businesses around AI** (2025-11; s5): From 2026 Nokia reorganises into two primary businesses under an AI-focused strategy, aiming to raise annual core profit by up to 60% over three years.
+- **NVIDIA invests USD 1.0 billion in AI-RAN** (2025-10; s6, s7): NVIDIA bought a 2.90% stake in Nokia as part of an AI-RAN partnership, and the companies have launched AI-native anyRAN software on NVIDIA Aerial RAN Computer.
+- **Autonomous networks win with One New Zealand** (2026-11; s8): One New Zealand selected Nokia autonomous networks solutions, with Nokia R&D co-creation and consulting services.
+- left out `s3`: internal finance
+- left out `s4`: says too little
+- left out `s9`: says too little
+- left out `s10`: says the same as another
+- left out `s11`: says the same as another
+
 **Likely needs (inferred): growing**
 
-Shifting its network business toward AI, with AI-RAN software now running on live 5G networks.
+Nokia is reorganising around AI, with AI and cloud customer sales more than doubling in Q3 2026.
 
-- **AI-RAN and 5G signal-processing engineers** (Senior; 5G NR, Link-level simulation, Python, NVIDIA Aerial, RAN software): Nokia and NVIDIA launched AI-native anyRAN software applying AI within the 5G signal-processing chain. (s7, s6, hiring now: Senior Standards researcher, 6G Physical Layer, hiring now: Senior Staff Research/Standardization Specialist)
-  - can do: Apply AI models inside the 5G physical layer chain
-  - can do: Build link-level and system-level simulations for RAN software
-  - can do: Validate AI-RAN software on live network conditions
-- **Cellular standards researchers** (Senior; 3GPP Release process, MIMO, CSI feedback, Link-level simulators, 5G NR): Nokia has several open senior roles for 3GPP standards research on 5G and 6G systems. (s1, s5, hiring now: Senior Standards researcher, 6G Physical Layer, hiring now: Senior Staff Standardization Specialist, hiring now: Senior Staff Research Specialist position in Technology Standards - Research & Innovation)
-  - can do: Write 3GPP contributions for 5G and 6G physical layer features
-  - can do: Design MIMO receiver and CSI feedback schemes
-  - can do: Turn new radio concepts into patentable inventions
-- **Wi-Fi standardization researchers** (Senior; IEEE 802.11, 802.11bn, PHY and MAC design, Simulation tools, Machine learning): Nokia is seeking senior delegates for IEEE 802.11 standardization up to 802.11bn, with AI in the PHY and MAC layers. (s5, hiring now: Senior Wi-Fi Standardization Researcher and Delegate)
-  - can do: Represent Nokia as a delegate in IEEE 802.11 working groups
-  - can do: Propose and test PHY and MAC changes for 802.11bn
-  - can do: Apply AI and ML methods to Wi-Fi PHY and MAC design
-- **Patent specialists for cellular standards** (Senior; Patent drafting, Cellular standards, 5G NR, 3GPP, Portfolio management): Nokia is hiring senior patent specialists for cellular standards while its portfolio work grows with 5G and 6G research. (s5, hiring now: (Technical) Senior Patent Specialist – Cellular Standards)
-  - can do: Draft patent claims from 5G and 6G standards contributions
-  - can do: Manage patent filings across several priorities at once
-  - can do: Analyse cellular standards essentiality for the portfolio
+- **AI-RAN and 5G/6G standards researchers** (Senior; 3GPP, Link-level simulation, MIMO, Python, AI for PHY): AI-RAN is moving into live networks and Nokia is building AI into the 5G signal-processing chain with NVIDIA. (s6, s7, hiring now: Senior Standards researcher, 6G Physical Layer, hiring now: Senior Staff Research Specialist, hiring now: Senior Staff Research/Standardization Specialist, hiring now: Senior Staff Research Specialist position in Technology Standards - Research & Innovation)
+  - can do: Design AI models for the 5G physical layer
+  - can do: Write 3GPP contributions with measured simulation results
+  - can do: Build link-level simulators for new radio features
+- **Wi-Fi standardization delegates** (Senior; IEEE 802.11, 802.11bn, MAC layer, Link simulation, AI/ML for wireless): Nokia is expanding its wireless research and standards presence while it reorganises its AI-focused businesses. (s5, hiring now: Senior Wi-Fi Standardization Researcher and Delegate)
+  - can do: Represent Nokia in IEEE 802.11 working groups
+  - can do: Propose and evaluate PHY and MAC features up to 802.11bn
+  - can do: Apply AI/ML methods to Wi-Fi PHY and MAC design
+- **Enterprise and AI cloud sales leads** (Experienced; Enterprise sales, Telecom solutions, Account management, Data center networking): Sales to AI and cloud customers grew 123% in Q3 2026, and order intake rose 118%. (s2)
+  - can do: Win AI data center networking deals with cloud operators
+  - can do: Manage multi-year autonomous networks contracts
+  - can do: Coordinate joint go-to-market plans with NVIDIA
 
 ## Nordic Clean Tech
 
@@ -1955,18 +2361,26 @@ https://nordicclean.tech · not in our Espoo job data
 - `s6` [growth, 2027] The company plans to expand service areas to Central Europe in 2027.  
   > "Expansion to Central Europe 2027" ([source](https://nordicclean.tech/technology))
 
-**Likely needs (inferred): growing**
+**What to tell candidates**
 
-Launching an AI-supported validation tool to cut cleanroom project timelines for European and Middle Eastern clients.
+- **Launching NCT CleanTech Quoter in April 2026** (2026-04; s1, s2): An AI-supported validation and documentation tool, which the company says can cut project timelines by up to 40%.
+- **Built cleanrooms from 3m² to 10,000m²** (2026; s4): Projects for clients across Europe and the Middle East, covering cleanroom design, qualification and testing.
+- **Expanding service areas to Central Europe in 2027** (2027; s6): A planned extension of services beyond the current Nordic and Middle East footprint.
+- **Offers airflow, CFD and recovery testing** (2026; s5): Testing services that include airflow visualisation, CFD modelling and recovery testing for cleanrooms.
+- left out `s3`: says too little
 
-- **Software and AI developers** (Experienced; Python, Document automation, GAMP 5, Machine learning, Software validation): Launching NCT CleanTech Quoter, an AI-supported validation tool, in April 2026. (s1, s2)
-  - can do: Build AI tools that generate validation documentation automatically
-  - can do: Test validation software against regulatory compliance requirements
-  - can do: Integrate tools with existing cleanroom testing and monitoring data
-- **Cleanroom qualification engineers** (Experienced; ISO 14644, GMP, CFD modelling, Recovery testing, HVAC systems): Company plans to expand service areas to Central Europe in 2027 and serves clients across Europe and the Middle East. (s4, s5, s6)
-  - can do: Qualify cleanrooms to ISO 14644 and GMP requirements
-  - can do: Run airflow visualisation and recovery testing on site
-  - can do: Prepare qualification reports for regulatory audits
+**Likely needs (inferred): unclear**
+
+Launching an AI-supported validation tool to cut cleanroom project timelines, and expanding into Central Europe.
+
+- **Software engineers for validation tools** (Experienced; Python, LLM integration, GAMP 5, REST APIs): The company is launching an AI-supported validation tool that must streamline documentation and testing. (s1, s2)
+  - can do: Build AI features that generate validation documentation
+  - can do: Integrate test data into compliance reports
+  - can do: Ship tools that meet GxP audit requirements
+- **Cleanroom validation engineers** (Experienced; ISO 14644, GMP, CFD modelling, Recovery testing): Growing cleanroom projects across Europe and the Middle East require qualification and testing work. (s4, s5)
+  - can do: Qualify cleanrooms to ISO 14644 requirements
+  - can do: Run airflow and recovery testing on site
+  - can do: Write IQ, OQ and PQ documentation
 
 ## Nordic Semiconductor
 
@@ -1995,21 +2409,34 @@ https://nordicsemi.com · not in our Espoo job data
 - `s9` [growth, 2026-10] Nordic's Q3 2026 revenue growth was broad across the market rather than concentrated in a few customers, with long-range revenue up 70%.  
   > "Long-range revenue grew even faster, rising 70% to $17 million." ([source](https://www.investing.com/news/transcripts/earnings-call-transcript-nordic-semiconductor-posts-record-q3-2026-growth-93CH-4964769))
 
+**What to tell candidates**
+
+- **Record Q3 revenue of USD 235 million** (2026-10; s3): Revenue rose 32% year over year and 8% sequentially, with adjusted EBITDA of USD 40 million in the quarter.
+- **Revenue up 33% year over year in Q2** (2026-06; s4): Q2 2026 revenue was USD 218.6 million, and headcount reached 1465 employees, up 10.5% from H1 2025.
+- **Launched nRF71 Series with edge AI** (2026-11; s2): The nRF71 combines Wi-Fi, Bluetooth LE, Thread and on-device edge AI on one chip, claiming up to 20 times lower standby power than nRF70.
+- **Entry-level nRF54LS05 chips in mass production** (2026-11; s1): The nRF54LS05A and nRF54LS05B Bluetooth LE SoCs target high-volume, cost-constrained designs.
+- **Expanding into power management chips** (2026-07; s6): A PMIC business is growing alongside wireless SoCs and as a standalone offering.
+- left out `s5`: older than two years
+- left out `s7`: says too little
+- left out `s8`: not about this company
+- left out `s9`: says the same as another
+
 **Likely needs (inferred): growing**
 
-Nordic is shipping cheap low-power chips for high-volume devices and a new chip combining Wi-Fi, Bluetooth and edge AI.
+Nordic is shipping new low-power wireless chips and growing revenue fast, with record quarterly sales.
 
-- **Embedded firmware engineers** (Experienced; Embedded C, Bluetooth LE, Thread, Low-power design, nRF SDK): Record revenue and new nRF71 and nRF54 chips create demand for firmware on new low-power devices. (s1, s2, s3)
-  - can do: Write low-power firmware for Bluetooth LE SoCs
-  - can do: Port wireless stacks onto new multi-protocol chips
-  - can do: Optimise firmware for battery life and standby power
-- **Power management IC designers** (Experienced; Analog IC design, DC-DC converters, Power electronics, Mixed-signal verification, Cadence Virtuoso): Nordic is expanding into a standalone PMIC business alongside its wireless SoCs. (s6)
-  - can do: Design PMIC circuits for battery-powered devices
-  - can do: Verify power converters through silicon bring-up
-  - can do: Work with wireless SoC teams on power sequencing
-- **RF and wireless hardware engineers** (Senior; RF design, Bluetooth PHY, Radio measurement, Antenna design): Bluetooth High Data Throughput and new multi-protocol chips require silicon-level radio work. (s2, s7)
-  - can do: Implement high-throughput Bluetooth radio features in silicon
-  - can do: Characterise RF performance across multi-protocol designs
+- **Power management IC engineers** (Experienced; Analog IC design, DC-DC converters, Power integrity, Battery management): Nordic is expanding its PMIC business alongside wireless SoCs and as a standalone offering. (s6)
+  - can do: Design low-quiescent-current power converters for battery devices
+  - can do: Validate PMIC power sequencing against wireless SoC loads
+  - can do: Characterise efficiency and transient response on the bench
+- **Wireless firmware engineers** (Experienced; Embedded C, Zephyr RTOS, Bluetooth LE, Thread protocol): New nRF71 and nRF54 chips with Thread and edge AI need firmware for mass-market devices. (s1, s2)
+  - can do: Port Bluetooth LE and Thread stacks to new SoC hardware
+  - can do: Optimise firmware for minimal standby power consumption
+  - can do: Integrate on-device edge AI inference into embedded products
+- **Enterprise sales leads** (Experienced; Semiconductor sales, Key account management, Technical selling, CRM): Revenue grew 32% year over year while partner-led platforms like SPARK's gaming peripherals are expanding. (s3, s8)
+  - can do: Win design-ins with OEMs for consumer and industrial IoT
+  - can do: Manage partner-led platform programmes across Asia and Americas
+  - can do: Forecast chip volumes against customer production ramps
 
 ## OneFab Nordic
 
@@ -2026,22 +2453,28 @@ https://onefabnordic.fi · not in our Espoo job data
 - `s3` [technology] The company provides micro- and nano-fabrication capabilities including MEMS, microfluidics, packaging and integration, plus DC and RF characterization.  
   > "Design and Fabrication of microacoustic RF Filters, Sensors, and other piezoelectric MEMS devices" ([source](https://onefabnordic.fi/index.php/services/))
 
-**Likely needs (inferred): growing**
+**What to tell candidates**
 
-A young Helsinki firm making RF filters and micro-devices for 5G, defense, aerospace and automotive clients.
+- **Founded in Helsinki in early 2025** (2025; s1): Founded by engineers and entrepreneurs combining BAW and SAW filter expertise with micro and nanofabrication services.
+- **Covers RF filters from concept to manufacturing** (2025; s2): Focus on RF filter design and manufacturing for 5G, defense, aerospace and automotive, spanning concept to full-scale production.
+- **MEMS, microfluidics and packaging capabilities** (2025; s3): Offers micro and nano fabrication including MEMS, microfluidics, packaging and integration, plus DC and RF characterization.
 
-- **BAW and SAW filter engineers** (Experienced; BAW, SAW, RF filter design, Microwave simulation, MEMS): Founded in 2025 to combine BAW and SAW expertise, and it now designs and manufactures RF filters for several sectors. (s1, s2)
-  - can do: Design BAW and SAW resonator filters for 5G bands
-  - can do: Model filter response and tune it against measured data
-  - can do: Take RF filter designs through to full-scale manufacturing
-- **Micro and nanofabrication engineers** (Experienced; MEMS, Photolithography, Thin-film deposition, Plasma etching, Cleanroom processes): It offers MEMS and micro- and nano-fabrication services to clients moving from concept to manufacturing. (s3, s2)
+**Likely needs (inferred): unclear**
+
+Offers micro and nano fabrication, packaging and RF characterization services for telecom, defense and aerospace clients.
+
+- **RF filter design engineers** (Experienced; BAW filters, SAW filters, RF simulation, Microwave design, MEMS): A young company focused on RF filter design and manufacturing for 5G, defense and aerospace needs filter designers. (s1, s2)
+  - can do: Design BAW and SAW filter structures for 5G bands
+  - can do: Simulate RF filter response and loss across frequencies
+  - can do: Take filter designs from concept through to manufacturing
+- **Micro and nano fabrication engineers** (Experienced; Photolithography, Thin film deposition, Etching, MEMS, Cleanroom processes): Provides MEMS, microfluidics and nano-fabrication services, which need process engineers to run them. (s3)
   - can do: Run MEMS process steps in a cleanroom
-  - can do: Develop process recipes for thin-film deposition and etching
-  - can do: Troubleshoot yield loss across fabrication batches
-- **DC and RF characterization engineers** (Early career; VNA measurements, DC parametric testing, RF characterization, Python automation, Calibration methods): It provides DC and RF characterization services, so clients need people who can measure and assess their components. (s3)
-  - can do: Measure RF device performance with network analyzers
-  - can do: Characterize components across DC and RF ranges
-  - can do: Write test procedures that give repeatable results
+  - can do: Develop and document fabrication recipes
+  - can do: Troubleshoot yield loss in micro-device processes
+- **RF characterization engineers** (Early career; VNA measurements, On-wafer probing, RF calibration, Python test automation): Offers DC and RF characterization services to clients developing high-performance components. (s3)
+  - can do: Measure S-parameters of RF devices on wafer
+  - can do: Build and maintain RF test setups
+  - can do: Report characterization results to clients
 
 ## Orion Oyj
 
@@ -2068,22 +2501,27 @@ https://www.orionpharma.com/fi/ · open tech roles in our data: 1
 - `s8` [other, 2026-04] Orion employed about 4,000 people worldwide in 2025, with average personnel of 4,107 in January–March 2026, up 4.6% year on year.  
   > "Average number of personnel during the period | 4,107 | 3,928 | +4.6%" ([source](https://www.orionpharma.com/newsroom/all-news/releases/stock-releases/2026/orion-group-interim-report-januarymarch-2026/))
 
+**What to tell candidates**
+
+- **Net sales up 24% in January–September 2026** (2026-10; s1, s2): Net sales reached EUR 1,481.5 million in the first nine months, and the full-year outlook was raised due to faster-than-expected royalty income.
+- **First biologic candidate dosed in clinical trial** (2026-10; s3, s4): Orion dosed the first patient in a Phase 1/2 trial of ODM-216, its first biologic candidate, marking its entry into clinical-stage biologics.
+- **EUR 100 million European Investment Bank loan** (2026-04; s5): The loan funds research and development across Orion's European centres, including personnel costs and clinical trials.
+- **Biosimilar partnership with Qilu Pharma Europe** (2026-10; s6): Orion will commercialise an intravenous pembrolizumab biosimilar in Europe under an agreement with exclusive distribution rights.
+- left out `s7`: says too little
+- left out `s8`: says the same as another
+
 **Likely needs (inferred): growing**
 
-Orion is growing fast and moving into biologics, with a first biologic candidate now in clinical trials.
+Orion is growing fast, with sales up 24% and first biologic drug now in clinical trials.
 
-- **Biologics process and analytical scientists** (Experienced; Monoclonal antibodies, Cell culture, Protein characterisation, GMP documentation): Orion dosed the first patient in its first biologic candidate trial and opened a biologics centre in Cambridge. (s3, s4)
-  - can do: Develop biologic manufacturing processes for early-stage candidates
-  - can do: Run analytical characterisation of protein drug substances
-  - can do: Support Phase 1/2 trial supply and quality data
-- **SAP finance solution leads** (Senior; SAP FI/CO, S/4HANA, Solution design, Financial close processes): Net sales and operating profit grew strongly in 2026, and the company is hiring for a finance SAP solution lead. (s1, s2, hiring now: SAP Solution Lead, Finance)
-  - can do: Design finance processes in SAP for group reporting
-  - can do: Lead stakeholder workshops across finance and business units
-  - can do: Drive SAP finance solution roadmaps and releases
-- **Biosimilar commercialisation managers** (Experienced; Biosimilars, Market access, European tenders, Pharma launch planning): Orion signed an agreement with Qilu Pharma Europe to commercialise a pembrolizumab biosimilar in Europe with exclusive distribution rights. (s6)
-  - can do: Plan European launch and distribution of a biosimilar
-  - can do: Manage partner relationships with licensors and manufacturers
-  - can do: Build pricing and tender strategy for hospital markets
+- **SAP finance solution leads** (Senior; SAP Finance, SAP S/4HANA, Solution design, Process mapping): Sales growth and a raised outlook increase the need for finance systems support across the business. (s1, s2, hiring now: SAP Solution Lead, Finance)
+  - can do: Design SAP Finance solutions for global business processes
+  - can do: Lead stakeholder workshops across finance and IT
+  - can do: Manage solution rollouts across multiple countries
+- **Biologics process development scientists** (Experienced; Cell culture, Protein purification, GMP, Process validation): Orion dosed its first biologic candidate in clinical trial and opened a biologics R&D centre. (s3, s4)
+  - can do: Develop upstream and downstream processes for biologic candidates
+  - can do: Scale up biologics manufacturing from lab to pilot
+  - can do: Document process validation for clinical supply
 
 ## Qevo Oy
 
@@ -2106,22 +2544,34 @@ https://qevo.fi/ · open tech roles in our data: 3
 - `s6` [hiring, 2026-05] Qevo is recruiting three senior quality roles: a test engineer, a test automation specialist and a quality lead, all as experienced consultants.  
   > "Test Engineer / Laadunvarmistuksen kokenut konsultti" ([source](https://qevo.fi/avoimet-paikat))
 
+**What to tell candidates**
+
+- **Grew about 60% year over year** (2026; s1): Founded in 2023 as a software quality consultancy with 1-10 employees, and its CEO says it is growing about 60% a year.
+- **Approved as Helsinki city supplier** (2026-04; s2): Helsinki city's procurement unit approved Qevo in a dynamic purchasing system for software development and maintenance services, valid until March 2030.
+- **Took over test automation for a client** (2026-05; s3): Its QaaS team took over test data management and performance testing for a client and helped design the client's test automation architecture.
+- **Embeds automation specialists in product teams** (2026-05; s4): Its test automation specialists work inside a client's product organisation so automation keeps pace with a new product's development.
+- **Offers AI test data and platform consulting** (2026-01; s5): Has written about AI-assisted synthetic test data generation and offers platform engineering and developer portal consulting.
+- left out `s6`: says too little
+
 **Likely needs (inferred): growing**
 
-Qevo helps client teams improve software quality with embedded test automation and quality assurance consulting.
+Qevo supplies software quality consultants to clients and recently won a Helsinki city supplier spot until 2030.
 
-- **Test automation specialists** (Senior; Test automation, API testing, CI/CD, Cloud services, Back-end systems): Qevo's automation specialists embedded in a client product organisation to keep automation from slowing development, and it is hiring a test automation specialist. (s4, s6, hiring now: Testiautomaatioasiantuntija – laadunvarmistuksen kokenut konsultti)
-  - can do: Build automated regression suites for multi-integration systems
-  - can do: Integrate test automation into CI/CD pipelines
-  - can do: Design test architecture for cloud services and APIs
-- **Software quality leads** (Lead; Software QA, Test strategy, Test management, Agile delivery): Qevo is recruiting a quality lead to run quality work as its client base grows about 60% a year. (s1, s6, hiring now: Quality lead – laadunvarmistuksen kokenut konsultti)
-  - can do: Set quality strategy and test standards across client projects
-  - can do: Lead and review test engineering work in client teams
-  - can do: Report quality risks and metrics to client management
-- **Test engineers for complex systems** (Experienced; Test case design, Performance testing, Test data management, APIs, Back-end systems): Qevo's QaaS team took over test data management and performance testing for a client and is recruiting a test engineer for complex multi-integration systems. (s3, s6, hiring now: Test Engineer / Laadunvarmistuksen kokenut konsultti)
+- **Senior test engineers** (Senior; Test case design, Regression testing, REST API testing, Cloud services, Fluent English): Qevo is recruiting a senior test engineer for consulting work on complex multi-integration systems. (s6)
   - can do: Write and execute test cases for multi-integration systems
-  - can do: Manage test data for end-to-end testing
-  - can do: Run performance tests and analyse results
+  - can do: Test cloud services, APIs and back-end systems end to end
+  - can do: Work in fluent English with client teams
+- **Test automation specialists** (Senior; Test automation, Test frameworks, CI/CD pipelines, API testing): Qevo is recruiting a test automation specialist as client work grows in embedded automation and architecture. (s4, s6, hiring now: Testiautomaatioasiantuntija – laadunvarmistuksen kokenut konsultti)
+  - can do: Build and maintain test automation frameworks for client products
+  - can do: Design test automation architecture alongside client teams
+  - can do: Keep automation from slowing product delivery
+- **Quality leads** (Lead; Test strategy, Quality assurance, Test data management, Performance testing): Qevo is recruiting a quality lead as its consultancy grows about 60% a year. (s1, s6, hiring now: Quality lead – laadunvarmistuksen kokenut konsultti)
+  - can do: Lead quality assurance across client delivery teams
+  - can do: Set test strategy and quality standards for engagements
+  - can do: Coordinate test data and performance testing work
+- **Test data engineers** (Experienced; Synthetic data, Test data management, Python): Qevo's QaaS team took over test data management and is exploring AI-assisted synthetic test data generation. (s3, s5)
+  - can do: Generate synthetic test data for client systems
+  - can do: Manage test data sets across integrated environments
 
 ## QMill Oy
 
@@ -2154,24 +2604,35 @@ https://qmill.com · open tech roles in our data: 3
 - `s11` [technology, 2025-11] QMill's Circuit Compression was demonstrated on IQM Emerald hardware at Slush 2025, with about 100 demos to booth visitors.  
   > "The demo was run on a real quantum computer, IQM Emerald" ([source](https://qmill.com/blog-qmill-at-slush/))
 
+**What to tell candidates**
+
+- **Received nearly EUR 3 million in Business Finland funding** (2026-05; s2): Business Finland granted QMill and ESL Shipping nearly EUR 3 million, with EUR 1.7 million going to the Supernova research project.
+- **Opening a UK office in 2026** (2026-09; s8, s9): QMill is opening a UK office, led by a business development role, with a UK-based quantum algorithm engineer post.
+- **Multi-year fleet optimisation project with ESL Shipping** (2026-05; s3): A multi-year Smart Fleet Optimization project assesses quantum computing for fleet-level shipping optimisation using real operational data.
+- **Launched Circuit Compression optimisation service** (2026-07; s5): QMill Circuit Compression is an AI-powered circuit optimisation service claimed to cut gate count and depth by 20–50%, now on qBraid Lab.
+- **Quantum-enhanced encryption developed with Telia Finland** (2026-05; s4): The message encryption method for mobile networks was developed with Telia Finland and demonstrated to the Finnish Defense Forces.
+- left out `s1`: older than two years
+- left out `s6`: says too little
+- left out `s7`: says the same as another
+- left out `s10`: a one-off that is over
+- left out `s11`: a one-off that is over
+
 **Likely needs (inferred): growing**
 
-Building quantum tools for shipping fleet optimisation, encryption and circuit compression, with a UK office opening.
+QMill is using today's quantum hardware for security and decision problems, working with shipping and telecom partners in Finland.
 
-- **Optimization and quantum algorithm developers** (Senior; Quantum algorithms, Combinatorial optimisation, Python, Benchmarking, NISQ hardware): ESL Shipping fleet optimisation project and Supernova research funding need algorithms tested on real operational data. (s2, s3, hiring now: Experienced optimization algorithm developer, hiring now: Quantum algorithm developer)
-  - can do: Design hybrid classical-quantum optimisation algorithms for fleet routing problems
-  - can do: Benchmark quantum algorithms against classical solvers on operational datasets
-  - can do: Implement algorithm code that runs on NISQ hardware simulators and devices
-- **Machine learning engineers** (Experienced; Reinforcement learning, PyTorch, GPU computing, Python, Test automation): QMill launched an AI-powered circuit optimisation service and is building algorithms that need learning models. (s5, hiring now: Machine learning expert)
-  - can do: Train neural network models for quantum circuit optimisation
-  - can do: Build GPU-parallel training pipelines for large experiment sets
-  - can do: Write unit and integration tests for production ML code
-- **Quantum cryptography engineers** (Senior; Post-quantum cryptography, Network security, Quantum key distribution, Cryptographic protocols): QMill built a quantum-enhanced encryption method with Telia Finland that was demonstrated to the Finnish Defense Forces. (s4)
-  - can do: Develop quantum-enhanced message encryption for mobile networks
-  - can do: Demonstrate security properties of encryption methods to defence clients
-- **Quantum algorithm engineers in the UK** (Experienced; Quantum algorithms, Qiskit, Linear algebra, Quantum simulation): QMill is opening a UK office with a quantum algorithm engineer post. (s8, s9)
-  - can do: Develop quantum algorithms for client optimisation problems
-  - can do: Present algorithm results to UK clients and partners
+- **Machine learning engineers** (Senior; PyTorch, Reinforcement learning, GPU parallel computing, LLMs): Funding and a multi-year shipping project create demand for ML work, and an open ML role is posted in Espoo. (s2, s3, s9, hiring now: Machine learning expert)
+  - can do: Train reinforcement learning models on operational data
+  - can do: Build GPU-parallel training pipelines for large datasets
+  - can do: Write unit and integration tests for ML services
+- **Optimisation algorithm developers** (Senior; Combinatorial optimisation, Quantum annealing, Heuristic search, Python): The ESL Shipping fleet project and Circuit Compression product both depend on optimisation work, and a role is open. (s3, s5, s9, hiring now: Experienced optimization algorithm developer)
+  - can do: Develop classical and quantum optimisation algorithms for fleet routing
+  - can do: Benchmark solvers against real operational data
+  - can do: Tune heuristics for circuit depth reduction
+- **Quantum algorithm developers** (Experienced; Qiskit, Quantum circuit compilation, NISQ algorithms, Linear algebra): Circuit Compression, the encryption work and the UK office all need quantum algorithm engineers, and roles are open in Espoo and the UK. (s5, s8, s9, hiring now: Quantum algorithm developer)
+  - can do: Design quantum algorithms for NISQ hardware
+  - can do: Benchmark algorithms on real quantum devices
+  - can do: Reduce gate count and circuit depth in compiled circuits
 
 ## QOCO Systems Oy
 
@@ -2200,22 +2661,32 @@ https://www.qoco.aero/ · open tech roles in our data: 3
 - `s9` [hiring] QOCO has three open product-side roles in Espoo: Engineering Manager, Senior Product Manager and Algorithm Developer.  
   > "Engineering Manager Product · QOCO Systems - Espoo · Hybrid" ([source](https://qocosystems.teamtailor.com/))
 
+**What to tell candidates**
+
+- **Raised tens of millions of euros in September 2026** (2026-09; s1): Pension funds Ilmarinen and Elo took minority stakes in a growth investment, with the exact size undisclosed.
+- **Recurring revenue up nearly fivefold in two years** (2026-09; s2, s3): Annual recurring revenue has grown nearly fivefold over the past 24 months, with expansion into the United States under way.
+- **Rolls-Royce Trent data service live at 40+ operators** (2026-09; s4): The data service now covers the full modern Trent fleet, with tens more operators in the pipeline.
+- **Airlines and engine shops adopting its platforms** (2026-01; s5, s6): Lufthansa picked QOCO Assignment for line maintenance planning, and Safran's India facility chose MROTools for its LEAP repair work.
+- **Zero lifetime customer churn, NPS above 70** (2026-06; s8): The company reports no lost customers since founding, with over 60 live integrations.
+- left out `s7`: says the same as another
+- left out `s9`: used for a role instead
+
 **Likely needs (inferred): growing**
 
-QOCO is scaling its aviation maintenance software across Lufthansa, Safran and Rolls-Royce fleets, with new US expansion.
+Growing aviation maintenance software, with airlines and engine makers like Lufthansa, Rolls-Royce and Safran adopting its platforms.
 
-- **Engineering managers** (Senior; SaaS architecture, Cloud environments, Agile delivery, Technical hiring): Ownership of a growing product team is needed as ARR grew nearly fivefold in 24 months and the company hires for an engineering manager. (s2, s9, hiring now: Engineering Manager)
-  - can do: Lead several software engineering teams as line manager
-  - can do: Scale team headcount and processes through a growth phase
-  - can do: Hire and develop engineers for a SaaS product
-- **Algorithm developers** (Experienced; Linear programming, Constraint programming, Combinatorial optimization, Python): The Trent data service now covers 40+ operators and maintenance planning tools need optimization across new airlines. (s4, s5, s9, hiring now: Algorithm Developer)
+- **Engineering managers** (Senior; SaaS development, Cloud environments, Hiring and performance management, Agile delivery): A growth investment and rapid revenue growth require scaling the engineering team through the expansion. (s1, s2, hiring now: Engineering Manager)
+  - can do: Lead several engineering teams through a product growth phase
+  - can do: Hire and grow engineers across a SaaS product org
+  - can do: Coordinate delivery with Product and stakeholders
+- **Optimization and algorithm developers** (Experienced; Linear and integer programming, Constraint programming, Combinatorial optimization, Production Python): Scheduling and line maintenance planning for airlines calls for optimization software, as Lufthansa's selection shows. (s5, hiring now: Algorithm Developer)
   - can do: Build integer programming models for maintenance scheduling
   - can do: Write production-quality optimization code in a shared codebase
-  - can do: Tune solver performance on large airline planning problems
-- **B2B SaaS product managers** (Senior; Product discovery, B2B SaaS, Experimentation, Data analysis): Several airline and engine customers are onboarding and the company is pushing into new markets, requiring product direction. (s3, s5, s9, hiring now: Senior Product Manager)
-  - can do: Run customer discovery through interviews and data analysis
-  - can do: Ship B2B SaaS features with measurable customer value
-  - can do: Set product priorities across aviation maintenance modules
+  - can do: Benchmark solver performance on real airline data
+- **Senior product managers** (Senior; B2B SaaS, Customer discovery, Experimentation, Aviation maintenance): Several airline and engine-maker rollouts are in the pipeline, each needing a product owner for B2B SaaS. (s4, s5, hiring now: Senior Product Manager)
+  - can do: Run customer discovery with airline maintenance teams
+  - can do: Define and ship B2B SaaS features with measurable customer value
+  - can do: Prioritize integrations for engine fleet data products
 
 ## Qt Group Oyj
 
@@ -2248,22 +2719,36 @@ https://www.qt.io/ · open tech roles in our data: 12
 - `s11` [hiring] Qt Group lists open senior roles in developer community, security, tooling, embedded product management and product security.  
   > "Software Excellence Starts With You" ([source](https://www.qt.io/careers))
 
+**What to tell candidates**
+
+- **Net sales up 27% in Q3 2026** (2026-10; s1): Q3 2026 net sales grew 27.0% to EUR 51.7 million, with ARR up 32.1% year to date at comparable exchange rates.
+- **Qt 6.12 LTS released with five-year support** (2026-09; s5): The release carries a five-year maintenance period, EU Cyber Resilience Act compliance and built-in QML hot reload.
+- **SAUTER chose Qt for building automation** (2026-10; s7): SAUTER publicly selected Qt tools for next generation building automation interfaces.
+- **Joined Reynolds & Moore safety partner ecosystem** (2026-06; s9): Qt Group pairs its TÜV-certified Axivion toolset with functional safety engineering services through the partnership.
+- left out `s2`: internal finance
+- left out `s3`: internal finance
+- left out `s4`: says the same as another
+- left out `s6`: says too little
+- left out `s8`: older than two years
+- left out `s10`: says too little
+- left out `s11`: used for a role instead
+
 **Likely needs (inferred): growing**
 
-Qt Group's revenue and recurring sales are growing fast while it restructures, and it is shipping new Qt releases for regulated products.
+Qt Group is growing fast, with net sales up 27% in Q3 2026 and recurring revenue climbing.
 
-- **Product security engineers** (Senior; Secure code review, Threat modelling, IEC 62443, EU CRA, ISO/IEC 27001): Multiple Qt Framework security advisories in autumn 2026 and EU Cyber Resilience Act compliance for the 6.12 LTS release. (s10, s5, hiring now: Product Security Principal)
-  - can do: Run vulnerability analysis and secure code review on Qt Framework modules
-  - can do: Build threat models for embedded and HMI products
-  - can do: Manage vulnerability disclosure and incident response for shipped releases
-- **Embedded product managers** (Senior; Yocto Linux, RTOS, BSP, Android, ROI business cases): Growing customer wins in building automation and automotive cockpits need product leads who understand hardware platforms. (s7, s8, s11, hiring now: Senior Product Lead, Embedded)
-  - can do: Own roadmap and business cases for Qt on embedded platforms
-  - can do: Coordinate BSP, GPU and chipset vendors across releases
-  - can do: Set P&L and ROI targets for embedded product lines
-- **Developer community leads** (Lead; C++, QML, Developer relations, Community KPIs): Qt Group is growing its developer base and lists an open senior community growth role. (s5, s11, hiring now: Senior Lead - Developer Community Growth)
-  - can do: Run developer community programmes measured by KPIs
-  - can do: Lead project teams that grow Qt adoption among C++ and QML developers
-  - can do: Produce technical content on Qt 6 features such as QML hot reload
+- **Embedded product managers** (Senior; Yocto Linux, Android BSP, RTOS, P&L modelling, Embedded Linux): Net sales grew 27% and Suzuki and SAUTER adopted Qt for embedded HMI and building interfaces. (s1, s7, s8, hiring now: Senior Product Lead, Embedded)
+  - can do: Own a P&L and build ROI cases for embedded platforms
+  - can do: Lead cross-functional teams without direct authority
+  - can do: Set roadmaps for chipsets, GPUs and BSPs
+- **Product security engineers** (Senior; Threat modelling, IEC 62443, EU CRA, ISO/IEC 27001, Vulnerability management): Multiple Qt Framework security advisories in autumn 2026 and the EU Cyber Resilience Act compliance of Qt 6.12 create security workload. (s5, s10, s11, hiring now: Product Security Principal, hiring now: Senior ICT Specialist, Security)
+  - can do: Run vulnerability analysis and secure code review on Qt modules
+  - can do: Lead incident response for published security advisories
+  - can do: Build threat models that meet EU CRA requirements
+- **Developer community leads** (Lead; C++, QML, Developer marketing, Community management, KPI reporting): ARR growth of 32% and a shift to faster Qt WebEngine and Qt PDF release cadence raise the need to grow the developer base. (s1, s6, s11, hiring now: Senior Lead - Developer Community Growth)
+  - can do: Grow the developer community with KPI-tracked programmes
+  - can do: Manage project teams and community contributions
+  - can do: Explain C++ and QML features to developers
 
 ## Qutwo
 
@@ -2292,26 +2777,30 @@ https://qutwo.com · not in our Espoo job data
 - `s9` [growth, 2026] Qutwo's team counts over 100 AI and quantum scientists and engineers.  
   > "Our team consists of 100+ AI and quantum scientists and engineers" ([source](https://www.qutwo.com/))
 
+**What to tell candidates**
+
+- **Raised €25m at €325m valuation** (2026-05; s1, s7): An angel round in May 2026, three months after the company's February launch, intended to expand Qutwo OS and grow its managed inference services.
+- **Over €20m contracted revenue since launch** (2026-05; s2, s3, s4): The company reports more than €20m in contracted revenue in the months since its February 2026 launch, with clients including Metsä Group and OP Pohjola.
+- **Team of over 100 scientists and engineers** (2026; s9): The company counts more than 100 AI and quantum scientists and engineers, a large team for a company founded in 2026.
+- **Quantum-inspired model compression announced** (2026-10; s5, s6): Compression reaching 90% while keeping over 90% of capability on standard benchmarks, now being extended to run scam detection on consumer devices.
+- **Defence and research partnerships** (2026-07; s3, s8): NestAI is building sovereign AI for European defence with QuTwo, and a quantum computing and AI research unit with OP Pohjola is scaling to about 60 specialists by mid-2027.
+
 **Likely needs (inferred): growing**
 
-Qutwo builds AI software for industrial and quantum-era use, with partners in finance, forestry, and defence.
+QuTwo raised €25m and is building Qutwo OS, an AI layer for industrial clients moving toward quantum computing.
 
-- **Model compression engineers** (Senior; Model quantization, PyTorch, Knowledge distillation, Edge inference, Benchmarking): Qutwo announced 90% model compression and extended its F-Secure work to run AI on consumer devices. (s5, s6)
-  - can do: Compress large AI models while keeping most benchmark capability
-  - can do: Deploy compressed models onto consumer hardware
-  - can do: Measure accuracy loss against standard benchmarks
-- **Quantum and hybrid AI researchers** (Experienced; Quantum algorithms, Qiskit, Variational circuits, Python, Machine learning): Qutwo is establishing a quantum computing and AI research unit with OP Pohjola, scaling to about 60 specialists by mid-2027. (s3, s7)
-  - can do: Design hybrid classical-quantum AI experiments
-  - can do: Prototype quantum-inspired algorithms for financial workloads
-  - can do: Evaluate quantum hardware performance against classical baselines
-- **Enterprise AI platform engineers** (Experienced; Kubernetes, Distributed systems, Python, Model serving, Industrial integration): Funding is meant to expand Qutwo OS and its managed inference services, and Metsä Group will run the platform on mill lines. (s4, s7)
-  - can do: Extend Qutwo OS for new industrial customers
-  - can do: Operate managed inference services at production scale
-  - can do: Integrate AI platforms with factory control systems
-- **Defence AI engineers** (Experienced; Secure enclaves, Access control, Air-gapped deployment, Python, Security accreditation): NestAI is partnering with Qutwo to build sovereign AI for European defence. (s8)
-  - can do: Build AI systems that run within sovereign infrastructure
-  - can do: Apply security controls to AI models in defence settings
-  - can do: Document systems to defence accreditation requirements
+- **Quantum algorithm researchers** (Experienced; Quantum circuits, Python, Qiskit, Optimisation methods, Quantum error mitigation): A research unit with OP Pohjola is scaling to about 60 specialists by mid-2027 on quantum computing and AI. (s3)
+  - can do: Design hybrid quantum-classical algorithms for industrial optimisation problems
+  - can do: Benchmark quantum approaches against classical baselines on real datasets
+  - can do: Translate research prototypes into reproducible experiments for client teams
+- **Model compression engineers** (Experienced; Model quantisation, PyTorch, ONNX, Knowledge distillation, Edge inference): Compression to 90% with over 90% capability retained is being extended to consumer devices for F-Secure. (s5, s6)
+  - can do: Compress neural networks while holding benchmark accuracy above target
+  - can do: Deploy compressed models to edge and consumer hardware
+  - can do: Measure capability loss across standard benchmarks
+- **Enterprise AI deployment engineers** (Experienced; Kubernetes, REST APIs, MLOps, Industrial data integration, Python): Qutwo OS is being rolled out to industrial clients such as Metsä Group's mill lines and wood procurement. (s4, s7)
+  - can do: Integrate Qutwo OS with client plant and procurement systems
+  - can do: Run managed inference services with agreed uptime
+  - can do: Adapt AI workflows to industrial operating environments
 
 ## Remedy Entertainment Oyj
 
@@ -2340,18 +2829,26 @@ https://www.remedygames.com/ · open tech roles in our data: 1
 - `s9` [organisation, 2025] Remedy's strategy for 2025–2030 centres on self-publishing its own franchises, with full publishing rights to the CONTROL franchise received in 2025.  
   > "Self-publishing the games we own" ([source](https://investors.remedygames.com/en/as_an_investment/strategy))
 
+**What to tell candidates**
+
+- **Q3 revenue up 226% to EUR 39.6 million** (2026-11; s1): Growth was driven by the launch of CONTROL Resonant, and operating profit stayed positive at EUR 0.6 million in the quarter.
+- **CONTROL Resonant passed one million sales** (2026-10; s2, s3): Launched worldwide on September 24, 2026, it sold over one million copies by mid-October, Remedy's fastest-selling game.
+- **Half of buyers new to the franchise** (2026-11; s3): About half of CONTROL Resonant's buyers had not played the franchise before, and sales grew in markets such as Brazil.
+- **Self-publishing its own franchises from 2025** (2025; s9): Remedy's 2025–2030 strategy centres on self-publishing, with full publishing rights to the CONTROL franchise received in 2025.
+- **Builds on its own Northlight engine** (2026-02; s8): Remedy develops its own Northlight engine and tools, which power its games including CONTROL Resonant.
+- left out `s4`: older than two years
+- left out `s5`: older than two years
+- left out `s6`: says too little
+- left out `s7`: internal finance
+
 **Likely needs (inferred): growing**
 
-CONTROL Resonant sold over a million copies fast, pulling in new players and driving a sharp revenue jump.
+Remedy's CONTROL Resonant became its fastest seller, passing one million copies within weeks of its September launch.
 
-- **Game audio designers** (Senior; Wwise, FMOD, Lua, C#, Python): CONTROL Resonant's launch lifted revenue 226% and the team is building further CONTROL content for a larger audience. (s1, s2, s9, hiring now: (Senior) Technical Music Designer)
-  - can do: Implement interactive music systems in Wwise for shipped titles
-  - can do: Write adaptive music logic that responds to player state
-  - can do: Collaborate with composers and sound designers on mix and integration
-- **Game engine developers** (Experienced; C++, Rendering, Profiling, Tool development): Remedy builds and maintains its own Northlight engine that powers its games, including Control Resonant. (s8)
-  - can do: Extend the Northlight engine for new rendering or gameplay features
-  - can do: Optimise performance across console and PC platforms
-  - can do: Build internal tools that game teams use daily
+- **Technical music designers** (Senior; Wwise, FMOD, Lua, C#, Python): CONTROL Resonant's launch and growing sales drove a growth quarter, and an open senior role seeks music systems work. (s1, s2, hiring now: (Senior) Technical Music Designer)
+  - can do: Implement adaptive music systems in Wwise for shipped titles
+  - can do: Build game music logic that responds to player state and combat
+  - can do: Debug audio middleware integration across platform builds
 
 ## Sansaino
 
@@ -2370,17 +2867,21 @@ https://sansaino.com · not in our Espoo job data
 - `s4` [hiring, 2026-10] sansaino posted an onsite full-time Security Engineer role in the UAE covering firewall, PAM, MFA and DNS security deployments.  
   > "Deploy, configure, and optimize firewalls and network security appliances across production and cloud environments." ([source](https://www.jobsportal.fi/jobs/16740-we-are-hiring-a-security-engineer-in-the-uae/))
 
+**What to tell candidates**
+
+- **Founded in Finland in 2025** (2025; s1): Sansaino is a Finnish startup building a verified talent marketplace for data centers, critical IT and enterprise technology.
+- **Employer of Record in 160+ countries** (2026-07; s2): Companies can hire internationally without opening a local entity, through Sansaino's Employer of Record coverage.
+- **Posted a UAE security engineer role** (2026-10; s4): An onsite full-time Security Engineer role in the UAE was posted, covering firewall, PAM, MFA and DNS security deployments.
+- left out `s3`: used for a role instead
+
 **Likely needs (inferred): unclear**
 
-Sansaino is building a verified talent marketplace for data centers and critical IT, letting firms hire internationally.
+Building a verified talent marketplace for data center, critical IT and enterprise technology hiring worldwide.
 
-- **Sales and marketing professionals** (Early career; B2B prospecting, CRM tools, Marketing campaigns, Market research): Sansaino posted a Sales and Marketing Professionals role offering internships, work trials and remote work in November 2026. (s3)
-  - can do: Pitch the verified talent marketplace to enterprise and data center employers
-  - can do: Run outreach campaigns that bring in new employer customers
-  - can do: Build relationships with hiring managers in critical infrastructure
-- **Security engineers** (Experienced; Firewall configuration, PAM, MFA, DNS security): Sansaino posted an onsite full-time Security Engineer role in the UAE covering firewall, PAM, MFA and DNS security deployments in October 2026. (s4)
-  - can do: Deploy firewall and PAM controls for enterprise networks
-  - can do: Configure MFA and DNS security across client environments
+- **Security engineers for Gulf deployments** (Experienced; Firewalls, PAM, MFA, DNS security, Zero trust): Sansaino posted an onsite full-time Security Engineer role in the UAE in October 2026. (s4)
+  - can do: Deploy firewall and DNS security controls for enterprise networks
+  - can do: Configure PAM and MFA across hybrid infrastructure
+  - can do: Document security baselines for client audits
 
 ## Semiqon Technologies oy
 
@@ -2403,18 +2904,27 @@ https://www.semiqon.com/ · open tech roles in our data: 1
 - `s6` [technology, 2026-02] SemiQon is developing a next-generation silicon-based quantum chip and cryo-CMOS electronics that operate inside the cryostat to reduce wiring and heat load.  
   > "SemiQon is launching a next-generation quantum chip enabling scalable quantum computing" ([source](https://www.semiqon.com/news-insights/semiqon-enters-new-growth-phase-with-new-chip-launch-and-cryo-electronics-manufacturing-expansion))
 
+**What to tell candidates**
+
+- **Raised EUR 17.5 million in 2025** (2025-03; s3): Blended EIC financing combined a EUR 2.5 million grant with EUR 15 million equity-based funding.
+- **Shipping first commercial quantum hardware orders** (2026-06; s4): After entering the commercial phase in spring 2026, SemiQon began shipping first customer orders in Q1 2026.
+- **Growing toward three times manufacturing capacity** (2026-02; s5): About 30 employees, with a planned move to the Kvanttinova facility in Otaniemi offering three times the previous manufacturing capacity.
+- **Building cryo-CMOS chips to cut wiring and heat** (2026-02; s6): Developing next-generation silicon quantum chips and electronics that run inside the cryostat to reduce wiring and heat load.
+- **Partnered with Novo Nordisk Foundation quantum programme** (2026-11; s1): Validating cryogenic CMOS multiplexers to measure more qubits per cooldown.
+- left out `s2`: says the same as another
+
 **Likely needs (inferred): growing**
 
-Shipping silicon quantum hardware to first commercial customers, and moving into a facility with three times its capacity.
+Shipping silicon quantum hardware to first commercial customers while scaling into a larger Espoo facility.
 
-- **Cryogenic CMOS IC designers** (Senior; Analog IC design, CMOS layout, Cryogenic characterization, Cadence Virtuoso, SPICE simulation): SemiQon is developing cryo-CMOS electronics that run inside the cryostat and validating multiplexers for more qubits per cooldown. (s1, s6, hiring now: (Senior) IC designer)
-  - can do: Design CMOS circuits that operate at cryogenic temperatures
-  - can do: Characterize low-temperature device behavior in lab measurements
-  - can do: Integrate cryo-CMOS blocks into a silicon quantum chip layout
-- **Quantum chip process engineers** (Experienced; Silicon process integration, Lithography, Thin-film deposition, Yield analysis, Cleanroom metrology): The company is moving into a facility offering three times its previous manufacturing capacity and ramping commercial orders. (s4, s5)
-  - can do: Run silicon fabrication process steps for qubit devices
-  - can do: Control yield and process variation across wafer lots
-  - can do: Transfer process recipes to a larger manufacturing line
+- **Cryogenic CMOS design engineers** (Senior; Cryogenic CMOS, Analog IC design, Cadence Virtuoso, SPICE modeling): Commercial orders and cryo-CMOS multiplexer validation require more chip design capacity. (s1, s4, s6, hiring now: (Senior) IC designer)
+  - can do: Design cryogenic CMOS circuits for operation near absolute zero
+  - can do: Verify low-temperature chip behavior with simulation and measurement
+  - can do: Integrate multiplexers into qubit readout chains
+- **Cleanroom process and fabrication engineers** (Experienced; Silicon process integration, Lithography, Thin-film deposition, Yield analysis): Moving into a site with three times the manufacturing capacity needs process engineers to run it. (s5)
+  - can do: Run silicon fabrication process steps in a cleanroom
+  - can do: Improve yield on qubit device wafers
+  - can do: Transfer processes to a new fabrication facility
 
 ## Smartly
 
@@ -2441,22 +2951,33 @@ https://smartly.io · not in our Espoo job data
 - `s8` [customers, 2026-02] Instamart reported 7,500+ incremental conversions and 15% lower customer acquisition cost after adopting Smartly's predictive budget allocation.  
   > "7,500+ incremental conversions €642k saved annually 15% lower CAC" ([source](https://www.smartly.io/resources/instamart-drives-efficient-growth-with-smartlys-ai-powered-predictive-budget-allocation))
 
+**What to tell candidates**
+
+- **Acquired INCRMNTAL in May 2026** (2026-05; s1, s5): The incrementality measurement company now feeds Smartly's Intelligence Pro, which launched in November 2026.
+- **Acquired Ad-Lib.io for over $100 million** (2026-03; s2): The March 2026 deal expands Smartly into Google advertising products.
+- **About 1,000 employees, $7 billion managed** (2026-11; s4): Smartly manages over $7 billion in ad spend for 800+ brands.
+- **Intelligence Pro launched in November 2026** (2026-11; s5): It combines Reach Planner, Headroom Analysis, Benchmarks and INCRMNTAL Connect into one product.
+- **LinkedIn Ads integration added in September 2026** (2026-09; s7): Smartly now brings LinkedIn Ads into its cross-channel platform.
+- left out `s3`: used for a role instead
+- left out `s6`: says the same as another
+- left out `s8`: says too little
+
 **Likely needs (inferred): growing**
 
-Smartly is buying measurement and Google ad tools while adding AI agents and a new engineering hub in Mexico City.
+Smartly is adding incrementality measurement and Google and LinkedIn ad support to its AI advertising platform.
 
-- **Machine learning engineers** (Experienced; Python, PyTorch, Ad bidding models, Experiment design, LLM orchestration): Smartly launched Synapse AI orchestration and Intelligence Pro while hiring for AI roles in its new Mexico City hub. (s3, s5, s6)
-  - can do: Build and tune models that allocate ad budgets across channels
-  - can do: Ship AI agent features that run inside production campaign workflows
-  - can do: Evaluate model performance on live advertising conversion data
-- **Marketing measurement scientists** (Senior; Incrementality testing, Media mix modelling, Causal inference, SQL, R): Smartly acquired INCRMNTAL, an incrementality measurement company, and built Intelligence Pro around it. (s1, s5)
-  - can do: Design incrementality tests that separate ad lift from baseline sales
-  - can do: Build media mix and headroom models for budget decisions
-  - can do: Validate measurement results against client conversion data
-- **Google Ads platform engineers** (Experienced; Google Ads API, REST APIs, Go, Kubernetes, Event streaming): Smartly bought Ad-Lib.io to expand into Google advertising products and integrated LinkedIn Ads in September 2026. (s2, s7, s3)
-  - can do: Build connectors that sync campaigns with Google and LinkedIn ad APIs
-  - can do: Maintain bidding and activation pipelines across ad networks
-  - can do: Debug API rate limits and attribution gaps across platforms
+- **Data scientists in incrementality measurement** (Experienced; Causal inference, Python, Statistical modelling, A/B testing): The INCRMNTAL acquisition and Intelligence Pro launch need people to build causal measurement into the product. (s1, s5)
+  - can do: Design incrementality tests for multi-channel campaigns
+  - can do: Build causal models that estimate ad lift
+  - can do: Validate measurement methods against holdout results
+- **Google Ads platform engineers** (Experienced; Google Ads API, Python, Data pipelines, REST APIs): The Ad-Lib.io acquisition expanded Smartly into Google advertising products. (s2)
+  - can do: Integrate Google Ads APIs into campaign workflows
+  - can do: Sync campaign data across channels reliably
+  - can do: Maintain bid and budget automation for Google
+- **Enterprise sales leads** (Senior; B2B sales, Ad tech, Pipeline management, CRM tools): Smartly manages over $7 billion in ad spend for 800+ brands and has added new product lines. (s4, s5)
+  - can do: Sell platform deals to large brand and agency accounts
+  - can do: Map campaign needs to Intelligence Pro offerings
+  - can do: Negotiate multi-year contracts with marketing leaders
 
 ## Solteq Oyj
 
@@ -2485,22 +3006,28 @@ https://www.solteq.com · open tech roles in our data: 2
 - `s9` [partnership, 2026-02] Solteq was named Liferay Industry Solution Partner of the Year for Manufacturing for 2025.  
   > "Liferay Industry Solution Partner of the Year for Manufacturing - 2025" ([source](https://www.solteq.com/en/news/solteq-named-liferay-industry-solution-partner-of-the-year-for-manufacturing-2025))
 
+**What to tell candidates**
+
+- **Restructuring EUR 18.74 million senior notes** (2026-09; s1, s4): Notes due October 2026 were amended, extending final maturity by 30 months to April 2029, after a going-concern uncertainty was flagged.
+- **Revenue down 6.6% in first nine months** (2026-10; s2, s8): Comparable revenue was EUR 32.4 million for January to September 2026, while comparable operating result rose to EUR 1.4 million.
+- **AI now in 72% of Utilities development** (2026-05; s6): AI's share of production-bound development in Utilities work rose from about 0% to 72% in March 2026, with a target of 100% by September.
+- **Phased new software launches planned for 2026** (2026-02; s7): Solteq plans to introduce new software solutions to the market in phases during 2026 after continued product development investment.
+- left out `s3`: says the same as another
+- left out `s5`: says too little
+- left out `s9`: older than two years
+
 **Likely needs (inferred): shrinking**
 
-Solteq is rebuilding its software for energy utilities, using AI to cut development cycles from weeks to days.
+Solteq is rebuilding its software for AI-driven development while restructuring its debt and cutting costs.
 
-- **Cloud solution architects** (Senior; Azure, AWS, C# and .NET Core, Azure Functions, API gateways): Solteq is rolling out new software solutions in phases during 2026 while its revenue fell 6.6 percent in the first nine months. (s7, s2, hiring now: Solution Architect)
+- **Cloud solution architects** (Senior; Azure, AWS, C#, Azure Service Bus, Azure Functions): Solteq is moving development toward AI-driven, cloud-based delivery while revenue falls. (s6, s7, hiring now: Solution Architect, hiring now: AI-Driven Cloud Architect)
   - can do: Design Azure integration architectures for retail and energy platforms
-  - can do: Build event-driven flows with Service Bus and Logic Apps
-  - can do: Guide cross-functional teams through CI/CD and Agile delivery
-- **AI-driven platform engineers** (Senior; Terraform, Kubernetes, Bicep, CI/CD, Azure): AI's share of production-bound development in Utilities work rose from about 0% to 72% in March 2026, targeting 100% by September. (s6, hiring now: AI-Driven Cloud Architect)
-  - can do: Automate production development pipelines with AI-assisted tooling
-  - can do: Provision multi-cloud infrastructure with Infrastructure as Code
-  - can do: Run highly available Kubernetes workloads on AKS or EKS
-- **Energy utilities product developers** (Experienced; C# and .NET Core, CI/CD, Agile delivery, API integration): Solteq is investing in continued product development and new software solutions for its energy sector work during 2026. (s6, s7)
-  - can do: Develop utility software features for energy customers
-  - can do: Ship production-ready releases in days rather than weeks
-  - can do: Work with customers to validate new product increments
+  - can do: Define API gateway and messaging patterns across services
+  - can do: Lead CI/CD and DevOps standards for cross-functional teams
+- **Platform and Kubernetes engineers** (Experienced; Kubernetes, Terraform, Bicep, AKS, Container orchestration): Cloud architecture work for AI-driven development requires hands-on container orchestration. (s6, hiring now: AI-Driven Cloud Architect)
+  - can do: Run highly available container platforms on AKS or EKS
+  - can do: Manage infrastructure as code for cloud environments
+  - can do: Operate CI/CD pipelines for production releases
 
 ## Supercell
 
@@ -2533,22 +3060,31 @@ https://supercell.com · not in our Espoo job data
 - `s11` [risk, 2026-02] According to AppMagic estimates cited by PocketGamer.biz, Brawl Stars sales fell by as much as 57% across the App Store and Google Play.  
   > "According to AppMagic estimates, sales fell by as much as 57% across the App Store and Google Play." ([source](https://www.pocketgamer.biz/supercell-revenue-declines-4-to-265bn-in-2025/))
 
+**What to tell candidates**
+
+- **Headcount up 30% to 890 in 2025** (2026-02; s3): Supercell recruited almost 300 employees in 2025, its biggest year of growth to date.
+- **Doubled new game development investment in 2025** (2026-02; s5): Supercell plans to double its investment in new game development again in 2026.
+- **Building AI-native reliability team for Titan engine** (2026-11; s8, s9): The new team works with engine and game teams on Supercell's proprietary Titan engine, alongside an AI Innovation Lab in Helsinki, San Francisco and Tokyo.
+- **Clash Royale was 2025's biggest success** (2026-02; s10): Re-engaged players doubled and new players rose by almost 500% during the year.
+- left out `s1`: not about this company
+- left out `s2`: internal finance
+- left out `s4`: says too little
+- left out `s6`: says too little
+- left out `s7`: says too little
+- left out `s11`: says the same as another
+
 **Likely needs (inferred): growing**
 
-Supercell is growing its team and investing in new games and AI tools after a record hiring year.
+Growing its headcount by 30% and doubling investment in new game development, while building AI tools for its Titan engine.
 
-- **Reliability and AI engineers** (Experienced; Python, Site reliability practices, Observability tooling, Machine learning basics, Game engine internals): Supercell is building a new AI-native Reliability team to work with its engine and game teams on Titan. (s8, s9)
-  - can do: Build reliability tooling for the proprietary Titan game engine
-  - can do: Apply AI tools to monitor and improve game stability
-  - can do: Work with game teams to resolve production incidents
-- **Game developers for new titles** (Experienced; C#, Unity, Mobile game architecture, Live game services, Performance profiling): Supercell doubled investment in new game development in 2025 and plans to double it again in 2026. (s5, s3)
-  - can do: Build gameplay features for free-to-play mobile titles
-  - can do: Prototype and test new game concepts with players
-  - can do: Optimise game performance across mobile devices
-- **Security engineers for platforms** (Senior; Application security, Incident response, Cloud access controls, Threat modelling, Data protection law): Supercell disclosed a security incident where an unauthorized party accessed user names and email addresses. (s7)
-  - can do: Investigate and contain unauthorized access to user data
-  - can do: Harden platform authentication and data access controls
-  - can do: Run security reviews of internal content systems
+- **Machine learning engineers** (Experienced; Python, PyTorch, MLOps, C++, Game engine tooling): Supercell is building an AI-native reliability team and an AI Innovation Lab across three cities. (s8, s9)
+  - can do: Build ML models that monitor engine and game reliability
+  - can do: Deploy AI tooling into live game development pipelines
+  - can do: Evaluate model outputs for player-facing quality
+- **Game engine engineers** (Senior; C++, Real-time rendering, Mobile performance profiling, Engine architecture): Investment in new game development doubled in 2025 and is set to double again, with work on the Titan engine. (s5, s8)
+  - can do: Extend the Titan engine for new game prototypes
+  - can do: Optimise rendering and performance for mobile devices
+  - can do: Support game teams building on the shared engine
 
 ## Taito United Oy
 
@@ -2575,22 +3111,29 @@ https://www.taitounited.fi · open tech roles in our data: 3
 - `s8` [customers, 2025-12] Taito United will be part of the Taito campus and Kupittaan kärki urban development as a supplier of digital services; the project is valued at around 150 million euros for YIT, unrelated to the software firm and not a Taito United contract.  
   > "Taito-kampuksen" ([source](https://news.cision.com/fi/yit-oyj/r/yit-kaynnistaa-turun-kupittaan-karjen-kumppanuushankkeen-taito-kampuksen-ja-infrahankkeen-toteutukse,c4277745))
 
+**What to tell candidates**
+
+- **Revenue up 17% in 2025** (2026-02; s2): Revenue grew 17% over the previous calendar year, with 11 new specialists hired and 12 new customers won.
+- **Building product-data system for GS1 Finland** (2025-08; s1): Technical implementer of a new product-data management system replacing two existing systems, with phased rollout planned from April 2026.
+- **AI road-infrastructure software for ScanwAi** (2026-01; s4): Technology partner building AI-driven road infrastructure management software that supports ScanwAi's growth into Czechia and Mexico.
+- **Custom document platform for Spesia** (2026-06; s5): Delivered an in-house document database on open components, replacing a costly licensed system.
+- **Google Cloud Partner for several years** (2025-01; s7): Officially recognised Google Cloud Partner, with its infrastructure built around Google Cloud over several years.
+- left out `s3`: says the same as another
+- left out `s6`: says too little
+- left out `s8`: not about this company
+
 **Likely needs (inferred): growing**
 
-Building a new product-data system for GS1 Finland and AI road-management software for ScanwAi.
+Taito United builds digital services and AI data work for Finnish customers, with a 2025 revenue rise of 17%.
 
-- **Full stack developers** (Experienced; React, TypeScript, Node.js, PostgreSQL, Google Cloud): Taito United reports 17% revenue growth in 2025 and 11 new specialists hired, with 12 new customers won. (s2, s3, s4, hiring now: Senior Full Stack -kehittäjä, hiring now: Fullstack-kehittäjä)
-  - can do: Build React and TypeScript user interfaces for customer products
-  - can do: Design and maintain PostgreSQL-backed Node.js services
-  - can do: Deliver cloud-hosted features from requirement to release
-- **Machine learning engineers** (Experienced; Python, LLM applications, Fine-tuning, Google Cloud, PostgreSQL): Taito United is expanding its AI and data service offering and builds AI-driven software for ScanwAi. (s4, s6, s7, hiring now: Machine Learning Engineer)
-  - can do: Decide between LLM prompting, fine-tuning and classical ML for a use case
-  - can do: Build LLM applications and agents in Python and TypeScript
-  - can do: Automate ML workloads on Google Cloud or Azure
-- **Data migration specialists** (Experienced; Data mapping, SQL, PostgreSQL, ETL): The GS1 Finland product-data system replaces two existing systems with a phased rollout from April 2026. (s1)
-  - can do: Map and migrate product data from two legacy systems
-  - can do: Plan phased rollouts that keep both systems running safely
-  - can do: Validate migrated records against customer requirements
+- **Machine learning engineers** (Experienced; Python, TypeScript, Google Cloud, LLM fine-tuning, Relational databases): Expanding AI and data services and posting an open Machine Learning Engineer role. (s6, s7, hiring now: Machine Learning Engineer)
+  - can do: Build and automate ML workloads on Google Cloud or Azure
+  - can do: Choose between LLMs, fine-tuning and classical ML for a use case
+  - can do: Ship LLM applications and agents into production
+- **Full stack developers** (Experienced; React, TypeScript, Node.js, PostgreSQL): Revenue grew 17% and 11 new specialists were hired, with ongoing customer delivery projects. (s2, s3, hiring now: Senior Full Stack -kehittäjä, hiring now: Fullstack-kehittäjä)
+  - can do: Build React and TypeScript front ends for customer platforms
+  - can do: Design and run PostgreSQL-backed services
+  - can do: Deliver features end to end from database to UI
 
 ## Teknologian tutkimuskeskus VTT Oy
 
@@ -2617,22 +3160,30 @@ https://www.vttresearch.com/en · open tech roles in our data: 6
 - `s8` [partnership, 2026-05] VTT and Japanese firm Emulsion Flow Technologies began discussions to validate separation technologies for battery metal recovery and PFAS removal in Europe.  
   > "VTT and Emulsion Flow Technologies Ltd. (EFT), a Japanese innovator in separation and recovery technologies, announce the commencement of discussions" ([source](https://www.vttresearch.com/en/news-and-ideas/vtt-and-japanese-emulsion-flow-technologies-collaborate-drive-sustainable-recovery))
 
-**Likely needs (inferred): unclear**
+**What to tell candidates**
 
-VTT is merging its business areas and cutting up to 190 roles while growing defence and quantum work.
+- **Net turnover rose to EUR 198 million in 2025** (2025; s4): The parent company's net turnover grew from EUR 189.7 million in 2024, a modest but positive trend.
+- **VTT spin-offs raised about EUR 445 million in 2025** (2025; s3): Equity funding for VTT-originating startups in 2025, with IQM's EUR 275 million round the largest single raise.
+- **Quantum computer contract with IQM under way** (2025-10; s6): IQM will deliver a 300-qubit superconducting quantum computer to VTT, financed by a EUR 70 million government grant, with delivery planned for Q4 2027.
+- **Defence framework agreement for 2026–2030** (2026-04; s5): VTT signed a framework agreement with the Finnish Defence Forces Logistics Command covering research and specialist services.
+- **Business areas merging into two, with a new AI unit** (2026-06; s2): Three business areas become Digital systems and Materials and energy, and a new unit is created to expand AI use in research.
+- left out `s1`: says too little
+- left out `s7`: not about this company
+- left out `s8`: says too little
 
-- **Quantum computing engineers** (Experienced; Superconducting qubits, Cryogenic systems, Quantum control software, Python): IQM is delivering a 300-qubit quantum computer to VTT, due Q4 2027, financed by a EUR 70 million government grant. (s6)
-  - can do: Operate and calibrate superconducting quantum hardware in a lab
-  - can do: Integrate quantum processors with classical control electronics
-  - can do: Benchmark quantum system performance and report results
-- **AI platform engineers** (Lead; Kubernetes, MLOps tools, Infrastructure as Code, Python): VTT is creating a new unit to expand AI use in research, after merging its business areas into two. (s2, hiring now: Lead AI Engineer)
-  - can do: Build and run MLOps pipelines for research AI workloads
-  - can do: Deploy LLM and RAG services on Kubernetes clusters
-  - can do: Automate model training and release with CI/CD
-- **Semiconductor process engineers** (Experienced; Cleanroom fabrication, Semiconductor process integration, 2D materials, Device characterisation): VTT is hiring for 2D-material sensors and 3D technologies, both requiring cleanroom fabrication work. (s2, hiring now: Research Scientist, CMOS integrated 2D sensors, hiring now: Research Scientist/Engineer, Semiconductor Process Integration and 3D Technologies)
-  - can do: Run cleanroom fabrication steps for 2D-material devices
-  - can do: Integrate process modules for 3D semiconductor stacks
-  - can do: Characterise devices and feed results back into process recipes
+**Likely needs (inferred): steady**
+
+VTT is cutting up to 175 roles while merging its business areas and expanding AI research and defence work.
+
+- **AI platform and MLOps engineers** (Lead; Kubernetes, MLOps, Infrastructure as Code, Python, LLMOps): VTT is creating a new unit to expand AI use in research, with a new AI-focused structure. (s2, hiring now: Lead AI Engineer)
+  - can do: Build and run ML platforms on Kubernetes and containers
+  - can do: Deploy and monitor LLM and RAG pipelines in production
+- **Quantum hardware engineers** (Experienced; Superconducting qubits, Cryogenics, Quantum control, Python): A 300-qubit superconducting quantum computer from IQM is due for delivery to VTT in Q4 2027. (s6)
+  - can do: Support installation and calibration of superconducting quantum hardware
+  - can do: Integrate quantum systems with research infrastructure
+- **Defence research scientists** (Experienced; Applied research, Technical reporting, Systems analysis): VTT signed a 2026–2030 framework agreement with the Finnish Defence Forces Logistics Command for research and specialist services. (s5)
+  - can do: Carry out applied research projects for defence customers
+  - can do: Deliver specialist technical reports to government clients
 
 ## TELUS Digital
 
@@ -2665,22 +3216,35 @@ https://telusdigital.com · not in our Espoo job data
 - `s11` [hiring, 2026-11] TELUS Digital's Philippines unit described commitment to employee engagement and talent development and plans for continued growth in the country.  
   > "plans for continued growth in the country" ([source](https://www.lionheartv.net/2026/11/telus-digital-philippines-honors-media-partners-at-scents-of-gratitude-thanksgiving-celebration/))
 
+**What to tell candidates**
+
+- **Expanded to 35+ countries, 82,000+ staff** (2026-05; s4): Delivery footprint grew across Asia-Pacific with a new Argentina location, now more than 82,000 team members.
+- **Named Leader in NelsonHall NEAT evaluation** (2026-08; s3): Recognised in both Overall and AI Training segments, with about 77 AI enablement clients.
+- **Partnered with Parloa and ElevenLabs** (2026-10; s1, s2): Became implementation partner for Parloa's agentic AI platform and preferred partner for ElevenLabs' voice AI platform.
+- **Macy's customers bought 4.75 times more** (2026-05; s10): AI-powered chat tools built on Gemini Enterprise for Customer Experience drove the reported uplift.
+- **Launched Fuel iX Fortify red-teaming tool** (2025-10; s8): Automated application for testing enterprise generative AI systems, extending the Fuel iX platform.
+- left out `s5`: not about this company
+- left out `s6`: internal finance
+- left out `s7`: older than two years
+- left out `s9`: not about this company
+- left out `s11`: says the same as another
+
 **Likely needs (inferred): growing**
 
-TELUS Digital is building AI customer-service tools with partners like Parloa and ElevenLabs, and expanding delivery across Asia-Pacific.
+TELUS Digital is building AI customer-service tools with partners like Parloa and ElevenLabs while expanding delivery across 35+ countries.
 
-- **AI agent implementation engineers** (Experienced; Conversational AI, Voice AI, CRM integration, REST APIs, Contact center platforms): Named implementation partner for Parloa's agentic AI customer-service platform and preferred partner for ElevenLabs' voice AI platform. (s1, s2)
-  - can do: Configure voice agents on partner platforms for client contact centers
-  - can do: Integrate conversational AI with CRM and telephony systems
-  - can do: Test agent responses against client quality and compliance rules
-- **Generative AI red-teaming specialists** (Experienced; Red teaming, LLM evaluation, Python, AI safety testing, Prompt engineering): Launched Fuel iX Fortify, an automated red-teaming application for testing enterprise generative AI systems. (s8)
-  - can do: Design adversarial prompts to probe enterprise generative AI systems
-  - can do: Analyze model failures and document risk for client teams
-  - can do: Run automated red-team test suites across deployed AI applications
-- **AI training data annotators** (Early career; Data annotation, RLHF, Quality assurance, Multilingual labeling): Recognized as a Leader in NelsonHall's AI Enablement Services evaluation with about 77 AI enablement clients. (s3)
-  - can do: Label text and audio data to specification for model training
-  - can do: Review annotation quality against client guidelines
-  - can do: Flag ambiguous examples and escalate to project leads
+- **AI integration engineers** (Experienced; Python, REST APIs, Speech-to-text, LLM orchestration, CCaaS platforms): Partnerships with Parloa and ElevenLabs require implementing agentic and voice AI for client deployments. (s1, s2)
+  - can do: Integrate voice AI agents with enterprise contact-center systems
+  - can do: Build conversational flows on agentic AI platforms
+  - can do: Monitor and tune deployed AI agents for accuracy
+- **AI red-teaming specialists** (Experienced; Adversarial testing, Prompt injection, Python, OWASP LLM Top 10, Threat modelling): Launch of Fuel iX Fortify for testing enterprise generative AI systems creates demand for people who probe those systems. (s8)
+  - can do: Design adversarial prompts to test generative AI guardrails
+  - can do: Document model vulnerabilities with reproducible evidence
+  - can do: Run automated red-teaming pipelines for enterprise clients
+- **AI training data specialists** (Early career; Data annotation, RLHF, Quality assurance, Python, Multilingual labelling): Recognition as a NelsonHall AI Training leader alongside about 77 AI enablement clients points to continuing demand for training data work. (s3)
+  - can do: Design labelling guidelines for generative AI training data
+  - can do: Run quality audits on annotated datasets
+  - can do: Coordinate distributed annotation teams across countries
 
 ## Texas Instruments
 
@@ -2713,26 +3277,34 @@ https://ti.com · not in our Espoo job data
 - `s11` [growth, 2026-10] TI's Q4 2026 revenue guidance is $5.80 billion to $6.30 billion, with lower bound above two analyst estimates.  
   > "set a fourth-quarter sales range whose lower bound topped two analyst estimates" ([source](https://econotimes.com/Texas-Instruments-Posts-28-Revenue-Growth-Sets-Forecast-Above-Estimates-1759912))
 
+**What to tell candidates**
+
+- **Q3 2026 revenue up 28% to $6.06 billion** (2026-10; s1, s11): Net income rose 78% from the year-earlier quarter, and Q4 guidance of $5.80 to $6.30 billion sits above two analyst estimates at its lower bound.
+- **Agreed to acquire Silicon Labs** (2026-10; s3, s4): The deal is expected to close in the first half of 2027 and is partly financed by new senior notes.
+- **Over $60 billion planned for US manufacturing** (2025-06; s2): The expansion includes seven chip plants in Texas and Utah.
+- **Industrial communications module on one board** (2026-11; s7): A multiprotocol module supports EtherCAT, EtherNet/IP and Profinet together.
+- **Agentic AI tools added to CCStudio** (2026-11; s6): TI says a device migration skill cuts migration time from months to days.
+- left out `s5`: says the same as another
+- left out `s8`: says too little
+- left out `s9`: says too little
+- left out `s10`: says too little
+
 **Likely needs (inferred): growing**
 
-Building new US chip plants and buying Silicon Labs to expand its analog and embedded chip business.
+Texas Instruments is buying Silicon Labs and building new US chip plants while revenue climbs.
 
-- **Semiconductor fab and process engineers** (Experienced; Semiconductor process, Yield analysis, Lithography, Statistical process control, Back-end packaging): TI plans over $60 billion of US manufacturing expansion, including seven chip plants in Texas and Utah. (s2, s9)
-  - can do: Run process integration for new analog wafer fabrication lines
-  - can do: Troubleshoot yield loss across back-end test and packaging
-  - can do: Qualify manufacturing tools and bring up new fab capacity
-- **Embedded connectivity software engineers** (Experienced; Embedded C, Industrial Ethernet, EtherCAT, RTOS, Real-time systems): TI launched a multiprotocol industrial communications module supporting EtherCAT, EtherNet/IP and Profinet on one board. (s7)
-  - can do: Implement industrial Ethernet protocol stacks on microcontrollers
-  - can do: Port connectivity firmware across TI processor families
-  - can do: Debug real-time communication timing on factory networks
-- **AI development tools engineers** (Experienced; Embedded toolchains, Python, LLM agents, Code generation, C/C++): TI expanded its CCStudio ecosystem with agentic AI tools for device migration, cutting migration time from months to days. (s6)
-  - can do: Build agentic AI skills for embedded device migration workflows
-  - can do: Maintain compiler and debugger integration in development tools
-  - can do: Validate AI-generated embedded code against hardware targets
-- **High-speed data converter engineers** (Senior; ADC design, Mixed-signal design, High-speed PCB layout, SerDes, Signal integrity): TI launched the ADC34DSO75, a 3 gigasamples-per-second ADC for remote monitoring in AI data centers. (s5)
-  - can do: Design high-speed analog-to-digital converter front ends
-  - can do: Characterize converter performance at multi-gigasample rates
-  - can do: Support data-center customers on converter integration
+- **Chip plant process and manufacturing engineers** (Experienced; Semiconductor process integration, Yield analysis, Back-end packaging, Statistical process control): TI is building seven new chip plants in Texas and Utah under a plan above $60 billion. (s2, s9)
+  - can do: Bring new fab lines up to volume production
+  - can do: Diagnose yield loss across wafer processing steps
+  - can do: Qualify tools and processes for back-end packaging
+- **Industrial networking firmware engineers** (Experienced; Embedded C, EtherCAT, Real-time operating systems, Industrial Ethernet): TI launched a multiprotocol industrial communications module supporting several factory network standards. (s7)
+  - can do: Implement industrial Ethernet protocol stacks on embedded processors
+  - can do: Port communications firmware to new TI silicon
+  - can do: Debug real-time network timing issues on the factory floor
+- **Software engineers for AI development tools** (Experienced; C++, Python, LLM agents, Embedded toolchains): TI expanded its CCStudio development ecosystem with agentic AI tools in November 2026. (s6)
+  - can do: Build agentic AI features into developer toolchains
+  - can do: Automate code migration across device families
+  - can do: Test AI-generated embedded code against hardware targets
 
 ## Tieto Finland Oy
 
@@ -2763,22 +3335,30 @@ https://www.tieto.com/en/ · open tech roles in our data: 10
 - `s10` [hiring, 2026-07] Tieto is shifting its Tech Consulting workforce through competence shift and AI upskilling as part of the transformation.  
   > "Transformation and reinvention of Tech Consulting accelerating through competence shift and AI upskilling" ([source](https://www.tieto.com/en/newsroom/stock-exchange-releases/2026/tietos-half-year-report-2026-strong-profitability-demonstrates-resilience-in-a-weak-market/))
 
+**What to tell candidates**
+
+- **Organic revenue fell 11% in Q3 2026** (2026-10; s1, s2): Revenue reached EUR 389.6 million, with known headwinds costing 7 percentage points, and full-year organic growth outlook was lowered to -6% to -5%.
+- **Adjusted EBITA margin reached 18.0%** (2026-07; s9): Cost optimisation lifted margin in Q3 2026 while Edlevo and HR & Payroll were divested and a EUR 90 million buyback was launched.
+- **Tech Consulting workforce shifting through AI upskilling** (2026-07; s10): Tieto is moving its Tech Consulting staff through competence shift and AI upskilling as part of the ongoing transformation.
+- **Traficom chose Tieto for Microsoft BI services** (2026-09; s4): The Finnish transport agency picked Tech Consulting as partner for data and analytics, a five-year deal worth an estimated EUR 6 million.
+- **Merus Power adopted Energy Management solution** (2026-10; s5): The customer selected Tieto's Energy Management software to optimise battery and hybrid assets across electricity markets.
+- left out `s3`: not about this company
+- left out `s6`: says the same as another
+- left out `s7`: a one-off that is over
+- left out `s8`: internal finance
+
 **Likely needs (inferred): shrinking**
 
-Tieto is reshaping its consulting arm and selling off non-core units while winning new energy and public-sector deals.
+Tieto is cutting costs and shifting its consulting staff toward AI as organic revenue falls.
 
-- **Microsoft BI and data consultants** (Senior; Power BI, DAX, Azure Data Factory, Microsoft Fabric, SQL Server): Traficom chose Tieto Tech Consulting for a five-year Microsoft BI data and analytics deal. (s4, s10, hiring now: Senior Power BI- ja analytiikkakonsultti – Tieto Tech Consulting (m/f/d))
-  - can do: Build Power BI reports and semantic models for public-sector clients
-  - can do: Design data warehouse loads with Azure Data Factory and SSIS
-  - can do: Translate KPI requirements into DAX measures and scorecards
-- **Data engineers for cloud platforms** (Experienced; Databricks, Snowflake, Apache Spark, Python, SQL): Tech Consulting is shifting its workforce through competence change and AI upskilling during the transformation. (s10, hiring now: Senior Data Engineer - Tieto Caretech (m/f/d), hiring now: Data Engineer (Databricks/Fabric/Snowflake) - Tieto Tech Consulting (m/f/d))
-  - can do: Build ETL and ELT pipelines on Databricks or Snowflake
-  - can do: Model data lakes and data products for client stakeholders
-  - can do: Operate cloud data environments on Azure
-- **Energy and healthcare solution consultants** (Experienced; Requirements analysis, DynamicHealth, Patient information systems, Energy market operations): Merus Power selected the Energy Management solution, and Caretech is hiring for healthcare consulting. (s5, hiring now: Solution Consultant - Tieto Caretech (m/f/d))
-  - can do: Map customer requirements to solution designs for energy markets
-  - can do: Lead healthcare system requirement analysis with clinical stakeholders
-  - can do: Explain integration options to non-technical buyers
+- **Microsoft BI and Fabric consultants** (Experienced; Power BI, DAX, Microsoft Fabric, Azure Data Factory, SQL Server): Traficom's five-year Microsoft BI deal and Tech Consulting's Power BI and Fabric roles show demand for this work. (s4, hiring now: Senior Power BI- ja analytiikkakonsultti – Tieto Tech Consulting (m/f/d), hiring now: Data Engineer (Databricks/Fabric/Snowflake) - Tieto Tech Consulting (m/f/d))
+  - can do: Build Power BI reporting and semantic models for public agencies
+  - can do: Design data warehouse integrations using Fabric and Data Factory
+  - can do: Define KPI scorecards with DAX for business stakeholders
+- **Cloud and AI architects** (Senior; Azure, Terraform, Bicep, MLflow, Zero trust security): Tieto is pushing AI upskilling in Tech Consulting and has an open senior AI cloud architect role for public sector work. (s10, hiring now: Senior AI Cloud Architect Public 360°- Tieto Indtech (m/f/d))
+  - can do: Design Azure cloud architectures for public sector AI platforms
+  - can do: Automate infrastructure deployments with Terraform or Bicep
+  - can do: Integrate LLM services into secure enterprise platforms
 
 ## TrueMed Oy
 
@@ -2803,22 +3383,31 @@ https://truemedinc.com/ · open tech roles in our data: 2
 - `s7` [product, 2026-06] TrueMed's platform authenticates packaging against original artwork files and needs no product or supply chain changes, with deployment described as taking weeks rather than months.  
   > "Deployment takes weeks, not months." ([source](https://www.prnewswire.com/news-releases/global-top-10-pharmaceutical-selects-truemed-to-protect-three-high-volume-drug-brands-against-counterfeit-threats-302793982.html))
 
+**What to tell candidates**
+
+- **Partnership protects three brands above $5 billion** (2026-06; s1): A commercial partnership with a top-10 pharma company covers three antibiotic and anti-infective brands with a combined market above $5 billion.
+- **Platform adopted by more customers, more product lines** (2025-12; s4): The CEO said in the 2025 year-in-review that more companies adopted the AI platform than ever before, extended to more product lines, geographies and investigative teams.
+- **Authenticates packaging without supply chain changes** (2026-06; s7): The platform checks packaging against original artwork files and needs no product or supply chain changes, with deployment described as weeks rather than months.
+- **Alliance Pharma case: 57% of items counterfeit** (2026-07; s6): Inspections confirmed 57% of checked items as counterfeit, with over 30,000 units seized across two raids in work from March 2024 to July 2026.
+- **Exclusive Israel rights for Vaccentis cancer vaccine** (2025-10; s5): A letter of intent with Zurich biotech Vaccentis gives TrueMed exclusive commercialization rights in Israel and support for its cancer vaccine development.
+- left out `s2`: says the same as another
+- left out `s3`: older than two years
+
 **Likely needs (inferred): growing**
 
-TrueMed's AI platform now protects more pharma brands, product lines and regions, with a top-10 drugmaker partnership.
+TrueMed's AI platform now protects three antibiotic brands for a top-10 pharma company, and is spreading to more product lines.
 
-- **Machine learning engineers** (Experienced; Python, Scikit-learn, Computer vision, Pandas, NumPy): Adoption extended to more product lines, geographies and investigative teams, per the 2025 year-in-review. (s4, s6, hiring now: Data Scientist)
-  - can do: Train detection models on packaging images and inspection data
-  - can do: Evaluate model accuracy on real counterfeit case data
-  - can do: Deploy models into production pipelines for new product lines
-- **Frontend engineers for mobile apps** (Experienced; Vue.js, Ionic, Capacitor, Docker, Figma): Investigative teams are expanding, so field and mobile tools need building and testing. (s4, hiring now: UX UI Engineer)
-  - can do: Build cross-platform mobile apps for field investigators
-  - can do: Write frontend tests and run QA before each release
-  - can do: Ship features through CI/CD pipelines
-- **Biotech partnership business leads** (Senior; Pharma business development, Licensing agreements, Market access): New partnerships in Israel and with a top-10 pharma company show deal flow across regions. (s1, s5)
-  - can do: Negotiate commercial partnership terms with pharma companies
-  - can do: Manage exclusive regional licensing arrangements
-  - can do: Scope pilot deployments with brand protection teams
+- **Machine learning engineers** (Experienced; PyTorch, Computer vision, MLOps, Python): Expanded deployments across more product lines and geographies mean the detection models must scale across many new packaging types. (s4, s6, hiring now: Data Scientist)
+  - can do: Train vision models on packaging artwork and imagery
+  - can do: Monitor model drift across markets and product lines
+  - can do: Build retraining pipelines for new counterfeit patterns
+- **Frontend engineers for investigator tools** (Experienced; Vue.js, Figma, Ionic, Capacitor, Docker): The platform's extension to more investigative teams and a hiring push for frontend developers point to growing demand for investigator-facing tools. (s4, hiring now: UX UI Engineer)
+  - can do: Build Vue.js interfaces for investigation workflows
+  - can do: Ship cross-platform mobile apps for field inspectors
+  - can do: Automate frontend tests in CI/CD pipelines
+- **Pharma regulatory and compliance specialists** (Experienced; GxP, Pharmacovigilance, EU FMD, Serialization standards): Deals with major pharma companies and a new biotech partner bring product authentication into regulated, multi-country pharmaceutical environments. (s1, s5)
+  - can do: Map anti-counterfeiting requirements across target markets
+  - can do: Prepare validation documentation for customer audits
 
 ## Turck Vilant Systems Oy
 
@@ -2847,22 +3436,28 @@ https://turckvilant.com/ · open tech roles in our data: 1
 - `s9` [product, 2026-09] Turck Vilant showed a Shipment Verification live demo at Logistics Fair Finland 2026 in Tampere, using RFID to catch shipping mistakes before dispatch.  
   > "our Shipment Verification live demo, where visitors could see how RFID can help catch shipping mistakes before they leave the door." ([source](https://turckvilant.com/news/logistics-fair-finland-2026/))
 
+**What to tell candidates**
+
+- **Rail RFID system for 250 km/h wagons** (2026-09; s3): Built for VR Group and Väylävirasto to identify freight wagons across Finland's roughly 5,900 km rail network.
+- **Material Origin Tracking for EU rules** (2026-04; s7): New software for EU Deforestation Regulation compliance, based on RFID, GPS and other AIDC technologies.
+- **Turnkey UHF RFID gates and tunnels** (2025-01; s1): Q180-based UHF RFID gate and tunnel sold as complete packages, completing Turck's UHF RFID portfolio.
+- **Customers across waste, metals and logistics** (2025-11; s2, s4, s5): Veolia's Ochtendung plant, Outokumpu, and Recalo in Laatzen run Turck Vilant RFID tracking systems.
+- **Part of German Turck group since 2017** (2017; s8): Acquired by the German Turck group in 2017 and operating under the Turck Vilant Systems name since 2018.
+- left out `s6`: says too little
+- left out `s9`: a one-off that is over
+
 **Likely needs (inferred): growing**
 
-Turck Vilant is building RFID tracking for freight, waste, warehouses and EU deforestation compliance.
+Turck Vilant builds RFID tracking for waste, rail, metals and logistics, and is adding EU deforestation compliance software.
 
-- **Embedded software engineers** (Experienced; C/C++, Embedded OS, Hardware-level programming, Industrial communications, UHF RFID): Its UHF RFID gates, tunnels and rail readers are shipping to new customers and sites, needing firmware work. (s1, s3, hiring now: Embedded Software Engineer)
-  - can do: Write C/C++ firmware for UHF RFID reader hardware
-  - can do: Program hardware interfaces and industrial communication links
-  - can do: Integrate readers with embedded operating systems on site
-- **RFID solution engineers** (Experienced; RFID, Track and trace, WMS integration, Industrial networking): Customers like Veolia, Outokumpu and Recalo each run custom RFID track-and-trace systems that need configuring. (s2, s4, s5)
-  - can do: Design RFID track-and-trace setups for customer sites
-  - can do: Integrate RFID data with customer warehouse systems
-  - can do: Commission readers and inspection points on site
-- **Compliance software developers** (Experienced; GPS data, Traceability systems, Data modelling, EUDR): A new Material Origin Tracking product for EU Deforestation Regulation compliance was launched in 2026. (s7)
-  - can do: Build traceability software linking RFID and GPS data
-  - can do: Model supply chain records for EU Deforestation Regulation reporting
-  - can do: Test data pipelines against regulatory requirements
+- **Embedded software engineers** (Experienced; C/C++, Embedded Linux, Industrial communications, UHF RFID): Turck Vilant is posting an open embedded role while launching new RFID gate and tunnel hardware packages. (s1, hiring now: Embedded Software Engineer)
+  - can do: Develop C and C++ firmware for RFID readers and gates
+  - can do: Program hardware at register and driver level
+  - can do: Integrate industrial communication protocols into device software
+- **RFID system integration engineers** (Experienced; UHF RFID, Warehouse systems, Industrial networks): Recent rail, waste and warehouse deployments require RFID systems tailored and integrated at each customer site. (s2, s3, s4)
+  - can do: Commission RFID readers and inspection points at customer sites
+  - can do: Connect RFID tracking data to customer warehouse systems
+  - can do: Troubleshoot read-rate issues in live industrial environments
 
 ## Varjo
 
@@ -2891,22 +3486,28 @@ https://varjo.com · not in our Espoo job data
 - `s9` [product, 2026-02] Varjo launched Integrated XR Systems, bundling XR-4 headsets, certified workstations, software and support for air-gapped defense deployments.  
   > "Varjo expands its product portfolio beyond industry-leading headsets to deliver fully validated XR solutions" ([source](https://varjo.com/news/varjo-launches-ready-to-deploy-xr-systems-for-secure-and-air-gapped-environments))
 
+**What to tell candidates**
+
+- **Revenue up 16% to 23 million euros in 2025** (2025; s2, s1): Revenue grew 16 percent to 23 million euros in 2025 while the operating loss shrank significantly, a sign of a scaling business.
+- **44 million euro R&D program for mixed reality training** (2025-10; s3): The program, with 12 million euros from Business Finland, advances Varjo's next-generation mixed reality training platform.
+- **Fresh 5 million euro investment from THEON** (2025-08; s4): THEON committed 5 million euros via a convertible loan, with an option to invest a further 5 million euros.
+- **Technology used in more than 120 NATO defense programs** (2026-10; s5): Varjo's technology is deployed across more than 120 defense programs in NATO and allied nations.
+- **Integrated XR Systems launched for air-gapped defense** (2026-02; s9): The bundle combines XR-4 headsets, certified workstations, software and support for air-gapped defense deployments.
+- left out `s6`: says the same as another
+- left out `s7`: says too little
+- left out `s8`: says too little
+
 **Likely needs (inferred): growing**
 
-Varjo is growing defense and training sales, with XR headsets now deployed across NATO and allied programs.
+Varjo is scaling defense mixed-reality training, with revenue up and a 44 million euro R&D program under way.
 
-- **Defense sales and business development leads** (Experienced; Public sector procurement, Defense market knowledge, Channel partnerships, Export compliance): Varjo's revenue grew 16 percent in 2025 and its technology now spans more than 120 defense programs. (s2, s5)
-  - can do: Win government and defense contracts for XR training systems
-  - can do: Map customer procurement cycles across NATO and allied nations
-  - can do: Build partner channels with authorized resellers
-- **Secure systems integration engineers** (Experienced; Air-gapped networks, Windows systems administration, Linux, Security accreditation): Varjo launched Integrated XR Systems for air-gapped defense deployments, requiring certified workstation setups. (s9)
-  - can do: Deploy XR systems on air-gapped classified networks
-  - can do: Integrate headsets with certified workstations and software
-  - can do: Support defense customers through long-term system updates
-- **R&D engineers for mixed reality** (Experienced; Display optics, Real-time rendering, Computer vision, C++): Varjo announced a 44 million euro R&D program to advance its next-generation mixed reality training platform. (s3)
-  - can do: Develop next-generation XR headset optics and displays
-  - can do: Optimize real-time rendering pipelines for high-fidelity visuals
-  - can do: Prototype hardware and validate it in simulation environments
+- **Defense simulation engineers** (Experienced; Unreal Engine, Unity, C++, Simulation frameworks, Varjo Base SDK): Over 120 defense programs and a Ukrainian project need training systems built and supported at scale. (s5, s6, s9)
+  - can do: Build mixed-reality training scenarios for air, land and sea
+  - can do: Integrate headsets with 3D and simulation platforms
+  - can do: Support air-gapped deployments in classified environments
+- **Enterprise sales leads** (Experienced; Defense procurement, B2B enterprise sales, Government tendering): Growing defense and government demand and new reseller partnerships need sales capacity. (s5, s7)
+  - can do: Win defense and government training contracts
+  - can do: Manage reseller partners across allied markets
 
 ## Vexlum
 
@@ -2933,26 +3534,33 @@ https://vexlum.com · not in our Espoo job data
 - `s8` [customers, 2025] Vexlum was awarded a European Space Agency contract in 2025 for a yellow guide star laser for satellite communication.  
   > "in 2025 it won a European Space Agency contract for a yellow guide star laser for satellite communication." ([source](https://www.eiceu.com/report/vexlum-eic-accelerator-semiconductor-lasers-quantum))
 
+**What to tell candidates**
+
+- **Raised EUR 10 million in February 2026** (2026-02; s1): Funding combined EUR 6 million equity led by Kvanted, a EUR 2.4 million EIC Accelerator grant and a EUR 1.6 million Nordea loan.
+- **Revenue up 48% to EUR 4.19 million in 2025** (2025; s2): Growth in 2025 came with 27 employees and a small positive operating profit, according to a company data summary.
+- **Opened London lab and R&D operation in July 2026** (2026-07; s3): The move was made citing a surge in UK demand for its VXL laser system.
+- **Building own semiconductor fab in Tampere** (2026-04; s4): Vexlum is moving from rented university equipment to its own fabrication facility to support scaling.
+- **Targets EUR 100 million revenue by 2030** (2026-02; s7): The stated growth strategy sets a 2030 revenue target roughly twenty-five times 2025 revenue.
+- left out `s5`: says the same as another
+- left out `s6`: says too little
+- left out `s8`: older than two years
+
 **Likely needs (inferred): growing**
 
-Vexlum is building its own fab in Tampere and opened a London lab to meet growing laser demand.
+Finnish laser maker Vexlum is raising funds, building its own fab, and opening London to serve growing quantum demand.
 
-- **Semiconductor fabrication engineers** (Experienced; MOCVD, Cleanroom processing, Photolithography, Process metrology, Semiconductor epitaxy): Vexlum is investing in its own fab in Tampere after relying on rented university equipment. (s4)
-  - can do: Run semiconductor epitaxy and wafer processing steps reliably
-  - can do: Troubleshoot cleanroom process yield losses on laser chips
-  - can do: Set up process control and metrology for new fab equipment
-- **Quantum laser integration engineers** (Experienced; Narrow linewidth lasers, Frequency stabilisation, Optical atomic clocks, Laser noise characterisation): A Menlo Systems collaboration targets a modular laser source for optical atomic clocks, and VXL is deployed in quantum projects. (s5, s6)
-  - can do: Integrate narrow-linewidth lasers into atomic clock optical setups
-  - can do: Characterise laser noise and frequency stability for quantum users
-  - can do: Support early-access customers deploying VXL systems in labs
-- **Space laser engineers** (Experienced; Laser qualification testing, Optical communication, Beam propagation modelling, Space qualification standards): A European Space Agency contract was awarded in 2025 for a yellow guide star laser for satellite communication. (s8)
-  - can do: Design laser sources for satellite optical communication terminals
-  - can do: Test laser systems against space qualification requirements
-  - can do: Model laser beam propagation through the atmosphere
-- **UK sales and application leads** (Experienced; Technical sales, Laser specifications, Scientific instrument markets, CRM tools): Vexlum opened a London lab and R&D operation in July 2026 citing a surge in UK demand for the VXL laser. (s3)
-  - can do: Win UK research and industrial customers for laser systems
-  - can do: Translate laser specifications into customer application needs
-  - can do: Coordinate pilot deployments with UK research teams
+- **Semiconductor process engineers** (Experienced; Cleanroom processing, Photolithography, Epitaxy, Process integration): Vexlum is moving from rented university equipment to its own Tampere fab to support scaling. (s4)
+  - can do: Run wafer fabrication processes for semiconductor laser chips
+  - can do: Set up and qualify new cleanroom process equipment
+  - can do: Improve yield on epitaxial laser structures
+- **Optical and laser engineers** (Experienced; VECSEL, Laser optics, Free-space optics, Linewidth measurement): A surge in UK demand and a EUR 100 million 2030 target require more laser systems to be built and delivered. (s3, s7)
+  - can do: Design VECSEL cavities for narrow linewidth output
+  - can do: Characterise laser noise and beam quality
+  - can do: Integrate laser modules into customer systems
+- **Quantum systems integration engineers** (Experienced; Laser frequency stabilisation, Atomic physics, Optical locking, Python): Early-access deployments by quantum research groups and a Menlo Systems atomic clock collaboration increase integration work. (s5, s6)
+  - can do: Adapt laser sources to specific quantum experiments
+  - can do: Support early-access customers in lab deployments
+  - can do: Stabilise laser frequency for atomic clock applications
 
 ## Visual Components Oy
 
@@ -2977,22 +3585,33 @@ https://www.visualcomponents.com · open tech roles in our data: 4
 - `s7` [hiring] Visual Components' careers page describes the company as part of KUKA Group with around 120 employees from 20 nationalities and says it continually seeks talented people.  
   > "We’re constantly looking for motivated and talented individuals to join our team" ([source](https://www.visualcomponents.com/careers/))
 
+**What to tell candidates**
+
+- **Launched simulation platform version 5.1** (2026-06; s1, s6): Adds support for hundreds of AMRs and AGVs, up to 10x faster performance, PhysX 5.5 physics and Allen-Bradley PLCs.
+- **Joint simulation work with KUKA** (2026-05; s2): KUKA and Visual Components agreed to jointly develop simulation-driven automation spanning planning, virtual commissioning and operations.
+- **Over 2,400 global customers** (2025-11; s3): The company has more than 2,400 customers worldwide and over 130 employees, with a Tokyo subsidiary and a Mitsubishi Electric joint venture in Aichi.
+- **Customer cut robot programming time about 50%** (2026-01; s5): MSK Finland reported that offline programming and factory simulation cut typical robot programming time by around 50%.
+- **Launched VC Ecosystem for partner add-ons** (2026-01; s4): A new section for partner add-ons and plugins, with an ergonomics integration from Work(s) Ergo as the first featured add-on.
+- left out `s7`: says too little
+
 **Likely needs (inferred): growing**
 
-Shipping simulation 5.1 for hundreds of AMRs and AGVs, with faster performance and new PLC support.
+Its simulation platform now handles hundreds of AMRs and AGVs, with up to 10x faster performance.
 
-- **Senior C# and C++ software engineers** (Senior; C#, C++, Azure DevOps, Git, Visual Studio): Version 5.1 launched with hundreds-of-robots simulation and up to 10x faster performance, requiring heavy platform engineering. (s1, s6, hiring now: C#/C++ Senior Software Engineer)
-  - can do: Modernize legacy monolithic simulation code into maintainable modules
-  - can do: Build and maintain C# and C++ components with CI/CD pipelines
-  - can do: Optimize simulation performance for large fleets of AMRs and AGVs
-- **Industrial controls and PLC engineers** (Experienced; CODESYS, IEC 61131-3, OPC UA, Virtual commissioning): Version 5.1 added Allen-Bradley PLC support, and a KUKA partnership covers virtual commissioning of automation. (s2, s6, hiring now: Junior Software QA Engineer)
-  - can do: Program PLCs in FBD, ST and SFC for virtual commissioning
-  - can do: Validate simulation against industrial protocols such as OPC UA
-  - can do: Integrate Allen-Bradley PLC models into simulation workflows
-- **Frontend engineers for 3D visualization** (Experienced; TypeScript, React, SignalR, Playwright, pnpm): New partner add-on ecosystem and a 3D simulation product create demand for browser-based visualization and plugin tooling. (s4, hiring now: Senior Frontend Software Developer)
-  - can do: Build browser-based 3D visualization features in React and TypeScript
-  - can do: Publish reusable npm packages for partner plugins
-  - can do: Design REST and WebSocket APIs for live simulation data
+- **Senior C# and C++ software engineers** (Senior; C#, C++, Azure DevOps, Git, Visual Studio): Version 5.1 and the KUKA partnership expand a large desktop simulation product that needs maintained and extended native code. (s1, s2, hiring now: C#/C++ Senior Software Engineer)
+  - can do: Modernize legacy monolithic desktop software into maintainable modules
+  - can do: Design algorithms and architecture for large-scale simulation
+  - can do: Own build, dependency and CI/CD pipelines in Azure DevOps
+- **Frontend engineers for browser 3D tools** (Experienced; TypeScript, React, SignalR, Playwright, pnpm): The VC Ecosystem launch and partner add-ons call for web interfaces that plug into the platform. (s4, hiring now: Senior Frontend Software Developer)
+  - can do: Build browser-based 3D visualization interfaces with React and TypeScript
+  - can do: Publish reusable npm packages for partner add-ons
+  - can do: Design REST and WebSocket APIs for real-time simulation data
+- **Engineering leads for product infrastructure** (Lead; Scrum, C#, C++, Build management, Agile): Modernizing the legacy codebase while growing the team requires someone to lead the product infrastructure group. (s1, s3, hiring now: Engineering Lead - Product Infra team)
+  - can do: Lead a software team through a legacy modernization program
+  - can do: Run Agile and Scrum delivery across build and release work
+- **Industrial controls QA engineers** (Early career; CODESYS, IEC 61131-3, IEC 61499, OPC UA, PLC programming): Support for Allen-Bradley PLCs and OPC UA-based virtual commissioning needs testers who can validate control logic. (s6, s2, hiring now: Junior Software QA Engineer)
+  - can do: Test PLC programs written in FBD, ST and SFC
+  - can do: Verify virtual commissioning against OPC UA interfaces
 
 ## Zero Gravity
 
@@ -3015,19 +3634,24 @@ https://zerogravity.fi · not in our Espoo job data
 - `s6` [customers] Zero Gravity Oy has paying clients in renewable energy, smart city and water monitoring across Europe, and its UrbanAI platform has been offered free to the ecosystem under an ESA contract.  
   > "We are commercial / have paying clients" ([source](https://www.zerogravity.fi/))
 
+**What to tell candidates**
+
+- **Selected for ESA Phi-Lab Finland program** (2025-12; s1): Chosen to commercialise its research over the next two years, following earlier ESA Phi-Lab funding for a thermal payload demonstrator.
+- **Joined Cassini Business Accelerator Batch 6** (2026-04; s3): Selected by the European Commission and EUSPA to join the accelerator, which supports space-based business growth.
+- **Paying clients across Europe in three sectors** (2026-11; s6): Serves renewable energy, smart city and water monitoring customers, and offered its UrbanAI platform free to the ecosystem under an ESA contract.
+- **Building a fine-resolution CubeSat thermal payload** (2026-11; s5, s4): Developing a miniaturized thermal imaging payload aimed at resolution far finer than existing roughly 1 km thermal satellite systems.
+- left out `s2`: older than two years
+
 **Likely needs (inferred): growing**
 
-Building tiny thermal cameras for satellites that map heat in cities, energy assets and water.
+Building a CubeSat thermal camera with far finer resolution than today's satellites, for city and energy monitoring.
 
-- **Thermal infrared payload engineers** (Experienced; Thermal infrared sensors, Optical design, CubeSat integration, Radiometric calibration): ESA Phi-Lab funding is developing a CubeSat thermal imaging payload demonstrator for commercial use. (s4, s5, s1)
-  - can do: Design miniaturized thermal imaging payloads for CubeSat platforms
-  - can do: Validate thermal sensor performance through ground and flight tests
-  - can do: Integrate optics and detectors within tight CubeSat mass and power limits
-- **Edge AI and image processing engineers** (Experienced; Edge AI, Computer vision, Python, Embedded Linux): The company runs on-board processing and an analytics platform, and is scaling its UrbanAI offering to paying clients. (s6, s5)
-  - can do: Build on-board image processing for satellite thermal data
-  - can do: Deploy edge AI models on constrained space-grade hardware
-  - can do: Turn thermal maps into analytics outputs for city clients
-- **Urban analytics data scientists** (Early career; Geospatial analysis, Remote sensing, Python, GIS): Paying clients in smart city and water monitoring are using UrbanAI to get data-driven insights from thermal maps. (s6)
-  - can do: Analyse thermal maps to detect urban heat islands
-  - can do: Build client-facing reports on energy and water assets
-  - can do: Combine satellite thermal data with ground data sources
+- **Thermal payload hardware engineers** (Experienced; Thermal infrared optics, Photonics, Microbolometer sensors, Optical design software): Its ESA-funded CubeSat thermal payload is moving from demonstrator toward commercial product. (s1, s4, s5)
+  - can do: Design miniaturized thermal imaging optics for CubeSats
+  - can do: Validate sensor performance under orbital thermal conditions
+- **Satellite payload systems engineers** (Senior; CubeSat integration, Systems engineering, Space environment testing, Power budgeting): Commercialising a CubeSat payload requires integration with satellite buses and launch readiness. (s1, s5)
+  - can do: Integrate imaging payloads with CubeSat buses
+  - can do: Define payload interfaces and power budgets
+- **Edge AI engineers** (Experienced; Edge AI, Embedded Linux, Computer vision, Model quantisation): Its payload design includes onboard processing and it serves clients with thermal analytics. (s5, s6)
+  - can do: Deploy AI models for onboard thermal image processing
+  - can do: Optimise inference for low-power space hardware

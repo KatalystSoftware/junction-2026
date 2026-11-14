@@ -14,118 +14,137 @@
   import { app, nameOf, reviewOf, saveReview } from './state.svelte'
   import type { Brief, Need, Review, Signal } from './types'
 
-  // The company's sign-up, already filled in. One card at a time in the centre; what the company
-  // accepts moves to the side and stays in view, so its page builds around the card: who it is on
-  // the left, who it wants to meet on the right. Any line at the side opens again in the centre.
+  // The company's sign-up, already filled in. One card at a time in the centre, one decision per
+  // card: who you are (with what we would tell candidates), then each drafted role, then anyone
+  // else and what you want at the event. What the company accepts travels to the side and stays in
+  // view, so its page builds around the card: who it is on the left, who it wants to meet on the
+  // right. Any line at the side opens again in the centre. The answers and their keys sit in a dock
+  // at the foot of the window, so they never move.
   let { brief }: { brief: Brief } = $props()
   const review = $derived(reviewOf(brief))
   const name = $derived(nameOf(brief))
   const identity = $derived(brief.identity)
   const event = $derived(app.presets.find((p) => p.ids.includes(brief.id)) ?? app.presets[0])
+  const dates = $derived(event?.note.split(',')[0] ?? '')
   const joined = $derived(review.status === 'joined')
-  const save = (patch: Partial<Review>) => saveReview(brief.id, { ...review, ...patch })
+  const save = (patch: Partial<Review>) => void saveReview(brief.id, { ...review, ...patch })
 
   // who they are: the brand record, each value theirs to correct
   const found = $derived<Record<string, string>>({
     Company: name,
-    'What you do': brief.card.pitch || identity?.slogan || '',
+    'What you do': brief.card.pitch || (identity?.slogan ?? ''),
     Field: identity?.industries[0]?.split(': ').pop() ?? '',
     People: identity?.employees?.replace(' to ', '–') ?? '',
     'Based in': [identity?.city, identity?.country].filter(Boolean).join(', '),
     Website: host(brief.website),
   })
-  const about = (key: string) => review.about?.[key] ?? found[key]
+  const about = (key: string): string => review.about?.[key] ?? found[key] ?? ''
   const typed = (e: FocusEvent) => (e.currentTarget as HTMLElement).innerText.replace(/\s+/g, ' ').trim()
-  const fix = (key: string, e: FocusEvent) => typed(e) !== about(key) && save({ about: { ...review.about, [key]: typed(e) } })
-  const enter = (e: KeyboardEvent) => e.key === 'Enter' && (e.preventDefault(), (e.currentTarget as HTMLElement).blur())
+  const fix = (key: string, e: FocusEvent) => {
+    if (typed(e) !== about(key)) save({ about: { ...review.about, [key]: typed(e) } })
+  }
+  const enter = (e: KeyboardEvent) => {
+    if (e.key !== 'Enter') return
+    e.preventDefault()
+    ;(e.currentTarget as HTMLElement).blur()
+  }
+  let editing = $state(false)
 
-  // their news: the few statements worth telling talent, the kinds they care about first, newest first
-  const WEIGHT = ['funding', 'growth', 'customers', 'product', 'partnership', 'technology', 'hiring']
-  const news = $derived(
-    brief.signals
-      .filter((s) => WEIGHT.includes(s.type))
-      .sort((a, b) => WEIGHT.indexOf(a.type) - WEIGHT.indexOf(b.type) || b.date.localeCompare(a.date))
-      .slice(0, 4),
-  )
-  const sourced = (s: Signal) => [host(s.source_url), when(s.date)].filter(Boolean).join(', ')
+  // what we would tell candidates: three short lines by default, the rest one press away
+  const SHOWN = 3
+  const tell = $derived(brief.card.tell)
+  const told = $derived(review.told ?? tell.slice(0, SHOWN).map((t) => t.id))
+  let more = $state(false)
+  let detail = $state<string | null>(null)
+  const sources = (ids: string[]): Signal[] => brief.signals.filter((s) => ids.includes(s.id))
+  /** Saying yes to a line opens what is behind it; saying no closes it. */
+  function toggle(id: string) {
+    const on = !told.includes(id)
+    save({ told: on ? [...told, id] : told.filter((t) => t !== id) })
+    detail = on ? id : null
+  }
 
   // everything to decide, in order; the first undecided one is in the centre unless a line was opened
-  type Item = { key: string; kind: 'you' | 'news' | 'role' | 'add' | 'finish'; signal?: Signal; need?: Need }
+  type Item = { key: string; kind: 'you' } | { key: string; kind: 'role'; need: Need } | { key: string; kind: 'finish' }
   const items = $derived<Item[]>([
     { key: 'you', kind: 'you' },
-    ...news.map((signal) => ({ key: `news:${signal.id}`, kind: 'news' as const, signal })),
     ...review.needs.map((need) => ({ key: `role:${need.id}`, kind: 'role' as const, need })),
-    { key: 'add', kind: 'add' },
     { key: 'finish', kind: 'finish' },
   ])
-  const decided = (i: Item) =>
-    i.kind === 'you' ? !!review.about_ok
-    : i.kind === 'news' ? review.facts?.[i.signal!.id] !== undefined
-    : i.kind === 'role' ? !!i.need!.ok
-    : i.kind === 'add' ? !!review.added_done
-    : joined
+  const FINISH: Item = { key: 'finish', kind: 'finish' }
+  const decided = (i: Item) => (i.kind === 'you' ? !!review.about_ok : i.kind === 'role' ? !!i.need.ok : joined)
   let opened = $state<string | null>(null)
   let started = $state(false)
   let seen = $state('')
   $effect(() => {
-    if (seen !== brief.id) [seen, opened, started] = [brief.id, null, !!reviewOf(brief).about_ok]
+    if (seen !== brief.id) [seen, opened, started, editing, more, detail] = [brief.id, null, !!reviewOf(brief).about_ok, false, false, null]
   })
-  const current = $derived(items.find((i) => i.key === opened) ?? items.find((i) => !decided(i)) ?? items.at(-1)!)
+  const current = $derived(items.find((i) => i.key === opened) ?? items.find((i) => !decided(i)) ?? FINISH)
   let bench = $state<HTMLElement>()
   let shown = ''
   // a new card starts at its top, also when the last one was read to its end on a phone
   $effect(() => {
     const key = current.key
-    if (shown && shown !== key && bench && bench.getBoundingClientRect().top < 0) tick().then(() => bench?.scrollIntoView({ block: 'start' }))
+    if (shown && shown !== key && bench && bench.getBoundingClientRect().top < 0) void tick().then(() => bench?.scrollIntoView({ block: 'start' }))
     shown = key
   })
 
-  const needs = (change: (list: Need[]) => Need[]) => save({ needs: change(review.needs) })
-  const patch = (id: string | undefined, p: Partial<Need>) => needs((list) => list.map((n) => (n.id === id ? { ...n, ...p } : n)))
+  const needs = (change: (list: Need[]) => Need[]) => { save({ needs: change(review.needs) }) }
+  const patch = (id: string, p: Partial<Need>) => { needs((list) => list.map((n) => (n.id === id ? { ...n, ...p } : n))) }
   const WANTS = ['1:1 meetings with candidates', 'A virtual booth', 'A company presentation']
-  const wants = $derived(review.wants ?? [WANTS[0]])
-  const want = (w: string) => save({ wants: wants.includes(w) ? wants.filter((x) => x !== w) : [...wants, w] })
+  const wants = $derived(review.wants ?? WANTS.slice(0, 1))
+  const want = (w: string) => { save({ wants: wants.includes(w) ? wants.filter((x) => x !== w) : [...wants, w] }) }
 
+  /** The last role removed, so one wrong key can be taken back. */
+  let undo = $state<null | { said: string; restore: () => void }>(null)
   function accept() {
     const i = current
     ;[opened, undo] = [null, null]
-    if (i.kind === 'you') save({ about_ok: true })
-    else if (i.kind === 'news') save({ facts: { ...review.facts, [i.signal!.id]: true } })
-    else if (i.kind === 'role') patch(i.need!.id, { ok: true })
-    else if (i.kind === 'add') line.trim() ? draft(line) : save({ added_done: true })
+    if (i.kind === 'you') save({ about_ok: true, told })
+    else if (i.kind === 'role') patch(i.need.id, { ok: true })
+    else if (line.trim()) void draft(line)
     else if (!joined) {
-      save({ status: 'joined', joined_at: new Date().toISOString(), wants })
+      save({ status: 'joined', joined_at: new Date().toISOString(), wants, told })
       confetti([...new Set([...(identity?.colors ?? []), '#ffffff', '#14151a'])])
       scrollTo({ top: 0 })
     }
   }
-  /** The last thing left out or removed, so one wrong key can be taken back. */
-  let undo = $state<null | { said: string; restore: () => void }>(null)
-  /** Leave a statement out, or remove a role entirely. */
+  /** Remove a role entirely. */
   function skip() {
     const i = current
+    if (i.kind !== 'role') return
     opened = null
-    if (i.kind === 'news') {
-      const id = i.signal!.id
-      save({ facts: { ...review.facts, [id]: false } })
-      undo = { said: 'Left out.', restore: () => (save({ facts: Object.fromEntries(Object.entries(review.facts ?? {}).filter(([k]) => k !== id)) }), (opened = `news:${id}`)) }
-    } else if (i.kind === 'role') {
-      const need = i.need!, at = review.needs.findIndex((n) => n.id === need.id)
-      needs((list) => list.filter((n) => n.id !== need.id))
-      undo = { said: `Removed ${need.title || 'the role'}.`, restore: () => needs((list) => [...list.slice(0, at), { ...need, ok: false }, ...list.slice(at)]) }
-    }
+    const need = i.need, at = review.needs.findIndex((n) => n.id === need.id)
+    needs((list) => list.filter((n) => n.id !== need.id))
+    undo = { said: `Removed ${need.title || 'the role'}.`, restore: () => { needs((list) => [...list.slice(0, at), { ...need, ok: false }, ...list.slice(at)]) } }
   }
-  const takeBack = () => (undo?.restore(), (undo = null))
+  const takeBack = () => {
+    undo?.restore()
+    undo = null
+  }
   const back = () => {
     const at = items.findIndex((i) => i.key === current.key)
-    if (at > 0) opened = items[at - 1].key
+    opened = items[at - 1]?.key ?? opened
   }
   function keys(e: KeyboardEvent) {
     const el = e.target as HTMLElement
-    const choice = el.tagName === 'BUTTON' && 'choice' in el.dataset && e.key === 'Enter'
-    if (!choice && (el.isContentEditable || ['INPUT', 'TEXTAREA', 'BUTTON', 'A'].includes(el.tagName) || e.metaKey || e.ctrlKey || e.altKey)) return
-    if (e.key === 'Enter') (e.preventDefault(), started ? accept() : (started = true))
-    else if (!started) return
+    const typing = el.isContentEditable || ['INPUT', 'TEXTAREA'].includes(el.tagName)
+    const z = e.key.toLowerCase() === 'z' && !e.altKey
+    // Z, or Ctrl/Cmd+Z, takes back the last removal; inside a field, z is a letter and Ctrl+Z is the field's own undo
+    if (z && !typing && undo) {
+      e.preventDefault()
+      takeBack()
+      return
+    }
+    if (e.metaKey || e.ctrlKey || e.altKey || typing) return
+    // Enter from a choice just clicked accepts the card; Space is what changes a choice
+    const choice = el.tagName === 'BUTTON' && 'choice' in el.dataset
+    if (['BUTTON', 'A'].includes(el.tagName) && !(choice && e.key === 'Enter')) return
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      if (started) accept()
+      else started = true
+    } else if (!started) return
     else if (e.key === 'Backspace' || e.key === 'Delete') skip()
     else if (e.key === 'ArrowLeft') back()
   }
@@ -134,131 +153,132 @@
   let line = $state('')
   let drafting = $state('')
   let failed = $state('')
-  const SUGGEST = ['Sales and account leads', 'Customer success managers', 'Data engineers', 'Product managers']
   let used = $state<string[]>([])
-  const suggestions = $derived((brief.card.also?.length ? brief.card.also : SUGGEST).filter((s) => !used.includes(s) && !review.needs.some((n) => n.title === s)))
+  const suggestions = $derived(brief.card.also.filter((s) => !used.includes(s) && !review.needs.some((n) => n.title === s)))
   async function draft(what: string) {
     ;[drafting, failed, line, used] = [what, '', '', [...used, what]]
     const r = await fetch(`role?id=${encodeURIComponent(brief.id)}`, { method: 'POST', body: JSON.stringify({ line: what }) }).catch(() => null)
-    const drafted: Need | null = r?.ok ? await r.json() : null
-    if (drafted) needs((list) => [...list, { ...drafted, id: `c${Date.now()}`, by: 'company' }])
-    else failed = r?.status === 429 ? 'Busy just now. Try again in a minute.' : 'That did not come through. Try again.'
+    const drafted = r?.ok ? ((await r.json()) as Omit<Need, 'id'>) : null
+    if (drafted) needs((list) => [...list, { ...drafted, id: `c${String(Date.now())}`, by: 'company' }])
+    else failed = r?.status === 429 ? 'Busy just now. Try again in a minute.' : 'That did not come through. Try again in a minute, or carry on without it.'
     drafting = ''
   }
 
   // what is already settled, at the sides; the one in the centre is not shown there
   const settled = $derived({
     you: !!review.about_ok && current.key !== 'you',
-    news: news.filter((s) => review.facts?.[s.id] === true && current.key !== `news:${s.id}`),
+    told: review.about_ok && current.key !== 'you' ? tell.filter((t) => told.includes(t.id)) : [],
     roles: review.needs.filter((n) => n.ok && current.key !== `role:${n.id}`),
   })
   /** How many of a role's practical questions nobody has answered yet. */
-  const open = (n: Need) => [n.language, n.workplace, n.abroad].filter((v) => v == null).length
+  const unanswered = (n: Need) => [n.language, n.workplace, n.abroad].filter((v) => v == null).length
   const calm = matchMedia('(prefers-reduced-motion: reduce)').matches
-  const [send, receive] = crossfade({ duration: calm ? 0 : 520, easing: cubicOut, fallback: (node) => fade(node, { duration: calm ? 0 : 200 }) })
+  const [send, receive] = crossfade({ duration: calm ? 0 : 560, easing: cubicOut, fallback: (node) => fade(node, { duration: calm ? 0 : 220 }) })
+
+  const answer = $derived(
+    current.kind === 'you' ? "That's us"
+    : current.kind === 'role' ? 'We want to meet them'
+    : line.trim() ? 'Draft this role'
+    : `Sign ${about('Company')} up`,
+  )
 </script>
 
 <svelte:window onkeydown={keys} />
 
 <div class="join" class:cover={!started}>
-  <p class="host">City of Espoo <span>{event?.title}, {event?.note.split(',')[0]}</span></p>
+  <p class="host">City of Espoo <span>{event?.title}, {dates}</span></p>
 
   {#if !started}
     <section class="invite">
       <div class="plate" class:dark={identity?.logo_on === 'dark'}><Logo {brief} /></div>
-      <h1>{#each `${name}, you're invited.`.split(' ') as word, i}<span style:--i={i}>{word}&nbsp;</span>{/each}</h1>
-      <p class="filled" style:--i={5}>{event?.title}, {event?.note.split(',')[0]}. Online and free: deep-tech professionals from around the world meet Finnish employers. Your sign-up is already filled in.</p>
+      <h1>{#each `${name}, you're invited.`.split(' ') as word, i (i)}<span style:--i={i}>{word}&nbsp;</span>{/each}</h1>
+      <p class="filled" style:--i={5}>{event?.title}, {dates}. Online and free. Your sign-up is already filled in.</p>
       <button class="yes big" style:--i={6} onclick={() => (started = true)}>Check it <kbd>Enter</kbd></button>
     </section>
   {:else if joined}
-    <Finished {brief} {review} {about} {news} />
+    <Finished {brief} {review} {about} told={tell.filter((t) => told.includes(t.id))} />
   {:else}
     <div class="bench" bind:this={bench}>
       <aside class="left" aria-label="About you">
-        {#if settled.you || settled.news.length}<h3>About you</h3>{/if}
         {#if settled.you}
+          <h3>About you</h3>
           <button class="line you" onclick={() => (opened = 'you')} in:receive={{ key: 'you' }} out:send={{ key: 'you' }}>
             <span class="tile" class:dark={identity?.icon_on === 'dark'}><Logo {brief} small /></span>
             <b>{about('Company')}</b>
-            <span class="more">{about('What you do')}</span>
-            <span class="more">{[about('Field'), about('People') && `${about('People')} people`, about('Based in')].filter(Boolean).join(' · ')}</span>
+            <span>{about('What you do')}</span>
           </button>
+          {#each settled.told as t (t.id)}
+            <button class="line" onclick={() => { opened = 'you'; detail = t.id }} in:fade={{ duration: 300, delay: 250 }} animate:flip={{ duration: 300 }}>
+              <span class="fact">{t.line}</span>
+              <span class="more">{t.detail}</span>
+            </button>
+          {/each}
         {/if}
-        {#each settled.news as s (s.id)}
-          <button class="line" onclick={() => (opened = `news:${s.id}`)} in:receive={{ key: `news:${s.id}` }} out:send={{ key: `news:${s.id}` }} animate:flip={{ duration: 300 }}>
-            <span class="clamp">{s.claim}</span>
-            <span class="more">{sourced(s)}</span>
-          </button>
-        {/each}
       </aside>
 
       <div class="centre">
-        {#key current.key}
-          <article class="card" in:receive={{ key: current.key }} out:send={{ key: current.key }}>
-            {#if current.kind === 'you'}
+        <!-- one keyed item, so a card that is leaving keeps its own content and key while it travels to the side -->
+        {#each [current] as item (item.key)}
+          <article class="card" in:receive={{ key: item.key }} out:send={{ key: item.key }}>
+            {#if item.kind === 'you'}
+              <button class="edit" aria-pressed={editing} onclick={() => (editing = !editing)}><Icon name={editing ? 'check' : 'pen'} size={16} />{editing ? 'Done' : 'Edit'}</button>
               <div class="band" class:dark={identity?.logo_on === 'dark'}><Logo {brief} /></div>
-              <h2 role="textbox" tabindex="0" aria-label="Company" contenteditable="plaintext-only" spellcheck="false" onblur={(e) => fix('Company', e)} onkeydown={enter} use:text={about('Company')}></h2>
-              <p class="pitch" role="textbox" tabindex="0" aria-label="What you do" contenteditable="plaintext-only" data-placeholder="What you do, in a line" onblur={(e) => fix('What you do', e)} onkeydown={enter} use:text={about('What you do')}></p>
-              <p class="chips">
-                {#each ['Field', 'People', 'Based in', 'Website'] as key}
-                  <span class="chip"><small>{key}</small><span role="textbox" tabindex="0" aria-label={key} contenteditable="plaintext-only" data-placeholder="add" onblur={(e) => fix(key, e)} onkeydown={enter} use:text={about(key)}></span></span>
-                {/each}
-              </p>
-              <div class="actions"><button class="yes" onclick={accept}>That's us <kbd>Enter</kbd></button></div>
-            {:else if current.kind === 'news'}
-              <h2 class="claim">{current.signal!.claim}</h2>
-              <p class="chips"><Cite signal={current.signal!} label={sourced(current.signal!)} /></p>
-              <div class="actions">
-                <button class="yes" onclick={accept}>Show this to candidates <kbd>Enter</kbd></button>
-                <button class="no" onclick={skip}>Leave it out <kbd>Backspace</kbd></button>
-              </div>
-            {:else if current.kind === 'role'}
-              <Role {brief} need={current.need!} change={(p) => patch(current.need!.id, p)} />
-              <div class="actions">
-                <button class="yes" onclick={accept}>We want to meet them <kbd>Enter</kbd></button>
-                <button class="no" onclick={skip}>Not us <kbd>Backspace</kbd></button>
-              </div>
-            {:else if current.kind === 'add'}
+              <h2 role={editing ? 'textbox' : undefined} aria-label={editing ? 'Company' : undefined} contenteditable={editing ? 'plaintext-only' : undefined} spellcheck="false" onblur={(e) => { fix('Company', e) }} onkeydown={enter} use:text={about('Company')}></h2>
+              <p class="pitch" role={editing ? 'textbox' : undefined} aria-label={editing ? 'What you do' : undefined} contenteditable={editing ? 'plaintext-only' : undefined} data-placeholder="What you do, in a line" onblur={(e) => { fix('What you do', e) }} onkeydown={enter} use:text={about('What you do')}></p>
+              {#if editing}
+                <p class="chips">
+                  {#each ['Field', 'People', 'Based in', 'Website'] as key (key)}
+                    <span class="chip"><small>{key}</small><span role="textbox" tabindex="0" aria-label={key} contenteditable="plaintext-only" data-placeholder="add" onblur={(e) => { fix(key, e) }} onkeydown={enter} use:text={about(key)}></span></span>
+                  {/each}
+                </p>
+              {:else}
+                <p class="facts">{[about('Field'), about('People') && `${about('People')} people`, about('Based in'), about('Website')].filter(Boolean).join(' · ')}</p>
+              {/if}
+
+              {#if tell.length}
+                <ul class="tell" aria-label="What we would tell candidates">
+                  {#each tell.filter((t, i) => i < SHOWN || more || told.includes(t.id)) as t (t.id)}
+                    <li class:on={told.includes(t.id)}>
+                      <button class="tick" role="checkbox" data-choice aria-checked={told.includes(t.id)} aria-label="Tell candidates this" onclick={() => { toggle(t.id) }}>
+                        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4.5 10.5 8.5 14.5 15.5 6" /></svg>
+                      </button>
+                      <button class="say" aria-expanded={detail === t.id} onclick={() => (detail = detail === t.id ? null : t.id)}>
+                        <b>{t.line}</b><small>{when(t.date)}</small>
+                      </button>
+                      {#if detail === t.id}
+                        <p class="behind">{t.detail} {#each sources(t.signals) as s (s.id)}<Cite signal={s} label={host(s.source_url)} />{/each}</p>
+                      {/if}
+                    </li>
+                  {/each}
+                </ul>
+                {#if tell.length > SHOWN && !more}<button class="rest" onclick={() => (more = true)}><Icon name="plus" size={14} />{tell.length - SHOWN} more we could tell</button>{/if}
+              {/if}
+            {:else if item.kind === 'role'}
+              <Role {brief} need={item.need} change={(p) => { patch(item.need.id, p) }} />
+            {:else}
               <h2>Anyone else?</h2>
               {#if drafting}
                 <p class="drafting" role="status"><i></i>Drafting “{drafting}”</p>
               {:else}
-                <form onsubmit={(e) => (e.preventDefault(), line.trim() && draft(line))}>
+                <form onsubmit={(e) => { e.preventDefault(); if (line.trim()) void draft(line) }}>
                   <input bind:value={line} placeholder="Describe them in a line" aria-label="Describe who else you want to meet" autocomplete="off" />
                 </form>
-                <p class="chips">
-                  {#each suggestions as s}<button class="chip pick" onclick={() => draft(s)}><Icon name="plus" size={14} />{s}</button>{/each}
-                </p>
+                {#if suggestions.length}
+                  <p class="chips">
+                    {#each suggestions as s (s)}<button class="chip pick" onclick={() => void draft(s)}><Icon name="plus" size={14} />{s}</button>{/each}
+                  </p>
+                {/if}
                 {#if failed}<p class="failed" role="alert">{failed}</p>{/if}
-                <div class="actions">
-                  {#if line.trim()}
-                    <button class="yes" onclick={() => draft(line)}>Draft this role <kbd>Enter</kbd></button>
-                  {:else}
-                    <button class="yes" onclick={accept}>No one else <kbd>Enter</kbd></button>
-                  {/if}
-                </div>
               {/if}
-            {:else}
-              <h2>What would you like at the event?</h2>
+              <h2 class="second">At the event</h2>
               <p class="chips">
-                {#each WANTS as w}
-                  <button class="chip want" data-choice aria-pressed={wants.includes(w)} onclick={() => want(w)}>{#if wants.includes(w)}<Icon name="check" size={14} />{/if}{w}</button>
+                {#each WANTS as w (w)}
+                  <button class="chip want" data-choice aria-pressed={wants.includes(w)} onclick={() => { want(w) }}>{#if wants.includes(w)}<Icon name="check" size={14} />{/if}{w}</button>
                 {/each}
               </p>
-              <div class="actions">
-                <button class="yes" disabled={!review.needs.some((n) => n.ok)} onclick={accept}>Sign {about('Company')} up <kbd>Enter</kbd></button>
-              </div>
             {/if}
           </article>
-        {/key}
-
-        <footer>
-          <span class="dots" aria-label="Progress">
-            {#each items as i (i.key)}<i class:done={decided(i)} class:now={i.key === current.key}></i>{/each}
-          </span>
-          {#if undo}<span class="undone">{undo.said} <button onclick={takeBack}>Undo</button></span>{/if}
-          <button class="back" onclick={back} disabled={items[0].key === current.key}><Icon name="undo" size={14} />Back <kbd>←</kbd></button>
-        </footer>
+        {/each}
       </div>
 
       <aside class="right" aria-label="Who you want to meet">
@@ -267,12 +287,24 @@
           <button class="line" onclick={() => (opened = `role:${n.id}`)} in:receive={{ key: `role:${n.id}` }} out:send={{ key: `role:${n.id}` }} animate:flip={{ duration: 300 }}>
             <b>{n.title}</b>
             <span>{terms(n).join(' · ')}</span>
-            {#if open(n)}<span class="todo">{open(n)} still to answer</span>{/if}
-            {#each n.can_do ?? [] as task}<span class="more task">{task}</span>{/each}
+            {#if unanswered(n)}<span class="todo">{unanswered(n)} still to answer</span>{/if}
+            {#if n.can_do.length}<span class="more">{#each n.can_do as task, k (k)}{#if k}<br />{/if}{task}{/each}</span>{/if}
           </button>
         {/each}
       </aside>
     </div>
+
+    <footer class="dock">
+      <button class="back" onclick={back} disabled={items[0]?.key === current.key} aria-label="Back"><Icon name="undo" size={16} /><kbd>←</kbd></button>
+      <span class="dots" aria-label="Progress">
+        {#each items as i (i.key)}<i class:done={decided(i)} class:now={i.key === current.key}></i>{/each}
+      </span>
+      {#if undo}<button class="undo" onclick={takeBack}>{undo.said} Undo <kbd>Z</kbd></button>{/if}
+      <span class="answers">
+        {#if current.kind === 'role'}<button class="no" onclick={skip}>Not us <kbd>Backspace</kbd></button>{/if}
+        <button class="yes" disabled={!!drafting || (current.kind === 'finish' && !line.trim() && !review.needs.some((n) => n.ok))} onclick={accept}>{answer} <kbd>Enter</kbd></button>
+      </span>
+    </footer>
   {/if}
 </div>
 
@@ -280,7 +312,7 @@
   .join {
     position: relative;
     min-height: 100dvh;
-    padding: 0 clamp(1rem, 3vw, 2.5rem) var(--s7);
+    padding: 0 clamp(1rem, 3vw, 2.5rem) 7rem;
     background: var(--brand);
     color: var(--brand-ink);
     overflow: clip;
@@ -311,7 +343,7 @@
   .host span {
     margin-left: var(--s3);
     font-weight: 400;
-    color: color-mix(in oklch, var(--brand-ink) 80%, var(--brand));
+    color: color-mix(in oklch, var(--brand-ink) 90%, var(--brand));
   }
   .cover .host {
     animation: fade 0.6s 1.1s backwards;
@@ -363,20 +395,22 @@
   }
   .filled {
     display: block;
-    max-width: 40ch;
+    max-width: 34ch;
     margin-top: var(--s4);
     font-size: clamp(1.125rem, 1rem + 0.5vw, 1.375rem);
     line-height: 1.35;
   }
 
-  /* three columns: who you are, the card, who you want to meet */
+  /* three columns: who you are, the card, who you want to meet. the card sits in the middle of the
+     space between the header and the dock */
   .bench {
     display: grid;
     grid-template-columns: minmax(12rem, 1fr) minmax(0, 36rem) minmax(12rem, 1fr);
     align-items: start;
     gap: clamp(1rem, 2.5vw, 2.5rem);
     max-width: 88rem;
-    margin: clamp(0.5rem, 4vh, 3rem) auto 0;
+    min-height: calc(100dvh - 11.5rem);
+    margin: 0 auto;
   }
   aside {
     position: sticky;
@@ -389,11 +423,12 @@
     padding: 0 var(--s3) var(--s2);
     font: 700 var(--t-sm) / 1.2 var(--text);
     letter-spacing: 0;
-    color: color-mix(in oklch, var(--brand-ink) 78%, var(--brand));
+    color: color-mix(in oklch, var(--brand-ink) 90%, var(--brand));
     animation: fade 0.4s;
   }
   /* a settled answer: written straight on the colour, so the card stays the only bright surface */
   .line {
+    position: relative;
     display: grid;
     gap: 0.15rem;
     padding: var(--s3);
@@ -416,49 +451,40 @@
   }
   .line > span {
     font-size: var(--t-sm);
-    color: color-mix(in oklch, var(--brand-ink) 84%, var(--brand));
+    color: color-mix(in oklch, var(--brand-ink) 92%, var(--brand));
   }
-  .line .clamp {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+  .line .fact {
     font-size: var(--t-md);
+    font-weight: 600;
     color: var(--brand-ink);
-  }
-  .line:hover .clamp,
-  .line:focus-visible .clamp {
-    -webkit-line-clamp: unset;
-    line-clamp: unset;
-  }
-  /* more of a settled answer shows on hover or focus */
-  .line .more {
-    max-height: 0;
-    overflow: hidden;
-    opacity: 0;
-    transition: max-height 0.3s var(--ease), opacity 0.2s;
-  }
-  .line:hover .more,
-  .line:focus-visible .more {
-    max-height: 6rem;
-    opacity: 1;
-  }
-  .line .task::before {
-    content: '· ';
   }
   .line .todo {
     font-weight: 700;
     color: var(--brand-ink);
   }
-  .undone button {
-    padding: 0 var(--s1);
-    border: 0;
-    background: none;
-    color: inherit;
-    font-weight: 700;
-    text-decoration: underline;
-    text-underline-offset: 0.2em;
+  /* more of a settled answer opens over what is below it on hover or focus, and pushes nothing */
+  .line .more {
+    position: absolute;
+    top: calc(100% - var(--s2));
+    left: var(--s2);
+    right: var(--s2);
+    z-index: 5;
+    padding: var(--s3);
+    border-radius: var(--r2);
+    background: var(--brand-ink);
+    color: var(--brand);
+    line-height: 1.4;
+    box-shadow: var(--lift);
+    opacity: 0;
+    visibility: hidden;
+    translate: 0 -4px;
+    transition: opacity 0.18s, translate 0.25s var(--ease), visibility 0.18s;
+  }
+  .line:hover .more,
+  .line:focus-visible .more {
+    opacity: 1;
+    visibility: visible;
+    translate: 0;
   }
   .tile {
     width: 3rem;
@@ -472,16 +498,11 @@
 
   .centre {
     display: grid;
-    align-content: start;
-  }
-  .centre > * {
-    grid-column: 1;
+    align-self: center;
   }
   .card {
-    grid-row: 1;
-    display: flex;
-    flex-direction: column;
-    min-height: 21rem;
+    position: relative;
+    grid-area: 1 / 1;
     padding: clamp(1.25rem, 3vw, 2.25rem);
     border-radius: 1.25rem;
     background: var(--ground);
@@ -491,12 +512,33 @@
   .card :focus-visible {
     outline-color: var(--ink);
   }
-  .band {
-    height: clamp(6rem, 16vh, 9rem);
-    margin-bottom: var(--s5);
-    padding: var(--s5) 20%;
-    border-radius: var(--r2);
+  .edit {
+    position: absolute;
+    top: var(--s3);
+    right: var(--s3);
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s1);
+    min-height: 2rem;
+    padding: 0 var(--s3);
+    border: 0;
+    border-radius: 99px;
+    background: var(--ground);
+    color: var(--ink-2);
+    font-size: var(--t-sm);
+    font-weight: 600;
+  }
+  .edit:hover,
+  .edit[aria-pressed='true'] {
     background: var(--wash);
+    color: var(--ink);
+  }
+  .band {
+    height: clamp(5.5rem, 14vh, 8rem);
+    margin-bottom: var(--s5);
+    padding: var(--s4) 22%;
+    border-radius: var(--r2);
   }
   .band:not(.dark) {
     background: #fff;
@@ -508,22 +550,120 @@
     letter-spacing: -0.03em;
     line-height: 1.05;
   }
-  h2.claim {
-    font-weight: 700;
-    line-height: 1.15;
-    text-wrap: pretty;
+  h2.second {
+    margin-top: var(--s6);
+    font-size: var(--t-lg);
+    letter-spacing: -0.015em;
   }
   .pitch {
     margin-top: var(--s2);
     font-size: var(--t-lg);
     line-height: 1.35;
+  }
+  .facts {
+    margin-top: var(--s2);
+    font-size: var(--t-sm);
     color: var(--ink-2);
+  }
+  /* what we would tell candidates: a short line each; the sentence and its source open on request */
+  .tell {
+    display: grid;
+    margin-top: var(--s5);
+    border-top: 1px solid var(--line);
+  }
+  .tell li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    column-gap: var(--s3);
+    padding: var(--s2) 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .say {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s3);
+    min-height: 2.25rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    text-align: left;
+  }
+  .say b {
+    font-size: var(--t-lg);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+  }
+  .say small {
+    flex: none;
+    font-size: var(--t-xs);
+    color: var(--ink-2);
+  }
+  .tell li:not(.on) .say b {
+    color: var(--ink-2);
+    font-weight: 500;
+  }
+  .behind {
+    grid-column: 2;
+    padding: 0 0 var(--s2);
+    color: var(--ink-2);
+    line-height: 1.45;
+    animation: rise 0.3s var(--ease);
+  }
+  .rest {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s1);
+    margin-top: var(--s2);
+    padding: var(--s1) 0;
+    border: 0;
+    background: none;
+    color: var(--ink-2);
+    font-size: var(--t-sm);
+    font-weight: 600;
+  }
+  .rest:hover {
+    color: var(--ink);
+  }
+  /* the tick draws itself, and its box takes the company's colour */
+  .tick {
+    display: grid;
+    place-items: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 2px solid var(--line);
+    border-radius: 6px;
+    background: var(--ground);
+    transition: background 0.25s, border-color 0.25s, scale 0.25s var(--ease);
+  }
+  .tick:active {
+    scale: 0.9;
+  }
+  .tick svg {
+    width: 1rem;
+    fill: none;
+    stroke: var(--brand-ink);
+    stroke-width: 2.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 18;
+    stroke-dashoffset: 18;
+    transition: stroke-dashoffset 0.35s var(--ease) 0.05s;
+  }
+  .on > .tick {
+    border-color: var(--brand);
+    background: var(--brand);
+  }
+  .on > .tick svg {
+    stroke-dashoffset: 0;
   }
   .chips {
     display: flex;
     flex-wrap: wrap;
     gap: var(--s2);
-    margin-top: var(--s4);
+    margin-top: var(--s3);
   }
   .chip {
     display: inline-flex;
@@ -545,7 +685,7 @@
   .pick {
     border-style: dashed;
     font-size: var(--t-sm);
-    transition: border-color 0.15s, background 0.15s;
+    transition: border-color 0.15s;
   }
   .pick:hover {
     border-style: solid;
@@ -562,9 +702,6 @@
   [contenteditable] {
     border-radius: 4px;
     outline: none;
-    transition: box-shadow 0.12s, background 0.12s;
-  }
-  [contenteditable]:hover {
     background: var(--wash);
     box-shadow: 0 0 0 4px var(--wash);
   }
@@ -575,6 +712,10 @@
   [contenteditable]:empty::before {
     content: attr(data-placeholder);
     color: color-mix(in oklch, var(--ink-2) 65%, var(--ground));
+  }
+  .chip [contenteditable] {
+    background: none;
+    box-shadow: none;
   }
   form input {
     width: 100%;
@@ -610,19 +751,34 @@
     color: var(--stop);
   }
 
-  /* the two answers under every card, with the key that gives each */
-  .actions {
-    position: sticky;
-    bottom: 0;
+  /* the dock: the answers, their keys and the progress, fixed at the foot of the window so nothing the
+     hand needs ever moves */
+  .dock {
+    position: fixed;
+    left: 50%;
+    bottom: var(--s4);
+    z-index: 10;
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
     gap: var(--s3);
-    margin: auto calc(-1 * clamp(1.25rem, 3vw, 2.25rem)) calc(-1 * clamp(1.25rem, 3vw, 2.25rem));
-    padding: var(--s4) clamp(1.25rem, 3vw, 2.25rem);
-    border-radius: 0 0 1.25rem 1.25rem;
+    width: min(100% - 2rem, 46rem);
+    min-height: 4rem;
+    padding: var(--s2) var(--s2) var(--s2) var(--s3);
+    border-radius: 99px;
     background: var(--ground);
-    box-shadow: 0 -1px 0 var(--line);
+    color: var(--ink);
+    box-shadow: var(--lift);
+    translate: -50% 0;
+    animation: rise 0.5s var(--ease) backwards;
+  }
+  .dock :focus-visible {
+    outline-color: var(--ink);
+  }
+  .answers {
+    display: flex;
+    align-items: center;
+    gap: var(--s1);
+    margin-left: auto;
   }
   .yes,
   .no {
@@ -634,6 +790,7 @@
     border: 0;
     border-radius: 99px;
     font-weight: 700;
+    white-space: nowrap;
     transition: transform 0.2s var(--ease), box-shadow 0.2s, background 0.15s;
   }
   .yes {
@@ -665,50 +822,53 @@
     background: var(--wash);
     color: var(--ink);
   }
-
-  footer {
-    grid-row: 2;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--s4);
-    padding: var(--s4) var(--s2) 0;
-    font-size: var(--t-sm);
-  }
   .dots {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.4rem;
+    gap: 0.35rem;
+    max-width: 8rem;
   }
   .dots i {
-    width: 0.5rem;
-    height: 0.5rem;
+    width: 0.45rem;
+    height: 0.45rem;
     border: 1.5px solid currentColor;
     border-radius: 50%;
-    opacity: 0.45;
+    opacity: 0.4;
     transition: opacity 0.3s, background 0.3s, scale 0.3s var(--ease);
   }
   .dots i.done {
     background: currentColor;
-    opacity: 0.9;
+    opacity: 0.85;
   }
   .dots i.now {
+    border-color: var(--brand);
+    background: var(--brand);
     opacity: 1;
     scale: 1.5;
   }
-  .back {
+  .back,
+  .undo {
     display: inline-flex;
     align-items: center;
     gap: var(--s2);
-    padding: var(--s1) var(--s2);
+    min-height: 3rem;
+    padding: 0 var(--s3);
     border: 0;
-    border-radius: var(--r1);
+    border-radius: 99px;
     background: none;
-    color: inherit;
+    color: var(--ink-2);
+    font-size: var(--t-sm);
     font-weight: 600;
+    white-space: nowrap;
+  }
+  .back:hover:not(:disabled),
+  .undo:hover {
+    background: var(--wash);
+    color: var(--ink);
   }
   .back:disabled {
-    visibility: hidden;
+    opacity: 0.3;
+    cursor: default;
   }
 
   @keyframes flood {
@@ -740,10 +900,11 @@
       opacity: 0.5;
     }
   }
-  /* narrow screens: the card first, then the page that is building under it */
-  @media (max-width: 62rem) {
+  /* less room: the card first, then the page that is building under it */
+  @media (max-width: 72rem) {
     .bench {
       grid-template-columns: minmax(0, 1fr);
+      min-height: 0;
     }
     .centre {
       order: -1;
@@ -752,11 +913,35 @@
       position: static;
     }
     .line .more {
-      max-height: none;
+      position: static;
+      padding: 0;
+      background: none;
+      color: inherit;
+      box-shadow: none;
       opacity: 1;
+      visibility: visible;
+      translate: 0;
     }
-    kbd {
+  }
+  @media (max-width: 40rem) {
+    kbd,
+    .dots {
       display: none;
+    }
+    .dock {
+      bottom: 0;
+      width: 100%;
+      min-height: 0;
+      padding: var(--s2) var(--s3) calc(var(--s2) + env(safe-area-inset-bottom));
+      border-radius: 1.25rem 1.25rem 0 0;
+    }
+    .answers {
+      flex: 1;
+      justify-content: flex-end;
+    }
+    .yes,
+    .no {
+      padding: 0 var(--s4);
     }
   }
 </style>

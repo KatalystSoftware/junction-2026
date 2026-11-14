@@ -12,6 +12,7 @@
     flat: 'M4 10h12M12 6l4 4-4 4',
     search: 'M13 13l4 4M9 14.5a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z',
     undo: 'M7 5 3.5 8.5 7 12M3.5 8.5H12a4.5 4.5 0 0 1 0 9H9',
+    pen: 'M4 16l.8-3.6L13.6 3.6l2.8 2.8-8.8 8.8L4 16zM11.8 5.4l2.8 2.8',
   }
   let { name, size = 20 }: { name: keyof typeof PATHS; size?: number } = $props()
 </script>

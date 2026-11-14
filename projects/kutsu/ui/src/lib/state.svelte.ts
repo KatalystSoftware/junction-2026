@@ -35,8 +35,9 @@ export const joinLink = (id: string) => `${location.origin}${location.pathname}$
 export const nameOf = (b: Brief) =>
   app.presets.map((p) => p.names?.[b.id]).find(Boolean) ?? b.name.replace(/\s+(Oyj Abp|Oyj|Oy Ab|Oy|Ab|sr)$/i, '')
 
+/** A company's sign-up so far, or the draft it starts from, where every drafted role gets its id. */
 export const reviewOf = (b: Brief): Review =>
-  app.reviews[b.id] ?? { status: 'draft', needs: b.card.needs.map((n, i) => ({ ...n, id: `n${i}` })) }
+  app.reviews[b.id] ?? { status: 'draft', needs: b.card.needs.map((n, i) => ({ ...n, id: `n${String(i)}` })) }
 
 export async function saveReview(id: string, review: Review) {
   app.reviews[id] = review

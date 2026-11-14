@@ -9,12 +9,8 @@ export type Signal = {
   published: string
 }
 
-/** One talent need. `by` is set once a person has written or changed it; `off` once the company says no to it. */
-export type Need = {
-  /** stable within one sign-up, so a card can be followed as it moves */
-  id?: string
-  /** the company has accepted it */
-  ok?: boolean
+/** A role as the pipeline drafts it: who the company seems to need, and what it asks of them. */
+export type Draft = {
   title: string
   why: string
   /** what the person must be able to do, as work that can be shown */
@@ -32,9 +28,22 @@ export type Need = {
   family?: string
   signals: string[]
   roles: string[]
-  by?: 'espoo' | 'company'
-  off?: boolean
 }
+
+/**
+ * A role inside one sign-up. Its id is what lists are keyed by and what a card is followed by as it
+ * moves, so it is required: a need without one once stopped the page.
+ */
+export type Need = Draft & {
+  id: string
+  /** the company has accepted it */
+  ok?: boolean
+  /** set once a person has written or changed it */
+  by?: 'espoo' | 'company'
+}
+
+/** Something to tell candidates about the company: a short line, the sentence behind it, and the statements it rests on. */
+export type Told = { id: string; line: string; detail: string; kind: string; date: string; signals: string[] }
 
 export type Identity = {
   name: string | null
@@ -59,7 +68,7 @@ export type Brief = {
   open_roles: number
   identity: Identity | null
   signals: Signal[]
-  card: { pitch: string; momentum: string; needs: Need[]; also?: string[] }
+  card: { pitch: string; momentum: string; tell: Told[]; left_out: { signal: string; why: string }[]; needs: Draft[]; also: string[] }
   generated_at: string
   stats: { results_read: number; signals_dropped: number }
 }
@@ -72,10 +81,8 @@ export type Review = {
   /** the company has confirmed who it is */
   about_ok?: boolean
   about?: Record<string, string>
-  /** per statement: true to tell talent, false to leave out; absent while undecided */
-  facts?: Record<string, boolean>
-  /** the company has said there is no one else to add */
-  added_done?: boolean
+  /** the ids of the things the company agreed to tell candidates; absent until it has looked */
+  told?: string[]
   wants?: string[]
   note?: string
   invited_at?: string

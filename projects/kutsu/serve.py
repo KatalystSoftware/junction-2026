@@ -32,16 +32,41 @@ HOST, PORT = os.environ.get("HOST", "127.0.0.1"), 8046
 LIVE_LIMIT = int(os.environ.get("LIVE_LIMIT", "300"))  # about $0.03 and 11 Context.dev credits each
 DIST = lib.HERE / "ui" / "dist"
 REVIEWS = lib.HERE / "reviews.json"
-DATA = {"/signals.json": "signals.json", "/presets.json": "presets.json", "/reviews.json": "reviews.json"}
+DATA = {"/signals.json": "signals.json", "/presets.json": "presets.json"}
 TYPES = {".html": "text/html; charset=utf-8", ".js": "text/javascript", ".css": "text/css", ".json": "application/json",
          ".svg": "image/svg+xml", ".woff2": "font/woff2", ".png": "image/png", ".ico": "image/x-icon"}
 STATUSES = {"draft", "invited", "joined"}
+# What a saved sign-up holds. Raise it whenever that changes: a file saved in another shape is set aside
+# at start, never read, because the page keys its lists by what is in it and must not meet an old one.
+REVIEW_SHAPE = 3
 COMPANIES, ROLES = signals.data()
 saving = threading.Lock()
 asked = {x.lower() for b in json.loads(signals.OUT.read_text()) for x in (b["id"], b["name"])}
 START = len(asked)
 researching = threading.BoundedSemaphore(4)
 progress = {}  # query -> the steps its research has taken
+
+
+def reviews():
+    """Every saved sign-up, by brief id. A file in another shape is moved aside and the result is empty."""
+    if not REVIEWS.exists():
+        return {}
+    saved = json.loads(REVIEWS.read_text())
+    if saved.get("shape") != REVIEW_SHAPE:
+        aside = REVIEWS.with_name(f"reviews.shape-{saved.get('shape', 'unversioned')}.json")
+        REVIEWS.rename(aside)
+        print(f"sign-ups saved in another shape were set aside as {aside.name}; starting with none", file=sys.stderr)
+        return {}
+    return saved["reviews"]
+
+
+def well_formed(review):
+    """A sign-up the page can show: a known status, and needs that each carry their own id and a title."""
+    needs = review.get("needs")
+    return (review.get("status") in STATUSES and isinstance(needs, list)
+            and all(isinstance(n, dict) and isinstance(n.get("id"), str) and n["id"] and isinstance(n.get("title"), str)
+                    for n in needs)
+            and len({n["id"] for n in needs}) == len(needs))
 
 
 class Handler(http.server.BaseHTTPRequestHandler):
@@ -65,9 +90,10 @@ class Handler(http.server.BaseHTTPRequestHandler):
     def do_GET(self):
         url = urllib.parse.urlsplit(self.path)
         q = urllib.parse.parse_qs(url.query).get("q", [""])[0].strip()[:100]
+        if url.path == "/reviews.json":
+            return self.json(reviews())
         if url.path in DATA:
-            path = lib.HERE / DATA[url.path]
-            return self.reply(200, path.read_bytes() if path.exists() else b"{}", "application/json")
+            return self.reply(200, (lib.HERE / DATA[url.path]).read_bytes(), "application/json")
         if url.path == "/progress":
             return self.json(progress.get(q.lower(), []))
         if url.path == "/brief" and q:
@@ -90,7 +116,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
             asked.add(q.lower())
             b = signals.brief(q, COMPANIES, ROLES, lambda stage, facts: steps.append({"stage": stage, **facts}))
         except (SystemExit, KeyError) as e:  # an API turned the request down, or a key is not in the environment
-            return self.text(502, f"Research failed: {e}")
+            print(f"research failed for {q!r}: {e}", file=sys.stderr)
+            return self.text(502, "We could not research this company just now. Try again in a minute.")
         finally:
             researching.release()
         if b is None:
@@ -106,7 +133,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
         try:
             draft = write()
         except (SystemExit, KeyError) as e:
-            return self.text(502, f"Drafting failed: {e}")
+            print(f"drafting failed: {e}", file=sys.stderr)
+            return self.text(502, "The draft did not come through.")
         finally:
             researching.release()
         self.json(draft) if draft else self.text(502, "The model gave no draft.")
@@ -127,16 +155,16 @@ class Handler(http.server.BaseHTTPRequestHandler):
             if not line or brief_id not in briefs:
                 return self.text(400, "A role needs a known brief id and a line describing it.")
             return self.draft(lambda: signals.role(briefs[brief_id], line))
-        known = set(briefs)
-        if brief_id not in known or review.get("status") not in STATUSES or not isinstance(review.get("needs"), list):
-            return self.text(400, "The review needs a known brief id, a status and a list of needs.")
+        if brief_id not in briefs or not isinstance(review, dict) or not well_formed(review):
+            return self.text(400, "A sign-up needs a known brief id, a status, and needs that each have their own id and a title.")
         with saving:
-            reviews = json.loads(REVIEWS.read_text()) if REVIEWS.exists() else {}
-            reviews[brief_id] = {**review, "updated_at": lib.now_iso()}
-            REVIEWS.write_text(json.dumps(reviews, ensure_ascii=False, indent=1))
-        self.json(reviews[brief_id])
+            saved = reviews()
+            saved[brief_id] = {**review, "updated_at": lib.now_iso()}
+            REVIEWS.write_text(json.dumps({"shape": REVIEW_SHAPE, "reviews": saved}, ensure_ascii=False, indent=1))
+        self.json(saved[brief_id])
 
 
 if __name__ == "__main__":
+    reviews()  # sets a file of another shape aside now, at start, and says so
     print(f"http://{HOST}:{PORT}", file=sys.stderr)
     http.server.ThreadingHTTPServer((HOST, PORT), Handler).serve_forever()

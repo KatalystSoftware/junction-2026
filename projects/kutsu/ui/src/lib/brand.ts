@@ -32,6 +32,11 @@ export function brandOf(colors: string[] = []): { field: string; ink: string } {
     const score = s * (1 - Math.abs(l - 0.45))
     if (s > 0.25 && l > 0.12 && l < 0.82 && score > best) [field, best] = [c, score]
   }
-  const ink = contrast(rgb(field), WHITE) >= contrast(rgb(field), rgb(DARK)) ? '#ffffff' : DARK
-  return { field, ink }
+  const light = contrast(rgb(field), WHITE) >= contrast(rgb(field), rgb(DARK))
+  const ink = light ? '#ffffff' : DARK
+  // a mid-tone brand colour (Nitor's red, Qutwo's rust) reads with neither ink: move the fill away from
+  // its ink, a little at a time, until body text on it clears 5.5:1
+  let c = rgb(field)
+  for (let i = 0; i < 24 && contrast(c, rgb(ink)) < 5.5; i++) c = c.map((v) => Math.round(light ? v * 0.95 : v + (255 - v) * 0.07)) as Rgb
+  return { field: '#' + c.map((v) => v.toString(16).padStart(2, '0')).join(''), ink }
 }

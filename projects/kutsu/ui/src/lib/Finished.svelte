@@ -3,17 +3,17 @@
   import Icon from './Icon.svelte'
   import Logo from './Logo.svelte'
   import { app, joinLink, saveReview } from './state.svelte'
-  import type { Brief, Need, Review, Signal } from './types'
+  import type { Brief, Need, Review, Told } from './types'
 
   // The company's finished page: who it is, who it is looking for, and what Espoo does for it,
   // which follows from what it picked. This is what it would screenshot or pass on.
-  let { brief, review, about, news }: { brief: Brief; review: Review; about: (key: string) => string; news: Signal[] } = $props()
+  let { brief, review, about, told }: { brief: Brief; review: Review; about: (key: string) => string; told: Told[] } = $props()
   const identity = $derived(brief.identity)
   const event = $derived(app.presets.find((p) => p.ids.includes(brief.id)) ?? app.presets[0])
   const roles = $derived(review.needs.filter((n) => n.ok))
-  const told = $derived(news.filter((s) => review.facts?.[s.id] === true))
+  const source = (t: Told) => brief.signals.find((s) => t.signals.includes(s.id))
   const wants = $derived(review.wants ?? [])
-  const count = (n: number, one: string) => `${n} ${one}${n === 1 ? '' : 's'}`
+  const count = (n: number, one: string) => `${String(n)} ${one}${n === 1 ? '' : 's'}`
 
   /** Who a role is shown to, from the language and the hiring-from-abroad answer. */
   const reach = (n: Need) => {
@@ -71,8 +71,8 @@
       <p class="facts">{[about('Field'), about('People') && `${about('People')} people`, about('Based in'), about('Website')].filter(Boolean).join(' · ')}</p>
       {#if told.length}
         <ul class="told">
-          {#each told as s (s.id)}
-            <li>{s.claim} <a href={s.source_url} target="_blank" rel="noopener">{[host(s.source_url), when(s.date)].filter(Boolean).join(', ')}</a></li>
+          {#each told as t (t.id)}
+            <li><b>{t.line}</b>{t.detail} {#if source(t)}<a href={source(t)?.source_url} target="_blank" rel="noopener">{[host(source(t)?.source_url ?? null), when(t.date)].filter(Boolean).join(', ')}</a>{/if}</li>
           {/each}
         </ul>
       {/if}
@@ -238,7 +238,15 @@
   }
   .told li {
     line-height: 1.4;
+    color: var(--ink-2);
     text-wrap: pretty;
+  }
+  .told b {
+    display: block;
+    color: var(--ink);
+    font-size: var(--t-lg);
+    font-weight: 700;
+    letter-spacing: -0.015em;
   }
   .told a {
     font-size: var(--t-sm);
