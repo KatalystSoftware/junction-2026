@@ -651,3 +651,12 @@ _XI = _X["m41x-i-long300-c10-820"]
 _X["m41x-j-kindfee-thin-820"] = {**_from820(_XI, kind_fees=True),
                                  "thin_play": {**_XI["thin_play"], "params": {**_XI["thin_play"]["params"], "kind_fees": True}}}
 VARIANTS.update(_X)
+# The 820+ parts on `m41x-h` without `m41x-l`'s onward quote 0.8, which reads under 0 at 820+ on both halves of the corrected
+# stand-in (d2d6e532): cost by hours (30, then 24), long drives at 1.0, and the trade-in fee fix (also under 760).
+_Y = {"m41y-c-h30-c11-820": _from820(_X["m41x-h-ss025-820"], cost=1.1, cost_hours=[[30, 1.2]])}
+_Y["m41y-f-h24-820"] = _from820(_Y["m41y-c-h30-c11-820"], cost_hours=[[24, 1.2]])
+_Y["m41y-i-long300-c10-820"] = _from820(_Y["m41y-f-h24-820"], long_drive=300, long_cost=1.0)
+_YI = _Y["m41y-i-long300-c10-820"]
+_Y["m41y-j-kindfee-thin-820"] = {**_from820(_YI, kind_fees=True),
+                                 "thin_play": {**_YI["thin_play"], "params": {**_YI["thin_play"]["params"], "kind_fees": True}}}
+VARIANTS.update(_Y)

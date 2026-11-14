@@ -966,7 +966,8 @@ def test_each_m41x_row_plays_trackb_merge_4_1_at_760_to_819_drivers():
             ("m41x-f-h24-820", {900: {"cost_hours": [[24, 1.2]]}}),
             ("m41x-i-long300-c10-820", {900: {"long_drive": 300, "long_cost": 1.0}}),
             ("m41x-j-kindfee-thin-820", {700: {"kind_fees": True}, 900: {"kind_fees": True}})]
-    for (below, _), (row, part) in zip(rows, rows[1:]):
+    rows_y = [rows[4]] + [(n.replace("m41x-", "m41y-"), part) for n, part in rows[6:]]  # on m41x-h, without m41x-l
+    for (below, _), (row, part) in [*zip(rows, rows[1:]), *zip(rows_y, rows_y[1:])]:
         for n in (700, 761, 819, 820, 900):
             new, old = desk(row, n), desk(below, n)
             want = part.get(n, {}) if n in (700, 900) else part.get(800, {}) if n < 820 else part.get(900, {})
