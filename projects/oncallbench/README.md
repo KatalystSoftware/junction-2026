@@ -124,14 +124,18 @@ baselines and Opus on the committed run's seed:
 LEVEL=4 SEED=101 ./run.sh reference nop stop-early opus
 ```
 
-Expect 1.00, 0.00, 0.00 and, for Opus, anything from 0.1 to 0.7 on this seed (0.11, 0.18 and 0.73
-in three runs; 0.32 mean over nine runs on 101-103). The runs go side by side: the first call
-spends about 5 minutes building the images, then the scripted runs take about a minute and an
-Opus run 5-8. Each run's score is in `jobs/<name>/<trial>/verifier/reward.txt`, its cost
-breakdown next to it in `reward.json`. `run.sh` writes a Harbor task for the episode to
-`jobs/variants/` and calls `harbor run -p <task> -a opencode -m anthropic/claude-opus-5-5`, so a
-judge can rerun that folder with plain Harbor. Stop-early and the other scripted policies run as
-Harbor's `oracle` agent with `POLICY=<name>`. `SEED` picks the episode (held-out 101-106); `ATTEMPTS=3` gives three Opus runs.
+Expect 1.00, 0.00, 0.00 and, for Opus, anything from 0.0 to 0.7 on this seed (0.11, 0.18 and 0.73
+in three runs; 0.32 mean over nine runs on 101-103). A rerun of this command from a clean clone
+in a fresh Ubuntu container with only Docker and uv, before the agent's image moved to Alpine,
+gave 1.00, 0.00, 0.00 and 0.00: Opus cleared every fault and wasted no mitigation, but its
+rollback of quotes-svc set off a retry storm and the shift cost $245,607 against $232,523 for
+doing nothing (`runs/repro-l4-s101-opus-204757/`). The runs go side by side: the first call spends
+about 5 minutes building the images, then the scripted runs take about a minute and an Opus run
+5-8. Each run's score is in `jobs/<name>/<trial>/verifier/reward.txt`, its cost breakdown next to
+it in `reward.json`. `run.sh` writes a Harbor task for the episode to `jobs/variants/` and calls
+`harbor run -p <task> -a opencode -m anthropic/claude-opus-5-5`, so a judge can rerun that folder
+with plain Harbor. Stop-early and the other scripted policies run as Harbor's `oracle` agent with
+`POLICY=<name>`. `SEED` picks the episode (held-out 101-106); `ATTEMPTS=3` gives three Opus runs.
 
 Committed run logs, each trial with its transcript in `agent/opencode.txt`, its action log in
 `artifacts/ledger/receipt.json` and its score in `verifier/reward.txt`:

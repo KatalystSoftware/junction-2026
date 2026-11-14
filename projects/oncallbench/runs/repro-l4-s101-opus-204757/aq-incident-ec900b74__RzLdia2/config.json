@@ -1,0 +1,12 @@
+{
+    "task": {
+        "path": "jobs/variants/aq-incident-ec900b74"
+    },
+    "trial_name": "aq-incident-ec900b74__RzLdia2",
+    "trials_dir": "jobs/run-l4-s101-opus-204757",
+    "agent": {
+        "name": "opencode",
+        "model_name": "anthropic/claude-opus-5-5"
+    },
+    "job_id": "a8bcee6f-60d2-4ce2-85ea-966ae0c3572d"
+}
