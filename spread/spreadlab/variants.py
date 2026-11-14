@@ -456,3 +456,59 @@ VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss
 # The aggressive row A1 on safe row 7: the day cap under 760 drivers and `late_cost` 100 at 760 or more.
 VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100"] = _full_weeks(
     VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62"], late_cost=100)
+# More rungs on the aggressive row A1.7 (`…-cap62-late100`), each only in a week of 760 drivers or more and row 7 below that:
+# the climb's `agg-r-mild` (cost 1.15, the 12-hour count, the kinds quoted cheaper: trade-in 2.0, private pickup 1.4, private
+# delivery 1.2) and lane 1 A's `agg-late100-cost10` (cost 1.0).
+_A1_7 = VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100"]
+_CHEAP_KINDS_760 = {"private_pickup": {**KINDS["private_pickup"], "cost": 1.4}, "private_delivery": {**KINDS["private_delivery"], "cost": 1.2},
+                    "trade_in": {**KINDS["trade_in"], "cost": 2.0}}
+VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100-mild"] = _full_weeks(
+    _A1_7, kinds=_CHEAP_KINDS_760, cost=1.15, queue_hours=12)
+VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100-cost10"] = _full_weeks(_A1_7, cost=1.0)
+# The joint search's volume parts on the aggressive row A1.7, only in a week of 760 drivers or more; a thinner week plays A1.7
+# exactly. Every knob here wins orders in the stand-in climb on its own: the quote's flat cost 1.1 (+561 a week on the old base,
+# +273 at 1.15 on step04), the waiting cars counted only when due within 12 hours (+320 on row 6), and the declined kinds at a
+# cheaper cost (trade-in 2.0, private pickup 1.4, private delivery 1.2: +170 on row 6). `-vol105` goes further: cost 1.05, and a
+# request that can go onward with a held car quoted at 0.9 of its typical fee, not 1.0 (pairs.py switches that off under 760).
+_A1_7 = VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100"]
+_KINDS_CHEAP = {"private_pickup": {"cost": 1.4, "odds": 0.06}, "private_delivery": {"cost": 1.2, "odds": 0.37}, "trade_in": {"cost": 2.0, "fee": 1.4, "odds": 0.27}}
+VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100-vol110"] = _full_weeks(
+    _A1_7, cost=1.1, queue_hours=12, kinds=_KINDS_CHEAP)
+VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100-vol105"] = {
+    **_full_weeks(_A1_7, cost=1.05, queue_hours=12, kinds=_KINDS_CHEAP), "pair_onward_cost": 0.9}
+# Lane 2's aggressive candidate on safe row 7 and on the aggressive row A1: the onward pairs at a held car's release, open gigs
+# and the onward quote at 1.0 in every week, not only with 760 drivers or more (`pair_more_drivers` 0). Row 7's day cap (62
+# under 760 drivers) bounds the extra won orders a thin week can collect on one day. At 760 drivers or more each is its row exactly.
+for _row in ("fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62",
+             "fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100"):
+    VARIANTS[f"{_row}-onward-all"] = {**VARIANTS[_row], "pair_more_drivers": 0}
+
+# Aggressive: the heaviest volume rung on row A1, all at 760 drivers or more. No waiting-car surcharge (`slow_step` 0, not 0.2),
+# the cost at 1.05, the waiting cars counted within 6 hours with a gate of 40, 4 hours to find a driver, not 5, and the kinds
+# quoted cheaper (trade-in 2.0, private pickup 1.4, private delivery 1.2). A1's `late_cost` 100 stays. Under 760 drivers it plays A1.
+_A1 = VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100"]
+VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100-agg-max"] = _full_weeks(
+    _A1, slow_step=0.0, cost=1.05, queue_hours=6, max_unbooked=40, min_slack=240,
+    kinds={**_A1["kinds"], "private_pickup": {**_A1["kinds"]["private_pickup"], "cost": 1.4},
+           "private_delivery": {**_A1["kinds"]["private_delivery"], "cost": 1.2}, "trade_in": {**_A1["kinds"]["trade_in"], "cost": 2.0}})
+# Lane 3, aggressive: a shorter time to find a driver (`min_slack`, 300 minutes) on the aggressive row A1.7, only in a week of
+# 760 drivers or more. There merge 1 drops the same_day option of 116 requests a week and declines 33 more for slack under 5
+# hours, yet its won orders with 5 to 6 hours of slack are 4.6% late, and a dealer offered same_day beside next_day takes it 84%
+# of the time. These orders come at the curve's full price, with the late chance in the cost. A thinner week plays A1.7 exactly.
+_A17 = VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100"]
+VARIANTS.update({f"a17-rich-slack{minutes}": _full_weeks(_A17, min_slack=minutes) for minutes in (240, 180, 120)})
+# Lane 4 B: the quote's cost by the groups where merge 1's late orders cluster, only in a week of 760 drivers or more (a
+# thinner week plays the row it is built on exactly). On merge 1's played weeks, orders with 16 to 30 hours from the win to the
+# last pickup are 5.5% late, orders with more time 0.8% (`within_3_days`), and cars over 120 euros typical (drives of about
+# 300 minutes or more) 7.2%. `-h30-c11`: an order with 30 hours or more costs 1.1 at the quote, the others 1.2. `-h16-30-c13`:
+# 16 to 30 hours costs 1.3. `-long300-c<cost>`: a drive over 300 minutes costs that. Quote levels only; no fee changes.
+# `r7-` is on safe row 7 (`-cap62`), `a17-` on the aggressive row A1 (`-cap62-late100`).
+_GROUP_COSTS = (
+    ("h30-c11", {"cost": 1.1, "cost_hours": [[30, 1.2]]}),
+    ("h16-30-c13", {"cost_hours": [[16, 1.2], [30, 1.3]]}),
+    ("h30-c11-h16-30-c13", {"cost": 1.1, "cost_hours": [[16, 1.2], [30, 1.3]]}),
+    ("long300-c13", {"long_drive": 300, "long_cost": 1.3}),
+    ("long300-c11", {"long_drive": 300, "long_cost": 1.1}))
+for _prefix, _row in (("r7", "fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62"),
+                      ("a17", "fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100")):
+    VARIANTS.update({f"{_prefix}-{name}": _full_weeks(VARIANTS[_row], **knobs) for name, knobs in _GROUP_COSTS})

@@ -1,5 +1,37 @@
 {
   "open": "l4-s109",
+  "spread": {
+    "caption": "Every dot is one run on a seed nobody tuned on; the expert script scores 1.00.",
+    "file": "../metrics.json",
+    "round": 15,
+    "level": 4,
+    "seeds": [
+      404,
+      418,
+      500,
+      502,
+      503,
+      504
+    ],
+    "models": [
+      [
+        "fable",
+        "Fable 5.2"
+      ],
+      [
+        "opus",
+        "Opus 5.5"
+      ],
+      [
+        "gemma-ft",
+        "Gemma 4 26B-A4B fine-tuned on OnCallBench"
+      ],
+      [
+        "gemma-base",
+        "Gemma 4 26B-A4B untrained"
+      ]
+    ]
+  },
   "l4-s109": {
     "headline": {
       "label": "Opus 5.5",

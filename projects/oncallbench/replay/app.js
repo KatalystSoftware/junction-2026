@@ -196,6 +196,44 @@
       state.ref;
   }
 
+  // --- the scores band: every run of each model on the pre-registered seeds -----------------
+  // Scores only, so it is safe for any seed. A dot per run, the mean as a tick with its 95% interval as a bar,
+  // the reference's 1.00 and doing nothing's 0.00 as the two walls. ?spread=0 leaves it out.
+
+  function renderSpread() {
+    const data = window.REPLAY_SPREAD, box = $("#spread");
+    if (!data || !data.models.length || params.get("spread") === "0") return;
+    const at = (v) => `${(Math.max(0, Math.min(1, v)) * 100).toFixed(2)}%`, two = (v) => v.toFixed(2);
+    const rows = data.models.length;
+    const how = `Level ${data.level}, seeds ${data.seeds.join(", ")}, ${data.source}. The mean counts each seed once; `
+      + `its 95% interval is over the seed means (Student's t), because runs on one seed share its outage.`;
+    box.replaceChildren(...[
+      h("p", { class: "spread-caption", style: "grid-row: 1" }, data.caption,
+        data.placeholder ? h("b", { class: "placeholder", text: "Placeholder data, not results" }) : null),
+      h("p", { class: "spread-head", style: "grid-row: 1", title: how, text: "mean ± 95% CI" }),
+      h("div", { class: "spread-walls", style: `grid-row: 2 / span ${rows}`, "aria-hidden": "true" },
+        [0.25, 0.5, 0.75].map((v) => h("i", { class: "grid", style: `left: ${at(v)}` })),
+        h("i", { class: "floor", style: "left: 0%" }), h("i", { class: "ceiling", style: "left: 100%" })),
+      data.models.map((m, i) => [
+        h("p", { class: "spread-name", style: `grid-row: ${i + 2}`, text: m.label }),
+        h("div", { class: "spread-lane", style: `grid-row: ${i + 2}`, role: "img",
+            "aria-label": `${m.label}, ${m.n} runs: ${m.runs.map((r) => two(r.score)).join(", ")}` },
+          m.half != null ? h("i", { class: "ci", style: `left: ${at(m.mean - m.half)}; right: calc(100% - ${at(m.mean + m.half)})` }) : null,
+          m.runs.map((r) => h("i", { class: "dot", style: `left: ${at(r.score)}; top: calc(50% + ${(r.k % 3) - 1} * 0.32rem)`,
+            title: `Seed ${r.seed}: ${two(r.score)}` })),
+          h("i", { class: "mean", style: `left: ${at(m.mean)}` })),
+        h("p", { class: "spread-stat", style: `grid-row: ${i + 2}`, title: how },
+          h("b", { text: m.half != null ? `${two(m.mean)} ± ${two(m.half)}` : two(m.mean) }),
+          h("span", { text: `${m.n} run${m.n === 1 ? "" : "s"}, ${m.seeds} seed${m.seeds === 1 ? "" : "s"}` })),
+      ]),
+      h("div", { class: "spread-axis", style: `grid-row: ${rows + 2}`, "aria-hidden": "true" },
+        h("span", { class: "start", style: "left: 0%" }, h("b", { text: "0.00" }), " doing nothing"),
+        [0.25, 0.5, 0.75].map((v) => h("span", { style: `left: ${at(v)}`, text: two(v) })),
+        h("span", { class: "end", style: "left: 100%" }, "the reference ", h("b", { text: "1.00" }))),
+    ].flat(2).filter(Boolean));
+    box.hidden = false;
+  }
+
   // --- the bar ---------------------------------------------------------------------
 
   function renderBar() {
@@ -1161,6 +1199,7 @@
       return;
     }
     if (params.has("still")) document.documentElement.classList.add("still");  // no motion: for screenshots
+    renderSpread();
     const bySeed = params.has("seed") && sessions.find((x) => String(x.seed) === params.get("seed")
       && (!params.has("level") || String(x.level) === params.get("level")));
     chooseSession(bySeed ? bySeed.key : params.get("session"));

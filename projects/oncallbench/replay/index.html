@@ -11,6 +11,7 @@
 <!-- data/index.js names the bundles; each is JSON wrapped in one assignment, so the page also works
      from file:// where fetch is blocked. export.py writes both. -->
 <script src="data/index.js"></script>
+<script src="data/spread.js"></script>
 <script src="app.js" defer></script>
 </head>
 <body class="loading">
@@ -31,6 +32,9 @@
     <button type="button" id="open-help" class="round" aria-label="What is this?">?</button>
   </div>
 </header>
+
+<!-- every run of each model on the pre-registered seeds; app.js fills it when data/spread.js has runs -->
+<section class="spread" id="spread" aria-label="Scores over repeated runs" hidden></section>
 
 <main>
   <section class="panel" id="panel-agent" aria-label="Agent run">

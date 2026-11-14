@@ -24,6 +24,7 @@ import itertools
 import json
 import math
 import re
+import statistics
 import sys
 from pathlib import Path
 
@@ -54,6 +55,8 @@ POLICY_LABELS = {
 MODELS = {
     "claude-opus-5-5": "Claude Opus 5.5", "claude-sonnet-5-5": "Claude Sonnet 5.5",
     "gemini-3.1-pro-preview": "Gemini 3.1 Pro",
+    # served from Modal by ../rl/modal_serve.py; the adapter is ../rl/RESULTS.md's SFT adapter
+    "gemma26-base": "Gemma 4 26B-A4B (untrained)", "gemma26-sft": "Gemma 4 26B-A4B + our SFT adapter",
 }
 FAULT_LABELS = {
     "bad_deploy": "bad deploy", "bad_config": "bad config", "leak": "memory leak",
@@ -707,6 +710,53 @@ def session(incident, policies, seed, level, names, trials, notes):
         services=services, faults=faults, decoy=decoy or None, runs=runs)
 
 
+# two-sided 95% quantiles of Student's t, by degrees of freedom (beyond 30, the normal's 1.96)
+T975 = [None, 12.706, 4.303, 3.182, 2.776, 2.571, 2.447, 2.365, 2.306, 2.262, 2.228, 2.201, 2.179, 2.160, 2.145,
+        2.131, 2.120, 2.110, 2.101, 2.093, 2.086, 2.080, 2.074, 2.069, 2.064, 2.060, 2.056, 2.052, 2.048, 2.045, 2.042]
+
+
+def spread(cfg, metrics, placeholder=False):
+    """Every scored run of each model on the pre-registered seeds, for the band above the replay: scores only,
+    no actions, so it is safe for any seed. The mean weighs each seed once, and its 95% interval comes from the
+    seed means (Student's t, seeds - 1 degrees of freedom): runs on one seed share its estate, so they are not
+    independent samples of the model."""
+    rows = [r for r in json.loads(Path(metrics).read_text())
+            if r.get("round") == cfg["round"] and r.get("level") == cfg["level"] and r.get("score") is not None]
+    models = []
+    for run, label in cfg["models"]:
+        mine = sorted((r for r in rows if r["run"] == run), key=lambda r: (r["seed"], r.get("trial", "")))
+        off = sorted({r["seed"] for r in mine} - set(cfg["seeds"]))
+        if off:
+            print(f"note: spread leaves out {run}'s runs on seeds {off}, which were not pre-registered", file=sys.stderr)
+        mine = [r for r in mine if r["seed"] in cfg["seeds"]]
+        if not mine:
+            continue
+        by = {}
+        for r in mine:
+            by.setdefault(r["seed"], []).append(round(r["score"], 4))
+        means = [statistics.mean(v) for v in by.values()]
+        k = len(means)
+        half = T975[min(k - 1, 30)] * statistics.stdev(means) / math.sqrt(k) if 1 < k <= 31 else \
+            1.96 * statistics.stdev(means) / math.sqrt(k) if k > 31 else None
+        models.append(dict(run=run, label=label, mean=round(statistics.mean(means), 4), n=len(mine), seeds=k,
+                           **({"half": round(half, 4)} if half is not None else {}),
+                           runs=[dict(seed=s, score=v, k=i) for s, vs in by.items() for i, v in enumerate(vs)]))
+    return dict(caption=cfg["caption"], level=cfg["level"], round=cfg["round"], seeds=cfg["seeds"], models=models,
+                source=f"{Path(metrics).name}, round {cfg['round']}", **({"placeholder": True} if placeholder else {}))
+
+
+def write_spread(notes, metrics=None):
+    """data/spread.js from the notes' "spread" entry; the page draws nothing while no model has a run."""
+    cfg = notes.get("spread")
+    if not cfg:
+        return
+    data = spread(cfg, metrics or HERE / cfg["file"], placeholder=metrics is not None)
+    DATA.mkdir(exist_ok=True)
+    (DATA / "spread.js").write_text(f"window.REPLAY_SPREAD = {json.dumps(data, separators=(',', ':'), sort_keys=True)};\n")
+    got = ", ".join(f"{m['run']} {m['n']} runs on {m['seeds']} seeds" for m in data["models"]) or "no runs yet"
+    print(f"wrote data/spread.js ({got}){' from PLACEHOLDER data' if metrics else ''}")
+
+
 def write_index(first=None):
     """data/index.js: the bundles the page loads. The first one opens: the episode the notes name under
     "open", then the newest level."""
@@ -729,11 +779,16 @@ def main():
     ap.add_argument("--sim", default=HERE.parent / "sim", help="folder with incident.py")
     ap.add_argument("--policy-file", default=HERE.parent / "task/solution/policies.py")
     ap.add_argument("--out", help="write plain JSON for the chosen episodes here instead of bundles")
+    ap.add_argument("--spread", action="store_true", help="write only data/spread.js, the scores band, and stop")
+    ap.add_argument("--metrics", help="read the band's runs from this file instead of ../metrics.json; marks it a "
+                                      "placeholder, which deploy.sh refuses to ship")
     opts = ap.parse_args()
+    notes = json.loads(Path(opts.notes).read_text()) if Path(opts.notes).exists() else {}
+    if opts.spread:
+        return write_spread(notes, opts.metrics)
 
     incident = load(Path(opts.sim) / "incident.py", "incident")
     policies = load(opts.policy_file, "policies")
-    notes = json.loads(Path(opts.notes).read_text()) if Path(opts.notes).exists() else {}
     stamp = hashlib.sha256((Path(opts.sim) / "incident.py").read_bytes()).hexdigest()[:12]
     picked = [p for p in (opts.policies or ",".join(POLICIES)).split(",") if p in policies.POLICIES and p != "reference"]
 
@@ -792,6 +847,7 @@ def main():
         out.write_text(f"(window.REPLAY_BUNDLES = window.REPLAY_BUNDLES || []).push({body});\n")
         print(f"wrote {out.relative_to(HERE)} ({out.stat().st_size / 1024:.0f} KB)")
     print("data/index.js lists " + ", ".join(p.name for p in write_index(notes.get("open"))))
+    write_spread(notes, opts.metrics)
 
 
 if __name__ == "__main__":

@@ -23,7 +23,6 @@ do not read at all.
 from __future__ import annotations
 
 import argparse
-import functools
 import gzip
 import hashlib
 import json
@@ -39,12 +38,6 @@ TRUTH = PROJECT / "catalogue" / "note-truth.jsonl.gz"
 BASELINE = PROJECT / "catalogue" / "note-misses.json"
 DAY = 24 * 60
 FIELDS = ("ready", "plates", "manual", "deadline", "pickup_hours", "delivery_hours", "summer_tyres")
-
-
-# The rules look each word up in their word lists, with typos, which takes minutes over the archive; notes share few
-# distinct words, so the lookups are cached here. They are pure functions of the word, so the reading is the same.
-for name in ("tag", "weekday", "hour_in_words"):
-    setattr(notes, name, functools.lru_cache(maxsize=None)(getattr(notes, name)))
 
 
 def held_out(text: str) -> bool:

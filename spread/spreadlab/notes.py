@@ -3,10 +3,13 @@ bring, and a manual licence. The kit's starter learns these from a failed visit,
 the deadline. RULES.md (Notes and changes of plan) says how days and times read; scratch/notes_check.py measures this
 reader against what the reveal says was true.
 
-Notes have typos, so a word counts when it is one edit from a known word.
+Notes have typos, so a word counts when it is one edit from a known word. That search is slow, and a desk reads the same
+note many times (at the quote, at each post, for each pair it weighs), so the readings are cached: each is a pure function
+of the word, or of the note's text and its arrival minute.
 """
 from __future__ import annotations
 
+import functools
 import re
 from typing import NamedTuple, Optional
 
@@ -74,10 +77,12 @@ def near(word: str, known: str) -> bool:
     return any(long[:i] + long[i + 1:] == short for i in range(len(long)))
 
 
+@functools.lru_cache(maxsize=None)
 def tag(word: str) -> Optional[str]:
     return next((name for name, words in WORDS.items() if any(near(word, known) for known in words)), None)
 
 
+@functools.lru_cache(maxsize=None)
 def weekday(word: str) -> Optional[int]:
     """The weekday that a word names, also in a Finnish case ("torstaina") or with a typo; 0 is Monday."""
     for day, names in enumerate(WEEKDAYS):
@@ -87,6 +92,7 @@ def weekday(word: str) -> Optional[int]:
     return None
 
 
+@functools.lru_cache(maxsize=None)
 def hour_in_words(word: str) -> Optional[int]:
     for stem, hour in HOURS:
         if any(word == stem + end or (len(stem + end) >= 6 and near(word, stem + end)) for end in ENDINGS):
@@ -184,9 +190,12 @@ def half_hours(text: str) -> str:
 
 
 def read(note: Optional[dict], arrived_at: int) -> Facts:
-    if not note:
-        return Facts()
-    text = note["text"].lower()
+    return _read(note["text"], arrived_at) if note else Facts()
+
+
+@functools.lru_cache(maxsize=1 << 16)
+def _read(text: str, arrived_at: int) -> Facts:
+    text = text.lower()
     plates = bool(PLATES.search(text)) and not HAS_PLATES.search(text)
     words = TOKEN.findall(plain(text))
     manual = (bool(MANUAL.search(text)) and not NOT_MANUAL.search(text)) or any(
@@ -309,9 +318,12 @@ def limits(note: Optional[dict], arrived_at: int) -> Limits:
     "at destination Monday 13:30 latest", "customer picks it up tomorrow 4pm"), and the hours of a site ("open weekdays
     10:00 - 15:00", "we close at 14:30", "haettava ennen klo 16", "kohde sulkee klo 16.30", "receiving until 16:30 only").
     A clause is about the delivery site when it names it; else about the pickup site. A correction replaces the limit before it."""
-    if not note:
-        return Limits()
-    text = re.sub(r"(?:the )?day after t\w+", "ylihuomenna", note["text"].lower())
+    return _limits(note["text"], arrived_at) if note else Limits()
+
+
+@functools.lru_cache(maxsize=1 << 16)
+def _limits(text: str, arrived_at: int) -> Limits:
+    text = re.sub(r"(?:the )?day after t\w+", "ylihuomenna", text.lower())
     text = re.sub(r"\b(?:hi|hello|hey) there\b", " ", text)
     today, weekday_ = arrived_at // DAY, arrived_at // DAY % 7
     deadline, hours = 0, {"pickup": [0, 0], "delivery": [0, 0]}

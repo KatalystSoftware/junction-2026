@@ -318,18 +318,22 @@ class PairPolicy(Policy):
         partners = [(id_, None) for id_ in self.pair_wait] + ([] if held else [(id_, g) for id_, g in self.open_alone(release) if id_ != order["id"]])
         if not partners:
             return None
-        mine = self.single(order)
+        mine = None
         for id_, gig_id in partners:
             other = self.orders[id_]
-            theirs = self.posts[gig_id] if gig_id else self.single(other)
+            # Which way round the two cars can go, from their places alone. Only then the posts: each is a whole post of a car
+            # alone, notes and fees included, and most partners are in other places.
             if self.returns(other, order):
-                tries = [(theirs["stops"] + mine["stops"], p["pair_fee"]), (mine["stops"] + theirs["stops"], p["pair_fee"])]
+                ways, rate = [True, False], p["pair_fee"]
             elif onward:
-                tries = ([(theirs["stops"] + mine["stops"], p["pair_onward"])] if self.onward(other, order) else []) + \
-                        ([(mine["stops"] + theirs["stops"], p["pair_onward"])] if self.onward(order, other) else [])
+                ways, rate = [True] * self.onward(other, order) + [False] * self.onward(order, other), p["pair_onward"]
             else:
                 continue
-            for stops, rate in tries:
+            if not ways:
+                continue
+            mine = mine or self.single(order)
+            theirs = self.posts[gig_id] if gig_id else self.single(other)
+            for stops in (theirs["stops"] + mine["stops"] if theirs_first else mine["stops"] + theirs["stops"] for theirs_first in ways):
                 latest = self.latest(stops, {order["id"]: order, id_: other})
                 if latest is not None and latest >= at + p["pair_left"] * HOUR and (best is None or (rate, -latest) < (best[3], -best[2])):
                     audience = {name: theirs["audience"][name] or mine["audience"][name] for name in mine["audience"]}
