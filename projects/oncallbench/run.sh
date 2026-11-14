@@ -22,7 +22,7 @@ harbor() {
     nix shell nixpkgs#uv nixpkgs#python313 -c uvx --from harbor==0.25.0 harbor "$@"
   fi
 }
-if command -v python3 >/dev/null; then python=(python3)
+if python3 -c '' 2>/dev/null; then python=(python3)  # macOS has a python3 stub that only offers to install
 elif command -v nix >/dev/null; then python=(nix shell nixpkgs#python313 -c python3)
 else python=(uv run --no-project --python 3.13 python3); fi
 read -ra extra <<<"${HARBOR_ARGS:-}"
@@ -38,7 +38,8 @@ task=jobs/variants/episode-$(od -An -N4 -tx1 /dev/urandom | tr -d ' \n')
 cp -r task "$task"
 printf '%s\t%s\t%s\n' "${task#jobs/variants/}" "$LEVEL" "$SEED" >>jobs/variants/index.tsv
 echo "$task: level $LEVEL, seed $SEED"
-sed -i "s/^SEED = .*/SEED = $SEED/; s/^LEVEL = .*/LEVEL = $LEVEL/" "$task/environment/mcp-server/server.py"
+sed -i.bak "s/^SEED = .*/SEED = $SEED/; s/^LEVEL = .*/LEVEL = $LEVEL/" "$task/environment/mcp-server/server.py"
+rm "$task/environment/mcp-server/server.py.bak"  # -i.bak: the form both GNU and BSD (macOS) sed accept
 "${python[@]}" -B -c "
 import sys; sys.path.insert(0, 'sim'); import incident; from pathlib import Path
 p = Path('$task/instruction.md')
@@ -63,7 +64,7 @@ for run in "$@"; do
     *) args=(-a oracle --ae "POLICY=$run") ;;
   esac
   harbor run -p "$task" -o jobs --job-name "${JOB_PREFIX:-run}-l$LEVEL-s$SEED-$run-$(date +%H%M%S)" \
-    "${args[@]}" "${extra[@]}" &
+    "${args[@]}" ${extra[@]+"${extra[@]}"} &  # the guard: bash 3.2 (macOS) calls an empty array unbound
   sleep 2
 done
 wait

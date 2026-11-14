@@ -12,7 +12,7 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 ./sync.sh
-if command -v python3 >/dev/null; then python=(python3)
+if python3 -c '' 2>/dev/null; then python=(python3)  # macOS has a python3 stub that only offers to install
 elif command -v nix >/dev/null; then python=(nix shell nixpkgs#python313 -c python3)
 else python=(uv run --no-project --python 3.13 python3); fi
 
@@ -43,7 +43,8 @@ for seed in "$@"; do
     rm -rf "$out"
   fi
   cp -r task "$out"
-  sed -i "s/^SEED = .*/SEED = $seed/; s/^LEVEL = .*/LEVEL = $level/" "$out/environment/mcp-server/server.py"
+  sed -i.bak "s/^SEED = .*/SEED = $seed/; s/^LEVEL = .*/LEVEL = $level/" "$out/environment/mcp-server/server.py"
+  rm "$out/environment/mcp-server/server.py.bak"  # -i.bak: the form both GNU and BSD (macOS) sed accept
   "${python[@]}" -B -c "
 import sys; sys.path.insert(0, 'sim'); import incident; from pathlib import Path
 p = Path('$out/instruction.md')
