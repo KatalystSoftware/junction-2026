@@ -793,8 +793,12 @@ PYTHONPATH=. uv run python scratch/pairs_report.py --variants slow-friday-late-1
 
 `pairs_report.py` prints the plan's checks: pair gigs booked within 1 and 2 hours, the fee paid, pair orders late, held
 cars without a return against the same orders in the base variant, return quotes won, and the margin with its interval.
-The live desk does not take `PairPolicy`: `live final --variant ...-pairs-...` stops at once with unknown parameters. A gig
-with two orders is a new case for its restart logic, and must pass the replays of `replay.py` before it can play live.
+A gig with two orders is a new case for the live desk's restart logic. `live.LivePairDesk` takes `PairPolicy` for a
+variant that sets `pair_hold`. The world's snapshot gives every stop of a pair gig, so a desk that starts again finds both
+cars on it and rebuilds its pair gigs from them. A held car stays held, and is not posted again at the restart. A note fix
+reaches both halves of a pair, and a fix that withdraws a pair gig posts the other car alone. A pair variant plays live
+only after the replays pass with its recorded weeks: `replay.py --variant <pair variant>` with `--crash-at`, `--start 4320`,
+`--slow 0.05` and `--watch-notes --inject 4`, each with no car in two live gigs and no `foreign_gig` line.
 
 ## Nights when drivers drop out (`day-cap-*`, off by default, being played)
 
