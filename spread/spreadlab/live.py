@@ -466,7 +466,7 @@ class LiveDesk(Policy):
                 self.orders.pop(order["id"], None)
                 self.leg_gigs.pop(order["id"], None)
             elif order["id"] in self.requests:
-                self.orders[order["id"]] = order
+                self.orders[order["id"]] = self.limited(order)  # as the desk booked it at the win: by the note's deadline when earlier
                 self.won_at.setdefault(order["id"], self.now)
 
     def reconcile(self, snapshot: dict, changed: dict[str, int], dropped: dict[str, int]) -> None:

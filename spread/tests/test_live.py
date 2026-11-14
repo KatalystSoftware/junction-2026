@@ -132,6 +132,20 @@ def test_a_desk_that_joins_from_the_history_alone_does_not_redo_a_change_that_wa
     assert second.desk.leg_gigs["R1"] == {0: "g2"}
 
 
+def test_a_desk_that_joins_from_the_history_books_an_order_by_the_deadline_of_its_note(tmp_path):
+    asked = request("R1", note={"text": "Moi. Pitää olla perillä huomenna 17 mennessä!"})  # by Tuesday 17:00, minute 2460
+    order = {"id": "R1", "dealerId": "D01", "option": "next_day", "priceCents": 15000, "deadline": 2640, "legs": asked["legs"],
+             "lastPickupAt": 2520, "status": "waiting", "deliveredAt": [None]}
+    events = [{"seq": 0, "at": 500, "kind": "price_request", "request": asked},
+              {"seq": 1, "at": 515, "kind": "order_won", "order": order}]
+    world = replay.Replay(events, ROSTER, ends_at=20000, start=600, speed=0.001)
+    joined = live.Live(world, world.guard_act, world.minute, 8, VARIANTS[live.VARIANT], MAP, tmp_path, echo=False)
+    joined.join()  # no books: it reads the win from the history, then takes the orders from the world
+    joined.stop()
+    assert joined.desk.orders["R1"]["deadline"] == 2460, "the world's order does not undo the note's earlier deadline"
+    assert joined.desk.orders["R1"]["lastPickupAt"] < 2460
+
+
 def test_a_replay_from_thursday_holds_a_pair_gig_with_both_cars_until_a_cancellation_shortens_it():
     won = lambda order_id, seq, at: {"seq": seq, "at": at, "kind": "order_won", "order": {  # noqa: E731
         "id": order_id, "dealerId": "D01", "option": "next_day", "priceCents": 15000, "deadline": 2640, "legs": request(order_id)["legs"],
