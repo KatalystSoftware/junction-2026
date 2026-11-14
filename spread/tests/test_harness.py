@@ -975,3 +975,19 @@ def test_each_m41x_row_plays_trackb_merge_4_1_at_760_to_819_drivers():
             new, old = desk(row, n), desk(below, n)
             want = part.get(n, {}) if n in (700, 900) else part.get(800, {}) if n < 820 else part.get(900, {})
             assert {k: new[k] for k in new if new[k] != old.get(k)} == want, (row, n)
+
+
+def test_ftop10_from_820_plays_m41y_l_below_820_drivers_and_only_a_lower_ladder_top_above():
+    from spreadlab import play
+    from spreadlab.variants import VARIANTS
+    roster = lambda n: [{**ROSTER[0], "id": f"x{i}"} for i in range(n)]  # noqa: E731
+    base, part_ = "m41y-l-ftop11-820", "m41y-l-ftop11-820-ftop10"
+
+    def desk(name, n):  # the parameters the week plays with
+        params = VARIANTS[name]
+        played = play.policy_class(params)(None, 8, 0, params, roster(n), MAP).params()
+        return {k: v for k, v in played.items() if k not in ("when_tight", "rich_drivers", "when_rich", "thin_play")}
+    for n in (700, 760, 819):
+        assert desk(part_, n) == desk(base, n), n
+    part, head = desk(part_, 820), desk(base, 820)
+    assert {k: part[k] for k in part if part[k] != head[k]} == {"fee_rules": [[0, 10 ** 6, 16, 10 ** 6, 0.8, 0.1, 1.0]]}

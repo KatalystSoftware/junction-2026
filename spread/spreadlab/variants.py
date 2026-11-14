@@ -670,3 +670,6 @@ VARIANTS["m41y-k-late100-760"] = _full_weeks(_Y["m41y-i-long300-c10-820"], late_
 # `late_cost` 100 at 760 to 819 drivers on it (80 from 820, 150 under 760), held until 760 to 819 may move again.
 VARIANTS["m41y-l-ftop11-820"] = _from820(_Y["m41y-i-long300-c10-820"], fee_rules=[[0, 10 ** 6, 16, 10 ** 6, 0.8, 0.1, 1.1]])
 VARIANTS["m41y-m-late100-760"] = _full_weeks(VARIANTS["m41y-l-ftop11-820"], late_cost=100)
+# Lane 3 A's next fee step on `m41y-l`: the 16-hour fee ladder stops at 1.0 of the typical fee, not 1.1, in a week of 820 drivers
+# or more (`when_rich`). A week under 820 plays `m41y-l` to the cent.
+VARIANTS["m41y-l-ftop11-820-ftop10"] = _from820(VARIANTS["m41y-l-ftop11-820"], fee_rules=[[0, 10 ** 6, 16, 10 ** 6, 0.8, 0.1, 1.0]])
