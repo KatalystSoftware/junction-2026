@@ -281,6 +281,19 @@ body.pdfshot .progress,body.pdfshot .dots,body.pdfshot .hint,body.pdfshot .pdf{d
   .slide,.slide::before,.band .head::before,.split .two>:last-child::before{background-attachment:scroll!important}
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
+
+/* round 8 (the user, 2026-11-15 01:30): the solution overview has no boxes, just numbered step names on the navy; the lead is one short line */
+.steps{grid-template-columns:repeat(3,minmax(0,1fr));gap:min(2rem,3.6vh) min(2.5rem,3vw);counter-reset:s;margin-top:min(1rem,1.5vh)}
+.step,.slide .step{background:none;border:0;box-shadow:none;padding:0;min-height:0;grid-template-columns:auto minmax(0,1fr);align-items:start;align-content:start;gap:.3rem 1rem;color:#fff}
+.step::before{width:2.3rem;height:2.3rem;font-size:var(--t-md);margin-top:.05em;grid-row:1/span 2}
+.step h3,.slide .step h3{color:#fff;font-size:min(var(--t-xl),2.1rem,4.4vh);min-height:0;line-height:1.15;display:block;text-wrap:balance}
+.step.soon{border:0}.step.soon::before{background:transparent;color:var(--city-dim);border:1px dashed var(--city-dim)}
+.step p,.slide .step p{grid-column:2;margin:0;color:var(--city-dim);text-transform:uppercase;font-size:var(--t-xs);letter-spacing:.1em;font-weight:700}
+@media (max-width:900px){.steps{grid-template-columns:1fr;gap:1.2rem}.step h3,.slide .step h3{font-size:var(--t-lg)}}
+
+/* round 8b (the user, 2026-11-15 01:35): slide 3 only introduces the section: the word "Solution", big, nothing else */
+.slide.divider .slide-content{justify-content:center;align-self:center}
+.slide.divider h2{font-size:min(clamp(4rem,2rem + 8vw,9rem),20vh);line-height:1;letter-spacing:-.035em;font-weight:800;color:#fff}
 </style>
 </head>
 <body>
@@ -323,21 +336,10 @@ body.pdfshot .progress,body.pdfshot .dots,body.pdfshot .hint,body.pdfshot .pdf{d
 </section>
 
 <!-- 3 Solution overview -->
-<section class="slide band" id="slide-3" data-phase="solution">
+<section class="slide band divider" id="slide-3" data-phase="solution">
   <div class="phase-label">Solution</div>
   <div class="slide-content stack">
-    <div class="head stack">
     <h2 class="enter" style="--d:.05s">Solution</h2>
-    <p class="lead" style="--d:.08s">Six steps, all yours as the organiser. The AI gathers the information; you make every judgement. Kutsu is your app; your invitees see their own page in it.</p>
-    </div>
-    <div class="steps">
-      <div class="step" style="--d:.15s"><h3>Choose which events to hold</h3></div>
-      <div class="step" style="--d:.2s"><h3>Invite the right companies and people</h3></div>
-      <div class="step" style="--d:.25s"><h3>Research any public company</h3></div>
-      <div class="step" style="--d:.3s"><h3>Send prefilled quiz pages</h3></div>
-      <div class="step" style="--d:.35s"><h3>Decide who gets in, with AI support</h3></div>
-      <div class="step soon" style="--d:.4s"><h3>Collect feedback after the event</h3><p>coming soon</p></div>
-    </div>
   </div>
 </section>
 
