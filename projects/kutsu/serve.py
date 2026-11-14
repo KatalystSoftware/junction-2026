@@ -34,7 +34,8 @@ import signals
 HOST, PORT = os.environ.get("HOST", "127.0.0.1"), 8046
 LIVE_LIMIT = int(os.environ.get("LIVE_LIMIT", "300"))  # about $0.03 and 11 Context.dev credits each
 DIST = lib.HERE / "ui" / "dist"
-# Esittely, the applicant's side of the same idea (projects/espoo-recruitment), served under /esittely/ so the organiser's
+# The first version of the applicant's pages (projects/espoo-recruitment, once called Esittely; the product has one name,
+# Kutsu), served under /apply/, with /esittely/ kept as a redirect, so the organiser's
 # screen can open the invitation form: a copy next to this file on the server, the sibling project in the repo
 ESITTELY = next((d for d in (lib.HERE / "esittely", lib.HERE.parent / "espoo-recruitment" / "app") if d.is_dir()), None)
 REVIEWS = lib.HERE / "reviews.json"
@@ -123,10 +124,11 @@ class Handler(http.server.BaseHTTPRequestHandler):
             return self.json(progress.get(q.lower(), []))
         if url.path == "/brief" and q:
             return self.research(q)
-        if url.path == "/esittely":
-            self.send_response(301); self.send_header("location", "/esittely/"); self.end_headers(); return
-        if url.path.startswith("/esittely/") and ESITTELY:
-            rel = url.path[len("/esittely/"):] or "index.html"
+        if url.path == "/apply" or url.path == "/esittely" or url.path.startswith("/esittely/"):
+            rest = url.path[len("/esittely/"):] if url.path.startswith("/esittely/") else ""
+            self.send_response(301); self.send_header("location", "/apply/" + rest); self.end_headers(); return
+        if url.path.startswith("/apply/") and ESITTELY:
+            rel = url.path[len("/apply/"):] or "index.html"
             path = ESITTELY / rel
             if not re.fullmatch(r"[\w.-]+(/[\w.-]+)*", rel) or ".." in rel or not path.is_file():
                 return self.text(404, "not found")

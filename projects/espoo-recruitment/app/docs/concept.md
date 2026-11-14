@@ -1,8 +1,8 @@
-# Esittely: hand-picked introductions for Espoo recruitment events
+# Kutsu: hand-picked introductions for Espoo recruitment events
 
 **One line:** a light layer on top of event registration. It pulls the information out of companies and candidates before the event, translates it into plain language, and lets City of Espoo organisers hand-pick the conversations that are worth having.
 
-**How it differs from matchmaking platforms:** matchmaking platforms let an algorithm score and rank people. Esittely gives the organiser the domain understanding to make the introduction themselves, and records the reason.
+**How it differs from matchmaking platforms:** matchmaking platforms let an algorithm score and rank people. Kutsu gives the organiser the domain understanding to make the introduction themselves, and records the reason.
 
 ## The problem today
 
@@ -44,7 +44,7 @@
 
 ## Why it beats today's process
 
-| Today | With Esittely |
+| Today | With Kutsu |
 |---|---|
 | Companies send needs late, or not at all | A draft from the company's own job ad. One minute to confirm. Promotion as the reward. |
 | "There are no relevant candidates in a public service" | A live count from this event's registrations shows the relevant people exist, before the company commits time. |

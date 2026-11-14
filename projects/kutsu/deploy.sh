@@ -27,7 +27,7 @@ if [ -d api-cache ]; then rsync -az --update -e "${SSH[*]}" api-cache "$HOST:$DI
 # No --delete: a tab opened before a redeploy still asks for the old hashed files under assets/, and
 # deleting them leaves that tab blank until it is reloaded.
 rsync -az -e "${SSH[*]}" ui/dist "$HOST:$DIR/ui/"
-# Esittely (projects/espoo-recruitment/app), the applicant's invitation, which serve.py serves under /esittely/
+# The first applicant pages (projects/espoo-recruitment/app), which serve.py serves under /apply/ (the folder keeps its old name)
 rsync -az --delete -e "${SSH[*]}" ../espoo-recruitment/app/ "$HOST:$DIR/esittely/"
 # signals.json grows on the server with every live search: ours replace the same ids, the rest stay
 rsync -az -e "${SSH[*]}" signals.json "$HOST:$DIR/signals.ours.json"

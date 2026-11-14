@@ -3,7 +3,7 @@
 The prototype is built on these assumptions. Each one changes the design if it is wrong.
 
 1. **Do organisers decide who is introduced to whom, or who is admitted to the event?** We designed for introductions: everyone registered can attend, and organisers plan conversations. Admission screening would be a much heavier decision about individuals, with higher AI Act and fairness stakes. Is any admission screening done today, and should the tool support it?
-2. **Which registration tool is used today** (Tavata, Brella or an own form)? Can we get an export or an API, so Esittely sits on top of it instead of replacing it?
+2. **Which registration tool is used today** (Tavata, Brella or an own form)? Can we get an export or an API, so Kutsu sits on top of it instead of replacing it?
 3. **Job ads as the source of the company draft.** May we draft from companies' public job ads (their own site, Duunitori, The Hub, Job Market Finland), or does each company need to agree first?
 4. **Scale and timing.** How many companies, candidates and organisers does a typical event have? How many weeks before the event do companies sign up?
 5. **"Finnish required".** How often is this a habit rather than a real need? Would companies accept being asked about it directly?

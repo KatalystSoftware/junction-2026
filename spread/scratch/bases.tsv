@@ -1,8 +1,13 @@
-# Track B's bases on `trackb-merged`, in merge order, from the last known-good tag on. The runner replays a seed with a week
-# under 90% on time on the last tag and on each base after it; the first base that fails names the part to drop.
-# A tag marks a known-good point (40 window weeks in a row at 90% or more). `fingerprint` is the variant's at that commit.
+# Track B's bases on `trackb-merged`, in merge order, from the last known-good point on. The runner replays a seed with a
+# week under 90% on time on the last known-good point and on each base after it; the first base that fails names the part
+# to drop. A `trackb-merge-<n>` tag marks a known-good point (40 window weeks in a row at 90% or more), placed on the
+# runner's word; merge 1 (`trackb-merge-1.x`) failed its thin exam and is no such point. `fingerprint` is the variant's at `commit`; `pairs.py` changed at row 3, so from there on
+# the pair variants have new fingerprints with the same decisions (the base 1f5cc2d99373 -> a273491eedbd).
+# `state`: known-good, window (on `trackb-merged` and in the rolling window), ready (built, not yet on `trackb-merged`), or
+# held (built, not to be played; it is not a base and the runner skips it).
 # Columns are tab-separated.
-order	tag	commit	variant	fingerprint	merged_utc	part
-1	trackb-merge-1.2	7174017	fee16-80-q24-wide-pairs-0.6-return-0.75	17620c00ba17	2026-11-14T18:55:00Z	merge 1 (failed its thin exam; parking place only)
-2		5cbf649	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-all	1f5cc2d99373	2026-11-14T20:15:00Z	every waiting car counted under 760 drivers
-3		1e6a8e4	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-all-onward-q10-d760	44409f1cda67	2026-11-14T20:45:00Z	lane 2's onward pairs, only at 760 drivers or more
+order	tag	commit	variant	fingerprint	state	part
+2	trackb-merge-2	5cbf649	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-all	1f5cc2d99373	known-good	every waiting car counted under 760 drivers (60 of 60 thin weeks at 90% or more)
+3		1e6a8e4	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-all-onward-q10-d760	44409f1cda67	window	lane 2's onward pairs, only at 760 drivers or more
+4		1e924c0	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760	1348152a78f8	window	the waiting-car count of a week under 760 drivers over 48 hours instead of all
+-		1e924c0	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-rich-ss02-late100	a49ae65e80d7	held	lane 1 A's lower surcharge and late price at 760 drivers or more; held by the review thread for the climb's step04

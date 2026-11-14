@@ -127,6 +127,43 @@ remembering seeds. It also reads each incident rather than replaying the referen
   `q_proj` changed most of all; layers 0-7 changed least (`out/lora-sft.png`). The updates use
   about 10-16 of the 32 ranks for 90% of their size.
 
+### RL on the score, from the SFT adapter
+
+Two runs start from the SFT adapter: 4 groups × 8 episodes per step on training seeds 1000+, lr 1e-5,
+T 1.0, 32k context, rollouts overlapped with training (`--overlap`), same simulator build
+(`eb8d08f157d7`). Held-out evals use 8 samples per seed on seeds 101-106 (48 episodes per level).
+
+| Run | Step | Level 3 | Level 4 |
+| --- | --- | --- | --- |
+| `gemma26-rl-l4`: level 4 only, 24 steps, one B200 | 0 | | 0.475 ± 0.047 |
+| | 6 | | 0.585 ± 0.042 |
+| | 12 | | 0.627 ± 0.042 |
+| | 18 | | 0.695 ± 0.040 |
+| | 24 | | 0.640 ± 0.043 |
+| | 24, second eval | | **0.752 ± 0.041** |
+| `gemma26-rl`: levels 3+4, 60 steps, two RTX PRO 6000 | 0 | 0.739 ± 0.033 | 0.554 ± 0.050 |
+| | 15 | 0.802 ± 0.034 | 0.568 ± 0.039 |
+| | 30 | **0.880 ± 0.019** | **0.643 ± 0.037** |
+
+- **Level 4 rises from about 0.5 to about 0.7 in 24 steps.** The two step-0 evals of the same
+  adapter (0.475 and 0.554) and the two evals of the same step-24 weights (0.640 and 0.752) differ by
+  about 0.1. That is the noise of one 48-episode eval, so read the trend across several evals, not
+  any single step. The training reward of `gemma26-rl-l4` went from 0.57 (mean of steps 1-5) to
+  0.71 (steps 20-24).
+- **More of its episodes end at the reply cap as it trains.** Of the 48 held-out level-4 episodes,
+  14 / 6 / 16 / 27 / 34 hit the 48-reply cap at steps 0 / 6 / 12 / 18 / 24 (28 on the second step-24
+  eval). The policy spends more replies before the shift ends; whether on queries or on mitigations
+  is not yet checked. Episodes cut by the cap are charged for the rest of the shift.
+- **`gemma26-rl` is still running** (60 steps, finishing about 01:10 on 15 Nov); this table stops
+  at its step-30 eval.
+- **Speed:** on one B200 (vLLM at half the memory, the LoRA trainer beside it), a step took about
+  200 s, about 3.3 minutes. On two RTX PRO 6000s (vLLM on one, the trainer on the other), about 263 s. On
+  Modal's two H200s the same step took 11-12.5 minutes, measured from the untrained model, whose
+  episodes all run to the reply cap.
+- **The harness is ours, not Harbor's.** These scores come from `env.py`, not from the OpenCode
+  agent the judges run. A like-for-like run of the base model and the adapter through Harbor on
+  `tasks/shift-1..3` (the reported seeds 101-103) was in progress when this was written.
+
 - **SFT:** `run.py sft --model google/gemma-4-26B-A4B-it --lora 32 --train-device cuda:1` on
   the reference's demos, 2 epochs, 100 optimiser steps. The loss fell from 0.30 at step 5 to 0.011 at
   step 100 (`out/sft-gemma26-sft.jsonl`). It ran on a Verda GPU instance (`verda.py`, `grab.py`) in
@@ -134,7 +171,7 @@ remembering seeds. It also reads each incident rather than replaying the referen
 - **Evaluation and RL on Modal:** `modal_app.py` runs `run.py` in a Modal container with two H200s:
   vLLM on one, the LoRA trainer on the other. The adapter's three evaluations above and the fresh-seed
   baseline ran there. RL from the untrained model ran 2 steps at level 4 as a smoke test (training
-  reward 0.068, then 0.088). That is too short to claim an RL result for Gemma, and none is claimed.
+  reward 0.068, then 0.088). The RL results above ran on Verda.
 - **Where the code is:** `modal_app.py` (the Modal runner) and `audit.py` (the audit) are in this
   folder. The adapter (`ckpt/gemma26-sft`) and the per-episode transcripts are on the Modal Volume
   `aq-rl`, not in git.
