@@ -2,6 +2,8 @@
 compare it with the others on the same seeds."""
 from __future__ import annotations
 
+from . import pairs
+
 GATE_10 = {"same_day": True, "floor": 1.7, "quote_share": 1, "max_unbooked": 10}  # `gate-10`
 # `curve-live-surcharge`: the win curve sets the price, the day's answers correct it, and the backlog raises the cost
 CURVE = {"same_day": True, "quote_share": 1, "floor": 0, "curve": True, "learn": 0.16, "max_unbooked": 15, "backlog_step": 0.04}
@@ -282,6 +284,13 @@ VARIANTS: dict[str, dict] = {
     # among the best on the tune weeks' log loss (scratch/dealer_filter.py). Worth 12 to 26 a week in the closed-loop replay (scratch/dealer_sim.py); see the README.
     "slow-friday-late-150-kinds-limits-dealer": {**REFERENCE, "backlog_step": 0, "slow_step": 0.8, "max_unbooked": 25, "slow_model": "friday", "cost": 1.2,
                                                  "late_cost": 150, "kinds": KINDS, "note_limits": True, "dealer_sd": 0.015, "dealer_drift": 0.02, "dealer_version": 1},
+    # The live default with out-and-back pairs (pairs.py): a won car with 16 hours or more to its last pickup, on a lane with 8 or more
+    # return requests a week, waits up to 4 hours for a return, and the two cars go as one gig that opens at 0.6, 0.7 or 0.8 x their two
+    # typical fees and rises to 1.0 x. `-return-0.75` also quotes a request that can go back with a held car at a cost of 0.75 in place of 1.2.
+    **{f"slow-friday-late-150-kinds-limits-pairs-{fee}{tail}": {
+        **REFERENCE, "backlog_step": 0, "slow_step": 0.8, "max_unbooked": 25, "slow_model": "friday", "cost": 1.2, "late_cost": 150, "kinds": KINDS,
+        "note_limits": True, "pair_hold": 4, "pair_fee": fee, "pair_cost": cost, "pair_version": pairs.VERSION}
+       for fee in (0.6, 0.7, 0.8) for tail, cost in (("", 0), ("-return-0.75", 0.75))},
     # ... the same without the note's limits, whose posting changed after its weeks were played.
     "slow-friday-late-150-kinds": {**REFERENCE, "backlog_step": 0, "slow_step": 0.8, "max_unbooked": 25, "slow_model": "friday", "cost": 1.2, "late_cost": 150, "kinds": KINDS},
     # The best point of the search over these parameters together (scratch/search.py, trial 16 of 20, on 30 tune seeds), and with the kinds.

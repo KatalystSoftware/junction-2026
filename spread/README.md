@@ -684,6 +684,43 @@ plays its best trials on other seeds. After 25 trials, 11 of them played in full
 of the same family (`search-16`: `slow_step` 0.8, the gate at 40, `cost` 1.22, a small late cost):
 +1,192 with a lowest week of 93.6%. A late cost alone on the reference's backlog rules is worth +72.
 
+## Out-and-back pairs (off by default, not played yet)
+
+A one-way fee pays for the driver's trip home. A car that goes back the same way removes that trip, so one driver
+delivers a won car and drives another back in one gig ([`pairs.py`](spreadlab/pairs.py), `PairPolicy`, variants
+`slow-friday-late-150-kinds-limits-pairs-<fee>` and `...-pairs-<fee>-return-0.75`). The evidence is in
+[`scratch/strategy/`](scratch/strategy/README.md): the world prices a trade-in, one car out and one back, at 26.3 cents a
+drive minute against 47.2 for a one-car dealer request. And 296 of 887 one-car dealer requests a week are followed by a
+return in time to drive both. The desk never paired them, because its cars book in six minutes.
+
+- **Hold.** A won one-car dealer order with 16 hours or more to its last pickup, on a lane with 8 or more return requests
+  a week ([`returns.json`](spreadlab/returns.json), [`scratch/pairs_returns.py`](scratch/pairs_returns.py), over 1,520 scans),
+  waits up to 4 hours unposted. It is never held past 18:00 or within 10 hours of its last pickup. Held cars do not count in the
+  backlog. On those lanes 40% to 93% of requests get a return within 4 hours, against 3% on lanes with under one a week.
+- **The return's quote.** A request that can run back with a held car, both ends within 30 km of the held car's other
+  ends, is quoted at a cost of 0.75 x its typical fee in place of 1.2 x (`pair_cost`, the `-return-0.75` variants only).
+- **One gig.** When the return is won, both cars go in one gig in the order that leaves a driver the most time. It must
+  stay on time by the road minutes, the stops' windows and the sites' hours for a driver who books it 10 hours from now,
+  within the 12 hours of driving of a gig with more than one car. It opens at 0.6, 0.7 or 0.8 x the two typical fees and
+  rises a tenth of them an hour to 1.0 x.
+- **Two gigs again.** An open pair gig goes back to two gigs, each car alone at its own fee, 6 hours before its latest
+  start, or when it expires, gets a deadline warning or its order changes. The same happens when a cancellation leaves one
+  car in it. Direct offers go to cars alone only.
+
+In a dry run on 8 recorded weeks, with fake drivers who book every single-car gig at once and 80% of pair gigs after
+half an hour, the desk held 75 cars a week, paired 59 orders (30 gigs) and posted 41 held cars alone. The test plan:
+the fee at 0.6, 0.7 and 0.8 on 10 tune seeds, then the return's quote on 30, then the two unseen sets.
+
+```bash
+uv run python -m spreadlab.sweep --variants slow-friday-late-150-kinds-limits,slow-friday-late-150-kinds-limits-pairs-0.6,slow-friday-late-150-kinds-limits-pairs-0.7,slow-friday-late-150-kinds-limits-pairs-0.8 --list tune --count 10
+PYTHONPATH=. uv run python scratch/pairs_report.py --variants slow-friday-late-150-kinds-limits-pairs-0.6,slow-friday-late-150-kinds-limits-pairs-0.7,slow-friday-late-150-kinds-limits-pairs-0.8 --list tune --count 10
+```
+
+`pairs_report.py` prints the plan's checks: pair gigs booked within 1 and 2 hours, the fee paid, pair orders late, held
+cars without a return against the same orders in the base variant, return quotes won, and the margin with its interval.
+The live desk does not take `PairPolicy`: `live final --variant ...-pairs-...` stops at once with unknown parameters. A gig
+with two orders is a new case for its restart logic, and must pass the replays of `replay.py` before it can play live.
+
 ## The final
 
 [`live.py`](spreadlab/live.py) plays the final, or a test final, with the default variant (`VARIANT`) from the live stream.
@@ -862,6 +899,7 @@ request, the driver list, the map and its own history in the week.
 - [`slow.py`](spreadlab/slow.py): the chance that an order ends late, from what the desk knows at the quote.
 - [`optquote.py`](spreadlab/optquote.py), [`optquote.json`](spreadlab/optquote.json): the quote as one optimisation (`opt`), and its fitted weights.
 - [`lanes.json`](spreadlab/lanes.json): the lanes' usual driver fees, for `lane_fee`.
+- [`pairs.py`](spreadlab/pairs.py), [`returns.json`](spreadlab/returns.json): out-and-back pairs, and the return requests a week on each lane.
 - [`play.py`](spreadlab/play.py), [`sweep.py`](spreadlab/sweep.py), [`report.py`](spreadlab/report.py): play, compare.
 - [`ledger.py`](spreadlab/ledger.py): mistakes by variant and situation.
 - [`live.py`](spreadlab/live.py), [`replay.py`](spreadlab/replay.py): the final from the live stream, and a recorded week as a stand-in for the server.

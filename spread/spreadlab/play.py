@@ -18,6 +18,7 @@ from spread.starter import DAY
 
 from .dealer import DealerPolicy
 from .fallback import ActionDesk
+from .pairs import PairPolicy
 from .policy import Policy, fingerprint
 from .riskfee import RiskFeePolicy
 from .server import PracticeClient, data_dir, read_json_gz, world_map, write_json_gz
@@ -62,8 +63,9 @@ def play(variant: str, params: dict, seed: str, level: int = 8) -> dict:
     world = client.create(level=level, seed=seed)
     try:
         snapshot, roster = world.snapshot(), world.roster()
-        # The day's correction with an offset for each dealer (dealer.py), the note fallback (fallback.py), or the fees by each car's risk (riskfee.py).
-        desk_class = (DealerPolicy if params.get("dealer_sd") else ActionDesk if "note_actions" in params
+        # The day's correction with an offset for each dealer (dealer.py), the note fallback (fallback.py), the fees by each car's
+        # risk (riskfee.py), or out-and-back pairs (pairs.py).
+        desk_class = (PairPolicy if params.get("pair_hold") else DealerPolicy if params.get("dealer_sd") else ActionDesk if "note_actions" in params
                       else RiskFeePolicy if params.get("risk_fees") else Policy)
         desk, ends_at = desk_class(world, level, snapshot["now"], params, roster, map_), snapshot["endsAt"]
         events: list[dict] = []
