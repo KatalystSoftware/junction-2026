@@ -42,7 +42,9 @@ level: by years and titles in the material.
 can_do: up to 6 things they can do, each a plain line of at most 14 words that starts with a verb and names the work, not a quality ("Builds data pipelines in Python", never "Strong communicator").
 skills: up to 10 tools, methods or technologies named in the material, each as the material writes it.
 experience: up to 6 roles, newest first. years as "2023–2025" or "2025–now"; empty when the material gives none. Leave out studies and schools.
-languages: spoken languages the material names, with the level if given."""
+languages: spoken languages the material names, with the level if given.
+
+Do not write a year the material does not give."""
 QUOTE = {"type": "string", "description": "3 to 15 words copied exactly from the material"}
 SCHEMA = {
     "type": "object", "additionalProperties": False,
@@ -157,6 +159,10 @@ def profile(kind, value, draft=True):
         kept = [item for item in lines[key] if len(words(item["from"]).split()) >= 2 and f" {words(item['from'])} " in there]
         dropped += len(lines[key]) - len(kept)
         lines[key] = kept
+    # the years of a role are kept only when every year in them stands in the material
+    for role in lines["experience"]:
+        if not all(year in material for year in re.findall(r"\d{4}", role["years"])):
+            role["years"] = ""
     # a name is kept only when it stands in the material; a profile's own record of the name comes first
     stated = lines.pop("name", "").strip()
     name = name or (stated if stated and f" {words(stated)} " in there else None)

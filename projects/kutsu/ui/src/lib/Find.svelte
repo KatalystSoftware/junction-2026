@@ -1,5 +1,6 @@
 <script lang="ts">
   import Icon from './Icon.svelte'
+  import { asDomain } from './format'
   import { app, joinPath, nameOf, research } from './state.svelte'
 
   // The public way in: a company types its own name and its sign-up fills itself in.
@@ -7,9 +8,10 @@
   const event = $derived(app.presets[0])
   function submit(e: SubmitEvent) {
     e.preventDefault()
-    const q = query.trim()
+    // a pasted address is searched by its domain
+    const q = asDomain(query)
     if (!q) return
-    const known = app.briefs.find((b) => nameOf(b).toLowerCase() === q.toLowerCase())
+    const known = app.briefs.find((b) => nameOf(b).toLowerCase() === q.toLowerCase() || b.id === q)
     if (known) location.hash = joinPath(known.id)
     else void research(q, (id) => (location.hash = joinPath(id)))
   }

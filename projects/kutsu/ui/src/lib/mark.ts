@@ -52,23 +52,27 @@ export function markOf(seed: string): MarkShape {
   const next = stream(hash(seed || 'kutsu'))
   // Three colours a third of the wheel apart would look like a flag; these sit close in hue and far apart
   // in lightness, so the mark reads as one thing and its shapes stay apart for eyes that cannot tell hues.
-  const hue = Math.floor(next() * 360)
-  const turn = 28 + Math.floor(next() * 40)
+  // The hues run from orange through green and blue to violet and stop short of pink and magenta, the
+  // one band people read as a statement about a person.
+  const hue = 25 + Math.floor(next() * 200)
+  const turn = 18 + Math.floor(next() * 20)
   const colours = [
-    `oklch(30% 0.11 ${String(hue)})`,
-    `oklch(62% 0.17 ${String((hue + turn) % 360)})`,
-    `oklch(88% 0.09 ${String((hue + 2 * turn) % 360)})`,
-    `oklch(97% 0.02 ${String(hue)})`,
+    `oklch(27% 0.1 ${String(hue)})`,
+    `oklch(52% 0.16 ${String(hue + turn)})`,
+    `oklch(76% 0.12 ${String(hue + 2 * turn)})`,
+    `oklch(95% 0.03 ${String(hue)})`,
   ]
   const pick = () => colours[Math.floor(next() * colours.length)] ?? '#000'
   const tiles: Tile[] = []
+  // at most one dot: two of them side by side would read as eyes
+  const dotAt = next() < 0.6 ? Math.floor(next() * SIZE * SIZE) : -1
   for (let y = 0; y < SIZE; y++) {
     for (let x = 0; x < SIZE; x++) {
       const fill = pick()
       let ink = pick()
       while (ink === fill) ink = pick()
       const [cx, cy, ax, ay, bx, by, sweep] = CORNERS[Math.floor(next() * 4)] ?? [0, 0, 1, 0, 0, 1, 1]
-      tiles.push({ x, y, fill, ink, dot: next() < 0.16, cx: x + cx, cy: y + cy, ax: x + ax, ay: y + ay, bx: x + bx, by: y + by, sweep })
+      tiles.push({ x, y, fill, ink, dot: tiles.length === dotAt, cx: x + cx, cy: y + cy, ax: x + ax, ay: y + ay, bx: x + bx, by: y + by, sweep })
     }
   }
   return { size: SIZE, ground: colours[3] ?? '#fff', tiles, colours }

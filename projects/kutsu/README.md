@@ -68,14 +68,35 @@ studies are left out, with photo, age, gender and nationality. Each item has `fr
 an item whose words are not in the material is dropped (`dropped` says how many). With `"draft": false` it
 answers with the text it read and involves no model.
 
-The person's sign-up (`#/me`) calls it for each source the person ticks, shows each one being read
-and what came of it, and says so plainly when a source cannot be read; nothing is ever filled in from
-anywhere else. "Try it with a sample person" is the explicit other choice: a made-up person whose
-addresses end in `.example`. In place of a photo each person gets a mark, a small abstract mosaic
-drawn in the browser from a hash of what they entered (`mark.ts`): never a face, nothing of their
-text in it, nothing stored. What a person wants and what would suit them are asked, never read.
+The person's sign-up (`#/me`) calls it twice for each source the person switches on, so the page can
+say what is happening: first for the text (`draft: false`), then for the lines. It says plainly when
+a source cannot be read, and nothing is ever filled in from anywhere else. Two other ways in are
+explicit choices: "Type it in myself", with nothing read at all, and "Try it with a sample person",
+a made-up person whose page ends in `.example`.
 
-- `linkedin`: Context.dev `POST /v1/people/enrich` with the profile address, 20 credits a match. A
+- **What is handed over:** a LinkedIn username (the field holds `linkedin.com/in/` as a fixed prefix
+  and cuts a pasted address down to the name), any number of links, and a pasted CV. A link's site is
+  recognised from its address and gets its icon (`sites.ts`: GitHub, GitLab, X, Instagram, Bluesky,
+  Mastodon, Threads, YouTube, Behance, Dribbble, Google Scholar, ORCID, Kaggle, Stack Overflow, a
+  PDF, anything else). Icons are drawn in the app, most after Feather (MIT); nothing is fetched to
+  show one. Pages about work are read; social feeds are shown on the profile and not read.
+- **What the person decides:** every line can be kept, taken out, reworded or added to; three things
+  they can do are kept by default and the rest are opt-in. The field and level are a reading the
+  person can change. No employer is ticked for them.
+- **Links on the profile** are only the ones the person gave and left there; each can be taken off.
+  The page says an employer would see name and links only once an organiser introduces them. That
+  rule is a proposal: in this demo a finished profile goes to nobody, so no employer view of a real
+  person exists to enforce it.
+- **The mark:** in place of a photo each person gets a small abstract mosaic drawn in the browser from
+  a hash of what they entered (`mark.ts`): never a face, nothing of their text in it, nothing stored,
+  hues kept away from pink so it cannot be read as a statement about the person.
+
+What a person wants and what would suit them are asked, never read. The last page says "Your profile
+is ready", not that the person is signed up, because nothing is submitted; the real sign-up for the
+forum is Espoo's Networking Pass, which it links to.
+
+- `linkedin`: Context.dev `POST /v1/people/enrich` with the profile address, 20 credits a match. Years
+  of a role are kept only when they stand in the material. A
   match scored under 90 of 100 is refused. It reads Context.dev's record of the profile, which can be
   weeks old. (`web/scrape` on a LinkedIn address is blocked for most profiles.)
 - `portfolio`: Context.dev `POST /v1/web/scrape` of any public page, 1 credit.

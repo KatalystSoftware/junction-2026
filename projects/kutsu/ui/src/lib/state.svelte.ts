@@ -26,19 +26,27 @@ export const app = $state<App>({
 /** A JSON answer from our own server, as the type the caller names: the server and the page are built together. */
 const get = <T>(path: string): Promise<T> => fetch(path).then((r) => r.json() as Promise<T>)
 
-export async function load() {
-  const [briefs, presets, reviews, pool, watch] = await Promise.all([
-    get<Brief[]>('signals.json'),
-    get<Preset[]>('presets.json'),
-    get<Record<string, Review>>('reviews.json'),
-    get<Pool>('pool.json'),
-    get<Watch>('changes.json'),
-  ])
-  Object.assign(app, { briefs, presets, reviews, pool, watch, ready: true })
+/** What only Espoo's and the companies' screens need: the sign-ups, what the monitors saw, the applications. */
+let backOffice = false
+async function loadBackOffice() {
+  if (backOffice) return
+  backOffice = true
+  const [reviews, watch] = await Promise.all([get<Record<string, Review>>('reviews.json'), get<Watch>('changes.json')])
+  Object.assign(app, { reviews, watch })
   void loadApplications()
+}
+
+export async function load() {
+  // a person's own sign-up asks the server for nothing about anyone else: only the employers, the events and the pool's counts
+  const [briefs, presets, pool] = await Promise.all([get<Brief[]>('signals.json'), get<Preset[]>('presets.json'), get<Pool>('pool.json')])
+  if (!route().me) await loadBackOffice()
+  Object.assign(app, { briefs, presets, pool, ready: true })
+  addEventListener('hashchange', () => {
+    if (!route().me) void loadBackOffice()
+  })
   // the server asks Context.dev at most every five minutes, so asking it once a minute is cheap
   setInterval(() => {
-    void get<Watch>('changes.json').then((seen) => (app.watch = seen))
+    if (backOffice && !route().me) void get<Watch>('changes.json').then((seen) => (app.watch = seen))
   }, 60_000)
   // A new screen starts at its top; back or forward through the browser's history returns to where the reader was.
   // Each history entry is numbered in history.state; the position of the current one follows the reader's scrolling,
@@ -78,7 +86,7 @@ export async function load() {
   })
   // a field being typed in would lose its text to a poll, so polls wait for the typing to end
   setInterval(async () => {
-    if (!(document.activeElement as HTMLElement | null)?.isContentEditable) app.reviews = await get<Record<string, Review>>('reviews.json')
+    if (backOffice && !route().me && !(document.activeElement as HTMLElement | null)?.isContentEditable) app.reviews = await get<Record<string, Review>>('reviews.json')
   }, 3000)
 }
 

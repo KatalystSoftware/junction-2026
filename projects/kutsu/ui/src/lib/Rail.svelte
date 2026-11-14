@@ -1,7 +1,7 @@
 <script lang="ts">
   import { untrack } from 'svelte'
   import { news } from './events'
-  import { when } from './format'
+  import { asDomain, when } from './format'
   import Icon from './Icon.svelte'
   import Logo from './Logo.svelte'
   import { app, go, nameOf, research, reviewOf, route, stateNames } from './state.svelte'
@@ -52,8 +52,9 @@
 
   function submit(e: SubmitEvent) {
     e.preventDefault()
-    const q = query.trim()
-    const found = app.briefs.filter((b) => nameOf(b).toLowerCase() === q.toLowerCase())
+    // a pasted address is searched by its domain
+    const q = asDomain(query)
+    const found = app.briefs.filter((b) => nameOf(b).toLowerCase() === q.toLowerCase() || b.id === q)
     if (!q) return
     query = ''
     const [only] = found

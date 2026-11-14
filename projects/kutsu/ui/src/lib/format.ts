@@ -32,5 +32,16 @@ export const ago = (iso: string) => {
   return `${String(Math.round(minutes / 1440))} days ago`
 }
 
+/** The username from whatever was typed or pasted for a LinkedIn profile: a whole address, with or without scheme, www or a tail, or the name itself. */
+export const linkedinName = (raw: string) =>
+  raw
+    .trim()
+    .replace(/^(https?:\/\/)?([a-z]{2,3}\.)?(www\.)?linkedin\.com\/(in\/)?/i, '')
+    .replace(/[/?#].*$/, '')
+/** A web address as typed or pasted, without the scheme nobody should have to type. */
+export const bare = (raw: string) => raw.trim().replace(/^https?:\/\//i, '')
+/** The domain, when what was typed is a web address ("https://www.nitor.com/en/careers" is "nitor.com"); otherwise the text as it is. */
+export const asDomain = (raw: string) => /^(?:https?:\/\/)?(?:www\.)?((?:[a-z0-9-]+\.)+[a-z]{2,})(?:[/?#].*)?$/i.exec(raw.trim())?.[1]?.toLowerCase() ?? raw.trim()
+
 export const clock = (iso?: string) =>
   iso ? new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }) : ''

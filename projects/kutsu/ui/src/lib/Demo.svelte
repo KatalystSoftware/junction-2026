@@ -9,6 +9,7 @@
   let open = $state(false)
   let busy = $state(false)
   const company = $derived(route().id || app.presets[0]?.ids[0] || '')
+  const recipient = $derived(route().me || route().join)
   $effect(() => {
     if (!open) sure = false
   })
@@ -68,9 +69,12 @@
       <a href="#/" onclick={() => (open = false)}>Espoo's organiser</a>
       <a href={joinPath(company)} onclick={() => (open = false)}>An invited company</a>
       <a href="#/me" onclick={() => (open = false)}>An invited person</a>
+      <!-- an invitation is not the place to change everyone's sign-ups from -->
+      {#if !recipient}
       <p>Sign-ups</p>
       <button disabled={busy} onclick={fill}>Fill in example sign-ups</button>
       <button disabled={busy} onclick={reset}>{sure ? 'Press again to clear them all' : 'Clear every sign-up'}</button>
+      {/if}
     </div>
   {/if}
 </div>

@@ -204,7 +204,7 @@ aside h3 {
   display: inline-flex;
   align-items: center;
   gap: var(--s1);
-  min-height: 2rem;
+  min-height: 2.75rem;
   padding: 0 var(--s3);
   border: 0;
   border-radius: 99px;
@@ -255,10 +255,17 @@ h2.second {
   margin-top: var(--s5);
   border-top: 1px solid var(--line);
 }
+/* One rule for every row: the tick is centred on the first line of its text, whether the text is one
+   line or three. The row is --row tall when the text is one line; the text's own padding makes it so,
+   and the tick is pushed down by the same reckoning. */
+.tell {
+  --row: 2.25rem;
+  --first: calc(1.25 * var(--t-lg));
+}
 .tell li {
   display: grid;
   grid-template-columns: auto 1fr;
-  align-items: center;
+  align-items: start;
   column-gap: var(--s3);
   padding: var(--s2) 0;
   border-bottom: 1px solid var(--line);
@@ -268,8 +275,7 @@ h2.second {
   align-items: baseline;
   justify-content: space-between;
   gap: var(--s3);
-  min-height: 2.25rem;
-  padding: 0;
+  padding: calc((var(--row) - var(--first)) / 2) 0;
   border: 0;
   background: none;
   text-align: left;
@@ -313,14 +319,22 @@ h2.second {
 }
 /* the tick draws itself, and its box takes the company's colour */
 .tick {
+  position: relative;
   display: grid;
   place-items: center;
   width: 1.5rem;
   height: 1.5rem;
+  margin-top: calc((var(--row, 2.25rem) - 1.5rem) / 2);
   border: 2px solid var(--line);
   border-radius: 6px;
   background: var(--ground);
   transition: background 0.25s, border-color 0.25s, scale 0.25s var(--ease);
+}
+/* the box is small; what a finger may press around it is not */
+.tick::after {
+  content: '';
+  position: absolute;
+  inset: -0.625rem;
 }
 .tick:active {
   scale: 0.9;
@@ -353,8 +367,8 @@ h2.second {
   display: inline-flex;
   align-items: center;
   gap: var(--s2);
-  min-height: 2.25rem;
-  padding: 0 var(--s3);
+  min-height: 2.75rem;
+  padding: 0 var(--s4);
   border: 1px solid var(--line);
   border-radius: 99px;
   background: var(--ground);
@@ -442,6 +456,7 @@ form input:focus {
 }
 .answers {
   display: flex;
+  flex: none;
   align-items: center;
   gap: var(--s1);
   margin-left: auto;
@@ -480,9 +495,8 @@ form input:focus {
 }
 .dots {
   display: flex;
-  flex-wrap: wrap;
+  flex: none;
   gap: 0.35rem;
-  max-width: 8rem;
 }
 .dots i {
   width: 0.45rem;
@@ -516,6 +530,16 @@ form input:focus {
   font-size: var(--t-sm);
   font-weight: 600;
   white-space: nowrap;
+}
+/* what was taken out is said in as few words as fit: it gives way before the answer leaves the dock */
+.undo {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.back {
+  flex: none;
 }
 .back:hover:not(:disabled),
 .undo:hover {

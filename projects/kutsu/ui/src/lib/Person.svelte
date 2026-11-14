@@ -5,11 +5,14 @@
   import { confetti } from './confetti'
   import { text } from './editable'
   import { occasionOf, plans } from './events'
+  import { bare, linkedinName } from './format'
   import Icon from './Icon.svelte'
   import Logo from './Logo.svelte'
   import Mark from './Mark.svelte'
   import { markOf } from './mark'
-  import { keep, kept, matches, me, readAll, seedOf, SOURCE_NAME, startOver, type Fact, type Source } from './person.svelte'
+  import { addOwn, chosen, CV_MOST, givenNow, keep, kept, linksOf, matches, me, progress, readAll, seedOf, SHOWN, sourceLabel, sourcesOf, startOver, type Fact } from './person.svelte'
+  import SiteIcon from './SiteIcon.svelte'
+  import { siteOf } from './sites'
   import { nameOf, route } from './state.svelte'
   import Yours from './Yours.svelte'
 
@@ -24,34 +27,80 @@
   const mark = $derived(markOf(seedOf(m)))
   const first = $derived(m.name.split(' ')[0] ?? '')
 
-  // the first card: one tick per source, and nothing is read before the person says so
-  const SOURCES: { key: Source; label: string; hint: string }[] = [
-    { key: 'linkedin', label: 'LinkedIn profile', hint: 'linkedin.com/in/your-name' },
-    { key: 'portfolio', label: 'A page of yours', hint: 'A portfolio, a personal site, a GitHub profile' },
-    { key: 'cv', label: 'Your CV', hint: 'Paste the text of your CV' },
-  ]
-  const chosen = $derived(SOURCES.map((s) => s.key).filter((k) => m.given[k].trim()))
-  let reading = $state(false)
-  const nothing = $derived(!reading && Object.keys(m.read).length > 0 && !m.can.length && !m.skills.length && !m.roles.length)
-  async function readNow() {
-    if (!chosen.length || reading) return
-    reading = true
-    await readAll(chosen)
-    reading = false
+  // ---- the first card: what may we read. Nothing is read before the person says so.
+  const reading = $derived(Object.keys(progress.at).length > 0)
+  const has = $derived(m.typed || m.can.length + m.skills.length + m.roles.length > 0)
+  const fresh = $derived(m.read_from === givenNow(m))
+  const all = $derived(sourcesOf(m))
+  const picked = $derived(chosen(m))
+  const found = $derived(m.can.length + m.skills.length + m.roles.length)
+  const nothing = $derived(!reading && !m.sample && Object.keys(m.read).length > 0 && found === 0)
+  /** What was typed or pasted, cut down to what the field holds: a username for LinkedIn, an address without its scheme for a link. */
+  function setLinkedin(field: HTMLInputElement) {
+    m.linkedin = linkedinName(field.value)
+    if (field.value !== m.linkedin) field.value = m.linkedin
+    keep()
   }
+  function setLink(i: number, field: HTMLInputElement) {
+    let value = bare(field.value)
+    // a LinkedIn address pasted among the links belongs in the field above them
+    if (/linkedin\.com\/in\//i.test(value)) {
+      m.linkedin = linkedinName(value)
+      value = ''
+    }
+    m.links[i] = value
+    if (field.value !== value) field.value = value
+    // there is always one empty field left to add another link, as long as there is room
+    if (m.links.every((l) => l.trim()) && m.links.length < 6) m.links.push('')
+    keep()
+  }
+  // an obviously wrong value is caught here, before a lookup is spent on it
+  const wrongLinkedin = $derived(
+    !m.linkedin
+      ? ''
+      : /[\s@]/.test(m.linkedin)
+        ? 'A LinkedIn username has no spaces and no @. It is the last part of your profile’s address.'
+        : /[/:]|\.[a-z]{2,}$/i.test(m.linkedin)
+          ? 'That looks like the address of another site. It goes among the links below.'
+          : '',
+  )
+  const wrongLink = (raw: string) => (!raw.trim() || siteOf(raw) ? '' : /^@[\w.-]+$/.test(raw.trim()) ? 'Add the site too, for example x.com/yourname.' : 'That does not look like a web address. It should read like yoursite.com.')
+  const wrong = $derived(!!wrongLinkedin || m.links.some((l) => wrongLink(l)))
+  const sourceOn = (key: string) => !m.off.includes(key)
+  const switchSource = (key: string) => {
+    m.off = sourceOn(key) ? [...m.off, key] : m.off.filter((k) => k !== key)
+    keep()
+  }
+  /** How one source is doing, in a short true line. */
+  const status = (key: string, label: string) => {
+    const at = progress.at[key]
+    const was = m.read[key]
+    if (at === 'reading') return { kind: 'busy', says: key === 'cv' ? 'Reading your CV' : `Reading ${label} through Context.dev` }
+    if (at === 'writing') return { kind: 'busy', says: `${was && 'lines' in was ? String(was.lines) : 'Some'} lines read. Writing them up for you to check` }
+    if (!was || !fresh) return undefined
+    return 'error' in was ? { kind: 'failed', says: was.error } : { kind: 'done', says: `${String(was.lines)} lines read, ${String(was.found ?? 0)} things found` }
+  }
+  // while the lines are being written up, say what that work is: every line here is something that is happening
+  const DOING = ['Looking for what you have built and run', 'Picking out the tools you named', 'Keeping the words each line comes from', 'Leaving out age, gender and nationality', 'Saving nothing while this runs']
+  let doing = $state(0)
+  $effect(() => {
+    if (!reading) return
+    const turn = setInterval(() => (doing = (doing + 1) % DOING.length), 1900)
+    return () => {
+      clearInterval(turn)
+    }
+  })
+  let where = $state(false)
 
-  // everything to decide, in order; the first undecided one is in the centre unless a line was opened
+  // ---- everything to decide, in order; the first undecided one is in the centre unless a line was opened
   const KEYS = ['read', 'you', 'know', 'want', 'meet'] as const
   type Key = (typeof KEYS)[number]
-  const has = $derived(m.can.length + m.skills.length + m.roles.length > 0)
-  const decided = (k: Key) => (k === 'read' ? has : k === 'you' ? m.you_ok : k === 'know' ? m.know_ok : k === 'want' ? m.wants.length > 0 && wanted : !!m.done)
-  let wanted = $state(false)
+  const decided = (k: Key) => (k === 'read' ? has && !reading && (fresh || m.typed) : k === 'you' ? m.you_ok : k === 'know' ? m.know_ok : k === 'want' ? m.want_ok : !!m.done)
   let opened = $state<Key | null>(null)
-  let started = $state(me.is.sample || Object.keys(me.is.read).length > 0)
+  let started = $state(me.is.sample || me.is.typed || Object.keys(me.is.read).length > 0)
   const current = $derived<Key>(opened ?? KEYS.find((k) => !decided(k)) ?? 'meet')
 
-  // who they are: three things they can do by default, the rest one press away
-  const SHOWN = 3
+  // who they are: three things they can do are kept by default, the rest one press away
   let more = $state(false)
   let detail = $state<string | null>(null)
   let editing = $state(false)
@@ -63,16 +112,15 @@
   }
   const on = (f: Fact) => !m.struck.includes(f.id)
   /** The last line taken out, so one wrong press can be taken back. */
-  let undo = $state<null | { said: string; id: string }>(null)
+  let undo = $state<null | { id: string }>(null)
   function toggle(f: Fact) {
     if (on(f)) {
       m.struck = [...m.struck, f.id]
-      undo = { said: `Took out “${f.text}”.`, id: f.id }
+      undo = { id: f.id }
       detail = null
     } else {
       m.struck = m.struck.filter((id) => id !== f.id)
       undo = null
-      detail = f.id
     }
     keep()
   }
@@ -83,31 +131,39 @@
     undo = null
     keep()
   }
-
-  // what they are looking for and what suits them: asked, never read
-  const fields = $derived([...new Set([m.field, ...(plan?.fields.map((f) => f.name) ?? [])].filter(Boolean))].slice(0, 8))
+  const reword = (f: Fact, e: FocusEvent) => {
+    const now = typed(e)
+    if (now && now !== f.text) f.text = now
+    keep()
+  }
+  let own = $state('')
+  const add = (list: 'can' | 'skills' | 'roles') => {
+    addOwn(list, own)
+    own = ''
+  }
+  const FIELDS = $derived([...new Set([m.field, ...(plan?.fields.map((f) => f.name) ?? [])].filter(Boolean))].slice(0, 8))
+  const LEVELS = ['Early career', 'Experienced', 'Senior', 'Lead']
   const PLACES = ['On site', 'Hybrid', 'Remote']
   const want = (field: string) => {
     m.wants = m.wants.includes(field) ? m.wants.filter((f) => f !== field) : [...m.wants, field]
     keep()
   }
-  // whom they might want to meet: this event's employers, each with why, the closest first and three ticked
-  const found = $derived(matches(m, plan?.employers ?? []).slice(0, 6))
-  const meet = $derived(m.meet.length || m.done ? m.meet : found.slice(0, 3).map((x) => x.employer.brief.id))
+  // whom they might want to meet: this event's employers that look for what they do, each with why. None is ticked for them.
+  const offered = $derived(matches(m, plan?.employers ?? []).slice(0, 6))
   const pick = (id: string) => {
-    m.meet = meet.includes(id) ? meet.filter((x) => x !== id) : [...meet, id]
+    m.meet = m.meet.includes(id) ? m.meet.filter((x) => x !== id) : [...m.meet, id]
     keep()
   }
 
   function accept() {
     const k = current
-    ;[opened, undo, editing] = [null, null, false]
-    if (k === 'read') void readNow()
-    else if (k === 'you') m.you_ok = true
+    ;[opened, undo, editing, own] = [null, null, false, '']
+    if (k === 'read') {
+      if (!(has && (fresh || m.typed)) && picked.length && !wrong && !reading) void readAll()
+    } else if (k === 'you') m.you_ok = true
     else if (k === 'know') m.know_ok = true
-    else if (k === 'want') wanted = true
+    else if (k === 'want') m.want_ok = true
     else if (!m.done) {
-      m.meet = meet
       m.done = new Date().toISOString()
       confetti([...mark.colours, '#ffffff'])
       scrollTo({ top: 0 })
@@ -120,7 +176,7 @@
   }
   function keys(e: KeyboardEvent) {
     const el = e.target as HTMLElement
-    const typing = el.isContentEditable || ['INPUT', 'TEXTAREA'].includes(el.tagName)
+    const typing = el.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName)
     // Z, or Ctrl/Cmd+Z, takes back the last line taken out; inside a field, z is a letter and Ctrl+Z is the field's own undo
     if (e.key.toLowerCase() === 'z' && !e.altKey && !typing && undo) {
       e.preventDefault()
@@ -131,44 +187,60 @@
     if (typing && !(e.key === 'Enter' && el.tagName === 'INPUT' && current === 'read')) return
     if (e.metaKey || e.ctrlKey || e.altKey) return
     const choice = el.tagName === 'BUTTON' && 'choice' in el.dataset
-    if (['BUTTON', 'A'].includes(el.tagName) && !(choice && e.key === 'Enter')) return
+    if (['BUTTON', 'A', 'SUMMARY'].includes(el.tagName) && !(choice && e.key === 'Enter')) return
     if (e.key === 'Enter' || (e.key === ' ' && !typing)) {
       e.preventDefault()
-      if (started) accept()
-      else started = true
+      if (!started) started = true
+      else if (ready) accept()
     } else if (started && e.key === 'ArrowLeft') back()
   }
 
-  // what is already settled, at the sides; the one in the centre is not shown there
+  // ---- what is already settled, at the sides; the one in the centre is not shown there
   const settled = $derived({
     you: m.you_ok && current !== 'you',
     can: m.you_ok && current !== 'you' ? kept(m, m.can) : [],
     know: m.know_ok && current !== 'know',
-    want: wanted && current !== 'want',
+    want: m.want_ok && current !== 'want',
   })
-  const terms = $derived([m.level, m.finnish ? 'Finnish and English' : 'English', m.place, m.abroad ? 'Living abroad now' : ''].filter(Boolean))
+  const links = $derived(linksOf(m))
+  const terms = $derived([m.level, m.place, m.finnish ? 'Works in Finnish too' : '', m.abroad ? 'Lives outside Finland now' : ''].filter(Boolean))
   const calm = matchMedia('(prefers-reduced-motion: reduce)').matches
   const [send, receive] = crossfade({ duration: calm ? 0 : 560, easing: cubicOut, fallback: (node) => fade(node, { duration: calm ? 0 : 220 }) })
   const answer = $derived(
-    current === 'read' ? (reading ? 'Reading' : 'Read these') : current === 'you' ? "That's me" : current === 'know' ? "That's right" : current === 'want' ? 'That is what I want' : 'Sign me up',
+    current === 'read'
+      ? reading
+        ? 'Reading'
+        : has && (fresh || m.typed)
+          ? 'Continue'
+          : 'Read these'
+      : current === 'you'
+        ? "That's me"
+        : current === 'know'
+          ? "That's right"
+          : current === 'want'
+            ? "That's what I want"
+            : 'My profile is ready',
   )
-  const ready = $derived(current === 'read' ? chosen.length > 0 && !reading : current === 'want' ? m.wants.length > 0 : true)
+  const ready = $derived(current === 'read' ? !reading && !wrong && ((has && (fresh || m.typed)) || picked.length > 0) : current === 'want' ? m.wants.length > 0 : true)
 </script>
 
 <svelte:window onkeydown={keys} />
 
-<div class="join" class:cover={!started} style:--brand={has ? mark.colours[0] : 'var(--city)'} style:--brand-ink={has ? '#fff' : 'var(--city-ink)'}>
-  <p class="host">City of Espoo <span>{event.name}, {event.when}</span></p>
+{#snippet says(state: { kind: string; says: string } | undefined)}
+  {#if state?.kind === 'busy'}<p class="drafting" role="status"><i></i>{state.says}</p>{:else if state}<p class={state.kind} role={state.kind === 'failed' ? 'alert' : undefined}>{state.says}</p>{/if}
+{/snippet}
+
+<div class="join" class:cover={!started} style:--brand="var(--city)" style:--brand-ink="var(--city-ink)">
+  <p class="host">City of Espoo <span>{event.name}, {event.when}{m.sample ? ' · sample person, made up' : ''}</span></p>
 
   {#if !started}
     <section class="invite">
-      <div class="plate mine"><Mark seed={event.slug || 'kutsu'} label="" /></div>
       <h1>{#each "You're invited.".split(' ') as word, i (i)}<span style:--i={i}>{word}&nbsp;</span>{/each}</h1>
-      <p class="filled" style:--i={3}>{event.name}, {event.when}. {event.facts} Your sign-up fills itself in from what you choose to show us.</p>
+      <p class="filled" style:--i={3}>{event.name}, {event.when}. {event.facts} Your profile fills itself in from what you choose to show us.</p>
       <button class="yes big" style:--i={4} onclick={() => (started = true)}>Start <kbd>Enter</kbd></button>
     </section>
   {:else if m.done}
-    <Yours {event} {found} {meet} seed={seedOf(m)} />
+    <Yours {event} {offered} url={plan?.url ?? ''} seed={seedOf(m)} />
   {:else}
     <div class="bench">
       <aside class="left" aria-label="About you">
@@ -178,11 +250,12 @@
             <span class="tile mine"><Mark seed={seedOf(m)} /></span>
             <b>{m.name || 'You'}</b>
             <span>{m.headline}</span>
+            {#if links.length}<span class="sites">{#each links as site (site.href)}<SiteIcon id={site.id} size={16} />{/each}</span>{/if}
           </button>
           {#each settled.can as f (f.id)}
             <button class="line" onclick={() => { opened = 'you'; detail = f.id }} in:fade={{ duration: 300, delay: 250 }} animate:flip={{ duration: 300 }}>
               <span class="fact">{f.text}</span>
-              <span class="more">“{f.from}”</span>
+              {#if f.from}<span class="more">“{f.from}”</span>{/if}
             </button>
           {/each}
         {/if}
@@ -201,78 +274,148 @@
           <article class="card" in:receive={{ key: item }} out:send={{ key: item }}>
             {#if item === 'read'}
               <h2>What may we read?</h2>
-              <p class="pitch">Nothing is read until you say so, and you see every line before anyone else does.</p>
-              <ul class="tell" aria-label="What you let us read">
-                {#each SOURCES as s (s.key)}
-                  {@const state = m.read[s.key]}
-                  <li class="source" class:on={!!m.given[s.key].trim()}>
-                    <span class="tick shown" class:set={!!m.given[s.key].trim()} aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M4.5 10.5 8.5 14.5 15.5 6" /></svg></span>
-                    <label>
-                      <b>{s.label}</b>
-                      {#if s.key === 'cv'}
-                        <textarea rows="2" placeholder={s.hint} bind:value={m.given.cv} oninput={keep} disabled={m.sample || reading}></textarea>
-                      {:else}
-                        <input placeholder={s.hint} bind:value={m.given[s.key]} oninput={keep} disabled={m.sample || reading} autocomplete="off" spellcheck="false" />
-                      {/if}
-                    </label>
-                    {#if reading && m.given[s.key].trim() && !state}
-                      <p class="drafting" role="status"><i></i>Reading</p>
-                    {:else if state && 'error' in state}
-                      <p class="failed" role="alert">{state.error}</p>
-                    {:else if state}
-                      <p class="behind">{state.lines} lines read</p>
-                    {/if}
-                  </li>
-                {/each}
-              </ul>
-              {#if nothing}<p class="failed" role="alert">Nothing could be read into a profile. Try another source, or type it in on the next cards yourself.</p>{/if}
-              <p class="facts">
-                An address goes to Context.dev, which reads that page. The text goes to a language model (Anthropic), which turns it into lines for you to check. Our
-                server keeps nothing. The draft stays in this browser tab and is gone when you close it. Never read into your profile: photo, age, gender, nationality.
-              </p>
+              {#if reading || (found > 0 && fresh)}
+                <!-- what has arrived so far: the page is never still while it works -->
+                <p class="live" role="status">
+                  <span class="tile mine"><Mark seed={seedOf(m)} /></span>
+                  <b>{m.name || (reading ? 'Reading what you chose' : 'Read')}</b>
+                  <span>{reading ? DOING[doing] : `${String(found)} things found. Every one is yours to keep or take out.`}</span>
+                </p>
+              {:else}
+                <p class="pitch">Nothing is read until you say so.</p>
+              {/if}
+
               {#if m.sample}
                 <p class="sample"><b>This is a sample person.</b> Olena K. is made up, and so is everything about her. <button class="rest" onclick={() => { startOver() }}>Use my own instead</button></p>
               {:else}
-                <button class="rest" onclick={() => { startOver(true) }}><Icon name="plus" size={14} />Try it with a sample person</button>
+                <ul class="tell sources" aria-label="What you let us read">
+                  <li class="source" class:on={!!m.linkedin && sourceOn('linkedin')}>
+                    <button class="tick" role="checkbox" data-choice aria-checked={!!m.linkedin && sourceOn('linkedin')} aria-label="Read my LinkedIn profile" disabled={!m.linkedin || reading} onclick={() => { switchSource('linkedin') }}>
+                      <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4.5 10.5 8.5 14.5 15.5 6" /></svg>
+                    </button>
+                    <!-- the fixed part of the address is part of the field; only the username is typed, and a pasted address is cut down to it -->
+                    <label class="field prefixed">
+                      <span aria-hidden="true">linkedin.com/in/</span>
+                      <input aria-label="Your LinkedIn username" placeholder="your-name" value={m.linkedin} oninput={(e) => { setLinkedin(e.currentTarget) }} disabled={reading} autocomplete="off" autocapitalize="none" spellcheck="false" />
+                    </label>
+                    {#if wrongLinkedin}<p class="failed" role="alert">{wrongLinkedin}</p>{:else}{@render says(status('linkedin', 'your LinkedIn'))}{/if}
+                  </li>
+                  {#each m.links as raw, i (i)}
+                    {@const site = siteOf(raw)}
+                    {@const key = site ? `link:${site.href}` : ''}
+                    {@const readable = !!site && all.some((s) => s.key === key)}
+                    {@const state = readable ? status(key, site.label) : undefined}
+                    <li class="source" class:on={readable && sourceOn(key)}>
+                      <button class="tick" role="checkbox" data-choice aria-checked={readable && sourceOn(key)} aria-label="Read this page" disabled={!readable || reading} onclick={() => { switchSource(key) }}>
+                        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4.5 10.5 8.5 14.5 15.5 6" /></svg>
+                      </button>
+                      <!-- the icon follows the address: nothing to choose, nothing fetched -->
+                      <label class="field prefixed">
+                        <span class="site" class:known={!!site} aria-hidden="true"><SiteIcon id={site?.id ?? 'globe'} /></span>
+                        <input aria-label="A link of yours" placeholder={i ? 'Another link' : 'A page of yours: a site, GitHub, a portfolio'} value={raw} oninput={(e) => { setLink(i, e.currentTarget) }} disabled={reading} inputmode="url" autocomplete="off" autocapitalize="none" spellcheck="false" />
+                      </label>
+                      {#if wrongLink(raw)}
+                        <p class="failed" role="alert">{wrongLink(raw)}</p>
+                      {:else if state}
+                        {@render says(state)}
+                      {:else if site && !readable}
+                        <p class="done">{site.name}: shown on your profile, not read.</p>
+                      {/if}
+                    </li>
+                  {/each}
+                  <li class="source" class:on={!!m.cv.trim() && sourceOn('cv')}>
+                    <button class="tick" role="checkbox" data-choice aria-checked={!!m.cv.trim() && sourceOn('cv')} aria-label="Read my CV" disabled={!m.cv.trim() || reading} onclick={() => { switchSource('cv') }}>
+                      <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4.5 10.5 8.5 14.5 15.5 6" /></svg>
+                    </button>
+                    <label class="field"><textarea rows="2" aria-label="The text of your CV" placeholder="Or paste the text of your CV" bind:value={m.cv} oninput={keep} disabled={reading}></textarea></label>
+                    {#if m.cv.length > CV_MOST}<p class="done">Only the first {CV_MOST.toLocaleString('en')} characters are read.</p>{:else}{@render says(status('cv', 'your CV'))}{/if}
+                  </li>
+                </ul>
+                {#if nothing}<p class="failed" role="alert">Nothing in that could be read into a profile, and nothing has been filled in. Try another source, or type your profile in yourself.</p>{/if}
+              {/if}
+
+              <ul class="promise">
+                <li><b>Read once</b>and not saved</li>
+                <li><b>Your lines</b>to keep or take out</li>
+                <li><b>Left out</b>photo, age, gender, nationality</li>
+              </ul>
+              <button class="rest" aria-expanded={where} onclick={() => (where = !where)}><Icon name={where ? 'x' : 'plus'} size={14} />Where it goes</button>
+              {#if where}
+                <p class="facts where">
+                  What you give is sent whole to this site's server, which keeps none of it: no file, no log. An address is read by Context.dev, a service that fetches public
+                  pages. The text is then turned into lines by a language model run by Anthropic. Those two receive it; what they keep is theirs to answer for. Your draft
+                  lives in this browser tab and is gone when you close it. Employer logos later on are loaded from Context.dev's image server.
+                </p>
+              {/if}
+              {#if !m.sample && !reading}
+                <p class="other">
+                  <button class="rest" onclick={() => { startOver('typed') }}><Icon name="pen" size={14} />Type it in myself</button>
+                  <button class="rest" onclick={() => { startOver('sample') }}><Icon name="plus" size={14} />Try it with a sample person</button>
+                </p>
               {/if}
             {:else if item === 'you'}
               <button class="edit" aria-pressed={editing} onclick={() => (editing = !editing)}><Icon name={editing ? 'check' : 'pen'} size={16} />{editing ? 'Done' : 'Edit'}</button>
               <div class="band mine"><Mark seed={seedOf(m)} /></div>
               <h2 class:unnamed={!m.name && !editing} role={editing ? 'textbox' : undefined} aria-label={editing ? 'Your name' : undefined} contenteditable={editing ? 'plaintext-only' : undefined} spellcheck="false" data-placeholder="Your name" onblur={(e) => { m.name = typed(e); keep() }} onkeydown={enter} use:text={m.name}></h2>
               <p class="pitch" role={editing ? 'textbox' : undefined} aria-label={editing ? 'What you do' : undefined} contenteditable={editing ? 'plaintext-only' : undefined} data-placeholder="What you do, in a line" onblur={(e) => { m.headline = typed(e); keep() }} onkeydown={enter} use:text={m.headline}></p>
-              <p class="facts">{[m.field, m.level].filter(Boolean).join(' · ')}</p>
+              {#if editing}
+                <p class="chips">
+                  {#each LEVELS as level (level)}
+                    <button class="chip want" data-choice aria-pressed={m.level === level} onclick={() => { m.level = level; keep() }}>{#if m.level === level}<Icon name="check" size={14} />{/if}{level}</button>
+                  {/each}
+                </p>
+              {:else if m.field || m.level}
+                <p class="facts">{[m.field, m.level].filter(Boolean).join(' · ')}{#if !m.typed}<span class="guess">our reading, yours to change with Edit</span>{/if}</p>
+              {/if}
+              {#if links.length}
+                <p class="links">
+                  {#each links as site (site.href)}<a href={site.href} target="_blank" rel="noopener" title={site.name}><SiteIcon id={site.id} size={16} />{site.label}</a>{/each}
+                </p>
+              {/if}
               {#if m.can.length}
                 <ul class="tell" aria-label="What you can do">
-                  {#each m.can.filter((f, i) => i < SHOWN || more || (i >= SHOWN && on(f) && m.you_ok)) as f (f.id)}
+                  {#each m.can.filter((f, i) => i < SHOWN || more || on(f)) as f (f.id)}
                     <li class:on={on(f)}>
                       <button class="tick" role="checkbox" data-choice aria-checked={on(f)} aria-label="Keep this line" onclick={() => { toggle(f) }}>
                         <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4.5 10.5 8.5 14.5 15.5 6" /></svg>
                       </button>
-                      <button class="say" aria-expanded={detail === f.id} onclick={() => (detail = detail === f.id ? null : f.id)}><b>{f.text}</b></button>
-                      {#if detail === f.id}<p class="behind">From {SOURCE_NAME[f.source]}: “{f.from}”</p>{/if}
+                      {#if editing}
+                        <span class="say"><b role="textbox" tabindex="0" aria-label="Reword this line" contenteditable="plaintext-only" spellcheck="false" onblur={(e) => { reword(f, e) }} onkeydown={enter} use:text={f.text}></b></span>
+                      {:else}
+                        <button class="say" aria-expanded={detail === f.id} disabled={!f.from} onclick={() => (detail = detail === f.id ? null : f.id)}><b>{f.text}</b></button>
+                      {/if}
+                      {#if detail === f.id && f.from}<p class="behind">From {sourceLabel(m, f.source)}: “{f.from}”</p>{/if}
                     </li>
                   {/each}
                 </ul>
-                {#if m.can.length > SHOWN && !more}<button class="rest" onclick={() => (more = true)}><Icon name="plus" size={14} />{m.can.length - SHOWN} more we read</button>{/if}
+                {#if m.can.length > SHOWN && !more}
+                  <button class="rest" onclick={() => (more = true)}><Icon name="plus" size={14} />{m.can.length - SHOWN} more we read, not on your profile unless you tick them</button>
+                {/if}
+              {/if}
+              {#if editing || m.typed || more}
+                <form onsubmit={(e) => { e.preventDefault(); add('can') }}>
+                  <input bind:value={own} placeholder="Add something you can do, in your own words" aria-label="Add something you can do" autocomplete="off" />
+                </form>
               {/if}
             {:else if item === 'know'}
               <h2>What you know</h2>
               <p class="chips">
                 {#each m.skills as f (f.id)}
-                  <button class="chip want" data-choice aria-pressed={on(f)} title="From {SOURCE_NAME[f.source]}: “{f.from}”" onclick={() => { toggle(f) }}>{#if on(f)}<Icon name="check" size={14} />{/if}{f.text}</button>
-                {:else}
-                  <span class="chip">Nothing was named in what we read</span>
+                  <button class="chip want known" data-choice aria-pressed={on(f)} title={f.from ? `From ${sourceLabel(m, f.source)}: “${f.from}”` : 'Added by you'} onclick={() => { toggle(f) }}>{#if on(f)}<Icon name="check" size={14} />{/if}{f.text}</button>
                 {/each}
               </p>
+              <form onsubmit={(e) => { e.preventDefault(); add('skills') }}>
+                <input bind:value={own} placeholder="Add a tool, a method or a technology" aria-label="Add something you know" autocomplete="off" />
+              </form>
               {#if m.roles.length}
-                <h2 class="second">Where you have worked</h2>
-                <ul class="tell" aria-label="Where you have worked">
+                <h2 class="second">Work and projects</h2>
+                <ul class="tell" aria-label="Work and projects">
                   {#each m.roles as f (f.id)}
                     <li class:on={on(f)}>
                       <button class="tick" role="checkbox" data-choice aria-checked={on(f)} aria-label="Keep this line" onclick={() => { toggle(f) }}>
                         <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4.5 10.5 8.5 14.5 15.5 6" /></svg>
                       </button>
-                      <span class="say"><b>{f.text}</b><small>{f.from}</small></span>
+                      <span class="say"><b>{f.text}</b>{#if f.when}<small>{f.when}</small>{/if}</span>
                     </li>
                   {/each}
                 </ul>
@@ -280,38 +423,45 @@
             {:else if item === 'want'}
               <h2>What are you looking for?</h2>
               <p class="chips">
-                {#each fields as field (field)}
+                {#each FIELDS as field (field)}
                   <button class="chip want" data-choice aria-pressed={m.wants.includes(field)} onclick={() => { want(field) }}>{#if m.wants.includes(field)}<Icon name="check" size={14} />{/if}{field}</button>
                 {/each}
               </p>
-              <form onsubmit={(e) => { e.preventDefault(); accept() }}>
-                <input bind:value={m.looking} oninput={keep} placeholder="In a line, in your own words" aria-label="What you are looking for, in your own words" autocomplete="off" />
-              </form>
+              <label class="field words"><textarea rows="2" bind:value={m.looking} oninput={keep} placeholder="In your own words, if you like" aria-label="What you are looking for, in your own words"></textarea></label>
               <h2 class="second">What suits you</h2>
+              <p class="chips">
+                {#each LEVELS as level (level)}
+                  <button class="chip want" data-choice aria-pressed={m.level === level} onclick={() => { m.level = m.level === level ? '' : level; keep() }}>{#if m.level === level}<Icon name="check" size={14} />{/if}{level}</button>
+                {/each}
+              </p>
               <p class="chips">
                 {#each PLACES as place (place)}
                   <button class="chip want" data-choice aria-pressed={m.place === place} onclick={() => { m.place = m.place === place ? '' : place; keep() }}>{#if m.place === place}<Icon name="check" size={14} />{/if}{place}</button>
                 {/each}
                 <button class="chip want" data-choice aria-pressed={m.finnish} onclick={() => { m.finnish = !m.finnish; keep() }}>{#if m.finnish}<Icon name="check" size={14} />{/if}I work in Finnish too</button>
-                <button class="chip want" data-choice aria-pressed={m.abroad} onclick={() => { m.abroad = !m.abroad; keep() }}>{#if m.abroad}<Icon name="check" size={14} />{/if}I live abroad now</button>
+                <button class="chip want" data-choice aria-pressed={m.abroad} onclick={() => { m.abroad = !m.abroad; keep() }}>{#if m.abroad}<Icon name="check" size={14} />{/if}I live outside Finland now</button>
               </p>
             {:else}
               <h2>Who would you like to meet?</h2>
-              {#if found.length}
+              {#if offered.length}
+                <p class="facts">Employers at this event whose roles are in your field or ask for something you know. Those asking for most of what you know come first. Tick any, or none.</p>
                 <ul class="tell meet" aria-label="Employers at this event">
-                  {#each found as match (match.employer.brief.id)}
+                  {#each offered as match (match.employer.brief.id)}
                     {@const id = match.employer.brief.id}
-                    <li class:on={meet.includes(id)}>
-                      <button class="tick" role="checkbox" data-choice aria-checked={meet.includes(id)} aria-label="Meet {nameOf(match.employer.brief)}" onclick={() => { pick(id) }}>
+                    <li class:on={m.meet.includes(id)}>
+                      <button class="tick" role="checkbox" data-choice aria-checked={m.meet.includes(id)} aria-label="Meet {nameOf(match.employer.brief)}" onclick={() => { pick(id) }}>
                         <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4.5 10.5 8.5 14.5 15.5 6" /></svg>
                       </button>
-                      <span class="say"><b><span class="tile"><Logo brief={match.employer.brief} small /></span>{nameOf(match.employer.brief)}</b></span>
+                      <span class="say">
+                        <b><span class="tile"><Logo brief={match.employer.brief} small /></span>{nameOf(match.employer.brief)}</b>
+                        {#if match.employer.brief.website}<a href={match.employer.brief.website} target="_blank" rel="noopener" aria-label="{nameOf(match.employer.brief)}'s own site"><Icon name="out" size={14} /></a>{/if}
+                      </span>
                       <p class="behind"><b>{match.role}</b>{#if match.reasons.length}<br />{match.reasons.join(' · ')}{/if}</p>
                     </li>
                   {/each}
                 </ul>
               {:else}
-                <p class="pitch">No employer at this event has said it looks for what you chose. You can still sign up, and visit anyone.</p>
+                <p class="pitch">No employer at this event has a role in the fields you chose. You can still finish, and visit anyone.</p>
               {/if}
             {/if}
           </article>
@@ -323,7 +473,7 @@
           <h3>You're looking for</h3>
           <button class="line" onclick={() => (opened = 'want')} in:receive={{ key: 'want' }} out:send={{ key: 'want' }}>
             <b>{m.wants.join(', ')}</b>
-            <span>{terms.join(' · ')}</span>
+            {#if terms.length}<span>{terms.join(' · ')}</span>{/if}
             {#if m.looking}<span class="more">“{m.looking}”</span>{/if}
           </button>
         {/if}
@@ -335,7 +485,7 @@
       <span class="dots" aria-label="Progress">
         {#each KEYS as k (k)}<i class:done={decided(k)} class:now={k === current}></i>{/each}
       </span>
-      {#if undo}<button class="undo" onclick={takeBack}>{undo.said} Undo <kbd>Z</kbd></button>{/if}
+      {#if undo}<button class="undo" onclick={takeBack}>Undo <kbd>Z</kbd></button>{/if}
       <span class="answers">
         <button class="yes" disabled={!ready} onclick={accept}>{answer}{first && current === 'meet' ? `, ${first}` : ''} <kbd>Enter</kbd></button>
       </span>
@@ -350,11 +500,8 @@
   .mine {
     padding: 0;
     background: none;
-    box-shadow: none;
-  }
-  .plate.mine {
-    width: clamp(6rem, 14vw, 9rem);
-    height: clamp(6rem, 14vw, 9rem);
+    box-shadow: 0 0 0 1px color-mix(in srgb, currentColor 22%, transparent);
+    border-radius: 22%;
   }
   .band.mine {
     width: 5.5rem;
@@ -364,61 +511,192 @@
   .unnamed {
     display: none;
   }
+  .guess {
+    margin-left: var(--s2);
+    padding: 0.15em 0.55em;
+    border-radius: 99px;
+    background: var(--wash);
+    font-size: var(--t-xs);
+    white-space: nowrap;
+  }
+  .links,
+  .sites {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s2) var(--s4);
+  }
+  .links {
+    margin-top: var(--s3);
+    font-size: var(--t-sm);
+  }
+  .links a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s1);
+    min-height: 2rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .links a:hover {
+    text-decoration: underline;
+  }
+  .sites {
+    margin-top: var(--s2);
+    opacity: 0.85;
+  }
+
+  /* what has arrived so far, while the reading runs */
+  .live {
+    display: grid;
+    grid-template-columns: 3rem 1fr;
+    align-items: center;
+    column-gap: var(--s3);
+    margin-top: var(--s3);
+    line-height: 1.3;
+  }
+  .live .tile {
+    grid-row: 1 / 3;
+    margin: 0;
+  }
+  .live b {
+    font-size: var(--t-lg);
+    letter-spacing: -0.01em;
+  }
+  .live span:last-child {
+    color: var(--ink-2);
+  }
+
+  .sources {
+    margin-top: var(--s4);
+  }
   .source {
     align-items: start;
   }
-  .source label {
-    display: grid;
-    gap: var(--s1);
+  /* here the tick is centred on its field, which is taller than a line of text */
+  .source .tick {
+    margin-top: calc((3.25rem + 4px - 1.5rem) / 2);
   }
-  .source b {
-    font-weight: 600;
+  .rest {
+    text-align: left;
   }
-  .source input,
-  .source textarea {
-    width: 100%;
-    min-height: 2.75rem;
-    padding: var(--s2) var(--s3);
-    border: 1px solid var(--line);
-    border-radius: var(--r1);
+  /* a field of this flow, in the shape of the company flow's own line of text */
+  .field {
+    display: flex;
+    align-items: center;
+    gap: var(--s2);
+    min-height: 3.25rem;
+    padding: 0 var(--s4);
+    border: 2px solid var(--line);
+    border-radius: var(--r2);
     background: var(--ground);
+    color: var(--ink-2);
+    font-size: var(--t-lg);
+  }
+  .field:focus-within {
+    border-color: var(--ink);
+  }
+  .field input,
+  .field textarea {
+    flex: 1;
+    min-width: 0;
+    padding: var(--s3) 0;
+    border: 0;
+    outline: 0;
+    background: none;
+    color: var(--ink);
     font: inherit;
     resize: vertical;
   }
-  .source input:focus,
-  .source textarea:focus {
-    outline: 2px solid var(--brand);
-    outline-offset: 1px;
+  .field textarea {
+    font-size: var(--t-md);
+    line-height: 1.4;
   }
-  .source .drafting,
-  .source .failed,
-  .source .behind {
+  /* a field whose first part is fixed: the prefix sits in the same box, quieter, and cannot be typed over */
+  .prefixed {
+    gap: 0;
+  }
+  .site {
+    display: grid;
+    margin-right: var(--s2);
+    opacity: 0.45;
+  }
+  .site.known {
+    opacity: 1;
+    color: var(--ink);
+  }
+  .words {
+    margin-top: var(--s4);
+  }
+  .source p {
     grid-column: 2;
     margin: var(--s1) 0 0;
+    font-size: var(--t-sm);
   }
-  .tick.shown {
-    margin-top: 1.6rem;
-    pointer-events: none;
+  .done {
+    color: var(--ink-2);
   }
-  .tick.shown.set {
-    border-color: var(--ink);
-    background: var(--ink);
+  .source .drafting {
+    gap: var(--s2);
   }
-  .tick.shown.set svg {
-    stroke-dashoffset: 0;
+  .source .drafting i {
+    width: 0.5rem;
+    height: 0.5rem;
+  }
+  .tick:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+
+  .promise {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--s3);
+    margin-top: var(--s5);
+    font-size: var(--t-sm);
+    line-height: 1.3;
+    color: var(--ink-2);
+  }
+  .promise b {
+    display: block;
+    color: var(--ink);
+  }
+  .where {
+    max-width: 62ch;
+    line-height: 1.5;
+  }
+  .other {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--s5);
+    margin-top: var(--s2);
   }
   .sample {
     margin-top: var(--s4);
-    font-size: var(--t-sm);
     color: var(--ink-2);
   }
   .sample b {
     color: var(--ink);
   }
+  /* what a person knows is many small things: kept ones are outlined, not filled, so ten of them are not a wall */
+  .known[aria-pressed='true'] {
+    border-color: var(--ink);
+    background: var(--ground);
+    color: var(--ink);
+  }
+  .meet .say {
+    justify-content: flex-start;
+  }
   .meet .say b {
     display: inline-flex;
     align-items: center;
     gap: var(--s2);
+  }
+  .meet .say a {
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    color: var(--ink-2);
   }
   .meet .tile {
     flex: none;
@@ -432,7 +710,17 @@
     font-weight: 600;
     color: var(--ink);
   }
-  .meet .behind {
-    grid-column: 2;
+  @media (max-width: 40rem) {
+    .promise {
+      grid-template-columns: 1fr;
+      gap: var(--s2);
+    }
+    .promise b {
+      display: inline;
+      margin-right: var(--s2);
+    }
+    .field {
+      font-size: var(--t-md);
+    }
   }
 </style>
