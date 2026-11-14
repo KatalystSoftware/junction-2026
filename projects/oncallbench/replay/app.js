@@ -240,17 +240,19 @@
     const ses = state.ses;
     const go = (key) => { chooseSession(key); state.pin = null; state.T = -12; setPlaying(true); renderAll(); };
     const few = sessions.length <= 3;
+    const oneLevel = sessions.every((x) => x.level === sessions[0].level);  // then the level is noise in a tab
+    const tab = (x) => oneLevel ? `Seed ${x.seed}` : x.title;
     $("#episode").setAttribute("role", few ? "tablist" : "group");
     $("#episode").replaceChildren(...(few
-      ? sessions.map((x) => h("button", { type: "button", role: "tab", "aria-selected": String(x === ses), title: `Seed ${x.seed}`, onclick: () => go(x.key), text: x.title }))
+      ? sessions.map((x) => h("button", { type: "button", role: "tab", "aria-selected": String(x === ses), title: `Level ${x.level}, seed ${x.seed}`, onclick: () => go(x.key), text: tab(x) }))
       : [h("select", { "aria-label": "Episode", onchange: (e) => go(e.target.value) },
           sessions.map((x) => h("option", { value: x.key, selected: x === ses, text: `${x.title}, seed ${x.seed}` })))]));
     document.body.classList.toggle("storms", !!ses.rules.storms);
     const runs = ses.runs.filter((r) => r !== state.ref);
     const pick = (id) => { state.run = runs.find((r) => r.id === id); state.pin = null; renderAll(); };
-    const name = (r) => {  // a model with two runs: the second is "run 2"
+    const name = (r) => {  // a model with several runs on the seed: "run 1", "run 2", in the notes' order
       const same = runs.filter((x) => x.label === r.label);
-      return same.indexOf(r) > 0 ? `${r.label} run ${same.indexOf(r) + 1}` : r.label;
+      return same.length > 1 ? `${r.label}, run ${same.indexOf(r) + 1}` : r.label;
     };
     for (const r of runs) r.name = name(r);
     // one picker for the run on the left: models first, then the scripted baselines that calibrate the score
@@ -1130,7 +1132,7 @@
       : band ? `${band.label} averages ${band.mean.toFixed(2)} of the expert's savings, over ${band.n} runs on ${band.seeds} seeds.`
       : `The score is the share of the expert's savings a run reaches.`;
     $("#onboard-watch").textContent = ses.rules.storms
-      ? "The red services, the money counter, and the moment the agent rolls back without protecting first."
+      ? "The red services, the money counter, and the moment the agent rolls back unprotected."
       : "The red services, the money counter, and where the two runs part.";
     const was = state.playing;
     setPlaying(false);

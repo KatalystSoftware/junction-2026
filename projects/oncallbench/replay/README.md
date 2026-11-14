@@ -14,7 +14,10 @@ xdg-open index.html   # macOS: open index.html
 ```
 
 The page is static and has no dependencies; it opens straight from disk with the committed
-bundles in `data/`. Level 4, seed 200019 opens first; seeds 108 and 109 are the other tabs in the bar.
+bundles in `data/`. Every episode is level 4, as shipped, so the tabs in the bar name only the
+seed: 200019 opens first, then 108 and 109. Each bundle carries every Harbor run on its seed except
+those cut by infrastructure (a Fable 5.2 run on 200019 hit a usage limit); a model with several
+runs is listed as "run 1", "run 2" in the order `notes.json` gives.
 
 ## Add or refresh an episode
 
@@ -91,7 +94,7 @@ shipped seeds 101 to 103 are not replayed here: their bundles would be the tasks
 
 | Episode | Run | What happened |
 | --- | --- | --- |
-| **Level 4, seed 200019** (`data/l4-s200019.js`), opens first | Opus 5.5, 0.00 (round 16, a common seed) | Ahead of the reference until minute 33. Then it rolled back geo-svc without adding capacity first: retries overloaded it, and partner-api, which earns $29,100 a minute, went to 72% errors. Minutes 33 to 42 cost it $185,000, the reference $1,000. |
+| **Level 4, seed 200019** (`data/l4-s200019.js`), opens first | Opus 5.5 run 1, 0.00, opens; run 2, 0.43 (round 16, a common seed) | Ahead of the reference until minute 33. Then it rolled back geo-svc without adding capacity first: retries overloaded it, and partner-api, which earns $29,100 a minute, went to 72% errors. Minutes 33 to 42 cost it $185,000, the reference $1,000. |
 | Level 4, seed 109 (`data/l4-s109.js`) | Opus 5.5, 0.36 (round 13) | Level with the reference until minute 34. Then it rolled back search-svc without adding capacity first: retries overloaded it and web-storefront went to 72% errors. Minutes 34 to 46 cost it $163,000, the reference $42,000. |
 | Level 4, seed 108 (`data/l4-s108.js`) | Opus 5.5, 0.34 (round 13) | The same mistake on checkout-svc, then a 50% throttle once the storm had started. Minutes 34 to 46 cost it $132,000, the reference $36,000. |
 

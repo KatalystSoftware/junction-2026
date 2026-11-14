@@ -139,6 +139,7 @@ main {
   grid-row: 2;
   display: grid;
   grid-template-columns: max-content minmax(0, 1fr) max-content;
+  grid-template-rows: auto;  /* the caption's row grows if it wraps; the lanes keep theirs */
   grid-auto-rows: 1.45rem;
   column-gap: 1.4rem;
   align-items: center;
@@ -151,7 +152,7 @@ main {
 .spread[hidden] { display: none; }
 .loading .spread { visibility: hidden; }
 .spread > * { grid-column: 2; }
-.spread-caption { grid-column: 1 / 3; font-size: 1.08rem; font-weight: 600; }
+.spread-caption { grid-column: 1 / 3; font-size: 1.08rem; font-weight: 600; line-height: 1.25; padding-bottom: 0.15rem; text-wrap: pretty; }
 .spread .placeholder { margin-left: 0.8rem; padding: 0.05rem 0.45rem; border-radius: 3px; font-size: 0.85rem;
   color: var(--sheet); background: var(--red); }
 .spread-head { grid-column: 3; font-size: 0.85rem; color: var(--ink-2); }
@@ -178,6 +179,7 @@ main {
 
 .panel {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);  /* never wider than the panel, however long the heading */
   grid-template-rows: auto minmax(0, 1fr);
   background: var(--sheet);
   border: 1px solid var(--rule);
@@ -194,8 +196,9 @@ main {
   border-bottom: 1px solid var(--rule-soft);
 }
 .who { min-width: 0; }
-.who h2 { font-size: 1.75rem; line-height: 1.1; font-weight: 700; font-stretch: 92%; white-space: nowrap; }
-.who h2 span { font-size: 1rem; font-weight: 450; font-stretch: 100%; color: var(--ink-2); margin-left: 0.7rem; }
+.who h2 { font-size: 1.75rem; line-height: 1.1; font-weight: 700; font-stretch: 92%; }
+/* the score moves under the name as one piece when the panel is narrow, never under the till */
+.who h2 span { font-size: 1rem; font-weight: 450; font-stretch: 100%; color: var(--ink-2); margin-left: 0.7rem; white-space: nowrap; display: inline-block; }
 .who h2 span b { color: var(--ink); font-weight: 700; }
 .who .sub { color: var(--ink-2); margin-top: 0.25rem; }
 .who .sub b { color: var(--ink); font-weight: 680; }
