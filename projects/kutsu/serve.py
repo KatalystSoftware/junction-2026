@@ -56,7 +56,7 @@ PITCH = next((d for d in (lib.HERE / "pitch", lib.HERE.parent / "espoo-recruitme
 REVIEWS = lib.HERE / "reviews.json"
 DATA = {"/signals.json": "signals.json", "/presets.json": "presets.json", "/pool.json": "pool.json", "/applications.json": "applications.json"}
 TYPES = {".html": "text/html; charset=utf-8", ".js": "text/javascript", ".css": "text/css", ".json": "application/json",
-         ".svg": "image/svg+xml", ".woff2": "font/woff2", ".png": "image/png", ".jpg": "image/jpeg", ".ico": "image/x-icon", ".md": "text/markdown; charset=utf-8"}
+         ".svg": "image/svg+xml", ".woff2": "font/woff2", ".png": "image/png", ".jpg": "image/jpeg", ".pdf": "application/pdf", ".ico": "image/x-icon", ".md": "text/markdown; charset=utf-8"}
 STATUSES = {"draft", "invited", "joined"}
 # What a saved sign-up holds. Raise it whenever that changes: a file saved in another shape is set aside
 # at start, never read, because the page keys its lists by what is in it and must not meet an old one.
