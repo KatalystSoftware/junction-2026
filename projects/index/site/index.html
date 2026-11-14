@@ -95,6 +95,7 @@ svg.arrow { width: 0.8em; height: 0.8em; flex: none; }
 .toc b { color: var(--field-ink); font-weight: 750; font-stretch: 112%; font-size: 1.15em; }
 .toc .who { font-size: 0.8em; text-align: right; }
 .toc .short { grid-column: 1 / -1; }
+.toc b::after { content: " ↓"; color: var(--spark); font-weight: 600; font-size: 0.8em; }
 .toc a:hover b { color: var(--spark); }
 @media (min-width: 46rem) {
   .toc { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2rem; }

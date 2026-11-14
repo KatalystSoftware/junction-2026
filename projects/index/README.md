@@ -47,8 +47,8 @@ The page says nothing the repo does not. When one of these files changes, change
 | Kutsu | [`projects/kutsu/README.md`](../kutsu/README.md): the first paragraphs (new surveys each time; who came and what employers said they need), the two sign-up flows, and the Context.dev table (brand record, careers page), and "What is real, what is sample" (statements quoted from the page they link to; the pool is sample data), and "About a person" (only what they hand over; the sign-up submits nothing) |
 | Spread desk | [`spread/README.md`](../../spread/README.md), "How the desk decides" |
 
-The screenshots are cropped to one readable moment: the replay at minute 34 of seed 200019
-(`?session=l4-s200019&t=34&intro=0&still`), Since When's first card at 520 px wide, and Kutsu's
+The screenshots are cropped to one readable moment: the replay at minute 42 of seed 200019
+(`?session=l4-s200019&t=42&intro=0&still`: the rollback at minute 33 and what it has cost by 42), Since When's first card at 520 px wide, and Kutsu's
 invitation to the Deep Tech Talent Forum at 1280 × 800; all taken at twice the pixel density.
 
 Source links are off: `repo` in `projects.js` is empty because this repository is private. Set it to
