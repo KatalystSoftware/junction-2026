@@ -29,7 +29,7 @@ class Embedder:
         import torch
         from transformers import AutoModel, AutoTokenizer
 
-        torch.set_num_threads(threads or os.cpu_count())
+        torch.set_num_threads(threads or os.cpu_count() or 1)
         self.torch = torch
         self.tok = AutoTokenizer.from_pretrained(MODEL)
         self.model = AutoModel.from_pretrained(MODEL).eval()

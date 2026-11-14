@@ -39,3 +39,32 @@ line-length = 120
 [tool.ruff.lint]
 # SIM115: the commands read a file once in a loop and exit; a with block would re-indent each loop body.
 ignore = ["SIM115"]
+
+[tool.ty.environment]
+# The image runs 3.13; the dev shell's interpreter is newer.
+python-version = "3.13"
+
+# Findings left as they are, shown as warnings so that a new one still fails the check. README lists them.
+[[tool.ty.overrides]]
+include = ["gapfinder/api.py", "gapfinder/test_live_sql.py"]
+[tool.ty.overrides.rules]
+# PRESETS holds a title, a parameter list and a function per preset in one dict; ty reads each value as any of them.
+not-iterable = "warn"
+not-callable = "warn"
+# The per-year rows of the timeline are built as mixed dicts.
+invalid-assignment = "warn"
+not-subscriptable = "warn"
+invalid-argument-type = "warn"
+
+[[tool.ty.overrides]]
+include = ["gapfinder/align.py", "gapfinder/wikitext.py", "gapfinder/embed.py"]
+[tool.ty.overrides.rules]
+invalid-argument-type = "warn"
+no-matching-overload = "warn"
+not-callable = "warn"
+
+[[tool.ty.overrides]]
+# Owned by the classifier work on feat/since-when-verify.
+include = ["differences/**", "demo/hero_*.py"]
+[tool.ty.overrides.rules]
+invalid-assignment = "warn"
