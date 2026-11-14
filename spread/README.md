@@ -58,6 +58,15 @@ A variant tuned to the simulator for margin may play the final instead, but only
 unseen weeks with at most 1 week in 60 under 90% on time, thin worlds included. Which variant played
 the final is recorded with its result.
 
+The first such version, `fee16-80-q24-wide-pairs-0.6-return-0.75`, made +€2,180 a week (1,867 to 2,511) on 40 unseen
+weeks and then failed a 120-week exam: 3 of 60 thin weeks under 90% on time (87.1%, 89.0%, 89.1%) and 1 of 60 natural
+ones, all 7 of its weeks under 92% on worlds with 648 to 723 drivers. Counting only the waiting cars due within 24 hours
+lets a desk with few drivers win more cars than they can move, and they pile up on one due day. The fix is one rule set
+before the first quote from the length of the driver list: under 760 drivers the desk counts every waiting car
+(`fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-all`, `tight_drivers` and `when_tight`). It has no week under 90% in
+60 unseen thin weeks, the lowest at 92.0%, and costs €1,290 a week against the version without it on thin worlds, about
+€830 a week more than this variant there. This variant had no thin week under 90% on the exam's seeds.
+
 **What keeps it running.** The desk answers each event as it comes and sends quotes first. A guard thread
 quotes 1.9 × the typical fee for any request with no quote when a third of its time is left. The books go
 to disk every second, and a desk that starts again rejoins the week without giving any car a second
