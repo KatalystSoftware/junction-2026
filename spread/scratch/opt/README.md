@@ -20,6 +20,7 @@ $PY $O/late_check.py $D $C           # the late model on weeks it was not fitted
 uv run python $O/marginal.py $D due-24-gate-25 step-2-gate-25   # where the margin of the extra orders goes in play
 $PY $O/homes.py $D $C                # who books a gig, by where the driver lives
 uv run --with numpy --with optuna python -u $O/search.py $D $C 120 0.6   # the outer search on the stand-in, 6 minutes on 4 cores
+uv run --with numpy --with optuna python -u $O/search.py $D $C 120 0.6 top10   # the same, chosen on mean margin with at most 1 week in 20 under 90%
 ```
 
 ## What each one found, on the 104 saved weeks of `steep-notes-offers-8`
@@ -34,3 +35,4 @@ uv run --with numpy --with optuna python -u $O/search.py $D $C 120 0.6   # the o
 | `marginal.py` | What does an extra order earn in play? | About 14, against 40 on average: it sells at 1.42 x its typical fee and costs 1.23 x with refunds. |
 | `homes.py` | Does a driver's home say what a gig costs them? | A driver who lives at the delivery place books 52% of their looks at the opening fee, one in the pickup town 16%, others 8 to 13%. |
 | `search.py` | What does the outer search find on the stand-in? | cost 1.2, a late cost of 220 to 250, a small surcharge for cars due within 24 hours and no gate: +1,480 a week on 52 unseen weeks with no week under 91%. An upper bound: the stand-in draws lateness from the model that the rule prices with. |
+| `search.py top10` | Does allowing 1 week in 20 under 90% buy margin? | No. The search turns the 90% rule's price off (cost 1.25 to 1.27, a late cost of 157 to 192, no gate): +1,514 to +1,586 on the unseen weeks with one or two of 52 under 90%, which is +1,106 to +1,353 once those count as no margin, against +1,480 for the point above. |
