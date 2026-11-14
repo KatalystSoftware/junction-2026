@@ -15,7 +15,7 @@ VOCABULARY = watch.Vocabulary({"words": ["auto", "valmis", "huomenna", "klo", "k
 
 
 def test_a_fix_adds_plates_and_a_manual_licence_and_moves_the_pickup_later_never_earlier():
-    asked = request("R1", arrivedAt=600, note={"text": "Valmis ensi tiistaina klo 9, ei aiemmin. Asiakas odottaa perillä keskiviikkona klo 16."})
+    asked = request("R1", arrivedAt=600, note={"text": "Valmis ensi tiistaina klo 9, ei aiemmin, manuaali. Asiakas odottaa perillä keskiviikkona klo 16."})
     asked["legs"][0]["pickup"]["window"] = {"from": 600, "to": 2000}  # Monday 10:00 on
     rules = notes.Facts(pickup_from=DAY + 12 * HOUR, plates=True)  # Tuesday 12:00, plates
     earlier = [{"fact": "ready", "day": "today", "time": "15:00"}, {"fact": "no_plates", "value": False}, {"fact": "manual", "value": False}]
@@ -26,6 +26,9 @@ def test_a_fix_adds_plates_and_a_manual_licence_and_moves_the_pickup_later_never
     # A time that the note gives for the delivery is no ready time, whatever the model says.
     delivery = [{"fact": "ready", "day": "wed", "time": "16:00"}]
     assert watch.safe_fix(delivery, rules, asked) == {}
+    # Plates and a manual gearbox need the note's own words: here it has words for the gearbox and none for plates.
+    asked["note"] = {"text": "Kolme polkimea ja kytkin. Avain tiskiltä, auto ruudussa 22."}
+    assert watch.safe_fix([{"fact": "no_plates", "value": True}, {"fact": "manual", "value": True}], notes.Facts(), asked) == {"manual": True}
 
 
 def test_an_answer_counts_only_as_a_yes_or_a_no_with_known_facts():

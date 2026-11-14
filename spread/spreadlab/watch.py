@@ -250,19 +250,26 @@ def about_pickup(text: str, minute: int) -> bool:
     return False
 
 
+# A fix of plates or of the gearbox needs a word about them in the note, also one that the rules do not read: the model
+# has added plates to a note about spare tyres and a parking bay.
+ABOUT_PLATES = re.compile(r"plate|plaat|tags?\b|regist|rekist|rek\.|kilp|kilv|skylt")  # not "number": notes give order numbers
+ABOUT_GEARS = re.compile(r"manu|clutch|pedal|gear|stick|shift|vaiht|kytkin|koppling|växel|kepp")
+
+
 def safe_fix(problems: list[dict], facts: notes.Facts, request: dict) -> dict:
     """The corrections that the desk applies by itself: plates, a manual licence, and a ready time later than the
-    rules' and the request's window, stated in a sentence about the pickup. A fact that the model says the rules have
-    and the note does not is not undone."""
+    rules' and the request's window, stated in a sentence about the pickup. Each needs the note's own words for it. A
+    fact that the model says the rules have and the note does not is not undone."""
     fix, start = {}, max(facts.pickup_from, min(leg["pickup"]["window"]["from"] for leg in request["legs"]))
+    text = (request.get("note") or {}).get("text", "").lower()
     for problem in problems:
         if problem["fact"] == "ready":
             at = when(problem.get("day"), problem.get("time"), request["arrivedAt"])
-            if at is not None and at > start and about_pickup((request.get("note") or {}).get("text", ""), at):
+            if at is not None and at > start and about_pickup(text, at):
                 fix["pickupFrom"] = max(fix.get("pickupFrom", 0), at)
-        elif problem["fact"] == "no_plates" and problem.get("value") is True and not facts.plates:
+        elif problem["fact"] == "no_plates" and problem.get("value") is True and not facts.plates and ABOUT_PLATES.search(text):
             fix["plates"] = True
-        elif problem["fact"] == "manual" and problem.get("value") is True and not facts.manual:
+        elif problem["fact"] == "manual" and problem.get("value") is True and not facts.manual and ABOUT_GEARS.search(text):
             fix["manual"] = True
     return fix
 
