@@ -26,8 +26,9 @@ from collections import Counter
 from typing import Iterator, Optional
 
 from spread.client import SpreadError
+from spread.starter import DAY, WEEKDAYS
 
-from .live import Clock, Live, LiveDesk, VARIANT, clock_text, folder_of, report
+from .live import Clock, Live, LiveDesk, VARIANT, clock_text, folder_of, note_watcher, report
 from .play import load_run
 from .server import world_map
 from .variants import VARIANTS
@@ -69,6 +70,7 @@ class Replay:
         self.crash_next_act = False
         self.failed_out: set[tuple[str, str, int]] = set()  # (gig, order, leg) of each failed visit: the car is no longer on that gig
         self.withdrawn_at: dict[str, int] = {}  # gig id -> the minute the recorded desk withdrew it, for gigs it posted before the start
+        self.taken_off: set[str] = set()  # the gigs this desk withdrew: no recorded driver can book or drive them any more
 
     def resume_from(self, gigs: list[dict], start: int) -> None:
         """The recorded gigs posted before `start`, for a desk that joins in the middle of the week without its books:
@@ -94,6 +96,8 @@ class Replay:
             event = self.all[self.published]
             self.published += 1
             kind, gig = event["kind"], self.gigs.get(event.get("gigId", ""))
+            if event.get("gigId") in self.taken_off:
+                gig = None  # the recording booked a gig that this desk withdrew, which the world would not allow
             if kind == "price_request":
                 self.requests[event["request"]["id"]] = event["request"]
             elif kind in ("order_won", "order_changed"):
@@ -200,6 +204,7 @@ class Replay:
             gig["schedule"] = action["schedule"]
         elif kind == "withdraw":
             gig["status"] = "withdrawn"
+            self.taken_off.add(gig["id"])
         return {"ok": True}
 
     def refuse(self, action: dict, now: int, reason: str) -> dict:
@@ -237,6 +242,23 @@ def slow_quotes(share: float, seconds: float) -> None:
         return quote(self, request)
 
     LiveDesk.quote = stalled
+
+
+# Notes in words that the archive has not seen and the rules do not read, each stating one fact: no plates, a manual
+# gearbox, a later ready time. The recorded world does not act on them: they test what the note watcher does.
+NEW_NOTES = ["Registration tags are off this one, so bring your own.", "Three pedals and a clutch: the driver must be able to drive one.",
+             "The workshop hands it over on {day} at 15, not sooner."]
+
+
+def inject(events: list[dict], start: int, every: int) -> list[str]:
+    """Gives every `every`-th order won from `start` on one of NEW_NOTES. Returns the ids of those orders."""
+    won = [e["order"]["id"] for e in events if e["kind"] == "order_won" and e["at"] >= start][::every]
+    for event in events:
+        if event["kind"] == "price_request" and event["request"]["id"] in won:
+            request = event["request"]
+            text = NEW_NOTES[won.index(request["id"]) % len(NEW_NOTES)]
+            request["note"] = {"text": text.format(day=WEEKDAYS[(request["arrivedAt"] // DAY + 3) % 7])}
+    return won
 
 
 def compare(run: dict, replay: Replay, start: int, down: tuple[int, int]) -> list[str]:
@@ -290,8 +312,12 @@ def main() -> None:
     parser.add_argument("--down", type=float, default=10, help="real seconds the desk stays down")
     parser.add_argument("--slow", type=float, default=0, help="the share of requests on which the policy stalls for 6 seconds, more than a request gives")
     parser.add_argument("--tag", default="", help="a name for this run's folder, data/live/replay-<seed>-<tag>")
+    parser.add_argument("--watch-notes", action="store_true", help="run the note watcher beside the desk (watch.py)")
+    parser.add_argument("--inject", type=int, default=0, help="give every n-th won order a note in new words that the rules miss")
     args = parser.parse_args()
     run = load_run(VARIANT, args.seed)
+    if args.inject:
+        print(f"New notes on {len(inject(run['events'], args.start, args.inject))} won orders.", flush=True)
     replay = Replay(run["events"], run["roster"], max(e["at"] for e in run["events"]) + 1, args.start, args.speed, "-".join(filter(None, ["replay", args.seed, args.tag])))
     replay.resume_from(run["gigs"], args.start)
     folder = folder_of(replay.id)
@@ -300,7 +326,7 @@ def main() -> None:
         slow_quotes(args.slow, 6 / args.speed)
 
     def desk() -> Live:
-        return Live(replay, replay.guard_act, replay.minute, run["level"], VARIANTS[VARIANT], world_map(), folder, args.speed)
+        return Live(replay, replay.guard_act, replay.minute, run["level"], VARIANTS[VARIANT], world_map(), folder, args.speed, watcher=note_watcher(args))
 
     live, down = desk(), (0, 0)
     print(f"Replay of {args.seed} from {clock_text(args.start)} at {args.speed} x the final's speed; files in {folder}.", flush=True)

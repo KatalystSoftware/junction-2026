@@ -295,13 +295,14 @@ def shadow_rule(weeks: Weeks, cost=1.3, late_cost=0.0, step=0.04, step_hours=0, 
 
 
 def loss(rows: list[dict], ref: list[dict], load: float = 0.026) -> dict:
-    """The search's objective on paired weeks, and what it is made of. A week under 91% on time counts as no margin, and each
-    point under 93% costs 300. Driver fees are taken to rise `load` x the typical fee for each 100 orders more than the reference."""
-    n, j, margin = len(rows), 0.0, 0.0
+    """The search's objectives on paired weeks, and what they are made of. J: a week under 91% on time counts as no margin, and each
+    point under 93% costs 300. J90: only a week under 90% counts as no margin; the search then allows 1 such week in 20. Driver fees are taken to rise `load` x the typical fee for each 100 orders more than the reference."""
+    n, j, j90, margin = len(rows), 0.0, 0.0, 0.0
     for a, b in zip(rows, ref):
         m = a["margin"] - load * max(0.0, a["orders"] - b["orders"]) / 100 * a["typ"] / 100
         margin += m - b["margin"]
         j += (m if a["on_time"] >= 0.91 else 0.0) - b["margin"] - 300 * max(0.0, 93 - 100 * a["on_time"])
-    return {"J": j / n, "margin": margin / n, "orders": sum(a["orders"] for a in rows) / n, "late": sum(a["late"] for a in rows) / n,
+        j90 += (m if a["on_time"] >= 0.90 else 0.0) - b["margin"]  # the top-10 objective: only an unranked week counts as no margin
+    return {"J": j / n, "J90": j90 / n, "margin": margin / n, "orders": sum(a["orders"] for a in rows) / n, "late": sum(a["late"] for a in rows) / n,
             "lowest": min(a["on_time"] for a in rows), "under90": sum(a["on_time"] < 0.90 for a in rows), "under91": sum(a["on_time"] < 0.91 for a in rows),
             "under92": sum(a["on_time"] < 0.92 for a in rows)}

@@ -212,3 +212,89 @@ def read(note: Optional[dict], arrived_at: int) -> Facts:
             last_is_pick = found[-1].at <= chosen.at or corrects(found[-1].at)
     pickup_from = max(((arrived_at // DAY + (pick.day or 0)) * DAY + pick.minute for pick in picks), default=0)
     return Facts(pickup_from, plates, manual)
+
+
+class Limits(NamedTuple):
+    deadline: int = 0  # the minute by which the note wants the car delivered, when it says one; else 0
+    pickup_hours: tuple[int, int] = (0, 0)  # the minutes of the day the pickup site opens and closes, where the note says so; 0 where it does not
+    delivery_hours: tuple[int, int] = (0, 0)  # the same for the delivery site
+
+
+# The words of a note's own limits. A word of five letters or more also counts with one typo.
+LIMIT_WORDS = {
+    "delivery": ["perillä", "perille", "perilla", "kohde", "kohteessa", "kohteen", "destination", "vastaanotto", "vastaanottava", "vastaanotetaan", "receiving", "receiver",
+                 "mottagaren", "mottagning", "framme", "plats", "toimitus", "toimitukset", "toimitusosoite", "delivery", "deliver", "delivered", "leverans", "levereras",
+                 "arrival", "arrive"],
+    "shut": ["kiinni", "sulkee", "sulkeutuu", "suljetaan", "close", "closes", "closed", "stänger", "stängt", "nobody", "ketään", "ingen", "enää", "anymore", "längre"],
+    "until": ["asti", "until", "saakka", "till"],
+    "latest": ["viim", "viimeistään", "viimeistaan", "mennessä", "mennessa", "latest", "by", "senast", "later"],
+    "before": ["ennen", "before", "före", "innan"],
+    "collect": ["haettava", "nouto", "noudettava", "nouda", "haku", "hakea", "collect", "pickup", "pick", "hämtas", "hämta", "avhämtning"],
+    "customer": ["asiakas", "kunden", "customer"],
+    "fetches": ["noutaa", "hämtar", "picks", "hakee"],
+}
+HOURS_RANGE = re.compile(r"\b(\d{1,2})(?:[.:](\d{2}))?\s*(am|pm)?\s*[-–]\s*(\d{1,2})(?:[.:](\d{2}))?\s*(am|pm)?\b|\b(\d{1,2}):st[aä]\s+(\d{1,2}):(?:een|ään|aan)\b")
+# Finnish hours in the cases a limit comes in ("ennen kahta", "kolmeen asti", "neljän jälkeen"), which `times` reads only after a word of time.
+HOUR_CASES = {"yhtä": 13, "yhteen": 13, "kahta": 14, "kahteen": 14, "kahden": 14, "kolmea": 15, "kolmeen": 15, "kolmen": 15, "neljää": 16, "neljään": 16, "neljän": 16,
+              "viittä": 17, "viiteen": 17, "viiden": 17, "kuutta": 18, "kuuteen": 18, "kuuden": 18}
+HOUR_CASE = re.compile(r"(?<!puoli )\b(" + "|".join(HOUR_CASES) + r")\b")
+
+
+def limits(note: Optional[dict], arrived_at: int) -> Limits:
+    """The limits that a note sets on top of the request: a deadline for the delivery ("perillä huomenna klo 17 mennessä",
+    "at destination Monday 13:30 latest", "customer picks it up tomorrow 4pm"), and the hours of a site ("open weekdays
+    10:00 - 15:00", "we close at 14:30", "haettava ennen klo 16", "kohde sulkee klo 16.30", "receiving until 16:30 only").
+    A clause is about the delivery site when it names it; else about the pickup site. A correction replaces the limit before it."""
+    if not note:
+        return Limits()
+    text = re.sub(r"(?:the )?day after t\w+", "ylihuomenna", note["text"].lower())
+    text = re.sub(r"\b(?:hi|hello|hey) there\b", " ", text)
+    today, weekday_ = arrived_at // DAY, arrived_at // DAY % 7
+    deadline, hours = 0, {"pickup": [0, 0], "delivery": [0, 0]}
+    last: Optional[tuple] = None  # the last limit read, which a correction replaces: ("deadline", day) or ("closes", site)
+    correcting = False  # the clause before was a correction without a time: "nej förlåt, kl 18"
+    for sentence in SENTENCE.split(SHORT.sub(r"\1 ", text)):
+        for clause in sentence.split(","):
+            for match in HOURS_RANGE.finditer(clause):
+                if match[7]:
+                    opens, closes = int(match[7]) * HOUR, int(match[8]) * HOUR
+                else:
+                    opens, closes = int(match[1]) * HOUR + int(match[2] or 0), int(match[4]) * HOUR + int(match[5] or 0)
+                    opens += 12 * HOUR if match[3] == "pm" and opens < 12 * HOUR else 0
+                    closes += 12 * HOUR if match[6] == "pm" and closes < 12 * HOUR else 0
+                break
+            else:
+                opens = closes = 0
+            plain = HOUR_CASE.sub(lambda m: f"klo {HOUR_CASES[m[1]]}", re.sub(r"\b(\d{1,2}):(?:aan|ään|een)\b", r"klo \1", HOURS_RANGE.sub(" ", clause)))
+            words = TOKEN.findall(plain)
+            tags = [tag(word) for word in words]
+            said = {name for name, known in LIMIT_WORDS.items() if any(near(word, k) for word in words for k in known)}
+            site = "delivery" if "delivery" in said else "pickup"
+            if 5 * HOUR <= opens < closes <= 23 * HOUR and closes - opens >= 4 * HOUR:  # opening hours, not a slot of an hour or two
+                hours[site] = [opens, closes]
+            found = times(words, weekday_)
+            corrects = correcting or any(t == "correction" for t in tags) or any(a == "ei" and b in ("kun", "ku") for a, b in zip(words, words[1:]))
+            named = next((weekday(word) for word in words if weekday(word) is not None), None)
+            correcting = corrects and not found and named is None
+            if corrects and not last:
+                continue  # it corrects a time that is not a limit
+            if corrects:
+                if last[0] == "closes" and found:
+                    hours[last[1]][1] = found[0].minute
+                elif last[0] == "deadline":
+                    day = found[0].day if found and found[0].day is not None else (named - weekday_ - 2) % 7 + 2 if named is not None and not found else last[1]
+                    deadline, last = (today + day) * DAY + (found[0].minute if found else deadline % DAY), ("deadline", day)
+                continue
+            if any(tags[j] == "by" and "not" in tags[max(0, j - 4):j] for j in range(len(tags))):
+                continue  # the first minute the car is ready, not a limit: "not ready before tomorrow 7:00", "ei ennen", "won't be ready until"
+            for time in found:
+                before = tags[max(0, time.at - 2):time.at]
+                if (before and before[-1] == "not") or before[-2:] == ["not", "clock"]:
+                    continue  # a time that the note denies
+                if "shut" in said or "until" in said or (site == "pickup" and time.day is None and "collect" in said and ("before" in said or "latest" in said)):
+                    hours[site][1], last = time.minute, ("closes", site)
+                elif (site == "delivery" and "latest" in said) or ("customer" in said and "fetches" in said):
+                    deadline, last = (today + (time.day or 0)) * DAY + time.minute, ("deadline", time.day or 0)
+                else:
+                    last = None  # another time, such as when the car is ready: a correction after it is not about a limit
+    return Limits(deadline, tuple(hours["pickup"]), tuple(hours["delivery"]))

@@ -377,13 +377,197 @@ played beyond the tune seeds ends a week near or under the 90% rule. None is kep
   still has 21 late orders (92.7%); with a gate of 25 it declines 18 and has 34 late.
 - `hours-due-24-gate-25-premium` was not played: the variant it builds on fell to 90.2% on tune.
 
-**How close the reference is to the rule.** Over 104 weeks (tune, holdout, `fresh-001` to
-`fresh-061` and 24 further weeks with under 720 drivers) every week is ranked. The lowest are 90.1%
-and 90.6%, both with under 680 drivers; with 750 or more drivers the lowest is 92.0%. A dearer
-quote in the weeks with under 720 drivers (`thin-cost-1.4`) costs 302 a week there (-681 to 106) on
-24 weeks it was not chosen on, for +0.3 points on time and a lowest week of 91.8% against 91.3%.
-An hour more to find a driver there (`thin-slack-6`) is -324 on 7 weeks with a lowest week of
-90.3% against 90.1%. Neither is kept.
+**The first look at this**, on 104 weeks, found every week ranked and the lowest at 90.1%; the larger
+sample is in the next section.
+
+## How close the reference is to the 90% rule
+
+A week under 90% on time is not ranked. The reference's lowest weeks are the worlds with a short
+driver list, so it was played on every world with under 720 drivers among 700 scanned seeds
+(`scratch/thin_seeds.py`): 197 thin worlds, and 56 others from the seed lists.
+
+| On time | Under 720 drivers, 197 weeks | 720 drivers or more, 56 weeks |
+| --- | --- | --- |
+| under 90%, not ranked | 3 (1.5%) | 0 |
+| 90 to 91% | 8 | 0 |
+| 91 to 92% | 16 | 0 |
+| 92 to 93% | 19 | 5 |
+| 93% and up | 151 | 51 |
+
+- Thin worlds are 27% of the scanned seeds: 16% have under 680 drivers and 5% under 650. By driver
+  count, 1 of 37 weeks with under 650 is not ranked, 2 of 79 with 650 to 679, and 0 of 81 with 680
+  to 719.
+- The three: `fresh-252` at 83.2% (113 orders), `fresh-410` at 89.5% (238) and `fresh-607` at 89.6%
+  (144). Two are worlds where the desk wins 13% and 17% of its quotes, not 30%: a thin world's 15 to
+  19 late orders then stand against half the usual orders. Of 8 thin weeks with under 180 orders, 2
+  are not ranked.
+- The weeks under 91% have as many drivers as the others (659 against 675). They have 21 late
+  orders against 13, and 84 requests declined for backlog against 46.
+- The late orders have no single source there. Pickups with under 5 drivers notified are 11% of the
+  orders and 4 of the 21 late; premium cars are 12 orders a week and 17% late; orders with under 6
+  hours to find a driver are 14 a week and 15% late.
+- A thin world earns 10,128 a week against 10,790 for the others, at 94.4% on time against 95.7%.
+
+**Rules for the thin worlds**, on the same 197 weeks, each only in a week with under 720 drivers
+(`tight_drivers`, `when_tight`). `scratch/thin_report.py` prints the table.
+
+| Variant | Margin against the reference | Orders, late a week | On time | Not ranked | 90 to 91% | 91 to 92% | Lowest |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| reference | 10,128 | 248, 13.6 | 94.4% | 3 | 8 | 16 | 83.2% |
+| `thin-cost-1.4`: cost 1.4 in the quote | -226 (-364 to -87) | 223, 11.3 | 94.9% | 1 | 4 | 12 | 87.0% |
+| `thin-gate-10`: quotes stop at 10 cars without a driver | -733 (-845 to -620) | 234, 11.6 | 94.9% | 2 | 1 | 7 | 86.1% |
+| `thin-cost-1.4-gate-10`: both | -829 (-956 to -698) | 214, 10.1 | 95.2% | 3 | 2 | 7 | 83.7% |
+
+- The dearer quote is the only one that pays for itself at all: +0.43 points on time (0.22 to 0.64),
+  11 weeks under 91% become 5. `fresh-252` stays not ranked under every rule.
+- A tighter gate wins fewer orders and loses nearly as many to lateness, so the share hardly moves
+  where it matters, and it costs three times as much.
+- The gain is under 680 drivers: there the dearer quote costs 100 a week and takes the weeks under
+  91% from 10 to 5 and the weeks not ranked from 3 to 1, in 116 weeks. At 680 to 719 drivers it costs
+  408 a week and there is one such week to remove. `thin-680-cost-1.4` applies it under 680 only.
+  That limit was read off these weeks, so it has a check of its own below.
+
+**A check on new worlds, and premium cars.** 72 more worlds with under 680 drivers (seeds 702 to 1201), which no rule was
+chosen on, and the two rules for premium cars: a premium car may go only to an experienced driver, 12 of them are won a
+week and 17% are late.
+
+| Variant, in weeks with under 720 drivers | 197 worlds: margin, not ranked, under 92% | 72 new worlds: margin, not ranked, under 92% |
+| --- | --- | --- |
+| reference | 10,128, 3, 27 | 1 (`fresh-1123`, 88.0%), 15 |
+| `thin-680-cost-1.4` | | -50, 2 |
+| `thin-premium-0.4`: a premium car costs 0.4 more | +139 (25 to 255), 1 | +121 (-78 to 330), 1 |
+| `thin-premium-0.4-slack-6`: and an option needs 6 hours of slack | +32 (-89 to 150), 1, 5 | +78 (-110 to 269), 1, 3 |
+
+- The dearer quote under 680 drivers did not hold: 2 weeks not ranked against the reference's 1.
+- `thin-premium-0.4-slack-6` is the best rule for thin worlds. Over all 269 thin weeks against the reference: not
+  ranked 4 to 2, under 91% 17 to 5, under 92% 42 to 8, on time 94.4% to 95.4%, and no loss of margin. No rule rescues
+  `fresh-252` or `fresh-1123`.
+- The premium cost in every week (`premium-0.4`) made +146 (11 to 298) over 80 weeks of the seed lists, and then -72
+  (-264 to 118) on 56 new worlds with 720 drivers or more, where it put `fresh-089` (764 drivers) at 87.9% against the
+  reference's 90.9%. It is not kept outside thin weeks.
+- In those 56 worlds the reference itself has one week that is not ranked: `fresh-122`, 724 drivers, 89.7%. The risk
+  does not end at 720 drivers.
+
+## Slow cars and the backlog
+
+The gate of 15 keeps the desk from winning cars it cannot staff, and it also refuses good requests.
+[`scratch/gate_report.py`](scratch/gate_report.py) reads this from 327 saved weeks of the reference
+(58 worlds with 720 drivers or more, 269 with fewer).
+
+| Requests declined for backlog a week | Mean | Median | 9 in 10 weeks under | Highest | Weeks with none | Weeks with 100 or more |
+| --- | --- | --- | --- | --- | --- | --- |
+| 720 drivers or more | 23.4 | 6.5 | 89 | 184 | 41% | 9% |
+| under 720 drivers | 46.5 | 28 | 125 | 289 | 23% | 16% |
+
+- The declined requests are easy ones: 43 hours to find a driver on average, 14 to 16% with under 8
+  hours. The curve expects 14.5 euros from one (13.4 in a thin world) against 12.9 to 13.8 from the
+  requests the desk quotes. That is about 300 a week forgone, and 580 in a thin world, before the late
+  orders they would add.
+- The gate does protect something: orders won with 10 to 14 cars waiting are 5.7% late (7.0% in a
+  thin world) against 3.5% (4.7%) with 0 to 4.
+- Of the cars that fill the gate, 53% are not due for over a day, 27% have waited over 12 hours, 22%
+  have a pickup with under 10 drivers notified, 27 to 36% drive over 4 hours, 23 to 27% were dropped
+  by a driver before, 11 to 14% are premium cars, and 31 to 39% end late.
+
+**What makes a won car wait** (252 one-car orders a week):
+
+| By | Group | Booked within an hour | Median wait | Late |
+| --- | --- | --- | --- | --- |
+| Drivers notified of the pickup | 100 or more | 80% | 2 min | 3.0% |
+| | 10 to 39 | 70% | 12 min | 6.8% |
+| | none | 64% | 21 min | 10.5% |
+| Hours from the win to the last pickup minute | under 6 | 59% | | 18.7% |
+| | over 24 | | | 3.4% |
+| Drive | over 6.7 hours, 8 orders a week | 36% | 429 min | 18.3% |
+| Car | premium, 12.7 a week | 50% | 61 min | 16.5% |
+| | other | 76% | 5 min | 4.6% |
+| Day won | Friday | 57% | 32 min | 8.5% |
+| | Monday | 81% | 3 min | 3.4% |
+
+Supply and time decide it together: under 10 drivers and under 8 hours is 21.8% late, 40 drivers or
+more and under 8 hours 8.3%, 40 or more and over 24 hours 2.3%. The hour of the day matters little.
+On a Friday it is the deadline that bites: an order that must be collected that Friday with under 6
+hours is 24% late against 14% on Monday to Wednesday, and one that arrives on Friday for next week
+is 2.8% late.
+
+[`slow.py`](spreadlab/slow.py) turns this into the chance that a request's order ends late, from
+what the desk knows at the quote: the hours to find a driver, the drivers notified, a premium car,
+the drive beyond 4 hours, Friday, a note and the length of the driver list
+([`scratch/slow_fit.py`](scratch/slow_fit.py), a logistic fit over 94,000 won orders). On the weeks
+left out of the fit the orders it puts at 2 to 3% are 2.2% late, at 8 to 12% 10.6%, and at 12 to
+20% 18.2%. Half the orders are under 3% and one in eight is over 10%.
+
+**A price in place of the refusals.** With `slow_step`, each won car without a driver adds that
+much times the new request's late chance to the cost in its quote, in place of the flat
+`backlog_step`: a waiting car makes a risky request dearer and leaves a safe one alone, so the gate
+can be wider. `slow-step-gate-25` is the reference with `slow_step` 0.8, no `backlog_step` and the
+gate at 25. Against the reference on the same seeds, euros a week
+([`scratch/thin_report.py`](scratch/thin_report.py)):
+
+| Seeds | Margin | Orders, late a week | Weeks under 90% (reference) | Lowest week | Declined for backlog (reference) |
+| --- | --- | --- | --- | --- | --- |
+| first 10 tune seeds | +510 (28 to 1,061) | 304, 10.2 | 0 (0) | 94.7% | 8.6 (34.1) |
+| 10 holdout seeds and `fresh-001` to `fresh-020` | +674 (317 to 1,054) | 283, 10.7 | 0 (0) | 93.0% | 4.3 |
+| 96 worlds not chosen by driver count | +657 (455 to 864) | 301, 11.7 | 0 (1) | 90.9% | 5.4 (28.7) |
+| 38 thin worlds, the reference's lowest among them | +987 (588 to 1,393) | 280, 13.5 | 1 (5) | 86.4% | 6.0 (60.5) |
+
+The week at 90.9% (`fresh-053`) had 9 of its 20 Friday orders late, which is what the `"friday"`
+late model (`slow_model`) adds terms for. Variants on this base, on the first 10 tune seeds only:
+
+| Variant | What differs from `slow-step-gate-25` | Margin against the reference | Orders, late | Lowest week |
+| --- | --- | --- | --- | --- |
+| `slow-step-gate-40` | the gate at 40 | +687 (76 to 1,423) | 307, 10.5 | 94.7% |
+| `slow-step-gate-25-kinds` | quotes private pickups, private deliveries and trade-ins (`kinds`) | +1,171 (674 to 1,665) | 316, 10.4 | 95.5% |
+| `slow-step-gate-25-late-150` | `cost` 1.2 and `late_cost` 150: 150 euros times the late chance in every quote | +874 (436 to 1,367) | 310, 8.9 | 94.9% |
+| `slow-step-gate-25-friday-late-150` | the same with the Friday late model | +905 (368 to 1,537) | 312, 8.5 | 94.9% |
+
+The same on 40 seeds (10 tune, 10 holdout, `fresh-001` to `fresh-020`), where the reference makes
+10,445 with 259 orders and 11.5 late. No week of any row is under 91%.
+
+| Variant | Margin against the reference | Orders, late | Lowest week |
+| --- | --- | --- | --- |
+| `notes-limits` | +244 (-25 to 498) | 263, 9.6 | 92.2% |
+| `slow-step-gate-25` | +633 (339 to 941) | 288, 10.6 | 93.0% |
+| `slow-step-gate-40` | +740 (415 to 1,077) | 290, 10.7 | 93.0% |
+| `slow-step-gate-25-friday-late-150` | +1,063 (772 to 1,388) | 298, 8.9 | 93.0% |
+| `slow-step-gate-25-kinds` | +1,244 (955 to 1,531) | 300, 10.6 | 93.6% |
+| `slow-step-gate-25-kinds-limits` | +1,211 (856 to 1,544) | 300, 10.6 | 93.5% |
+| `slow-friday-late-150-kinds-limits`: the late cost, the Friday model, the kinds and the note limits | +1,479 (1,135 to 1,828) | 306, 9.8 | 92.3% |
+
+- On the reference's 10 lowest worlds `slow-step-gate-25-friday-late-150` makes +2,854 (1,942 to
+  3,929) with no week under 90% against 5, and a lowest week of 90.7%.
+- The kinds were a wash on the reference, because the gate handed their wins back; on the wider
+  gate they are not.
+- **Note limits** (`note_limits`, [`notes.limits`](spreadlab/notes.py)): the note's own deadline and
+  site hours count at the quote and in the posting. Against the revealed orders the reader finds 457
+  of 457 deadlines, 347 of 347 delivery hours and 609 of 610 pickup hours on 10,374 notes, and 57 of
+  57, 45 of 45 and 72 of 73 on 1,291 notes it was not written on. On the 40 seeds visits to a
+  closed site go from 1.7 a week to none and waits from 0.9 to 0.2, for +244 (-25 to 498) on the
+  reference. On top of the kinds the limits add nothing: -34 (-218 to 163)
+  ([`scratch/notes_effect.py`](scratch/notes_effect.py)). With the kinds, 18 of the first 80 weeks
+  failed: a private address has its own slot, and the desk posted a delivery window that ended
+  before it. That is fixed, and the 18 weeks are in the numbers above.
+- **`opt`** ([`optquote.py`](spreadlab/optquote.py)): the quote as one optimisation, with its own
+  fits of an order's cost and late chance and a belief about the world's price level. On the tune
+  seeds `opt-mu-0.2` makes +1,016 (623 to 1,416) with a lowest week of 92.4%, and
+  `opt-mu-0.3-lambda-100` +988 (527 to 1,556) with 379 orders, 12.6 late and a lowest week of 94.5%.
+  Its weights were fitted on saved weeks of 9 of those 10 seeds. On the 30 holdout and fresh seeds
+  `opt-mu-0.3-lambda-100` makes +997 (619 to 1,373) with 16.2 late orders a week and one week at
+  89.8%, and `opt-mu-0.2` +724 with two weeks under 90%. Its gate declines 51 requests a week
+  against 4 for `slow-step-gate-25`: its price hardly moves with the backlog, so the gate sets its
+  volume, and its late chance is too low for orders won with 16 or more cars waiting, which the
+  weeks it was fitted on do not have. Not a candidate as built.
+- **Offers to drivers who live at the destination** (`home_offers`) lose 86 to 152 a week on 40
+  seeds at fees of 0.8 to 1.0, with one week at 89.6%. Not kept.
+- `rescue-*` and `late-225-cost-1.19` switch a late cost on from a point of the week; they are there
+  for a comparison and are not candidates.
+
+None of these is the default. The default changes when a candidate has at most 3 weeks under 90% on
+each of two sets of 60 seeds that nothing else has played. [`scratch/search.py`](scratch/search.py)
+searches the parameters above together on 30 tune seeds; [`scratch/search_check.py`](scratch/search_check.py)
+plays its best trials on other seeds. After 25 trials, 11 of them played in full, its best point is
+of the same family (`search-16`: `slow_step` 0.8, the gate at 40, `cost` 1.22, a small late cost):
++1,192 with a lowest week of 93.6%. A late cost alone on the reference's backlog rules is worth +72.
 
 ## The final
 
@@ -466,6 +650,76 @@ requests with the policy, missed none while it ran and left 15 unquoted while it
 lost connections, at least 1.16 s left at a quote, and the week was ranked at 97.0% on time. An action took 10 ms
 there, 25 ms at the 99th percentile.
 
+### The note watcher (`--watch-notes`, off by default)
+
+[`watch.py`](spreadlab/watch.py) adds a second reader of the dealers' notes beside the desk. It needs
+`NVIDIA_API_KEY` in the environment; without it, only the log of new notes and drift runs. `NOTE_MODEL_URL`,
+`NOTE_MODEL`, `NOTE_MODEL_KEY` (the name of the variable with the key) and `NOTE_MODEL_RPM` point it at another
+OpenAI-compatible endpoint, such as a dedicated container without the free tier's limit; only Lightning on
+NVIDIA's endpoint has been measured.
+
+```bash
+uv run python -m spreadlab.live final --watch-notes                          # the same desk, with the note watcher
+uv run python -m spreadlab.watch review <world id>                           # the notes the model said the rules missed, by fact
+uv run python -m spreadlab.watch check "Registration tags are off, bring your own."   # one note: the rules, the model, the fix
+```
+
+- **The check.** For each won order with a note, Nemotron 3.5 Lightning gets the note, what the request states
+  (pickup window, both sites' hours, the deadline) and what `notes.read` made of it. It answers yes or no: did the rules capture every operational fact in the note? On a no it names each
+  missing or wrong fact. A no counts only when the fact it names would change what the desk knows. A no that names
+  only "other" goes to the review queue, not as a no: the model puts spare tyres and parked cars there.
+- **Safe fixes only.** The desk applies plates, a manual licence and a ready time later than the rules read, never
+  earlier. A later ready time must also be a clock time that the rules find in the note, in a sentence that is not
+  about the delivery or a closing site: the model calls "the customer collects at 12, the car must be there by
+  then" a ready time. Deadlines, opening hours and summer tyres are logged, not acted on.
+- **The first post waits, briefly.** A driver often books a gig within a world minute or two of its post, and a
+  booked gig cannot be withdrawn. So the car's first post waits for the answer, at most 1.5 s and 5 world minutes;
+  then it goes with the rules' reading. A later no withdraws the gig, alone and first, and posts the cars whose gig
+  left the app again; when a driver holds the gig, the fix waits for the car's next post, a retry after a failed visit.
+- **Never in the way of a quote.** The model runs on a thread of its own, 30 calls a minute at most, with a 6-second
+  timeout and retries when the free tier answers 429. A check that has waited 2 minutes is dropped. A call that
+  fails leaves the rules' post as it is. The books on disk keep the fixes and the notes still to check, so a desk
+  that starts again checks those whose cars no driver holds yet.
+- **The review queue.** Every no goes to `review.jsonl` in the world's folder with the note, the rules' reading and
+  the model's answer. `report` and the end of the week print it by fact. It is what `notes.py` should learn next:
+  in practice weeks, hand it to whoever extends the rules.
+- **New notes and drift.** The thread also scores each request's note against the words and digit-masked sentence
+  patterns of the archive's 202,579 notes ([`note-vocab.json`](spreadlab/note-vocab.json), built by
+  `python -m spreadlab.watch build`). A word that is more than one typo from a known word, or a new sentence, goes
+  to the log as `note_new`. It counts the share of the last 200 notes that mention a ready time, a closing time, a
+  limit ("by", "ennen"), the delivery, opening hours, plates, a manual car, summer tyres or something new. When a
+  share is more than twice the archive's, at 4 standard deviations or more, it prints a line and logs `note_drift`.
+  In 60 archive weeks held out from the rest, 11% of notes have a word or sentence pattern that the other weeks lack.
+
+What the rules leave out, by the reveal of every won note with one car in the archive (24,595 notes in 186
+weeks, `scratch/llm-notes/verify.py misses`): 16.4% of the readings are incomplete. The note's deadline is missing
+on 5.96%, pickup hours or a closing time on 5.91%, delivery hours on 3.33% and summer tyres on 1.18%. Ready times
+(6 notes) and manual gearboxes (8) are read wrong almost never, and plates never.
+
+What the check found offline against the reveal ([`verify.py`](scratch/llm-notes/verify.py), the prompt of the
+live desk). It ran on 150 won notes drawn at random and on 124 notes of the study's sample: every third, and the 14 that
+the rules misread:
+
+| | Random notes | Study sample |
+| --- | --- | --- |
+| A no on a complete reading, as the model says it | 39% (48 of 124) | 27% (16 of 60) |
+| A no on a complete reading, counted as the desk counts it | 4.8% (6 of 124), and 21% more that name only "other" | 8.3% (5 of 60), and 10% more |
+| A no on an incomplete reading | 73% (19 of 26) | 65% (41 of 63) |
+| Safe fixes made: mend, break | none | 7 (5 ready times, 2 manual gearboxes), 0 |
+
+Most false no's name spare tyres in the boot ("other", or "summer tyres"). Before the checks of the note's own
+words, the safe fixes broke three readings on these notes. They added plates to a note about spare tyres, took
+"the customer collects at 12" for a ready time, and read "huomenna" as the day after tomorrow. A call took 0.4 s
+at the median and 1.6 s at the 95th percentile. On this day, though, the free key, which the team's other projects
+also use, refused half of all calls with 429: 552 calls for 273 answers.
+
+On replays of `fresh-003` from Thursday, with every fourth won order given a note in words that the rules miss
+(`replay.py --watch-notes --inject 4`), the watcher found every injected fact that got an answer: plates, a
+manual gearbox, a later ready time. All 386 requests were still quoted by the policy, with at least 4.47 s left.
+Of 19 held first posts, 9 went with the answer and 10 with the rules when it was late, the longest after 1.51 s.
+With the watcher on and no model, `fresh-001` at ten times the final's speed matched the recording in every quote
+and every gig.
+
 ## Rules for policy code
 
 The final is one secret week. A policy may use only what the live system sees at that minute: the
@@ -489,7 +743,9 @@ request, the driver list, the map and its own history in the week.
 - [`scan.py`](spreadlab/scan.py), [`catalogue.py`](spreadlab/catalogue.py): the scans, the table of what each week shows, and the seed lists.
 - [`policy.py`](spreadlab/policy.py), [`variants.py`](spreadlab/variants.py): the policy on top of the kit's starter desk, and the named variants.
 - [`curve.py`](spreadlab/curve.py), [`curve.json`](spreadlab/curve.json), [`curve-day.json`](spreadlab/curve-day.json): the win curve, its best price and its live shift, and the fitted weights.
-- [`notes.py`](spreadlab/notes.py): what a dealer's note says about the first posting.
+- [`notes.py`](spreadlab/notes.py): what a dealer's note says about the first posting, and its own deadline and site hours.
+- [`slow.py`](spreadlab/slow.py): the chance that an order ends late, from what the desk knows at the quote.
+- [`optquote.py`](spreadlab/optquote.py), [`optquote.json`](spreadlab/optquote.json): the quote as one optimisation (`opt`), and its fitted weights.
 - [`lanes.json`](spreadlab/lanes.json): the lanes' usual driver fees, for `lane_fee`.
 - [`play.py`](spreadlab/play.py), [`sweep.py`](spreadlab/sweep.py), [`report.py`](spreadlab/report.py): play, compare.
 - [`ledger.py`](spreadlab/ledger.py): mistakes by variant and situation.
