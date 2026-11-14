@@ -8,7 +8,10 @@ is set beside play's:
 - keep or reject: an arm is kept when its margin gain over the baseline has a 95% interval above zero and it has at most 1 week
   under 90% on time in 60 (a week under 90% counts as no margin);
 - the gain itself: correlation, rank correlation, the slope of the played gain on the stand-in's, and the typical miss;
-- weeks under 90% and under 92% on time, counts against counts.
+- weeks under 90% and under 92% on time, counts against counts;
+- the similarity score. Ranking: of the policy pairs that play decides (the played difference's 95% interval excludes zero), the share
+  the stand-in ranks the same way. Week by week, for the same policy and seed: the error of the margin, the orders and the on-time
+  share, and the correlation of the margin. The base policy's own weeks are left out of the week-by-week numbers.
 Natural and thin worlds (under 720 drivers listed) are reported apart. Fit the weights with `--hold-out` on the same seed prefix
 (fit.py), or the check is not held out.
 """
@@ -77,10 +80,18 @@ def corr(a: list[float], b: list[float]) -> float:
 
 def score(checks: list[dict], sim: dict, draws: int) -> dict:
     """`sim`: (arm, seed, base) -> [week of each draw]."""
-    rows = []
+    rows, weeks = [], {}
     for check in checks:
         arm, baseline = check["arm"], check["baseline"]
         played = {s: (run.played_week(arm, s), run.played_week(baseline, s)) for s in check["seeds"]}
+        for n, name in enumerate((arm, baseline)):  # each played week beside the stand-in's week of the same policy and seed
+            for s in check["seeds"]:
+                ws = sim.get((name, s, baseline), [])
+                if len(ws) == draws and not (name == baseline and (name, s, baseline) in weeks):
+                    p = played[s][n]
+                    weeks[(name, s, baseline)] = {"policy": name, "seed": s, "base": baseline, "drivers": p["drivers"], "own_base": name == baseline,
+                                                  **{f"played_{k}": p[k] for k in ("margin", "orders", "late", "on_time")},
+                                                  **{f"sim_{k}": sum(w[k] for w in ws) / draws for k in ("margin", "orders", "late", "on_time")}}
         for group, keep in GROUPS.items():
             seeds = [s for s in check["seeds"] if keep(played[s][0]["drivers"]) and len(sim.get((arm, s, baseline), [])) == draws and len(sim.get((baseline, s, baseline), [])) == draws]
             if len(seeds) < 10:
@@ -106,6 +117,12 @@ def score(checks: list[dict], sim: dict, draws: int) -> dict:
         sel = [r for r in rows if group == "all" or r["group"] == group]
         if not sel:
             continue
+        # Week by week, the policies that are not the base: the base's own played week is what the stand-in measured its market from.
+        wk = [w for w in weeks.values() if not w["own_base"] and (group == "all" or GROUPS[group](w["drivers"]))]
+        err = lambda k: [w[f"sim_{k}"] - w[f"played_{k}"] for w in wk]
+        mae = lambda k: sum(map(abs, err(k))) / max(1, len(wk))
+        bias = lambda k: sum(err(k)) / max(1, len(wk))
+        decided = [r for r in sel if r["played_interval"][0] > 0 or r["played_interval"][1] < 0]
         p, s = [r["played_gain"] for r in sel], [r["sim_gain"] for r in sel]
         var_s = sum((x - sum(s) / len(s)) ** 2 for x in s)
         weeks = sum(r["seeds"] for r in sel)
@@ -115,6 +132,12 @@ def score(checks: list[dict], sim: dict, draws: int) -> dict:
             "kept_by_play": sum(r["played_keep"] for r in sel), "kept_by_both": sum(r["played_keep"] and r["sim_keep"] for r in sel),
             "kept_by_sim_only": sum(r["sim_keep"] and not r["played_keep"] for r in sel), "kept_by_play_only": sum(r["played_keep"] and not r["sim_keep"] for r in sel),
             "sign_agree": sum((a > 0) == (b > 0) for a, b in zip(p, s)) / len(sel),
+            # The headline: of the policy pairs that play decided (the played difference's 95% interval excludes zero), the share the stand-in ranks the same way.
+            "decided": len(decided), "ranking_agree": sum((r["played_gain"] > 0) == (r["sim_gain"] > 0) for r in decided) / len(decided) if decided else float("nan"),
+            "week_n": len(wk), "week_margin_mae": mae("margin"), "week_margin_bias": bias("margin"), "week_margin_corr": corr([w["played_margin"] for w in wk], [w["sim_margin"] for w in wk]),
+            "week_margin_mean": sum(w["played_margin"] for w in wk) / max(1, len(wk)),
+            "week_orders_mae": mae("orders"), "week_orders_bias": bias("orders"), "week_orders_corr": corr([w["played_orders"] for w in wk], [w["sim_orders"] for w in wk]),
+            "week_on_time_mae": mae("on_time"), "week_on_time_bias": bias("on_time"), "week_on_time_corr": corr([w["played_on_time"] for w in wk], [w["sim_on_time"] for w in wk]),
             "gain_corr": corr(p, s), "gain_rank_corr": corr(rank(p), rank(s)),
             "slope": sum((x - sum(s) / len(s)) * (y - sum(p) / len(p)) for x, y in zip(s, p)) / var_s if var_s else float("nan"),
             "gain_rmse": math.sqrt(sum((a - b) ** 2 for a, b in zip(p, s)) / len(sel)), "gain_bias": sum(b - a for a, b in zip(p, s)) / len(sel),
@@ -124,7 +147,7 @@ def score(checks: list[dict], sim: dict, draws: int) -> dict:
             "late_corr": corr([r["played_late"] for r in sel], [r["sim_late"] for r in sel]), "orders_corr": corr([r["played_orders"] for r in sel], [r["sim_orders"] for r in sel]),
             "arm_late_ratio": sum(r["sim_arm_late"] * r["seeds"] for r in sel) / max(1e-9, sum(r["played_arm_late"] * r["seeds"] for r in sel)),
         }
-    return {"rows": rows, "summary": summary}
+    return {"rows": rows, "summary": summary, "weeks": list(weeks.values())}
 
 
 def report(scored: dict) -> list[str]:
@@ -136,6 +159,10 @@ def report(scored: dict) -> list[str]:
                      f"{r['played_arm_late']:5.1f}/{r['sim_arm_late']:<5.1f}")
     for group, s in scored["summary"].items():
         lines.append(f"\n{group}: {s['checks']} checks, {s['weeks']} played weeks of the arms")
+        lines.append(f"  SIMILARITY, ranking: of {s['decided']} policy pairs that play decides, the stand-in ranks {s['ranking_agree']:.0%} the same way (all {s['checks']} pairs: {s['sign_agree']:.0%})")
+        lines.append(f"  SIMILARITY, week by week ({s['week_n']} weeks, same policy and seed): margin off by {s['week_margin_mae']:.0f} on average ({s['week_margin_mae'] / max(1, s['week_margin_mean']):.0%} of {s['week_margin_mean']:.0f}), "
+                     f"bias {s['week_margin_bias']:+.0f}, correlation {s['week_margin_corr']:.2f}; orders off by {s['week_orders_mae']:.1f}, bias {s['week_orders_bias']:+.1f}, correlation {s['week_orders_corr']:.2f}; "
+                     f"on-time share off by {100 * s['week_on_time_mae']:.1f} points, bias {100 * s['week_on_time_bias']:+.1f}, correlation {s['week_on_time_corr']:.2f}")
         lines.append(f"  keep or reject agrees in {s['verdict_agree']:.0%}; play keeps {s['kept_by_play']}, both keep {s['kept_by_both']}, only the stand-in keeps {s['kept_by_sim_only']}, only play keeps {s['kept_by_play_only']}")
         lines.append(f"  the gain's sign agrees in {s['sign_agree']:.0%}; correlation {s['gain_corr']:.2f}, rank correlation {s['gain_rank_corr']:.2f}, played gain per unit of stand-in gain {s['slope']:.2f}, "
                      f"typical miss {s['gain_rmse']:.0f}, stand-in minus played {s['gain_bias']:+.0f}")

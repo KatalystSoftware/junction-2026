@@ -15,7 +15,7 @@ AGES = [0, 2, 5, 15, 60, 180, 720]            # minutes since the gig opened (or
 HOURS = [0, 6, 9, 12, 16, 19, 23]             # the hour of the day; 23 to 6 is the night
 LEFT = [-10**9, 0, 180, 480, 1440, 2880]      # minutes to the last pickup that is on time
 NAMES = ([f"age {a}+" for a in AGES[1:]] + [f"hour {h}+" for h in HOURS[1:]] + [f"left {x}+" for x in LEFT[1:]]
-         + ["ln fee", "ln fee, first 15 min", "ln fee squared", "rise left", "ready tomorrow", "ready later", "ln notified", "ln at delivery", "ln drivers/800",
+         + ["ln fee", "ln fee early", "ln fee squared", "rise left", "ready tomorrow", "ready later", "ln notified", "ln at delivery", "ln drivers/800",
             "ln drive/120", "experienced only", "manual only", "two cars", "private", "after a drop", "posted again", "ln order age h", "ln crowd",
             "saturday", "sunday", "last monday on", "wave day", "cannot be on time"])
 

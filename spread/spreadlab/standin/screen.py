@@ -1,0 +1,109 @@
+"""Screens policy variants on the stand-in before they bid for practice worlds: each arm and the baseline play the same saved
+seeds offline, and the result is one row a week and a summary with natural and thin worlds apart.
+
+    python -m spreadlab.standin.screen --arms my-variant other-variant [--baseline fee16-80-q24-wide-pairs-0.6-return-0.75] --out out
+
+The seeds are those the default desk has a played week on (`seeds-natural.txt`, 114 worlds with 720 drivers or more, and
+`seeds-thin.txt`, 92 with fewer); each seed's market is measured on that played week. Arms are names in variants.py of the
+checkout that runs this, so a lane's branch screens its own desk code. Nothing here reaches Bahn's server or needs the team key.
+
+`out/rows.csv` has a row for each arm, seed and draw; `out/summary.md` has, for each group, the margin a week (a week under 90% on
+time counts as none), the paired gain over the baseline with a 95% interval, orders, late orders, the on-time share and the weeks
+under 90% and 92%, and a verdict for each arm. README.md says how far these numbers were from play on held-out checks.
+"""
+from __future__ import annotations
+
+import argparse
+import csv
+import json
+import os
+import time
+from pathlib import Path
+
+from ..variants import VARIANTS
+from . import run
+
+HERE = Path(__file__).parent
+MERGE_1 = "fee16-80-q24-wide-pairs-0.6-return-0.75"
+DEFAULT = "slow-friday-late-150-kinds-limits"
+COLUMNS = ["variant", "seed", "draw", "group", "drivers", "orders", "late", "on_time", "margin", "ranked_margin", "late_booked_after_last_pickup", "gigs", "bookings", "drops",
+           "expired_gigs", "refused", "wave_days", "revenue", "driver_fees", "late_refunds"]
+
+
+def verdict(rows: dict, arm: str, first: str) -> tuple[str, list[str]]:
+    """PASS when the arm gains on natural worlds (95% interval above zero), does not lose on thin ones (interval not below zero) and has
+    at most 1 week in 60 under 90% in each group; else the reasons. On thin worlds the stand-in sees about a third of play's weeks under
+    90% (README.md), so a thin group with more weeks under 92% than the baseline's is named too."""
+    reasons, notes = [], []
+    for group, thin in (("natural", False), ("thin", True)):
+        seeds = [s for s, ws in rows[arm].items() if (ws[0]["drivers"] < run.THIN) == thin and s in rows[first]]
+        if not seeds:
+            continue
+        gains = [sum(run.ranked(a) - run.ranked(b) for a, b in zip(rows[arm][s], rows[first][s])) / len(rows[arm][s]) for s in seeds]
+        lo, hi = run.interval(gains)
+        weeks = [w for s in seeds for w in rows[arm][s]]
+        base = [w for s in seeds for w in rows[first][s]]
+        under = 60 * sum(w["on_time"] < 0.90 for w in weeks) / len(weeks)
+        if not thin and lo <= 0:
+            reasons.append(f"no gain on natural worlds ({sum(gains) / len(gains):+.0f}, {lo:+.0f} to {hi:+.0f})")
+        if thin and hi < 0:
+            reasons.append(f"loses on thin worlds ({sum(gains) / len(gains):+.0f}, {lo:+.0f} to {hi:+.0f})")
+        if under > 1.0:
+            reasons.append(f"{under:.1f} weeks in 60 under 90% on {group} worlds")
+        if thin and sum(w["on_time"] < 0.92 for w in weeks) > sum(w["on_time"] < 0.92 for w in base) + len(weeks) / 30:
+            notes.append(f"more thin weeks under 92% than the baseline ({sum(w['on_time'] < 0.92 for w in weeks)} against {sum(w['on_time'] < 0.92 for w in base)} of {len(weeks)})")
+    return ("FAIL" if reasons else "PASS"), reasons + notes
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--arms", nargs="+", required=True, help="names in variants.py")
+    parser.add_argument("--baseline", default="", help=f"default: {MERGE_1}, or {DEFAULT} where variants.py lacks it")
+    parser.add_argument("--sets", nargs="+", default=["natural", "thin"], help="natural, thin, or files with a seed a line")
+    parser.add_argument("--limit", type=int, default=0, help="at most this many seeds a set")
+    parser.add_argument("--draws", type=int, default=1)
+    parser.add_argument("--jobs", type=int, default=os.cpu_count() or 2)
+    parser.add_argument("--design", default="{}")
+    parser.add_argument("--weights", default=str(run.WEIGHTS))
+    parser.add_argument("--out", default="out")
+    args = parser.parse_args()
+    first = args.baseline or (MERGE_1 if MERGE_1 in VARIANTS else DEFAULT)
+    names = list(dict.fromkeys([first] + [a for name in args.arms for a in name.split(",") if a]))
+    missing = [n for n in names if n not in VARIANTS]
+    if missing:
+        raise SystemExit(f"Not in this checkout's variants.py: {missing}")
+    seeds: list[str] = []
+    for name in args.sets:
+        path = HERE / f"seeds-{name}.txt" if name in ("natural", "thin") else Path(name)
+        found = [line.strip() for line in path.read_text().splitlines() if line.strip()]
+        seeds += found[: args.limit] if args.limit else found
+    seeds = list(dict.fromkeys(seeds))
+    started = time.time()
+    out = run.run({n: VARIANTS[n] for n in names}, seeds, DEFAULT, json.loads(Path(args.weights).read_text()), json.loads(args.design), args.draws, args.jobs)
+    rows, folder = out["results"], Path(args.out)
+    folder.mkdir(parents=True, exist_ok=True)
+    with open(folder / "rows.csv", "w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(COLUMNS)
+        for arm in names:
+            for seed, weeks in rows[arm].items():
+                for draw, w in enumerate(weeks):
+                    writer.writerow([arm, seed, draw, "thin" if w["drivers"] < run.THIN else "natural", w["drivers"], w["orders"], w["late"], round(w["on_time"], 4), round(w["margin"]),
+                                     round(run.ranked(w)), w["late_after"], w["gigs"], w["booked"], w["dropped"], w["expired"], w["refused"], " ".join(map(str, w["wave"])),
+                                     round(w["ledger"].get("revenue", 0)), round(-w["ledger"].get("driver_fee", 0)), round(-w["ledger"].get("late_refund", 0))])
+    lines = [f"# Stand-in screen: {', '.join(names[1:])} against {first}", "",
+             f"{len(seeds)} seeds, {args.draws} draw(s), {time.time() - started:.0f} s on {args.jobs} cores. Stand-in weeks, not played ones: read README.md of spreadlab/standin for how far to trust them.", ""]
+    for arm in names[1:]:
+        result, why = verdict(rows, arm, first)
+        lines.append(f"- **{arm}: {result}**" + (": " + "; ".join(why) if why else ""))
+    lines += ["", "```"] + run.table(rows, names) + ["```"]
+    if out["errors"]:
+        lines += ["", f"{len(out['errors'])} weeks failed and are left out, with their seed in every arm:", "```"] + [f"{a} {s} draw {d}: {e.splitlines()[0]}" for a, s, d, e in out["errors"][:10]] + ["```"]
+    (folder / "summary.md").write_text("\n".join(lines) + "\n")
+    print("\n".join(lines))
+    if out["errors"]:
+        print(out["errors"][0][3])
+
+
+if __name__ == "__main__":
+    main()

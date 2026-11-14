@@ -35,7 +35,9 @@ M = curve.MODELS["day"]
 # The odds of the kinds of request that the curve was not fitted on, as the default desk takes them (variants.KINDS).
 KIND_ODDS = {"private_pickup": 0.06, "private_delivery": 0.37, "trade_in": 0.27}
 DESIGN = {
-    "react": 0.6,        # the competitor's answer to the desk's share at a dealer the day before, in log price per unit of share
+    # The competitor's answer to the desk's share at a dealer the day before, in log price per unit of share. 0: on the held-out paired
+    # checks the gains are nearest to play's without it (0.6, scratch/opt's fit, reads them about 700 a week too far from play's).
+    "react": 0.0,
     "anchor": 1.0,       # how far each day's own booking speed, measured on the base week, moves the fitted chance (0 is not at all)
     "level_sd": 0.3,     # how far a day's level can be from the curve, in log price, when it is measured on the base week
     "wave": 1.0,         # multiplies the share of the due bookings dropped on the wave night
@@ -149,7 +151,7 @@ class StandIn:
         self.level = {day: curve.shift(answers, sd, M["slope"]) + self.d["rival"] for day, answers in self.base.get("answers", {}).items()}
         self.beta = [weights["weights"][name] for name in model.NAMES]
         i = model.NAMES.index
-        for name in ("ln fee", "ln fee, first 15 min", "ln fee squared"):
+        for name in ("ln fee", "ln fee early", "ln fee squared"):
             self.beta[i(name)] *= self.d["fee_gain"]
         self.beta[i("ln crowd")] *= self.d["crowd_gain"]
         self.offset = weights["intercept"] + self.d["hazard"]

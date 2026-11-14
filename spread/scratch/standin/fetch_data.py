@@ -1,4 +1,5 @@
 """Downloads the packed weeks of a release of this repository and unpacks them (CI only; the job's own token reads the release).
+Every asset of the release is a tar of the data folder; a later asset adds to the earlier ones.
 
     python3 scratch/standin/fetch_data.py <tag> <folder>
 """
