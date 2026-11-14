@@ -125,7 +125,9 @@
 	function cell(column: string, x: string | number | null): { text: string; cls: string; note?: string } {
 		if (x === null) return { text: 'NULL', cls: 'null' }
 		if (typeof x === 'number') return { text: Number.isInteger(x) ? String(x) : x.toFixed(4), cls: 'num' }
-		if (/^\d{4}-\d\d-\d\dT/.test(x)) return { text: x.replace('T', ' '), cls: 'when', note: column === 'row_end' && x.startsWith('2106-') ? 'current' : undefined }
+		// MariaDB keeps a current row's row_end at the largest TIMESTAMP; it means the row is still current.
+		if (column === 'row_end' && x.startsWith('2106-')) return { text: 'still current', cls: 'when', note: '(2106-02-07, the largest TIMESTAMP)' }
+		if (/^\d{4}-\d\d-\d\dT/.test(x)) return { text: x.replace('T', ' '), cls: 'when', }
 		return { text: x, cls: x.length > 40 ? 'txt' : '' }
 	}
 </script>
@@ -202,7 +204,8 @@
 				{@const v = values[preset.name]}
 				{@render statement(sent ? sent.sql.map((q) => q.query.trim()).join(';\n\n') : preview(preset.name, v) || preset.description)}
 				<form onsubmit={run}>
-					{#each preset.params as x}
+					<!-- asof's finding is set by "Check in MariaDB", not typed. -->
+					{#each preset.params.filter((x) => !(preset.name === 'asof' && x.kind === 'finding')) as x}
 						<div class="cdx-field">
 							<div class="cdx-label">
 								<label class="cdx-label__label" for="sql-{x.name}"><span class="cdx-label__label__text">{LABEL[x.name] ?? x.name}</span></label>

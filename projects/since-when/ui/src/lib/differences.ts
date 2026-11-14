@@ -117,7 +117,11 @@ function headline(primary: Finding, title: string): { who: string; what: string 
 	const w = word(primary)
 	if (w) return { who: '', what: `“${w.term}”` }
 	const first = [...primary.summary.matchAll(SUBJECT)][0]?.[1]
-	const clause = first && clauses(primary.summary)?.[byName(first)]
+	const both = clauses(primary.summary)
+	const clause = first && both?.[byName(first)]
+	// Both sides, so the headline does not tell one edition's alone.
+	const other = first && both && LANGS.find((l) => l !== byName(first) && both[l])
+	if (clause && other) return { who: first, what: `${clause}; ${NAMES[other]} ${both![other]}` }
 	if (clause) return { who: first, what: clause }
 	const cut = title
 		.split(/[:;]|,? (?:while|whereas|but|contradicting) /)[0]

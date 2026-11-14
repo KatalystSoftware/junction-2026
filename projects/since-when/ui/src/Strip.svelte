@@ -117,8 +117,12 @@
 		white-space: nowrap;
 	}
 
+	/* A taller target for a finger than the line it sits on. */
 	.since a {
 		pointer-events: auto;
+		display: inline-block;
+		padding: 6px 0;
+		margin: -6px 0;
 	}
 
 	@media (max-width: 640px) {

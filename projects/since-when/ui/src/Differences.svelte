@@ -233,12 +233,6 @@
 		transform: none;
 	}
 
-	/* The first difference is open on arrival and has a wide first screen to itself. */
-	@media (min-width: 641px) {
-		.rows > :global(.row:first-child:has(> details[open])) {
-			min-height: 35rem;
-		}
-	}
 
 	.rest {
 		margin-top: var(--spacing-100);

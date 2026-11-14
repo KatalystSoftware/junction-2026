@@ -70,7 +70,7 @@
 			{#if !began.known && !d.primary.began}<p class="line small" title="No earlier version was compared">In the current text</p>{/if}
 			{#if check}
 				{@const e = check.evidence}
-				<Why id="why-check-{Math.abs(d.id)}{d.id < 0 ? 'n' : ''}" label="Checked">
+				<Why id="why-check-{Math.abs(d.id)}{d.id < 0 ? 'n' : ''}" label="Checked by Nemotron">
 					{modelName(check.judge)} read {check.read ?? 'the nearest'} of {check.searched ?? 'the'} passages of the other article on {day(check.as_of)}{#if e?.quote}
 						and settled on this in {NAMES[e.lang]}: <q lang={e.lang}>{e.quote}</q>
 						{#if e.rev_id}(<a href={revisionUrl(e.lang, e.rev_id, e.section)} target="_blank" rel="noopener">{sectionLabel(e.section ?? '')}, revision {e.rev_id}</a>){/if}{/if}.
@@ -162,8 +162,8 @@
 
 	.row > details[open] > summary .cdx-accordion__header__title {
 		font-family: var(--font-family-serif);
-		font-size: var(--font-size-xxx-large);
-		line-height: var(--line-height-xxx-large);
+		font-size: var(--font-size-x-large);
+		line-height: var(--line-height-x-large);
 		color: var(--color-emphasized);
 		text-wrap: balance;
 	}
