@@ -13,7 +13,8 @@ thing:
             reported, with other evidence. Listed with -v, to be judged by hand
     gone    nothing like it
 
-Two quotes are the same when they share at least half of the shorter one's words. Per type the
+Two quotes are the same when they share at least six in ten of the shorter one's words of three
+letters or more. Per type the
 table counts, of the rows the hand check called false, how many are gone, and of the rows it
 called real, how many are kept: a real row that is gone is as bad as a false one that is kept.
 The label file's `recheck` entries (labels a search of the stored article contradicts) are applied
@@ -30,13 +31,14 @@ HERE = Path(__file__).resolve().parent
 
 
 def words(text):
-    return set(re.findall(r"\w+", (text or "").lower()))
+    """The words of three letters or more: "at", "on", "of" and "in" alone made a short quote match a long one."""
+    return set(re.findall(r"\w{3,}", (text or "").lower()))
 
 
 def same(x, y):
-    """Whether two quotes share at least half of the shorter one's words."""
+    """Whether two quotes share at least six in ten of the shorter one's words."""
     a, b = words(x), words(y)
-    return bool(a and b) and len(a & b) / min(len(a), len(b)) >= 0.5
+    return bool(a and b) and len(a & b) / min(len(a), len(b)) >= 0.6
 
 
 def sides(row):

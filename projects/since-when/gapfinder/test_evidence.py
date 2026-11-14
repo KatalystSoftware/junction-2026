@@ -25,7 +25,7 @@ class Terms(unittest.TestCase):
         self.assertEqual(len(evidence.terms("SAJ julisti 16. marraskuuta 1929 yleislakon")), 2)   # the date and the year
 
     def test_a_number_matches_whatever_separates_its_thousands(self):
-        for text in ("12 600 miestä", "12,600 men", "12.600 man", "12 600 miestä", "12600"):
+        for text in ("12 600 miestä", "12,600 men", "12.600 man", "12\u00a0600 miestä", "12600"):
             self.assertEqual(matches("samla omkring 12 600 utvalda män", text), 1, text)
         self.assertEqual(matches("samla omkring 12 600 utvalda män", "112 600 or 12 6000"), 0)
         self.assertEqual(matches("noin 8000 miehen", "about 8,000 men"), 1)

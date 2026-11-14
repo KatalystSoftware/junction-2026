@@ -35,7 +35,7 @@ def searched(claim, *texts):
 
 def verdict(v, quote="", passage=None, difference="none"):
     return {"verdict": v, "difference": difference, "about": "a", "evidence_about": "e", "note": "The note.",
-            "quote": quote, "passage": passage}
+            "quote": quote, "passage": passage, "figures": None}
 
 
 class Sentences(unittest.TestCase):
@@ -67,24 +67,51 @@ class Judge(unittest.TestCase):
         return searched(c, "Another passage.", EN)
 
     def ask(self, answer):
-        return mock.patch.object(claims, "_ask", lambda kind, messages, schema, cfg, valid: answer)
+        return mock.patch.object(claims, "_ask", lambda kind, messages, schema, cfg, valid: {"verdicts": [dict(answer, claim=1)]})
+
+    def judge(self):
+        return claims.judge([self.claim()], ("url", "key", "m"))[0]
 
     def test_the_quote_is_found_in_another_passage_than_the_one_named(self):
         with self.ask({"verdict": "contradicted", "difference": "figure", "passage": 1, "quote": "about 12,000 men",
                        "about": "a", "evidence_about": "e", "note": "n"}):
-            v = claims.judge(self.claim(), ("url", "key", "m"))
+            v = self.judge()
         self.assertEqual((v["verdict"], v["quote"], v["passage"]["chunk_id"]), ("contradicted", "about 12,000 men", 31))
 
     def test_a_verdict_without_a_quote_in_the_passages_is_unchecked(self):
         with self.ask({"verdict": "supported", "difference": "none", "passage": 2, "quote": "12,600 men marched",
                        "about": "a", "evidence_about": "e", "note": "n"}):
-            self.assertEqual(claims.judge(self.claim(), ("url", "key", "m"))["verdict"], "unchecked")
+            self.assertEqual(self.judge()["verdict"], "unchecked")
+
+    def test_the_two_figures_decide_between_supported_and_contradicted(self):
+        answer = {"verdict": "supported", "difference": "none", "passage": 2, "quote": "about 12,000 men",
+                  "claim_figure": "12 600", "evidence_figure": "about 12,000", "about": "a", "evidence_about": "e", "note": "n"}
+        with self.ask(answer):
+            v = self.judge()
+        self.assertEqual((v["verdict"], v["difference"], v["figures"]["agree"], v["figures"]["model"]),
+                         ("contradicted", "figure", False, "supported"))
+        with self.ask(dict(answer, verdict="contradicted", difference="figure", claim_figure="12 400")):
+            self.assertEqual(self.judge()["verdict"], "supported")
+        with self.ask(dict(answer, claim_figure="some twelve thousand")):   # not read: the model's verdict stands
+            self.assertEqual(self.judge()["verdict"], "supported")
 
     def test_not_mentioned_needs_no_quote(self):
         with self.ask({"verdict": "not_mentioned", "difference": "none", "passage": 0, "quote": "",
                        "about": "a", "evidence_about": "", "note": "n"}):
-            v = claims.judge(self.claim(), ("url", "key", "m"))
+            v = self.judge()
         self.assertEqual((v["verdict"], v["quote"], v["passage"]), ("not_mentioned", "", None))
+
+    def test_claims_of_one_passage_share_a_call_and_a_claim_left_out_is_unchecked(self):
+        rows = [row("missing_fact", "12 600 miestä", "", "en"), row("missing_fact", "Se päättyi Senaatintorille", "", "en"),
+                row("missing_fact", "", "It ended at Senate Square", "fi")]
+        cs = [searched(c, "Another passage.", EN if c["target_lang"] == "en" else FI) for c in claims.row_claims(pair(), rows)]
+        self.assertEqual(claims.groups(cs), [[0, 1], [2]])
+        self.assertEqual(claims.groups(cs, size=1), [[0], [1], [2]])
+        answer = {"verdicts": [{"claim": 2, "verdict": "supported", "difference": "none", "passage": 2,
+                                "quote": "It ended at Senate Square", "about": "a", "evidence_about": "e", "note": "n"}]}
+        with mock.patch.object(claims, "_ask", lambda kind, messages, schema, cfg, valid: answer):
+            got = claims.judge(cs[:2], ("url", "key", "m"))
+        self.assertEqual([v["verdict"] for v in got], ["unchecked", "supported"])
 
 
 class Findings(unittest.TestCase):
@@ -116,6 +143,31 @@ class Findings(unittest.TestCase):
                          ("numbers", "Q1:2026-11-14:fi:10:en:31", "12 600 miestä", "about 12,000 men", "The note."))
         self.assertEqual((kept[0]["evidence"]["lang"], kept[0]["evidence"]["quote"], kept[0]["claim"]["lang"]),
                          ("en", "about 12,000 men", "fi"))
+
+    def test_a_contradiction_needs_the_other_side(self):
+        rows = [row("numbers", "12 600 miestä", "about 12,000 men"), row("missing_fact", "Se päättyi Senaatintorille", "", "en")]
+        cs = [searched(c, "Another passage.", EN if c["target_lang"] == "en" else FI) for c in claims.row_claims(pair(), rows)]
+        en_passage, fi_passage = cs[0]["evidence"]["passages"][1], cs[1]["evidence"]["passages"][1]
+        vs = [verdict("contradicted", "about 12,000 men", en_passage, "figure"), verdict("not_mentioned"),
+              verdict("contradicted", "It ended at Senate Square", en_passage, "fact")]
+        back = claims.reverse_claims(cs, vs)
+        self.assertEqual([(c["lang"], c["target_lang"], c["quote"], c["reverses"] == cs[n]["claim_id"])
+                          for c, n in zip(back, (0, 2))],
+                         [("en", "fi", "about 12,000 men", True), ("en", "fi", "It ended at Senate Square", True)])
+        back = [searched(c, "Another passage.", FI) for c in back]
+
+        def run(first, second):
+            reverse = {c["reverses"]: (c, v) for c, v in zip(back, (first, second))}
+            return claims.findings([pair()], {pair()["pair_id"]: rows}, cs, vs, "m", reverse)
+
+        kept, aside = run(verdict("contradicted", "12 600 miestä", fi_passage, "figure"),
+                          verdict("supported", "Se päättyi Senaatintorille", fi_passage))
+        self.assertEqual([(r["type"], r["verdict"]) for r in kept], [("missing_fact", "not_mentioned"), ("numbers", "contradicted")])
+        self.assertEqual(kept[1]["reverse"]["evidence"]["quote"], "12 600 miestä")
+        self.assertEqual(kept[0]["reverse"]["verdict"], "supported")   # the other side says the same: no contradiction
+        kept, aside = run(verdict("supported", "12 600 miestä", fi_passage), verdict("not_mentioned"))
+        self.assertEqual([r["type"] for r in kept], ["missing_fact"])
+        self.assertEqual([(r["type"], r["verdict"]) for r in aside], [("numbers", "not_mentioned")])
 
     def test_a_numbers_row_with_no_contradicted_claim_is_set_aside_and_framing_is_untouched(self):
         framing = row("framing", "x", "y")
