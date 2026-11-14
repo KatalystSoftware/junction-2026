@@ -348,7 +348,11 @@ class LiveDesk(Policy):
                 held.pop(leg, None)
             if freed:
                 self.post(order, freed)
-            outcome = "withdrawn and posted again" if len(off) == len(gigs) else "kept for its next post: a driver booked the gig as the desk withdrew it"
+            posted = any(a["type"] == "post" and any(s["orderId"] == order_id for s in a["stops"]) for a in self.outbox) or bool(self.gigs_of(order_id))
+            if not gigs:  # the car had no gig: a car held for a return goes out later, with the fix
+                outcome = "posted with the fix" if posted else "kept for its next post: the car has no gig yet"
+            else:
+                outcome = "withdrawn and posted again" if len(off) == len(gigs) else "kept for its next post: a driver booked the gig as the desk withdrew it"
         self.log.write("note_fix", orderId=order_id, fix=new, outcome=outcome, problems=result["problems"])
         self.log.say(f"Note of {order_id}: the model found {self.found(old, new)}, which the rules missed; {outcome}.")
 
