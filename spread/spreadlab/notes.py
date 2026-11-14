@@ -304,6 +304,14 @@ LIMIT_WORDS = {
     "customer": ["asiakas", "kunden", "customer"],
     "fetches": ["noutaa", "hämtar", "picks", "hakee"],
 }
+
+
+@functools.lru_cache(maxsize=None)
+def limit_words(word: str) -> frozenset[str]:
+    """The names in LIMIT_WORDS of the lists that have the word, or a word one typo from it."""
+    return frozenset(name for name, known in LIMIT_WORDS.items() if any(near(word, k) for k in known))
+
+
 HOURS_RANGE = re.compile(r"\b(\d{1,2})(?:[.:](\d{2}))?\s*(am|pm)?\s*[-–]\s*(\d{1,2})(?:[.:](\d{2}))?\s*(am|pm)?\b|\b(\d{1,2}):st[aä]\s+(\d{1,2}):(?:een|ään|aan)\b")
 # Finnish hours in the cases a limit comes in ("ennen kahta", "kolmeen asti", "neljän jälkeen"), which `times` reads only after a word of time.
 HOUR_CASES = {"kahdeksaa": 8, "kahdeksaan": 8, "yhdeksää": 9, "yhdeksään": 9, "kymmentä": 10, "kymmeneen": 10, "yhtätoista": 11, "yhteentoista": 11,
@@ -344,7 +352,7 @@ def _limits(text: str, arrived_at: int) -> Limits:
             plain = HOUR_CASE.sub(lambda m: f"klo {HOUR_CASES[m[1]]}", half_hours(re.sub(r"\b(\d{1,2}):(?:aan|ään|een)\b", r"klo \1", HOURS_RANGE.sub(" ", clause))))
             words = TOKEN.findall(plain)
             tags = [tag(word) for word in words]
-            said = {name for name, known in LIMIT_WORDS.items() if any(near(word, k) for word in words for k in known)}
+            said = set().union(*map(limit_words, words))
             site = "delivery" if "delivery" in said else "pickup"
             if 5 * HOUR <= opens < closes <= 23 * HOUR and closes - opens >= 4 * HOUR:  # opening hours, not a slot of an hour or two
                 hours[site] = [opens, closes]

@@ -393,9 +393,15 @@ class Policy(Desk):
     def unbooked(self, hours: float = 0) -> int:
         """The won cars that no driver holds now: just won, dropped, or posted again after a failed visit. With `hours`,
         only those whose order must be collected within that many hours."""
-        return sum(1 for id_, order in self.orders.items() for leg, at in enumerate(order["deliveredAt"])
-                   if at is None and self.leg_gigs.get(id_, {}).get(leg) not in self.booked
-                   and (not hours or order["lastPickupAt"] - self.now <= hours * HOUR))
+        # Called on every quote and look over the week's orders: the order's time is checked before its legs.
+        now, within, booked, leg_gigs, count = self.now, hours * HOUR, self.booked, self.leg_gigs, 0
+        for id_, order in self.orders.items():
+            if hours and order["lastPickupAt"] - now > within:
+                continue
+            for leg, at in enumerate(order["deliveredAt"]):
+                if at is None and leg_gigs.get(id_, {}).get(leg) not in booked:
+                    count += 1
+        return count
 
     def drive(self, request) -> int:
         """The minutes on the road with the request's cars."""
@@ -595,7 +601,10 @@ class Policy(Desk):
         """The open gigs that get direct offers now: (gig id, order). Its order must be collected within `offer_hours`,
         or should have been, and the app has had half an hour to find a driver."""
         hours = self.params()["offer_hours"]
-        return [(gig_id, order) for id_, order in self.orders.items() if hours and order["lastPickupAt"] - self.now <= hours * HOUR
+        if not hours:
+            return []
+        now, within = self.now, hours * HOUR
+        return [(gig_id, order) for id_, order in self.orders.items() if order["lastPickupAt"] - now <= within
                 for gig_id in self.gigs_of(id_) if gig_id not in self.booked and self.now - self.opened.get(gig_id, self.now) >= OFFER_AFTER]
 
     def wake_at(self) -> int:
