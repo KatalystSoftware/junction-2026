@@ -2,26 +2,26 @@
   import { some, type Plan } from './events'
   import { when } from './format'
   import Icon from './Icon.svelte'
-  import { sendGolden } from './manage.svelte'
+  import { sendInvitation } from './manage.svelte'
   import { app } from './state.svelte'
 
-  // The golden ticket goes to people who came to earlier events: a personal invitation with a reserved place and a
-  // profile drafted from what they already agreed we may read. The organiser picks which past events and which fields,
-  // reads the message, and sends. Sample data: the count is of the sample pool, and nothing is sent.
+  // Sending the invitation to the people who came to earlier events. The organiser picks which past events and which
+  // fields, reads the message, and sends. Everyone applies through the same link, and every application is reviewed
+  // separately on the Applications tab. Sample data: the count is of the sample pool, and nothing is sent.
   let { plan, onclose }: { plan: Plan; onclose: () => void } = $props()
-  // the modal opens for one plan; its initial choices are taken from the plan once (svelte-ignore state_referenced_locally)
+  // the modal opens for one plan; its initial choices are taken from the plan once
   // svelte-ignore state_referenced_locally
   const start = { fields: plan.fields.map((f) => f.name), title: plan.title, when: plan.when }
   let events = $state(app.pool.events.map((e) => e.id))
   let fields = $state(start.fields)
   let message = $state(
-    `You came to one of Espoo's talent events before, so you have a golden ticket to the ${start.title}${start.when ? ` (${start.when})` : ''}: a reserved place and 1:1 conversations with employers who look for what you do. Your profile is already drafted from what you agreed we may read; checking it takes three minutes.`,
+    `You came to one of Espoo's talent events before, so here is an invitation to apply to the ${start.title}${start.when ? ` (${start.when})` : ''}: short 1:1 conversations with employers who look for what you do. Your application is drafted from what you agree we may read, you check every line, and a named organiser tells you their decision with a reason.`,
   )
   const toggle = (list: string[], id: string) => (list.includes(id) ? list.filter((x) => x !== id) : [...list, id])
   // a person who came to two events is counted in each; the pool keeps no rows, only counts per field and event
   const n = $derived(plan.fields.filter((f) => fields.includes(f.name)).reduce((sum, f) => sum + events.reduce((s, e) => s + (f.people.events[e] ?? 0), 0), 0))
   function send() {
-    sendGolden({ n, events, fields, message })
+    sendInvitation({ n, events, fields, message })
     onclose()
   }
   const keys = (e: KeyboardEvent) => {
@@ -34,12 +34,12 @@
 <!-- the veil closes on a click outside the box; the keyboard closes with Escape (window handler above) -->
 <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 <div class="veil" onclick={(e) => e.target === e.currentTarget && onclose()}>
-  <div class="box" role="dialog" aria-modal="true" aria-labelledby="golden-title" tabindex="-1">
+  <div class="box" role="dialog" aria-modal="true" aria-labelledby="send-title" tabindex="-1">
     <header>
-      <h2 id="golden-title">Golden ticket: send to all</h2>
+      <h2 id="send-title">Send the invitation</h2>
       <button class="btn quiet" onclick={onclose} aria-label="Close"><Icon name="x" size={16} /></button>
     </header>
-    <p class="lead">A personal invitation with a reserved place, to the people who came to Espoo's earlier events. Choose whom, read the message, send.</p>
+    <p class="lead">To the people who came to Espoo's earlier events. Choose whom, read the message, send. Everyone applies through the same link, and each application is reviewed separately.</p>
 
     <div class="cols">
       <fieldset>
@@ -60,7 +60,7 @@
       <span>The message</span>
       <textarea bind:value={message} rows="4"></textarea>
     </label>
-    <p class="note">Each person's invitation opens on their own name with their profile drafted. Sample data: nobody is written to.</p>
+    <p class="note">Each person's invitation opens on their own name with their application drafted from what they agreed we may read. Sample data: nobody is written to.</p>
 
     <footer>
       <span class="count"><b>{some(n)}</b> people</span>

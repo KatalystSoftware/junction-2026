@@ -62,6 +62,7 @@
     if (k === "company") { const id = CO[h[1]] ? h[1] : "puro"; return h[2] === "intros" ? viewIntros(id) : viewCompany(id); }
     if (k === "cand") return h[1] === "stands" ? viewStands() : h[1] === "me" ? viewMe() : h[1] === "evidence" ? viewEvidence() : viewWizard();
     if (k === "after") return viewAfter();
+    if (k === "source") return viewSource(h[1] || "linkedin");
     if (["concept", "responsible", "demo", "mentors"].includes(k)) return viewDoc(k);
     return viewHome();
   }
@@ -374,8 +375,8 @@
   const JSTEPS = [["general", "General information"], ["event", "Questions for this event"], ["you", "In your own words"], ["confirm", "Confirm"]];
   const firstName = () => (cand(ME).name || "Olena K.").split(" ")[0];
   function joinState() {
-    if (!S.join) { S.join = { consent: { linkedin: true, github: true, portfolio: false, project: false }, ids: { linkedin: "linkedin.com/in/olena-k", github: "github.com/olena-k", portfolio: "olena-k.example", project: "" }, project: null, facts: null, skipped: [], lines: [], own: { about: "", looking: "" }, trade: {}, types: ["full"], permit: false, ans: {}, wants: null, seen: {}, done: null, started: null }; save(); }
-    if (!S.join.ans) S.join.ans = {}; if (!S.join.seen) S.join.seen = {}; if (!S.join.ids) S.join.ids = { linkedin: "linkedin.com/in/olena-k", github: "github.com/olena-k", portfolio: "olena-k.example", project: "" };
+    if (!S.join) { S.join = { consent: { linkedin: true, github: true, portfolio: false, project: false }, ids: { linkedin: "linkedin.example/in/olena-k", github: "github.example/olena-k", portfolio: "olena-k.example", project: "" }, project: null, facts: null, skipped: [], lines: [], own: { about: "", looking: "" }, trade: {}, types: ["full"], permit: false, ans: {}, wants: null, seen: {}, done: null, started: null }; save(); }
+    if (!S.join.ans) S.join.ans = {}; if (!S.join.seen) S.join.seen = {}; if (!S.join.ids) S.join.ids = { linkedin: "linkedin.example/in/olena-k", github: "github.example/olena-k", portfolio: "olena-k.example", project: "" };
     return S.join;
   }
   function joinScan(J) {
@@ -428,16 +429,12 @@
   }
   const YNL = { yes: "Yes, at work", learning: "Learning it now", no: "Not yet" };
 
-  // Two invitations branch here: the golden ticket (a personal invitation with a reserved place, sent to people who came to
-  // earlier events) and the regular one (an open link; the organiser decides whom to introduce). Same check pages, different words.
-  const KIND = {
-    golden: { title: () => `${esc(firstName())}, you have a golden ticket.`, lead: "You came to one of Espoo's events before, so your place is reserved. Your profile is drafted from what you already agreed we may read, the way companies get theirs drafted from their job ads. <b>You see every line before anyone else does</b>.", eyebrow: "golden ticket", go: "Draft my profile →", confirm: "Confirm: this is me", confirmed: "Confirmed. Only what you checked is used, and organisers see that you checked it.", doneH1: () => `You're in, ${esc(firstName())}.`, doneLead: (t) => `Your place is reserved. Confirmed on ${t}. Only what you checked is used, and the organiser sees that you checked it.`, first: ["Today", "Your profile goes to Espoo's event team", "lines, checked by you", "Marked “checked by the candidate”."] },
-    regular: { title: () => `Apply to attend the ${esc(D.event.name)}.`, lead: "Tell us where to read about you, and your application is drafted from it, the way companies get theirs drafted from their job ads. <b>You see every line before anyone else does</b>, and a named organiser decides who is introduced, with a reason.", eyebrow: "application", go: "Draft my application →", confirm: "Send my application", confirmed: "Application sent. A named organiser reads it and tells you their decision with a reason.", doneH1: () => `Application sent, ${esc(firstName())}.`, doneLead: (t) => `Sent on ${t}. Only what you checked is in it, and the organiser sees that you checked it.`, first: ["Next days", "Espoo's event team reads your application", "lines, checked by you", "Accepted or declined by a named organiser, with the reason written down. You get it either way."] },
-  };
-  const kindOf = (J) => KIND[J.kind] || KIND.regular;
+  // The invitation is an open link: the applicant applies, and a named organiser decides who is introduced, with a reason.
+  const KIND = { title: () => `Apply to attend the ${esc(D.event.name)}.`, lead: "Tell us where to read about you, and your application is drafted from it, the way companies get theirs drafted from their job ads. <b>You see every line before anyone else does</b>, and a named organiser decides who is introduced, with a reason.", eyebrow: "application", go: "Draft my application →", confirm: "Send my application", confirmed: "Application sent. A named organiser reads it and tells you their decision with a reason.", doneH1: () => `Application sent, ${esc(firstName())}.`, doneLead: (t) => `Sent on ${t}. Only what you checked is in it, and the organiser sees that you checked it.`, first: ["Next days", "Espoo's event team reads your application", "lines, checked by you", "Accepted or declined by a named organiser, with the reason written down. You get it either way."] };
+  const kindOf = () => KIND;
   function viewJoin(step, sec) {
     const J = joinState();
-    if (step === "golden" || !step) { const k = step ? "golden" : "regular"; if (J.kind !== k) { J.kind = k; save(); } return joinInvite(J); }
+    if (!step) return joinInvite(J);
     if (step === "reading") return joinReading(J);
     if (!J.facts) joinScan(J); // a deep link straight to a check page still gets a draft
     if (step === "done") return J.done ? joinDone(J) : joinCheck(J, "confirm");
@@ -446,7 +443,7 @@
   function joinInvite(J) {
     const c = J.consent;
     const row = (k, title, sub, field) => `<div class="srcrow ${c[k] ? "on" : ""}"><label><input type="checkbox" data-act="jn-consent" data-v="${k}" ${c[k] ? "checked" : ""}><span><b>${title}</b><small>${sub}</small></span></label><span class="fld">${field}</span></div>`;
-    const idField = (k, label) => `<input type="text" data-act="jn-srcid" data-v="${k}" value="${esc(J.ids[k] || "")}" aria-label="${label}" placeholder="${label}">`;
+    const idField = (k, label) => `<input type="text" data-act="jn-srcid" data-v="${k}" value="${esc(J.ids[k] || "")}" aria-label="${label}" placeholder="${label}">${k === "linkedin" || k === "github" ? `<a class="peek" href="#/source/${k}" target="_blank" rel="noopener" title="The fake ${SRCNAME[k]} page this demo reads">open ↗</a>` : ""}`;
     const pr = J.project;
     app.innerHTML = `<div class="wiz join">
       <p class="eyebrow">${esc(D.event.name)} · ${esc(D.event.date)} · ${esc(D.event.format)}</p>
@@ -476,6 +473,27 @@
       <div id="scandone" style="display:none"><div class="cheer" style="margin-top:14px">Found <b>${(J.facts || []).length} things</b> about you. Now the important part: you decide what is true.</div><div class="jnav"><a class="back" href="#/join">← Change what we may read</a><button data-act="jn-go" data-v="check/general">Check the draft →</button></div></div></div>`;
     rows.forEach(([k], i) => setTimeout(() => { const el = document.getElementById("scan-" + k); if (!el) return; el.classList.add("done"); el.querySelector(".spin").outerHTML = "✓"; el.querySelector(".st").textContent = n(k); }, 700 + i * 650));
     setTimeout(() => { const d = document.getElementById("scandone"); if (d) d.style.display = "block"; }, 900 + rows.length * 650);
+  }
+  // The demo's sources, shown as the pages they stand for. Both are invented (reserved .example addresses): nothing here is a
+  // real person, profile or repository. The applicant opens them from the invitation to see exactly what the pipeline reads.
+  function viewSource(k) {
+    const J = joinState(), back = `<a class="back" href="#/join">← Back to the invitation</a>`;
+    document.title = `${SRCNAME[k] || "Source"} (demo) · Esittely`;
+    if (k === "github") {
+      app.innerHTML = `<div class="wiz join fake"><p class="fakebar">Sample page: an invented GitHub account at ${esc(J.ids.github)}. Not a real account.</p>
+        <div class="jcard ghcard"><div class="ghhead"><span class="avatar">OK</span><div><h1>olena-k</h1><p class="mut">Olena K. · Espoo, Finland · data analyst, dashboards and the SQL behind them</p></div></div>
+        <h2>Public repositories <span class="mut">(${SRC.github.length})</span></h2>
+        ${SRC.github.map(r => `<div class="repo"><b>${esc(r.name)}</b> <span class="pill">Public</span><p>${esc(r.desc)}</p><small><span class="dot ${esc(r.lang.toLowerCase())}"></span>${esc(r.lang)} · updated this year</small></div>`).join("")}
+        <p class="xs mut">What the draft uses: each repository's name, language and description. Not commits, issues or followers.</p>${back}</div></div>`;
+      return;
+    }
+    const lines = SRC.linkedin.split("\n"), head = lines[0], secs = [];
+    let cur = null;
+    lines.slice(1).forEach(l => { if (/^(About|Experience|Skills|Licenses & certifications|Languages|Education)$/.test(l)) { cur = { t: l, rows: [] }; secs.push(cur); } else if (cur) cur.rows.push(l); });
+    app.innerHTML = `<div class="wiz join fake"><p class="fakebar">Sample page: an invented LinkedIn profile at ${esc(J.ids.linkedin)}. Not a real person.</p>
+      <div class="jcard licard"><div class="libanner"></div><div class="lihead"><span class="avatar">OK</span><div><h1>${esc(head.split(" — ")[0])}</h1><p>${esc(head.split(" — ")[1] || "")}</p><p class="mut xs">Espoo, Uusimaa, Finland · 500+ connections</p></div></div>
+      ${secs.map(sc => `<section><h2>${esc(sc.t)}</h2>${sc.t === "Skills" ? `<div class="chips">${sc.rows.join(" ").split(" · ").map(x => `<span class="chip">${esc(x)}</span>`).join("")}</div>` : sc.rows.map(r => r.startsWith("- ") ? `<li>${esc(r.slice(2))}</li>` : `<p class="${/^[A-Z].*\d{4}/.test(r) ? "lirole" : ""}">${esc(r)}</p>`).join("")}</section>`).join("")}
+      <p class="xs mut">What the draft uses: headline, experience, skills and languages. Never the photo, connections or anything about age, gender or nationality.</p>${back}</div></div>`;
   }
   function joinCheck(J, sec) {
     const me = cand(ME);
@@ -919,10 +937,9 @@
     if (k === "reset") { S = seed(); save(); toast("Demo reset"); return goTo("#/"); }
     if (k === "co-draft") { delete S.comp.puro; save(); return goTo("#/company/puro"); }
     if (k === "co-ok") { S.comp.puro = { finnish: "helpful", confirmedAt: now }; save(); return goTo("#/company/puro"); }
-    if (k === "jn-0") { S.join = null; joinState(); save(); return goTo("#/join/golden"); }
-    if (k === "jn-reg") { S.join = null; joinState(); save(); return goTo("#/join"); }
+    if (k === "jn-0") { S.join = null; joinState(); save(); return goTo("#/join"); }
     if (k === "jn-2") { S.join = null; const J = joinState(); joinScan(J); save(); return goTo("#/join/check/general"); }
-    if (k === "jn-done") { S.join = null; const J = joinState(); J.kind = "golden"; joinScan(J); J.trade = { build: "b", depth: "a", pace: "b" }; J.own = { about: "I like being the person who explains the numbers to people who hate numbers.", looking: "A team where I can grow from reporting into forecasting." }; joinApply(J); return goTo("#/join/done"); }
+    if (k === "jn-done") { S.join = null; const J = joinState(); joinScan(J); J.trade = { build: "b", depth: "a", pace: "b" }; J.own = { about: "I like being the person who explains the numbers to people who hate numbers.", looking: "A team where I can grow from reporting into forecasting." }; joinApply(J); return goTo("#/join/done"); }
     if (k === "org-questions") return goTo("#/org/questions");
     if (k === "org-puro") { S.ui.open = {}; S.ui.f = {}; if (S.dec.puro) delete S.dec.puro[ME]; save(); return goTo("#/org/puro"); }
     if (k === "org-intro") { (S.dec.puro = S.dec.puro || {})[ME] = { d: "introduce", reason: "Power BI and SQL at work for 4–5 years; their exact stack. Finnish only helpful.", at: now, by: ORGANISER }; S.ui.open["puro" + ME] = true; save(); return goTo("#/org/puro"); }

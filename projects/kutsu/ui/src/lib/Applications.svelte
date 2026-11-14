@@ -9,7 +9,7 @@
   import Tabs from './Tabs.svelte'
   import type { Applicant } from './types'
 
-  // The applications that came back from the regular invitation, one at a time, as a one-page summary with two kinds
+  // The applications that came back from the invitation link, one at a time, as a one-page summary with two kinds
   // of lines kept apart: what the pipeline drafted from the applicant's sources (the AI summary) and what the applicant
   // explicitly answered, corrected or wrote. Espoo's view analyses fit against the whole event and the pool; a
   // company's view, reached by its own link, shows only the applications that concern it and fit against its roles.
@@ -63,7 +63,7 @@
   <a class="back" href="#/"><Icon name="back" size={16} />Events</a>
   <header>
     <h1>{plan.title}</h1>
-    <p>{plan.when}. {brief ? `Applications as ${nameOf(brief)} sees them.` : 'Applications from the regular invitation.'} <span class="sample">sample data</span></p>
+    <p>{plan.when}. {brief ? `Applications as ${nameOf(brief)} sees them.` : 'Every application is reviewed separately.'} <span class="sample">sample data</span></p>
   </header>
   {#if !brief}<Tabs {plan} tab="applications" />{/if}
 
@@ -83,8 +83,8 @@
     <div><b>{counts.declined}</b><span>declined</span></div>
     <div><b>{list.length - counts.accepted - counts.declined}</b><span>to decide</span></div>
     {#if !brief}
-      <div><b>{manage.golden ? some(manage.golden.n) : '0'}</b><span>golden tickets{manage.golden ? `, sent ${when(manage.golden.at.slice(0, 10))}` : ' sent'}</span></div>
-      <div><b>{manage.copies}</b><span>regular link {manage.copies === 1 ? 'copy' : 'copies'}</span></div>
+      <div><b>{manage.sent ? some(manage.sent.n) : '0'}</b><span>invited{manage.sent ? `, sent ${when(manage.sent.at.slice(0, 10))}` : ''}</span></div>
+      <div><b>{manage.copies}</b><span>link {manage.copies === 1 ? 'copy' : 'copies'}</span></div>
     {/if}
   </section>
 

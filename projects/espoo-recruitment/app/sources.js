@@ -1,4 +1,5 @@
-// Synthetic sources for the demo applicant (Olena K., C-027). Nothing here is a real person, profile or repository.
+// Synthetic sources for the demo applicant (Olena K., C-027). Nothing here is a real person, profile or repository;
+// the addresses use the reserved .example domain (linkedin.example, github.example) so they can never resolve to anyone real.
 window.SOURCES = {
   linkedin: `Olena K. — Data Analyst (Power BI, SQL) · Espoo
 About

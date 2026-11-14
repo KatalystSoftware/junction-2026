@@ -1,13 +1,13 @@
 import type { Applicant } from './types'
 
 /**
- * What the organiser does with an event's applications and invitations, kept in this browser (localStorage): the
- * golden-ticket send, how often the regular link was copied, and each decision, keyed by who took it (Espoo, or a
+ * What the organiser does with an event's applications and invitation, kept in this browser (localStorage): the send to
+ * past attendees, how often the invitation link was copied, and each decision, keyed by who took it (Espoo, or a
  * company by its id) and the application. Sample data; nothing leaves the browser.
  */
 export type Decision = { d: 'accept' | 'decline'; reason: string; by: string; at: string }
-export type Golden = { at: string; n: number; events: string[]; fields: string[]; message: string }
-type Manage = { golden: Golden | null; copies: number; decisions: Record<string, Decision> }
+export type Sent = { at: string; n: number; events: string[]; fields: string[]; message: string }
+type Manage = { sent: Sent | null; copies: number; decisions: Record<string, Decision> }
 
 const KEY = 'kutsu-manage-v1'
 const read = (): Manage | null => {
@@ -18,7 +18,7 @@ const read = (): Manage | null => {
     return null
   }
 }
-export const manage = $state<Manage>(read() ?? { golden: null, copies: 0, decisions: {} })
+export const manage = $state<Manage>({ sent: null, copies: 0, decisions: {}, ...read() })
 export const persist = () => {
   try {
     localStorage.setItem(KEY, JSON.stringify(manage))
@@ -37,8 +37,8 @@ export function undecide(by: string, id: string) {
   delete manage.decisions[decisionKey(by, id)]
   persist()
 }
-export function sendGolden(g: Omit<Golden, 'at'>) {
-  manage.golden = { ...g, at: new Date().toISOString() }
+export function sendInvitation(g: Omit<Sent, 'at'>) {
+  manage.sent = { ...g, at: new Date().toISOString() }
   persist()
 }
 export function countCopy() {

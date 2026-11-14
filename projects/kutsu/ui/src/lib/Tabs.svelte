@@ -2,7 +2,7 @@
   import type { Plan } from './events'
   import { applications } from './manage.svelte'
 
-  // The two sides of managing one event: whom to invite, and the applications that came back from the regular invitation.
+  // The two sides of managing one event: whom to invite, and the applications that came back from the invitation link.
   let { plan, tab }: { plan: Plan; tab: 'invite' | 'applications' } = $props()
   const n = $derived(applications.list.length)
 </script>
