@@ -124,8 +124,10 @@ DEFAULTS = {
     "min_on_time": 0,     # the desk is behind while its projected on-time share is under this; 0 is never
     "behind_from": 0,     # ... and it has won at least this many orders: with few orders, one late order moves the share far
     "when_behind": {},    # the parameters while it is behind; they come after those of a tight week
+    "rich_drivers": 0,    # the week is rich when the driver list has at least this many drivers; 0 is never
+    "when_rich": {},      # the parameters of a rich week, known before the first quote, as `when_tight` for a long list
 }
-RULES = {"tight_drivers", "when_tight", "min_on_time", "behind_from", "when_behind"}
+RULES = {"tight_drivers", "when_tight", "min_on_time", "behind_from", "when_behind", "rich_drivers", "when_rich"}
 DECLINE = 10  # times the list price: a quote that loses costs nothing, and no quote costs goodwill (RULES.md)
 # The chance that an order which is not late yet arrives late, by what the desk sees of it at a quote.
 # Measured on the 10 tuning weeks of `gate-10` and of `gate-15`: 3% late while drivers hold all its cars,
@@ -153,7 +155,7 @@ class Policy(Desk):
         unknown = set(params) - set(DEFAULTS)
         if unknown:
             raise ValueError(f"Unknown parameters {sorted(unknown)}. The parameters are {sorted(DEFAULTS)}")
-        for rule in ("when_tight", "when_behind"):
+        for rule in ("when_tight", "when_behind", "when_rich"):
             wrong = set(params.get(rule, {})) - (set(DEFAULTS) - RULES)
             if wrong:
                 raise ValueError(f"{rule} cannot set {sorted(wrong)}. It sets some of {sorted(set(DEFAULTS) - RULES)}")
@@ -162,6 +164,8 @@ class Policy(Desk):
         self.tight = len(roster) < self.p["tight_drivers"]
         if self.tight:
             self.p = {**self.p, **self.p["when_tight"]}
+        if self.p["rich_drivers"] and len(roster) >= self.p["rich_drivers"]:
+            self.p = {**self.p, **self.p["when_rich"]}
         self.won_at: dict[str, int] = {}  # order id -> the minute the desk learned of the win
         self.late: set[str] = set()  # the orders that the account has refunded or fined for lateness
         self.asked: dict[str, tuple[str, int, float]] = {}  # request id -> dealer, day and the curve's log odds, for each serious quote without an answer

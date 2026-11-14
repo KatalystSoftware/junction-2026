@@ -844,3 +844,19 @@ def test_agg_max_changes_only_weeks_with_760_drivers_or_more():
     full, base = desk(heavy, 800), desk(a1, 800)
     assert {k for k in full if full[k] != base[k]} == {"slow_step", "cost", "queue_hours", "max_unbooked", "min_slack", "kinds"}
     assert (full["slow_step"], full["cost"], full["queue_hours"], full["max_unbooked"], full["min_slack"]) == (0.0, 1.05, 6, 40, 240)
+
+
+def test_a_rich_week_takes_its_own_parameters_and_the_others_play_the_variant():
+    from spreadlab import play
+    from spreadlab.variants import VARIANTS
+    a17 = VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100"]
+    rich = {**a17, "rich_drivers": 850, "when_rich": {"cost": 1.05, "max_unbooked": 40, "pair_onward_cost": 0.9}}
+    roster = lambda n: [{**ROSTER[0], "id": f"x{i}"} for i in range(n)]  # noqa: E731
+
+    def desk(params, n):  # the parameters the week plays with
+        played = play.policy_class(params)(None, 8, 0, params, roster(n), MAP).params()
+        return {k: v for k, v in played.items() if k not in ("when_tight", "rich_drivers", "when_rich")}
+    for n in (700, 800, 849):  # a tight week, and one under the rich line, play the variant without it
+        assert desk(rich, n) == desk(a17, n), n
+    full, base = desk(rich, 900), desk(a17, 900)
+    assert {k: full[k] for k in full if full[k] != base[k]} == {"cost": 1.05, "max_unbooked": 40, "pair_onward_cost": 0.9}

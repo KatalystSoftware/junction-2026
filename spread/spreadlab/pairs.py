@@ -95,10 +95,16 @@ def next_open(t: int, hours: Optional[dict]) -> int:
 class PairPolicy(Policy):
     def __init__(self, world, level: int, now: int, params: dict, roster: list[dict], map_: dict):
         own = {name: params.get(name, default) for name, default in PARAMS.items()}
-        super().__init__(world, level, now, {k: v for k, v in params.items() if k not in PARAMS}, roster, map_)
+        rich = {k: v for k, v in params.get("when_rich", {}).items() if k in PARAMS}  # a rich week's pair parameters: the policy knows only its own
+        rest = {k: v for k, v in params.items() if k not in PARAMS}
+        if "when_rich" in rest:
+            rest["when_rich"] = {k: v for k, v in rest["when_rich"].items() if k not in PARAMS}
+        super().__init__(world, level, now, rest, roster, map_)
         if self.p["push_from"] or self.p["home_offers"]:
             raise ValueError("Pairs do not reprice for the backlog (push_from) or send offers home (home_offers)")
         self.p.update(own)
+        if self.p["rich_drivers"] and len(roster) >= self.p["rich_drivers"]:
+            self.p.update(rich)
         if len(roster) < self.p["pair_more_drivers"]:
             self.p.update(pair_open=False, pair_onward=0, pair_late=False, pair_onward_cost=0)
         self.pair_wait: dict[str, int] = {}  # order id -> the minute its car is posted alone if no return comes

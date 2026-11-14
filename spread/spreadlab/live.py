@@ -749,6 +749,7 @@ class Live:
             source = "world"
             self.desk = desk_class(self.params)(self.world, self.level, first["now"], self.params, self.world.roster(), self.map)
         self.desk.attach(self.world, self.log, self.guard, self.clock, self.watcher)
+        self.guard.max_unbooked = self.desk.p["max_unbooked"]  # the week's gate: a tight or rich week sets its own
         events = self.world.events(after=self.desk.seq)
         snapshot = self.world.snapshot()
         self.clock.saw(snapshot["now"], exact=True)
