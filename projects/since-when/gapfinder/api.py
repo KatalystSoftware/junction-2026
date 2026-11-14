@@ -12,6 +12,7 @@ import re
 import threading
 import time
 from datetime import date, datetime
+from itertools import pairwise
 
 import mariadb
 import uvicorn
@@ -304,6 +305,89 @@ def apply_checks(findings, checks):
     return out, totals
 
 
+# --- Since when each edition has said it ------------------------------------------------------
+
+LEXICON_SUMMARY = re.compile(r"first sentence uses .+ other words for the same thing")
+BEGAN_TYPES = ("numbers", "contradiction", "framing")
+
+
+def _words(text):
+    return re.findall(r"\w+", (text or "").casefold())
+
+
+def _holds(passage_words, quote_words):
+    """Whether a passage holds a quote, allowing for changes of case, punctuation and wiki markup:
+    every number of the quote, and three in four of its pairs of consecutive words, or three in five
+    when the numbers already match (a place renamed, a clause reworded around the same figure)."""
+    have = set(passage_words)
+    if not all(w in have for w in quote_words if w.isdigit()):
+        return False
+    pairs = set(pairwise(quote_words))
+    if not pairs:
+        return all(w in have for w in quote_words)
+    there = set(pairwise(passage_words))
+    share = 0.6 if any(w.isdigit() for w in quote_words) else 0.75
+    return len(pairs & there) >= share * len(pairs)
+
+
+def began(r, qid, findings):
+    """For each difference of fact or wording a model wrote, and each edition it quotes: the first
+    revision of the unbroken run of revisions, up to today, in which that edition holds the quoted
+    words, read from the article's full history (chunk FOR SYSTEM_TIME ALL). An edit that only
+    reformats the words, or touches another part of the passage, does not start a run. Sets
+    `began` on each such finding: {lang: {"at", "rev", "old", "first"}}, `first` when the run
+    reaches back to the oldest version loaded, `quoted` the first revision of the run with the quote word
+    for word."""
+    wanted = [
+        f
+        for f in findings
+        if f["status"] == "open" and f["type"] in BEGAN_TYPES and not LEXICON_SUMMARY.search(f["summary"] or "")
+    ]
+    if not wanted:
+        return
+    rows = r(
+        "Every version of every passage, for when each quote first stood",
+        f"""
+SELECT c.lang, c.rev_id, c.row_start, c.row_end, p.text
+FROM chunk FOR SYSTEM_TIME ALL AS c
+JOIN passage AS p ON p.sha = c.sha
+WHERE c.wikidata_id = {lit(qid)}
+ORDER BY c.lang, c.row_start""",
+    )
+    by_lang = {}
+    for x in rows:
+        by_lang.setdefault(x["lang"], []).append(
+            (x["row_start"], x["row_end"], x["rev_id"], _words(x["text"]), x["text"])
+        )
+    times = {lang: sorted({v[0] for v in vs}) for lang, vs in by_lang.items()}
+    for f in wanted:
+        out = {}
+        for lang, quote in f["quotes"].items():
+            vs, ts = by_lang.get(lang), times.get(lang)
+            q = _words(quote)
+            if not vs or not q:
+                continue
+
+            def holds(t, vs=vs, q=q):
+                return any(a <= t < b and _holds(w, q) for a, b, _, w, _ in vs)
+
+            i = len(ts) - 1
+            if not holds(ts[i]):
+                continue
+            while i > 0 and holds(ts[i - 1]):
+                i -= 1
+            rev = max(v[2] for v in vs if v[0] == ts[i])
+            old = max(v[2] for v in vs if v[0] == ts[i - 1]) if i > 0 else None
+            # The first revision of the run that has the quote word for word, for reading it back.
+            j = next(
+                (k for k in range(i, len(ts)) if any(a <= ts[k] < b and quote in text for a, b, _, _, text in vs)),
+                len(ts) - 1,
+            )
+            out[lang] = {"at": ts[i], "rev": rev, "old": old, "first": i == 0, "quoted": ts[j]}
+        if out:
+            f["began"] = out
+
+
 def checks(r, qid):
     """The topic's rows of checked_finding; none on a database loaded before the check existed. A
     table made before its status column (checked.py hand adds it) reads as all open."""
@@ -379,6 +463,8 @@ ORDER BY c.lang, c.ord""",
             lead[x["lang"]]["also"] = x["text"]
     found = r("Findings (latest version of each)", findings_sql(qid))
     findings, checked = apply_checks([finding(x) for x in found], checks(r, qid))
+    if checked:  # the topics checked have their full history loaded
+        began(r, qid, findings)
     return {
         "wikidata_id": qid,
         "topic": t["title_en"],

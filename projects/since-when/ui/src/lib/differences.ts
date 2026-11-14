@@ -238,7 +238,7 @@ export function setAside(topic: Topic): Aside[] {
 	const seen = new Set<string>()
 	return topic.findings.flatMap((f) => {
 		const c = f.check
-		if (c?.outcome !== 'set_aside' || c.reason !== 'stated_elsewhere' || !c.evidence || !c.claim.quote || !c.claim.lang) return []
+		if (f.status !== 'open' || c?.outcome !== 'set_aside' || c.reason !== 'stated_elsewhere' || !c.evidence || !c.claim.quote || !c.claim.lang) return []
 		const key = `${c.claim.lang}|${squash(c.claim.quote)}`
 		if (seen.has(key)) return []
 		seen.add(key)
@@ -359,6 +359,15 @@ export interface Lane {
  * the two editions the row compares.
  */
 export function lanes(d: Difference, main: Turn[]): Lane[] {
+	// A difference a model wrote: each edition's lane starts where its quoted words first stood.
+	if (d.primary.began) {
+		return d.quotes.map((q): Lane => {
+			const b = (q.from ?? d.primary).began?.[q.lang] ?? d.primary.began?.[q.lang]
+			if (!b) return { lang: q.lang, spans: [], since: null }
+			const at = String(b.at)
+			return { lang: q.lang, spans: [{ from: at, to: null }], since: { at, exact: !b.first, edit: b.old ? { rev: b.rev, old: b.old } : null, either: false } }
+		})
+	}
 	const out = d.quotes.map((q): Lane => ({ lang: q.lang, spans: [], since: null }))
 	for (const t of main) {
 		if (!t.known) continue

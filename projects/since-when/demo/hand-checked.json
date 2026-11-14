@@ -72,6 +72,98 @@
         "en": "The Lapua Movement (Finnish: Lapuanliike or Lapuan liike, Swedish: Lapporörelsen) was a radical Finnish nationalist, fascist, pro-Nazi and anti-communist political movement founded in and named after the town of Lapua."
       },
       "why": "The English first sentence word for word: the cleaner the lexicon ran on dropped \"Finnish:\" and \"Swedish: Lapporörelsen\" from the parenthesis. The passage now loaded, and revision 1383067871 the findings cite, read as here."
+    },
+    {
+      "topic": "Q1412941",
+      "type": "numbers",
+      "quotes": {
+        "sv": "omkring 12 000 utvalda män",
+        "en": "12,600 men"
+      },
+      "close": "Figures that agree: \"around 12,000\" and 12,600 men at the Peasant March. (round 1 of the blind review, editor reviewer)"
+    },
+    {
+      "topic": "Q1412941",
+      "type": "numbers",
+      "quotes": {
+        "en": "three other communists",
+        "fi": "kymmenen muuta vasemmistolaista"
+      },
+      "close": "A part against the whole: three communists against about ten leftists, a group that includes a Social Democrat. (round 1 of the blind review, editor reviewer)"
+    },
+    {
+      "topic": "Q1412941",
+      "type": "numbers",
+      "quotes": {
+        "en": "seventy-two men publicly declared"
+      },
+      "close": "Two steps of one course of events: the men declared themselves responsible on 4 April and reported to the governor on 9 April. (round 1 of the blind review, editor reviewer)"
+    },
+    {
+      "topic": "Q1412941",
+      "type": "contradiction",
+      "quotes": {
+        "en": "refused to make Vihtori Kosola",
+        "fi": "kommunistiset kansanedustajat vangittiin"
+      },
+      "close": "Two steps of one course of events: the Finnish article also tells the first refusal and then the arrests. (round 1 of the blind review, editor reviewer)"
+    },
+    {
+      "topic": "Q1412941",
+      "type": "framing",
+      "quotes": {
+        "fi": "aseellinen vallankaappausyritys",
+        "sv": "misslyckade Mäntsäläupproret"
+      },
+      "close": "\"Uppror\" against \"vallankaappausyritys\": both articles tell an armed coup attempt. (round 1 of the blind review, editor reviewer)"
+    },
+    {
+      "topic": "Q1412941",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "bondetåg till Helsingfors"
+      },
+      "close": "The Finnish article has a section on the Peasant March of 7 July (Talonpoikaismarssi). (round 1 of the blind review, editor reviewer)"
+    },
+    {
+      "topic": "Q1412941",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "beaten badly along with three other communists"
+      },
+      "close": "The Finnish article tells the Vaasa riot and the beating (Vaasan mellakka). (round 1 of the blind review, editor reviewer)"
+    },
+    {
+      "topic": "Q1412941",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Mussolinis Italien som förebild"
+      },
+      "close": "Set aside in error: the English article classifies the movement but does not say it took Mussolini's Italy as a model. (round 1 of the blind review, editor reviewer)"
+    },
+    {
+      "topic": "Q736268",
+      "type": "numbers",
+      "quotes": {
+        "fi": "julistettiin sotatila 3. maaliskuuta"
+      },
+      "close": "A state of war declared within Sweden on 3 March against a declaration of war in April: two different acts. (round 1 of the blind review, editor reviewer)"
+    },
+    {
+      "topic": "Q2457646",
+      "type": "numbers",
+      "quotes": {
+        "fi": "kutsuttu koolle 22. maaliskuuta"
+      },
+      "close": "The day the Diet was summoned for against the days it sat: not the same date. (round 1 of the blind review, editor reviewer)"
+    },
+    {
+      "topic": "Q2457646",
+      "type": "framing",
+      "quotes": {
+        "fi": "Nimitys ”valtiopäivät” on vakiintunut"
+      },
+      "close": "\"Established\" and \"now common, of later date\" agree. (round 1 of the blind review, editor reviewer)"
     }
   ]
 }

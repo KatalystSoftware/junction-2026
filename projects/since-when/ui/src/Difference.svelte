@@ -16,7 +16,9 @@
 	const story = $derived(turns(d, events))
 	const began = $derived(story[0])
 	const main = $derived(dating(story))
-	const related = $derived(story.filter((t) => !main.includes(t)))
+	// A difference a model wrote is dated per edition by where its quoted words first stood; the edits
+	// of the rows merged into it are not listed, since an edit there may only have reformatted them.
+	const related = $derived(d.primary.began ? [] : story.filter((t) => !main.includes(t)))
 	// The strip is drawn once the edits have arrived: before that a day has no edition to sit on.
 	const strip = $derived(lanes(d, events.size ? main : []))
 	const cap = (text: string) => text[0].toUpperCase() + text.slice(1)
@@ -27,6 +29,11 @@
 	const asof = $derived.by(() => {
 		const q = d.quotes.find((x) => x.lang === began.lang) ?? d.quotes[0]
 		if (check && check.outcome !== 'set_aside' && q) return { qid: topic.wikidata_id, date: check.as_of.slice(0, 10), lang: q.lang, finding: String((q.from ?? d.primary).id) }
+		// A difference a model wrote, not checked: the edition whose words came last, the day they did.
+		const last = strip.filter((l) => l.since).sort((a, b) => b.since!.at.localeCompare(a.since!.at))[0]
+		const from = last && (d.quotes.find((x) => x.lang === last.lang)?.from ?? d.primary)
+		const quoted = from && (from.began?.[last.lang] ?? d.primary.began?.[last.lang])?.quoted
+		if (d.primary.began && last && from && quoted) return { qid: topic.wikidata_id, date: dayAfter(String(quoted).slice(0, 10)), lang: last.lang, finding: String(from.id) }
 		return { qid: topic.wikidata_id, date: dayAfter(began.at), lang: began.lang, finding: '0' }
 	})
 	let row: HTMLDetailsElement
@@ -58,7 +65,7 @@
 					</figure>
 				{/each}
 			</div>
-			{#if !began.known}<p class="line small" title="No earlier version was compared">In the current text</p>{/if}
+			{#if !began.known && !d.primary.began}<p class="line small" title="No earlier version was compared">In the current text</p>{/if}
 			{#if check}
 				{@const e = check.evidence}
 				<Why id="why-check-{Math.abs(d.id)}{d.id < 0 ? 'n' : ''}" label="Checked">

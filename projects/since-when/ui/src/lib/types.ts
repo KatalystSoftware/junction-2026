@@ -70,6 +70,9 @@ export interface Finding {
 	history?: boolean
 	/** null: the check did not look at this row. Absent on a database without the check. */
 	check?: Check | null
+	/** For a difference a model wrote: per quoted edition, the first revision of the unbroken run, up
+	 * to today, that holds the quoted words. `first`: the run reaches the oldest version loaded. */
+	began?: PerLang<{ at: string; rev: number; old: number | null; first: boolean; quoted: string }>
 }
 
 export interface Lead {
