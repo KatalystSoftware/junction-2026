@@ -27,6 +27,7 @@ window.KATALYST = {
       shot: "incident.webp",
       what: "A simulated 120-minute on-call shift that AI agents handle worse than a scripted expert. The replay puts an agent's shift next to the expert's: each action, what the agent saw and what it wrote.",
     },
+    {
       name: "Kutsu",
       for: "City of Espoo, Rethinking Recruitment",
       live: "",
