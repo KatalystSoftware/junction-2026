@@ -40,6 +40,7 @@ from typing import Optional
 from spread.starter import DAY, HOUR, Retry, steep
 
 from .policy import OPEN, OPENS, Policy, kind
+from .server import near_places
 
 HERE = Path(__file__)
 RETURNS: dict[str, float] = json.loads(HERE.with_name("returns.json").read_text(encoding="utf-8"))  # "a>b" -> return requests a week
@@ -53,6 +54,17 @@ PARAMS = {
     "pair_fee": 0.7,      # the pair gig opens at this multiple of the two cars' typical fees ...
     "pair_top": 1.0,      # ... and rises a tenth of them an hour up to this multiple
     "pair_cost": 0,       # a request that can pair with a held car is quoted at this cost, as a multiple of its typical fee; 0 is `cost`
+    "pair_km": 0,         # the ends of a pair lie within this many km of each other; 0 is the notification distance (30 km)
+    "pair_open": False,   # a won return can also pair with a car whose own gig is open and unbooked: that gig is withdrawn first
+    "pair_onward": 0,     # above 0, a held car can also go with a car collected near its delivery place, wherever that one goes,
+                          # in a gig that opens at this multiple of the two typical fees: it saves the trips between, not the trip home
+    "pair_late": False,   # with `pair_onward`, a held car waits for a return and takes an onward partner only at its release: another
+                          # held car, or a car alone in an open gig that no driver holds, which is withdrawn first
+    "pair_onward_cost": 0,  # with `pair_late`, a request whose car can go onward with a held car, and has no return to go with,
+                          # is quoted at this cost, a multiple of its typical fee; once won its car is held until that car's release
+    "pair_onward_drivers": 0,  # ... only in a week with at least this many drivers listed: thin worlds keep the usual cost
+    "pair_more_drivers": 0,  # in a week with fewer drivers listed, `pair_open`, `pair_onward`, `pair_late` and `pair_onward_cost` are
+                          # off, so the week plays as the base; known before the first quote
     "pair_version": "",   # VERSION, set by the variant, so a sweep plays the weeks again when this file changes
 }
 GIG_DRIVING = 12 * HOUR  # RULES.md: a gig with more than one car plans at most 12 hours of driving
@@ -87,15 +99,21 @@ class PairPolicy(Policy):
         if self.p["push_from"] or self.p["home_offers"]:
             raise ValueError("Pairs do not reprice for the backlog (push_from) or send offers home (home_offers)")
         self.p.update(own)
+        if len(roster) < self.p["pair_more_drivers"]:
+            self.p.update(pair_open=False, pair_onward=0, pair_late=False, pair_onward_cost=0)
         self.pair_wait: dict[str, int] = {}  # order id -> the minute its car is posted alone if no return comes
         self.pair_gigs: dict[str, int] = {}  # gig id of a pair -> the latest minute a driver can set out and deliver both cars on time
         self.first: Optional[str] = None  # the order whose first post is being decided
-        self.pairing = False  # the quote being made is for a return of a held car
+        self.pairing = False  # the quote being made is for a return of a held car, or "onward" for an onward partner
+        self.pair_near = near_places(map_, self.p["pair_km"]) if self.p["pair_km"] else self.near
+        self.pair_rate: dict[str, float] = {}  # gig id of a pair -> its opening multiple, when it is not `pair_fee`
 
     # The parts of the policy that see a held car or a pair gig.
 
     def params(self) -> dict:
         p = super().params()
+        if self.pairing == "onward":
+            return {**p, "cost": p["pair_onward_cost"]}
         return {**p, "cost": p["pair_cost"]} if self.pairing and p["pair_cost"] else p
 
     def unbooked(self, hours: float = 0) -> int:
@@ -105,13 +123,16 @@ class PairPolicy(Policy):
     def quote(self, request) -> None:
         self.requests[request["id"]] = request
         partner = self.partner(request) if self.p["pair_hold"] else None
-        self.pairing = partner is not None
+        onward = None if partner or not self.p["pair_hold"] else self.onward_partner(request)
+        self.pairing = "onward" if onward else partner is not None
         try:
             super().quote(request)
         finally:
             self.pairing = False
         if partner:
             self.decisions[request["id"]]["pair"] = partner
+        if onward:
+            self.decisions[request["id"]]["onward"] = onward
 
     def win(self, order) -> None:
         self.first = order["id"]
@@ -129,13 +150,13 @@ class PairPolicy(Policy):
             return  # a held car goes out by its release, in a pair or alone: after a restart the desk does not post it twice
         if self.first == order["id"]:
             self.first = None
-            if self.p["pair_hold"] and self.pairable(order) and (self.pair_up(order) or self.hold(order)):
+            if self.p["pair_hold"] and self.pairable(order) and (self.pair_up(order) or self.hold_onward(order) or self.hold(order)):
                 return
         super().post(order, legs, retry)
 
     def look(self) -> None:
         for id_, until in list(self.pair_wait.items()):
-            if until <= self.now:
+            if until <= self.now and id_ in self.pair_wait:  # an earlier release may have taken it as a partner
                 self.post_held(id_)
         for gig_id, latest in list(self.pair_gigs.items()):
             if gig_id not in self.booked and latest - self.p["pair_split"] * HOUR <= self.now:
@@ -175,7 +196,7 @@ class PairPolicy(Policy):
             if len(ids) < 2:  # a cancelled order left one car in it: that car goes alone, at its own fee
                 return self.split(gig_id, "dropped")
             if not any(id_ in self.urgent for id_ in ids):
-                self.outbox.append({"type": "reprice", "gigId": gig_id, "schedule": self.pair_fees(ids, self.p["drop_fee"] or 1.0)})
+                self.outbox.append({"type": "reprice", "gigId": gig_id, "schedule": self.pair_fees(ids, self.p["drop_fee"] or 1.0, self.pair_rate.get(gig_id))})
             return
         super().reopen(gig_id)
 
@@ -214,15 +235,30 @@ class PairPolicy(Policy):
         self.decisions.setdefault(order["id"], {})["held"] = {"at": self.now, "until": until}
         return True
 
+    def hold_onward(self, order) -> bool:
+        """With `pair_onward_cost`: a car won at the onward quote waits for the held car it was quoted with, until that car's
+        release, which takes it as its onward partner when no return came first."""
+        partner = self.decisions.get(order["id"], {}).get("onward")
+        if partner not in self.pair_wait:
+            return False
+        until = min(self.pair_wait[partner], order["lastPickupAt"] - int(self.p["pair_left"] * HOUR))
+        if until <= self.now:
+            return False
+        self.pair_wait[order["id"]] = until
+        self.decisions[order["id"]]["held"] = {"at": self.now, "until": until, "onward": partner}
+        return True
+
     def post_held(self, order_id: str) -> None:
-        """Posts a held car alone."""
+        """Posts a held car alone, or with `pair_late` with the best partner left at its release."""
         del self.pair_wait[order_id]
+        if self.p["pair_late"] and self.p["pair_onward"] and order_id not in self.urgent and self.pair_up(self.orders[order_id], release=True):
+            return
         self.decisions.setdefault(order_id, {}).setdefault("held", {})["alone"] = self.now
         self.alone(self.orders[order_id], [0])
 
     def partner(self, request) -> Optional[str]:
         """The held order that the request's car can go back with, in one gig that a driver can still book in time."""
-        if len(request["legs"]) != 1 or kind(request) != "" or not self.pair_wait:
+        if len(request["legs"]) != 1 or kind(request) != "" or not (self.pair_wait or self.p["pair_open"]):
             return None
         reason, options = self.choose(request, self.params())
         if reason:
@@ -234,34 +270,88 @@ class PairPolicy(Policy):
         best = self.best_pair(order, at=request["respondBy"])
         return best[0] if best else None
 
+    def onward_partner(self, request) -> Optional[str]:
+        """With `pair_onward_cost`: the held car that the request's car can go onward with at that car's release."""
+        p = self.p
+        if (not (p["pair_onward_cost"] and p["pair_late"] and p["pair_onward"] and self.pair_wait) or len(request["legs"]) != 1 or kind(request) != ""
+                or len(self.roster) < p["pair_onward_drivers"]):
+            return None
+        reason, options = self.choose(request, self.params())
+        if reason:
+            return None
+        option = min(options, key=lambda o: o["deadline"])
+        order = {"id": request["id"], "legs": request["legs"], "deadline": option["deadline"],
+                 "lastPickupAt": option["deadline"] - self.drive(request), "deliveredAt": [None], "option": option["kind"]}
+        best = self.best_pair(order, at=request["respondBy"], release=True, held=True)
+        return best[0] if best else None
+
     def returns(self, order, other) -> bool:
         """Whether one car runs back from near the other's delivery place to near its pickup place."""
         a, b = order["legs"][0], other["legs"][0]
-        return (b["pickup"]["placeId"] in self.near[a["delivery"]["placeId"]] and b["delivery"]["placeId"] in self.near[a["pickup"]["placeId"]])
+        return (b["pickup"]["placeId"] in self.pair_near[a["delivery"]["placeId"]] and b["delivery"]["placeId"] in self.pair_near[a["pickup"]["placeId"]])
 
-    def best_pair(self, order, at: int) -> Optional[tuple[str, dict, int]]:
-        """The held order to pair with, the post of both cars, and the latest start: the pair that leaves a driver the most time."""
-        best = None
-        for id_ in self.pair_wait:
+    def onward(self, first, second) -> bool:
+        """Whether the second car is collected near the first's delivery place."""
+        return first["legs"][0]["delivery"]["placeId"] in self.pair_near[second["legs"][0]["pickup"]["placeId"]]
+
+    def open_alone(self, release: bool = False) -> list[tuple[str, str]]:
+        """With `pair_open`, or at a release with `pair_late`: (order id, gig id) of the one-car dealer orders whose car is alone
+        in an open gig that no driver holds."""
+        if not (self.p["pair_open"] or release):
+            return []
+        out = []
+        for id_, legs in self.leg_gigs.items():
+            gig_id = legs.get(0)
+            order = self.orders.get(id_)
+            if (gig_id and gig_id not in self.booked and gig_id not in self.pair_gigs and order is not None and self.pairable(order)
+                    and gig_id in self.posts and len({s["orderId"] for s in self.posts[gig_id]["stops"]}) == 1):
+                out.append((id_, gig_id))
+        return out
+
+    def best_pair(self, order, at: int, release: bool = False, held: bool = False) -> Optional[tuple]:
+        """The order to pair with, the post of both cars, the latest start, the opening multiple and the open gig to withdraw
+        first (or None): the pair that leaves a driver the most time. Partners are the held cars, and with `pair_open` the
+        cars alone in an open gig. Out and back first; with `pair_onward`, a car collected near the other's delivery place,
+        which with `pair_late` only a held car at its release takes."""
+        best, p = None, self.p
+        onward = p["pair_onward"] and (release or not p["pair_late"])
+        partners = [(id_, None) for id_ in self.pair_wait] + ([] if held else [(id_, g) for id_, g in self.open_alone(release) if id_ != order["id"]])
+        if not partners:
+            return None
+        mine = self.single(order)
+        for id_, gig_id in partners:
             other = self.orders[id_]
-            if not self.returns(other, order):
+            theirs = self.posts[gig_id] if gig_id else self.single(other)
+            if self.returns(other, order):
+                tries = [(theirs["stops"] + mine["stops"], p["pair_fee"]), (mine["stops"] + theirs["stops"], p["pair_fee"])]
+            elif onward:
+                tries = ([(theirs["stops"] + mine["stops"], p["pair_onward"])] if self.onward(other, order) else []) + \
+                        ([(mine["stops"] + theirs["stops"], p["pair_onward"])] if self.onward(order, other) else [])
+            else:
                 continue
-            mine, theirs = self.single(order), self.single(other)
-            for stops in (theirs["stops"] + mine["stops"], mine["stops"] + theirs["stops"]):
+            for stops, rate in tries:
                 latest = self.latest(stops, {order["id"]: order, id_: other})
-                if latest is not None and latest >= at + self.p["pair_left"] * HOUR and (best is None or latest > best[2]):
+                if latest is not None and latest >= at + p["pair_left"] * HOUR and (best is None or (rate, -latest) < (best[3], -best[2])):
                     audience = {name: theirs["audience"][name] or mine["audience"][name] for name in mine["audience"]}
-                    best = (id_, {"type": "post", "stops": stops, "audience": audience}, latest)
+                    best = (id_, {"type": "post", "stops": stops, "audience": audience}, latest, rate, gig_id)
         return best
 
-    def pair_up(self, order) -> bool:
+    def pair_up(self, order, release: bool = False) -> bool:
         """Posts the order's car in one gig with a held car that it runs back with. False when none fits."""
-        best = self.best_pair(order, at=self.now)
+        best = self.best_pair(order, at=self.now, release=release)
         if best is None:
             return False
-        id_, action, latest = best
-        del self.pair_wait[id_]
-        self.outbox.append({**action, "schedule": self.pair_fees([id_, order["id"]])})
+        id_, action, latest, rate, open_gig = best
+        if open_gig:  # the partner's own gig goes first and alone: a driver may book it meanwhile, and the world then refuses
+            withdraw, before = {"type": "withdraw", "gigId": open_gig}, len(self.refused)
+            self.outbox.append(withdraw)
+            self.send()
+            if any(r["action"] is withdraw for r in self.refused[before:]):
+                return False
+            self.leg_gigs[id_].pop(0, None)
+            self.decisions.setdefault(id_, {})["unposted"] = {"gig": open_gig, "at": self.now}
+        self.pair_wait.pop(id_, None)
+        self.outbox.append({**action, "schedule": self.pair_fees([id_, order["id"]], rate=rate)})
         self.send()  # the gig's id now, as for a trade-in: later events of either order find it
         gig_id = self.leg_gigs.get(order["id"], {}).get(0)
         if gig_id is None:  # refused: both alone
@@ -270,6 +360,8 @@ class PairPolicy(Policy):
             self.decisions.setdefault(order["id"], {})["paired"] = {"with": id_, "refused": True}
             return True
         self.pair_gigs[gig_id] = latest
+        if rate != self.p["pair_fee"]:
+            self.pair_rate[gig_id] = rate
         for one, other in ((order["id"], id_), (id_, order["id"])):
             self.decisions.setdefault(one, {})["paired"] = {"with": other, "gig": gig_id, "at": self.now, "latest": latest}
         return True
@@ -277,6 +369,7 @@ class PairPolicy(Policy):
     def split(self, gig_id: str, why: str, withdraw: bool = True) -> None:
         """Takes a pair gig out of the app, when it is still there, and posts each car that it still carries alone."""
         del self.pair_gigs[gig_id]
+        self.pair_rate.pop(gig_id, None)
         if withdraw:
             self.outbox.append({"type": "withdraw", "gigId": gig_id})
         for stop in self.posts[gig_id]["stops"]:
@@ -337,13 +430,13 @@ class PairPolicy(Policy):
     def pair_of(self, order_id: str) -> Optional[str]:
         return next((gig_id for gig_id in self.gigs_of(order_id) if gig_id in self.pair_gigs), None)
 
-    def pair_fees(self, order_ids: list[str], opening: float = 1.0) -> list[dict]:
-        """The fees of a pair gig from now: `pair_fee` x the two typical fees, rising a tenth of them an hour to `pair_top` x."""
+    def pair_fees(self, order_ids: list[str], opening: float = 1.0, rate: Optional[float] = None) -> list[dict]:
+        """The fees of a pair gig from now: `pair_fee` (or `rate`) x the two typical fees, rising a tenth of them an hour to `pair_top` x."""
         p = self.p
         usual = sum(self.usual_fee(self.requests[id_], p) for id_ in order_ids)
         if any(id_ in self.urgent for id_ in order_ids):
             return steep(self.now, usual, self.level)
-        fee, step = usual * p["pair_fee"] * opening, usual / 10
+        fee, step = usual * (rate or p["pair_fee"]) * opening, usual / 10
         top = max(fee, usual * p["pair_top"])
         steps, shown = [], None
         for k in range(math.ceil((top - fee) / step - 1e-9) + 1):

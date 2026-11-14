@@ -612,12 +612,12 @@ class LivePairDesk(LiveDesk, PairPolicy):
         self.read_pairs = []  # wins read offline that would go back with a held car: reconcile gives them their first post
         return super().catch_up(events)
 
-    def pair_up(self, order) -> bool:
+    def pair_up(self, order, release: bool = False) -> bool:
         """Offline a pair gig cannot be posted, and pairs.py would take it for refused and post both cars alone. So a win
         read at a join that pairs leaves the held car held and its own car unposted, for `reconcile` to pair them online."""
         if not self.offline:
-            return super().pair_up(order)
-        if self.best_pair(order, at=self.now) is None:
+            return super().pair_up(order, release)
+        if release or self.best_pair(order, at=self.now) is None:  # a release is online, from look
             return False
         self.read_pairs.append(order["id"])
         return True

@@ -40,6 +40,7 @@ from multiprocessing import Pool
 from pathlib import Path
 
 from spreadlab import curve, notes
+from spreadlab.late_wide import WidePairPolicy
 from spreadlab.pairs import PairPolicy
 from spreadlab.policy import Policy, kind
 from spreadlab.server import data_dir
@@ -124,8 +125,8 @@ class World:
                 del self.live[car]
 
 
-class Screen(PairPolicy):
-    """PairPolicy that also notes, for each return quote, the quote the policy would have sent at its usual cost."""
+class Screening:
+    """The pair desk that also notes, for each return quote, the quote the policy would have sent at its usual cost."""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -141,6 +142,8 @@ class Screen(PairPolicy):
     def quote(self, request) -> None:
         self.requests[request["id"]] = request
         partner = self.partner(request) if self.p["pair_hold"] else None
+        onward = None if partner or not self.p["pair_hold"] else self.onward_partner(request)
+        partner = partner or onward
         if partner is None:
             return super().quote(request)
         dealer = request["dealerId"]
@@ -152,7 +155,16 @@ class Screen(PairPolicy):
         super().quote(request)
         lo = self.answer(request, self.decisions[request["id"]]["prices"])
         self.return_quotes.append({"id": request["id"], "partner": partner, "hi": hi, "lo": lo, "typical": request["referenceFeeCents"],
+                                   "rate": self.p["pair_onward"] if onward else None,
                              "partner_typical": self.requests[partner]["referenceFeeCents"]})
+
+
+class Screen(Screening, PairPolicy):
+    pass
+
+
+class ScreenWide(Screening, WidePairPolicy):
+    pass
 
 
 def screen(path: str) -> dict:
@@ -184,7 +196,9 @@ def screen(path: str) -> dict:
         out["slack"] = slack
         map_ = json.loads((data_dir() / "map.json").read_text())
         world = World(map_, waits)
-        d = Screen(world, 8, 0, VARIANTS[SCREENED], run["roster"], map_)
+        params = VARIANTS[SCREENED]
+        desk_class = ScreenWide if params.get("late_wide") else Screen  # as play.py takes the desk
+        d = desk_class(world, 8, 0, params, run["roster"], map_)
 
         def until(t: int) -> None:
             for _ in range(10_000):
@@ -255,7 +269,9 @@ def screen(path: str) -> dict:
         for g, ids in pairs.items():
             x = world.gigs[g]
             split = any("split" in d.decisions[i]["paired"] for i in ids)
-            out["pairs"].append({"typical": sum(requests[i]["referenceFeeCents"] for i in ids), "alone": sum(fees[i] for i in ids),
+            back = len(ids) == 2 and d.returns(won[ids[0]]["order"], won[ids[1]]["order"])
+            out["pairs"].append({"ids": sorted(ids), "back": back, "rate": None if back else params.get("pair_onward"),
+                                 "typical": sum(requests[i]["referenceFeeCents"] for i in ids), "alone": sum(fees[i] for i in ids),
                                  "booked_after": None if g not in d.booked else x["book"] - x["at"], "split": split,
                                  "late_alone": sum(i in late for i in ids)})
         out["held"] = len(held)
@@ -282,6 +298,11 @@ def screen(path: str) -> dict:
     except Exception:
         out["error"] = traceback.format_exc()[-1500:]
     return out
+
+
+def screening(variant: str) -> None:
+    global SCREENED
+    SCREENED = variant
 
 
 def read(rows: list[dict]) -> None:
@@ -318,12 +339,13 @@ def read(rows: list[dict]) -> None:
         print(f"== {group}: {n} weeks")
         print(f"   2. pairs a week {len(pairs) / n:.1f} ({2 * len(pairs) / n:.0f} orders); held {held / n:.1f}, of which alone {len(alone) / n:.1f}; "
               f"pairs back to two gigs {sum(p['split'] for p in pairs) / n:.1f} a week, by reason {dict(sum((collections.Counter(r['splits']) for r in sel), collections.Counter()))}")
+        print(f"   2b. out and back {sum(p.get('back', True) for p in pairs) / n:.1f} a week, onward {sum(not p.get('back', True) for p in pairs) / n:.1f}")
         print(f"   3. held cars without a return: late {base_late / max(1, len(alone)):.2%} at the recorded post, "
               f"{(base_late + d_late) / max(1, len(alone)):.2%} when held: {100 * d_late / max(1, len(alone)):+.2f} points")
         booked = [p for p in pairs if p["booked_after"] is not None and not p["split"]]
         for fee in FEES:
             # The pair books after the slower of its two cars' recorded waits; the fee rises a tenth an hour to 1.0.
-            pay = sum(min(fee + 0.1 * (p["booked_after"] // 60), 1.0) * p["typical"] for p in booked)
+            pay = sum(min((p.get("rate") or fee) + 0.1 * (p["booked_after"] // 60), 1.0) * p["typical"] for p in booked)  # onward pairs at their own rate
             saved = sum(p["alone"] for p in booked) - pay
             held_cost = LATE_EUROS * 100 * d_late
             band = [w for m, w in trade if abs(m - fee * ratio) <= 0.1]
@@ -334,7 +356,7 @@ def read(rows: list[dict]) -> None:
             pp = sum(y["paired"] for y in rets if y["won"]) / max(1, sum(y["won"] for y in rets))  # the share of won returns that pair
             for x in rets:
                 (c_hi, p_hi), (c_lo, p_lo) = x["hi"], x["lo"]
-                paired_cost = fee * (x["typical"] + x["partner_typical"]) - (x["partner_fee"] or 1.08 * x["partner_typical"])
+                paired_cost = (x.get("rate") or fee) * (x["typical"] + x["partner_typical"]) - (x["partner_fee"] or 1.08 * x["partner_typical"])
                 cost = pp * paired_cost + (1 - pp) * 1.2 * x["typical"]
                 gain += c_lo * (p_lo - cost) - c_hi * (p_hi - cost)
             print(f"   pairs-{fee}: 4. trade-ins at {fee * ratio:.2f} x their typical fee ({len(band)} gigs): booked within 1 h {in1:.0%}, 2 h {in2:.0%}; "
@@ -352,6 +374,7 @@ def main() -> None:
     parser.add_argument("--out", default=str(data_dir() / "pairs-screen.jsonl"))
     parser.add_argument("--read", help="only print the screen from this file")
     parser.add_argument("--processes", type=int, default=4)
+    parser.add_argument("--screened", default=SCREENED, help=f"the pair variant to run over the recorded weeks (default {SCREENED})")
     args = parser.parse_args()
     if args.read:
         return read([json.loads(line) for line in open(args.read)])
@@ -364,7 +387,7 @@ def main() -> None:
     rows = [json.loads(line) for line in open(args.out)] if Path(args.out).exists() else []  # a screen that stopped goes on
     done = {r["path"] for r in rows}
     paths = [p for p in paths if p not in done]
-    with Pool(args.processes) as pool, open(args.out, "a") as f:
+    with Pool(args.processes, initializer=screening, initargs=(args.screened,)) as pool, open(args.out, "a") as f:
         for i, row in enumerate(pool.imap(screen, paths, chunksize=2)):
             rows.append(row)
             f.write(json.dumps(row) + "\n")
