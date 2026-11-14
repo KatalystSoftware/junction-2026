@@ -93,7 +93,7 @@
 		{/each}
 	</div>
 	{#if canExpand}
-		<button class="btn quiet more" aria-expanded={whole} onclick={() => (whole = !whole)}>{whole ? 'Opening sentences only' : 'Show the full leads'}</button>
+		<button class="cdx-button cdx-button--action-progressive cdx-button--weight-quiet more" aria-expanded={whole} onclick={() => (whole = !whole)}>{whole ? 'Opening sentences only' : 'Show the full leads'}</button>
 	{/if}
 </section>
 
@@ -104,7 +104,7 @@
 			{#if types.length > 1}
 				<div class="chips" role="group" aria-label="Type of difference">
 					{#each types as t}
-						<button class="btn" aria-pressed={only === t} onclick={() => ((only = only === t ? null : t), (all = false))}>
+						<button class="cdx-button" aria-pressed={only === t} onclick={() => ((only = only === t ? null : t), (all = false))}>
 							{TYPES[t]} <span class="count num">{open.filter((f) => f.type === t).length}</span>
 						</button>
 					{/each}
@@ -118,7 +118,7 @@
 			{/each}
 		</ul>
 		{#if listed.length > shown.length}
-			<button class="btn rest" onclick={() => (all = true)}>Show all {listed.length}</button>
+			<button class="cdx-button rest" onclick={() => (all = true)}>Show all {listed.length}</button>
 		{/if}
 	{/if}
 	{#if closed.length}
@@ -227,7 +227,7 @@
 
 	.more {
 		margin-top: var(--spacing-50);
-		margin-left: calc(-1 * var(--spacing-50));
+		margin-left: calc(-1 * var(--spacing-75));
 	}
 
 	.list h2 {
@@ -250,11 +250,6 @@
 		display: flex;
 		flex-wrap: wrap;
 		gap: var(--spacing-35);
-	}
-
-	.chips .btn {
-		gap: var(--spacing-35);
-		font-weight: var(--font-weight-normal);
 	}
 
 	.count {

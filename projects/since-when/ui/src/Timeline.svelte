@@ -118,7 +118,7 @@
 			{#if types.length > 1}
 				<div class="chips" role="group" aria-label="Type of difference">
 					{#each types as t}
-						<button class="btn" aria-pressed={only === t} onclick={() => ((only = only === t ? null : t), (all = false))}>
+						<button class="cdx-button" aria-pressed={only === t} onclick={() => ((only = only === t ? null : t), (all = false))}>
 							{TYPES[t]} <span class="count num">{stories.filter((s) => s.type === t).length}</span>
 						</button>
 					{/each}
@@ -162,7 +162,7 @@
 			{/each}
 		</ol>
 		{#if listed.length > shown.length}
-			<button class="btn rest" onclick={() => (all = true)}>Show all {listed.length}</button>
+			<button class="cdx-button rest" onclick={() => (all = true)}>Show all {listed.length}</button>
 		{/if}
 
 		<details class="years small">
@@ -212,11 +212,6 @@
 		display: flex;
 		flex-wrap: wrap;
 		gap: var(--spacing-35);
-	}
-
-	.chips .btn {
-		gap: var(--spacing-35);
-		font-weight: var(--font-weight-normal);
 	}
 
 	.count {

@@ -129,14 +129,14 @@
 <aside id="sql-panel" class="panel" class:open={ui.sql} hidden={!ui.sql} aria-labelledby="sql-title" tabindex="-1" bind:this={panel}>
 	<header>
 		<h2 id="sql-title">SQL behind this page</h2>
-		<button class="btn quiet" onclick={() => (ui.sql = false)}>Close</button>
+		<button class="cdx-button cdx-button--action-progressive cdx-button--weight-quiet" onclick={() => (ui.sql = false)}>Close</button>
 	</header>
 
 	{#if preset}
 		<section class="live" aria-label="Run a statement on MariaDB">
 			<div class="presets" role="group" aria-label="Statement">
 				{#each presets as p}
-					<button class="btn" aria-pressed={p.name === name} onclick={() => ((name = p.name), (failure = ''))}>{p.title}</button>
+					<button class="cdx-button" aria-pressed={p.name === name} onclick={() => ((name = p.name), (failure = ''))}>{p.title}</button>
 				{/each}
 			</div>
 			<p class="small subtle">{preset.description}</p>
@@ -158,7 +158,7 @@
 						{/if}
 					</label>
 				{/each}
-				<button class="btn primary" type="submit" disabled={running}>{running ? 'Running…' : 'Run'}</button>
+				<button class="cdx-button cdx-button--action-progressive cdx-button--weight-primary" type="submit" disabled={running}>{running ? 'Running…' : 'Run'}</button>
 			</form>
 			{#if failure}<p class="small error" role="alert">{failure}</p>{/if}
 
@@ -243,11 +243,6 @@
 		display: flex;
 		flex-wrap: wrap;
 		gap: var(--spacing-35);
-	}
-
-	.presets .btn {
-		font-family: var(--font-family-system-sans);
-		font-weight: var(--font-weight-normal);
 	}
 
 	form {

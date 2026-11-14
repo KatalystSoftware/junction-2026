@@ -36,17 +36,17 @@
 	<div class="sheet">
 		<header>
 			<h2 id="topics-title">Topics</h2>
-			<button class="btn quiet" onclick={() => dialog.close()}>Close</button>
+			<button class="cdx-button cdx-button--action-progressive cdx-button--weight-quiet" onclick={() => dialog.close()}>Close</button>
 		</header>
 		{#if queue.searchable}
 			<form role="search" onsubmit={search}>
 				<input class="field" type="search" name="q" placeholder="Search topics" aria-label="Search topics" value={nav.q} autocomplete="off" />
-				<button class="btn" type="submit">Search</button>
+				<button class="cdx-button" type="submit">Search</button>
 			</form>
 		{/if}
 		<div class="filters" role="group" aria-label="Edition">
 			{#each FILTERS as l}
-				<button class="btn" aria-pressed={nav.lang === l} onclick={() => filter(l)}>{l === 'all' ? 'All' : NAMES[l]}</button>
+				<button class="cdx-button" aria-pressed={nav.lang === l} onclick={() => filter(l)}>{l === 'all' ? 'All' : NAMES[l]}</button>
 			{/each}
 		</div>
 		{#if queue.error}
@@ -67,7 +67,7 @@
 			{/each}
 		</ul>
 		{#if !nav.q && queue.items.length < queue.total}
-			<button class="btn more" disabled={queue.loading} onclick={() => loadQueue(true)}>Show {Math.min(pageSize, queue.total - queue.items.length)} more</button>
+			<button class="cdx-button more" disabled={queue.loading} onclick={() => loadQueue(true)}>Show {Math.min(pageSize, queue.total - queue.items.length)} more</button>
 		{/if}
 	</div>
 </dialog>
@@ -124,9 +124,8 @@
 		gap: var(--spacing-35);
 	}
 
-	.filters .btn {
+	.filters .cdx-button {
 		flex: 1;
-		font-weight: var(--font-weight-normal);
 	}
 
 	li a {

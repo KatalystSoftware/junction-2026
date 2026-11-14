@@ -76,10 +76,10 @@
 <header class="bar">
 	<div class="inner">
 		<span class="brand">Since When</span>
-		<button class="btn quiet" onclick={() => (ui.topics = true)}>Topics</button>
+		<button class="cdx-button cdx-button--action-progressive cdx-button--weight-quiet" onclick={() => (ui.topics = true)}>Topics</button>
 		<span class="grow"></span>
 		{#if flags.fixture}<span class="fixture">Fixture data</span>{/if}
-		<button class="btn" aria-expanded={ui.sql} aria-controls="sql-panel" onclick={() => (ui.sql = !ui.sql)}>SQL</button>
+		<button class="cdx-button" aria-expanded={ui.sql} aria-controls="sql-panel" onclick={() => (ui.sql = !ui.sql)}>SQL</button>
 	</div>
 </header>
 
