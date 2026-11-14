@@ -48,7 +48,8 @@ chance the private and trade-in requests and the note's own deadline and site ho
 | 120 unseen practice weeks (`fresh-1301` to `fresh-1360`, `fresh-1401` to `fresh-1460`) | €12,376 a week against €10,890 for `steep-notes-offers-8`: +€1,486 (1,297 to 1,677), ahead in 117 of 120. 312 orders and 11.2 late a week; no week under 90% on time against 2, the lowest 90.5%, the mean 96.4% |
 | 38 thin worlds, the lowest of `steep-notes-offers-8` among them | +€1,830 a week (1,398 to 2,268); no week under 90% against 5 |
 | Test final, Saturday 14:00 Helsinki, played by `steep-notes-offers-8` at `480d933` | Joined on Thursday after three replayed days, so live for two days: €1,401.25, 68 orders, 97.1% on time, ranked. All 417 live requests quoted by the policy, none by the guard, none missed; at least 3.6 s left at a quote, 4.5 s at the median; no lost connection, no 429 or 5xx, and the longest hold-up of the event stream under a second |
-| Ranking rounds and the final | not played yet at this commit |
+| Ranking round, Saturday 15:00 Helsinki, played by this variant from the checkout the unseen sets confirmed | €68,743.40 over five weeks, €13,749 a week, every week ranked: €15,686, €13,473, €9,339, €11,968 and €18,278 on 323, 343, 240, 345 and 409 orders; 96.9% on time, the lowest week 95.6%. The place is read when the round closes |
+| The final | not played yet at this commit |
 
 A variant tuned to the simulator for margin may play the final instead, but only if it beats this one on
 unseen weeks with at most 1 week in 60 under 90% on time, thin worlds included. Which variant played
