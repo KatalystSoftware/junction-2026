@@ -1,0 +1,16 @@
+# 3-minute demo script
+
+The demo follows one company (Puro Analytics), one candidate (Olena K., C-027) and one organiser (Aino). Before starting, click **Reset demo**.
+
+| Time | Screen | What to show and say |
+|---|---|---|
+| **0:00–0:20** | Home | "Espoo's recruitment events have a signal problem. Companies don't say what they need, candidates' CVs are AI-written, and organisers who could hand-pick conversations lack the tech knowledge to do it. Esittely fixes the information, not the people. **The AI pulls the information; humans make the judgements.**" Point to the dark strip: no scores, no rankings of people. |
+| **0:20–1:00** | Company → Puro Analytics | "Puro never sent its needs. So we drafted them from its own public job ad. Hover a field, and you see the sentence it came from." The live count shows **7 registered attendees meet your must-haves.** "Their ad says *fluent Finnish required*. We ask: is it truly required?" Click **Helpful, not required**, and the count goes to **14**. "A real number from this event, aggregate only." Move Python up to a must-have, then back. Click **Confirm and promote my stand**. "About a minute, framed as promotion, not filtering." |
+| **1:00–1:50** | Candidate → Olena | Click through: field, then tools with depth ("used at work, 4 years" plus one concrete example), languages, and the three forced trade-offs. "Concrete choices instead of a free text an AI can write. Each step shows why it's worth answering, computed from the companies here." Open **Stands worth visiting**: Puro is first, with a plain reason, and "you can visit any stand". Open **How organisers see you** and change Python's depth. "She sees exactly what the organiser sees, and her correction is logged." |
+| **1:50–2:40** | Organiser → Puro Analytics | "72 people asked to meet Puro. That's the noise." Tick **Meets every stated must-have**: 72 becomes **10**, the same definition as the company's live count. Note the criteria line: "her choice, shown on screen. The order is just registration time; nothing is scored. Each row names the must-haves, not a score." Open **C-027**: overlaps, gaps, practical checks and conversation starters. Click **source** on one: "every line points to the answer or job-ad sentence it came from." "The name is hidden until she decides." Click **Introduce**, write the reason, and **Save**. Then open **Lähde Logistics IT**: "the fairness check flags that more than half of those who asked lack working Finnish, but none of the introductions so far do, and the company never said Finnish is required. Worth a second look." Open the **Decision log**. |
+| **2:40–3:00** | After the event | One tap: "Was this conversation relevant?" "That builds proof of quality for companies at the next event." Close: "**A layer on top of Espoo's registration, not another event platform.** Matchmaking platforms let an algorithm rank people; Esittely gives the organiser the understanding to introduce them, with a reason." |
+
+**Backup lines if asked:**
+- **EU AI Act:** this is a preparatory task with human oversight and no profiling. Details are in the responsible-AI note.
+- **Crashes at login:** it's a static site, filled in before the event.
+- **Data:** synthetic. 360 candidates and 12 fictional companies, generated with a fixed seed.

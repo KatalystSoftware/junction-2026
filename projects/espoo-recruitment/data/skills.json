@@ -1,0 +1,437 @@
+[
+ {
+  "id": "python",
+  "label": "Python",
+  "family": "programming",
+  "plain": "A widely used programming language for back-end services, data work and automation.",
+  "esco": {
+   "title": "Python (computer programming)",
+   "uri": "http://data.europa.eu/esco/skill/ccd0a1d9-afda-43d9-b901-96344886e14d"
+  }
+ },
+ {
+  "id": "java",
+  "label": "Java",
+  "family": "programming",
+  "plain": "A programming language common in large company systems, banking and Android apps.",
+  "esco": {
+   "title": "Java (computer programming)",
+   "uri": "http://data.europa.eu/esco/skill/19a8293b-8e95-4de3-983f-77484079c389"
+  }
+ },
+ {
+  "id": "kotlin",
+  "label": "Kotlin",
+  "family": "programming",
+  "plain": "A modern language mainly used for Android apps and some back-end services; close relative of Java.",
+  "esco": null
+ },
+ {
+  "id": "javascript",
+  "label": "JavaScript",
+  "family": "programming",
+  "plain": "The language that makes websites interactive; also used on servers (Node.js).",
+  "esco": {
+   "title": "JavaScript",
+   "uri": "http://data.europa.eu/esco/skill/3cd569a2-4f88-4c1e-9995-8dce8c5e51a7"
+  }
+ },
+ {
+  "id": "typescript",
+  "label": "TypeScript",
+  "family": "programming",
+  "plain": "JavaScript with extra checks that catch mistakes early; standard in larger web projects.",
+  "esco": {
+   "title": "TypeScript",
+   "uri": "http://data.europa.eu/esco/skill/867137fb-ff1b-4ca3-99f3-cb6969aa2c68"
+  }
+ },
+ {
+  "id": "csharp",
+  "label": "C#",
+  "family": "programming",
+  "plain": "Microsoft's main programming language, used for business software, games (Unity) and cloud services.",
+  "esco": {
+   "title": "C#",
+   "uri": "http://data.europa.eu/esco/skill/4c016b68-4116-468c-9dc6-42710c239e4a"
+  }
+ },
+ {
+  "id": "cpp",
+  "label": "C / C++",
+  "family": "programming",
+  "plain": "Low-level languages for software that must be fast or run on devices: machines, cars, telecom gear.",
+  "esco": {
+   "title": "C++",
+   "uri": "http://data.europa.eu/esco/skill/b633eb55-8f1f-4ae6-ab4c-2022ffe2cb7f"
+  }
+ },
+ {
+  "id": "go",
+  "label": "Go",
+  "family": "programming",
+  "plain": "A language from Google for fast, simple network and cloud services.",
+  "esco": null
+ },
+ {
+  "id": "rust",
+  "label": "Rust",
+  "family": "programming",
+  "plain": "A newer language for fast and safe system software; growing in embedded and infrastructure work.",
+  "esco": null
+ },
+ {
+  "id": "sql",
+  "label": "SQL / databases",
+  "family": "data",
+  "plain": "The standard way to store, search and combine data in databases.",
+  "esco": {
+   "title": "SQL",
+   "uri": "http://data.europa.eu/esco/skill/598de5b0-5b58-4ea7-8058-a4bc4d18c742"
+  }
+ },
+ {
+  "id": "react",
+  "label": "React",
+  "family": "frontend",
+  "plain": "The most common toolkit for building the screens of web applications.",
+  "esco": {
+   "title": "JavaScript Framework",
+   "uri": "http://data.europa.eu/esco/skill/9b9de2a4-d8af-4a7b-933a-a8334ae60067"
+  }
+ },
+ {
+  "id": "uiux",
+  "label": "UX / UI design",
+  "family": "design",
+  "plain": "Designing how a product looks and how easy it is to use, based on research with real users.",
+  "esco": {
+   "title": "create prototype of user experience solutions",
+   "uri": "http://data.europa.eu/esco/skill/07dd856d-6141-48a7-a228-918f88494812"
+  }
+ },
+ {
+  "id": "figma",
+  "label": "Figma",
+  "family": "design",
+  "plain": "The standard design tool for drawing app and website screens and prototypes.",
+  "esco": {
+   "title": "graphics editor software",
+   "uri": "http://data.europa.eu/esco/skill/a71577b2-7550-4222-88ee-dcbd2d881516"
+  }
+ },
+ {
+  "id": "userresearch",
+  "label": "User research",
+  "family": "design",
+  "plain": "Interviewing and observing users to find out what they need and where they struggle.",
+  "esco": {
+   "title": "research website users",
+   "uri": "http://data.europa.eu/esco/skill/5e14de3d-d055-427e-9f5b-eb068f56b019"
+  }
+ },
+ {
+  "id": "aws",
+  "label": "AWS (Amazon cloud)",
+  "family": "cloud",
+  "plain": "Amazon's cloud: renting servers and services over the internet instead of owning machines.",
+  "esco": {
+   "title": "cloud technologies",
+   "uri": "http://data.europa.eu/esco/skill/bd14968e-e409-45af-b362-3495ed7b10e0"
+  }
+ },
+ {
+  "id": "azure",
+  "label": "Azure (Microsoft cloud)",
+  "family": "cloud",
+  "plain": "Microsoft's cloud platform; common in companies that already use Microsoft products.",
+  "esco": {
+   "title": "cloud technologies",
+   "uri": "http://data.europa.eu/esco/skill/bd14968e-e409-45af-b362-3495ed7b10e0"
+  }
+ },
+ {
+  "id": "docker",
+  "label": "Docker / containers",
+  "family": "cloud",
+  "plain": "Packaging software so it runs the same way on any computer or server.",
+  "esco": {
+   "title": "manage ICT virtualisation machines",
+   "uri": "http://data.europa.eu/esco/skill/ae4f0cc6-e0b9-47f5-bdca-2fc2e6316dce"
+  }
+ },
+ {
+  "id": "kubernetes",
+  "label": "Kubernetes",
+  "family": "cloud",
+  "plain": "A system that runs and scales many containers (packaged programs) across many servers automatically.",
+  "esco": {
+   "title": "cloud technologies",
+   "uri": "http://data.europa.eu/esco/skill/bd14968e-e409-45af-b362-3495ed7b10e0"
+  }
+ },
+ {
+  "id": "cicd",
+  "label": "CI/CD pipelines",
+  "family": "cloud",
+  "plain": "Automation that tests and releases new software versions safely, many times a day.",
+  "esco": {
+   "title": "DevOps",
+   "uri": "http://data.europa.eu/esco/skill/f0de4973-0a70-4644-8fd4-3a97080476f4"
+  }
+ },
+ {
+  "id": "linux",
+  "label": "Linux administration",
+  "family": "cloud",
+  "plain": "Running and maintaining the operating system most servers use.",
+  "esco": {
+   "title": "use digital device operating systems",
+   "uri": "http://data.europa.eu/esco/skill/35f1be97-06c4-4367-a067-7e0e94f2fa70"
+  }
+ },
+ {
+  "id": "terraform",
+  "label": "Infrastructure as code",
+  "family": "cloud",
+  "plain": "Describing servers and networks in text files so they can be created and changed reliably.",
+  "esco": {
+   "title": "cloud technologies",
+   "uri": "http://data.europa.eu/esco/skill/bd14968e-e409-45af-b362-3495ed7b10e0"
+  }
+ },
+ {
+  "id": "ml",
+  "label": "Machine learning",
+  "family": "data",
+  "plain": "Building models that learn patterns from data, e.g. to predict demand or recognise images.",
+  "esco": {
+   "title": "utilise machine learning",
+   "uri": "http://data.europa.eu/esco/skill/8369c2d6-c100-4cf6-bd83-9668d8678433"
+  }
+ },
+ {
+  "id": "dataeng",
+  "label": "Data pipelines",
+  "family": "data",
+  "plain": "Moving and cleaning large amounts of data so analysts and models can use it.",
+  "esco": {
+   "title": "data extraction, transformation and loading tools",
+   "uri": "http://data.europa.eu/esco/skill/9d0d89be-bffa-4393-b6f6-8d05bea49051"
+  }
+ },
+ {
+  "id": "analytics",
+  "label": "Data analysis / BI",
+  "family": "data",
+  "plain": "Turning data into reports and dashboards that help people decide (e.g. Power BI, Tableau).",
+  "esco": {
+   "title": "perform data analysis",
+   "uri": "http://data.europa.eu/esco/skill/2b92a5b2-6758-4ee3-9fb4-b6387a55cc8f"
+  }
+ },
+ {
+  "id": "statistics",
+  "label": "Statistics",
+  "family": "data",
+  "plain": "Mathematical methods to tell real effects from chance in data.",
+  "esco": {
+   "title": "statistics",
+   "uri": "http://data.europa.eu/esco/skill/7ee4c2ea-b349-4bd2-81a3-ec31475d4833"
+  }
+ },
+ {
+  "id": "llm",
+  "label": "LLM / generative AI apps",
+  "family": "data",
+  "plain": "Building products on top of AI language models like ChatGPT: prompts, retrieval, evaluation.",
+  "esco": {
+   "title": "principles of artificial intelligence",
+   "uri": "http://data.europa.eu/esco/skill/e465a154-93f7-4973-9ce1-31659fe16dd2"
+  }
+ },
+ {
+  "id": "testauto",
+  "label": "Test automation",
+  "family": "quality",
+  "plain": "Writing programs that check software automatically, so errors are caught before users see them.",
+  "esco": {
+   "title": "tools for ICT test automation",
+   "uri": "http://data.europa.eu/esco/skill/7557f0f4-b8bc-4ac0-b91e-222ab1ba744f"
+  }
+ },
+ {
+  "id": "manualtest",
+  "label": "Manual testing",
+  "family": "quality",
+  "plain": "Systematically trying software by hand to find errors and document them.",
+  "esco": {
+   "title": "execute software tests",
+   "uri": "http://data.europa.eu/esco/skill/913e7e83-b8f8-4574-b1ca-1b38f3fd974a"
+  }
+ },
+ {
+  "id": "embedded",
+  "label": "Embedded software",
+  "family": "embedded",
+  "plain": "Software inside physical devices (machines, sensors, vehicles) with tight limits on memory and power.",
+  "esco": {
+   "title": "embedded systems",
+   "uri": "http://data.europa.eu/esco/skill/2180bd8c-86de-4889-8165-adac902eee9d"
+  }
+ },
+ {
+  "id": "electronics",
+  "label": "Electronics design",
+  "family": "embedded",
+  "plain": "Designing circuit boards and the hardware that embedded software runs on.",
+  "esco": {
+   "title": "design electronic systems",
+   "uri": "http://data.europa.eu/esco/skill/feb717ff-fba6-4a91-aa10-ee11cf2da6b4"
+  }
+ },
+ {
+  "id": "robotics",
+  "label": "Robotics / ROS",
+  "family": "embedded",
+  "plain": "Programming robots to sense and move; ROS is a common robot software toolkit.",
+  "esco": {
+   "title": "robotics",
+   "uri": "http://data.europa.eu/esco/skill/e87ec79a-c9ff-46f5-84fa-7a0f394cdf40"
+  }
+ },
+ {
+  "id": "security",
+  "label": "Cybersecurity",
+  "family": "security",
+  "plain": "Protecting systems and data from attacks: finding weaknesses, monitoring, responding to incidents.",
+  "esco": {
+   "title": "cyber security",
+   "uri": "http://data.europa.eu/esco/skill/8088750d-8388-4170-a76f-48354c469c44"
+  }
+ },
+ {
+  "id": "networks",
+  "label": "Networking",
+  "family": "security",
+  "plain": "Configuring how computers and devices connect and talk to each other.",
+  "esco": {
+   "title": "ICT networking hardware",
+   "uri": "http://data.europa.eu/esco/skill/f9e788df-d68a-4f92-92c7-80e135fc35ff"
+  }
+ },
+ {
+  "id": "iam",
+  "label": "Identity & access management",
+  "family": "security",
+  "plain": "Controlling who may log in and what each person may access.",
+  "esco": {
+   "title": "maintain ICT identity management",
+   "uri": "http://data.europa.eu/esco/skill/ab49f767-296b-47d5-af56-0b4a69515b03"
+  }
+ },
+ {
+  "id": "agile",
+  "label": "Agile / Scrum",
+  "family": "process",
+  "plain": "A way of working in short cycles with frequent feedback; most software teams use it.",
+  "esco": {
+   "title": "Agile project management",
+   "uri": "http://data.europa.eu/esco/skill/0a9acb6b-1139-4be9-b431-3a80a959f2f4"
+  }
+ },
+ {
+  "id": "projectmgmt",
+  "label": "Project management",
+  "family": "process",
+  "plain": "Planning work, schedules and budgets and keeping a team on track.",
+  "esco": {
+   "title": "project management",
+   "uri": "http://data.europa.eu/esco/skill/7111b95d-0ce3-441a-9d92-4c75d05c4388"
+  }
+ },
+ {
+  "id": "productmgmt",
+  "label": "Product management",
+  "family": "process",
+  "plain": "Deciding what a product should do next, based on customers and business goals.",
+  "esco": {
+   "title": "plan product management",
+   "uri": "http://data.europa.eu/esco/skill/29fb886c-6be0-4e93-9ea1-232881f2092a"
+  }
+ },
+ {
+  "id": "itsupport",
+  "label": "IT support",
+  "family": "support",
+  "plain": "Helping users with computers, accounts and software problems.",
+  "esco": {
+   "title": "provide ICT support",
+   "uri": "http://data.europa.eu/esco/skill/c2296e2e-5fef-4f24-a24f-e5b3792268be"
+  }
+ },
+ {
+  "id": "sap",
+  "label": "SAP / ERP systems",
+  "family": "business",
+  "plain": "Large business software for finance, purchasing and logistics; needs specialist configuration.",
+  "esco": {
+   "title": "manage standard enterprise resource planning system",
+   "uri": "http://data.europa.eu/esco/skill/f0393af3-bcd9-41af-a36e-0cfb83b60081"
+  }
+ },
+ {
+  "id": "salesforce",
+  "label": "CRM systems",
+  "family": "business",
+  "plain": "Software for managing customer relationships and sales (e.g. Salesforce, HubSpot).",
+  "esco": null
+ },
+ {
+  "id": "mobile",
+  "label": "Mobile apps (iOS/Android)",
+  "family": "frontend",
+  "plain": "Building apps for phones.",
+  "esco": {
+   "title": "mobile operating systems",
+   "uri": "http://data.europa.eu/esco/skill/976455eb-5bbe-4493-ae64-ed16c3b009ea"
+  }
+ },
+ {
+  "id": "gamedev",
+  "label": "Game development / Unity",
+  "family": "frontend",
+  "plain": "Building games or 3D interactive apps, often with the Unity or Unreal engines.",
+  "esco": null
+ },
+ {
+  "id": "telecom",
+  "label": "Telecom / 5G",
+  "family": "embedded",
+  "plain": "The technology behind mobile networks, a big industry in Espoo.",
+  "esco": {
+   "title": "concepts of telecommunications",
+   "uri": "http://data.europa.eu/esco/skill/f1a56786-e6d7-4b2e-a39c-23e09024d473"
+  }
+ },
+ {
+  "id": "gis",
+  "label": "GIS / map data",
+  "family": "data",
+  "plain": "Working with map and location data.",
+  "esco": {
+   "title": "geographic information systems",
+   "uri": "http://data.europa.eu/esco/skill/377861af-f966-4c87-a2db-7e99904312b9"
+  }
+ },
+ {
+  "id": "health",
+  "label": "Health-data regulation",
+  "family": "business",
+  "plain": "Rules for medical software and patient data (e.g. MDR, GDPR in health).",
+  "esco": {
+   "title": "health informatics",
+   "uri": "http://data.europa.eu/esco/skill/fb82ae25-b59f-43fd-aacf-a8308afbe85e"
+  }
+ }
+]

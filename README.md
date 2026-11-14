@@ -13,4 +13,5 @@ Setup: `direnv allow` (or `nix develop`) for the tools; secrets are sops-encrypt
 - [`docs/challenges/`](docs/challenges/README.md): all challenge briefs, brief-based scoring and ranking.
 - [`docs/shortlist/`](docs/shortlist/README.md): the challenges we talked to, with chat notes and in-person scoring.
 - [`spread/`](spread/README.md): harness for the Bahn Express "Spread" challenge: scan practice weeks, compare policy variants, find their mistakes.
+- [`projects/espoo-recruitment/`](projects/espoo-recruitment/README.md): Esittely, the City of Espoo "Rethinking Recruitment" prototype: organisers hand-pick introductions with plain-language overlaps and gaps; no scores. Live: https://esittely.duckymcduck2.workers.dev/
 - [`projects/mariadb-wikipedia/cleanroom/`](projects/mariadb-wikipedia/cleanroom/README.md): clean-room test of the gap finder: an API check against live Wikipedia and four agent testers who see only what a user or judge sees.

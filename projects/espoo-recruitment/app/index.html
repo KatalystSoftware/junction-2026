@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Esittely — hand-picked introductions</title>
+<meta name="description" content="Prototype for the City of Espoo 'Rethinking Recruitment' challenge, Junction 2026. Synthetic data only.">
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='11' cy='16' r='8' fill='%231c5fd4'/><circle cx='21' cy='16' r='8' fill='%2300a389' fill-opacity='.85'/></svg>">
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="#/"><span class="dots"><i></i><i></i></span><b>Esittely</b><small>hand-picked introductions for Espoo recruitment events</small></a>
+  <nav id="nav">
+    <a href="#/org" data-k="org">Organiser</a>
+    <a href="#/company/puro" data-k="company">Company</a>
+    <a href="#/cand" data-k="cand">Candidate</a>
+    <a href="#/after" data-k="after">After the event</a>
+    <a href="#/concept" data-k="doc">About</a>
+  </nav>
+  <div class="topright"><span class="badge synth" title="Every company, job ad and person in this prototype is fictional">Synthetic demo data</span><button class="ghost sm" id="reset" title="Reset all demo decisions and edits">Reset demo</button></div>
+</header>
+<div class="principle" id="principle">
+  <span><b>The software gathers and translates</b> what people said.</span><span><b>People decide</b> who meets whom, with a reason.</span><span><b>No scores, no rankings of people.</b></span>
+</div>
+<main id="app"></main>
+<div id="toast"></div>
+<script src="data.js"></script>
+<script src="logic.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
