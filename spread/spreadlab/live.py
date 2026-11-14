@@ -58,6 +58,8 @@ VARIANT = "slow-friday-late-150-kinds-limits"
 # cars, paid on each, and was 96% on time (README, "Results so far"). It declines while the backlog gate is shut.
 FALLBACK_FEE, FALLBACK_LIST = 1.9, 1.5
 GUARD_SHARE, GUARD_MIN, GUARD_MAX = 1 / 3, 0.2, 1.5  # the guard quotes when this share of a request's time is left, in seconds
+OFFER_RATE, OFFER_BURST = 15.0, 30  # direct offers a second, and at most at once: the final's actions refill 20 a second with
+# 50 saved up (API.md, Limits), and the rest is for the quotes, posts and reprices
 LATE = 0.05  # seconds: a quote that would reach the world later than this before its deadline is not sent
 # The first post of a won order with a note waits for the note watcher's answer this long at most, in real seconds and
 # in world minutes: a driver often books a gig within a minute or two of its post, and a booked gig cannot be withdrawn.
@@ -244,7 +246,8 @@ THROTTLED = Throttled()  # every client of this process: the desk's and the guar
 class LiveDesk(Policy):
     """The policy on the live stream: it takes each event once, sends its actions at once, and can be put on disk."""
 
-    RUNTIME = ("world", "log", "guard", "clock", "watch", "held")  # not on disk: the connection, the log, the guard, the clock, the note watcher, held posts
+    RUNTIME = ("world", "log", "guard", "clock", "watch", "held", "pace")  # not on disk: the connection, the log, the guard, the clock, the note watcher,
+    # held posts, the offers' tokens
 
     def __init__(self, world, level: int, now: int, params: dict, roster: list[dict], map_: dict):
         super().__init__(world, level, now, params, roster, map_)
@@ -258,6 +261,7 @@ class LiveDesk(Policy):
         self.foreign: set[str] = set()  # gigs in the stream that this desk did not post: another desk may be playing
         self.log = self.guard = self.clock = self.watch = None
         self.held: dict[str, dict] = {}  # order id -> its first post, while it waits for the note watcher: legs, retry, since, at
+        self.pace: Optional[tuple[float, float]] = None  # the direct offers' tokens and the monotonic time they were counted at
 
     def __getstate__(self) -> dict:
         return {k: v for k, v in vars(self).items() if k not in self.RUNTIME}
@@ -432,9 +436,25 @@ class LiveDesk(Policy):
         self.guard.claim([action["requestId"] for action in quotes])
         # The quotes go in a call of their own: in the final each action costs a token, and a batch of offers behind
         # them would make the kit wait for tokens before the quotes reach the world.
-        for batch in (quotes, keep[len(quotes):]):
+        for batch in (quotes, self.paced(keep[len(quotes):])):
             if batch:
                 self.deliver(batch)
+
+    def paced(self, actions: list) -> list:
+        """The actions that go now: every one but the direct offers beyond the offers' share of the final's action bucket,
+        which wait in the outbox for the next pass of the loop, a tenth of a second later. Thus the kit never sleeps for
+        tokens while a quote waits. An offer counts as sent when the policy makes it, so one that waits is not made again."""
+        now, rate = time.monotonic(), OFFER_RATE * self.clock.speed  # a faster rehearsal gives the world's minute as many
+        tokens, at = self.pace or (OFFER_BURST, now)
+        tokens, go, wait = min(OFFER_BURST, tokens + (now - at) * rate), [], []
+        for action in actions:
+            if action["type"] != "offer" or tokens >= 1:
+                tokens -= action["type"] == "offer"
+                go.append(action)
+            else:
+                wait.append(action)
+        self.pace, self.outbox[:0] = (tokens, now), wait
+        return go
 
     def deliver(self, actions: list) -> None:
         started = time.monotonic()

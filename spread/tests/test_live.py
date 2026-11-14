@@ -415,12 +415,17 @@ def test_the_desk_sends_its_quotes_in_a_call_of_their_own_before_its_other_actio
     desk.desk.attach(world, desk.log, desk.guard, desk.clock)
     calls, act = [], world.act
     world.act = lambda actions, by="desk": calls.append([a["type"] for a in actions]) or act(actions, by)
-    desk.desk.outbox = [{"type": "offer", "gigId": f"g{i}", "driverId": "d1"} for i in range(3)]
+    desk.desk.outbox = [{"type": "offer", "gigId": f"g{i}", "driverId": "d1"} for i in range(40)]
     desk.desk.take(world.events()[0])  # its quote joins the outbox behind the offers
     desk.desk.send()
-    desk.stop()
-    assert calls == [["quote"], ["offer"] * 3]
+    assert calls == [["quote"], ["offer"] * live.OFFER_BURST]
     assert [by for _, _, by in world.quotes["R1"]] == ["desk"]
+    # The offers beyond the burst wait in the outbox, so the kit does not sleep for tokens, and go as the tokens come back.
+    assert [a["gigId"] for a in desk.desk.outbox] == [f"g{i}" for i in range(live.OFFER_BURST, 40)]
+    time.sleep(11 / live.OFFER_RATE)
+    desk.desk.send()
+    desk.stop()
+    assert calls[2] == ["offer"] * 10 and desk.desk.outbox == []
 
 
 def test_the_desk_counts_the_429_answers_that_the_kit_waits_out():
