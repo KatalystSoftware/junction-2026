@@ -1,0 +1,4 @@
+# One site per app, each in its own file under sites/. {$BASE_DOMAIN} comes from proxy.env.
+# Caddy gets a certificate for each hostname by itself, over HTTP on port 80 or TLS on 443,
+# so the machine holds no DNS provider key.
+import sites/*.caddy

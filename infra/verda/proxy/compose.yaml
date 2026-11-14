@@ -1,0 +1,21 @@
+# The one reverse proxy of the Verda machine. It owns ports 80 and 443 and routes by hostname to
+# each app's own compose project over the `proxy` network. See README.md.
+name: proxy
+
+services:
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports: ["80:80", "443:443", "443:443/udp"]
+    # BASE_DOMAIN: every app is served as <app>.<base domain>.
+    env_file: [proxy.env]
+    volumes: [.:/etc/caddy:ro, data:/data]
+    networks: [proxy]
+    deploy: {resources: {limits: {cpus: "0.5", memory: 256m}}}
+
+networks:
+  proxy:
+    external: true
+
+volumes:
+  data:
