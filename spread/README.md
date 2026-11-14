@@ -387,12 +387,28 @@ uv run python -m spreadlab.replay --seed fresh-003 --start 4320                 
 uv run python -m spreadlab.replay --seed fresh-004 --speed 2 --slow 0.05          # the policy stalls on 5% of requests
 ```
 
-On `fresh-001` at ten times the final's speed, 0.45 real seconds for a request, the live desk quoted all 1,030
-requests itself, each with at least 0.43 s left, and every quote was the recorded one to the cent. It posted the 285
-recorded gigs with the same cars, stop windows from the notes, plates and audience, and sent 1,286 direct offers, each
-to the driver and gig of a recorded one. So the day's corrections, the note reader and the offers run on the live
-stream as they do in the sweeps. Deciding takes 0.4 ms for a request and 2 ms for a win; the books are 0.7 MB and
+What the replays showed, on the reference's recorded weeks:
+
+| Replay | Requests | Policy quotes | Fallback | Missed while it ran | Unquoted while down | Same as the recording |
+| --- | --- | --- | --- | --- | --- | --- |
+| `fresh-001`, ten times the final's speed | 1,030 | 1,030 | 0 | 0 | - | every quote, all 285 gigs, all 1,283 offers |
+| `fresh-003`, joins on Thursday from the history alone | 386 | 386 | 0 | 0 | - | every quote, all 243 gigs |
+| `fresh-002`, dies on Tuesday 12:00, down 20 s | 1,039 | 1,025 | 0 | 0 | 14 | all 325 gigs |
+| `fresh-005`, from Thursday, dies on Thursday 11:00 | 386 | 369 | 0 | 0 | 17 | no car in two gigs |
+| `fresh-004`, the policy stalls 6 s on 5% of requests | 1,035 | 781 | 254 | 0 | - | all 234 gigs |
+
+So the day's corrections, the note reader and the direct offers run on the live stream as in the sweeps: at ten
+times the speed, 0.45 s for a request, every quote is the recorded one to the cent, with at least 0.43 s left. After
+a crash the quotes differ from the recording on purpose: the desk does not learn from the answers to requests that
+nobody quoted while it was down, and the recording quoted them. The fallback column counts the requests whose last
+quote was the fallback, because the policy's own quote was too late to replace it. Deciding takes 0.4 ms for a request and 2 ms for a win; the books are 0.7 MB and
 take 11 ms to save at the end of the week.
+
+The replays found five faults, each fixed with a test. After a restart the guard sent its fallback over quotes
+that the desk had sent before it stopped. The guard stopped covering a request once the desk started on it, so a
+hold-up before the quote went out left the request without one. A join redid changes of plan that the desk had
+already handled, and learned the day's prices from requests that nobody had quoted. And a car whose visit failed
+while the desk was down was not posted again when the world still listed it on the driver's gig.
 
 A rehearsal on a practice world moves its clock like the final's from a second process, so the desk meets Bahn's
 real stream and limits. `--start 4320` begins on Thursday 00:00, as a test final does; `--kill-at` kills the desk at a
@@ -401,6 +417,11 @@ world minute and starts it again after `--down` seconds. It plays practice world
 ```bash
 uv run python -m spreadlab.live rehearse --seed fresh-041 --start 4320 --kill-at 5000 --down 20   # about 19 minutes
 ```
+
+On the runner in Helsinki, with the desk killed at Thursday 11:20 and started again 20 s later, it quoted 371 of 386
+requests with the policy, missed none while it ran and left 15 unquoted while it was down. It had no errors and no
+lost connections, at least 1.16 s left at a quote, and the week was ranked at 97.0% on time. An action took 10 ms
+there, 25 ms at the 99th percentile.
 
 ## Rules for policy code
 
