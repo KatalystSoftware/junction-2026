@@ -1,0 +1,110 @@
+Skipping image OS validation for hb__e597ab5e6dac1aeff6251c20fa70248a: docker inspect returned 1
+Running command: apt-get update && apt-get install -y nodejs npm
+Command outputs captured
+Running command: set -euo pipefail; if ldd --version 2>&1 | grep -qi musl || [ -f /etc/alpine-release ]; then node --version && npm --version; else curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.2/install.sh | env -u NODE_VERSION bash && export NVM_DIR="$HOME/.nvm" && \. "$NVM_DIR/nvm.sh" || true && command -v nvm &>/dev/null || { echo 'Error: NVM failed to load' >&2; exit 1; } && nvm install 22 && nvm alias default 22 && npm -v; fi && npm i -g opencode-ai@latest && opencode --version
+Command outputs captured
+Running command: mkdir -p ~/.config/opencode && echo '{
+  "mcp": {
+    "ops": {
+      "type": "remote",
+      "url": "http://mcp-server:8000/mcp",
+      "oauth": false
+    }
+  },
+  "provider": {
+    "anthropic": {
+      "models": {
+        "claude-opus-5-5": {}
+      }
+    }
+  }
+}' > ~/.config/opencode/opencode.json
+Command outputs captured
+Running command: [ -f ~/.nvm/nvm.sh ] && . ~/.nvm/nvm.sh; opencode --model=anthropic/claude-opus-5-5 run --format=json --thinking --dangerously-skip-permissions -- 'You are the on-call engineer for an online shop'"'"'s backend. You have just been paged: customers
+are seeing errors. Work the incident through the `ops` MCP tools and keep the lost revenue for
+the shift as low as you can.
+
+## The job
+
+- The shift lasts 120 simulated minutes from the page (minute 0). Telemetry reaches back three
+  hours before the page.
+- Customer-facing (edge) services earn revenue per minute; every failed request at an edge
+  service loses its share of that revenue. Edge services call app services, which call data
+  services. A service that fails passes failures to its callers (a hard dependency passes all of
+  them, a soft one about 30%).
+- When nothing is wrong, an edge service fails well under 1% of its requests. Anything above
+  that is a fault costing money, however steady it looks.
+- Several things can be broken at once, and new faults can start during the shift. Find every
+  cause and apply the mitigation that fits it. A symptom on one service is often caused by a
+  service it depends on.
+- Not every alert or recent change is a cause. A mitigation on a service that did not need it
+  costs money and can disrupt that service.
+- Everything you need is in the tools; nothing is on disk. A shift accepts at most 400 tool calls
+  (`get_status` does not count).
+
+## How time works
+
+- Looking and acting take time. `get_changes`, `get_diff`, `get_logs`, `get_metrics`, `list_alerts` take 2 minutes each, and starting a mitigation takes 1 minute. `get_status` and `get_topology` are free, `wait` passes the minutes you ask for, and thinking is free. A result shows the estate as it was when you called; its `minute` is the clock after the call.
+- A mitigation takes effect a few minutes after you start it and can disturb the service while it
+  runs. Only one operation can run on a service at a time. Check that the mitigation worked.
+- `finish` ends the shift early. The rest of the 120 minutes is still simulated and charged, so
+  anything left broken keeps costing money, and a fault that starts or comes back after you leave
+  is yours.
+
+## Mitigations
+
+| Tool | Fits | Takes | While it runs |
+| --- | --- | --- | --- |
+| `rollback` | a bad or leaking build: reverts the latest live deploy | 6 min | 30% of requests fail |
+| `revert_config` | a bad config change: reverts the latest live config change | 2 min | no impact |
+| `restart` | a stuck or bloated process; it does not remove the cause | 3 min | 50% of requests fail (data tier: fully down, 5 min) |
+| `scale` | more traffic than the replicas can serve | 4 min | no impact |
+| `failover` | a data service whose primary node is gone | 2 min | fully down |
+
+## What is scored
+
+Only the total cost of the shift, computed by replaying your actions in the simulator. Lower is
+better.
+
+| Cost | Amount |
+| --- | --- |
+| Lost revenue | each edge service'"'"'s revenue per minute × its error rate, every minute of the shift |
+| Extra replicas | $3 per replica above normal per minute, from when the scale lands to the end of the shift |
+| Wasted mitigation | $10,000 for each mitigation applied to a service that did not need it (setting a service back to its normal replica count is free) |
+
+## What you can see
+
+- Alerts fire only above their thresholds. `list_alerts` shows the 10 loudest (highest value) and
+  the `total` that are firing; pass `tier` (`edge`, `app` or `data`) to list one tier.
+- A service'"'"'s own metrics and logs can look healthy while its callers see it failing. `get_status`
+  is what customers actually see.
+- `get_metrics` returns 30 minutes and `get_logs` 10 minutes, ending now or at the `until_minute`
+  you pass (not in the future). Looking further back is another call.
+- Logs show symptoms and do not name the change behind them. `get_diff` shows what a change did.
+
+## Retries and overload
+
+- Callers retry a failed call to some services: `callers_retry` in `get_topology` is how many times
+  (0: they do not). Only a service'"'"'s own failures are retried (its fault, the requests a running
+  mitigation fails, the load it sheds when over capacity), not failures passed up from what it calls.
+- Retries are extra load the next minute. `get_metrics` shows `rps` with retries included, and
+  `retry_share`, the share of incoming requests that are retries. `cpu` is load over capacity.
+- A service close to capacity can be pushed over it by retries when a fault or a mitigation fails
+  part of its requests. It then sheds load, the shed requests are retried, and it stays overloaded
+  after the cause is gone, until load is shed or capacity is added. A service with enough headroom
+  recovers by itself.
+- `throttle(service, percent)` makes the service reject that share of requests (0 to 90) up front,
+  from the next minute. Callers see rejected requests fail, but they are not retried. It does not
+  disturb the service and is never a wasted mitigation: its cost is the traffic it rejects. It
+  stays on until you set it to 0, and `get_status` lists the throttles that are on. Starting or
+  changing one takes 1 minute.
+- `scale` is never charged as a wasted mitigation here, whatever the table above says: its cost is
+  the extra replicas, for as long as they stay, and the minute it takes to start.
+
+Your score is how much of the avoidable cost you avoided: doing nothing scores 0, the on-call
+reference run scores 1.
+' 2>&1 </dev/null | stdbuf -oL tee /logs/agent/opencode.txt
+Command outputs captured
+Wrote opencode trajectory to /root/plain/opus-x2/shift-1__gwH8mwq/agent/trajectory.json
+Collecting main service artifacts
+Skipping image OS validation for hb__f77ab129ea0782532c504d695c80c04e: docker inspect returned 1
