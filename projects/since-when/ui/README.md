@@ -67,7 +67,8 @@ builds the bundle in a Node stage. `fixtures/` holds the answers it gives when s
   differences (the API's timeline, asked once for each edition), the articles' links.
 - `src/Differences.svelte`: the list of differences under the strips' scale, then what one edition
   says and another leaves out, collapsed for each edition. On a topic the claim check has run on:
-  only what the check let stand, then wording (unchecked), then what the check set aside, collapsed,
+  first the word list's loaded words ("Word list": a word is in a sentence or it is not), then only
+  what the check let stand, then the model's wording rows (unchecked), then what the check set aside, collapsed,
   each with the passage that states it.
 - `src/Difference.svelte`: one difference: its headline and time strip; opened, each edition's
   quote with the differing words marked, and "Check in MariaDB".

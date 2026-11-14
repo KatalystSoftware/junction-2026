@@ -38,7 +38,7 @@ The six tests that run the SQL presets skip without a database login; `docker co
 runs them against the scratch database. The torch and DuckDB wheels don't load on NixOS outside a container, so the
 embedder and the loaders run in the image.
 
-Dependencies are pinned in `uv.lock` and the image installs from it. `ty check` passes with 21 warnings, left in
+Dependencies are pinned in `uv.lock` and the image installs from it. `ty check` passes with 33 warnings (21 are listed here; the claim check's modules added the rest), left in
 place because the fix is a restructure or ty is wrong ([`pyproject.toml`](pyproject.toml) keeps them as warnings
 per file, so a new finding still fails):
 
