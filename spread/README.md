@@ -928,6 +928,61 @@ requests with the policy, missed none while it ran and left 15 unquoted while it
 lost connections, at least 1.16 s left at a quote, and the week was ranked at 97.0% on time. An action took 10 ms
 there, 25 ms at the 99th percentile.
 
+### A cold standby and the alarm
+
+A stopped desk costs about €9 of margin a real second. The standby is a second machine on which a person starts
+the desk by hand; nothing takes over by itself. It needs a clean checkout of `origin/main` with `uv sync` done
+and the team key at hand. Without books on disk, the desk there rebuilds the week from the world's history.
+
+[`alarm.py`](spreadlab/alarm.py) runs on the standby and reads the desk's `log.jsonl` over ssh every 2 seconds.
+The desk writes a heartbeat line every 2 seconds. The alarm needs no key and reads nothing from Bahn:
+
+```bash
+uv run python -m spreadlab.alarm --ssh <desk host> --path <checkout>/spread/data/live --notify '<command>'   # the world written last
+```
+
+It rings when the desk writes nothing for 8 seconds, when the log cannot be read for 8 seconds (the desk's machine
+or the network to it), when a request reaches its deadline with no quote in the log, and when the desk is fenced.
+It warns of lost connections, errors, and gigs that the desk did not post. It says once when the desk writes again.
+Each notice is a line with a bell, and `--notify` runs a shell command with `$ALARM_TEXT` and `$ALARM_LEVEL`. It
+watches the log written last, so it moves to the next test final or the final by itself.
+
+**The fence.** Two desks on one world post every car twice, and the file lock in `data/live/<world id>/` only
+holds on one machine. The world posts no gigs by itself. So a desk that joins again and finds gigs it did not post,
+posted after the last minute in its log, knows that another desk has played. It writes `fenced` in its folder and
+stops for good, and every later start stops at once. A desk that keeps its connection never joins again, so it
+cannot see the other desk that way. It prints a warning when the stream shows a gig that it did not post, and the
+alarm passes the warning on.
+
+When the alarm rings:
+
+1. If the desk's machine answers, look at the desk's terminal. The supervisor loop starts a stopped desk again
+   within seconds; that is the fastest way back.
+2. If the machine or its network is lost, make sure that its desk cannot come back: stop the instance in the
+   provider's console. Then start the standby with the same loop as on the first machine. Without the stop, the first
+   desk fences itself when it joins again, but it posts until then if it never lost its connection.
+3. To go back to the first machine later, stop the standby, then delete `fenced` and `state.pickle` in the first
+   machine's world folder: that desk then rebuilds the week from the world's history.
+
+Rehearse it in a test final. Stop the first desk on purpose with Ctrl-C in its loop, start the standby by hand,
+and time the gap from the alarm's first ring to the standby's "Joined" line.
+
+**As set up for the final.** The standby is the Verda instance `the standby instance` in FIN-01, another data
+centre than the runner's FIN-03, made with the API outside `infra/verda` (4 vCPU, €0.05 an hour). Its user `amp` has
+a checkout of `origin/main` in `~/code/junction2026` with `uv sync` done, and the team key and the note model's
+settings in `~/.config/spread/` (mode 600). Two systemd services run the alarm there and push to an ntfy topic
+named in `~/.config/spread/alarm.env`: `spread-alarm` reads the runner's desk over ssh as `amp`, with a
+`restrict` key, and `spread-alarm-standby` reads the standby's own desk once it plays. To take over:
+
+```bash
+# on the standby, as amp (root's keys are those of infra/verda):
+ssh amp@<runner> 'tmux kill-session -t final'   # the first desk's loop; or stop its instance in the Verda console
+~/bin/start-desk --watch-notes                  # the same loop, in tmux session final
+```
+
+Before a final, move the standby's checkout to the commit the runner plays (`git checkout --detach origin/main`,
+`uv sync`), so both desks would play the same code.
+
 ### The note watcher (`--watch-notes`, off by default)
 
 [`watch.py`](spreadlab/watch.py) adds a second reader of the dealers' notes beside the desk. It needs
