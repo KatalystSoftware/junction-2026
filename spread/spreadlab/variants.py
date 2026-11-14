@@ -2,7 +2,7 @@
 compare it with the others on the same seeds."""
 from __future__ import annotations
 
-from . import pairs
+from . import late_wide, pairs
 
 GATE_10 = {"same_day": True, "floor": 1.7, "quote_share": 1, "max_unbooked": 10}  # `gate-10`
 # `curve-live-surcharge`: the win curve sets the price, the day's answers correct it, and the backlog raises the cost
@@ -291,6 +291,13 @@ VARIANTS: dict[str, dict] = {
         **REFERENCE, "backlog_step": 0, "slow_step": 0.8, "max_unbooked": 25, "slow_model": "friday", "cost": 1.2, "late_cost": 150, "kinds": KINDS,
         "note_limits": True, "pair_hold": 4, "pair_fee": fee, "pair_cost": cost, "pair_version": pairs.VERSION}
        for fee in (0.6, 0.7, 0.8) for tail, cost in (("", 0), ("-return-0.75", 0.75))},
+    # Track B's first distillation of the qualifying track's candidate: the live default with the fee ladder for cars with 16 hours
+    # or more to their last pickup (0.9 x, rising 0.1 an hour to 1.2 x), the wide late chance (late_wide.py), pairs at 0.6 and the
+    # return quote at 0.75. Not the track's 0.8 opening, its 24-hour waiting-car count or its outage split.
+    "fee16-wide-pairs-0.6-return-0.75": {
+        **REFERENCE, "backlog_step": 0, "slow_step": 0.8, "max_unbooked": 25, "slow_model": "friday", "cost": 1.2, "late_cost": 150, "kinds": KINDS,
+        "note_limits": True, "fee_rules": [[0, 10 ** 6, 16, 10 ** 6, 0.9, 0.1, 1.2]], "late_wide": True, "late_wide_version": late_wide.VERSION,
+        "pair_hold": 4, "pair_fee": 0.6, "pair_cost": 0.75, "pair_version": pairs.VERSION},
     # ... the same without the note's limits, whose posting changed after its weeks were played.
     "slow-friday-late-150-kinds": {**REFERENCE, "backlog_step": 0, "slow_step": 0.8, "max_unbooked": 25, "slow_model": "friday", "cost": 1.2, "late_cost": 150, "kinds": KINDS},
     # The best point of the search over these parameters together (scratch/search.py, trial 16 of 20, on 30 tune seeds), and with the kinds.

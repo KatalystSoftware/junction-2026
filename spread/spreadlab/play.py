@@ -18,6 +18,7 @@ from spread.starter import DAY
 
 from .dealer import DealerPolicy
 from .fallback import ActionDesk
+from .late_wide import WidePairPolicy, WidePolicy
 from .pairs import PairPolicy
 from .policy import Policy, fingerprint
 from .riskfee import RiskFeePolicy
@@ -67,6 +68,8 @@ def play(variant: str, params: dict, seed: str, level: int = 8) -> dict:
         # risk (riskfee.py), or out-and-back pairs (pairs.py).
         desk_class = (PairPolicy if params.get("pair_hold") else DealerPolicy if params.get("dealer_sd") else ActionDesk if "note_actions" in params
                       else RiskFeePolicy if params.get("risk_fees") else Policy)
+        if params.get("late_wide"):  # the wide late chance (late_wide.py), with or without pairs
+            desk_class = {Policy: WidePolicy, PairPolicy: WidePairPolicy}[desk_class]
         desk, ends_at = desk_class(world, level, snapshot["now"], params, roster, map_), snapshot["endsAt"]
         events: list[dict] = []
         while desk.now < ends_at:

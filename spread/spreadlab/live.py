@@ -45,6 +45,7 @@ from spread.client import Client, SpreadError, Unreachable, World
 from spread.starter import DAY, HOUR, WEEKDAYS, Retry, pickups, undelivered
 
 from . import notes, watch
+from .late_wide import WideLate
 from .pairs import PairPolicy
 from .policy import DECLINE, Policy
 from .server import SERVER, PracticeClient, data_dir, world_map
@@ -579,7 +580,17 @@ class LivePairDesk(LiveDesk, PairPolicy):
                 del self.pair_wait[order_id]
 
 
+class LiveWideDesk(WideLate, LiveDesk):
+    """The live desk with the wide late chance (late_wide.py), for a variant that sets `late_wide`."""
+
+
+class LiveWidePairDesk(WideLate, LivePairDesk):
+    """... and with out-and-back pairs."""
+
+
 def desk_class(params: dict) -> type:
+    if params.get("late_wide"):
+        return LiveWidePairDesk if params.get("pair_hold") else LiveWideDesk
     return LivePairDesk if params.get("pair_hold") else LiveDesk
 
 

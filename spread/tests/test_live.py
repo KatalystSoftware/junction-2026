@@ -225,7 +225,8 @@ def test_a_desk_that_starts_again_posts_a_car_whose_visit_failed_while_it_was_do
     assert world.gigs["g2"]["stops"][0]["withPlates"] is True, "the car goes again, with plates"
 
 
-def test_a_pair_desk_that_dies_after_the_world_took_a_pair_gig_finds_both_cars_on_it(tmp_path, monkeypatch):
+@pytest.mark.parametrize("variant", ["slow-friday-late-150-kinds-limits-pairs-0.7", "fee16-wide-pairs-0.6-return-0.75"])
+def test_a_pair_desk_that_dies_after_the_world_took_a_pair_gig_finds_both_cars_on_it(tmp_path, monkeypatch, variant):
     from spreadlab import pairs
     monkeypatch.setattr(pairs, "RETURNS", {"helsinki>tampere": 20, "tampere>helsinki": 20})
     out = request("R1", pickup="helsinki")
@@ -238,7 +239,7 @@ def test_a_pair_desk_that_dies_after_the_world_took_a_pair_gig_finds_both_cars_o
               {"seq": 2, "at": 520, "kind": "price_request", "request": back},
               {"seq": 3, "at": 535, "kind": "order_won", "order": won(back, 535)}]
     world = replay.Replay(events, ROSTER, ends_at=20000, start=506, speed=0.001)
-    desk = lambda: live.Live(world, world.guard_act, world.minute, 8, VARIANTS["slow-friday-late-150-kinds-limits-pairs-0.7"], MAP, tmp_path, echo=False)  # noqa: E731
+    desk = lambda: live.Live(world, world.guard_act, world.minute, 8, VARIANTS[variant], MAP, tmp_path, echo=False)  # noqa: E731
     first = desk()
     first.join()
     assert isinstance(first.desk, live.LivePairDesk)
@@ -266,6 +267,7 @@ def test_a_pair_desk_that_dies_after_the_world_took_a_pair_gig_finds_both_cars_o
     second = desk()
     second.join()  # from books that hold R1 and its hold, and know nothing of R2's win or of g1
     second.stop()
+    assert type(second.desk) is type(first.desk), "the books bring back the same desk, with the wide late chance when the variant has it"
     assert list(world.gigs) == ["g1"], "no car of the pair gets a second gig"
     assert second.desk.gigs_of("R1") == second.desk.gigs_of("R2") == ["g1"]
     assert "g1" in second.desk.pair_gigs and not second.desk.pair_wait
