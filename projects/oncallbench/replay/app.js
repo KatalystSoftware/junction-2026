@@ -1124,8 +1124,10 @@
 
   function openIntro(thenPlay) {
     const dialog = $("#onboard"), ses = state.ses, head = ses.headline;
+    const band = (window.REPLAY_SPREAD || { models: [] }).models[0];
     $("#onboard-result").textContent = head
       ? `${head.label} averages ${head.mean.toFixed(2)} of the expert's savings on this level, over ${head.count} runs.`
+      : band ? `${band.label} averages ${band.mean.toFixed(2)} of the expert's savings, over ${band.n} runs on ${band.seeds} seeds.`
       : `The score is the share of the expert's savings a run reaches.`;
     $("#onboard-watch").textContent = ses.rules.storms
       ? "The red services, the money counter, and the moment the agent rolls back without protecting first."

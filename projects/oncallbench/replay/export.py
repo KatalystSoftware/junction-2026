@@ -737,10 +737,11 @@ T975 = [None, 12.706, 4.303, 3.182, 2.776, 2.571, 2.447, 2.365, 2.306, 2.262, 2.
 
 
 def spread(cfg, metrics, placeholder=False):
-    """Every scored run of each model on the pre-registered seeds, for the band above the replay: scores only,
-    no actions, so it is safe for any seed. The mean weighs each seed once, and its 95% interval comes from the
-    seed means (Student's t, seeds - 1 degrees of freedom): runs on one seed share its estate, so they are not
-    independent samples of the model."""
+    """Every scored run of each model on the common seeds, for the band above the replay: scores only, no
+    actions, so it is safe for any seed. The mean is over all runs, as the reports give it. Its 95% interval is
+    clustered by seed (Student's t, seeds - 1 degrees of freedom): runs on one seed share its outage, so they
+    are not independent samples of the model. With the same number of runs on every seed this is the
+    t-interval of the seed means."""
     rows = [r for r in json.loads(Path(metrics).read_text())
             if r.get("round") == cfg["round"] and r.get("level") == cfg["level"] and r.get("score") is not None]
     # Harbor trials only (<job>/<trial>__<id>): scores from another harness, such as rl/'s own runner, stay out
@@ -749,6 +750,11 @@ def spread(cfg, metrics, placeholder=False):
         print(f"note: spread leaves out {len(rows) - len(harbor)} round-{cfg['round']} rows that are not Harbor trials",
               file=sys.stderr)
     rows = harbor
+    # a run cut short by the harness (a usage limit, a lost container) is not a score of the model
+    cut = [r for r in rows if (r.get("failure") or "").startswith("infrastructure:")]
+    if cut:
+        print(f"note: spread leaves out {len(cut)} runs cut by infrastructure", file=sys.stderr)
+    rows = [r for r in rows if r not in cut]
     models = []
     for run, label in cfg["models"]:
         mine = sorted((r for r in rows if r["run"] == run), key=lambda r: (r["seed"], r.get("trial", "")))
@@ -761,16 +767,24 @@ def spread(cfg, metrics, placeholder=False):
         by = {}
         for r in mine:
             by.setdefault(r["seed"], []).append(round(r["score"], 4))
-        means = [statistics.mean(v) for v in by.values()]
-        k = len(means)
-        half = T975[min(k - 1, 30)] * statistics.stdev(means) / math.sqrt(k) if 1 < k <= 31 else \
-            1.96 * statistics.stdev(means) / math.sqrt(k) if k > 31 else None
-        models.append(dict(run=run, label=label, mean=round(statistics.mean(means), 4), n=len(mine), seeds=k,
+        n, k = len(mine), len(by)
+        mean = sum(v for vs in by.values() for v in vs) / n
+        # cluster-robust standard error of the mean, clusters = seeds, with the k/(k-1) small-sample factor
+        spread_ = math.sqrt(k / (k - 1) * sum(sum(v - mean for v in vs) ** 2 for vs in by.values())) / n if k > 1 else 0
+        half = (T975[k - 1] if k <= 31 else 1.96) * spread_ if k > 1 else None
+        models.append(dict(run=run, label=label, mean=round(mean, 4), n=n, seeds=k,
                            **({"half": round(half, 4)} if half is not None else {}),
                            runs=[dict(seed=s, score=v, k=i) for s, vs in by.items() for i, v in enumerate(vs)]))
     seeds = sorted(cfg["seeds"])
     named = f"{seeds[0]} to {seeds[-1]}" if seeds == list(range(seeds[0], seeds[-1] + 1)) else ", ".join(map(str, seeds))
-    return dict(caption=cfg["caption"], level=cfg["level"], round=cfg["round"], seeds=named, models=models,
+    caption = cfg["caption"]
+    claim = next((m for m in models if m["run"] == cfg.get("claim")), None)
+    if claim:  # the headline sentence, from the runs themselves, so it stays true as runs land
+        below = sum(r["score"] < 1 for r in claim["runs"])
+        caption += (f" {claim['label']} averages {claim['mean']:.2f}; "
+                    + (f"all {claim['n']} runs are below the expert." if below == claim["n"]
+                       else f"{below} of its {claim['n']} runs are below the expert."))
+    return dict(caption=caption, level=cfg["level"], round=cfg["round"], seeds=named, models=models,
                 source=f"{Path(metrics).name}, round {cfg['round']}", **({"placeholder": True} if placeholder else {}))
 
 
