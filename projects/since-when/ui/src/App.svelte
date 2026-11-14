@@ -2,29 +2,22 @@
 	import { onMount } from 'svelte'
 	import { api, flags } from './lib/api.svelte'
 	import { NAMES, articleUrl, kb, wikidataUrl } from './lib/format'
-	import { thirdOf } from './lib/headline'
 	import { href, log, nav, ui } from './lib/nav.svelte'
 	import { loadQueue, queue } from './lib/queue.svelte'
-	import { LANGS, isLang, type Lang, type Topic } from './lib/types'
-	import Findings from './Findings.svelte'
+	import { LANGS, type Timeline, type TimelineEvent, type Topic } from './lib/types'
+	import Differences from './Differences.svelte'
 	import SqlPanel from './SqlPanel.svelte'
-	import Timeline from './Timeline.svelte'
 	import TopicList from './TopicList.svelte'
 
 	let loaded = $state<{ qid: string; topic: Topic } | null>(null)
+	// The edits behind each difference, by finding. They arrive after the topic; until then a
+	// difference shows its date without the link to the edit.
+	let events = $state(new Map<number, TimelineEvent[]>())
 	let failure = $state('')
 	let seq = 0
 
-	const route = $derived(nav.route)
 	const qid = $derived(nav.route?.qid)
 	const topic = $derived(loaded && loaded.qid === qid ? loaded.topic : null)
-	const pair = $derived(route && isLang(route.lang) && isLang(route.rich) && route.lang !== route.rich ? { lang: route.lang, rich: route.rich } : null)
-	// The three pairs of editions, each keeping the order the address already has.
-	const pairs = $derived.by((): [Lang, Lang][] => {
-		if (!pair) return []
-		const third = thirdOf(pair.lang, pair.rich)!
-		return [[pair.lang, pair.rich], [pair.lang, third], [pair.rich, third]]
-	})
 
 	onMount(() => void loadQueue())
 
@@ -34,6 +27,8 @@
 		const token = ++seq
 		failure = ''
 		log.topic = []
+		log.history = []
+		events = new Map()
 		api<Topic>(`/topics/${encodeURIComponent(id)}`).then(
 			(t) => {
 				if (token !== seq) return
@@ -44,33 +39,27 @@
 				if (token === seq) failure = e.message
 			},
 		)
+		// The API answers the history of one edition's rows at a time, so it is asked once for each.
+		Promise.all(LANGS.map((l) => api<Timeline>(`/topics/${encodeURIComponent(id)}/timeline?lang=${l}&rich_lang=${LANGS.find((x) => x !== l)}`).catch(() => null))).then((answers) => {
+			if (token !== seq) return
+			const by = new Map<number, TimelineEvent[]>()
+			for (const e of answers.flatMap((a) => a?.events ?? [])) by.set(e.finding_id, [...(by.get(e.finding_id) ?? []), e])
+			events = by
+			log.history = answers.flatMap((a, i) => (a?.sql ?? []).map((q) => ({ ...q, label: `${q.label} (${NAMES[LANGS[i]]})` })))
+		})
 	})
 
 	// An address without a topic opens the first one in the list.
 	$effect(() => {
 		const top = queue.items[0]
-		if (!nav.route && top) location.replace(href({ qid: top.wikidata_id, lang: top.lang, rich: top.rich_lang, tab: 'findings' }))
-	})
-
-	// An address without two editions takes them from the topic's first open finding.
-	$effect(() => {
-		if (!topic || !route || pair) return
-		const f = topic.findings.find((x) => x.status === 'open' && (!isLang(route.lang) || x.lang === route.lang)) ?? topic.findings[0]
-		const lang = isLang(route.lang) ? route.lang : (f?.lang ?? 'en')
-		const rich = f && f.lang === lang ? f.other_lang : (LANGS.find((l) => l !== lang && topic.titles[l]) ?? thirdOf(lang, lang)!)
-		location.replace(href({ ...route, lang, rich }))
+		if (!nav.route && top) location.replace(href(top.wikidata_id))
 	})
 
 	const views = (n?: number) => (n ? `${n.toLocaleString('en')} views a year` : '')
-
-	function choosePair(e: Event) {
-		const [lang, rich] = (e.currentTarget as HTMLSelectElement).value.split('/')
-		if (route) location.hash = href(route, { lang, rich })
-	}
 </script>
 
 <svelte:head>
-	<title>{topic && pair ? `${topic.topic}: ${NAMES[pair.lang]} and ${NAMES[pair.rich]} | Since When` : 'Since When'}</title>
+	<title>{topic ? `${topic.topic} | Since When` : 'Since When'}</title>
 </svelte:head>
 
 <header class="bar">
@@ -86,50 +75,29 @@
 <main>
 	{#if failure}
 		<div class="cdx-message cdx-message--block cdx-message--error" role="alert"><span class="cdx-message__icon"></span><div class="cdx-message__content">Could not load this topic: {failure}</div></div>
-	{:else if !route && !queue.loading && !queue.items.length}
+	{:else if !nav.route && !queue.loading && !queue.items.length}
 		<p class="state">{queue.error ? `Could not load the topics: ${queue.error}` : 'No topics yet.'}</p>
-	{:else if !topic || !route || !pair}
+	{:else if !topic}
 		<p class="state subtle">Loading…</p>
 	{:else}
-		<div class="title">
-			<h1>{topic.topic}</h1>
-			<details class="cdx-accordion cdx-accordion--separation-minimal facts">
-				<summary><h2 class="cdx-accordion__header">Details</h2></summary>
-				<div class="cdx-accordion__content">
-					<ul>
-						{#each [pair.lang, pair.rich, thirdOf(pair.lang, pair.rich)!] as l}
-							{#if topic.titles[l]}
-								<li>
-									<a href={articleUrl(l, topic.titles[l]!)} target="_blank" rel="noopener" lang={l}>{topic.titles[l]}</a>
-									<span class="subtle">{[NAMES[l], topic.size[l] ? kb(topic.size[l]!) : '', topic.refs?.[l] != null ? `${topic.refs[l]} references` : '', topic.quality?.[l] ?? '', views(topic.readers[l])].filter(Boolean).join(', ')}</span>
-								</li>
-							{/if}
-						{/each}
-						<li><a href={wikidataUrl(topic.wikidata_id)} target="_blank" rel="noopener">Wikidata {topic.wikidata_id}</a></li>
-					</ul>
-				</div>
-			</details>
-		</div>
-		<nav class="tabs" aria-label="Views">
-			<a href={href(route, { tab: 'findings' })} aria-current={route.tab === 'findings' ? 'page' : undefined}>Differences</a>
-			<a href={href(route, { tab: 'timeline' })} aria-current={route.tab === 'timeline' ? 'page' : undefined}>Timeline</a>
-			<span class="grow"></span>
-			<label class="pair">
-				<span class="sr-only">Editions compared</span>
-				<select class="cdx-select" onchange={choosePair}>
-					{#each pairs as [a, b]}
-						<option value="{a}/{b}" selected={a === pair.lang && b === pair.rich}>{NAMES[a]} and {NAMES[b]}</option>
-					{/each}
-				</select>
-			</label>
-		</nav>
-		{#key `${route.qid}/${pair.lang}/${pair.rich}`}
-			{#if route.tab === 'timeline'}
-				<Timeline {topic} {route} lang={pair.lang} rich={pair.rich} />
-			{:else}
-				<Findings {topic} {route} lang={pair.lang} rich={pair.rich} />
-			{/if}
+		<h1>{topic.topic}</h1>
+		{#key topic.wikidata_id}
+			<Differences {topic} {events} />
 		{/key}
+		<section class="articles small" aria-labelledby="articles-title">
+			<h2 id="articles-title">The articles compared</h2>
+			<ul>
+				{#each LANGS as l}
+					{#if topic.titles[l]}
+						<li>
+							<a href={articleUrl(l, topic.titles[l]!)} target="_blank" rel="noopener" lang={l}>{topic.titles[l]}</a>
+							<span class="subtle">{[NAMES[l], topic.size[l] ? kb(topic.size[l]!) : '', topic.refs?.[l] != null ? `${topic.refs[l]} references` : '', topic.quality?.[l] ?? '', views(topic.readers[l])].filter(Boolean).join(', ')}</span>
+						</li>
+					{/if}
+				{/each}
+				<li><a href={wikidataUrl(topic.wikidata_id)} target="_blank" rel="noopener">Wikidata {topic.wikidata_id}</a></li>
+			</ul>
+		</section>
 	{/if}
 </main>
 
@@ -184,72 +152,26 @@
 		padding: var(--spacing-300) 0;
 	}
 
-	.title {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: baseline;
-		gap: 0 var(--spacing-100);
-	}
-
 	h1 {
-		flex: 1;
+		margin-bottom: var(--spacing-100);
 		font-size: var(--font-size-xxx-large);
 		line-height: var(--line-height-xxx-large);
 	}
 
-	/* A Codex accordion header, not one of the page's serif titles. */
-	.facts .cdx-accordion__header {
+	.articles {
+		margin-top: var(--spacing-300);
+	}
+
+	.articles h2 {
 		font-family: inherit;
+		font-size: inherit;
 		font-weight: var(--font-weight-bold);
-		color: inherit;
 	}
 
-	/* Open, the list takes a full row under the title instead of squeezing beside it. */
-	.facts[open] {
-		flex-basis: 100%;
-		order: 1;
-	}
-
-	.facts ul {
-		padding: var(--spacing-50) 0 var(--spacing-25);
-	}
-
-	.facts li {
+	.articles li {
 		display: flex;
 		flex-wrap: wrap;
 		gap: 0 var(--spacing-50);
-	}
-
-	.tabs {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		gap: 0 var(--spacing-100);
-		margin-top: var(--spacing-25);
-		border-bottom: 1px solid var(--border-color-subtle);
-	}
-
-	.tabs a {
-		padding: var(--spacing-35) 0;
-		margin-bottom: -1px;
-		border-bottom: 2px solid transparent;
-		font-size: var(--font-size-small);
-		font-weight: var(--font-weight-bold);
-		color: var(--color-subtle);
-	}
-
-	.tabs a:hover {
-		color: var(--color-progressive);
-		text-decoration: none;
-	}
-
-	.tabs a[aria-current='page'] {
-		border-bottom-color: var(--border-color-progressive);
-		color: var(--color-progressive);
-	}
-
-	.pair {
-		padding: var(--spacing-25) 0;
 	}
 
 	@media (max-width: 640px) {

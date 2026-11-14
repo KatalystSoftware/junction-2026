@@ -1,6 +1,6 @@
 <script lang="ts">
 	// A plain way to pick a topic: the API's list, a search box and the edition filter.
-	import { NAMES, plural } from './lib/format'
+	import { NAMES } from './lib/format'
 	import { href, nav, syncSearch, ui } from './lib/nav.svelte'
 	import { loadQueue, pageSize, queue } from './lib/queue.svelte'
 	import type { Lang } from './lib/types'
@@ -23,6 +23,9 @@
 		syncSearch()
 		void loadQueue()
 	}
+
+	// The API lists a topic once for each edition; the page is about the topic, so it is listed once.
+	const topics = $derived(queue.items.filter((i, n, all) => all.findIndex((x) => x.wikidata_id === i.wikidata_id) === n))
 
 	function filter(l: Lang | 'all') {
 		nav.lang = l
@@ -62,13 +65,10 @@
 			<p class="note subtle">{queue.loading ? 'Loading…' : nav.q ? `No topic matches "${nav.q}".` : 'No topics yet.'}</p>
 		{/if}
 		<ul>
-			{#each queue.items as i (i.wikidata_id + i.lang)}
-				{@const current = nav.route?.qid === i.wikidata_id && nav.route?.lang === i.lang}
+			{#each topics as i (i.wikidata_id)}
 				<li>
-					<a href={href({ qid: i.wikidata_id, lang: i.lang, rich: i.rich_lang, tab: 'findings' })} aria-current={current ? 'page' : undefined} onclick={() => dialog.close()}>
+					<a href={href(i.wikidata_id)} aria-current={nav.route?.qid === i.wikidata_id ? 'page' : undefined} onclick={() => dialog.close()}>
 						<span class="name">{i.topic}</span>
-						<span class="edition small subtle">{NAMES[i.lang]}</span>
-						{#if i.findings}<span class="count small num" title={plural(i.findings, 'open difference', 'open differences')}>{i.findings}</span>{/if}
 					</a>
 				</li>
 			{/each}
@@ -127,7 +127,7 @@
 
 	li a {
 		display: grid;
-		grid-template-columns: 1fr auto 2.5rem;
+		grid-template-columns: 1fr;
 		align-items: baseline;
 		gap: var(--spacing-50);
 		padding: var(--spacing-35) var(--spacing-50);
@@ -142,12 +142,6 @@
 
 	li a[aria-current='page'] {
 		background: var(--background-color-progressive-subtle);
-	}
-
-	.count {
-		grid-column: 3;
-		text-align: right;
-		color: var(--color-base);
 	}
 
 	.more {

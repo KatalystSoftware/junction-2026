@@ -1,15 +1,8 @@
-import type { Finding, FindingType, Lang } from './types'
+import type { Finding, Lang } from './types'
 
 export const NAMES: Record<Lang, string> = { fi: 'Finnish', sv: 'Swedish', en: 'English' }
-export const TYPES: Record<FindingType, string> = {
-	contradiction: 'Contradiction',
-	numbers: 'Numbers',
-	framing: 'Framing',
-	missing_fact: 'Missing fact',
-	coverage: 'Missing passage',
-}
-// Statements that differ come before content one edition lacks.
-export const TYPE_ORDER: FindingType[] = ['contradiction', 'numbers', 'framing', 'missing_fact', 'coverage']
+/** "Finnish, Swedish and English". */
+export const list = (names: string[], and = 'and') => (names.length < 2 ? names.join('') : `${names.slice(0, -1).join(', ')} ${and} ${names[names.length - 1]}`)
 
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 export const day = (d: string) => `${+d.slice(8, 10)} ${MONTHS[+d.slice(5, 7) - 1]} ${d.slice(0, 4)}`
@@ -26,16 +19,17 @@ export function when(after: string | null | undefined, at: string, fmt = day): s
 	return after ? `between ${fmt(after)} and ${fmt(at)}` : `${fmt(at)} or earlier`
 }
 
-export function since(f: Finding, fmt = day): string {
-	if (f.history === false) return 'In the current text; earlier years not compared'
-	return `Since ${when(f.opened_after, f.opened_at, fmt)}`
-}
-
 /** One short date for a list row; the bounds are spelled out inside the row. */
 export function rowDate(f: Finding): string {
-	if (f.status !== 'open' && f.closed_at) return `closed ${shortDay(f.closed_at)}`
-	if (f.history === false) return 'current text'
-	return exact(f.opened_after, f.opened_at) ? shortDay(f.opened_at) : `by ${shortDay(f.opened_at)}`
+	if (f.history === false) return 'In the current text'
+	return `${exact(f.opened_after, f.opened_at) ? 'Since' : 'By'} ${shortDay(f.opened_at)}`
+}
+
+/** The day after, for reading a text as it stood once an edit of that day was in. Never past today. */
+export function dayAfter(d: string, days = 1): string {
+	const next = new Date(Date.parse(d) + days * 86_400_000).toISOString().slice(0, 10)
+	const today = new Date().toISOString().slice(0, 10)
+	return next > today ? today : next
 }
 
 const slug = (title: string) => encodeURIComponent(title.replace(/ /g, '_'))
