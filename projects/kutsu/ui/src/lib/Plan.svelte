@@ -5,7 +5,7 @@
   import Icon from './Icon.svelte'
   import Logo from './Logo.svelte'
   import Progress from './Progress.svelte'
-  import { app, copyLink, joinLink, nameOf, reviewOf, saveReview, stateNames } from './state.svelte'
+  import { app, copyText, joinLink, nameOf, reviewOf, saveReview } from './state.svelte'
   import type { Status } from './types'
   import Wall from './Wall.svelte'
 
@@ -22,14 +22,21 @@
   // the person's invitation is Esittely, served next to this page by serve.py; in development, the hosted copy
   const esittely = import.meta.env.DEV ? 'https://esittely.duckymcduck2.workers.dev/esittely/#/join' : './esittely/#/join'
 
-  const names = $derived(stateNames(plan.coming))
   // the forum's employers are coming already, so their link needs no event; any other invitation names its own
   const link = $derived(plan.coming ? '' : plan.slug)
-  /** Where an employer stands for this event: its profile is one for all events, an invitation is for this one. */
-  const standing = (e: Invitee): Status | '' => {
+  /** Where an employer stands for this event, in words: its profile is one for all events, an invitation and a sign-up are for this one. */
+  const standing = (e: Invitee): { status: Status; says: string } | undefined => {
     const review = reviewOf(e.brief)
-    return review.status === 'joined' ? 'joined' : plan.coming ? (review.status === 'invited' ? 'invited' : '') : review.events?.includes(plan.slug) ? 'invited' : ''
+    if (plan.coming) return review.status === 'joined' ? { status: 'joined', says: 'Profile confirmed' } : review.status === 'invited' ? { status: 'invited', says: 'Profile sent' } : undefined
+    if (review.status === 'joined' && review.signed?.includes(plan.slug)) return { status: 'joined', says: 'Signed up' }
+    if (review.events?.includes(plan.slug)) return { status: 'invited', says: 'Invited' }
+    return review.status === 'joined' ? { status: 'joined', says: 'Profile confirmed' } : undefined
   }
+  /** What the person pastes into their own message: why now, and the link to a sign-up that is already filled in. */
+  const message = (e: Invitee) =>
+    plan.coming
+      ? `Your profile for the ${plan.title} (${plan.when}) is filled in from what ${nameOf(e.brief)} has said in public. Checking it takes a minute: ${joinLink(e.brief.id, link)}`
+      : `The City of Espoo is planning a ${plan.title.replace(/^[A-Z](?=[a-z])/, (c) => c.toLowerCase())} talent event. ${some(field?.people.people ?? 0)} people who came to our earlier events work in this field. Your sign-up is filled in from what ${nameOf(e.brief)} has said in public: ${joinLink(e.brief.id, link)}`
   const listed = $derived(all ? plan.employers : plan.employers.slice(0, FIRST))
   const rest = $derived(all ? [] : plan.employers.slice(FIRST))
   // the one field whose people are shown: the event's own, or the one opened from its list
@@ -39,13 +46,13 @@
   const came = $derived(app.pool.events.map((e) => ({ ...e, n: people?.events[e.id] ?? 0 })).filter((e) => e.n).sort((a, b) => b.n - a.n))
   const most = $derived(Math.max(1, ...(field ? field.rows.map((r) => r.have) : plan.fields.map((f) => f.people.people))))
 
-  /** An invitation leaves this screen as a link: a person sends it. Copying it is what marks the employer as invited. */
+  /** An invitation leaves this screen as text to paste: a person sends it. Copying it is what marks the employer as invited. */
   async function invite(e: Invitee) {
     const review = reviewOf(e.brief)
     const events = plan.coming ? review.events : [...new Set([...(review.events ?? []), plan.slug])]
     if (review.status === 'draft') await saveReview(e.brief.id, { ...review, status: 'invited', invited_at: new Date().toISOString(), events })
     else if (!plan.coming && !review.events?.includes(plan.slug)) await saveReview(e.brief.id, { ...review, events })
-    await copyLink(e.brief.id, link)
+    await copyText(message(e))
     copied = e.brief.id
     setTimeout(() => (copied = ''), 1600)
   }
@@ -57,7 +64,7 @@
     <h1>{plan.title}</h1>
     {#if plan.date}
       <p>
-        {when(plan.date)}{daysTo(plan.date) > 1 ? `, in ${String(daysTo(plan.date))} days` : ''}
+        {plan.when}{daysTo(plan.date) > 1 ? `, in ${String(daysTo(plan.date))} days` : ''}
         {#if plan.url}<a href={plan.url} target="_blank" rel="noopener">Espoo's event page<Icon name="out" size={14} /></a>{/if}
       </p>
     {/if}
@@ -75,17 +82,19 @@
             <a class="tile" href="#/{encodeURIComponent(e.brief.id)}" aria-label={nameOf(e.brief)}><Logo brief={e.brief} small /></a>
             <div>
               <a class="name" href="#/{encodeURIComponent(e.brief.id)}">{nameOf(e.brief)}</a>
-              <p class="roles">{e.roles.map((r) => r.title).join(', ') || 'No role drafted'}</p>
-              {#if e.news}<p class="why">{e.news.line}{#if source}{' '}<Cite signal={source} label={when(e.news.date)} />{/if}</p>{/if}
+              <p class="roles" title={e.roles.map((r) => r.title).join(', ')}>
+                {e.roles[0]?.title ?? 'No role drafted'}{#if e.roles.length > 1}{' '}<span>+{e.roles.length - 1}</span>{/if}
+              </p>
+              {#if e.news}<p class="why">{e.news.line}, {when(e.news.date)}{#if source}<Cite signal={source} n={1} />{/if}</p>{/if}
+              <a class="see" href={joinLink(e.brief.id, link)} target="_blank" rel="noopener">Their sign-up<Icon name="out" size={14} /></a>
             </div>
             <div class="act">
-              {#if status}<span class="state {status}">{status === 'joined' ? 'Profile confirmed' : names[status]}</span>{/if}
-              {#if status !== 'joined'}
-                <button class="btn quiet" onclick={() => invite(e)}>
-                  <Icon name={copied === e.brief.id ? 'check' : 'copy'} size={16} />{copied === e.brief.id ? 'Link copied' : plan.coming ? 'Copy profile link' : 'Copy invitation'}
+              {#if status}<span class="state {status.status}">{status.says}</span>{/if}
+              {#if status?.says !== 'Signed up' && status?.says !== 'Profile confirmed' || !plan.coming && status?.says === 'Profile confirmed'}
+                <button class="btn" onclick={() => invite(e)}>
+                  <Icon name={copied === e.brief.id ? 'check' : 'copy'} size={16} />{copied === e.brief.id ? 'Copied, ready to paste' : 'Copy invitation'}
                 </button>
               {/if}
-              <a class="btn quiet" href={joinLink(e.brief.id, link)} target="_blank" rel="noopener">Their sign-up<Icon name="out" size={14} /></a>
             </div>
           </li>
         {/each}
@@ -243,7 +252,7 @@
   }
   .employers li {
     display: grid;
-    grid-template-columns: 3rem minmax(0, 1fr) auto;
+    grid-template-columns: 4rem minmax(0, 1fr) auto;
     gap: var(--s4);
     align-items: start;
     padding: var(--s4) 0;
@@ -251,9 +260,9 @@
   }
   .tile {
     display: block;
-    width: 3rem;
-    height: 3rem;
-    padding: 6px;
+    width: 4rem;
+    height: 4rem;
+    padding: 8px;
     border-radius: var(--r1);
     overflow: hidden;
     background: #fff;
@@ -276,21 +285,33 @@
     margin-top: 2px;
     line-height: 1.35;
   }
+  .roles span {
+    color: var(--ink-2);
+  }
+  .see {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s1);
+    min-height: 2rem;
+    font-size: var(--t-sm);
+    color: var(--ink-2);
+    text-decoration: none;
+  }
+  .see:hover {
+    color: var(--ink);
+  }
   .why {
     margin-top: var(--s1);
     font-size: var(--t-sm);
     line-height: 1.4;
     color: var(--ink-2);
   }
-  .why :global(.cite) {
-    white-space: nowrap;
-  }
   .act {
-    display: grid;
-    justify-items: end;
-  }
-  .act .btn {
-    min-height: 2.25rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: end;
+    align-items: center;
+    gap: var(--s2) var(--s3);
   }
   .state {
     display: inline-flex;
@@ -332,9 +353,6 @@
   .people {
     position: sticky;
     top: var(--s5);
-    padding: var(--s5);
-    border-radius: var(--r2);
-    background: var(--wash);
   }
   /* the two actions of the people side, one row, the same size, the send as the city's step */
   .go {
@@ -364,7 +382,7 @@
     margin-left: var(--s2);
     padding: 0.2em 0.6em;
     border-radius: 99px;
-    background: var(--ground);
+    background: var(--wash);
     font: 600 var(--t-xs) / 1.4 var(--text);
     letter-spacing: 0;
     color: var(--ink-2);
@@ -394,8 +412,8 @@
     margin-top: 0;
   }
   .count b {
-    font: 800 var(--t-2xl) / 1 var(--display);
-    letter-spacing: -0.035em;
+    font: 800 var(--t-xl) / 1 var(--display);
+    letter-spacing: -0.03em;
   }
   .count span {
     flex-basis: 100%;
@@ -434,10 +452,10 @@
   }
   .rows li {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 5rem 2.25rem;
+    grid-template-columns: minmax(0, 1fr) auto;
     gap: 0 var(--s3);
     align-items: center;
-    padding: var(--s2) 0;
+    padding: var(--s2) 0 var(--s3);
     border-top: 1px solid var(--line);
     line-height: 1.25;
   }
@@ -448,7 +466,8 @@
     display: inline-flex;
     align-items: center;
     gap: var(--s2);
-    justify-self: start;
+    width: 100%;
+    min-height: 2.25rem;
     padding: 0;
     border: 0;
     background: none;
@@ -467,15 +486,16 @@
     min-height: 2.75rem;
   }
   .rows small {
-    grid-column: 1;
+    grid-column: 1 / -1;
     grid-row: 2;
     font-size: var(--t-xs);
     color: var(--ink-2);
   }
   .meter {
-    grid-row: 1 / 3;
-    grid-column: 2;
-    height: 0.5rem;
+    grid-row: 3;
+    grid-column: 1 / -1;
+    margin-top: var(--s2);
+    height: 0.375rem;
     border-radius: 99px;
     background: var(--line);
   }
@@ -487,14 +507,14 @@
     background: var(--city);
   }
   .rows b {
-    grid-row: 1 / 3;
-    grid-column: 3;
+    grid-row: 1;
+    grid-column: 2;
     text-align: right;
     font-size: var(--t-sm);
   }
   .rows b.few {
-    font-weight: 600;
-    color: var(--stop);
+    font-weight: 500;
+    color: var(--ink-2);
   }
   .came {
     display: grid;
@@ -527,21 +547,19 @@
       padding: var(--s5) var(--s4) var(--s7);
     }
     .employers li {
-      grid-template-columns: 2.5rem minmax(0, 1fr);
+      grid-template-columns: 3rem minmax(0, 1fr);
     }
     .tile {
-      width: 2.5rem;
-      height: 2.5rem;
+      width: 3rem;
+      height: 3rem;
+      padding: 6px;
     }
     .act {
       grid-column: 2;
-      grid-auto-flow: column;
       justify-content: start;
-      align-items: center;
-      margin-left: calc(-1 * var(--s2));
     }
     .act .btn,
-    .state {
+    .see {
       min-height: 2.75rem;
     }
   }

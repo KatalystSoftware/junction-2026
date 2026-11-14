@@ -101,6 +101,8 @@
     text-transform: capitalize;
   }
   .site {
+    /* the demo's own button sits at the top right */
+    margin-right: 4.5rem;
     display: inline-flex;
     align-items: center;
     gap: var(--s1);

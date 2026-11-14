@@ -30,8 +30,8 @@
 
 {#if careers || news}
   <section>
-    <h2>{brief ? 'Changed since the draft' : 'Changed lately'}</h2>
     {#if changes.length}
+      <h2>{brief ? 'Changed since the draft' : 'Changed lately'}</h2>
       <ul>
         {#each changes as change (change.id)}
           <li>
@@ -47,7 +47,7 @@
       </ul>
     {/if}
     <p class="watching">
-      {changes.length ? '' : 'Nothing new yet. '}Watching {watching}{next ? `, next at ${clock(next)}` : ''}.
+      Watching {watching} for changes{next ? `, next at ${clock(next)}` : ''}.{changes.length ? '' : ' Nothing has changed yet.'}
     </p>
   </section>
 {/if}

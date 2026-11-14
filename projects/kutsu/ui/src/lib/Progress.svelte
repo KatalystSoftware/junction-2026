@@ -20,7 +20,7 @@
     {#each parts.filter((p) => p.n) as part (part.status)}<span class={part.status} style:flex-grow={part.n}></span>{/each}
   </div>
   <p>
-    {#each parts as part (part.status)}<span class={part.status}><b>{part.n}</b> {part.label}</span>{/each}
+    {#if coming}<span class="what">Profiles</span>{/if}{#each parts as part (part.status)}<span class={part.status}><b>{part.n}</b> {part.label}</span>{/each}
   </p>
 </div>
 
@@ -49,7 +49,7 @@
     font-size: var(--t-sm);
     color: var(--ink-2);
   }
-  p span::before {
+  p span:not(.what)::before {
     content: '';
     display: inline-block;
     width: 0.5rem;

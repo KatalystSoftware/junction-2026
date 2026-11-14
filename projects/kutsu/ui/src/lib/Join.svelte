@@ -26,7 +26,8 @@
   const name = $derived(nameOf(brief))
   const identity = $derived(brief.identity)
   const event = $derived(occasion(route().event, brief))
-  const joined = $derived(review.status === 'joined')
+  // signed up for this event; a profile confirmed for another event is one press away from this one
+  const joined = $derived(review.status === 'joined' && !!review.signed?.includes(event.slug))
   const save = (patch: Partial<Review>) => void saveReview(brief.id, { ...review, ...patch })
 
   // who they are: the brand record, each value theirs to correct
@@ -104,7 +105,7 @@
     else if (i.kind === 'role') patch(i.need.id, { ok: true })
     else if (line.trim()) void draft(line)
     else if (!joined) {
-      save({ status: 'joined', joined_at: new Date().toISOString(), wants, told })
+      save({ status: 'joined', joined_at: new Date().toISOString(), wants, told, signed: [...new Set([...(review.signed ?? []), event.slug])] })
       confetti([...new Set([...(identity?.colors ?? []), '#ffffff', '#14151a'])])
       scrollTo({ top: 0 })
     }
@@ -336,7 +337,8 @@
     outline-color: var(--brand-ink);
   }
   .host {
-    padding: var(--s4) 0;
+    /* the demo's own button sits at the top right */
+    padding: var(--s4) 5rem var(--s4) 0;
     font-size: var(--t-sm);
     font-weight: 700;
   }

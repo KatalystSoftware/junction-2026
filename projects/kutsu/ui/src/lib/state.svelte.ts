@@ -19,6 +19,7 @@ export async function load() {
   Object.assign(app, { briefs, presets, reviews, pool, watch, ready: true })
   // the server asks Context.dev at most every five minutes, so asking it once a minute is cheap
   setInterval(async () => (app.watch = await get('changes.json')), 60_000)
+<<<<<<< Updated upstream
   // A new screen starts at its top; back or forward through the browser's history returns to where the reader was.
   // Each history entry is numbered in history.state; the position of the current one follows the reader's scrolling,
   // and is not touched while a fresh render still moves the page.
@@ -51,6 +52,11 @@ export async function load() {
     }
     app.hash = location.hash
     requestAnimationFrame(() => settle(traverse ? (scrolls[at] ?? 0) : 0, traverse ? 10 : 0))
+=======
+  addEventListener('hashchange', () => {
+    app.hash = location.hash
+    scrollTo({ top: 0 })
+>>>>>>> Stashed changes
   })
   // a field being typed in would lose its text to a poll, so polls wait for the typing to end
   setInterval(async () => {
@@ -72,12 +78,13 @@ export const go = (id: string) => (location.hash = `#/${encodeURIComponent(id)}`
 export const joinPath = (id: string, event = '') => `#/join/${encodeURIComponent(id)}${event ? `/${event}` : ''}`
 export const joinLink = (id: string, event = '') => `${location.origin}${location.pathname}${joinPath(id, event)}`
 /** Put a company's invitation link on the clipboard, which is how an invitation leaves this screen: a person sends it. */
-export async function copyLink(id: string, event = '') {
+export const copyLink = (id: string, event = '') => copyText(joinLink(id, event))
+export async function copyText(text: string) {
   // the clipboard API needs https; on plain http fall back to selecting a hidden field
   try {
-    await navigator.clipboard.writeText(joinLink(id, event))
+    await navigator.clipboard.writeText(text)
   } catch {
-    const field = Object.assign(document.createElement('textarea'), { value: joinLink(id, event) })
+    const field = Object.assign(document.createElement('textarea'), { value: text })
     document.body.append(field)
     field.select()
     document.execCommand('copy')
@@ -89,7 +96,7 @@ export async function copyLink(id: string, event = '') {
 export const isComing = (id: string) => app.presets.some((p) => p.coming && p.ids.includes(id))
 /** What the three states of a sign-up are called, for a company still to be invited or for one already coming. */
 export const stateNames = (coming: boolean): Record<Status, string> =>
-  coming ? { draft: 'Profile not sent', invited: 'Profile sent', joined: 'Profile confirmed' } : { draft: 'To invite', invited: 'Invited', joined: 'Signed up' }
+  coming ? { draft: 'Not sent', invited: 'Sent', joined: 'Confirmed' } : { draft: 'To invite', invited: 'Invited', joined: 'Signed up' }
 
 /** The event's own name for a company, where the brand record calls it something else. */
 export const nameOf = (b: Brief) =>
