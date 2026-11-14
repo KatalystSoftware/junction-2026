@@ -273,6 +273,10 @@ a.link:hover{box-shadow:0 1px 2px oklch(21% 0.03 264 / .06),0 14px 30px -12px #0
   .slide{height:900px;min-height:0;max-height:900px;overflow:hidden;break-after:page;page-break-after:always;break-inside:avoid}
   .slide:last-of-type{break-after:auto;page-break-after:auto}
   .progress,.dots,.counter,.hint,.pdf{display:none!important}
+}
+/* body.pdf: what pitch-tools/pdf.js hides while it photographs each slide for the PDF */
+body.pdf .progress,body.pdf .dots,body.pdf .hint,body.pdf .pdf{display:none!important}
+@media print{
   .enter{animation:none!important;opacity:1!important;transform:none!important}
   .slide,.slide::before,.band .head::before,.split .two>:last-child::before{background-attachment:scroll!important}
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
