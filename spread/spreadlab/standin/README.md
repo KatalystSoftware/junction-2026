@@ -107,8 +107,8 @@ from `baseline` to merge 1 on 266 seeds, each beside its played weeks on the sam
 
 Every milestone is on the same side of the reference as in play, 12 of 12, and the chain comes out in play's order. From
 the fee cap on, the desk family the stand-in was built around, a variant's margin a week is within 500 of play's and its
-orders within 6; the steps since the reference read 10 to 50% low, most on thin worlds (default: +990 against +1,776).
-The three early desks read 1,000 to 1,900 too low, with 15 to 20% too few orders: far from today's prices and fee
+orders within 7; the steps since the reference read 7 to 50% low, most on thin worlds (default: +990 against +1,776).
+The three early desks read 1,000 to 1,900 too low, with 14 to 19% too few orders: far from today's prices and fee
 schedules the sizes are off. The default's own played weeks are what each seed's market is measured on, so its row is
 not an independent check. Merge 1 and the first distillation have no played week on these seeds: the stand-in has them
 +3,891 and +1,392 over the reference, where play's two steps on other seeds add to about +3,900 and +2,770.
