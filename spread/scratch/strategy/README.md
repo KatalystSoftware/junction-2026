@@ -77,6 +77,34 @@ Over 404,374 one-car dealer orders of 1,356 weeks, 37 variants and 401 seeds, fi
 - It moves 24.0 orders a week up by 5 points or more (17.2% late, `friday` says 8.3%) and 5.0 down (8.5% late, `friday` says 16.7%).
 - The world's `lastPickupAt` is the last pickup minute by the sites' hours for 98.7% of orders.
 
+### The seeds of the fit, and weights without `confirm-30`
+
+[`late-fit-seeds.txt`](late-fit-seeds.txt) lists the 401 seeds whose weeks `WEIGHTS` was fitted on. They are the seeds of the
+reference's 401 saved weeks: 40 catalogue seeds, `fresh-001` to `fresh-141` except `fresh-041`, and 221 seeds between
+`fresh-147` and `fresh-1191`. A result of a variant that prices with `WEIGHTS` on any of them is in-sample for the late chance.
+
+| Seed set | In the fit | Share of the fitted orders |
+| --- | --- | --- |
+| [`confirm-30.txt`](confirm-30.txt): the first 10 of the catalogue's holdout list and `fresh-001` to `fresh-020` | 30 of 30 | 18.2% |
+| The first 30 of the catalogue's tune list, which `scratch/search.py` plays | 30 of 30 | 46.4% |
+| `fresh-1301` to `fresh-1360` and `fresh-1401` to `fresh-1460` | none | |
+| `fresh-1901` to `fresh-2020`, and every seed from `fresh-2101` on | none | |
+
+`late_wide.WEIGHTS_WITHOUT_CONFIRM_30` is the same fit over the other 371 seeds (330,894 orders of 1,115 weeks), for a variant
+that is screened on `confirm-30`: `chance(known, late_wide.WEIGHTS_WITHOUT_CONFIRM_30)`. `late_fit.py --without $S/confirm-30.txt`
+prints it, before the other arguments. On the 73,480 orders of those 30 seeds (4.8% late):
+
+| Chance | AUC | Log loss |
+| --- | --- | --- |
+| slow.py's `friday` weights, as played | 0.723 | 0.1763 |
+| `WEIGHTS`, fitted on every seed | 0.777 | 0.1648 |
+| `WEIGHTS_WITHOUT_CONFIRM_30` | 0.773 | 0.1658 |
+
+The two fits differ there by 0.23 points of chance on an average order and by 2.1 at the 99th percentile; the largest
+change of a weight is 0.13. What that does to a played week is not measured.
+
+### Wiring
+
 It is not wired into the policy, because a change to `policy.py` makes every sweep play its saved weeks again. A variant needs
 one branch in `Policy.slow` for a request with one car, and keeps slow.py for a trade-in:
 

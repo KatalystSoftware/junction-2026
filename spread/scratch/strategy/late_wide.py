@@ -31,6 +31,13 @@ NAMES = [
 WEIGHTS = [-3.649, 0.594, 0.135, 0.088, -0.722, 0.673, 0.557, 1.590, 0.468, -0.410, 0.530, 0.240, -0.291, 0.769,  # slow.py's terms
            0.305, 0.480, 0.860,  # the waiting cars
            0.587, 0.232, 0.735, -0.631, 0.148, -0.022, -0.149, -0.658, 0.962, -0.407, 0.109, 0.617, -0.488, -0.314, -0.270, 0.174, -1.345]
+# The same fit without the 30 seeds of confirm-30.txt (the first 10 of the catalogue's holdout list and fresh-001 to fresh-020), which are
+# among the 401 (late-fit-seeds.txt): 330,894 orders of 1,115 weeks and 371 seeds. A variant that is screened on those 30 seeds takes these
+# weights, `chance(known, WEIGHTS_WITHOUT_CONFIRM_30)`, so that it is not judged on orders its late chance was fitted on. On their 73,480
+# orders these rank late orders with an AUC of 0.773, `WEIGHTS` with 0.777 and slow.py's `friday` weights with 0.723.
+WEIGHTS_WITHOUT_CONFIRM_30 = [-3.723, 0.666, 0.102, 0.158, -0.764, 0.710, 0.586, 1.618, 0.463, -0.468, 0.546, 0.189, -0.298, 0.844,  # slow.py's terms
+                             0.342, 0.442, 0.734,  # the waiting cars
+                             0.643, 0.283, 0.749, -0.586, 0.279, -0.026, -0.154, -0.661, 0.930, -0.416, 0.145, 0.695, -0.455, -0.345, -0.230, 0.189, -1.256]
 
 
 def open_at(minute: int, hours: dict | None) -> bool:

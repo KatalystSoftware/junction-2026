@@ -1,12 +1,16 @@
 """Fits the weights of late_wide.py over the won one-car dealer orders of cached weeks (cache.py), checks them on seeds
 that the fit did not see, and prints the weights of the fit over every seed.
 
-    uv run --no-project --with numpy python -I scratch/strategy/late_fit.py <cache dir> <map.json> <variant> [...]
+    uv run --no-project --with numpy python -I scratch/strategy/late_fit.py [--without <seed file>] <cache dir> <map.json> <variant> [...]
 
 The check fits on half of the seeds and reads the other half: how well each chance ranks the late orders (AUC), and
 the late share against the chance by band of the chance and by the won cars that waited for a driver at the quote. It
 compares three chances: slow.py's `friday` weights as played, those 14 terms with the three for waiting cars, and all
 of late_wide.py's terms.
+
+`--without` names a file of seeds, separated by commas or lines. The script then also fits every term over the other seeds
+only, prints those weights, and reads both fits on the orders of the named seeds: a variant that is screened on those seeds
+with the first weights is judged on orders its late chance was fitted on.
 """
 import collections
 import glob
@@ -23,6 +27,10 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))  # -I leaves the script's folder off the path
 import late_wide  # noqa: E402
 
+WITHOUT = ""
+if "--without" in sys.argv:
+    WITHOUT = sys.argv.pop(sys.argv.index("--without") + 1)
+    sys.argv.remove("--without")
 DAY, HOUR = 1440, 60
 FRIDAY = [-4.601, 1.803, 1.239, 0.813, 0.392, 0.784, 0.681, 1.539, 0.454, -0.327, 0.437, 0.3, 0.22, 0.715]  # slow.MODELS["friday"]
 MAP = json.load(open(sys.argv[2])) if len(sys.argv) > 2 else {"roads": [], "places": []}
@@ -160,6 +168,21 @@ def main() -> None:
     for name, weight in zip(late_wide.NAMES, weights):
         print(f"  {weight:+.3f}  {name}")
     print("WEIGHTS = [" + ", ".join(f"{weight:.3f}" for weight in weights) + "]")
+    print("\nThe seeds of the fit:\n" + ",".join(sorted({r["seed"] for r in rows})))
+    if WITHOUT:
+        left_out = set(open(WITHOUT).read().replace(",", " ").split())
+        seeds = np.array([r["seed"] for r in rows])
+        out = np.isin(seeds, sorted(left_out))
+        print(f"\n{WITHOUT}: {len(left_out & set(seeds))} of its {len(left_out)} seeds are in the fit, with {int(out.sum())} orders ({100 * out.mean():.1f}%), {100 * y[out].mean():.1f}% late")
+        without = fit(x[~out], y[~out])
+        print("  Read on those orders: AUC, log loss, mean chance")
+        for name, w in (("friday, as played", np.array(FRIDAY)), ("all terms, fitted on every seed", weights), ("all terms, fitted without these seeds", without)):
+            p_ = np.clip(1 / (1 + np.exp(-x[out][:, :len(w)] @ w)), 1e-9, 1 - 1e-9)
+            print(f"   {name:40s} {auc(p_, y[out]):.3f}, {-np.mean(y[out] * np.log(p_) + (1 - y[out]) * np.log(1 - p_)):.4f}, {100 * p_.mean():.2f}%")
+        apart = 100 * np.abs(1 / (1 + np.exp(-x[out] @ weights)) - 1 / (1 + np.exp(-x[out] @ without)))
+        print(f"  The two fits differ on those orders by {apart.mean():.2f} points of chance on average, {np.percentile(apart, 99):.1f} at the 99th percentile")
+        print("  The fit without these seeds:")
+        print("WEIGHTS_WITHOUT = [" + ", ".join(f"{weight:.3f}" for weight in without) + "]")
 
 
 if __name__ == "__main__":
