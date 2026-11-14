@@ -76,35 +76,10 @@ resource "verda_instance" "render" {
   }
 }
 
-# Clean box for rehearsing the AfterQuery judges' rerun of the on-call environment: a machine that
-# has never seen this repo, so nothing in its README works by accident. It gets Docker and git and
-# nothing else. It holds nothing worth keeping; remove it once the submission is in.
-# Verda had no CPU type free in any location when it was made (Sat 14 Nov, evening), so it is the
-# smallest type that was: 4 vCPU, 18 GB and a V100 it does not use, $0.24 an hour.
-resource "verda_instance" "judge" {
-  hostname          = "junction2026-judge"
-  description       = "Junction 2026 judge rerun rehearsal"
-  instance_type     = "1V100.4V"
-  image             = "26.04.base"
-  location          = "FIN-01"
-  ssh_key_ids       = [verda_ssh_key.hestia.id, verda_ssh_key.amp_runner.id]
-  startup_script_id = verda_startup_script.docker.id
-
-  os_volume = {
-    name = "junction2026-judge-os"
-    size = 60
-    type = "NVMe"
-  }
-}
-
 output "runner_ip" {
   value = verda_instance.runner.ip
 }
 
 output "render_ip" {
   value = verda_instance.render.ip
-}
-
-output "judge_ip" {
-  value = verda_instance.judge.ip
 }
