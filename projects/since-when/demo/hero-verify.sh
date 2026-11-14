@@ -19,9 +19,13 @@
 # verify/cache/$JUDGE/, so a second run of the same claims sends nothing; --offline never sends
 # anything.
 #
-#   JUDGE=lightning   Nemotron 3.5 Lightning (default)      IMAGE=since-when   the project image
-#   JUDGE=super       Nemotron 3.5 Super VL                 RPM=20             requests a minute
-#   JUDGE=haiku       Claude Haiku 5.5, a second opinion    WORKERS=12, RETRIES=60, BATCH=6
+#   JUDGE=super         Nemotron 3.5 Super VL on the dedicated Verda container (default); no
+#                       per-minute limit, shared with the gap finder's run: keep WORKERS moderate
+#   JUDGE=super-nvidia  the same model on NVIDIA Build's free tier
+#   JUDGE=lightning     Nemotron 3.5 Lightning on NVIDIA Build
+#   JUDGE=haiku         Claude Haiku 5.5, a second opinion
+#   IMAGE=since-when (the project image), WORKERS=12, RETRIES=60, BATCH=6, and RPM, requests a
+#   minute: 20 on NVIDIA Build, 600 elsewhere
 #
 # The model key comes from the environment: run this through
 #   nix develop -c sops exec-env ../../secrets/secrets.yaml 'sh demo/hero-verify.sh ...'
@@ -42,15 +46,19 @@ done
 M=${M:-$HOME/junction2026-data/mariadb}
 root=${HERO_CLASSIFY:-$M/classify}/verify
 out=$root/$name
-judge=${JUDGE:-lightning}
+judge=${JUDGE:-super}
+rpm=600
 case $judge in
-  lightning) export DIFFERENCES_PROVIDER=nvidia DIFFERENCES_MODEL=nvidia/nemotron-3.5-lightning-30b-a3b ;;
-  super) export DIFFERENCES_PROVIDER=nvidia DIFFERENCES_MODEL=nvidia/nemotron-3.5-super-vl-120b-a12b ;;
+  super) export DIFFERENCES_PROVIDER=verda-super DIFFERENCES_MODEL=nemotron-3.5-super-vl
+         export DIFFERENCES_TIMEOUT="${DIFFERENCES_TIMEOUT:-1800}" ;;   # a busy container queues for minutes
+  super-nvidia) export DIFFERENCES_PROVIDER=nvidia DIFFERENCES_MODEL=nvidia/nemotron-3.5-super-vl-120b-a12b; rpm=20 ;;
+  lightning) export DIFFERENCES_PROVIDER=nvidia DIFFERENCES_MODEL=nvidia/nemotron-3.5-lightning-30b-a3b; rpm=20 ;;
   haiku) export DIFFERENCES_PROVIDER=anthropic DIFFERENCES_MODEL=claude-haiku-5-5 ;;
-  *) echo "JUDGE is lightning, super or haiku" >&2; exit 2 ;;
+  *) echo "JUDGE is super, super-nvidia, lightning or haiku" >&2; exit 2 ;;
 esac
-export DIFFERENCES_CLAIMS_CACHE="$root/cache/$judge" DIFFERENCES_RPM="${RPM:-20}"
+export DIFFERENCES_CLAIMS_CACHE="$root/cache/$judge" DIFFERENCES_RPM="${RPM:-$rpm}"
 if [ -n "$offline" ]; then   # the cache key needs the endpoint and the model, not the key
+  [ "$DIFFERENCES_PROVIDER" = verda-super ] && export VERDA_INFERENCE_KEY="${VERDA_INFERENCE_KEY:-offline}"
   [ "$DIFFERENCES_PROVIDER" = nvidia ] && export NVIDIA_API_KEY="${NVIDIA_API_KEY:-offline}"
   [ "$DIFFERENCES_PROVIDER" = anthropic ] && export ANTHROPIC_API_KEY="${ANTHROPIC_API_KEY:-offline}"
 fi

@@ -5,6 +5,9 @@ DIFFERENCES_PROVIDER:
 
   custom     DIFFERENCES_API_KEY at DIFFERENCES_BASE_URL (default: Anthropic's)
   nvidia     NVIDIA_API_KEY, https://integrate.api.nvidia.com/v1 (NVIDIA Build, free tier)
+  verda-super  VERDA_INFERENCE_KEY, a dedicated Verda container serving the same Nemotron 3.5
+             Super VL (a Verda inference key; it has no NVIDIA rate limit, so raise
+             DIFFERENCES_RPM)
   anthropic  ANTHROPIC_API_KEY, https://api.anthropic.com/v1 (OpenAI-compatible API)
   verda      VERDA_INFERENCE_API_KEY, https://inference.verda.com/v1 (an inference key, not the
              VERDA_CLIENT_ID/SECRET cloud credentials)
@@ -18,6 +21,8 @@ Request settings, all optional:
                            chat_template_kwargs.enable_thinking. Not sent by default.
   DIFFERENCES_RPM          requests a minute this process sends, retries included, across all
                            workers; default 30, under NVIDIA's free-tier limit of about 40
+  DIFFERENCES_TIMEOUT      seconds to wait for one answer; default 300. The shared Verda container
+                           queues a request for minutes when busy
 
 DIFFERENCES_BASE_URL and DIFFERENCES_MODEL override the endpoint and model. Other endpoints
 that work: https://api.openai.com/v1, a local vLLM or Ollama server. With no key at all, the
@@ -36,6 +41,11 @@ ANTHROPIC = ("https://api.anthropic.com/v1", "claude-haiku-5-5")
 PROVIDERS = {  # name -> (key variable, base URL, default model)
     "custom": ("DIFFERENCES_API_KEY", *ANTHROPIC),
     "nvidia": ("NVIDIA_API_KEY", "https://integrate.api.nvidia.com/v1", "nvidia/nemotron-3.5-super-vl-120b-a12b"),
+    "verda-super": (
+        "VERDA_INFERENCE_KEY",
+        "https://containers.datacrunch.io/nemotron-3-5-super-vl-b300/v1",
+        "nemotron-3.5-super-vl",
+    ),
     "anthropic": ("ANTHROPIC_API_KEY", *ANTHROPIC),
     "verda": ("VERDA_INFERENCE_API_KEY", "https://inference.verda.com/v1", "deepseek-4-1-flash-1017"),
     "vultr": ("VULTR_INFERENCE_API_KEY", "https://api.vultrinference.com/v1", "deepseek-v4.1-flash-1017"),
@@ -70,7 +80,8 @@ def options():
     return opts
 
 
-def _post(url, key, body, timeout=300):
+def _post(url, key, body, timeout=None):
+    timeout = timeout or float(os.environ.get("DIFFERENCES_TIMEOUT", "300"))
     req = urllib.request.Request(
         url,
         data=json.dumps(body).encode(),
