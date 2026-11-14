@@ -1,39 +1,71 @@
-# Gap finder UI
+# Since When UI
 
-The editor-facing page: candidate differences ranked by readers, one topic's differences as
-verbatim quotes from both editions (with section, talk page and citation links), the passages of
-two editions side by side as of any 1 January, the timeline of when each difference opened and
-closed, and the SQL behind each screen.
+The web page of Since When: for one topic, what the Finnish, Swedish and English Wikipedia articles
+say differently, the date and the edit each difference began with, and the MariaDB statement behind
+each screen, which the viewer can run.
 
-It shows evidence and hands over to the wiki; it never suggests what an article should say. The
-classifier's one-sentence summary is labelled as a machine suggestion. An editor records one of
-four outcomes (edited, raised on talk page, intentional difference, not a real difference) and can
-copy an attribution edit summary or a talk page note made only of the two quotes and their links.
-When the API refuses to record outcomes (403, 405 or 501, as on a read-only public deployment),
-the page keeps them in the browser's local storage and marks them "saved in this browser only".
+A Svelte 5 single-page app built with Vite and TypeScript. Styles are component-scoped CSS on
+Wikimedia's Codex design tokens (`@wikimedia/codex-design-tokens`, CSS variables only). It talks
+only to `/api/*`; the contract is [`../docs/api.md`](../docs/api.md).
 
-Addresses are shareable: `?q=…&lang=sv#/<wikidata id>/<edition to review>/<edition compared
-with>/<findings|compare|timeline>/<year>`. While the SQL panel is open on an API that can run
-statements, `sql=<preset>,<its values>` is in the address too and reopens the panel with them
-filled in, e.g. `?sql=asof,Q1412941,2026-10-22,sv`.
+## Run
 
-```bash
-python3 ui/serve.py                                       # fixture data, http://localhost:8078
-GAPFINDER_API=http://localhost:8077 python3 ui/serve.py   # proxy /api/* to the real server
+Node comes from the repo's dev shell: prefix the commands with `nix develop -c` from the repo root,
+or run them inside `nix develop`. From this folder:
+
+```sh
+npm install
+npm run dev
 ```
 
-Plain HTML, CSS and JavaScript with no build step. `serve.py` uses only the Python standard
-library. The API contract is `docs/gap-finder/api.md`.
+The dev server listens on <http://127.0.0.1:8079> and forwards `/api` to the data service at
+`http://127.0.0.1:8077`. Set `SINCE_WHEN_API` to point it at another one.
 
-## Fixtures
+## Build and check
 
-`fixtures/` answers the API until MariaDB does, with 11 History of Finland topics.
+```sh
+npm run check   # svelte-check: types and Svelte diagnostics, no errors or warnings expected
+npm run build   # writes the static bundle to dist/
+```
 
-- **Real:** titles, leads and current text (MediaWiki API, 13 Nov 2026), page views
-  (Nov 2025 to Oct 2026), article sizes on each 1 January 2005–2026, and the quotes, dates and
-  revision IDs behind each Lapua Movement finding.
-- **Stand-ins:** the Finnish–English and Finnish–Swedish passage matches for Lapua Movement are
-  made by hand from the section contents, and their distances are placeholders. Coverage for the
-  other topics and for earlier years is a size ratio. SQL timings are invented.
+`dist/` is plain files. `index.html` refers to its assets relatively, so the bundle can be served
+from any path. The app calls the API at the absolute path `/api`, so the server that serves the
+bundle must answer `/api/*` on the same origin. Routing is in the fragment (`#/…`), so the server
+needs no fallback route.
 
-The page shows a "Fixture data" badge whenever a response carries `"fixture": true`.
+`serve.py` and `fixtures/` belong to the previous plain-JavaScript page and are replaced in the next
+step; they do not serve this app.
+
+## Addresses
+
+```
+?q=<search>&lang=<fi|sv|en>&sql=<preset>,<values>#/<wikidata id>/<edition>/<edition>/<findings|timeline>
+```
+
+- `#/Q1412941/sv/en/findings` opens the differences of a topic, `…/timeline` when each one opened and
+  closed. An address with `compare` or a trailing year opens the findings: the side-by-side view is gone.
+- `?sql=asof,Q1412941,2026-10-22,sv` opens the SQL panel with that preset filled in. It never runs
+  by itself; the viewer clicks Run. The presets are `nearest`, `asof` and `history`.
+- `?q=` opens the topic list with that search. Search runs only when the form is submitted, because
+  the first search makes the data service load its embedding model. Do not use it against the demo
+  instance, which has no model and not enough memory for one: the request restarts the API container.
+
+## Where things are
+
+- `src/App.svelte`: the top bar, the topic's title and tabs, loading the topic.
+- `src/Findings.svelte`, `src/FindingRow.svelte`: the headline difference, the editions' opening
+  sentences, the list of differences.
+- `src/Timeline.svelte`: each difference with the periods it held and the edit behind every turn.
+- `src/SqlPanel.svelte`: the runnable presets and the queries each response reported.
+- `src/TopicList.svelte`: the topic picker.
+- `src/lib/`: the API types and fetch, the address state, the headline rule (`headline.ts`), text
+  marking and sentence cutting (`text.ts`), dates and links (`format.ts`).
+
+## Rules the page keeps
+
+- Quotes are shown word for word. Text is shortened only at sentence boundaries, and the rest is
+  one click away.
+- A classifier's summary is labelled as a machine suggestion, and the page never says what an
+  article should say.
+- The page sends the API a preset name and its values, never SQL.
+- The "Fixture data" badge appears when a response carries `"fixture": true`.
