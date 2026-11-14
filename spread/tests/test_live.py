@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import time
 
+import pytest
+
 from spreadlab import live, replay
 from spreadlab.variants import VARIANTS
 
@@ -81,3 +83,45 @@ def test_a_desk_that_dies_after_the_world_took_its_post_keeps_the_gig_and_what_i
     time.sleep(0.4)  # past the minute at which the guard quotes a request that nobody answered
     assert [by for _, _, by in world.quotes["R1"] + world.quotes["R3"]] == ["desk", "desk"], "the guard replaces no quote of the desk"
     second.stop()
+
+
+def test_the_desk_plays_no_ranking_run_and_no_final_outside_the_final_command():
+    class Worlds:
+        def worlds(self):
+            return [{"worldId": "p", "kind": "practice", "boardRun": None}, {"worldId": "b", "kind": "practice", "boardRun": 2},
+                    {"worldId": "f", "kind": "final", "boardRun": None}]
+
+        def world(self, world_id):
+            return world_id
+
+    assert live.practice_world(Worlds(), "p") == "p"
+    for world_id in ("b", "f", "unknown"):
+        with pytest.raises(SystemExit):
+            live.practice_world(Worlds(), world_id)
+
+
+def test_a_desk_that_joins_from_the_history_alone_does_not_redo_a_change_that_was_handled(tmp_path):
+    asked = request("R1")
+    order = {"id": "R1", "dealerId": "D01", "option": "next_day", "priceCents": 15000, "deadline": 2640, "legs": asked["legs"],
+             "lastPickupAt": 2400, "status": "waiting", "deliveredAt": [None]}
+    moved = {**order, "legs": [{**asked["legs"][0], "delivery": {**asked["legs"][0]["delivery"], "placeId": "tampere"}}]}
+    events = [{"seq": 0, "at": 500, "kind": "price_request", "request": asked},
+              {"seq": 1, "at": 515, "kind": "order_won", "order": order},
+              {"seq": 2, "at": 600, "kind": "order_changed", "order": moved}]
+    world = replay.Replay(events, ROSTER, ends_at=20000, start=506, speed=0.001)
+    desk = lambda folder: live.Live(world, world.guard_act, world.minute, 8, VARIANTS[live.VARIANT], MAP, folder, echo=False)
+    first = desk(tmp_path / "first")
+    first.join()
+    for minute in (516, 601):  # the win, then the change: the desk posts g1, then takes it off and posts g2 to the new place
+        world.clock.saw(minute)
+        for event in world.events(after=first.desk.seq):
+            first.desk.take(event)
+        first.desk.send()
+    first.stop()
+    assert {gig_id: gig["status"] for gig_id, gig in world.gigs.items()} == {"g1": "withdrawn", "g2": "open"}
+
+    second = desk(tmp_path / "second")  # no books: it learns the week from the world's history
+    second.join()
+    second.stop()
+    assert {gig_id: gig["status"] for gig_id, gig in world.gigs.items()} == {"g1": "withdrawn", "g2": "open"}
+    assert second.desk.leg_gigs["R1"] == {0: "g2"}

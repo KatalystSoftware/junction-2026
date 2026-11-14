@@ -305,18 +305,18 @@ class LiveDesk(Policy):
             if action["type"] == "quote" and result["ok"]:
                 self.quoted.add(action["requestId"])
 
-    def catch_up(self, events: list[dict]) -> tuple[set[str], set[str]]:
+    def catch_up(self, events: list[dict]) -> tuple[dict[str, int], dict[str, int]]:
         """Learns from the events that it missed, without acting on them: `reconcile` then acts on what the world
-        is now. Returns the orders that changed and the gigs that were dropped meanwhile."""
-        changed, dropped = set(), set()
+        is now. Returns the orders that changed and the gigs that were dropped meanwhile, with the minute of the last time."""
+        changed, dropped = {}, {}
         self.offline = True
         try:
             for event in events:
                 self.take(event)
                 if event["kind"] == "order_changed":
-                    changed.add(event["order"]["id"])
+                    changed[event["order"]["id"]] = event["at"]
                 elif event["kind"] == "gig_dropped":
-                    dropped.add(event["gigId"])
+                    dropped[event["gigId"]] = event["at"]
         finally:
             self.offline, self.outbox = False, []
         return changed, dropped
@@ -339,16 +339,19 @@ class LiveDesk(Policy):
                 self.orders[order["id"]] = order
                 self.won_at.setdefault(order["id"], self.now)
 
-    def reconcile(self, snapshot: dict, changed: set[str], dropped: set[str]) -> None:
-        """Does what the missed events asked for, against the world as it is now, and sends it. Each order and request
-        is done on its own: one that fails must not keep the desk from the others, or from joining."""
-        for order_id in changed & set(self.orders):
-            if undelivered(self.orders[order_id]):
+    def reconcile(self, snapshot: dict, changed: dict[str, int], dropped: dict[str, int]) -> None:
+        """Does what the missed events asked for and the desk has not done yet, against the world as it is now, and
+        sends it. Each order and request is done on its own: one that fails must not keep the desk from the others."""
+        live = [gig for gig in snapshot["gigs"] if gig["status"] in ("open", "booked", "working")]
+        for order_id, at in changed.items():
+            # A change is done when the order has a gig posted since: the desk took the old gig off and posted the new places.
+            done = any(gig["postedAt"] >= at for gig in live if any(stop["orderId"] == order_id for stop in gig["stops"]))
+            if order_id in self.orders and undelivered(self.orders[order_id]) and not done:
                 self.safely("change", order_id, self.change, self.orders[order_id])
         if self.p["drop_fee"]:
-            open_now = {gig["id"] for gig in snapshot["gigs"] if gig["status"] == "open"}
-            for gig_id in dropped & open_now:
-                self.safely("reopen", gig_id, self.reopen, gig_id)
+            for gig in live:  # the fees start again after a drop, unless they did already
+                if gig["status"] == "open" and gig["id"] in dropped and gig["schedule"][0]["at"] < dropped[gig["id"]]:
+                    self.safely("reopen", gig["id"], self.reopen, gig["id"])
         posting = {(s["orderId"], s["leg"]) for a in self.outbox if a["type"] == "post" for s in a["stops"]}
         for order_id, order in list(self.orders.items()):
             legs = [leg for leg in undelivered(order) if leg not in self.leg_gigs.get(order_id, {}) and (order_id, leg) not in posting]
