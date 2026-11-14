@@ -215,6 +215,58 @@
         "fi": "Suomen sotalaitos pysyi entisellään"
       },
       "close": "Statements that agree: the old military organisation was kept while the levy was suspended against vacancy fees. (round 1 of the blind review, editor reviewer)"
+    },
+    {
+      "topic": "Q736268",
+      "type": "numbers",
+      "quotes": {
+        "en": "It was not until 26 September"
+      },
+      "close": "Two steps of one course of events: the Russian forces joined on 26 September, and Sandels held out until October. (round 2 of the blind review, editor reviewer)"
+    },
+    {
+      "topic": "Q736268",
+      "type": "numbers",
+      "quotes": {
+        "sv": "en kår om 1 000 man landsteg"
+      },
+      "close": "A round figure against an exact one: a corps of 1,000 and 1,100 men. (round 2 of the blind review, editor reviewer)"
+    },
+    {
+      "topic": "Q1412941",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "102 av rörelsens ledare fängslades"
+      },
+      "outcome": "kept",
+      "close": "Not left out: the Finnish article gives its own figures for the trial (about 100 charged, 54 sentenced), a disagreement, not an omission. (round 2 of the blind review, editor reviewer)"
+    },
+    {
+      "topic": "Q1412941",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Rörelsen var som starkast under perioden 1929–1932"
+      },
+      "outcome": "kept",
+      "close": "The Finnish first sentence gives 1929–1932. (round 2 of the blind review, editor reviewer)"
+    },
+    {
+      "topic": "Q1412941",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "banned on 21 November 1932"
+      },
+      "outcome": "set_aside",
+      "close": "Set aside in error: the Finnish article dates the ban to May 1932, a disagreement, not the same fact. (round 2 of the blind review, editor reviewer)"
+    },
+    {
+      "topic": "Q2457646",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Kejsaren bibehöll landets lagar, religion och språk"
+      },
+      "outcome": "kept",
+      "close": "Partly there: the Finnish and English articles give the laws and the religion; only the language is not. (round 2 of the blind review, editor reviewer)"
     }
   ]
 }

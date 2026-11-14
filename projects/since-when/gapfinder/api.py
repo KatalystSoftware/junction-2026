@@ -309,6 +309,8 @@ def apply_checks(findings, checks):
 
 LEXICON_SUMMARY = re.compile(r"first sentence uses .+ other words for the same thing")
 BEGAN_TYPES = ("numbers", "contradiction", "framing")
+# Words missing for at most this many revisions and days are taken for vandalism and its revert.
+GAP_REVISIONS, GAP_DAYS = 5, 30
 
 
 def _words(text):
@@ -317,7 +319,7 @@ def _words(text):
 
 def _holds(passage_words, quote_words):
     """Whether a passage holds a quote, allowing for changes of case, punctuation and wiki markup:
-    every number of the quote, and three in four of its pairs of consecutive words, or three in five
+    every number of the quote, and three in four of its pairs of consecutive words, or one in two
     when the numbers already match (a place renamed, a clause reworded around the same figure)."""
     have = set(passage_words)
     if not all(w in have for w in quote_words if w.isdigit()):
@@ -326,7 +328,7 @@ def _holds(passage_words, quote_words):
     if not pairs:
         return all(w in have for w in quote_words)
     there = set(pairwise(passage_words))
-    share = 0.6 if any(w.isdigit() for w in quote_words) else 0.75
+    share = 0.5 if any(w.isdigit() for w in quote_words) else 0.75
     return len(pairs & there) >= share * len(pairs)
 
 
@@ -382,8 +384,23 @@ ORDER BY c.lang, c.row_start""",
             i = len(ts) - 1
             if not holds(ts[i]):
                 continue
-            while i > 0 and holds(ts[i - 1]):
-                i -= 1
+            # Walk back while an older version holds the words. A short gap is vandalism and its rollback
+            # (or an edit undone): the words were there before it, so the run goes on past it.
+            while i > 0:
+                if holds(ts[i - 1]):
+                    i -= 1
+                    continue
+                back = next(
+                    (
+                        k
+                        for k in range(i - 2, max(i - 2 - GAP_REVISIONS, -1), -1)
+                        if (ts[i] - ts[k + 1]).days <= GAP_DAYS and holds(ts[k])
+                    ),
+                    None,
+                )
+                if back is None:
+                    break
+                i = back
             rev = max(v[2] for v in vs if v[0] == ts[i])
             old = max(v[2] for v in vs if v[0] == ts[i - 1]) if i > 0 else None
             # The first revision of the run that has the quote word for word, for reading it back.

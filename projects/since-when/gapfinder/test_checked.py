@@ -246,5 +246,27 @@ class Began(unittest.TestCase):
         )
 
 
+class BeganRun(unittest.TestCase):
+    """api.began: the run of revisions that hold a quote goes on past vandalism and its revert."""
+
+    def test_a_short_gap_does_not_start_the_run(self):
+        from datetime import datetime as dt
+
+        quote = "Den svenska fältarmén räknade ca 17 000 man"
+        versions = [  # (start, end, rev, text): the words, a vandal blanking them, the rollback
+            (dt(2009, 12, 26), dt(2021, 10, 26, 12, 46, 19), 1, quote + "."),
+            (dt(2021, 10, 26, 12, 46, 19), dt(2021, 10, 26, 12, 46, 42), 2, "hej hej"),
+            (dt(2021, 10, 26, 12, 46, 42), dt(2106, 2, 7), 3, quote + "."),
+        ]
+
+        def r(label, sql):
+            return [{"lang": "sv", "rev_id": v[2], "row_start": v[0], "row_end": v[1], "text": v[3]} for v in versions]
+
+        f = {"id": 1, "status": "open", "type": "numbers", "summary": "x", "quotes": {"sv": quote}}
+        api._BEGAN.pop("QTEST", None)
+        api.began(r, "QTEST", [f])
+        self.assertEqual(f["began"]["sv"]["at"], dt(2009, 12, 26))
+
+
 if __name__ == "__main__":
     unittest.main()
