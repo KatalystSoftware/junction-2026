@@ -215,8 +215,11 @@ file; a file that cannot be read is set aside, and the server starts with no sig
 
 **Who can change what.** The address is public, so anyone can open every screen, but on the server
 (`KUTSU_KEY` set) a sign-up is saved only from Espoo's side unlocked with the demo key, or from a
-company's own invitation link. Without either, every click works in that visitor's browser and is not
-saved, so the next visitor finds the demo as it was.
+company's own invitation link. Without either, a visitor works on their own copy: everything they do on
+Espoo's side or as a company (send, take back, sign up in another tab, fill in or clear the examples) is
+kept in their browser (`localStorage`) over what everyone sees, across reloads and tabs, and the page says
+"Your own copy: changes stay in this browser". "Clear my changes" in the Demo menu empties it. A judge can
+use every screen fully, and the next visitor still finds the demo as it was.
 
 - **Unlock:** in the Demo menu (top right corner; it appears on hover), "Unlock with the demo key", and
   paste the key once. The browser keeps it (`localStorage`). The key is `KUTSU_KEY` in
@@ -225,7 +228,8 @@ saved, so the next visitor finds the demo as it was.
   example sign-ups" and "Clear every sign-up", and each company's invitation link ends in `?t=<token>`:
   its id signed with the key (`link_token` in `serve.py`). That link saves that one company's answers and
   no other's.
-- **Without the key, the server refuses** `DELETE /reviews` and any `POST /review` (403).
+- **Without the key, the server refuses** `DELETE /reviews` and any `POST /review` (403); the page keeps
+  the change in the visitor's own copy instead. On a laptop with no `KUTSU_KEY`, everything is saved as before.
 
 A company is named by its id in `companies.json`, or by any name or domain. One that is not in our
 data takes about 20 seconds; anything asked before answers at once.

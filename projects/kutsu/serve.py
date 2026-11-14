@@ -10,7 +10,7 @@ POST /review?id=<brief id>                  replaces one of those (the officer's
 POST /role?id=<brief id>                    drafts a whole need from the one line in the body
 POST /person                                a person's profile from their LinkedIn, a page of theirs or the text of a CV
 DELETE /reviews                             takes out every sign-up (the demo's reset)
-GET  /unlock                                204 when the x-kutsu-key header holds the demo key
+GET  /unlock                                204 when the x-kutsu-key header holds the demo key, or no key is set
 
 Without keys the page still shows every brief already in signals.json, and anything in api-cache/
 still answers.
@@ -169,7 +169,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
         if url.path == "/reviews.json":
             return self.json(reviews())
         if url.path == "/unlock":
-            return self.reply(204, b"", "text/plain") if KEY and self.organiser() else self.text(403, "That is not the demo key.")
+            return self.reply(204, b"", "text/plain") if self.organiser() else self.text(403, "That is not the demo key.")
         if url.path == "/changes.json":
             return self.json(changes())
         if url.path in DATA:

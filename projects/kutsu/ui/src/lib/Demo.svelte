@@ -1,6 +1,6 @@
 <script lang="ts">
   import { upcoming } from './events'
-  import { app, demo, joinPath, organiser, reviewOf, route, saveReview, unlock, unsaved } from './state.svelte'
+  import { app, clearMine, demo, joinPath, mine, organiser, reviewOf, route, saveReview, unlock } from './state.svelte'
   import type { Review } from './types'
 
   // The demo's own control, apart from the product: move between the three people Kutsu is for, and
@@ -46,7 +46,8 @@
     busy = false
     open = false
   }
-  /** Take out every sign-up, real or example: each company is back to the draft it starts from. Asked twice, since it cannot be undone. */
+  /** Take out every sign-up, real or example: each company is back to the draft it starts from. Asked twice, since it cannot be undone.
+   *  Without the key it takes out this visitor's own changes only, which is all they made. */
   let sure = $state(false)
   /** The key is asked for once, here, and kept in this browser: it is what makes Espoo's side and the sign-ups save. */
   let wrong = $state(false)
@@ -61,11 +62,8 @@
     if (!sure) return void (sure = true)
     sure = false
     busy = true
-    const r = await fetch('reviews', { method: 'DELETE', headers: organiser() }).catch(() => null)
-    if (r?.ok) {
-      unsaved.clear()
-      app.reviews = {}
-    }
+    if (demo.key) await fetch('reviews', { method: 'DELETE', headers: organiser() }).catch(() => null)
+    await clearMine()
     busy = false
     open = false
   }
@@ -75,6 +73,10 @@
 
 <div class="demo" role="presentation" onclick={(e) => { e.stopPropagation() }}>
   <button class="toggle" aria-expanded={open} onclick={() => (open = !open)}>Demo</button>
+  <!-- said while a visitor's own copy holds anything, so nobody takes it for what everyone sees -->
+  {#if mine.count && !demo.key && !open}
+    <button class="mine" onclick={() => (open = true)}>Your own copy: changes stay in this browser</button>
+  {/if}
   {#if open}
     <div class="menu">
       <p>See it as</p>
@@ -84,11 +86,12 @@
       <!-- an invitation is not the place to change everyone's sign-ups from -->
       {#if !recipient}
       <p>Sign-ups</p>
-      {#if demo.key}
       <button disabled={busy} onclick={fill}>Fill in example sign-ups</button>
+      {#if demo.key}
       <button disabled={busy} onclick={reset}>{sure ? 'Press again to clear them all' : 'Clear every sign-up'}</button>
       {:else}
-      <!-- without the key nothing is saved: anyone may try every screen, and the next visitor finds it as it was -->
+      <!-- without the key everything works on the visitor's own copy, in this browser; the next visitor finds the demo as it was -->
+      <button disabled={busy || !mine.count} onclick={reset}>{sure ? 'Press again to clear your changes' : 'Clear my changes'}</button>
       <button disabled={busy} onclick={askKey}>{wrong ? 'Not the key. Try again' : 'Unlock with the demo key'}</button>
       {/if}
       {/if}
@@ -140,6 +143,16 @@
   .toggle:focus-visible,
   .menu :focus-visible {
     outline-color: #fff;
+  }
+  .mine {
+    min-height: 2rem;
+    padding: 0 var(--s3);
+    border: 0;
+    border-radius: 99px;
+    background: oklch(21% 0.03 264 / 0.9);
+    color: #fff;
+    font-weight: 600;
+    backdrop-filter: blur(8px);
   }
   .menu {
     display: grid;

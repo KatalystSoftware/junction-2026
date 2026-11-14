@@ -1,4 +1,3 @@
-import { SvelteMap } from 'svelte/reactivity'
 import { loadApplications } from './manage.svelte'
 import type { Brief, Pool, Preset, Review, Status, Step, Watch } from './types'
 
@@ -41,6 +40,8 @@ export async function unlock(key: string) {
   const r = await fetch('unlock', { headers: { 'x-kutsu-key': key } }).catch(() => null)
   if (r?.status !== 204) return false
   demo.key = key
+  // unlocked, what is done is saved for everyone: a visitor's copy from before would only hide it
+  await clearMine()
   try {
     localStorage.setItem(KEY_KEPT, key)
   } catch {
@@ -77,7 +78,7 @@ async function loadBackOffice() {
   if (backOffice) return
   backOffice = true
   const [reviews, watch] = await Promise.all([get<Record<string, Review>>('reviews.json'), get<Watch>('changes.json')])
-  Object.assign(app, { reviews, watch })
+  Object.assign(app, { reviews: withMine(reviews), watch })
   void loadApplications()
 }
 
@@ -133,7 +134,7 @@ export async function load() {
   // a field being typed in would lose its text to a poll, so polls wait for the typing to end
   setInterval(async () => {
     if (backOffice && !route().me && !(document.activeElement as HTMLElement | null)?.isContentEditable)
-      app.reviews = { ...(await get<Record<string, Review>>('reviews.json')), ...Object.fromEntries(unsaved) }
+      app.reviews = withMine(await get<Record<string, Review>>('reviews.json'))
   }, 3000)
 }
 
@@ -186,13 +187,48 @@ export const nameOf = (b: Brief) =>
 export const reviewOf = (b: Brief): Review =>
   app.reviews[b.id] ?? { status: 'draft', needs: b.card.needs.map((n, i) => ({ ...n, id: `n${String(i)}` })) }
 
-/** Sign-ups the server would not save (no key, no link of the company's own): this visitor's alone, kept over each poll until a reload. */
-export const unsaved = new SvelteMap<string, Review>()
+/**
+ * A visitor's own copy of the demo. On the live server a sign-up is saved for everyone only with the key or a company's
+ * own link; anything else a visitor does (send an invitation, take it back, sign a company up in another tab, fill in
+ * or clear the examples) is kept here, in this browser (localStorage), over what everyone sees. So a judge can use every
+ * screen fully, across reloads and tabs, and the next visitor still finds the demo as it was. The page says so while
+ * the copy holds anything (`mine.count`), and "Clear my changes" empties it.
+ */
+const MINE = 'kutsu-my-copy'
+export const mine = $state({ count: 0 })
+function readMine(): Record<string, Review> {
+  try {
+    return JSON.parse(localStorage.getItem(MINE) ?? '{}') as Record<string, Review>
+  } catch {
+    return {}
+  }
+}
+function writeMine(copy: Record<string, Review>) {
+  mine.count = Object.keys(copy).length
+  try {
+    if (mine.count) localStorage.setItem(MINE, JSON.stringify(copy))
+    else localStorage.removeItem(MINE)
+  } catch {
+    // a browser that keeps nothing still shows the change until the page is left
+  }
+}
+/** What everyone sees, with this visitor's own copy over it. */
+const withMine = (saved: Record<string, Review>) => {
+  const copy = readMine()
+  mine.count = Object.keys(copy).length
+  return { ...saved, ...copy }
+}
+/** Empty this visitor's copy: every company is back to what everyone sees. */
+export async function clearMine() {
+  writeMine({})
+  app.reviews = await get<Record<string, Review>>('reviews.json')
+}
 export async function saveReview(id: string, review: Review) {
   app.reviews[id] = review
   const r = await fetch(`review?id=${encodeURIComponent(id)}`, { method: 'POST', body: JSON.stringify(review), headers: allowed(id) }).catch(() => null)
-  if (r?.ok) unsaved.delete(id)
-  else unsaved.set(id, review)
+  const copy = Object.fromEntries(Object.entries(readMine()).filter(([k]) => k !== id))
+  if (!r?.ok) copy[id] = review
+  writeMine(copy)
 }
 
 let run = 0
