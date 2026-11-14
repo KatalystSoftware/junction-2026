@@ -468,3 +468,14 @@ VARIANTS.update({f"aggr7-{tail}": _full_weeks(_ROW_7, **knobs) for tail, knobs i
     ("ss0", {"late_cost": 100, "slow_step": 0.0}),
     ("mid", {"late_cost": 100, "kinds": _CHEAP_KINDS_760, "cost": 1.1, "queue_hours": 12}),
     ("mild", {"late_cost": 100, "kinds": _CHEAP_KINDS_760, "cost": 1.15, "queue_hours": 12}))})
+# The joint search's volume parts on the aggressive row A1.7, only in a week of 760 drivers or more; a thinner week plays A1.7
+# exactly. Every knob here wins orders in the stand-in climb on its own: the quote's flat cost 1.1 (+561 a week on the old base,
+# +273 at 1.15 on step04), the waiting cars counted only when due within 12 hours (+320 on row 6), and the declined kinds at a
+# cheaper cost (trade-in 2.0, private pickup 1.4, private delivery 1.2: +170 on row 6). `-vol105` goes further: cost 1.05, and a
+# request that can go onward with a held car quoted at 0.9 of its typical fee, not 1.0 (pairs.py switches that off under 760).
+_A1_7 = VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100"]
+_KINDS_CHEAP = {"private_pickup": {"cost": 1.4, "odds": 0.06}, "private_delivery": {"cost": 1.2, "odds": 0.37}, "trade_in": {"cost": 2.0, "fee": 1.4, "odds": 0.27}}
+VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100-vol110"] = _full_weeks(
+    _A1_7, cost=1.1, queue_hours=12, kinds=_KINDS_CHEAP)
+VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100-vol105"] = {
+    **_full_weeks(_A1_7, cost=1.05, queue_hours=12, kinds=_KINDS_CHEAP), "pair_onward_cost": 0.9}
