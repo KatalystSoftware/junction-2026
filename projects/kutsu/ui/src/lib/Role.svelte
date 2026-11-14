@@ -1,10 +1,8 @@
 <script lang="ts">
-  import { tick } from 'svelte'
   import Cite from './Cite.svelte'
   import { text } from './editable'
-  import { terms } from './format'
   import Icon from './Icon.svelte'
-  import type { Brief, Need, Posting } from './types'
+  import type { Brief, Need } from './types'
 
   // One role, open for editing: its title, why now, and the six things it asks for. Values read
   // from a job post say so; what no public page can say is marked as the company's call.
@@ -34,30 +32,6 @@
     input.value = ''
   }
 
-  let posting = $state<Posting | 'drafting' | 'failed' | null>(null)
-  let sheet = $state<HTMLElement>()
-  let copied = $state(false)
-  async function draft() {
-    posting = 'drafting'
-    const r = await fetch(`posting?id=${encodeURIComponent(brief.id)}`, { method: 'POST', body: JSON.stringify(need) }).catch(() => null)
-    posting = r?.ok ? await r.json() : 'failed'
-    await tick()
-    sheet?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-  }
-  async function copy() {
-    const words = sheet?.innerText ?? ''
-    try {
-      await navigator.clipboard.writeText(words)
-    } catch {
-      const field = Object.assign(document.createElement('textarea'), { value: words })
-      document.body.append(field)
-      field.select()
-      document.execCommand('copy')
-      field.remove()
-    }
-    copied = true
-    setTimeout(() => (copied = false), 1600)
-  }
 </script>
 
 <h2 role="textbox" tabindex="0" aria-label="Role" contenteditable="plaintext-only" spellcheck="false" data-placeholder="Who are you looking for?" onblur={(e) => reword('title', e)} onkeydown={enter} use:text={need.title}></h2>
@@ -111,25 +85,6 @@
     </div>
   {/each}
 </dl>
-
-{#if posting && typeof posting === 'object'}
-  <div class="posting" bind:this={sheet}>
-    <h3>{posting.headline}</h3>
-    <p class="terms">{terms(need).join(' · ')}</p>
-    <p>{posting.intro}</p>
-    <h4>You will</h4>
-    <ul>{#each posting.you_will as line}<li>{line}</li>{/each}</ul>
-    <h4>You bring</h4>
-    <ul>{#each posting.you_bring as line}<li>{line}</li>{/each}</ul>
-    <p class="now">{posting.why_now}</p>
-  </div>
-{/if}
-<p class="drafts">
-  <button class="draft" disabled={posting === 'drafting'} onclick={draft}>
-    {posting === 'drafting' ? 'Drafting the posting' : posting === 'failed' ? 'That did not come through. Try again' : posting ? 'Draft it again' : 'Draft a job posting'}
-  </button>
-  {#if posting && typeof posting === 'object'}<button class="draft" onclick={copy}>{copied ? 'Copied' : 'Copy it'}</button>{/if}
-</p>
 
 <style>
   h2 {
@@ -311,59 +266,6 @@
     background: color-mix(in srgb, var(--brand) 16%, #fff);
     font-size: var(--t-xs);
     font-weight: 600;
-  }
-  .drafts {
-    display: flex;
-    gap: var(--s2);
-    margin-top: var(--s4);
-  }
-  .draft {
-    min-height: 2.25rem;
-    padding: 0 var(--s4);
-    border: 1px solid var(--line);
-    border-radius: 99px;
-    background: none;
-    font-size: var(--t-sm);
-    font-weight: 600;
-  }
-  .draft:hover:not(:disabled) {
-    border-color: var(--ink);
-  }
-  .posting .terms {
-    margin-bottom: var(--s3);
-    font-size: var(--t-sm);
-    font-weight: 600;
-    color: var(--ink-2);
-  }
-  .posting {
-    margin-top: var(--s5);
-    padding: var(--s5);
-    border-radius: var(--r2);
-    background: var(--wash);
-    animation: rise 0.5s var(--ease);
-  }
-  .posting h3 {
-    margin-bottom: var(--s2);
-    font-size: var(--t-lg);
-  }
-  .posting h4 {
-    margin: var(--s3) 0 var(--s1);
-    font: 700 var(--t-sm) / 1.2 var(--text);
-    color: var(--ink-2);
-  }
-  .posting ul {
-    padding-left: var(--s4);
-    list-style: disc;
-  }
-  .posting .now {
-    margin-top: var(--s3);
-    font-weight: 600;
-  }
-  @keyframes rise {
-    from {
-      opacity: 0;
-      translate: 0 12px;
-    }
   }
   @media (max-width: 640px) {
     dl > div {

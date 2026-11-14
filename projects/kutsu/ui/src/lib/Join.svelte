@@ -4,7 +4,9 @@
   import { cubicOut } from 'svelte/easing'
   import { crossfade, fade } from 'svelte/transition'
   import Cite from './Cite.svelte'
+  import { confetti } from './confetti'
   import { text } from './editable'
+  import Finished from './Finished.svelte'
   import { host, terms, when } from './format'
   import Icon from './Icon.svelte'
   import Logo from './Logo.svelte'
@@ -91,7 +93,11 @@
     else if (i.kind === 'news') save({ facts: { ...review.facts, [i.signal!.id]: true } })
     else if (i.kind === 'role') patch(i.need!.id, { ok: true })
     else if (i.kind === 'add') line.trim() ? draft(line) : save({ added_done: true })
-    else if (!joined) save({ status: 'joined', joined_at: new Date().toISOString(), wants })
+    else if (!joined) {
+      save({ status: 'joined', joined_at: new Date().toISOString(), wants })
+      confetti([...new Set([...(identity?.colors ?? []), '#ffffff', '#14151a'])])
+      scrollTo({ top: 0 })
+    }
   }
   /** The last thing left out or removed, so one wrong key can be taken back. */
   let undo = $state<null | { said: string; restore: () => void }>(null)
@@ -164,6 +170,8 @@
       <p class="filled" style:--i={5}>{event?.title}, {event?.note.split(',')[0]}. Online and free: deep-tech professionals from around the world meet Finnish employers. Your sign-up is already filled in.</p>
       <button class="yes big" style:--i={6} onclick={() => (started = true)}>Check it <kbd>Enter</kbd></button>
     </section>
+  {:else if joined}
+    <Finished {brief} {review} {about} {news} />
   {:else}
     <div class="bench" bind:this={bench}>
       <aside class="left" aria-label="About you">
@@ -230,10 +238,6 @@
                   {/if}
                 </div>
               {/if}
-            {:else if joined}
-              <h2 class="in">You're in.</h2>
-              <p class="pitch">Candidates at the forum will see {about('Company')} as it stands on this page, and nothing you left out. Espoo's event team will be in touch before {event?.note.split(',')[0].split('–')[0]} November with your booking. Open any role you chose to change it or to draft its job posting.</p>
-              <div class="actions"><button class="no" onclick={() => save({ status: 'invited' })}><Icon name="undo" size={16} />Change my answers</button></div>
             {:else}
               <h2>What would you like at the event?</h2>
               <p class="chips">
@@ -508,9 +512,6 @@
     font-weight: 700;
     line-height: 1.15;
     text-wrap: pretty;
-  }
-  h2.in {
-    font-size: var(--t-2xl);
   }
   .pitch {
     margin-top: var(--s2);

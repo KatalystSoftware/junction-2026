@@ -7,7 +7,6 @@ GET  /brief?q=<company id, name or domain>  runs signals.brief, saves the result
 GET  /progress?q=<same>                     the steps that research has taken so far
 GET  /reviews.json                          every brief's sign-up state: status, the needs, what the company changed
 POST /review?id=<brief id>                  replaces one of those (the officer's edits, or the company's sign-up)
-POST /posting?id=<brief id>                 drafts a job posting for the need in the body
 POST /role?id=<brief id>                    drafts a whole need from the one line in the body
 
 Without keys the page still shows every brief already in signals.json, and anything in api-cache/
@@ -100,18 +99,6 @@ class Handler(http.server.BaseHTTPRequestHandler):
             signals.save([b])
         self.json(b)
 
-    def posting(self, brief, need):
-        try:
-            need = {"title": str(need["title"])[:120], "why": str(need["why"])[:300], "seniority": str(need["seniority"])[:40],
-                    "skills": [str(k)[:60] for k in need["skills"]][:8],
-                    "can_do": [str(k)[:120] for k in need.get("can_do") or []][:5],
-                    **{k: str(need[k])[:60] for k in ("language", "workplace", "where") if need.get(k)}}
-        except (KeyError, TypeError):
-            need = None
-        if not brief or not need or not need["title"].strip():
-            return self.text(400, "A posting needs a known brief id and a need with a title.")
-        self.draft(lambda: signals.posting(brief, need))
-
     def draft(self, write):
         """One model draft, a few at a time, as JSON."""
         if not researching.acquire(blocking=False):
@@ -128,15 +115,13 @@ class Handler(http.server.BaseHTTPRequestHandler):
         url = urllib.parse.urlsplit(self.path)
         brief_id = urllib.parse.parse_qs(url.query).get("id", [""])[0]
         length = int(self.headers.get("content-length") or 0)
-        if url.path not in ("/review", "/posting", "/role") or not 0 < length < 50_000:
+        if url.path not in ("/review", "/role") or not 0 < length < 50_000:
             return self.text(404, "not found")
         try:
             review = json.loads(self.rfile.read(length))
         except ValueError:
             return self.text(400, "The body is not JSON.")
         briefs = {b["id"]: b for b in json.loads(signals.OUT.read_text())}
-        if url.path == "/posting":
-            return self.posting(briefs.get(brief_id), review)
         if url.path == "/role":
             line = str(review.get("line") or "").strip()[:200] if isinstance(review, dict) else ""
             if not line or brief_id not in briefs:

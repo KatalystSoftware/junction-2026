@@ -13,7 +13,7 @@
   let list: HTMLOListElement
   const number = (id: string) => brief.signals.findIndex((s) => s.id === id) + 1
   const BY = { espoo: 'Edited by Espoo', company: 'Changed by the company' }
-  const blank = (): Need => ({ title: '', why: '', can_do: [], skills: [], seniority: 'Experienced', signals: [], roles: [], by: who })
+  const blank = (): Need => ({ id: `e${String(Date.now())}`, title: '', why: '', can_do: [], skills: [], seniority: 'Experienced', signals: [], roles: [], by: who })
 
   const save = (needs: Need[]) => saveReview(brief.id, { ...review, needs })
 

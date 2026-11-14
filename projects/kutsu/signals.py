@@ -362,37 +362,6 @@ def card(company, posts, signals, named):
                       and clean(" ".join([n["title"], n["why"], *n["can_do"]]))]}, usd
 
 
-POSTING_SCHEMA = {
-    "type": "object", "additionalProperties": False, "required": ["headline", "intro", "you_will", "you_bring", "why_now"],
-    "properties": {"headline": {"type": "string"}, "intro": {"type": "string"}, "why_now": {"type": "string"},
-                   "you_will": {"type": "array", "items": {"type": "string"}},
-                   "you_bring": {"type": "array", "items": {"type": "string"}}}}
-POSTING_SYSTEM = """You draft a short job posting for one role at one company, for the company to edit before \
-it is used. Use only the facts given: the company's description, the role, and the numbered \
-statements, each checked against a public source.
-headline: the role in the singular, sentence case.
-intro: two sentences: what the company does, then why this role exists now, with a fact.
-you_will: four lines of 6 to 12 words, each starting with a verb.
-you_bring: four lines of 4 to 10 words, built on what the person must be able to do, knows, and the level.
-State the working language and workplace only when they are given.
-why_now: one sentence with one concrete recent fact from the statements, and not one the intro used.
-Describe the company's products only in the words the description and statements use.
-No praise words, nothing about salary, benefits or culture, and no names of people."""
-
-
-def posting(brief, need):
-    """A drafted job posting for one need of a stored brief. Returns the posting, or None."""
-    lines = [f"Company: {brief['name']}", f"What it does: {brief['card']['pitch'] or (brief['identity'] or {}).get('description') or 'unknown'}",
-             f"Role: {need['title']}", f"Level: {need['seniority']}", f"Must be able to: {'; '.join(need.get('can_do') or [])}",
-             f"Knows: {', '.join(need['skills'])}",
-             f"Working language: {need.get('language') or 'not said'}. Workplace: {need.get('workplace') or 'not said'}"
-             f"{', ' + need['where'] if need.get('where') else ''}.",
-             f"Why the company needs it: {need['why']}", ""]
-    lines += [f"{x['id']} [{x['type']}{', ' + x['date'] if x['date'] else ''}] {x['claim']}" for x in brief["signals"]]
-    answer, _ = ask(POSTING_SYSTEM, POSTING_SCHEMA, "\n".join(lines))
-    return answer
-
-
 ROLE_SCHEMA = {
     "type": "object", "additionalProperties": False, "required": ["title", "why", "can_do", "skills", "seniority", "family"],
     "properties": {"title": {"type": "string"}, "why": {"type": "string"}, "family": {"type": "string", "enum": FAMILIES},

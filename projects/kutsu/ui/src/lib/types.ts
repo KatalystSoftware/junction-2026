@@ -35,7 +35,6 @@ export type Need = {
   by?: 'espoo' | 'company'
   off?: boolean
 }
-export type Posting = { headline: string; intro: string; you_will: string[]; you_bring: string[]; why_now: string }
 
 export type Identity = {
   name: string | null
