@@ -19,7 +19,7 @@
   )
   const toggle = (list: string[], id: string) => (list.includes(id) ? list.filter((x) => x !== id) : [...list, id])
   // a person who came to two events is counted in each; the pool keeps no rows, only counts per field and event
-  const n = $derived(plan.fields.filter((f) => fields.includes(f.name)).reduce((sum, f) => sum + events.reduce((s, e) => s + (f.people.events[e] ?? 0), 0), 0))
+  const n = $derived(plan.fields.filter((f) => fields.includes(f.name)).reduce((sum, f) => sum + Math.min(f.people.people, events.reduce((s, e) => s + (f.people.events[e] ?? 0), 0)), 0))
   function send() {
     sendInvitation({ n, events, fields, message })
     onclose()

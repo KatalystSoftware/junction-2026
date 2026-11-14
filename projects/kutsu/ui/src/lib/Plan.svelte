@@ -28,7 +28,8 @@
   const regularLink = $derived(`${location.origin}${location.pathname}${invitation}`)
   // whom a send reaches before the organiser narrows it in the modal: everyone in the pool who came to an earlier event and
   // works in one of this event's fields (a person who came twice is counted twice; the pool keeps counts, not people)
-  const reach = $derived(plan.fields.reduce((sum, f) => sum + Object.values(f.people.events).reduce((a, b) => a + b, 0), 0))
+  // never more than the people there are: someone who came to two events is one person to invite
+  const reach = $derived(plan.fields.reduce((sum, f) => sum + Math.min(f.people.people, Object.values(f.people.events).reduce((a, b) => a + b, 0)), 0))
   async function copyRegular() {
     await copyText(regularLink)
     countCopy()
@@ -80,6 +81,7 @@
 <main>
   <a class="back" href="#/events"><Icon name="back" size={16} />Events</a>
   <header>
+    {#if plan.kind === 'suggested'}<p class="proposed">Proposed event, no date yet</p>{/if}
     <h1>{plan.title}</h1>
     {#if plan.date}
       <p>
@@ -88,7 +90,8 @@
       </p>
     {/if}
   </header>
-  <Tabs {plan} tab="invite" />
+  <!-- applications come in for an event that exists; a proposed one has none yet -->
+  {#if plan.kind === 'upcoming'}<Tabs {plan} tab="invite" />{/if}
 
   <div class="sides">
     <section>
@@ -143,7 +146,8 @@
 
       {#if field && people}
         {#if plan.fields.length > 1}
-          <button class="up" onclick={() => (open = '')}><Icon name="back" size={16} />{field.name}</button>
+          <button class="up" onclick={() => (open = '')}><Icon name="back" size={16} />All fields</button>
+          <h3 class="in">{field.name}</h3>
         {/if}
         <p class="count"><b>{some(people.people)}</b> do this work{#if people.wanting}<span>+{some(people.wanting)} want to move into it</span>{/if}</p>
 
@@ -222,6 +226,21 @@
     text-decoration: none;
   }
   .back:hover {
+    color: var(--ink);
+  }
+  .proposed {
+    justify-self: start;
+    margin-bottom: var(--s2);
+    padding: 0.2em 0.7em;
+    border-radius: 99px;
+    background: var(--wash);
+    font-size: var(--t-sm);
+    font-weight: 600;
+    color: var(--ink-2);
+  }
+  h3.in {
+    margin: 0;
+    font: 700 var(--t-lg) / 1.2 var(--display);
     color: var(--ink);
   }
   h1 {
@@ -468,7 +487,7 @@
     margin-top: var(--s3);
     font-size: var(--t-lg);
   }
-  .up + .count {
+  .in + .count {
     margin-top: 0;
   }
   .count b {

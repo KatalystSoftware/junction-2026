@@ -5,7 +5,8 @@ import type { Applicant } from './types'
  * past attendees, how often the invitation link was copied, and each decision, keyed by who took it (Espoo, or a
  * company by its id) and the application. Sample data; nothing leaves the browser.
  */
-export type Decision = { d: 'accept' | 'decline'; reason: string; by: string; at: string }
+/** A decision on one application: accepted or declined, each with the reason given, or set aside for a second look. */
+export type Decision = { d: 'accept' | 'decline' | 'later'; reason: string; by: string; at: string }
 export type Sent = { at: string; n: number; events: string[]; fields: string[]; message: string }
 type Manage = { sent: Sent | null; copies: number; decisions: Record<string, Decision> }
 
@@ -31,7 +32,7 @@ export const persist = () => {
 const now = () => new Date(Date.now()).toISOString()
 export const decisionKey = (by: string, id: string) => `${by}:${id}`
 export const decisionOf = (by: string, id: string): Decision | undefined => manage.decisions[decisionKey(by, id)]
-export function decide(by: string, id: string, d: 'accept' | 'decline', reason: string) {
+export function decide(by: string, id: string, d: Decision['d'], reason: string) {
   manage.decisions[decisionKey(by, id)] = { d, reason, by, at: now() }
   persist()
 }

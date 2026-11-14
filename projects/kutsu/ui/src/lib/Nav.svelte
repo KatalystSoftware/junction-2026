@@ -97,29 +97,27 @@
   }
   /* on a phone the navigation is a bar across the top, its items in one row that scrolls */
   @media (max-width: 820px) {
+    /* the name on its own row, then every section in one row that fits: nothing is off the screen */
     nav {
       position: static;
-      flex-direction: row;
-      align-items: center;
-      gap: var(--s3);
+      gap: var(--s2);
       height: auto;
-      /* the demo's own button sits at the top right */
-      padding: var(--s2) 4.75rem var(--s2) var(--s3);
+      padding: var(--s3) var(--s2) var(--s2);
     }
     .name {
-      padding: 0 var(--s1);
+      padding: 0 var(--s2);
       font-size: 1.25rem;
     }
     ul {
       display: flex;
-      flex: 1;
-      min-width: 0;
-      overflow-x: auto;
-      scrollbar-width: none;
+      justify-content: space-between;
+      gap: 0;
     }
     li a {
+      min-height: 2.75rem;
+      padding: var(--s2);
+      font-size: var(--t-sm);
       white-space: nowrap;
-      padding: var(--s2) var(--s3);
     }
     li span,
     p {
