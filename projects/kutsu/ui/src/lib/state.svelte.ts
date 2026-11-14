@@ -19,7 +19,6 @@ export async function load() {
   Object.assign(app, { briefs, presets, reviews, pool, watch, ready: true })
   // the server asks Context.dev at most every five minutes, so asking it once a minute is cheap
   setInterval(async () => (app.watch = await get('changes.json')), 60_000)
-<<<<<<< Updated upstream
   // A new screen starts at its top; back or forward through the browser's history returns to where the reader was.
   // Each history entry is numbered in history.state; the position of the current one follows the reader's scrolling,
   // and is not touched while a fresh render still moves the page.
@@ -52,11 +51,6 @@ export async function load() {
     }
     app.hash = location.hash
     requestAnimationFrame(() => settle(traverse ? (scrolls[at] ?? 0) : 0, traverse ? 10 : 0))
-=======
-  addEventListener('hashchange', () => {
-    app.hash = location.hash
-    scrollTo({ top: 0 })
->>>>>>> Stashed changes
   })
   // a field being typed in would lose its text to a poll, so polls wait for the typing to end
   setInterval(async () => {

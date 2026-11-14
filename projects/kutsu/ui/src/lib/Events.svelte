@@ -31,6 +31,7 @@
 <main>
   <h1>Events</h1>
 
+  <div class="upcoming">
   <h2 class="group">Upcoming events</h2>
   {#each next as plan (plan.slug)}
     <section class="next">
@@ -45,6 +46,7 @@
       <a class="btn primary" href="#/event/{plan.slug}">Manage event<Icon name="flat" size={18} /></a>
     </section>
   {/each}
+  </div>
 
   {#if app.watch.changes.length}<Watch />{/if}
 
@@ -128,9 +130,7 @@
     --brand-ink: var(--city);
     display: grid;
     gap: var(--s6);
-    padding: var(--s7) var(--s7) var(--s7) var(--s6);
-    background: var(--city-raise);
-    color: var(--city-ink);
+    padding: var(--s4) var(--s7) var(--s7) var(--s6);
   }
   .next > * {
     max-width: 72rem;
@@ -283,7 +283,7 @@
       gap: var(--s6);
     }
     .next {
-      padding: var(--s6) var(--s4);
+      padding: var(--s3) var(--s4) var(--s6);
       gap: var(--s5);
     }
     main > :global(section):not(.next) {
@@ -299,8 +299,20 @@
       grid-row: auto;
     }
   }
-  /* the group heading sits right above its card, not a whole grid gap away */
+  /* the upcoming events share one field; their group heading sits at its top */
+  .upcoming {
+    background: var(--city-raise);
+    color: var(--city-ink);
+  }
   .group {
-    margin-bottom: calc(-1 * var(--s5));
+    padding: var(--s6) var(--s7) 0 var(--s6);
+    font-size: var(--t-lg);
+    letter-spacing: -0.01em;
+    color: var(--city-dim);
+  }
+  @media (max-width: 820px) {
+    .group {
+      padding: var(--s5) var(--s4) 0;
+    }
   }
 </style>
