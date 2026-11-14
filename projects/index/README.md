@@ -52,7 +52,7 @@ The page says nothing the repo does not. When one of these files changes, change
 
 The screenshots are cropped to one readable moment: the replay at minute 42 of seed 200019
 (`?session=l4-s200019&t=42&intro=0&still`: the rollback at minute 33 and what it has cost by 42), Since When's first card at 520 px wide, and Kutsu's
-invitation to the Deep Tech Talent Forum at 1280 × 800; all taken at twice the pixel density.
+invitation for IQM (`#/join/2912625-6/deep-tech-talent-forum`, the company the Kutsu video uses) at 1280 × 800; all taken at twice the pixel density.
 
 Source links are off: `repo` in `projects.js` is empty because this repository is private. Set it to
 the public copy's address once `scripts/publish-public.sh` has pushed one, and every entry gets a
