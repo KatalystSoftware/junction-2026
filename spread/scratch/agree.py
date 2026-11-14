@@ -14,8 +14,10 @@ variants.py. The first arm is the reference.
 
 Open loop: the recording's dealers and drivers answered another desk, so this measures how far decisions are apart, not
 what the difference earns. Weight a decision type by what it is worth: on round 1 the quote prices tracked the played
-capture, and 74% of first posts differed in fee for about 120 euros a week. `--chain` names arms that each add one part
-on the way from the reference; each departure of an arm is put on the first arm along the chain that departs there.
+capture, and 74% of first posts differed in fee for about 120 euros a week. Gigs of several orders are also compared at
+any time, not only as first posts, so a car paired after its first post (re-pairing, chains) counts. `--chain` names arms
+that each add one part on the way from the reference; each departure of an arm is put on the first arm along the chain
+that departs there.
 """
 from __future__ import annotations
 
@@ -62,7 +64,8 @@ def play(root: str, target: str, variant: str, week_path: str, map_path: str, ou
             o["deliveredAt"] = [at if at is not None and at <= e["at"] and delivered.get((o["id"], leg)) == at else None
                                 for leg, at in enumerate(o["deliveredAt"])]
     posts: dict[str, list] = {}  # order id -> [minute, opening fee in cents, cars, the other order of a pair gig]
-    counts = {"reprices": 0}
+    combined: list[list[str]] = []  # the orders of every gig posted with more than one order, first or later
+    counts = {"reprices": 0, "withdraws": 0}
 
     class World:
         gigs = 0
@@ -74,11 +77,14 @@ def play(root: str, target: str, variant: str, week_path: str, map_path: str, ou
                     self.gigs += 1
                     results.append({"ok": True, "id": f"g{self.gigs}"})
                     orders = sorted({s["orderId"] for s in action["stops"]})
+                    if len(orders) > 1:
+                        combined.append(orders)
                     for o in orders:
                         posts.setdefault(o, [desk.now, action["schedule"][0]["feeCents"], sum(s["kind"] == "pickup" for s in action["stops"]),
                                              next((x for x in orders if x != o), None)])
                 else:
                     counts["reprices"] += action["type"] == "reprice"
+                    counts["withdraws"] += action["type"] == "withdraw"
                     results.append({"ok": True})
             return results
 
@@ -103,7 +109,7 @@ def play(root: str, target: str, variant: str, week_path: str, map_path: str, ou
     flush()
     quotes = {rid: {"declined": d.get("declined"), "prices": d.get("prices") or {}} for rid, d in desk.decisions.items()}
     won = [e["order"]["id"] for e in week["events"] if e["kind"] == "order_won"]
-    Path(out).write_text(json.dumps({"drivers": len(week["roster"]), "quotes": quotes, "posts": posts, "won": won, **counts}))
+    Path(out).write_text(json.dumps({"drivers": len(week["roster"]), "quotes": quotes, "posts": posts, "combined": combined, "won": won, **counts}))
 
 
 def run(args) -> None:
@@ -147,7 +153,8 @@ def read(args) -> None:
     chain = args.chain.split(",") if args.chain else []
     steps = dict(zip(chain[1:], args.steps.split(","))) if args.steps else {a: a for a in chain[1:]}
     for title, keep in (("Natural (720 drivers or more)", lambda d: d >= 720), ("Thin (under 720 drivers)", lambda d: d < 720)):
-        rows = {a: {k: [] for k in ("status", "options", "price", "logp", "minute", "fee", "pair")} | {"pairs": 0, "reprices": 0} for a in arms}
+        rows = {a: {k: [] for k in ("status", "options", "price", "logp", "minute", "fee", "pair", "same_combined")}
+                | {"pairs": 0, "reprices": 0, "combined": 0, "withdraws": 0} for a in arms}
         firsts = {a: {} for a in chain[1:]}
         weeks = 0
         for seed in seeds:
@@ -160,6 +167,11 @@ def read(args) -> None:
                 d, row = data[a], rows[a]
                 row["pairs"] += sum(1 for p in d["posts"].values() if p[3]) / 2
                 row["reprices"] += d["reprices"]
+                # Gigs of several orders at any time, not only first posts: a later re-pairing or a chain shows here.
+                mine = {tuple(c) for c in d.get("combined", [])}
+                row["combined"] += len(mine)
+                row["withdraws"] += d.get("withdraws", 0)
+                row["same_combined"] += [tuple(c) in mine for c in {tuple(c) for c in r0.get("combined", [])}]
                 for rid, q in r0["quotes"].items():
                     mine = d["quotes"][rid]
                     qa, qb = not mine["declined"] and bool(mine["prices"]), not q["declined"] and bool(q["prices"])
@@ -186,13 +198,15 @@ def read(args) -> None:
             continue
         share = lambda xs: f"{100 * sum(xs) / len(xs):.1f}%" if xs else "-"
         print(f"\n{title}: {weeks} weeks; agreement with {ref} (prices and fees within {TOL:.0%})")
-        print("| arm | quote or decline | same options | price, all options | median price vs ref | post minute | opening fee | pairing | pair gigs/wk | reprices/wk |")
-        print("|---|---|---|---|---|---|---|---|---|---|")
+        print("| arm | quote or decline | same options | price, all options | median price vs ref | post minute | opening fee | pairing "
+              "| pair gigs/wk | combined gigs/wk | ref's combinations formed | withdraws/wk | reprices/wk |")
+        print("|---|---|---|---|---|---|---|---|---|---|---|---|---|")
         for a in arms:
             r = rows[a]
             med = f"{100 * (math.exp(statistics.median(r['logp'])) - 1):+.1f}%" if r["logp"] else "-"
             print(f"| {a} | {share(r['status'])} | {share(r['options'])} | {share(r['price'])} | {med} | {share(r['minute'])} | "
-                  f"{share(r['fee'])} | {share(r['pair'])} | {r['pairs'] / weeks:.1f} | {r['reprices'] / weeks:.0f} |")
+                  f"{share(r['fee'])} | {share(r['pair'])} | {r['pairs'] / weeks:.1f} | {r['combined'] / weeks:.1f} | {share(r['same_combined'])} "
+                  f"| {r['withdraws'] / weeks:.1f} | {r['reprices'] / weeks:.0f} |")
         for a, counts in firsts.items():
             parts = []
             for kind in ("quote", "post"):
