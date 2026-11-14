@@ -1,0 +1,7 @@
+# The gap finder (projects/mariadb-wikipedia). The second name is the address it was first
+# published under; it stays whatever BASE_DOMAIN becomes. The upstream is its container on its own
+# network (compose.yaml says why).
+gapfinder.{$BASE_DOMAIN}, 31-22-104-106.sslip.io {
+	encode zstd gzip
+	reverse_proxy gapfinder-ui-1:8078
+}

@@ -1,0 +1,5 @@
+# Since When (projects/since-when).
+since-when.{$BASE_DOMAIN} {
+	encode zstd gzip
+	reverse_proxy since-when-app:8078
+}

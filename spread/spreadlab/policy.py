@@ -87,6 +87,9 @@ DEFAULTS = {
     "slow_step": 0,       # the cost rises by this much x the request's chance of arriving late, for each won car without a driver
     "late_cost": 0,       # the cost rises by the request's chance of arriving late (slow.py) x this many euros: the refund and the dealer's trust
     "rule_cost": 0,       # ... and by (that chance - 0.10) x this many euros, the price of the 90% rule: an order safer than the rule gets cheaper. The cost is then never under the typical fee
+    # Snow. A `forecast` event names places and hours a day ahead; there drives are slower and some drivers stay at home. Each is off at its default.
+    "snow_odds": 0,       # added to the log odds of the late chance when snow is forecast at a pickup or delivery place between the first pickup minute and the fastest option's deadline
+    "snow_fee": 0,        # the fees of a gig whose order has snow forecast at one of its places before its deadline are this multiple of the usual schedule
     "backlog_later": 0,   # the surcharge for each won car without a driver that is not due within `backlog_hours`; `backlog_step` is then for those that are
     "full_from": 0,       # the backlog is filling once this many won cars have no driver; 0 is never
     "when_full": {},      # the parameters while it is filling; they come after those of a desk that is behind
@@ -172,6 +175,7 @@ class Policy(Desk):
         self.decisions: dict[str, dict] = {}  # request id -> what the policy answered, and why it declined
         self.refused: list[dict] = []  # the actions that the world refused
         self.opt = optquote.Quotes(map_, roster) if self.p["opt"] else None
+        self.forecasts: list[dict] = []  # the snow forecasts so far: places, and the minutes from and to
 
     def params(self) -> dict:
         """The parameters at this minute: those of the week, of a desk that is behind, or of one whose backlog is filling."""
@@ -349,8 +353,15 @@ class Policy(Desk):
 
     def slow(self, request, options) -> float:
         """The chance that the request's order arrives late (slow.py), if the dealer takes the fastest of the options."""
-        notified = min(self.notified[leg["pickup"]["placeId"]] for leg in request["legs"])
-        return slow.chance(slow.known(request, curve.fastest(options), notified, self.drive(request), len(self.roster)), slow.MODELS[self.p["slow_model"]])
+        notified, fastest = min(self.notified[leg["pickup"]["placeId"]] for leg in request["legs"]), curve.fastest(options)
+        start = max(request["respondBy"], request["legs"][0]["pickup"]["window"]["from"])
+        odds = self.p["snow_odds"] if self.p["snow_odds"] and self.snowy(request["legs"], start, fastest["deadline"]) else 0
+        return slow.chance(slow.known(request, fastest, notified, self.drive(request), len(self.roster)), slow.MODELS[self.p["slow_model"]], odds)
+
+    def snowy(self, legs, start: int, end: int) -> bool:
+        """Whether a forecast so far names a pickup or delivery place of the legs for hours between the two minutes."""
+        places = {leg[end_]["placeId"] for leg in legs for end_ in ("pickup", "delivery")}
+        return any(places & set(f["placeIds"]) and start < f["to"] and end > f["from"] for f in self.forecasts)
 
     def unbooked(self, hours: float = 0) -> int:
         """The won cars that no driver holds now: just won, dropped, or posted again after a failed visit. With `hours`,
@@ -499,6 +510,8 @@ class Policy(Desk):
         p = self.params()
         request = self.requests[order["id"]]
         usual = self.usual_fee(request, p) * cars / len(order["legs"])
+        if p["snow_fee"] and self.snowy(order["legs"], self.now, order["deadline"]):
+            usual *= p["snow_fee"]  # drivers who stay at home leave fewer to book it: the whole schedule is dearer
         rule = self.fee_rule(order, p)
         fee = usual * (rule[0] if rule else self.opening(request, p)) * opening
         if order["id"] in self.urgent:
@@ -666,6 +679,8 @@ class Policy(Desk):
                     self.today, self.today_at = (day, []), {}
                 self.today[1].append((log_odds, event["kind"] == "order_won"))
                 self.today_at.setdefault(self.asked_at.pop(event["order"]["id"] if event["kind"] == "order_won" else event["requestId"]), []).append((log_odds, event["kind"] == "order_won"))
+        elif event["kind"] == "forecast":
+            self.forecasts.append({"from": event["from"], "to": event["to"], "placeIds": event["placeIds"]})
         elif event["kind"] in ("gig_viewed", "gig_booked"):
             self.seen[event["driverId"]] = event["at"] // DAY
         elif event["kind"] == "gig_dropped":

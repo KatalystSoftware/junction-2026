@@ -11,6 +11,7 @@ shares no files with it. The Python package names are unchanged.
 - [`gapfinder/`](gapfinder/): loader, schema, and the FastAPI server for the API ([contract](docs/api.md)) and the app.
 - [`differences/`](differences/README.md): classifies the differences between two passages with Nemotron.
 - [`ui/`](ui/README.md): the app, in Svelte.
+- [`deploy/`](deploy/README.md): the public instance on the Verda machine.
 - [`demo/`](demo/HANDOFF.md): the handoff note, the [walkthrough script](demo/WALKTHROUGH.md) and the builders' notes.
 - [`measurements/`](demo/measurements.md): recall and query times, with the runs they come from.
 

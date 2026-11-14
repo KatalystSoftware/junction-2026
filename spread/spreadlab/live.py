@@ -229,7 +229,7 @@ class LiveDesk(Policy):
         return {k: v for k, v in vars(self).items() if k not in self.RUNTIME}
 
     def __setstate__(self, state: dict) -> None:
-        vars(self).update({"fixes": {}, "unchecked": set(), **state})  # books written before the note watcher have neither
+        vars(self).update({"fixes": {}, "unchecked": set(), "forecasts": [], **state})  # books written before the note watcher or the snow forecasts lack them
         for k in self.RUNTIME:
             setattr(self, k, None)
 

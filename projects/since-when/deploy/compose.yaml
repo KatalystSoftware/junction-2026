@@ -1,0 +1,55 @@
+# Since When on the shared Verda machine, behind the proxy in infra/verda/proxy. See README.md.
+# Limits: 3 GB of memory and 3 CPUs in all, so the machine's other apps keep theirs.
+name: since-when
+
+services:
+  db:
+    image: mariadb:11.8
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?run up.sh, which writes .env}
+      MARIADB_DATABASE: since_when
+      MARIADB_USER: since_when
+      MARIADB_PASSWORD: ${DB_PASSWORD:?}
+    command:
+      - --innodb-buffer-pool-size=1G
+      - --innodb-log-file-size=256M
+      - --max-allowed-packet=256M
+      - --mhnsw-max-cache-size=256M
+      - --default-time-zone=+00:00
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_uca1400_ai_ci
+    volumes: [db:/var/lib/mysql]
+    healthcheck:
+      test: [CMD, healthcheck.sh, --connect, --innodb_initialized]
+      interval: 5s
+      retries: 60
+    deploy: {resources: {limits: {cpus: "1", memory: 2g}}}
+
+  app:
+    build: ..
+    image: since-when
+    restart: unless-stopped
+    environment:
+      DB_HOST: db
+      DB_NAME: since_when
+      DB_USER: since_when
+      DB_PASSWORD: ${DB_PASSWORD:?}
+      # The Run button's user, SELECT only (up.sh creates it).
+      DB_RO_USER: since_when_ro
+      DB_RO_PASSWORD: ${DB_RO_PASSWORD:?}
+      # A public instance takes no writes: POST /api/findings/<id>/status answers 403.
+      SINCE_WHEN_READ_ONLY: "1"
+    depends_on: {db: {condition: service_healthy}}
+    # No ports: the proxy reaches it as since-when-app:8078.
+    networks:
+      default:
+      proxy: {aliases: [since-when-app]}
+    deploy: {resources: {limits: {cpus: "2", memory: 1g}}}
+
+networks:
+  proxy:
+    external: true
+
+volumes:
+  db:
