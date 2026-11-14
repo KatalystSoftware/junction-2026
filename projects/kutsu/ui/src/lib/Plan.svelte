@@ -6,6 +6,7 @@
   import Logo from './Logo.svelte'
   import Progress from './Progress.svelte'
   import { app, copyLink, joinLink, nameOf, reviewOf, saveReview, stateNames } from './state.svelte'
+  import type { Status } from './types'
   import Wall from './Wall.svelte'
 
   // One event, as the two lists Espoo has to build for it: its employers, each with the news that
@@ -19,6 +20,13 @@
   let copied = $state('')
 
   const names = $derived(stateNames(plan.coming))
+  // the forum's employers are coming already, so their link needs no event; any other invitation names its own
+  const link = $derived(plan.coming ? '' : plan.slug)
+  /** Where an employer stands for this event: its profile is one for all events, an invitation is for this one. */
+  const standing = (e: Invitee): Status | '' => {
+    const review = reviewOf(e.brief)
+    return review.status === 'joined' ? 'joined' : plan.coming ? (review.status === 'invited' ? 'invited' : '') : review.events?.includes(plan.slug) ? 'invited' : ''
+  }
   const listed = $derived(all ? plan.employers : plan.employers.slice(0, FIRST))
   const rest = $derived(all ? [] : plan.employers.slice(FIRST))
   // the one field whose people are shown: the event's own, or the one opened from its list
@@ -31,8 +39,10 @@
   /** An invitation leaves this screen as a link: a person sends it. Copying it is what marks the employer as invited. */
   async function invite(e: Invitee) {
     const review = reviewOf(e.brief)
-    if (review.status === 'draft') await saveReview(e.brief.id, { ...review, status: 'invited', invited_at: new Date().toISOString() })
-    await copyLink(e.brief.id)
+    const events = plan.coming ? review.events : [...new Set([...(review.events ?? []), plan.slug])]
+    if (review.status === 'draft') await saveReview(e.brief.id, { ...review, status: 'invited', invited_at: new Date().toISOString(), events })
+    else if (!plan.coming && !review.events?.includes(plan.slug)) await saveReview(e.brief.id, { ...review, events })
+    await copyLink(e.brief.id, link)
     copied = e.brief.id
     setTimeout(() => (copied = ''), 1600)
   }
@@ -56,7 +66,7 @@
       {#if plan.coming}<div class="progress"><Progress employers={plan.employers} coming /></div>{/if}
       <ul class="employers">
         {#each listed as e (e.brief.id)}
-          {@const status = reviewOf(e.brief).status}
+          {@const status = standing(e)}
           {@const source = sourceOf(e)}
           <li>
             <a class="tile" href="#/{encodeURIComponent(e.brief.id)}" aria-label={nameOf(e.brief)}><Logo brief={e.brief} small /></a>
@@ -66,13 +76,13 @@
               {#if e.news}<p class="why">{e.news.line}{#if source}{' '}<Cite signal={source} label={when(e.news.date)} />{/if}</p>{/if}
             </div>
             <div class="act">
-              {#if status !== 'draft'}<span class="state {status}">{names[status]}</span>{/if}
+              {#if status}<span class="state {status}">{status === 'joined' ? 'Profile confirmed' : names[status]}</span>{/if}
               {#if status !== 'joined'}
                 <button class="btn quiet" onclick={() => invite(e)}>
                   <Icon name={copied === e.brief.id ? 'check' : 'copy'} size={16} />{copied === e.brief.id ? 'Link copied' : plan.coming ? 'Copy profile link' : 'Copy invitation'}
                 </button>
               {/if}
-              <a class="btn quiet" href={joinLink(e.brief.id)} target="_blank" rel="noopener">Their sign-up<Icon name="out" size={14} /></a>
+              <a class="btn quiet" href={joinLink(e.brief.id, link)} target="_blank" rel="noopener">Their sign-up<Icon name="out" size={14} /></a>
             </div>
           </li>
         {/each}

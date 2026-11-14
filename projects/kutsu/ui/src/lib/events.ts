@@ -26,6 +26,7 @@ export type Plan = {
   fields: Field[]
 }
 
+const slugOf = (p: Preset) => slug(p.title)
 export const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
 
 /** A count of people as a screen may show it. Under five is too easy to recognise as someone. */
@@ -85,7 +86,7 @@ export const upcoming = (preset: Preset): Plan => {
     .filter((b): b is Brief => !!b)
     .map(invitee)
   return {
-    slug: slug(preset.title),
+    slug: slugOf(preset),
     title: preset.title,
     kind: 'upcoming',
     coming: !!preset.coming,
@@ -97,6 +98,20 @@ export const upcoming = (preset: Preset): Plan => {
 }
 
 export const plans = (): Plan[] => [...app.presets.map(upcoming), ...suggested()]
+
+/** An event as the invited company reads it: its name, when it is, and what is settled about it. */
+export type Occasion = { slug: string; name: string; when: string; facts: string; dated: boolean }
+/**
+ * The event a company's invitation is for: the one named in its link, else the event it is already
+ * coming to, else the suggested event it would be invited to first. A suggested event has no date yet.
+ */
+export function occasion(slug: string, brief: Brief): Occasion {
+  const preset = app.presets.find((p) => slug === slugOf(p)) ?? (slug ? undefined : app.presets.find((p) => p.ids.includes(brief.id)))
+  if (preset) return { slug: slugOf(preset), name: preset.title, when: preset.note.split(',')[0] ?? '', facts: preset.facts ?? '', dated: true }
+  const ideas = suggested()
+  const plan = ideas.find((p) => p.slug === slug) ?? ideas.find((p) => p.employers.some((e) => e.brief.id === brief.id))
+  return { slug: plan?.slug ?? '', name: plan ? `${plan.title} talent event` : 'A talent event', when: 'date to be set', facts: '', dated: false }
+}
 
 /** "9 employers, 2 confirmed": how many look for something, and how many of those said so themselves. */
 export const asking = (n: number, sure: number) => `${String(n)} ${n === 1 ? 'employer' : 'employers'}${sure ? `, ${String(sure)} confirmed` : ''}`

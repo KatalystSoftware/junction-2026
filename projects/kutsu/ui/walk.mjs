@@ -98,6 +98,10 @@ try {
   await open(`#/${COMPANY}`)
   await expect('an employer', 'Looking for')
 
+  // an invitation from a suggested event names that event, not the upcoming one
+  await open('#/join/nitor.com/security')
+  await expect('an invitation to a suggested event', 'Security talent event')
+  await shot('join-suggested-cover')
   await open(`#/join/${COMPANY}`)
   await shot('join-1-cover')
   let presses = 0

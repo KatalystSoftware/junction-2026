@@ -28,23 +28,24 @@ export async function load() {
 
 /**
  * `#/` is Espoo's events, `#/event/<slug>` one event and `#/<brief id>` one employer. `#/join/<brief id>` is the
- * company's sign-up, and `#/join` lets a company find itself.
+ * company's sign-up, `#/join/<brief id>/<event slug>` the same as an invitation to that event, and `#/join` lets a
+ * company find itself.
  */
 export const route = () => {
-  const [, a = '', b = ''] = app.hash.split('/').map(decodeURIComponent)
+  const [, a = '', b = '', c = ''] = app.hash.split('/').map(decodeURIComponent)
   if (a === 'event') return { join: false, id: '', event: b }
-  return a === 'join' || a === 'c' ? { join: true, id: b, event: '' } : { join: false, id: a, event: '' }
+  return a === 'join' || a === 'c' ? { join: true, id: b, event: c } : { join: false, id: a, event: '' }
 }
 export const go = (id: string) => (location.hash = `#/${encodeURIComponent(id)}`)
-export const joinPath = (id: string) => `#/join/${encodeURIComponent(id)}`
-export const joinLink = (id: string) => `${location.origin}${location.pathname}${joinPath(id)}`
+export const joinPath = (id: string, event = '') => `#/join/${encodeURIComponent(id)}${event ? `/${event}` : ''}`
+export const joinLink = (id: string, event = '') => `${location.origin}${location.pathname}${joinPath(id, event)}`
 /** Put a company's invitation link on the clipboard, which is how an invitation leaves this screen: a person sends it. */
-export async function copyLink(id: string) {
+export async function copyLink(id: string, event = '') {
   // the clipboard API needs https; on plain http fall back to selecting a hidden field
   try {
-    await navigator.clipboard.writeText(joinLink(id))
+    await navigator.clipboard.writeText(joinLink(id, event))
   } catch {
-    const field = Object.assign(document.createElement('textarea'), { value: joinLink(id) })
+    const field = Object.assign(document.createElement('textarea'), { value: joinLink(id, event) })
     document.body.append(field)
     field.select()
     document.execCommand('copy')

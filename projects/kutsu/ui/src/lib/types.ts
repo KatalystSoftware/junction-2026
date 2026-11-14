@@ -87,11 +87,13 @@ export type Review = {
   note?: string
   invited_at?: string
   joined_at?: string
+  /** the events the company has been invited to, by slug; its profile is one and the same for all of them */
+  events?: string[]
   /** filled in by the demo control to show a screen in use; no company did this */
   example?: boolean
 }
 /** A named list of employers. `coming` says they are already on the event's public page, so nobody has to be invited: only their profiles confirmed. */
-export type Preset = { title: string; note: string; url: string; date?: string; coming?: boolean; ids: string[]; names?: Record<string, string> }
+export type Preset = { title: string; note: string; url: string; date?: string; coming?: boolean; facts?: string; ids: string[]; names?: Record<string, string> }
 
 /** One field of work in the sample pool, as counts. No row here is a person. */
 export type PoolField = {

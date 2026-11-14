@@ -11,7 +11,8 @@
   import Icon from './Icon.svelte'
   import Logo from './Logo.svelte'
   import Role from './Role.svelte'
-  import { app, nameOf, reviewOf, saveReview } from './state.svelte'
+  import { occasion } from './events'
+  import { nameOf, reviewOf, route, saveReview } from './state.svelte'
   import type { Brief, Need, Review, Signal } from './types'
 
   // The company's sign-up, already filled in. One card at a time in the centre, one decision per
@@ -24,8 +25,7 @@
   const review = $derived(reviewOf(brief))
   const name = $derived(nameOf(brief))
   const identity = $derived(brief.identity)
-  const event = $derived(app.presets.find((p) => p.ids.includes(brief.id)) ?? app.presets[0])
-  const dates = $derived(event?.note.split(',')[0] ?? '')
+  const event = $derived(occasion(route().event, brief))
   const joined = $derived(review.status === 'joined')
   const save = (patch: Partial<Review>) => void saveReview(brief.id, { ...review, ...patch })
 
@@ -186,17 +186,17 @@
 <svelte:window onkeydown={keys} />
 
 <div class="join" class:cover={!started}>
-  <p class="host">City of Espoo <span>{event?.title}, {dates}</span></p>
+  <p class="host">City of Espoo <span>{event.name}, {event.when}</span></p>
 
   {#if !started}
     <section class="invite">
       <div class="plate" class:dark={identity?.logo_on === 'dark'}><Logo {brief} /></div>
       <h1>{#each `${name}, you're invited.`.split(' ') as word, i (i)}<span style:--i={i}>{word}&nbsp;</span>{/each}</h1>
-      <p class="filled" style:--i={5}>{event?.title}, {dates}. Online and free. Your sign-up is already filled in.</p>
+      <p class="filled" style:--i={5}>{event.name}, {event.when}. {event.facts} Your sign-up is already filled in.</p>
       <button class="yes big" style:--i={6} onclick={() => (started = true)}>Check it <kbd>Enter</kbd></button>
     </section>
   {:else if joined}
-    <Finished {brief} {review} {about} told={tell.filter((t) => told.includes(t.id))} />
+    <Finished {brief} {review} {about} {event} told={tell.filter((t) => told.includes(t.id))} />
   {:else}
     <div class="bench" bind:this={bench}>
       <aside class="left" aria-label="About you">
