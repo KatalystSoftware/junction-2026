@@ -403,3 +403,30 @@ def test_a_pair_desk_that_joins_from_the_history_alone_does_not_post_a_car_held_
     second.stop()
     assert list(world.gigs) == ["g1"], "a delivered car gets no second gig"
     assert not second.desk.pair_wait
+
+
+def test_the_desk_sends_its_quotes_in_a_call_of_their_own_before_its_other_actions(tmp_path):
+    # In the final each action costs a token (API.md, Limits): offers in the quote's call would make the kit wait for tokens first.
+    asked = request("R1", arrivedAt=506, respondBy=521)
+    world = replay.Replay([{"seq": 0, "at": 506, "kind": "price_request", "request": asked}], ROSTER, ends_at=20000, start=506, speed=0.001)
+    desk = live.Live(world, world.guard_act, world.minute, 8, VARIANTS[live.VARIANT], MAP, tmp_path, echo=False)
+    desk.clock.saw(506, exact=True)
+    desk.desk = live.LiveDesk(world, 8, 506, VARIANTS[live.VARIANT], ROSTER, MAP)
+    desk.desk.attach(world, desk.log, desk.guard, desk.clock)
+    calls, act = [], world.act
+    world.act = lambda actions, by="desk": calls.append([a["type"] for a in actions]) or act(actions, by)
+    desk.desk.outbox = [{"type": "offer", "gigId": f"g{i}", "driverId": "d1"} for i in range(3)]
+    desk.desk.take(world.events()[0])  # its quote joins the outbox behind the offers
+    desk.desk.send()
+    desk.stop()
+    assert calls == [["quote"], ["offer"] * 3]
+    assert [by for _, _, by in world.quotes["R1"]] == ["desk"]
+
+
+def test_the_desk_counts_the_429_answers_that_the_kit_waits_out():
+    client = live.Client(url="http://127.0.0.1:9", key="k")
+    answers = iter([(429, {"Retry-After": "1"}, b""), (429, {"Retry-After": "1"}, b""), (200, {}, b"[]")])
+    client._send = lambda *args: next(answers)
+    before = live.THROTTLED.count
+    assert live.THROTTLED.watch(client).worlds() == []
+    assert live.THROTTLED.count - before == 2

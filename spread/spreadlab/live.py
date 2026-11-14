@@ -217,6 +217,30 @@ class Guard(threading.Thread):
         self.log.say(f"Fallback quote for {', '.join(r['id'] for r in requests)}: the desk had not answered with a third of the time left.")
 
 
+class Throttled:
+    """Counts the 429 answers that the desk's clients get. The kit waits each one out without a word, and in the final
+    a request over the limit gets 429 at once (API.md, Limits), so the beat line carries the count for the alarm."""
+
+    def __init__(self):
+        self.count, self.lock = 0, threading.Lock()
+
+    def watch(self, client):
+        send = client._send
+
+        def counted(*args):
+            answer = send(*args)
+            if answer[0] == 429:
+                with self.lock:
+                    self.count += 1
+            return answer
+
+        client._send = counted
+        return client
+
+
+THROTTLED = Throttled()  # every client of this process: the desk's and the guard's
+
+
 class LiveDesk(Policy):
     """The policy on the live stream: it takes each event once, sends its actions at once, and can be put on disk."""
 
@@ -404,19 +428,27 @@ class LiveDesk(Policy):
             keep.append(action)
         if not keep:
             return
-        self.guard.claim([action["requestId"] for action in keep if action["type"] == "quote"])
+        quotes = [action for action in keep if action["type"] == "quote"]
+        self.guard.claim([action["requestId"] for action in quotes])
+        # The quotes go in a call of their own: in the final each action costs a token, and a batch of offers behind
+        # them would make the kit wait for tokens before the quotes reach the world.
+        for batch in (quotes, keep[len(quotes):]):
+            if batch:
+                self.deliver(batch)
+
+    def deliver(self, actions: list) -> None:
         started = time.monotonic()
         try:
-            results = self.world.act(keep)
+            results = self.world.act(actions)
         except SpreadError as error:
             if isinstance(error, Unreachable) or error.status not in (0, 400):
                 raise  # the next join reads the world and sends again what is still needed
-            results = self.one_by_one(keep)  # one action the world cannot parse must not hold up the others
+            results = self.one_by_one(actions)  # one action the world cannot parse must not hold up the others
         took = round(time.monotonic() - started, 3)
-        for action, result in zip(keep, results):
+        for action, result in zip(actions, results):
             fields = {"left": round(self.clock.seconds_until(self.requests[action["requestId"]]["respondBy"]), 3)} if action["type"] == "quote" else {}
             self.log.write("action", action=action, ok=result["ok"], id=result.get("id"), reason=result.get("reason"), took=took, **fields)
-        self.read_results(keep, results)
+        self.read_results(actions, results)
 
     def one_by_one(self, actions: list) -> list:
         results = []
@@ -798,7 +830,8 @@ class Live:
                 self.guard.backlog = desk.unbooked()
                 if time.monotonic() - beat >= BEAT:  # for the alarm: the desk is alive, and how far it is
                     beat = time.monotonic()
-                    self.log.write("beat", minute=desk.now, clock=round(self.clock.now(), 1), seq=desk.seq, unbooked=self.guard.backlog)
+                    self.log.write("beat", minute=desk.now, clock=round(self.clock.now(), 1), seq=desk.seq, unbooked=self.guard.backlog,
+                                   throttled=THROTTLED.count)
                 if dirty and time.monotonic() - saved >= SAVE:
                     self.store.save(desk)
                     saved, dirty = time.monotonic(), False
@@ -945,10 +978,10 @@ def note_watcher(args) -> Optional[Callable[..., watch.Watcher]]:
 
 
 def play_final(args) -> None:
-    client = Client(url=os.environ.get("SPREAD_URL") or SERVER)
+    client = THROTTLED.watch(Client(url=os.environ.get("SPREAD_URL") or SERVER))
     world, final = wait_for_final(client)
     level = next((w["level"] for w in client.worlds() if w["worldId"] == world.id), 8)
-    guard_world = World(Client(url=client.url, key=client.key), world.id)
+    guard_world = World(THROTTLED.watch(Client(url=client.url, key=client.key)), world.id)
     live = Live(world, guard_world.act, lambda: client.final()["now"], level, VARIANTS[args.variant], client.map(), folder_of(world.id),
                 watcher=note_watcher(args))
     live.clock.start_at(datetime.fromisoformat(final["startsAt"].replace("Z", "+00:00")).timestamp())
@@ -966,9 +999,9 @@ def practice_world(client: Client, world_id: str) -> World:
 
 
 def play_practice(args) -> None:
-    client = PracticeClient()
+    client = THROTTLED.watch(PracticeClient())
     world = practice_world(client, args.world)
-    guard_world = World(PracticeClient(), world.id)
+    guard_world = World(THROTTLED.watch(PracticeClient()), world.id)
     live = Live(world, guard_world.act, lambda: world.snapshot()["now"], 8, VARIANTS[args.variant], world_map(client), folder_of(world.id), args.speed,
                 watcher=note_watcher(args))
     keep_going(live, "practice world")
@@ -1064,6 +1097,12 @@ def report(world_id: str) -> str:
         if l["kind"] == "decision" and l["requestId"] in requests:
             shifts[requests[l["requestId"]]["arrivedAt"] // DAY] = l["shift"]
     end = next((l["score"] for l in reversed(lines) if l["kind"] in ("end", "score")), None)
+    throttled = last = 0  # each start of the program counts the 429 answers from 0 again
+    for l in lines:
+        if l["kind"] == "beat":
+            count = l.get("throttled", 0)
+            throttled, last = throttled + (last if count < last else 0), count
+    throttled += last
     out = [f"World {world_id}: {len(asked)} requests while the desk ran, {len(desk_quotes)} quoted by the policy, "
            f"{len(fallbacks)} by the fallback, {len(missed)} missed{' (' + ', '.join(missed[:10]) + ')' if missed else ''}, "
            f"{len(away)} unquoted while the desk was down.",
@@ -1071,7 +1110,8 @@ def report(world_id: str) -> str:
            f"{lead[len(lead) // 20] if lead else '-'}, median {statistics.median(lead) if lead else '-'}.",
            f"Joins: {len(joins)} ({'; '.join(join_text(j) for j in joins)}).",
            f"Errors: {sum(1 for l in lines if l['kind'] == 'error')}. Lost connections: {sum(1 for l in lines if l['kind'] == 'lost')}. "
-           f"Quotes held back as late: {sum(1 for l in lines if l['kind'] == 'quote_late')}.",
+           f"Quotes held back as late: {sum(1 for l in lines if l['kind'] == 'quote_late')}. "
+           f"429 answers: {throttled}.",
            f"Refused actions: {sum(refused.values())}" + "".join(f"; {n} x {reason}" for reason, n in refused.most_common(4)) + ".",
            "The day's correction at its last quote: " + ", ".join(f"{WEEKDAYS[d % 7][:3]} {s:+.3f}" for d, s in sorted(shifts.items())) + ".",
            f"Notes read at a win: {sum(1 for l in lines if l['kind'] == 'note')}. Offers sent: "
