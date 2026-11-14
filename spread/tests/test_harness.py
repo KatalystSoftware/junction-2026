@@ -968,7 +968,8 @@ def test_each_m41x_row_plays_trackb_merge_4_1_at_760_to_819_drivers():
             ("m41x-j-kindfee-thin-820", {700: {"kind_fees": True}, 900: {"kind_fees": True}})]
     # m41y: on m41x-h without m41x-l, then late_cost 100 at 760-819 (m41y-j, kind_fees, never plays)
     rows_y = [rows[4]] + [(n.replace("m41x-", "m41y-"), part) for n, part in rows[6:9]] + [
-        ("m41y-k-late100-760", {800: {"late_cost": 100}})]
+        ("m41y-l-ftop11-820", {900: {"fee_rules": [[0, 10 ** 6, 16, 10 ** 6, 0.8, 0.1, 1.1]]}}),
+        ("m41y-m-late100-760", {800: {"late_cost": 100}})]  # m41y-k is the same late_cost row on m41y-i
     for (below, _), (row, part) in [*zip(rows, rows[1:]), *zip(rows_y, rows_y[1:])]:
         for n in (700, 761, 819, 820, 900):
             new, old = desk(row, n), desk(below, n)

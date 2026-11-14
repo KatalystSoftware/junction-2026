@@ -664,3 +664,9 @@ VARIANTS.update(_Y)
 # every band (`m41y-j` never plays), and clears `late_cost` 100 (`m41-a` held the seed at 93.80%). `m41y-k` sets it on `m41y-i`
 # at 760 to 819 drivers: `when_rich` keeps 80 from 820, and under 760 the thin play keeps 150.
 VARIANTS["m41y-k-late100-760"] = _full_weeks(_Y["m41y-i-long300-c10-820"], late_cost=100)
+# Lane 3 A's fee top on `m41y-i` (its entry was built on `m41y-j`, without `kind_fees` here): the fee ladder of a gig with 16
+# hours or more (opening 0.8 of the typical fee, rising 0.1 an hour) stops at 1.1, not 1.2, in a week of 820 drivers or more
+# (`when_rich`), where drivers book such gigs before the top. A week under 820 plays `m41y-i` to the cent. `m41y-m` then sets
+# `late_cost` 100 at 760 to 819 drivers on it (80 from 820, 150 under 760), held until 760 to 819 may move again.
+VARIANTS["m41y-l-ftop11-820"] = _from820(_Y["m41y-i-long300-c10-820"], fee_rules=[[0, 10 ** 6, 16, 10 ** 6, 0.8, 0.1, 1.1]])
+VARIANTS["m41y-m-late100-760"] = _full_weeks(VARIANTS["m41y-l-ftop11-820"], late_cost=100)
