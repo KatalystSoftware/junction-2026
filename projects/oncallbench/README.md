@@ -83,9 +83,24 @@ Every run with its cost: `metrics.json`; how each level was built and checked: `
 
 **Common seeds.** Every model is compared on the same 24 level-4 seeds, **200000-200023**, which no
 demo, tuning or training run used: the Gemma adapter was first evaluated there in our own runner
-(`rl/RESULTS.md`). Opus 5.5 gets two Harbor runs per seed, Fable 5.2 one, Gemma untrained and
-fine-tuned their own Harbor runs, plus the reference, do-nothing and stop-early; every result goes
-into `metrics.json` and this section whatever it is. This set replaced an earlier pre-registered
+(`rl/RESULTS.md`). Every result goes into `metrics.json` (round 16) and this section whatever it is.
+
+| Level 4, common seeds 200000-200023, Harbor + OpenCode | Runs | Mean | Median | Range | Below the reference |
+| --- | --- | --- | --- | --- | --- |
+| Reference (scripted) | 24 | 1.00 | 1.00 | 1.00 | - |
+| **Opus 5.5** | 45 on 24 seeds | **0.45** | 0.55 | 0.00-0.96 | **45 of 45** |
+| Fable 5.2 | 13 on 13 seeds | 0.88 | 0.90 | 0.62-1.00 | 11 of 13 |
+| Finds the cause, guesses the fix (`shotgun`, scripted) | 24 | 0.47 | - | 0.00-0.77 | 24 of 24 |
+| Do-nothing, stop-early, every mitigation on everything (scripted) | 24 each | 0.00 | 0.00 | 0.00 | - |
+
+**Opus 5.5 averages 0.45 on 24 fresh seeds: all 45 runs below the expert, and 9 cost more than doing
+nothing, every one of them through an unprotected rollback** (39 of its 45 runs roll back a hot
+service at least once without scaling or throttling it first; it wastes 0.18 mitigations per run).
+Fable 5.2 makes the same mistake (9 of 13 runs) but recovers from it far better: the newest model
+nearly closes the gap, so level 4 separates Opus-class agents, and a harder level is the next step
+(Roadmap). Fable's other eleven runs, and three Opus runs, were cut by an Anthropic usage limit and
+are marked as infrastructure failures, not scores; the three Opus runs were rerun. Gemma's Harbor
+runs on these seeds follow in `rl/RESULTS.md`; its own-runner scores there are not comparable. This set replaced an earlier pre-registered
 one, the HTTP status codes 404, 418, 500, 502, 503 and 504 (55aa6f8), so that every model shares
 one larger set. Only three Fable 5.2 test runs were made on that set before the switch (404: 1.00,
 418: 0.26, 500: 0.86); they stay in `metrics.json` as round 15 and are not part of any table.
