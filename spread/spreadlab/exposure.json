@@ -1,0 +1,68 @@
+{
+ "source": "need: scratch/exposure/need_fit.py on the saved weeks of slow-friday-late-150-kinds-limits, steep-notes-offers-8 and thin-premium-0.4 with seeds cat-* and fresh-001 to fresh-1201 (854 weeks, 310,463 rows of wins, drops and cars waiting at 20:00 and 01:00), week intercepts from the rows not due on the week's flu day, the bands set to the rows' late share; measured: scratch/exposure/measure.py, days.py, need_fit.py",
+ "weights": [
+  -0.828,
+  -2.679,
+  -3.23,
+  -3.857,
+  -4.153,
+  -5.552,
+  0.877,
+  0.685,
+  1.412,
+  0.398,
+  0.408,
+  0.359,
+  -0.288,
+  0.67,
+  0.295,
+  0.113,
+  0.317,
+  0.447,
+  0.544,
+  0.481
+ ],
+ "measured": {
+  "calm_share": 0.0275,
+  "wave_shares": [
+   0.26,
+   0.33,
+   0.5
+  ],
+  "wave_share": 0.34,
+  "wave_sd": 0.09,
+  "held_late": 0.02,
+  "drop_day": 0.107,
+  "held_by_night": [
+   [
+    6,
+    0.16
+   ],
+   [
+    18,
+    0.45
+   ],
+   [
+    30,
+    0.77
+   ],
+   [
+    54,
+    0.85
+   ],
+   [
+    1000000000.0,
+    0.87
+   ]
+  ],
+  "omega": 1.0,
+  "orders_a_driver": 0.43,
+  "late_share": 0.045,
+  "margin": 41.0,
+  "candidate_waiting": 0.13,
+  "week_sd": 0.4,
+  "late_euros": 82.0,
+  "flu_sd": 0.69,
+  "calm_sd": 0.75
+ }
+}

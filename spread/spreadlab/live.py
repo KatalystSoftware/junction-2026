@@ -45,6 +45,7 @@ from spread.client import Client, SpreadError, Unreachable, World
 from spread.starter import DAY, HOUR, WEEKDAYS, Retry, pickups, undelivered
 
 from . import notes, watch
+from .exposure import ExposurePolicy
 from .late_wide import WideLate
 from .pairs import PairPolicy
 from .policy import DECLINE, Policy
@@ -614,7 +615,13 @@ class LiveWidePairDesk(WideLate, LivePairDesk):
     """... and with out-and-back pairs."""
 
 
+class LiveExposureDesk(ExposurePolicy, LiveDesk):
+    """The live desk with the quote's cost by the book's exposure to drops (exposure.py), for a variant that sets `exposure`."""
+
+
 def desk_class(params: dict) -> type:
+    if params.get("exposure"):
+        return LiveExposureDesk
     if params.get("late_wide"):
         return LiveWidePairDesk if params.get("pair_hold") else LiveWideDesk
     return LivePairDesk if params.get("pair_hold") else LiveDesk
