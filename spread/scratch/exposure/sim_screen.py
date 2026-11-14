@@ -177,7 +177,7 @@ def main() -> None:
     global WEEKS, CROWD_ON, WATCH
     draws = int(sys.argv[1])
     CROWD_ON = (sys.argv[2] if len(sys.argv) > 2 else "crowd") == "crowd"
-    names = ["default", "cap-70"] + [a for a in sys.argv[3:] if a != "--watch"]
+    names = ["default", "cap-70"] + [a for a in sys.argv[3:] if not a.startswith("--")]
     if "--watch" in sys.argv:  # the model's view of the default's and the cap's quotes too (doubles their time)
         WATCH = {"default", "cap-70", "default-24h"}
     saved = pickle.load(open(target.OUT / f"{BASE}.pkl", "rb"))
@@ -258,17 +258,22 @@ def main() -> None:
             seen = "model not recorded"
         print(f"  {name:14} orders {dor:+6.1f} late {dla:+5.1f} ratio {dla / dor if dor else 0:5.2f}   {seen}")
     print("\nP bands at each evening's last quote (Mon to Thu) against the arm's own weeks, draw 0: band, evenings, mean P, share ended under")
+    split = {"all": lambda s: True, **{g: groups[g] for g in ("tune (cat-, tune list)", "judge: natural fresh-", "judge: thin fresh- (< 720)")}}
     for name in names:
         p = model[name]["p"]
         if not p:
             continue
-        for k, line in ((0, 0.90), (1, 0.92)):
-            out = []
-            for lo, hi in ((0, .01), (.01, .05), (.05, .15), (.15, .35), (.35, 1.01)):
-                sel = [(v[k], res[(wi, 0)][name]["on_time"] < line) for (wi, day), v in p.items() if day < 4 and lo <= v[k] < hi]
-                if sel:
-                    out.append(f"{lo:.2f}-{hi:.2f}: {len(sel)} P {sum(x for x, _ in sel) / len(sel):.3f} ended {sum(y for _, y in sel) / len(sel):.3f}")
-            print(f"  {name:14} under {line:.0%}: " + " | ".join(out))
+        for gname, keep in split.items():
+            for k, line in ((0, 0.90), (1, 0.92)):
+                out = []
+                for lo, hi in ((0, .01), (.01, .05), (.05, .15), (.15, .35), (.35, 1.01)):
+                    sel = [(v[k], res[(wi, 0)][name]["on_time"] < line) for (wi, day), v in p.items() if day < 4 and lo <= v[k] < hi and keep(saved[wi])]
+                    if sel:
+                        out.append(f"{lo:.2f}-{hi:.2f}: {len(sel)} P {sum(x for x, _ in sel) / len(sel):.3f} ended {sum(y for _, y in sel) / len(sel):.3f}")
+                print(f"  {name:14} {gname[:22]:22} under {line:.0%}: " + " | ".join(out))
+    if "--save" in sys.argv:  # the weeks and the model's view, for later cuts
+        pickle.dump({"seeds": [s["seed"] for s in saved], "res": dict(res), "model": {k: dict(v) for k, v in model.items()}},
+                    open(data_dir() / "exposure" / "out" / f"screen-{'-'.join(names)}.pkl", "wb"))
 
 
 if __name__ == "__main__":
