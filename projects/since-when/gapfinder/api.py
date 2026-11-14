@@ -613,7 +613,7 @@ def _int(q, name, default, lo, hi):
     return max(lo, min(hi, v))
 
 
-# ---------- live SQL: three preset statements, run as the SELECT-only user ----------
+# ---------- live SQL: four preset statements, run as the SELECT-only user ----------
 # The caller picks a preset and its parameters, never SQL text. Every statement comes from the
 # templates below and runs on a connection of DB_RO_USER with a time limit and a row cap.
 
@@ -635,9 +635,16 @@ JOIN passage AS p ON p.sha = c.sha
 WHERE c.wikidata_id = ? AND c.lang = ? AND c.ord = 0
 ORDER BY c.row_start DESC"""
 
+CHECK_SQL = """
+SELECT id, finding_id, outcome, verdict, claim_lang, claim_quote, evidence_lang, evidence_quote, judge, search_sql
+FROM checked_finding
+WHERE finding_id = ? OR (? < 0 AND id = -?)"""
+
 # name -> title, description, [(parameter, kind, default)] and the statements to run, each
 # (label, text, values to bind). `nearest` is the tool's own alignment query, its text built by
-# align.py from the validated values; the other two bind theirs.
+# align.py from the validated values; `asof` and `history` bind theirs. `check` runs the statement
+# the claim check stored for a finding (evidence.search_sql), as the check ran it: its text comes
+# from the table, written by the check's loader, never from the request.
 PRESETS = {
     "nearest": {
         "title": "Time travel + vector search",
@@ -676,7 +683,32 @@ PRESETS = {
         "params": [("qid", "qid", "Q1412941"), ("lang", "lang", "en")],
         "statements": lambda v: [("Every version of the first passage", HISTORY_SQL, (v["qid"], v["lang"]))],
     },
+    "check": {
+        "title": "The claim check",
+        "description": "How a difference was checked: the other article as it stood on the day "
+        "(FOR SYSTEM_TIME AS OF), each of its sentences ranked by VEC_DISTANCE_COSINE to the claim, "
+        "and dates, numbers and names matched with REGEXP. The statement the check ran, from the "
+        "table it stored it in.",
+        "params": [("finding", "finding", "14115")],
+        "statements": lambda v: [
+            ("The claim, the verdict and the statement the check ran", CHECK_SQL, (int(v["finding"]),) * 3),
+            ("The other article's passages nearest the claim, sentence by sentence", _stored, ()),
+        ],
+    },
 }
+
+
+def _stored(rows):
+    """The statement the check stored, from the previous statement's last column, unchanged inside a
+    SELECT that leads with what the judge read: each passage's nearest sentence, its distance to
+    the claim and how many of the claim's dates, numbers and names it matched."""
+    if not rows or not rows[0][-1]:
+        raise ApiError(404, "the claim check has no statement for this finding")
+    return f"""SELECT ord, section, sentence, distance, term_hits, by_vector, by_terms, searched
+FROM (
+{rows[0][-1].strip()}
+) AS checked
+ORDER BY distance"""
 
 
 def live_enabled():
@@ -730,6 +762,8 @@ def live_params(body):
             raise ApiError(400, f"{n} must be a string")
         if kind == "qid" and not QID.fullmatch(v):
             raise ApiError(400, f"{n} must be a Wikidata id like Q1412941")
+        if kind == "finding" and not re.fullmatch(r"-?[0-9]{1,9}", v):
+            raise ApiError(400, f"{n} must be a finding id like 14115")
         if kind == "lang" and v not in LANGS:
             raise ApiError(400, f"{n} must be one of {', '.join(LANGS)}")
         if kind == "date":
@@ -758,14 +792,20 @@ def live_run(body):
     try:
         con = live_connect()
         cur = con.cursor()
-        log, columns, rows = [], [], []
+        log, columns, rows, got = [], [], [], []
         for label, sql, binds in PRESETS[name]["statements"](values):
+            if callable(sql):  # a statement read from the previous one's rows
+                sql = sql(got)
             t0 = time.perf_counter()
-            cur.execute(sql, binds)
+            cur.execute(sql, binds) if binds else cur.execute(sql)  # a stored REGEXP may hold a "?"
             got = cur.fetchall() if cur.description else []
             ms = round((time.perf_counter() - t0) * 1000, 1)
             # As sent: the connector writes the bound values into the text as literals.
-            shown = "".join(part + (lit(binds[i]) if i < len(binds) else "") for i, part in enumerate(sql.split("?")))
+            shown = (
+                "".join(part + (lit(binds[i]) if i < len(binds) else "") for i, part in enumerate(sql.split("?")))
+                if binds
+                else sql
+            )
             log.append({"label": label, "query": shown.strip(), "ms": ms, "rows": len(got)})
             if cur.description:
                 columns, rows = [d[0] for d in cur.description], [list(x) for x in got]

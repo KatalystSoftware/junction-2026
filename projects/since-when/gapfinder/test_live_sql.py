@@ -108,6 +108,8 @@ class Refused(Served):
                 self.refused({"preset": "asof", "params": params})
         self.refused({"preset": "nearest", "params": {"a": "fi", "b": "en' OR 1=1 --"}})
         self.refused({"preset": "nearest", "params": {"a": "fi", "b": "fi"}})
+        self.refused({"preset": "check", "params": {"finding": "1 OR 1=1"}})
+        self.refused({"preset": "check", "params": {"finding": "SELECT 1"}})
 
     def test_extra_fields(self):
         self.refused({"preset": "asof", "params": {}, "limit": 100000})
@@ -126,6 +128,9 @@ class Refused(Served):
         for name, preset in api.PRESETS.items():
             _, values = api.live_params({"preset": name})
             for _, sql, binds in preset["statements"](values):
+                if callable(sql):  # check: the statement the claim check stored, read by the one before
+                    self.assertIs(sql, api._stored)
+                    continue
                 self.assertRegex(sql.strip(), r"^(WITH|SELECT|SET SESSION system_versioning_asof = \?$)")
                 self.assertNotRegex(sql, r"(?i)\b(insert|update|delete|replace|drop|alter|create|grant|call|into)\b")
                 self.assertEqual(sql.count("?"), len(binds))
@@ -210,6 +215,21 @@ class OnTheDatabase(Served):
                     self.assertEqual(len(out["rows"][0]), len(out["columns"]))
                     self.assertGreater(out["ms"], 0)
                     self.assertEqual(out["sql"][-1]["rows"], len(out["rows"]))
+
+    def test_check_runs_the_statement_the_check_stored(self):
+        self.cur.execute(
+            "SELECT COALESCE(finding_id, -id), search_sql FROM checked_finding WHERE search_sql > '' LIMIT 1"
+        )
+        found = self.cur.fetchall()
+        if not found:
+            self.skipTest("no checked_finding rows in this database")
+        status, out = call(
+            self.port, "POST", "/api/sql/run", {"preset": "check", "params": {"finding": str(found[0][0])}}
+        )
+        self.assertEqual(status, 200, out)
+        self.assertIn(found[0][1].strip(), out["sql"][1]["query"])
+        self.assertGreater(len(out["rows"]), 0)
+        self.assertEqual(out["columns"][:4], ["ord", "section", "sentence", "distance"])
 
     def test_asof_is_the_same_statement_on_another_date(self):
         runs = [

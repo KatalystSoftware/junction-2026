@@ -107,7 +107,7 @@ export interface Preset {
 	name: string
 	title: string
 	description: string
-	params: { name: string; kind: 'qid' | 'date' | 'lang'; default: string }[]
+	params: { name: string; kind: 'qid' | 'date' | 'lang' | 'finding'; default: string }[]
 }
 
 export interface Presets {

@@ -2,7 +2,7 @@
 
 const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!)
 const KEYWORDS =
-	/\b(SELECT|FROM|WHERE|JOIN|LEFT|ON|AND|OR|AS|OF|FOR|SYSTEM_TIME|ALL|GROUP BY|ORDER BY|LIMIT|OFFSET|HAVING|SET|SESSION|TIMESTAMP|WITH|OVER|PARTITION BY|COUNT|MIN|AVG|SUM|LEAST|ROUND|COALESCE|ROW_NUMBER|VEC_DISTANCE_COSINE|VEC_FromText|DESC|BY)\b/g
+	/\b(SELECT|FROM|WHERE|JOIN|LEFT|ON|AND|OR|AS|OF|FOR|SYSTEM_TIME|ALL|GROUP BY|ORDER BY|LIMIT|OFFSET|HAVING|SET|SESSION|TIMESTAMP|WITH|OVER|PARTITION BY|COUNT|MIN|AVG|SUM|LEAST|ROUND|COALESCE|ROW_NUMBER|VEC_DISTANCE_COSINE|VEC_FromText|REGEXP|UNHEX|DESC|BY)\b/g
 
 export function sqlHtml(query: string): string {
 	return esc(query)
@@ -36,6 +36,14 @@ FROM chunk FOR SYSTEM_TIME ALL AS c
 JOIN passage AS p ON p.sha = c.sha
 WHERE c.wikidata_id = '${v.qid}' AND c.lang = '${v.lang}' AND c.ord = 0
 ORDER BY c.row_start DESC`
+	if (preset === 'check')
+		return `SELECT id, finding_id, outcome, verdict, claim_lang, claim_quote, evidence_lang, evidence_quote, judge, search_sql
+FROM checked_finding
+WHERE finding_id = ${v.finding} OR (${v.finding} < 0 AND id = -${v.finding});
+
+-- Then the statement in search_sql, as the check ran it: the other article
+-- FOR SYSTEM_TIME AS OF the day, each sentence ranked by VEC_DISTANCE_COSINE to the
+-- claim's vector, and its dates, numbers and names matched with REGEXP.`
 	if (preset === 'nearest')
 		return `WITH c AS (
   SELECT c.id, c.lang, c.ord, c.section, c.chunk_no, c.rev_id, p.embedding

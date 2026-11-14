@@ -1,6 +1,6 @@
 <script lang="ts">
 	// The SQL behind the page, one statement at a time: the statement, its values, Run, the rows.
-	// Three statements can be run; the server runs them as a SELECT-only user. The app sends a
+	// Four statements can be run; the server runs them as a SELECT-only user. The app sends a
 	// preset name and its values, never SQL. The queries each response reported can be read too.
 	import { onMount } from 'svelte'
 	import { api } from './lib/api.svelte'
@@ -17,10 +17,11 @@
 		asof: ['An article as it stood on a date', "The article's first passage at 00:00 UTC on the date: set the session's time, then a plain SELECT."],
 		history: ['Every version MariaDB has kept', "Every version of the article's first passage, with the time each one was current."],
 		nearest: ['Editions compared on a date', 'Time travel and vector search in one statement: each passage with its nearest in the other edition.'],
+		check: ['How a difference was checked', "The claim check's own statement, as stored with its verdict: the other article as it stood on the day, every sentence ranked by vector distance to the claim, dates and numbers matched with REGEXP."],
 	}
 	const DEMO: Record<string, string> = { Q1412941: 'Lapua Movement', Q736268: 'Finnish War', Q2457646: 'Diet of Porvoo' }
-	const LABEL: Record<string, string> = { qid: 'Topic', date: 'As of', lang: 'Edition', a: 'Passages in', b: 'Nearest in' }
-	const VALID = { qid: /^Q[0-9]+$/, date: /^\d{4}-\d\d-\d\d$/, lang: /^(fi|sv|en)$/ }
+	const LABEL: Record<string, string> = { qid: 'Topic', date: 'As of', lang: 'Edition', a: 'Passages in', b: 'Nearest in', finding: 'Finding' }
+	const VALID = { qid: /^Q[0-9]+$/, date: /^\d{4}-\d\d-\d\d$/, lang: /^(fi|sv|en)$/, finding: /^-?[0-9]{1,9}$/ }
 	const today = new Date().toISOString().slice(0, 10)
 
 	let presets = $state<Preset[]>([])
@@ -207,7 +208,11 @@
 								<label class="cdx-label__label" for="sql-{x.name}"><span class="cdx-label__label__text">{LABEL[x.name] ?? x.name}</span></label>
 							</div>
 							<div class="cdx-field__control">
-								{#if x.kind === 'date'}
+								{#if x.kind === 'finding'}
+									<div class="cdx-text-input">
+										<input id="sql-{x.name}" class="cdx-text-input__input" inputmode="numeric" pattern="-?[0-9]+" value={v[x.name]} required onchange={(e) => set(x.name, e.currentTarget.value)} />
+									</div>
+								{:else if x.kind === 'date'}
 									<div class="cdx-text-input">
 										<input id="sql-{x.name}" class="cdx-text-input__input" type="date" value={v[x.name]} min="2001-01-15" max={today} required onchange={(e) => set(x.name, e.currentTarget.value)} />
 									</div>

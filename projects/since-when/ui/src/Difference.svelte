@@ -62,6 +62,14 @@
 					title="Opens the statement that reads the {NAMES[began.lang]} article as it stood after that day. Nothing runs until you click Run."
 					onclick={() => showSql('asof', { qid: topic.wikidata_id, date: dayAfter(began.at), lang: began.lang })}>Check in MariaDB</button
 				>
+				{#if check}
+					<button
+						class="cdx-button cdx-button--action-progressive cdx-button--weight-quiet check"
+						aria-haspopup="dialog"
+						title="Opens the statement the claim check ran for this difference. Nothing runs until you click Run."
+						onclick={() => showSql('check', { finding: String(d.primary.id) })}>How it was checked</button
+					>
+				{/if}
 			{/if}
 			{#if related.length}
 				<details class="cdx-accordion cdx-accordion--separation-minimal related">

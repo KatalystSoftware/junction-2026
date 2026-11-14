@@ -247,7 +247,7 @@ The statements the SQL panel's Run button can run:
 
 ```
 Preset {
-  "name": "nearest" | "asof" | "history",
+  "name": "nearest" | "asof" | "history" | "check",
   "title": str, "description": str,
   "params": [{"name": str, "kind": "qid" | "date" | "lang", "default": str}]
 }
@@ -261,6 +261,7 @@ Preset {
 | `nearest` | `qid`, `date`, `a`, `b` | Time travel and vector search in one statement: the passages of `a` as of `date` (`chunk FOR SYSTEM_TIME AS OF`), each with its nearest passage in `b` (`VEC_DISTANCE_COSINE`). The query the aligner uses (`align.nearest_sql`). |
 | `asof`    | `qid`, `date`, `lang`  | `SET SESSION system_versioning_asof` to `date`, then a plain `SELECT` of the first passage with no time clause. Same statement, another date, another revision. |
 | `history` | `qid`, `lang`          | Every version of the first passage (`chunk FOR SYSTEM_TIME ALL`) with its `row_start` and `row_end`, newest first. |
+| `check`   | `finding`              | The claim check of one finding (its id, or a check-found row's negative id): its row of `checked_finding`, then the statement the check stored in `search_sql`, unchanged inside a `SELECT` of each passage's nearest sentence, its distance and its `REGEXP` hits. The other article `FOR SYSTEM_TIME AS OF` the day, each sentence ranked by `VEC_DISTANCE_COSINE` to the claim, dates, numbers and names counted with `REGEXP`. Its text comes from the table, never from the request. |
 
 ### `POST /api/sql/run`
 
