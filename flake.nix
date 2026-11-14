@@ -25,6 +25,7 @@
             git-lfs
             python3
             uv
+            nodejs
           ];
         };
       });

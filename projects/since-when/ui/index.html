@@ -1,27 +1,13 @@
 <!doctype html>
 <html lang="en">
-<head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Since When · Wikipedia through time</title>
-	<meta name="description" content="Where the Finnish, Swedish and English Wikipedia articles on the same topic differ, since when, and the MariaDB SQL behind each screen.">
-	<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23222'/%3E%3Ctext x='16' y='23' font-size='20' font-family='Georgia,serif' text-anchor='middle' fill='%23fff'%3EW%3C/text%3E%3C/svg%3E">
-	<link rel="stylesheet" href="style.css">
-</head>
-<body>
-	<header class="top">
-		<div class="brand">
-			<strong>Since When</strong>
-			<span class="muted">What Finnish, Swedish and English Wikipedia tell differently, and since when</span>
-		</div>
-		<span id="fixture" class="badge warn" hidden title="The API is answering from ui/fixtures/, not from MariaDB">Fixture data</span>
-		<button id="sqlToggle" class="btn outline" aria-expanded="false" aria-controls="sql">Show SQL</button>
-	</header>
-	<main class="layout">
-		<section id="queue" class="pane queue" aria-label="Gap queue"></section>
-		<section id="topic" class="pane topic" aria-label="Topic"></section>
-		<aside id="sql" class="pane sql" aria-label="SQL behind this screen" hidden></aside>
-	</main>
-	<script src="app.js"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="What the Finnish, Swedish and English Wikipedia articles on one topic say differently, and since when." />
+    <title>Since When</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
 </html>
