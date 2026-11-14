@@ -1,7 +1,7 @@
 """One design of the stand-in, fitted and checked on a CI runner: fits the drivers on the weeks outside the held-out seeds, then scores the
 stand-in on the played paired checks of the held-out seeds (spreadlab/standin/validate.py). Offline: it reads packed weeks only.
 
-    python3 scratch/standin/ci.py <design name> <out folder> [jobs]
+    python3 scratch/standin/ci.py <design name or place in the list> <out folder> [jobs]
 
 A design is an entry of designs.json: the features to leave out of the fit (`drop`) and the world's options (`design`, world.DESIGN).
 """
@@ -15,7 +15,12 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 name, out, jobs = sys.argv[1], Path(sys.argv[2]), sys.argv[3] if len(sys.argv) > 3 else str(os.cpu_count())
-design = next(d for d in json.loads((HERE / "designs.json").read_text()) if d["name"] == name)
+designs = json.loads((HERE / "designs.json").read_text())
+if name.isdigit():  # a place in the list: a CI job's slot
+    if int(name) >= len(designs):
+        sys.exit(0)
+    name = designs[int(name)]["name"]
+design = next(d for d in designs if d["name"] == name)
 out.mkdir(parents=True, exist_ok=True)
 weights = out / f"weights-{name}.json"
 py = [sys.executable, "-m"]

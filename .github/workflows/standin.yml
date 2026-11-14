@@ -11,23 +11,14 @@ permissions:
   contents: read
 
 jobs:
-  designs:
-    runs-on: craci
-    outputs:
-      names: ${{ steps.names.outputs.names }}
-    steps:
-      - uses: actions/checkout@v4
-      - id: names
-        run: echo "names=$(python3 -c 'import json; print(json.dumps([d["name"] for d in json.load(open("spread/scratch/standin/designs.json"))]))')" >> "$GITHUB_OUTPUT"
-
   design:
-    needs: designs
     runs-on: craci
     timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
-        name: ${{ fromJSON(needs.designs.outputs.names) }}
+        # One job a design, by its place in designs.json; a place past the end of the list ends at once.
+        slot: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
     steps:
       - uses: cracicorp/setup@v1
         with:
@@ -43,7 +34,7 @@ jobs:
         run: python3 spread/scratch/standin/fetch_data.py spread-standin-data "$RUNNER_TEMP/spread-data"
       - name: Fit and check
         env:
-          DESIGN: ${{ matrix.name }}
+          DESIGN: ${{ matrix.slot }}
         run: |
           export SPREAD_DATA="$RUNNER_TEMP/spread-data"
           echo "nproc=$(nproc) mem=$(free -g | awk '/Mem:/{print $2}')G python=$(python3 --version)"
@@ -51,7 +42,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: standin-${{ matrix.name }}
+          name: standin-${{ matrix.slot }}
           path: out/
           if-no-files-found: ignore
           retention-days: 7
