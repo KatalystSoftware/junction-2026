@@ -48,6 +48,8 @@ builds the bundle in a Node stage. `fixtures/` holds the answers it gives when s
 ?q=<search>&lang=<fi|sv|en>&sql=<preset>,<values>#/<wikidata id>
 ```
 
+- The address with no topic is the front page: three topics to start from, each with its
+  strongest difference and its time strip, then the whole topic list with search.
 - `#/Q1412941` opens a topic's page. There is one page per topic. Older addresses that name two
   editions and a view (`#/Q1412941/sv/en/findings`, `…/timeline`, `…/compare/2020`) open the same
   page and are rewritten to the short form.
@@ -72,7 +74,8 @@ builds the bundle in a Node stage. `fixtures/` holds the answers it gives when s
 - `src/Why.svelte`: a compact mark (a Codex info chip) that opens its explanation in a popover.
 - `src/SqlPanel.svelte`: one statement at a time, in a dialog: the statement, its values, Run, the
   rows. The three presets can be run; the queries each response reported can be read.
-- `src/TopicList.svelte`: the topic picker, in a dialog.
+- `src/Front.svelte`: the front page. The three topics it leads with are named there.
+- `src/TopicList.svelte`: the topic picker: a dialog over a topic's page, and part of the front page.
 - `src/main.ts`, `src/app.css`: the Codex stylesheets the app imports, and the base styles.
 - `src/lib/differences.ts`: how the API's rows become the page's differences (next section).
 - `src/lib/`: the API types and fetch, the address state, text marking and sentence cutting

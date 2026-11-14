@@ -11,7 +11,7 @@ Two things to know before clicking:
 - A `?sql=` link opens the SQL panel with the fields filled in. It never runs by itself: click
   **Run**. So does **Check in MariaDB** on a difference.
 - The part after `#` keeps the Lapua Movement page behind the panel. Without it the panel opens over
-  the first topic of the list.
+  the front page.
 
 Lines marked **Say** are the spoken text, 271 words in all. Everything else is what to click and
 what must be on screen.

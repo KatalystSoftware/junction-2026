@@ -285,6 +285,12 @@ export function turns(d: Difference, events: Map<number, TimelineEvent[]>): Turn
 	return out
 }
 
+/**
+ * The turns that date the difference itself: the row that speaks for it and, for a loaded word,
+ * every edition's edit about that word. The rest are other rows about the same claim.
+ */
+export const dating = (story: Turn[]) => story.filter((t, i) => i === 0 || (!!story[0].term && t.term === story[0].term))
+
 export interface Lane {
 	lang: Lang
 	/** The periods this edition has said what the difference is about, oldest first. `to` is null while it still does. */

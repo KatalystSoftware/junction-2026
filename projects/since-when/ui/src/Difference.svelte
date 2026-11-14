@@ -1,7 +1,7 @@
 <script lang="ts">
 	// One difference: a headline and its time strip; opened, each edition's own words side by side
 	// and a way to read the text on that date in MariaDB.
-	import { figureMarks, lanes, turns, type Difference } from './lib/differences'
+	import { dating, figureMarks, lanes, turns, type Difference } from './lib/differences'
 	import { NAMES, articleUrl, dayAfter, diffUrl, list, plural, revisionUrl, sectionLabel, sectionOf } from './lib/format'
 	import { showSql, ui } from './lib/nav.svelte'
 	import type { TimelineEvent, Topic } from './lib/types'
@@ -14,9 +14,7 @@
 	const marks = $derived(figureMarks(d))
 	const story = $derived(turns(d, events))
 	const began = $derived(story[0])
-	// The lines that date the difference itself: the row that speaks for it and, for a loaded word,
-	// every edition's edit about that word. The rest are other rows about the same claim.
-	const main = $derived(story.filter((t, i) => i === 0 || (began.term && t.term === began.term)))
+	const main = $derived(dating(story))
 	const related = $derived(story.filter((t) => !main.includes(t)))
 	// The strip is drawn once the edits have arrived: before that a day has no edition to sit on.
 	const strip = $derived(lanes(d, events.size ? main : []))

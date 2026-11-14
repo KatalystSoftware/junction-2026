@@ -2,10 +2,11 @@
 	import { onMount } from 'svelte'
 	import { api, flags } from './lib/api.svelte'
 	import { NAMES, articleUrl, kb, wikidataUrl } from './lib/format'
-	import { href, log, nav, ui } from './lib/nav.svelte'
-	import { loadQueue, queue } from './lib/queue.svelte'
+	import { log, nav, ui } from './lib/nav.svelte'
+	import { loadQueue } from './lib/queue.svelte'
 	import { LANGS, type Timeline, type TimelineEvent, type Topic } from './lib/types'
 	import Differences from './Differences.svelte'
+	import Front from './Front.svelte'
 	import SqlPanel from './SqlPanel.svelte'
 	import TopicList from './TopicList.svelte'
 
@@ -49,12 +50,6 @@
 		})
 	})
 
-	// An address without a topic opens the first one in the list.
-	$effect(() => {
-		const top = queue.items[0]
-		if (!nav.route && top) location.replace(href(top.wikidata_id))
-	})
-
 	const largest = $derived(Math.max(1, ...Object.values(topic?.size ?? {})))
 </script>
 
@@ -64,8 +59,8 @@
 
 <header class="bar">
 	<div class="inner">
-		<span class="brand">Since When</span>
-		<button class="cdx-button cdx-button--action-progressive cdx-button--weight-quiet" onclick={() => (ui.topics = true)}>Topics</button>
+		<a class="brand" href="#/">Since When</a>
+		{#if nav.route}<button class="cdx-button cdx-button--action-progressive cdx-button--weight-quiet" onclick={() => (ui.topics = true)}>Topics</button>{/if}
 		<span class="grow"></span>
 		{#if flags.fixture}<span class="fixture">Fixture data</span>{/if}
 		<button class="cdx-button" aria-haspopup="dialog" onclick={() => (ui.sql = true)}>SQL</button>
@@ -73,10 +68,10 @@
 </header>
 
 <main>
-	{#if failure}
+	{#if !nav.route}
+		<Front />
+	{:else if failure}
 		<div class="cdx-message cdx-message--block cdx-message--error" role="alert"><span class="cdx-message__icon"></span><div class="cdx-message__content">Could not load this topic: {failure}</div></div>
-	{:else if !nav.route && !queue.loading && !queue.items.length}
-		<p class="state">{queue.error ? `Could not load the topics: ${queue.error}` : 'No topics yet.'}</p>
 	{:else if !topic}
 		<p class="state subtle">Loading…</p>
 	{:else}
@@ -113,7 +108,7 @@
 	{/if}
 </main>
 
-<TopicList />
+{#if nav.route}<TopicList />{/if}
 <SqlPanel {topic} />
 
 <style>

@@ -1,14 +1,17 @@
 <script lang="ts">
-	// A plain way to pick a topic: the API's list, a search box and the edition filter.
+	// A plain way to pick a topic: the API's list, a search box and the edition filter. It is a
+	// sheet over a topic's page, and on the front page (`inline`) a section of the page itself.
 	import { NAMES } from './lib/format'
 	import { href, nav, syncSearch, ui } from './lib/nav.svelte'
 	import { loadQueue, pageSize, queue } from './lib/queue.svelte'
 	import type { Lang } from './lib/types'
 
-	let dialog: HTMLDialogElement
+	let { inline = false }: { inline?: boolean } = $props()
+	let dialog = $state<HTMLDialogElement>()
 	const FILTERS: (Lang | 'all')[] = ['all', 'en', 'sv', 'fi']
 
 	$effect(() => {
+		if (!dialog) return
 		if (ui.topics && !dialog.open) dialog.showModal()
 		if (!ui.topics && dialog.open) dialog.close()
 	})
@@ -34,13 +37,7 @@
 	}
 </script>
 
-<!-- A click on the backdrop lands on the dialog element itself and closes it. -->
-<dialog bind:this={dialog} aria-labelledby="topics-title" onclose={() => (ui.topics = false)} onclick={(e) => e.target === dialog && dialog.close()}>
-	<div class="sheet">
-		<header>
-			<h2 id="topics-title">Topics</h2>
-			<button class="cdx-button cdx-button--action-progressive cdx-button--weight-quiet" onclick={() => dialog.close()}>Close</button>
-		</header>
+{#snippet body()}
 		{#if queue.searchable}
 			<form role="search" onsubmit={search}>
 				<div class="cdx-search-input cdx-search-input--has-end-button">
@@ -67,7 +64,7 @@
 		<ul>
 			{#each topics as i (i.wikidata_id)}
 				<li>
-					<a href={href(i.wikidata_id)} aria-current={nav.route?.qid === i.wikidata_id ? 'page' : undefined} onclick={() => dialog.close()}>
+					<a href={href(i.wikidata_id)} aria-current={nav.route?.qid === i.wikidata_id ? 'page' : undefined} onclick={() => dialog?.close()}>
 						<span class="name">{i.topic}</span>
 					</a>
 				</li>
@@ -76,8 +73,25 @@
 		{#if !nav.q && queue.items.length < queue.total}
 			<button class="cdx-button more" disabled={queue.loading} onclick={() => loadQueue(true)}>Show {Math.min(pageSize, queue.total - queue.items.length)} more</button>
 		{/if}
-	</div>
-</dialog>
+{/snippet}
+
+{#if inline}
+	<section class="sheet inline" aria-labelledby="all-topics-title">
+		<h2 id="all-topics-title">All topics</h2>
+		{@render body()}
+	</section>
+{:else}
+	<!-- A click on the backdrop lands on the dialog element itself and closes it. -->
+	<dialog bind:this={dialog} aria-labelledby="topics-title" onclose={() => (ui.topics = false)} onclick={(e) => e.target === dialog && dialog?.close()}>
+		<div class="sheet">
+			<header>
+				<h2 id="topics-title">Topics</h2>
+				<button class="cdx-button cdx-button--action-progressive cdx-button--weight-quiet" onclick={() => dialog?.close()}>Close</button>
+			</header>
+			{@render body()}
+		</div>
+	</dialog>
+{/if}
 
 <style>
 	dialog {
@@ -114,6 +128,17 @@
 
 	h2 {
 		font-size: var(--font-size-xx-large);
+	}
+
+	/* On the front page: part of the page, as wide as the sheet. */
+	.inline {
+		max-width: 26rem;
+		min-height: 0;
+		padding: 0;
+	}
+
+	.inline h2 {
+		font-size: var(--font-size-x-large);
 	}
 
 	.filters {
