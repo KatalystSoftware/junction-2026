@@ -8,8 +8,9 @@ until its car is at risk, and only then rises as the policy's do, a tenth of the
 - **Risk** is the car's chance of ending late (slow.py) with the hours left now to collect it. The chance grows as the
   hours run out, faster for a car with few drivers notified, a premium car, a long drive or a Friday deadline. The gig
   rises from the first minute that chance reaches `risk_raise_late`: from the posting for a risky car, which then
-  gets the policy's fees, hours before the last pickup for an ordinary one, and never for a safe one, which keeps its
-  fee until the deadline warning and the direct offers.
+  gets the policy's fees, and 6 to 24 hours before the last pickup for the others. At 4%, on 40 weeks of
+  `slow-step-gate-25`, 22% of one-car orders rise from the posting, 13% with under 24 hours left, 30% under 12, 17%
+  under 8 and 18% under 6. A car that never reaches the bar keeps its fee until the deadline warning and the offers.
 - **A safe car opens lower.** A car with at least `risk_open_hours` to its last pickup and a chance under
   `risk_open_late` at the posting opens at `risk_open` x the typical fee. On 40 paired weeks of `curve-fee-0.9-cost-1.2`
   and `curve-fee-1.0-cost-1.2`, such cars paid 0.08 to 0.10 x less at 0.9 and were late as often; cars with under 8

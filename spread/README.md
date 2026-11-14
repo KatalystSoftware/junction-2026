@@ -178,7 +178,7 @@ over the opening, of which 330 overnight, 300 to 330 on rises the same day, 130 
 **Fees by each car's risk** (`risk-*`, [`riskfee.py`](spreadlab/riskfee.py), on the live default, not played yet). A
 car with 16 hours or more to its last pickup and a late chance under 6% opens at 0.9 x (81% of one-car orders, 2.3%
 late); a gig holds its opening fee until the car's late chance with the hours left reaches 4%, then rises as now:
-22% of cars from the posting, the others 6 to 12 hours before their last pickup, 18% never. `risk-hold` is the hold
+22% of cars from the posting, 13% with under 24 hours left, 30% under 12, 17% under 8 and 18% under 6. `risk-hold` is the hold
 alone, `risk-open` the lower opening alone, and `-due-24` counts only the waiting cars due within 24 hours in
 `slow_step` and the gate.
 
