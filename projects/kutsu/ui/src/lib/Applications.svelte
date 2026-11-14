@@ -23,10 +23,8 @@
   })
   let openId = $state('')
   let reason = $state('')
-  let pick = $state<'accept' | 'decline' | ''>('')
   let copied = $state('')
   let linkFor = $state('')
-  let error = $state('')
   const current = $derived(list.find((a) => a.id === openId) ?? list.find((a) => !decisionOf(by, a.id)) ?? list[0])
   const decision = $derived(current ? decisionOf(by, current.id) : undefined)
   // fit: Espoo sees the closest employers of the event; a company sees each of its roles
@@ -38,16 +36,13 @@
   function open(id: string) {
     openId = id
     reason = ''
-    pick = ''
-    error = ''
   }
-  function save() {
+  // Accept and Decline decide at once, with whatever note was written (a note is welcome, not required), and move on to
+  // the next application still to decide.
+  function save(d: 'accept' | 'decline') {
     const me = current // read before deciding: `current` re-derives as soon as the decision lands
     if (!me) return
-    if (!pick) return (error = 'Choose Accept or Decline first.')
-    if (reason.trim().length < 8) return (error = 'Write one line explaining why: it is part of the record.')
-    decide(by, me.id, pick, reason.trim())
-    error = ''
+    decide(by, me.id, d, reason.trim())
     const next = list.find((a) => a.id !== me.id && !decisionOf(by, a.id))
     if (next) open(next.id)
   }
@@ -190,18 +185,20 @@
 
           <footer class="decide">
             {#if decision}
-              <p class="made"><span class="state {decision.d}">{decision.d === 'accept' ? 'Accepted' : 'Declined'}</span> by {decision.by === 'espoo' ? 'City of Espoo' : (brief ? nameOf(brief) : decision.by)}, {when(decision.at.slice(0, 10))}: “{decision.reason}”</p>
+              <p class="made"><span class="state {decision.d}">{decision.d === 'accept' ? 'Accepted' : 'Declined'}</span> by {decision.by === 'espoo' ? 'City of Espoo' : (brief ? nameOf(brief) : decision.by)}, {when(decision.at.slice(0, 10))}{#if decision.reason}: “{decision.reason}”{/if}</p>
               <button class="btn quiet" onclick={() => {
                 undecide(by, current.id)
               }}>Change</button>
             {:else}
               <div class="pickrow">
-                <button class="btn" class:primary={pick === 'accept'} onclick={() => (pick = 'accept')}><Icon name="check" size={16} />Accept</button>
-                <button class="btn" class:primary={pick === 'decline'} onclick={() => (pick = 'decline')}><Icon name="x" size={16} />Decline</button>
-                <input type="text" bind:value={reason} placeholder="Why, in one line (part of the record)" onkeydown={(e) => e.key === 'Enter' && save()} />
-                <button class="btn primary" onclick={save}>Save and next</button>
+                <input type="text" bind:value={reason} placeholder="A note for the record (optional)" />
+                <button class="btn primary" onclick={() => {
+                  save('accept')
+                }}><Icon name="check" size={16} />Accept</button>
+                <button class="btn decline" onclick={() => {
+                  save('decline')
+                }}><Icon name="x" size={16} />Decline</button>
               </div>
-              {#if error}<p class="err">{error}</p>{/if}
             {/if}
           </footer>
         </article>
@@ -594,9 +591,8 @@
     font: inherit;
     font-size: var(--t-sm);
   }
-  .err {
-    margin-top: var(--s2);
-    font-size: var(--t-sm);
+  .pickrow .decline {
+    border-color: color-mix(in oklch, var(--stop) 45%, var(--line));
     color: var(--stop);
   }
   .made {
