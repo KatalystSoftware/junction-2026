@@ -134,10 +134,12 @@ forum is Espoo's Networking Pass, which it links to.
 - `portfolio`: Context.dev `POST /v1/web/scrape` of any public page, 1 credit.
 - `cv`: the pasted text.
 
-Handing it over is the consent. Nothing is stored, cached or logged on our side. An address goes to
+Handing it over is the consent. Nothing is written or logged on our side. An address goes to
 Context.dev, which reads the profile or page; the text goes to the model (Anthropic), which writes
-the lines. The draft lives in the person's browser tab (`sessionStorage`) and is gone when it closes. The address is public, so anyone could ask it about any profile:
-it reads at most 60 profiles per start (`PEOPLE_LIMIT`), and that is a reason this stays a demo.
+the lines. The draft lives in the person's browser tab (`sessionStorage`) and is gone when it closes.
+The one thing held: the answer for a LinkedIn profile, in the server's memory, so the same profile
+asked for again costs nothing (see below). The address is public, so anyone could ask it about any
+profile: it reads at most 60 profiles per start (`PEOPLE_LIMIT`), and that is a reason this stays a demo.
 
 ```sh
 curl -s https://kutsu.katalyst.fyi/person -d '{"kind": "linkedin", "value": "https://www.linkedin.com/in/<you>"}'
@@ -156,8 +158,14 @@ The rule: **the cache may hold company information; data about an individual per
   LinkedIn address, a page of theirs, or the text of their CV (`POST /person`). A
   LinkedIn address goes to Context.dev's people lookup, a portfolio page to its scraper, and the
   resulting text to the model (Anthropic) to be turned into lines the person agrees with or strikes.
-  None of it is cached, logged or saved on our side: the answer goes back to the person's browser
-  tab and that is the only copy, gone when the tab closes. A finished profile is sent to nobody in
+  None of it is logged or written to disk on our side: the answer goes back to the person's browser
+  tab, gone when the tab closes. **One exception, decided on 14 November:** a LinkedIn read costs up to
+  20 credits, and anyone can ask for the same public profile again and again, so the server keeps the
+  answer for each LinkedIn username in memory for as long as the process runs. It is keyed by a hash of
+  the username (written any way: case, `www`, a query or a trailing slash), at most 200 profiles, the
+  oldest dropped first; it is never written to a file and is gone at the next restart or deploy. We judged
+  this acceptable because it holds nothing the person did not hand over, it is what was already sent back
+  to whoever asked, and it lives no longer than the process. A page or a CV is never kept, even in memory. A finished profile is sent to nobody in
   this demo, and its last page says so. Company research never looks people up, and its searches leave out
   social networks.
 - **People as numbers:** the pool on Espoo's screen is sample data, and it is counts, never rows.
@@ -202,16 +210,33 @@ from one line or a suggestion. Enter accepts, Backspace removes a role, Z takes 
 arrow goes back. What they accept moves to the side and stays in view, who they are on the left and
 who they want to meet on the right, and any line there opens again in the centre. It ends on the
 company's finished page. `ui/` is the Svelte app; `serve.py` serves it and keeps sign-up state in
-`reviews.json`.
+`reviews.json`, written to a file beside it and then moved into place, so a crash never leaves half a
+file; a file that cannot be read is set aside, and the server starts with no sign-ups.
+
+**Who can change what.** The address is public, so anyone can open every screen, but on the server
+(`KUTSU_KEY` set) a sign-up is saved only from Espoo's side unlocked with the demo key, or from a
+company's own invitation link. Without either, every click works in that visitor's browser and is not
+saved, so the next visitor finds the demo as it was.
+
+- **Unlock:** in the Demo menu (top right corner; it appears on hover), "Unlock with the demo key", and
+  paste the key once. The browser keeps it (`localStorage`). The key is `KUTSU_KEY` in
+  `secrets/secrets.yaml`: `sops -d --extract '["KUTSU_KEY"]' secrets/secrets.yaml` from the repo root.
+- **Unlocked:** Espoo's actions are saved (send, take back, edit a draft), the Demo menu offers "Fill in
+  example sign-ups" and "Clear every sign-up", and each company's invitation link ends in `?t=<token>`:
+  its id signed with the key (`link_token` in `serve.py`). That link saves that one company's answers and
+  no other's.
+- **Without the key, the server refuses** `DELETE /reviews` and any `POST /review` (403).
 
 A company is named by its id in `companies.json`, or by any name or domain. One that is not in our
 data takes about 20 seconds; anything asked before answers at once.
 
-It runs on the Verda runner as a systemd service on port 8046; the team's shared proxy serves it as
-`https://kutsu.katalyst.fyi/` (`infra/verda/proxy/sites/kutsu.caddy`).
+It runs on the Verda runner as a systemd service on port 8046, listening only on the address of the
+proxy's Docker network (`172.19.0.1`), so the shared proxy is the only way in: it serves it as
+`https://kutsu.katalyst.fyi/` (`infra/verda/proxy/sites/kutsu.caddy`), and the machine's public address
+does not answer on 8046.
 `sops exec-env ../../secrets/secrets.yaml ./deploy.sh` builds the page, puts the current code and cache
-there and restarts it. Live searches for companies not asked before are capped at 300 per restart,
-four at a time, because each one spends our credits.
+there and restarts it. Whatever spends our credits is capped per restart and shares one limit of four at
+a time: live searches for companies not asked before (300), role drafts (150) and profile reads (60).
 
 ## Context.dev endpoints: what each gives Kutsu and where you see it
 

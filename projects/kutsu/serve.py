@@ -8,15 +8,26 @@ GET  /progress?q=<same>                     the steps that research has taken so
 GET  /reviews.json                          every brief's sign-up state: status, the needs, what the company changed
 POST /review?id=<brief id>                  replaces one of those (the officer's edits, or the company's sign-up)
 POST /role?id=<brief id>                    drafts a whole need from the one line in the body
+POST /person                                a person's profile from their LinkedIn, a page of theirs or the text of a CV
+DELETE /reviews                             takes out every sign-up (the demo's reset)
+GET  /unlock                                204 when the x-kutsu-key header holds the demo key
 
 Without keys the page still shows every brief already in signals.json, and anything in api-cache/
 still answers.
 
-On a public address (HOST=0.0.0.0, see deploy.sh) anyone can spend our API credits, so companies
-not asked for before are capped at LIVE_LIMIT per process, a few at a time. Reviews are open to
-anyone with the address too: this is a demo, and a real one would sign the company's link.
+The address is public, so everything that spends API credits is capped per process and shares one limit
+of four at a time: research on companies not asked for before (LIVE_LIMIT), role drafts (ROLE_LIMIT) and
+profile reads (PEOPLE_LIMIT; a LinkedIn profile read again is answered from memory, see `read_person`).
+
+With KUTSU_KEY set, as on the server, a sign-up is saved only from Espoo's side unlocked with that key
+(the x-kutsu-key header) or from a company's own invitation link, which carries a token signed with it
+for that one company (x-kutsu-link). Taking every sign-up out needs the key. Anything else is answered
+as before and is not saved. Without KUTSU_KEY, on a laptop, every write is open.
 """
 
+import collections
+import hashlib
+import hmac
 import http.server
 import json
 import os
@@ -33,6 +44,8 @@ import signals
 
 HOST, PORT = os.environ.get("HOST", "127.0.0.1"), 8046
 LIVE_LIMIT = int(os.environ.get("LIVE_LIMIT", "300"))  # about $0.03 and 11 Context.dev credits each
+ROLE_LIMIT = int(os.environ.get("ROLE_LIMIT", "150"))  # one Haiku call each, about $0.01
+KEY = os.environ.get("KUTSU_KEY", "")
 DIST = lib.HERE / "ui" / "dist"
 # The first version of the applicant's pages (projects/espoo-recruitment, once called Esittely; the product has one name,
 # Kutsu), served under /apply/, with /esittely/ kept as a redirect, so the organiser's
@@ -56,22 +69,51 @@ researching = threading.BoundedSemaphore(4)
 # a person's profile read costs up to 20 Context.dev credits, and the address is public: a small budget per start
 PEOPLE_LIMIT = int(os.environ.get("PEOPLE_LIMIT", "60"))
 people = {"read": 0}
+roles = {"drafted": 0}
+# A LinkedIn profile already read in this process: by a hash of its username, the answer, so reading the same
+# profile again spends nothing. Memory only, never written, gone at the next start, the oldest dropped past 200.
+read_before = collections.OrderedDict()
 watching = threading.Lock()
 watch = {"read": 0.0, "seen": {"watched": {}, "changes": [], "checked_at": ""}}
 progress = {}  # query -> the steps its research has taken
 
 
 def reviews():
-    """Every saved sign-up, by brief id. A file in another shape is moved aside and the result is empty."""
+    """Every saved sign-up, by brief id. A file in another shape, or one that is not JSON, is moved aside and the result is empty."""
     if not REVIEWS.exists():
         return {}
-    saved = json.loads(REVIEWS.read_text())
-    if saved.get("shape") != REVIEW_SHAPE:
-        aside = REVIEWS.with_name(f"reviews.shape-{saved.get('shape', 'unversioned')}.json")
+    try:
+        saved = json.loads(REVIEWS.read_text())
+    except ValueError:
+        saved = {"shape": "broken"}
+    if not isinstance(saved, dict) or saved.get("shape") != REVIEW_SHAPE:
+        aside = REVIEWS.with_name(f"reviews.shape-{saved.get('shape', 'unversioned') if isinstance(saved, dict) else 'broken'}-{int(time.time())}.json")
         REVIEWS.rename(aside)
         print(f"sign-ups saved in another shape were set aside as {aside.name}; starting with none", file=sys.stderr)
         return {}
     return saved["reviews"]
+
+
+def keep(saved):
+    """Write every sign-up at once: to a file beside the real one, then put in its place, so a crash mid-write
+    leaves the last whole file and never half of one."""
+    part = REVIEWS.with_name(REVIEWS.name + ".part")
+    with open(part, "w") as out:
+        json.dump({"shape": REVIEW_SHAPE, "reviews": saved}, out, ensure_ascii=False, indent=1)
+        out.flush()
+        os.fsync(out.fileno())
+    os.replace(part, REVIEWS)
+
+
+def link_token(brief_id):
+    """What a company's invitation link carries: the brief id signed with the key, so it opens that one sign-up only."""
+    return hmac.new(KEY.encode(), f"join:{brief_id}".encode(), hashlib.sha256).hexdigest()[:24]
+
+
+def linkedin_handle(value):
+    """The username of a LinkedIn profile address, the same however it was written: case, scheme, www, a query or a trailing slash."""
+    found = re.search(r"linkedin\.com/in/([^/?#\s]+)", str(value), re.I)
+    return urllib.parse.unquote(found[1]).lower() if found else ""
 
 
 def changes():
@@ -98,6 +140,14 @@ def well_formed(review):
 class Handler(http.server.BaseHTTPRequestHandler):
     timeout = 30  # seconds a client may take to send its request
 
+    def organiser(self):
+        """Espoo's side, unlocked with the demo key; on a laptop with no key set, anyone."""
+        return not KEY or hmac.compare_digest(self.headers.get("x-kutsu-key", ""), KEY)
+
+    def may_save(self, brief_id):
+        """Espoo's side, or this company's own invitation link."""
+        return self.organiser() or hmac.compare_digest(self.headers.get("x-kutsu-link", ""), link_token(brief_id))
+
     def reply(self, status, body, content_type):
         self.send_response(status)
         self.send_header("content-type", content_type)
@@ -118,6 +168,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
         q = urllib.parse.parse_qs(url.query).get("q", [""])[0].strip()[:100]
         if url.path == "/reviews.json":
             return self.json(reviews())
+        if url.path == "/unlock":
+            return self.reply(204, b"", "text/plain") if KEY and self.organiser() else self.text(403, "That is not the demo key.")
         if url.path == "/changes.json":
             return self.json(changes())
         if url.path in DATA:
@@ -172,9 +224,19 @@ class Handler(http.server.BaseHTTPRequestHandler):
         self.json(b)
 
     def person(self, handed):
-        """A person's profile from what they handed over: {kind: linkedin | portfolio | cv, value, draft?}. Nothing of it is kept or logged."""
+        """A person's profile from what they handed over: {kind: linkedin | portfolio | cv, value, draft?}. Nothing of it is
+        written or logged; a LinkedIn profile's answer is held in memory, see `read_before`."""
         if not isinstance(handed, dict):
             return self.text(400, "Choose your LinkedIn, a portfolio page or your CV.")
+        draft = handed.get("draft") is not False
+        handle = linkedin_handle(handed.get("value")) if handed.get("kind") == "linkedin" else ""
+        known = hashlib.sha256(f"{handle}|{draft}".encode()).hexdigest() if handle else ""
+        with saving:
+            seen = read_before.get(known) if known else None
+            if seen is not None:
+                read_before.move_to_end(known)
+        if seen is not None:
+            return self.json(seen)
         with saving:
             if people["read"] >= PEOPLE_LIMIT:
                 return self.text(429, "This demo has read as many profiles as it may. Type yours in instead.")
@@ -182,7 +244,13 @@ class Handler(http.server.BaseHTTPRequestHandler):
         if not researching.acquire(blocking=False):
             return self.text(429, "Busy. Try again in a minute.")
         try:
-            self.json(person.profile(handed.get("kind"), handed.get("value"), draft=handed.get("draft") is not False))
+            answer = person.profile(handed.get("kind"), handed.get("value"), draft=draft)
+            if known:
+                with saving:
+                    read_before[known] = answer
+                    while len(read_before) > 200:
+                        read_before.popitem(last=False)
+            self.json(answer)
         except person.Unreadable as unreadable:
             self.text(422, str(unreadable))
         except (KeyError, OSError, ValueError, StopIteration) as error:  # a missing key, their side down, an answer in no shape
@@ -192,7 +260,11 @@ class Handler(http.server.BaseHTTPRequestHandler):
             researching.release()
 
     def draft(self, write):
-        """One model draft, a few at a time, as JSON."""
+        """One model draft, a few at a time and ROLE_LIMIT in all, as JSON."""
+        with saving:
+            if roles["drafted"] >= ROLE_LIMIT:
+                return self.text(429, "This demo has drafted as many roles as it may. Write this one in yourself.")
+            roles["drafted"] += 1
         if not researching.acquire(blocking=False):
             return self.text(429, "Busy. Try again in a minute.")
         try:
@@ -208,8 +280,10 @@ class Handler(http.server.BaseHTTPRequestHandler):
         """Take out every saved sign-up: the demo's reset."""
         if urllib.parse.urlsplit(self.path).path != "/reviews":
             return self.text(404, "not found")
+        if not self.organiser():
+            return self.text(403, "Only Espoo's side, unlocked with the demo key, can take every sign-up out.")
         with saving:
-            REVIEWS.write_text(json.dumps({"shape": REVIEW_SHAPE, "reviews": {}}))
+            keep({})
         self.json({})
 
     def do_POST(self):
@@ -232,10 +306,12 @@ class Handler(http.server.BaseHTTPRequestHandler):
             return self.draft(lambda: signals.role(briefs[brief_id], line))
         if brief_id not in briefs or not isinstance(review, dict) or not well_formed(review):
             return self.text(400, "A sign-up needs a known brief id, a status, and needs that each have their own id and a title.")
+        if not self.may_save(brief_id):
+            return self.text(403, "Not saved: a sign-up is saved from the company's own invitation link, or from Espoo's side unlocked.")
         with saving:
             saved = reviews()
             saved[brief_id] = {**review, "updated_at": lib.now_iso()}
-            REVIEWS.write_text(json.dumps({"shape": REVIEW_SHAPE, "reviews": saved}, ensure_ascii=False, indent=1))
+            keep(saved)
         self.json(saved[brief_id])
 
 

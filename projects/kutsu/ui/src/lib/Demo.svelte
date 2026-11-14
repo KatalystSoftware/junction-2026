@@ -1,6 +1,6 @@
 <script lang="ts">
   import { upcoming } from './events'
-  import { app, joinPath, reviewOf, route, saveReview } from './state.svelte'
+  import { app, demo, joinPath, organiser, reviewOf, route, saveReview, unlock, unsaved } from './state.svelte'
   import type { Review } from './types'
 
   // The demo's own control, apart from the product: move between the three people Kutsu is for, and
@@ -48,12 +48,24 @@
   }
   /** Take out every sign-up, real or example: each company is back to the draft it starts from. Asked twice, since it cannot be undone. */
   let sure = $state(false)
+  /** The key is asked for once, here, and kept in this browser: it is what makes Espoo's side and the sign-ups save. */
+  let wrong = $state(false)
+  async function askKey() {
+    const key = prompt('The demo key')?.trim()
+    if (!key) return
+    busy = true
+    wrong = !(await unlock(key))
+    busy = false
+  }
   async function reset() {
     if (!sure) return void (sure = true)
     sure = false
     busy = true
-    await fetch('reviews', { method: 'DELETE' })
-    app.reviews = {}
+    const r = await fetch('reviews', { method: 'DELETE', headers: organiser() }).catch(() => null)
+    if (r?.ok) {
+      unsaved.clear()
+      app.reviews = {}
+    }
     busy = false
     open = false
   }
@@ -72,8 +84,13 @@
       <!-- an invitation is not the place to change everyone's sign-ups from -->
       {#if !recipient}
       <p>Sign-ups</p>
+      {#if demo.key}
       <button disabled={busy} onclick={fill}>Fill in example sign-ups</button>
       <button disabled={busy} onclick={reset}>{sure ? 'Press again to clear them all' : 'Clear every sign-up'}</button>
+      {:else}
+      <!-- without the key nothing is saved: anyone may try every screen, and the next visitor finds it as it was -->
+      <button disabled={busy} onclick={askKey}>{wrong ? 'Not the key. Try again' : 'Unlock with the demo key'}</button>
+      {/if}
       {/if}
     </div>
   {/if}

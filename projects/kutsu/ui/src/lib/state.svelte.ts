@@ -1,3 +1,4 @@
+import { SvelteMap } from 'svelte/reactivity'
 import { loadApplications } from './manage.svelte'
 import type { Brief, Pool, Preset, Review, Status, Step, Watch } from './types'
 
@@ -23,6 +24,50 @@ export const app = $state<App>({
   research: null,
 })
 
+/** The demo's key, typed once into the Demo menu on Espoo's side and kept in this browser. With it a sign-up is
+ *  saved from Espoo's side, every sign-up can be taken out, and each company's invitation link carries a token
+ *  signed with it (`tokens`), so the company's own answers are saved too. Without it nothing on Espoo's side is saved. */
+const KEY_KEPT = 'kutsu-demo-key'
+export const demo = $state<{ key: string; tokens: Record<string, string> }>({ key: kept(), tokens: {} })
+function kept() {
+  try {
+    return localStorage.getItem(KEY_KEPT) ?? ''
+  } catch {
+    return ''
+  }
+}
+/** Check a key with the server, and keep it when it is right. */
+export async function unlock(key: string) {
+  const r = await fetch('unlock', { headers: { 'x-kutsu-key': key } }).catch(() => null)
+  if (r?.status !== 204) return false
+  demo.key = key
+  try {
+    localStorage.setItem(KEY_KEPT, key)
+  } catch {
+    // a browser that keeps nothing keeps the key until the tab closes
+  }
+  await signLinks()
+  return true
+}
+/** The token each company's invitation link carries: its id signed with the key, as serve.py's link_token. */
+async function signLinks() {
+  if (!demo.key) return
+  const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(demo.key), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign'])
+  for (const b of app.briefs) {
+    if (demo.tokens[b.id]) continue
+    const mac = new Uint8Array(await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(`join:${b.id}`)))
+    demo.tokens[b.id] = [...mac].map((x) => x.toString(16).padStart(2, '0')).join('').slice(0, 24)
+  }
+}
+/** What lets a write to one company's sign-up be saved: the key, or the token in the invitation link this page was opened from. */
+const allowed = (id: string): Record<string, string> => {
+  if (demo.key) return { 'x-kutsu-key': demo.key }
+  const token = new URLSearchParams(app.hash.split('?')[1] ?? '').get('t')
+  return token && route().id === id ? { 'x-kutsu-link': token } : {}
+}
+/** The demo key as a header, for what only Espoo's side may do. */
+export const organiser = (): Record<string, string> => (demo.key ? { 'x-kutsu-key': demo.key } : {})
+
 /** A JSON answer from our own server, as the type the caller names: the server and the page are built together. */
 const get = <T>(path: string): Promise<T> => fetch(path).then((r) => r.json() as Promise<T>)
 
@@ -41,6 +86,7 @@ export async function load() {
   const [briefs, presets, pool] = await Promise.all([get<Brief[]>('signals.json'), get<Preset[]>('presets.json'), get<Pool>('pool.json')])
   if (!route().me) await loadBackOffice()
   Object.assign(app, { briefs, presets, pool, ready: true })
+  void signLinks()
   addEventListener('hashchange', () => {
     if (!route().me) void loadBackOffice()
   })
@@ -86,7 +132,8 @@ export async function load() {
   })
   // a field being typed in would lose its text to a poll, so polls wait for the typing to end
   setInterval(async () => {
-    if (backOffice && !route().me && !(document.activeElement as HTMLElement | null)?.isContentEditable) app.reviews = await get<Record<string, Review>>('reviews.json')
+    if (backOffice && !route().me && !(document.activeElement as HTMLElement | null)?.isContentEditable)
+      app.reviews = { ...(await get<Record<string, Review>>('reviews.json')), ...Object.fromEntries(unsaved) }
   }, 3000)
 }
 
@@ -98,7 +145,8 @@ export async function load() {
  */
 const PAGES = ['events', 'companies', 'pool', 'applications']
 export const route = () => {
-  const [, a = '', b = '', c = '', d = ''] = app.hash.split('/').map(decodeURIComponent)
+  // an invitation link may end in `?t=<token>`, which is no part of the route
+  const [, a = '', b = '', c = '', d = ''] = (app.hash.split('?')[0] ?? '').split('/').map(decodeURIComponent)
   if (a === 'event') return { join: false, me: false, page: '', item: '', id: '', event: b, tab: c, company: d }
   // `#/me` is a person's own sign-up, and `#/me/<event slug>` the same as an invitation to that event
   if (a === 'me') return { join: false, me: true, page: '', item: '', id: '', event: b, tab: '', company: '' }
@@ -109,7 +157,8 @@ export const route = () => {
   return { join: false, me: false, page: '', item: '', id: a, event: '', tab: '', company: '' }
 }
 export const go = (id: string) => (location.hash = `#/${encodeURIComponent(id)}`)
-export const joinPath = (id: string, event = '') => `#/join/${encodeURIComponent(id)}${event ? `/${event}` : ''}`
+export const joinPath = (id: string, event = '') =>
+  `#/join/${encodeURIComponent(id)}${event ? `/${event}` : ''}${demo.tokens[id] ? `?t=${demo.tokens[id]}` : ''}`
 export const joinLink = (id: string, event = '') => `${location.origin}${location.pathname}${joinPath(id, event)}`
 /** Put a company's invitation link on the clipboard, which is how an invitation leaves this screen: a person sends it. */
 export const copyLink = (id: string, event = '') => copyText(joinLink(id, event))
@@ -137,9 +186,13 @@ export const nameOf = (b: Brief) =>
 export const reviewOf = (b: Brief): Review =>
   app.reviews[b.id] ?? { status: 'draft', needs: b.card.needs.map((n, i) => ({ ...n, id: `n${String(i)}` })) }
 
+/** Sign-ups the server would not save (no key, no link of the company's own): this visitor's alone, kept over each poll until a reload. */
+export const unsaved = new SvelteMap<string, Review>()
 export async function saveReview(id: string, review: Review) {
   app.reviews[id] = review
-  await fetch(`review?id=${encodeURIComponent(id)}`, { method: 'POST', body: JSON.stringify(review) })
+  const r = await fetch(`review?id=${encodeURIComponent(id)}`, { method: 'POST', body: JSON.stringify(review), headers: allowed(id) }).catch(() => null)
+  if (r?.ok) unsaved.delete(id)
+  else unsaved.set(id, review)
 }
 
 let run = 0
@@ -157,6 +210,7 @@ export async function research(query: string, open: (id: string) => void = go) {
     if (!r.ok) throw new Error(await r.text())
     const brief = (await r.json()) as Brief
     app.briefs = [...app.briefs.filter((b) => b.id !== brief.id), brief]
+    await signLinks()
     if (run === mine) {
       app.research = null
       open(brief.id)

@@ -8,6 +8,7 @@
 // company that agrees with everything would. No dependencies: it speaks to the browser over its
 // debugging socket.
 import { spawn } from 'node:child_process'
+import { createHmac } from 'node:crypto'
 import { mkdtempSync, readdirSync, writeFileSync } from 'node:fs'
 import { homedir, tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -89,7 +90,10 @@ try {
   // a walk must not start from an earlier one's answers: put the company back to the draft it starts from
   const brief = (await (await fetch(`${base}/signals.json`)).json()).find((b) => b.id === COMPANY)
   const draft = { status: 'draft', needs: brief.card.needs.map((n, i) => ({ ...n, id: `n${String(i)}` })) }
-  await fetch(`${base}/review?id=${COMPANY}`, { method: 'POST', body: JSON.stringify(draft) })
+  // a server with a demo key (KUTSU_KEY, as live) saves nothing without it: pass it to reset there too
+  const keyed = (await fetch(`${base}/unlock`)).status === 403
+  const keyHeader = process.env.KUTSU_KEY ? { 'x-kutsu-key': process.env.KUTSU_KEY } : {}
+  await fetch(`${base}/review?id=${COMPANY}`, { method: 'POST', body: JSON.stringify(draft), headers: keyHeader })
 
   await open('#/')
   await expect('home', 'Their profiles')
@@ -297,6 +301,29 @@ try {
   }
   await expect(`the sign-up after ${String(presses)} presses of Enter`, 'Change my answers')
   console.log(`signed up in ${String(presses)} presses of Enter`)
+  // on a server with a key, a sign-up from a link without the company's token is the visitor's alone: not saved
+  if (keyed) {
+    const saved = (await (await fetch(`${base}/reviews.json`)).json())[COMPANY]
+    if (saved?.status === 'joined') errors.push('a sign-up from a link without its token was saved on a server with a key')
+    for (const [method, path] of [['DELETE', '/reviews'], ['POST', `/review?id=${COMPANY}`]]) {
+      const r = await fetch(base + path, { method, body: method === 'POST' ? JSON.stringify(draft) : undefined })
+      if (r.status !== 403) errors.push(`${method} ${path} without the key answered ${String(r.status)}, not 403`)
+    }
+    await open('#/')
+    await evaluate(`document.querySelector('.demo .toggle').click()`)
+    await sleep(300)
+    await expect('the Demo menu without the key', 'Unlock with the demo key')
+    if ((await text()).includes('Clear every sign-up')) errors.push('the Demo menu offers to clear every sign-up without the key')
+    // the company's own link, signed with the key as Espoo's screen signs it, is saved; then put back
+    if (process.env.KUTSU_KEY) {
+      const token = createHmac('sha256', process.env.KUTSU_KEY).update(`join:${COMPANY}`).digest('hex').slice(0, 24)
+      await open(`#/join/${COMPANY}?t=${token}`)
+      for (let i = 0; i < 14 && !(await text()).includes('Change my answers'); i++) await enter()
+      const mine = (await (await fetch(`${base}/reviews.json`)).json())[COMPANY]
+      if (mine?.status !== 'joined') errors.push("a sign-up from the company's own signed link was not saved")
+      await fetch(`${base}/review?id=${COMPANY}`, { method: 'POST', body: JSON.stringify(draft), headers: keyHeader })
+    }
+  }
   socket.close()
 } catch (e) {
   errors.push(String(e))
