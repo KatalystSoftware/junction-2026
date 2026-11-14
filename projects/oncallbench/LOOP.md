@@ -1,6 +1,6 @@
 # Improvement loop: on-call incident response on a generated estate
 
-Process: `docs/overnight-loop.md`. Owner: Claude (this file and `metrics.json`). Builder: a fresh
+Process: an owner, a fresh builder and a fresh verifier per round, each round kept or reverted. Owner: Claude (this file and `metrics.json`). Builder: a fresh
 sub-agent per round. Verifier: a fresh GPT 6.1 Sol reviewer per round. Agents under test: OpenCode
 in Harbor 0.25.0.
 

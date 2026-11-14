@@ -41,7 +41,7 @@ network is public, and the main container has `python3` and `curl`.
 
 ## 2. High once the repository is public: the reference script itself
 
-`docs/event/submission-checklist.md` plans a public repository. Once it is public, a script inside
+The submission plans a public repository. Once it is public, a script inside
 the container can download `projects/oncallbench/sim/policies.py` from GitHub and run
 `python3 policies.py reference http://mcp-server:8000/mcp`. That is exactly what
 `harbor run -a oracle` does, so it scores **1.00 on every seed**, and the judges will have the

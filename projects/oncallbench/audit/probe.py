@@ -80,7 +80,7 @@ for path in ("/", "/docs", "/openapi.json", "/server.py", "/incident.py", "/sse"
         emit("http_" + path, dict(error=type(error).__name__))
 
 # Internet is public by task configuration. Request only public, unauthenticated repository files.
-public_url = "https://raw.githubusercontent.com/KatalystSoftware/junction2026/main/projects/oncallbench/sim/incident.py"
+public_url = "https://raw.githubusercontent.com/KatalystSoftware/junction-2026/main/projects/oncallbench/sim/incident.py"
 try:
     with urllib.request.urlopen(public_url, timeout=15) as response:
         content = response.read()
