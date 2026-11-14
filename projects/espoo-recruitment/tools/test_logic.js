@@ -1,6 +1,6 @@
 // Plain-node tests of the core logic: no browser, no dependencies. Run: node tools/test_logic.js
 globalThis.window = globalThis;
-require("../app/data.js"); require("../app/sources.js"); require("../app/logic.js");
+require("../app/data.js"); require("../app/logic.js");
 const assert = require("assert"), D = window.DATA, L = window.LOGIC;
 let n = 0; const t = (name, fn) => { fn(); n++; console.log("ok", name); };
 const co = id => D.companies.find(c => c.id === id), P = D.candidates;
@@ -45,17 +45,5 @@ t("recommendations rank stands, not people; an unconfirmed Finnish line never ex
   assert.ok(L.meetsMust(L.companyProfile(puro), me) && !L.meetsMust(L.companyProfile(puro), me, true));
   // one schedule for both sides
   assert.strictEqual(L.slotFor("puro", "C-027"), L.slotFor("puro", "C-027"));
-});
-t("consented scan drafts the applicant's profile with a source per line and leaves out school names and other languages", () => {
-  const r = L.scanSources(window.SOURCES), F = r.facts;
-  const sk = Object.fromEntries(F.filter(f => f.kind === "skill").map(f => [f.value, f]));
-  assert.ok(F.every(f => f.from && f.quote), "every fact names its document and line");
-  assert.strictEqual(F.find(f => f.kind === "role").value, "data");
-  assert.strictEqual(F.find(f => f.kind === "exp").value, 2);
-  assert.strictEqual(sk.sql.depth, "work"); assert.strictEqual(sk.sql.years, 5); assert.ok(/2 s instead of 40 s/.test(sk.sql.example));
-  assert.strictEqual(sk.python.depth, "project"); assert.strictEqual(sk.sap.depth, "learning");
-  assert.deepStrictEqual(F.filter(f => f.kind === "lang").map(f => f.value + ":" + f.level).sort(), ["en:fluent", "fi:basic"]);
-  assert.ok(r.skipped.some(x => /university/i.test(x.what)) && r.skipped.some(x => /languages/.test(x.what)));
-  assert.ok(!JSON.stringify(F).includes("Ukrainian") && !JSON.stringify(F).includes("University"), "skipped lines never become facts");
 });
 console.log(`${n} tests passed`);

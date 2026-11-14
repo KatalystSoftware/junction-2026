@@ -26,7 +26,7 @@
    - The draft comes from the company's public job ad, and every field shows the sentence it came from.
    - The company is asked directly whether Finnish is truly required. Each answer shows how many attendees would fit.
    - If the company never answers, the draft is used and marked as unconfirmed.
-2. **Applicants join with a consented scan, then check every line.** They choose which of their own sources we may read once (LinkedIn, CV, GitHub, portfolio). The draft covers the same dimensions companies answer, so the two sides can be compared directly, and every line shows the document and line it came from. The applicant confirms, corrects or removes each line before anyone sees it, adds the three trade-offs and a few sentences in their own words, and can type everything by hand instead. The dimensions:
+2. **Candidates answer the same dimensions companies answer**, so the two sides can be compared directly:
    - field and experience
    - tools, each with a depth and an optional concrete example
    - working languages

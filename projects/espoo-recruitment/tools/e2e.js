@@ -40,24 +40,6 @@ require("fs").mkdirSync(OUT, { recursive: true });
   await go("#/after"); await pg.click('span[data-act="fb"][data-side="cand"][data-v="Yes"]'); await shot("after", true);
   await go("#/concept"); await pg.waitForTimeout(500); await shot("concept", true);
   await pg.setViewportSize({ width: 390, height: 844 }); await go("#/cand/stands"); await shot("mobile-stands"); await go("#/company/puro"); await shot("mobile-company"); await go("#/cand/me"); await shot("mobile-me", true); await go("#/log"); await shot("mobile-log");
-  // applicant joining: consent -> scan -> check every line -> own words -> profile
-  await go("#/join"); await pg.evaluate(() => localStorage.removeItem("esittely-demo-v2")); await pg.reload(); await pg.waitForTimeout(300); await go("#/join"); await shot("join0", true);
-  await pg.click('button[data-act="jn-scan"]'); await pg.waitForTimeout(4200); await shot("join1");
-  await pg.click('button[data-act="jn-step"][data-v="2"]'); await pg.waitForTimeout(200); await shot("join2", true);
-  const nf = await pg.$$eval(".jf", e => e.length); const next0 = await pg.$eval('button[data-act="jn-step"][data-v="3"]', b => b.disabled);
-  await pg.click('.jf button[data-act="jn-edit"]'); await pg.waitForTimeout(150); await pg.fill('.jf .edit input[data-jf="example"]', "Cut a nightly load from 4 h to 20 min.").catch(() => {}); await pg.click('button[data-act="jn-save"]'); await pg.waitForTimeout(150);
-  await pg.click('.jf button[data-act="jn-rm"]'); await pg.waitForTimeout(150); await pg.click('button[data-act="jn-okall"]'); await pg.waitForTimeout(200); await shot("join2b", true);
-  const next1 = await pg.$eval('button[data-act="jn-step"][data-v="3"]', b => b.disabled);
-  await pg.click('button[data-act="jn-step"][data-v="3"]'); await pg.waitForTimeout(150);
-  for (const [id, v] of [["build", "b"], ["depth", "a"], ["pace", "b"]]) await pg.click(`.opt[data-act="jn-trade"][data-id="${id}"][data-v="${v}"]`);
-  await pg.fill('textarea[data-act="jn-own"][data-v="about"]', "I like explaining numbers to people who hate numbers."); await pg.dispatchEvent('textarea[data-act="jn-own"][data-v="about"]', "change"); await shot("join3", true);
-  await pg.click('button[data-act="jn-finish"]'); await pg.waitForTimeout(200); await shot("join4", true);
-  const verified = await pg.textContent(".cheer");
-  await go("#/org/puro"); await pg.click('.head[data-id="C-027"]'); await pg.waitForTimeout(200); const badge = await pg.textContent('.cand:has(.head[data-id="C-027"])');
-  console.log("join facts:", nf, "| next disabled before/after:", next0, next1, "|", verified.slice(0, 60), "| organiser sees checked badge:", /checked by candidate/.test(badge), "| own words:", /In their own words/.test(badge));
-  // demo control panel
-  await pg.click('[data-dbg="org-intro"]'); await pg.waitForTimeout(200); console.log("dbg org-intro ->", location_hash = await pg.evaluate(() => location.hash), (await pg.textContent(".cand:has(.head[data-id=\"C-027\"])")).includes("Introduce") );
-  await pg.click('[data-dbg="jn-done"]'); await pg.waitForTimeout(200); console.log("dbg jn-done ->", await pg.evaluate(() => location.hash), (await pg.textContent("h1")).slice(0, 40));
   console.log("errors:", errs.length ? errs : "none");
   await b.close();
 })().catch(e => { console.error("FAIL", e.message); process.exit(1); });

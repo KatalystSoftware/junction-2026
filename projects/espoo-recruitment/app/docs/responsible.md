@@ -6,8 +6,7 @@
 
 | Does | Never does |
 |---|---|
-| Drafts a company's needs from that company's own public job ad (information about a job, not a person) | Searches the web or social media for people, or scrapes profiles |
-| Drafts an applicant's profile from sources the applicant chose and consented to (their LinkedIn, CV, GitHub, portfolio), read once; the applicant confirms, corrects or removes every line before anyone sees it, and the raw files are deleted after drafting | Uses anything the applicant did not confirm, or keeps the raw documents |
+| Drafts a company's needs from that company's own public job ad (information about a job, not a person) | Reads CVs, searches the web or social media for people, or scrapes profiles |
 | Translates technical terms into plain language and links them to the EU ESCO skills taxonomy | Gives a person a score, a rank, a match percentage or a label |
 | Lays out where a candidate's own answers overlap with a company's stated needs, and where they don't, each with its source | Orders people by an AI judgement. The list order is only the sort the organiser chose, such as registration time. |
 | Summarises a work sample the candidate chose to share, after which the candidate approves or edits the summary | Infers personal traits, personality, "potential" or "culture fit" |
@@ -17,14 +16,14 @@
 
 | Data | From | Why | Who sees it | Kept |
 |---|---|---|---|---|
-| Field, experience band, tools with depth, working languages, practicalities, 3 trade-offs, a few sentences in their own words | Drafted from sources the candidate chose, then confirmed line by line by the candidate (or typed by hand) | To compare with stated needs | The candidate and organisers. Companies only see people introduced to them. | 30 days after the event, unless the candidate opts in to the next one |
+| Field, experience band, tools with depth, working languages, practicalities, 3 trade-offs | Candidate's own answers | To compare with stated needs | The candidate and organisers. Companies only see people introduced to them. | 30 days after the event, unless the candidate opts in to the next one |
 | Optional work-sample link and approved summary | Candidate, by choice | To show concrete work | Same as above, and only after the candidate approves it | Same |
 | Optional "needs work-permit support" | Candidate, by choice | To point them to companies that offer support, and to let Espoo's international recruitment advisers help the company | The candidate and organisers | Same |
 | Name and contact details | The existing registration | To run the event | Organisers, after a decision. The company gets them only when the candidate agrees at the event. | Under the registration tool's own policy |
 | Company needs | Public job ad, plus the company's confirmation | To promote the stand and plan introductions | Everyone at the event | Until the event ends |
 | Decisions and reasons | Organiser | Accountability | Organisers. Each candidate can ask to see the decisions about them. | 12 months, as an audit record |
 
-**Never collected:** photo, age, gender, nationality, ethnicity, school or university names, CV files, or languages other than the ones the companies work in. The scan skips these lines on purpose and shows the applicant what it left out.
+**Never collected:** photo, age, gender, nationality, ethnicity, school or university names, CV files, or languages other than the ones the companies work in.
 
 ## Human checkpoints
 
