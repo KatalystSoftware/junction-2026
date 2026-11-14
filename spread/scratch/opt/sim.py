@@ -266,6 +266,7 @@ def simulate(weeks: Weeks, rule, on: list[int], draw: int = 0, learn: float = 0.
             here[(r["dealer"], r["day"])] += won
             if not won:
                 return
+            wk.setdefault("won", []).append(r["rid"])
             u, parts, life = draws(r, draw), parts_at(by), r["life"]
             if life is None:
                 kinds = weeks.took[r["kinds"]]

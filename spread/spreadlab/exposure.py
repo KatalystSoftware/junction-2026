@@ -385,7 +385,7 @@ class ExposurePolicy(Policy):
             quoted = menu[k:]
             first = curve.fastest(quoted)
             at_list = curve.at_list(request, quoted, on_time, self.model) + own.get("odds", 0)
-            cost_ = max(usual * flat + 100 * self.added(book, request, first, p), usual)
+            cost_ = max(usual * flat + 100 * self.added(book, request, first, p), usual * min(flat, 1))  # a pair's return quote may cost under the typical fee
             multiple = curve.best(at_list, shift, first["listPriceCents"], cost_, slope)
             value = (multiple * first["listPriceCents"] - cost_) * curve.chance(at_list, multiple, shift, slope)
             if best is None or value > best[0]:

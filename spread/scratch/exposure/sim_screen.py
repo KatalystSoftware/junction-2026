@@ -101,26 +101,54 @@ def book_of(row, desk, load: float):
     return exposure.Book(now, cars, nights, desk["drivers"], desk["orders"], resolved, desk["late"], load)
 
 
+REC: dict = {"added": {}, "p": {}}  # per process: the model's late orders added at each quote (week, request) and P(under 90%, 92%) by (week, day) at its last quote
+
+
+def view(row, desk, cache: dict, load: float, wave: bool = True):
+    """The book at this quote (cached until a win, a delivery or half an hour), the candidate car and its due day, and P(under 90%) and the
+    expected late of the book without it; records P at the day's last quote."""
+    key = (id(desk["inflight"]), len(desk["inflight"]), desk["orders"], desk["now"] // 30)
+    if cache.get("key") != key:
+        book = book_of(row, desk, load)
+        if not wave:
+            book.weights = {None: 1.0}
+        f0, e0 = book.risk()
+        cache.update(key=key, book=book, base=(f0, e0, book.risk(line=0.08)[0]))
+    book, (f0, e0, f92) = cache["book"], cache["base"]
+    now, day = desk["now"], sim.due_day(row)
+    REC["p"][(row["w"], now // DAY)] = (f0, f92)
+    hours = row["h"] + (row["by"] - now) / 60
+    car = {"day": day, "last": now + hours * 60, "held": False, "picked": False, "hours": hours, "night": hours - (day * DAY - now) / 60,
+           "weight": exposure.M["candidate_waiting"], "waited": 0.0, "hard": exposure.hard(car_of(row), row["drivers"])}
+    return book, day, car, f0, e0
+
+
 def exposed(kappa: float = 1.0, load: float = 1.0, tail: bool = True, wave: bool = True, gate: int = 40):
     cache = {}
 
     def rule(row, parts, trust, desk):
         if sum(parts) >= gate:
             return None
-        key = (id(desk["inflight"]), len(desk["inflight"]), desk["orders"], desk["now"] // 30)  # the book is the same until a win, a delivery or half an hour
-        if cache.get("key") != key:
-            cache["key"], cache["book"] = key, book_of(row, desk, load)
-            if not wave:
-                cache["book"].weights = {None: 1.0}
-        book = cache["book"]
-        now, day = desk["now"], sim.due_day(row)
-        hours = row["h"] + (row["by"] - now) / 60
-        car = {"day": day, "last": now + hours * 60, "held": False, "picked": False, "hours": hours, "night": hours - (day * DAY - now) / 60,
-               "weight": exposure.M["candidate_waiting"], "waited": 0.0, "hard": exposure.hard(car_of(row), row["drivers"])}
+        book, day, car, f0, e0 = view(row, desk, cache, load, wave)
+        f1, e1 = book.risk(day, car)
+        REC["added"][(row["w"], row["rid"])] = e1 - e0
         later, _ = book.future()
         value = (book.orders + later) * exposure.M["margin"]
-        euros = exposure.cost(book, day, car, exposure.M["late_euros"], kappa, value, tail)
+        euros = exposure.M["late_euros"] * (e1 - e0) + (kappa * value * (f1 - f0) if tail else 0.0)
         return max(row["fee"], row["fee"] * 1.2 + 100 * euros)
+    return rule
+
+
+def watched(base):
+    """`base`, with the model's view of each quote it makes recorded as the exposure arms record theirs."""
+    cache = {}
+
+    def rule(row, parts, trust, desk):
+        cost = base(row, parts, trust, desk)
+        if cost is not None:
+            book, day, car, f0, e0 = view(row, desk, cache, 1.0)
+            REC["added"][(row["w"], row["rid"])] = book.risk(day, car)[1] - e0
+        return cost
     return rule
 
 
@@ -134,19 +162,24 @@ def default_24h(row, parts, trust, desk):
 RULES = {"default": default, "cap-70": cap(70), "default-24h": default_24h, "no-tail": exposed(tail=False), "no-wave": exposed(wave=False),
          **{f"k{k}-l{l}": exposed(k, l) for k in (0.5, 1, 2, 4, 8, 16, 32) for l in (0.5, 1)},
          **{f"k{k}-l1-g25": exposed(k, 1, gate=25) for k in (1, 2, 4, 8, 16, 32)}}
-WEEKS, CROWD_ON = None, True
+WEEKS, CROWD_ON, WATCH = None, True, set()
 
 
 def run(job):
     name, draw, on = job
-    return sim.simulate(WEEKS, RULES[name], on, draw=draw, react=0.6, crowd=CROWD if CROWD_ON else None)
+    REC["added"], REC["p"] = {}, {}
+    rule = watched(RULES[name]) if name in WATCH else RULES[name]
+    out = sim.simulate(WEEKS, rule, on, draw=draw, react=0.6, crowd=CROWD if CROWD_ON else None)
+    return out, dict(REC)
 
 
 def main() -> None:
-    global WEEKS, CROWD_ON
+    global WEEKS, CROWD_ON, WATCH
     draws = int(sys.argv[1])
     CROWD_ON = (sys.argv[2] if len(sys.argv) > 2 else "crowd") == "crowd"
-    names = ["default", "cap-70"] + sys.argv[3:]
+    names = ["default", "cap-70"] + [a for a in sys.argv[3:] if a != "--watch"]
+    if "--watch" in sys.argv:  # the model's view of the default's and the cap's quotes too (doubles their time)
+        WATCH = {"default", "cap-70", "default-24h"}
     saved = pickle.load(open(target.OUT / f"{BASE}.pkl", "rb"))
     nights = {w["seed"]: (w["first_hour"], w["night"]) for w in pickle.load(open(data_dir() / "exposure" / f"{BASE}.pkl", "rb"))}
     weeks = target.load(saved)
@@ -159,9 +192,13 @@ def main() -> None:
     with Pool(2) as pool:
         done = pool.map(run, jobs, chunksize=1)
     res = collections.defaultdict(dict)
-    for (name, d, chunk), out in zip(jobs, done):
+    model = collections.defaultdict(lambda: {"added": {}, "p": {}})
+    for (name, d, chunk), (out, rec) in zip(jobs, done):
         for wi, wk in zip(chunk, out):
             res[(wi, d)][name] = wk
+        if d == 0:
+            model[name]["added"].update(rec["added"])
+            model[name]["p"].update(rec["p"])
     groups = {
         "tune (cat-, tune list)": lambda s: s["seed"] in TUNE,
         "judge: natural fresh-": lambda s: s["seed"].startswith("fresh-") and s["drivers"] >= 720,
@@ -199,6 +236,39 @@ def main() -> None:
         s = saved[wi]
         print(f"  {s['seed']:10} drivers {s['drivers']:4} Fri due {s['friday_due']:3} Fri wave {s['friday_wave']:3}  " + "  ".join(
             f"{name} " + "/".join(f"{res[(wi, d)][name]['on_time']:.3f}" for d in range(draws)) for name in names))
+
+    heavy = [wi for wi in on if saved[wi]["friday_wave"] >= 10 and saved[wi]["friday_due"] >= 100]
+    print("\nFriday-wave weeks with 100 or more due on Friday (default's saved week), on time / orders / late, draw 0:")
+    for wi in heavy:
+        s = saved[wi]
+        print(f"  {s['seed']:10} drivers {s['drivers']:4} Fri due {s['friday_due']:3}  " + "  ".join(
+            f"{name} {res[(wi, 0)][name]['on_time']:.3f}/{res[(wi, 0)][name]['orders']}/{res[(wi, 0)][name]['late']}" for name in names))
+    print("\nVolume and the model, draw 0, all weeks: extra orders and late a week against the default (ratio); the model's late orders added at the"
+          " quote, summed over the orders won, against the stand-in's late a week")
+    base = [res[(wi, 0)]["default"] for wi in on]
+    for name in names:
+        arm = [res[(wi, 0)][name] for wi in on]
+        dor = sum(a["orders"] - b["orders"] for a, b in zip(arm, base)) / len(on)
+        dla = sum(a["late"] - b["late"] for a, b in zip(arm, base)) / len(on)
+        added = model[name]["added"]
+        if added:
+            exp = sum(added.get((wi, rid), 0.0) for wi, a in zip(on, arm) for rid in a.get("won", [])) / len(on)
+            seen = f"model {exp:5.1f} against stand-in {sum(a['late'] for a in arm) / len(on):5.1f}"
+        else:
+            seen = "model not recorded"
+        print(f"  {name:14} orders {dor:+6.1f} late {dla:+5.1f} ratio {dla / dor if dor else 0:5.2f}   {seen}")
+    print("\nP bands at each evening's last quote (Mon to Thu) against the arm's own weeks, draw 0: band, evenings, mean P, share ended under")
+    for name in names:
+        p = model[name]["p"]
+        if not p:
+            continue
+        for k, line in ((0, 0.90), (1, 0.92)):
+            out = []
+            for lo, hi in ((0, .01), (.01, .05), (.05, .15), (.15, .35), (.35, 1.01)):
+                sel = [(v[k], res[(wi, 0)][name]["on_time"] < line) for (wi, day), v in p.items() if day < 4 and lo <= v[k] < hi]
+                if sel:
+                    out.append(f"{lo:.2f}-{hi:.2f}: {len(sel)} P {sum(x for x, _ in sel) / len(sel):.3f} ended {sum(y for _, y in sel) / len(sel):.3f}")
+            print(f"  {name:14} under {line:.0%}: " + " | ".join(out))
 
 
 if __name__ == "__main__":
