@@ -344,6 +344,64 @@ ones with few drivers, not the ones with many short orders. A dearer `same_day` 
 to the competitor more often than it moves the dealer to `next_day` (264 and 256 orders a week
 against 275).
 
+## The final
+
+[`live.py`](spreadlab/live.py) plays the final, or a test final, with the reference policy from the live stream.
+Run it on the runner in Helsinki, from a clean checkout of `origin/main`, so no experiment in a working tree plays:
+
+```bash
+git worktree add ../final origin/main && cd ../final/spread && uv sync   # once
+export SPREAD_KEY=<team key>
+while true; do uv run python -m spreadlab.live final; sleep 3; done      # in tmux; waits for the next final or test final
+uv run python -m spreadlab.live report <world id>                        # afterwards: the evidence for the jury
+```
+
+Start it at any time before the start. The organisers set a test final 15 minutes before it begins (14:00 and
+20:00 on Saturday), and the final at 07:30. The desk acts only on the world that `GET /v1/final` names. When it
+stops, by Ctrl-C, a crash or a reboot, the world goes on, and the same command goes on from `data/live/<world id>/`.
+
+In the final the clock moves by itself, `advance` is closed, and a request gives 4.5 real seconds. What the live
+desk adds to the policy, which is the same class as in the sweeps:
+
+- **Quotes first, and a fallback.** It answers each event as it comes and sends the quotes ahead of the other
+  actions. A guard thread, with its own connection, quotes 1.9 x the typical fee (no `same_day`, no trade-in or private
+  address; a decline while 15 won cars have no driver) for a request the desk has not taken up when a third of its
+  time is left. A quote that would arrive after the deadline is not sent, and its answer does not count in the day's correction.
+- **Restarts.** The books go to disk every second. A desk that starts again reads the events it missed and learns
+  from them without acting: the day's answers, the dealers' orders on time, who used the app, failed visits. It then
+  takes the gigs and orders from the world's snapshot and acts on the world as it is: it posts the cars that have no
+  gig, steepens the fees of orders that got a deadline warning, and quotes the open requests. A car never gets a
+  second gig, also when the desk died after the world took its post and before it read the answer. Without books,
+  for example on a new machine, it learns the same from the world's whole history.
+- **Evidence.** `log.jsonl` holds every event with its delay, every action with its answer and the seconds left
+  for a quote, each quote's decision with the day's correction, each note read at a win, fallbacks, joins and the
+  score each world hour. `report` sums it up; `end.json` holds the final score and the reveal.
+
+Tested offline with [`replay.py`](spreadlab/replay.py), which plays a recorded week of the reference on the final's
+clock as a stand-in for Bahn's server, without the team key:
+
+```bash
+uv run python -m spreadlab.replay --seed fresh-001 --speed 10                     # ten times the final's speed
+uv run python -m spreadlab.replay --seed fresh-002 --crash-at 2160 --down 20      # the desk dies on Tuesday 12:00 inside a batch of actions
+uv run python -m spreadlab.replay --seed fresh-003 --start 4320                   # joins on Thursday from the world's history alone
+uv run python -m spreadlab.replay --seed fresh-004 --speed 2 --slow 0.05          # the policy stalls on 5% of requests
+```
+
+On `fresh-001` at ten times the final's speed, 0.45 real seconds for a request, the live desk quoted all 1,030
+requests itself, each with at least 0.43 s left, and every quote was the recorded one to the cent. It posted the 285
+recorded gigs with the same cars, stop windows from the notes, plates and audience, and sent 1,286 direct offers, each
+to the driver and gig of a recorded one. So the day's corrections, the note reader and the offers run on the live
+stream as they do in the sweeps. Deciding takes 0.4 ms for a request and 2 ms for a win; the books are 0.7 MB and
+take 11 ms to save at the end of the week.
+
+A rehearsal on a practice world moves its clock like the final's from a second process, so the desk meets Bahn's
+real stream and limits. `--start 4320` begins on Thursday 00:00, as a test final does; `--kill-at` kills the desk at a
+world minute and starts it again after `--down` seconds. It plays practice worlds only, never a ranking run.
+
+```bash
+uv run python -m spreadlab.live rehearse --seed fresh-041 --start 4320 --kill-at 5000 --down 20   # about 19 minutes
+```
+
 ## Rules for policy code
 
 The final is one secret week. A policy may use only what the live system sees at that minute: the
@@ -371,6 +429,7 @@ request, the driver list, the map and its own history in the week.
 - [`lanes.json`](spreadlab/lanes.json): the lanes' usual driver fees, for `lane_fee`.
 - [`play.py`](spreadlab/play.py), [`sweep.py`](spreadlab/sweep.py), [`report.py`](spreadlab/report.py): play, compare.
 - [`ledger.py`](spreadlab/ledger.py): mistakes by variant and situation.
+- [`live.py`](spreadlab/live.py), [`replay.py`](spreadlab/replay.py): the final from the live stream, and a recorded week as a stand-in for the server.
 
 ## Limits
 
