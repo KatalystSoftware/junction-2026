@@ -57,7 +57,10 @@ the final is recorded with its result.
 **What keeps it running.** The desk answers each event as it comes and sends quotes first. A guard thread
 quotes 1.9 × the typical fee for any request with no quote when a third of its time is left. The books go
 to disk every second, and a desk that starts again rejoins the week without giving any car a second
-gig. "The final" has the replays and the rehearsal.
+gig. A second machine stands by, started by a person: its alarm rings after 8 seconds without the desk's
+heartbeat or when a request reaches its deadline without a quote, and a desk that rejoins and finds gigs
+it did not post stops for good. In the 14:00 test final the alarm watched the whole run and raised no
+false alarm. "The final" has the replays, the rehearsal and the standby's procedure.
 
 **What would break it.** A thin world with an early bulk order: the default's worst practice week is
 88.4%, on a set of seeds chosen to be hard, and 2 of 255 weeks outside the search's seeds are under 90%.
