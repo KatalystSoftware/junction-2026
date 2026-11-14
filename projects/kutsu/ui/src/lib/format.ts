@@ -32,13 +32,17 @@ export const ago = (iso: string) => {
   return `${String(Math.round(minutes / 1440))} days ago`
 }
 
-/** The username from whatever was typed or pasted for a LinkedIn profile: a whole address, with or without scheme, www or a tail, or the name itself. */
-export const linkedinName = (raw: string) =>
-  raw
-    .trim()
-    .replace(/^(https?:\/\/)?([a-z]{2,3}\.)?(www\.)?linkedin\.com\/(in\/)?/i, '')
-    .replace(/[/?#].*$/, '')
-/** A web address as typed or pasted, without the scheme nobody should have to type. */
+/** The fixed start of a LinkedIn profile's address, with or without scheme, country and www. */
+const LINKEDIN = /^(https?:\/\/)?([a-z]{2,3}\.)?(www\.)?linkedin\.com\/(in\/)?/i
+/** The username from a whole LinkedIn address, with or without scheme, www or a tail, or from the name itself. */
+export const linkedinName = (raw: string) => raw.trim().replace(LINKEDIN, '').replace(/[/?#].*$/, '')
+/** What is typed so far, as a LinkedIn address: 'whole' up to the username, 'starting' while it could still become one, or neither. */
+export const linkedinTyped = (raw: string) => {
+  const text = raw.trim().toLowerCase()
+  if (/\/in\/$/.test(LINKEDIN.exec(text)?.[0] ?? '')) return 'whole'
+  return text && ['https://www.', 'https://', 'http://www.', 'http://', 'www.', ''].some((s) => `${s}linkedin.com/in/`.startsWith(text)) ? 'starting' : ''
+}
+/** A web address once it is whole (pasted, or typed and the field left), without the scheme nobody should have to type. */
 export const bare = (raw: string) =>
   raw
     .trim()

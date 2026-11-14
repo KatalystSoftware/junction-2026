@@ -5,7 +5,7 @@
   import { confetti } from './confetti'
   import { text } from './editable'
   import { occasionOf, plans } from './events'
-  import { bare, linkedinName } from './format'
+  import { bare, linkedinName, linkedinTyped } from './format'
   import Icon from './Icon.svelte'
   import Logo from './Logo.svelte'
   import Mark from './Mark.svelte'
@@ -37,15 +37,28 @@
   const found = $derived(m.can.length + m.skills.length + m.roles.length)
   const nothing = $derived(!reading && !m.sample && Object.keys(m.read).length > 0 && found === 0)
   /** What was typed or pasted, cut down to what the field holds: a username for LinkedIn, an address without its scheme for a link. */
-  function setLinkedin(field: HTMLInputElement) {
-    m.linkedin = linkedinName(field.value)
-    if (field.value !== m.linkedin) field.value = m.linkedin
+  // A field is never rewritten under the person's fingers: a key typed or deleted stays as it is, slashes included, or
+  // "https://github.com/name" could not be typed at all. An address is tidied when it arrives whole (pasted, dropped,
+  // filled in by the browser) and when the field is left.
+  type Typed = Event & { currentTarget: HTMLInputElement }
+  const typing = (e: Event) => e.type === 'input' && /^(insertText|insertCompositionText|delete)/.test((e as InputEvent).inputType || '')
+  function setLinkedin(e: Typed) {
+    const field = e.currentTarget
+    // the one thing done while typing: a whole address typed up to the username gives way to the fixed prefix beside the field
+    const value = !typing(e) || linkedinTyped(field.value) === 'whole' ? linkedinName(field.value) : field.value
+    if (field.value !== value) {
+      const caret = Math.max(0, (field.selectionStart ?? 0) - (field.value.length - value.length))
+      field.value = value
+      if (document.activeElement === field) field.setSelectionRange(caret, caret)
+    }
+    m.linkedin = value
     keep()
   }
-  function setLink(i: number, field: HTMLInputElement) {
-    let value = bare(field.value)
+  function setLink(i: number, e: Typed) {
+    const field = e.currentTarget
+    let value = typing(e) ? field.value : bare(field.value)
     // a LinkedIn address pasted among the links belongs in the field above them
-    if (/linkedin\.com\/in\//i.test(value)) {
+    if (!typing(e) && /linkedin\.com\/in\/./i.test(value)) {
       m.linkedin = linkedinName(value)
       value = ''
     }
@@ -321,9 +334,10 @@
                     <!-- the fixed part of the address is part of the field; only the username is typed, and a pasted address is cut down to it -->
                     <label class="field prefixed">
                       <span aria-hidden="true">linkedin.com/in/</span>
-                      <input aria-label="Your LinkedIn username" placeholder="your-name" value={m.linkedin} oninput={(e) => { setLinkedin(e.currentTarget) }} disabled={reading} autocomplete="off" autocapitalize="none" spellcheck="false" />
+                      <input aria-label="Your LinkedIn username" placeholder="your-name" value={m.linkedin} oninput={setLinkedin} onchange={setLinkedin} disabled={reading} autocomplete="off" autocapitalize="none" spellcheck="false" />
                     </label>
-                    {#if wrongLinkedin}<p class="failed" role="alert">{wrongLinkedin}</p>{:else}{@render says(status('linkedin', 'your LinkedIn'))}{/if}
+                    <!-- a LinkedIn address still being typed is not called a mistake: it cannot be read yet, and nothing is said -->
+                    {#if wrongLinkedin && !linkedinTyped(m.linkedin)}<p class="failed" role="alert">{wrongLinkedin}</p>{:else}{@render says(status('linkedin', 'your LinkedIn'))}{/if}
                   </li>
                   {#each m.links as raw, i (i)}
                     {@const site = siteOf(raw)}
@@ -337,7 +351,7 @@
                       <!-- the icon follows the address: nothing to choose, nothing fetched -->
                       <label class="field prefixed">
                         <span class="site" class:known={!!site} aria-hidden="true"><SiteIcon id={site?.id ?? 'globe'} /></span>
-                        <input aria-label="A link of yours" placeholder={i ? 'Another page about you' : 'A page about you: a site, GitHub, a portfolio'} value={raw} oninput={(e) => { setLink(i, e.currentTarget) }} disabled={reading} inputmode="url" autocomplete="off" autocapitalize="none" spellcheck="false" />
+                        <input aria-label="A link of yours" placeholder={i ? 'Another page about you' : 'A page about you: a site, GitHub, a portfolio'} value={raw} oninput={(e) => { setLink(i, e) }} onchange={(e) => { setLink(i, e) }} disabled={reading} inputmode="url" autocomplete="off" autocapitalize="none" spellcheck="false" />
                       </label>
                       {#if wrongLink(raw)}
                         <p class="failed" role="alert">{wrongLink(raw)}</p>

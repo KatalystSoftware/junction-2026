@@ -123,6 +123,61 @@ try {
   await open(`#/${COMPANY}`)
   await expect('an employer', 'Looking for')
 
+  // a person's links are typed one key at a time, the way a keyboard does it: what is typed stays as typed,
+  // slashes included, and is tidied only when the field is left; a pasted address is tidied at once
+  const LINK = 'input[aria-label="A link of yours"]'
+  const LINKEDIN = 'input[aria-label="Your LinkedIn username"]'
+  const key = async (key, code = '', text = key.length === 1 ? key : undefined) => {
+    await send('Input.dispatchKeyEvent', { type: 'keyDown', key, code, windowsVirtualKeyCode: { Backspace: 8, Home: 36 }[key], text })
+    await send('Input.dispatchKeyEvent', { type: 'keyUp', key, code })
+  }
+  const type = async (selector, typed) => {
+    await evaluate(`document.querySelector('${selector}').focus()`)
+    for (const c of typed) await key(c)
+  }
+  const field = (selector) => evaluate(`document.querySelector('${selector}').value`)
+  const holds = async (what, selector, wanted) => {
+    const value = await field(selector)
+    if (value !== wanted) errors.push(`${what}: the field holds "${String(value)}", not "${wanted}"`)
+  }
+  const empty = (selector) => evaluate(`(() => { const f = document.querySelector('${selector}'); f.focus(); f.select() })()`).then(() => key('Backspace', 'Backspace'))
+  const leave = () => evaluate('document.activeElement.blur()')
+  const paste = (selector, pasted) =>
+    evaluate(`(() => {
+      const f = document.querySelector('${selector}')
+      f.focus()
+      Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(f, ${JSON.stringify(pasted)})
+      f.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertFromPaste', data: ${JSON.stringify(pasted)} }))
+    })()`)
+  await open('#/me')
+  await enter()
+  await type(LINK, 'https://github.com/octocat/hello-world/')
+  await holds('a GitHub address typed key by key', LINK, 'https://github.com/octocat/hello-world/')
+  if ((await evaluate(`document.querySelector('button[aria-label="Read this page"]').getAttribute('aria-checked')`)) !== 'true') errors.push('a GitHub address typed key by key is not offered for reading')
+  await shot('me-link-typed')
+  await leave()
+  await holds('a typed address once the field is left', LINK, 'github.com/octocat/hello-world')
+  await empty(LINK)
+  await type(LINK, 'example.com/work/2026')
+  await key('Backspace', 'Backspace')
+  await key('Backspace', 'Backspace')
+  await key('Backspace', 'Backspace')
+  await key('Backspace', 'Backspace')
+  await holds('a path after four presses of Backspace', LINK, 'example.com/work/')
+  await type(LINK, 'cv')
+  await key('Home', 'Home')
+  await type(LINK, 'my.')
+  await holds('an address edited at its start', LINK, 'my.example.com/work/cv')
+  await paste(LINK, 'https://www.example.com/portfolio/')
+  await holds('a pasted address', LINK, 'example.com/portfolio')
+  await type(LINKEDIN, 'https://www.linkedin.com/in/jane-doe')
+  await holds('a LinkedIn address typed key by key', LINKEDIN, 'jane-doe')
+  await paste(LINKEDIN, 'https://fi.linkedin.com/in/jane-doe/?trk=profile')
+  await holds('a pasted LinkedIn address', LINKEDIN, 'jane-doe')
+  await paste(LINK, 'https://www.linkedin.com/in/someone-else/')
+  await holds('a LinkedIn address pasted among the links', LINK, '')
+  await holds('the LinkedIn field after that paste', LINKEDIN, 'someone-else')
+
   // an invitation from a suggested event names that event, not the upcoming one
   await open('#/join/nitor.com/security')
   await expect('an invitation to a suggested event', 'Security talent event')
