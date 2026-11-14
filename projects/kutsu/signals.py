@@ -229,7 +229,7 @@ def identity(domain, name):
             else {"type": "by_name", "name": name[:30], "country_gl": "fi"})
     resp, credits = context("brand/retrieve", body)
     b = resp.get("brand")
-    if not b or not b.get("domain"):
+    if resp.get("status") != "ok" or not b or not b.get("domain"):  # a 200 can still carry a failed lookup
         return None, credits
     logos = b.get("logos") or []
     # a site's own logo is usually an SVG; the first raster "logo" can be a customer's (Cisco on hamina.com)
@@ -253,7 +253,8 @@ def careers_page(url):
     """The company's careers page as one more result to quote from: what it tells candidates itself."""
     resp, credits = context("web/scrape", {"url": url, "formats": {"markdown": True},
                                            "markdownParams": {"includeLinks": False}})
-    text = lib.norm((resp.get("markdown") or {}).get("data") or "")[:CAREERS_CHARS]
+    markdown = resp.get("markdown") or {}  # a 200 can still carry a failed output: success says which
+    text = lib.norm(markdown.get("data") or "")[:CAREERS_CHARS] if markdown.get("success") else ""
     if len(text) < 200:
         return None, credits
     title = (resp.get("metadata") or {}).get("title") or "Careers"
@@ -265,15 +266,17 @@ FAMILIES = ["Software", "AI and data", "Embedded and electronics", "Semiconducto
             "Sales and business", "Operations and support", "Leadership"]
 SENIORITY = ["Early career", "Experienced", "Senior", "Lead"]
 CARD_SCHEMA = {
-    "type": "object", "additionalProperties": False, "required": ["pitch", "momentum", "needs"],
+    "type": "object", "additionalProperties": False, "required": ["pitch", "momentum", "needs", "also"],
     "properties": {
         "pitch": {"type": "string"},
+        "also": {"type": "array", "items": {"type": "string"}},
         "momentum": {"type": "string", "enum": ["growing", "steady", "shrinking", "unclear"]},
         "needs": {"type": "array", "items": {
             "type": "object", "additionalProperties": False,
-            "required": ["title", "family", "why", "skills", "seniority", "signals", "roles"],
+            "required": ["title", "family", "why", "can_do", "skills", "seniority", "signals", "roles"],
             "properties": {"title": {"type": "string"}, "family": {"type": "string", "enum": FAMILIES},
-                           "why": {"type": "string"}, "skills": {"type": "array", "items": {"type": "string"}},
+                           "why": {"type": "string"}, "can_do": {"type": "array", "items": {"type": "string"}},
+                           "skills": {"type": "array", "items": {"type": "string"}},
                            "seniority": {"type": "string", "enum": SENIORITY},
                            "signals": {"type": "array", "items": {"type": "string"}},
                            "roles": {"type": "array", "items": {"type": "string"}}}}}}}
@@ -294,55 +297,99 @@ antenna engineers" or "Enterprise sales leads". No slash, no company or product 
 - family: the closest one from the list.
 - why: one sentence, at most 16 words: the fact in the statements that creates this need. Say what \
 happened, not that it "suggests" or "implies" something, and do not repeat the title.
-- skills: 3 to 5 concrete skills or fields someone in this role would have, one to three words \
-each, such as "GaN epitaxy", "Embedded C", "ISO 13485". No soft skills.
+- can_do: 2 or 3 things this person must be able to do in the job, each a line of 5 to 10 words \
+that starts with a verb and names the real work, such as "Design RF front ends for small \
+satellites" or "Run ISO 27001 audits across cloud services". Something that can be shown in a \
+work sample or a conversation. Take them from an open role's must-haves when there is one.
+- skills: 3 to 5 tools, methods or fields this person knows, one to three words each, such as \
+"GaN epitaxy", "Embedded C", "ISO 13485". Hard skills only: no soft skills, no traits of character.
 - seniority: the level most of the need sits at.
 - signals: the ids of the one to three statements it rests on.
 - roles: open role titles, copied exactly, that are this need; empty when there are none.
-A need must rest on at least one statement or one open role. Never name a person."""
+A need must rest on at least one statement or one open role. Never name a person.
+
+also: up to 4 further kinds of people a company like this one often needs and you did not list, \
+as titles of the same form. These are guesses to offer, not claims, so they need no statement."""
 
 
-def card(company, roles, signals, named):
+LANGUAGE = {"english_enough": "English is enough", "finnish_required": "Finnish needed"}
+WORKPLACE = {"onsite": "On site", "hybrid": "Hybrid", "remote": "Remote"}
+
+
+def from_posts(titles, posts):
+    """Working language, workplace and place for a need, read off the job posts it covers.
+
+    Each comes with the sentence and page it was read from. What no post states is left out, for
+    the company to answer; whether it hires from abroad is never in a post, so that is always theirs.
+    """
+    mine = [p for p in posts if p["title"]["value"] in titles]
+    out, sources = {}, {}
+    for key, field, labels in (("language", "language_requirement", LANGUAGE), ("workplace", "workplace", WORKPLACE),
+                               ("where", "location", None)):
+        stated = [p[field] for p in mine if p.get(field) and (p[field].get("value") in labels if labels else p[field].get("value"))]
+        if not stated:
+            continue
+        values = [f["value"] for f in stated]
+        best = max(set(values), key=values.count)
+        first = next(f for f in stated if f["value"] == best)
+        out[key] = labels[best] if labels else best
+        if first.get("quote"):
+            sources[key] = {"quote": first["quote"], "url": first.get("source_url")}
+    return {**out, "sources": sources}
+
+
+def card(company, posts, signals, named):
     """The needs and pitch, written from the statements that passed the checks. Returns (card, usd)."""
+    roles = [p["title"]["value"] for p in posts]
+    must = lambda p: "; ".join(m["value"] for m in p.get("must_have") or [])[:300]
+    listed = "\n".join(f"- {p['title']['value']}" + (f" (must have: {must(p)})" if must(p) else "") for p in posts)
     lines = [f"Company: {company['name']}", f"What it does: {company['what_they_do'] or 'unknown'}",
-             "Open tech roles: " + ("; ".join(roles) or company["no_roles"]), ""]
+             "Open tech roles:" + (f"\n{listed}" if posts else f" {company['no_roles']}"), ""]
     lines += [f"{x['id']} [{x['type']}{', ' + x['date'] if x['date'] else ''}] {x['claim']}" for x in signals]
     answer, usd = ask(CARD_SYSTEM, CARD_SCHEMA, "\n".join(lines)) if signals or roles else (None, 0.0)
-    answer = answer or {"pitch": "", "momentum": "unclear", "needs": []}
+    answer = answer or {"pitch": "", "momentum": "unclear", "needs": [], "also": []}
     ids = {x["id"] for x in signals}
     clean = lambda t: not PERSON.search(t) and not any(p in t for p in named)
-    needs = [{**n, "skills": [k.strip() for k in n["skills"] if k.strip()][:5],
+    needs = [{**n, "can_do": [k.strip() for k in n["can_do"] if k.strip()][:3],
+              "skills": [k.strip() for k in n["skills"] if k.strip()][:5],
               "signals": [i for i in n["signals"] if i in ids][:3], "roles": [t for t in n["roles"] if t in roles]}
              for n in answer["needs"][:4]]
+    needs = [{**n, **from_posts(n["roles"], posts)} for n in needs]
     return {"kind": "inferred", "method": f"{MODEL} reading of the checked statements and open roles",
             "pitch": answer["pitch"] if clean(answer["pitch"]) else "", "momentum": answer["momentum"],
-            "needs": [n for n in needs if (n["signals"] or n["roles"]) and clean(n["title"] + " " + n["why"])]}, usd
+            "also": [t.strip() for t in answer["also"] if t.strip() and clean(t)][:4],
+            "needs": [n for n in needs if (n["signals"] or n["roles"])
+                      and clean(" ".join([n["title"], n["why"], *n["can_do"]]))]}, usd
 
 
-POSTING_SCHEMA = {
-    "type": "object", "additionalProperties": False, "required": ["headline", "intro", "you_will", "you_bring", "why_now"],
-    "properties": {"headline": {"type": "string"}, "intro": {"type": "string"}, "why_now": {"type": "string"},
-                   "you_will": {"type": "array", "items": {"type": "string"}},
-                   "you_bring": {"type": "array", "items": {"type": "string"}}}}
-POSTING_SYSTEM = """You draft a short job posting for one role at one company, for the company to edit before \
-it is used. Use only the facts given: the company's description, the role, and the numbered \
-statements, each checked against a public source.
-headline: the role in the singular, sentence case.
-intro: two sentences: what the company does, then why this role exists now, with a fact.
-you_will: four lines of 6 to 12 words, each starting with a verb.
-you_bring: four lines of 4 to 10 words, built on the skills and level given.
-why_now: one sentence with one concrete recent fact from the statements.
-No praise words, nothing about salary, benefits or culture, and no names of people."""
+ROLE_SCHEMA = {
+    "type": "object", "additionalProperties": False, "required": ["title", "why", "can_do", "skills", "seniority", "family"],
+    "properties": {"title": {"type": "string"}, "why": {"type": "string"}, "family": {"type": "string", "enum": FAMILIES},
+                   "can_do": {"type": "array", "items": {"type": "string"}},
+                   "skills": {"type": "array", "items": {"type": "string"}},
+                   "seniority": {"type": "string", "enum": SENIORITY}}}
+ROLE_SYSTEM = """A company signing up for a recruitment event describes, in one line, a kind of person it wants \
+to meet. Turn that line into a role for the company to correct. You also get what the company does \
+and numbered statements about it, each checked against a public source.
+- title: 2 to 5 words naming the kind of person in the plural, in sentence case.
+- why: one sentence, at most 16 words, when a statement explains the need; otherwise an empty string. \
+Do not invent a reason.
+- can_do: 2 or 3 things this person must be able to do, each 5 to 10 words starting with a verb, \
+fitted to what this company does.
+- skills: 3 to 5 tools, methods or fields this person knows, one to three words each. Hard skills only.
+- seniority and family: the closest of the choices, by what the line says.
+Never name a person."""
 
 
-def posting(brief, need):
-    """A drafted job posting for one need of a stored brief. Returns the posting, or None."""
+def role(brief, line):
+    """A need drafted from one line a company typed about who else it wants to meet, or None."""
     lines = [f"Company: {brief['name']}", f"What it does: {brief['card']['pitch'] or (brief['identity'] or {}).get('description') or 'unknown'}",
-             f"Role: {need['title']}", f"Level: {need['seniority']}", f"Skills: {', '.join(need['skills'])}",
-             f"Why the company needs it: {need['why']}", ""]
+             f"The line: {line}", ""]
     lines += [f"{x['id']} [{x['type']}{', ' + x['date'] if x['date'] else ''}] {x['claim']}" for x in brief["signals"]]
-    answer, _ = ask(POSTING_SYSTEM, POSTING_SCHEMA, "\n".join(lines))
-    return answer
+    answer, _ = ask(ROLE_SYSTEM, ROLE_SCHEMA, "\n".join(lines))
+    if not answer or PERSON.search(" ".join([answer["title"], answer["why"], *answer["can_do"]])):
+        return None
+    return {**answer, "can_do": answer["can_do"][:3], "skills": answer["skills"][:5], "signals": [], "roles": []}
 
 
 def gather(name, domain, step):
@@ -437,7 +484,8 @@ def brief(key, companies, all_roles, step=lambda stage, facts: None):
                else "; ".join(ident.get("industries") or []),
                "what_they_do": (c.get("what_they_do") or {}).get("value") if c else ident.get("description"),
                "no_roles": "none found" if c else "not checked, so say nothing about open roles"}
-    roles = [r["title"]["value"] for r in all_roles if r["company_id"] == key]
+    posts = [r for r in all_roles if r["company_id"] == key]
+    roles = [r["title"]["value"] for r in posts]
     results, exa_usd = gather(company["name"], domain, step)
     careers = ident.get("careers") or (c and (c.get("careers_url") or {}).get("value"))
     if careers and careers not in {r["url"] for r in results}:
@@ -457,7 +505,7 @@ def brief(key, companies, all_roles, step=lambda stage, facts: None):
     named, names_usd = people(answer, company["name"])
     signals, dropped = check(answer, results, named)
     step("card", {"statements": len(signals)})
-    needs, card_usd = card(company, roles, signals, named)
+    needs, card_usd = card(company, posts, signals, named)
     return {"id": key if c else domain or key, "name": c["name"]["value"] if c else company["name"],
             "website": company["website"], "in_espoo_data": bool(c), "open_roles": len(roles),
             "identity": ident or None, "signals": signals, "card": needs, "generated_at": lib.now_iso(),
@@ -482,6 +530,7 @@ def markdown(b):
     for n in o["needs"]:
         cites = n["signals"] + [f"hiring now: {t}" for t in n["roles"]]
         lines.append(f"- **{n['title']}** ({n['seniority']}; {', '.join(n['skills'])}): {n['why']} ({', '.join(cites)})")
+        lines += [f"  - can do: {x}" for x in n["can_do"]]
     return "\n".join(lines) + "\n"
 
 

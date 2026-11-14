@@ -26,9 +26,12 @@ sops exec-env ../../secrets/secrets.yaml 'python3 signals.py 2639822-1 Varjo wol
 ## How it works
 
 There are two screens. The company's sign-up (`#/join/<id>`, or `#/join` to find yourself) is an
-invitation to an event that is already filled in: who they are, what we would tell talent about them,
-and who they want to meet, each to tick or correct, ending on their finished card with a job posting
-drafted per role. Espoo's screen (`#/<id>`) lists employers by how fresh their funding and growth news
+invitation to an event that is already filled in. It shows one card at a time in the centre: who they
+are, then each piece of their news, then each drafted role, then "anyone else?", which drafts a whole
+role from one line or a suggestion. Enter accepts, Backspace leaves out or removes, the left arrow
+goes back. What they accept moves to the side and stays in view, who they are on the left and who
+they want to meet on the right, and any line there opens again in the centre. A job posting can be
+drafted for any role. Espoo's screen (`#/<id>`) lists employers by how fresh their funding and growth news
 is, shows the draft and its sources, and hands out the invitation link. `ui/` is the Svelte app;
 `serve.py` serves it and keeps sign-up state in `reviews.json`.
 
@@ -65,8 +68,18 @@ logo from the company's page (Cisco's on hamina.com).
   the company's own site. Social networks are excluded because posts there are people speaking.
 - **Claude Haiku 5.5**, three calls: one writes the statements, one lists the people named so those
   statements can be dropped, and one writes the card from the statements that passed: a one-line
-  pitch and at most four needs, each a short title, one reason, a few skills and a level. A fourth
-  drafts a job posting when a company asks for one.
+  pitch and at most four needs. A fourth drafts a job posting when a company asks for one.
+
+What a need asks for, and where each value comes from:
+
+| Field | What it is | From |
+|---|---|---|
+| Can do | two or three tasks the person must be able to do, written as work that can be shown | drafted from the statements and an open role's must-haves |
+| Knows | up to five tools, methods or fields; no soft skills or traits of character | drafted |
+| Level | early career, experienced, senior or lead | drafted |
+| Working language | English is enough, or Finnish needed | the job post, with its sentence; otherwise the company |
+| Where | on site, hybrid or remote, and the place | the job post, with its sentence; otherwise the company |
+| Hiring from abroad | yes, or only people already in Finland | always the company: no post says it |
 
 Four Exa searches, two or three Context.dev requests and three Haiku calls per company, about $0.03
 and 11 to 13 credits. Every request and its raw response is stored in `api-cache/`, which is in git,

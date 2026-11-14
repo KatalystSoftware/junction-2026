@@ -21,6 +21,7 @@ Prototype for the City of Espoo challenge **"Rethinking Recruitment"** at Juncti
 ## What's in the prototype
 
 **Working:**
+- **Navigation is a horizontal timeline** of one event: 1 Company (3 weeks before), 2 Candidate (2 weeks before), 3 Organiser (1 week before), 4 Event day (`#/event`: both sides see the same planned conversations), 5 Day after. Each tab is one flow.
 - **Organiser view** (`#/org`): plain-language needs with ESCO links; overlaps, gaps, checks and conversation starters with sources; organiser-chosen filters and sort; names hidden until a decision; a decision with a required reason; decision log and CSV export; aggregate fairness check.
 - **One-minute employer confirmation** (`#/company/puro`): a draft from the public job ad, with each field's source line highlighted; "Is Finnish truly required?" with counts per answer; live anonymous count with numbers under 5 suppressed; what-if counts for each must-have; a "try another job ad" extractor that runs in the browser.
 - **Candidate** (`#/cand`): a 6-step questionnaire on the same dimensions as the employer form; live "why answer" feedback from the pool; stand recommendations with reasons, with every stand still open; "How organisers see you" with logged corrections.

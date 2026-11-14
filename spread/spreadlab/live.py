@@ -236,7 +236,7 @@ class LiveDesk(Policy):
         return {k: v for k, v in vars(self).items() if k not in self.RUNTIME}
 
     def __setstate__(self, state: dict) -> None:
-        vars(self).update({"fixes": {}, "unchecked": set(), "forecasts": [], "foreign": set(), **state})  # books written before the note watcher, the snow forecasts or the fence lack them
+        vars(self).update(state)  # what older books lack, Live.join takes from a new desk
         for k in self.RUNTIME:
             setattr(self, k, None)
 
@@ -570,6 +570,9 @@ class Live:
         source = "memory" if self.desk is not None else "disk"
         if self.desk is None:
             self.desk = self.store.load(self.world.id)
+            if self.desk is not None:  # books that older code wrote lack what the desk has gained since: a new desk's starting values
+                fresh = LiveDesk(self.world, self.level, first["now"], self.params, self.world.roster(), self.map)
+                vars(self.desk).update({k: v for k, v in vars(fresh).items() if k not in vars(self.desk)})
         if self.desk is None:
             source = "world"
             self.desk = LiveDesk(self.world, self.level, first["now"], self.params, self.world.roster(), self.map)

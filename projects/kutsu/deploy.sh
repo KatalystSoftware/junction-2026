@@ -18,7 +18,9 @@ npm --prefix ui ci --no-audit --no-fund >/dev/null
 npm --prefix ui run build >/dev/null
 rsync -az -e "${SSH[*]}" \
   lib.py signals.py serve.py presets.json companies.json roles.json api-cache "$HOST:$DIR/"
-rsync -az --delete -e "${SSH[*]}" ui/dist "$HOST:$DIR/ui/"
+# No --delete: a tab opened before a redeploy still asks for the old hashed files under assets/, and
+# deleting them leaves that tab blank until it is reloaded.
+rsync -az -e "${SSH[*]}" ui/dist "$HOST:$DIR/ui/"
 # signals.json grows on the server with every live search: ours replace the same ids, the rest stay
 rsync -az -e "${SSH[*]}" signals.json "$HOST:$DIR/signals.ours.json"
 "${SSH[@]}" "$HOST" "cd $DIR && python3 -" <<'PY'

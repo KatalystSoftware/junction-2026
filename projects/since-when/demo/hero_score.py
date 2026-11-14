@@ -15,9 +15,9 @@ thing:
     gone    nothing like it
 
 Two quotes are the same when they share at least six in ten of the shorter one's words of three
-letters or more. Per type the
-table counts, of the rows the hand check called false, how many are gone, and of the rows it
-called real, how many are kept: a real row that is gone is as bad as a false one that is kept.
+letters or more. Per type the table counts, of the rows the hand check called false, how many
+are gone, and of the rows it called real, how many are kept: a real row that is gone is as bad as
+a false one that is kept.
 The label file's `recheck` entries (labels a search of the stored article contradicts) are applied
 in a second table.
 """

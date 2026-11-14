@@ -4,7 +4,8 @@
   import type { Signal } from './types'
 
   // A numbered source. Hovering, focusing or tapping it shows the sentence the claim rests on.
-  let { signal, n }: { signal: Signal; n: number } = $props()
+  // With `label` it reads as a source chip ("qoco.aero, Sep 2026") instead of a number.
+  let { signal, n = 0, label = '' }: { signal: Signal; n?: number; label?: string } = $props()
   let open = $state(false)
   let place = $state('')
   let button: HTMLButtonElement
@@ -22,8 +23,8 @@
   const hide = () => (closing = setTimeout(() => (open = false), 140))
 </script>
 
-<span class="cite" role="presentation" onpointerenter={show} onpointerleave={hide} onfocusin={show} onfocusout={hide}>
-  <button bind:this={button} aria-expanded={open} aria-label="Source {n}, {host(signal.source_url)}" onclick={() => (open ? (open = false) : show())}>{n}</button>
+<span class="cite" class:chip={!!label} role="presentation" onpointerenter={show} onpointerleave={hide} onfocusin={show} onfocusout={hide}>
+  <button bind:this={button} aria-expanded={open} aria-label="Source {n || ''}, {host(signal.source_url)}" onclick={show}>{label || n}</button>
   {#if open}
     <span class="card" style={place}>
       <q>{signal.quote}</q>
@@ -54,6 +55,18 @@
     color: var(--ink-2);
     font: 700 0.72rem / 1 var(--text);
     transition: background 0.12s, color 0.12s, border-color 0.12s;
+  }
+  .chip {
+    top: 0;
+    margin-left: 0;
+    font-size: var(--t-sm);
+    line-height: inherit;
+  }
+  .chip button {
+    height: 1.75rem;
+    padding: 0 var(--s3);
+    font-size: var(--t-sm);
+    font-weight: 600;
   }
   button:hover,
   button[aria-expanded='true'] {

@@ -20,7 +20,7 @@ from spreadlab.variants import VARIANTS
 
 
 def same_parameters(saved: dict, params: dict) -> bool:
-    # A parameter of a subclass (riskfee.py, daycap.py, ...) is not in DEFAULTS; a saved week has it in its params.
+    # A parameter of a subclass (riskfee.py, pairs.py, ...) is not in DEFAULTS; a saved week has it in its params.
     return all(saved["params"].get(name, DEFAULTS.get(name)) == value for name, value in json.loads(json.dumps({**DEFAULTS, **params})).items())
 
 

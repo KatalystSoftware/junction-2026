@@ -30,11 +30,10 @@ window.KATALYST = {
     {
       name: "Kutsu",
       for: "City of Espoo, Rethinking Recruitment",
-      live: "",
+      live: "https://kutsu.katalyst.fyi/",
       source: "projects/kutsu",
       shot: "kutsu.webp",
       what: "Finds a company worth inviting and sends it an event sign-up that is already filled in.",
-      note: "Not on a secure address yet.",
     },
     {
       name: "Spread desk",

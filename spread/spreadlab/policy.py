@@ -32,6 +32,13 @@ DEFAULTS = {
     "min_slack": 300,     # offer an option only with this many minutes between the first possible pickup and the last one that is on time
     "min_notified": 0,    # decline when fewer drivers than this are notified of the pickup
     "max_unbooked": 0,    # decline while this many won cars have no driver; 0 is no limit
+    # The drop wave: on one night a week, most often before a Friday, 10 or more drivers drop their bookings in the first hour, and
+    # the day's cars must then book on the day itself. With `due_cap` the desk quotes no option whose last pickup falls on a day
+    # that already has this many won orders with a car still to deliver; 0 is no cap.
+    "due_cap": 0,
+    # ... and the cap lifts for the rest of the week once a night's first hour has had this many drops of the desk's gigs; 0 never
+    # lifts it. No saved week has had two such nights at 10 (0 of 631), so after one the later days are safe.
+    "due_cap_wave": 0,
     "fee": 1.2,           # the opening fee, as a multiple of the request's typical fee
     # The fees after the opening. The starter's schedule rises 10% of the opening fee an hour, to 1.5 times. Each is off at its default.
     "fee_cap": 0,         # the fee rises a tenth of the typical fee an hour up to this multiple of it, then holds
@@ -57,6 +64,9 @@ DEFAULTS = {
     # With `read_notes`: the note's own deadline and the site hours it gives (notes.limits) count at the quote and in the posting. A desk
     # that rejoins a world takes its orders from the world again, without the note's deadline in its books; the postings keep it.
     "note_limits": False,
+    # RULES.md 3: an electric car below 30% charge needs a charging stop on a route over 200 km. The starter plans one for every such car;
+    # with this, only where the route is longer than this many km. 0 keeps the starter's stop.
+    "charge_km": 0,
     "read_notes": False,  # read the note before the first posting (notes.py): the first minute to collect the car, plates, a manual licence
     # What the floor follows. Each is off at its default.
     "dealer_steps": [],   # [[share, floor], ...]: the floor at a dealer once the desk has won this share of its quotes there in the week
@@ -160,6 +170,7 @@ class Policy(Desk):
         self.requested: dict[str, int] = {}  # dealer -> its requests so far
         self.trust: dict[str, int] = {}  # dealer -> the orders it counts as on time, as the dealer counts them
         self.minutes = {(road["from"], road["to"]): road["minutes"] for road in map_["roads"]}
+        self.km = {(road["from"], road["to"]): road["km"] for road in map_["roads"]}
         self.near = near_places(map_)  # place -> the places within the notification distance of it
         self.notified = drivers_near(roster, self.near)
         self.home: dict[str, int] = {}  # gig id -> the rounds of offers it may still get to drivers who live where the car is going
@@ -176,6 +187,7 @@ class Policy(Desk):
         self.refused: list[dict] = []  # the actions that the world refused
         self.opt = optquote.Quotes(map_, roster) if self.p["opt"] else None
         self.forecasts: list[dict] = []  # the snow forecasts so far: places, and the minutes from and to
+        self.night_drops: dict[int, int] = {}  # day -> the desk's gigs dropped in its first hour, with `due_cap_wave`
 
     def params(self) -> dict:
         """The parameters at this minute: those of the week, of a desk that is behind, or of one whose backlog is filling."""
@@ -337,7 +349,16 @@ class Policy(Desk):
             return "slow", []
         if share(request["id"]) >= p["quote_share"]:
             return "volume", []
+        if p["due_cap"] and not (p["due_cap_wave"] and max(self.night_drops.values(), default=0) >= p["due_cap_wave"]):
+            drive = self.drive(request)
+            options = [o for o in options if self.due_on((o["deadline"] - drive) // DAY) < p["due_cap"]]
+            if not options:
+                return "day_full", []
         return None, options
+
+    def due_on(self, day: int) -> int:
+        """The won orders with a car still to deliver whose last minute to collect it falls on the day."""
+        return sum(1 for order in self.orders.values() if order["lastPickupAt"] // DAY == day and None in order["deliveredAt"])
 
     def slack(self, request, option) -> int:
         """The minutes the desk has to find a driver: from the first minute a driver can set out with the first car to
@@ -398,6 +419,9 @@ class Policy(Desk):
         audience = {"experienced": any(leg["car"]["premium"] for leg in order["legs"]), "manualLicence": retry.manual_licence}
         stops = without_windows(stops_for(order, legs, request["note"], retry), self.now)
         for stop in stops:
+            if stop.get("withCharging") and self.params()["charge_km"]:
+                leg_ = order["legs"][stop["leg"]]
+                stop["withCharging"] = self.km[(leg_["pickup"]["placeId"], leg_["delivery"]["placeId"])] > self.params()["charge_km"]
             leg = order["legs"][stop["leg"]]
             # The starter reads a closing time on the day the window starts. When the car is ready on a later day,
             # that leaves no time to collect it: the pickup then runs to the end of the request's window.
@@ -687,6 +711,8 @@ class Policy(Desk):
             self.gave_back.setdefault(event["gigId"], set()).add(event["driverId"])
             if self.p["home_offers"] and event["gigId"] in self.posts and pickups(self.posts[event["gigId"]]) == 1:
                 self.home[event["gigId"]] = self.p["home_rounds"]
+            if self.p["due_cap_wave"] and event["at"] % DAY < HOUR:
+                self.night_drops[event["at"] // DAY] = self.night_drops.get(event["at"] // DAY, 0) + 1
         super().handle(event)
         if event["kind"] == "gig_dropped" and self.p["drop_fee"]:
             self.reopen(event["gigId"])

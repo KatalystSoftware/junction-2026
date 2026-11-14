@@ -108,6 +108,13 @@ class RowClaims(unittest.TestCase):
             [("fi", "en", "Se päättyi Senaatintorille", [30])],
         )
 
+    def test_a_lone_quote_is_the_fact_whichever_edition_the_row_names(self):
+        for named in ("fi", "en", None):
+            got = claims.row_claims(pair(), [row("missing_fact", "Se päättyi Senaatintorille", "", named)])
+            self.assertEqual([(c["lang"], c["target_lang"]) for c in got], [("fi", "en")])
+        got = claims.row_claims(pair(), [row("missing_fact", "Se päättyi Senaatintorille", "It ended", None)])
+        self.assertEqual([(c["lang"], c["target_lang"]) for c in got], [("fi", "en")])
+
     def test_both_quotes_of_a_numbers_row_are_claims_and_framing_has_none(self):
         got = claims.row_claims(pair(), [row("framing", "x", "y"), row("numbers", "12 600 miestä", "about 12,000 men")])
         self.assertEqual([(c["lang"], c["target_lang"], c["row"]) for c in got], [("fi", "en", 1), ("en", "fi", 1)])
@@ -247,13 +254,56 @@ class Findings(unittest.TestCase):
 
     def test_a_missing_fact_not_mentioned_stays_and_says_what_was_searched(self):
         kept, aside = self.run_rows(
-            [row("missing_fact", "Presidentti Relander", "", "en")], [("not_mentioned", "", "none")]
+            [row("missing_fact", "Presidentti Relander", "", "fi")], [("not_mentioned", "", "none")]
         )
         self.assertEqual(aside, [])
         self.assertEqual(
             (kept[0]["type"], kept[0]["verdict"], kept[0]["checked"]["searched"], kept[0]["evidence"]),
             ("missing_fact", "not_mentioned", 9, None),
         )
+        # The row named the edition its quote is from: the edition that was searched replaces it,
+        # and the classifier's value stays for finding the row's finding.
+        self.assertEqual((kept[0]["missing_in"], kept[0]["classifier_missing_in"]), ("en", "fi"))
+
+    def said(self, passage, quote, mine, theirs, agree=False):
+        v = verdict("contradicted", quote, passage, "figure")
+        return dict(v, figures={"claim": mine, "evidence": theirs, "agree": agree, "model": "contradicted"})
+
+    def test_one_statement_and_its_figure_is_one_row_and_the_repeat_is_set_aside(self):
+        rows = [
+            row("numbers", "12 600 miestä", "about 12,000 men"),
+            row("numbers", "7. heinäkuuta 1930", "It ended at Senate Square"),
+        ]
+        cs = [
+            searched(c, "Another passage.", EN if c["target_lang"] == "en" else FI)
+            for c in claims.row_claims(pair(), rows)
+        ]
+        en = cs[0]["evidence"]["passages"][1]
+        vs = [
+            self.said(en, "about 12,000 men", "12 600", "about 12,000"),
+            verdict("not_mentioned"),
+            self.said(en, "about 12,000 men", "7. heinäkuuta 1930", "about 12,000"),
+            verdict("not_mentioned"),
+        ]
+        kept, aside = claims.findings([pair()], {pair()["pair_id"]: rows}, cs, vs, "m")
+        self.assertEqual([r["quote_a"] for r in kept], ["12 600 miestä"])  # the English figure, against one sentence
+        self.assertEqual(kept[0]["original"]["quote_b"], "about 12,000 men")
+        self.assertEqual([(r["aside"], r["original"]["quote_a"]) for r in aside], [("repeat", "7. heinäkuuta 1930")])
+        vs[2] = self.said(en, "It ended at Senate Square", "7. heinäkuuta 1930", "Senate Square")
+        kept, _ = claims.findings([pair()], {pair()["pair_id"]: rows}, cs, vs, "m")
+        self.assertEqual(len(kept), 2)  # another English sentence: another difference
+
+    def test_of_two_rows_on_one_sentence_the_one_with_two_read_figures_stays(self):
+        rows = [row("missing_fact", "Presidentti Relander", "", "en"), row("missing_fact", "12 600 miestä", "", "en")]
+        cs = [searched(c, "Another passage.", EN) for c in claims.row_claims(pair(), rows)]
+        en = cs[0]["evidence"]["passages"][1]
+        vs = [
+            self.said(en, "about 12,000 men", "many", "about 12,000", agree=None),
+            self.said(en, "about 12,000 men", "12 600", "about 12,000"),
+        ]
+        kept, aside = claims.findings([pair()], {pair()["pair_id"]: rows}, cs, vs, "m")
+        self.assertEqual([r["quote_a"] for r in kept], ["12 600 miestä"])
+        self.assertEqual([(r["aside"], r["quote_a"]) for r in aside], [("repeat", "Presidentti Relander")])
 
     def test_a_contradicted_claim_is_one_numbers_row_between_the_two_quotes(self):
         kept, aside = self.run_rows(
