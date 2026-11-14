@@ -301,12 +301,14 @@ VARIANTS: dict[str, dict] = {
     # ... with `queue_hours`: the waiting-car surcharge and the gate of 25 count only the cars due within that many hours. A car
     # that opens cheap and waits a day for its driver is no risk to the week. A ladder on the first distillation's 0.9 opening,
     # from the full count (the first distillation itself) through 48, 36 and 24 hours to 12, past the qualifying track's 24; and
-    # 24 hours with the track's 0.8 opening (Track B's second distillation: its candidate without the outage split).
+    # 24 hours with the track's 0.8 opening (Track B's second distillation: its candidate without the outage split). On the ladder's
+    # 40 weeks 12 hours won about 10 more orders a week than 24 at the 0.9 opening, for +207 a week; `fee16-80-q12-...` tries
+    # that window on merge 1's 0.8 opening.
     **{f"fee16{tail}-q{hours}-wide-pairs-0.6-return-0.75": {
         **REFERENCE, "backlog_step": 0, "slow_step": 0.8, "max_unbooked": 25, "slow_model": "friday", "cost": 1.2, "late_cost": 150, "kinds": KINDS,
         "note_limits": True, "fee_rules": [[0, 10 ** 6, 16, 10 ** 6, opening, 0.1, 1.2]], "queue_hours": hours, "late_wide": True,
         "late_wide_version": late_wide.VERSION, "pair_hold": 4, "pair_fee": 0.6, "pair_cost": 0.75, "pair_version": pairs.VERSION}
-       for tail, opening, hours in (("", 0.9, 12), ("", 0.9, 24), ("", 0.9, 36), ("", 0.9, 48), ("-80", 0.8, 24))},
+       for tail, opening, hours in (("", 0.9, 12), ("", 0.9, 24), ("", 0.9, 36), ("", 0.9, 48), ("-80", 0.8, 24), ("-80", 0.8, 12))},
     # ... the same without the note's limits, whose posting changed after its weeks were played.
     "slow-friday-late-150-kinds": {**REFERENCE, "backlog_step": 0, "slow_step": 0.8, "max_unbooked": 25, "slow_model": "friday", "cost": 1.2, "late_cost": 150, "kinds": KINDS},
     # The best point of the search over these parameters together (scratch/search.py, trial 16 of 20, on 30 tune seeds), and with the kinds.
