@@ -54,6 +54,31 @@ def cap(limit: int):
     return rule
 
 
+DELIVERY: dict = {}  # (week, request id) -> drivers near the delivery place, read from the saved weeks
+
+
+def delivery_counts(seeds: list[str]) -> dict:
+    """The drivers near each request's delivery place, by week and request id, from the base's saved weeks (cached)."""
+    import gzip
+    path = data_dir() / "exposure" / f"delivery-{BASE}.pkl"
+    if path.exists():
+        return pickle.load(open(path, "rb"))
+    from spreadlab.server import drivers_near, near_places
+    near = near_places(json.loads((data_dir() / "map.json").read_text()))
+    out = {}
+    for wi, seed in enumerate(seeds):
+        d = json.load(gzip.open(data_dir() / "runs" / BASE / f"{seed}-L8.json.gz"))
+        notified = drivers_near(d["roster"], near)
+        for r in d["reveal"]["requests"]:
+            out[(wi, r["request"]["id"])] = notified[r["request"]["legs"][0]["delivery"]["placeId"]]
+    pickle.dump(out, open(path, "wb"))
+    return out
+
+
+def car_of(r: dict) -> dict:
+    return {"notified": r["notified"], "at_delivery": DELIVERY.get((r["w"], r["rid"]), 200), "premium": r["premium"], "drive": r["drive"], "note": r["note"]}
+
+
 def book_of(row, desk, load: float):
     """The desk's book at the quote, as exposure.Book wants it, from the stand-in's orders in flight. A car is held while it is outside its
     course's minutes without a driver, and on the road once it is held past its last pickup. The nights are the saved week's, with the
@@ -62,11 +87,11 @@ def book_of(row, desk, load: float):
     for o in desk["inflight"]:
         r = o["row"]
         if "hard" not in o:
-            o["hard"] = exposure.hard({"notified": r["notified"], "premium": r["premium"], "drive": r["drive"], "note": r["note"]}, r["drivers"])
+            o["hard"] = exposure.hard(car_of(r), r["drivers"])
         age = now - o["won"]
         gap = next(((a, b) for a, b in o["iv"] if a <= age < b), None)
         hours = (o["won"] + o["last"] - now) / 60
-        cars.append({"day": o["due"], "held": gap is None, "picked": gap is None and hours < 0, "hours": hours,
+        cars.append({"day": o["due"], "last": o["won"] + o["last"], "held": gap is None, "picked": gap is None and hours < 0, "hours": hours,
                      "night": hours - (o["due"] * DAY - now) / 60, "weight": 1.0, "waited": (age - gap[0]) / 60 if gap else 0.0, "hard": o["hard"]})
     nights = {}
     for d, (dropped, held) in desk["night"].items():
@@ -90,9 +115,8 @@ def exposed(kappa: float = 1.0, load: float = 1.0, tail: bool = True, wave: bool
         book = cache["book"]
         now, day = desk["now"], sim.due_day(row)
         hours = row["h"] + (row["by"] - now) / 60
-        car = {"day": day, "held": False, "picked": False, "hours": hours, "night": hours - (day * DAY - now) / 60,
-               "weight": exposure.M["candidate_waiting"], "waited": 0.0,
-               "hard": exposure.hard({"notified": row["notified"], "premium": row["premium"], "drive": row["drive"], "note": row["note"]}, row["drivers"])}
+        car = {"day": day, "last": now + hours * 60, "held": False, "picked": False, "hours": hours, "night": hours - (day * DAY - now) / 60,
+               "weight": exposure.M["candidate_waiting"], "waited": 0.0, "hard": exposure.hard(car_of(row), row["drivers"])}
         later, _ = book.future()
         value = (book.orders + later) * exposure.M["margin"]
         euros = exposure.cost(book, day, car, exposure.M["late_euros"], kappa, value, tail)
@@ -108,8 +132,8 @@ def default_24h(row, parts, trust, desk):
 
 
 RULES = {"default": default, "cap-70": cap(70), "default-24h": default_24h, "no-tail": exposed(tail=False), "no-wave": exposed(wave=False),
-         **{f"k{k}-l{l}": exposed(k, l) for k in (0.5, 1, 2, 4, 8) for l in (0.5, 1)},
-         **{f"k{k}-l1-g25": exposed(k, 1, gate=25) for k in (1, 2, 4, 8)}}
+         **{f"k{k}-l{l}": exposed(k, l) for k in (0.5, 1, 2, 4, 8, 16, 32) for l in (0.5, 1)},
+         **{f"k{k}-l1-g25": exposed(k, 1, gate=25) for k in (1, 2, 4, 8, 16, 32)}}
 WEEKS, CROWD_ON = None, True
 
 
@@ -130,6 +154,7 @@ def main() -> None:
     weeks.fit(on, by_day=True)
     weeks.first_hour = {wi: {d: (nights[s][0].get(d, 0), held[1]) for d, held in nights[s][1].items()} for wi, s in enumerate(weeks.seeds) if s in nights}
     WEEKS = weeks
+    DELIVERY.update(delivery_counts(weeks.seeds))
     jobs = [(name, d, on[i::8]) for name in names for d in range(draws) for i in range(8)]
     with Pool(2) as pool:
         done = pool.map(run, jobs, chunksize=1)

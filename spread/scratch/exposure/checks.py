@@ -29,7 +29,7 @@ def feats_of(w: dict) -> dict:
     feats = {}
     for r in w["rows"]:
         if r["order"] not in feats:
-            feats[r["order"]] = {k: r[k] for k in ("notified", "premium", "drive", "note")}
+            feats[r["order"]] = {k: r[k] for k in ("notified", "at_delivery", "last", "premium", "drive", "note")}
             feats[r["order"]]["hard"] = exposure.hard(feats[r["order"]], w["drivers"])
     return feats
 
