@@ -48,8 +48,11 @@ chance the private and trade-in requests and the note's own deadline and site ho
 | 120 unseen practice weeks (`fresh-1301` to `fresh-1360`, `fresh-1401` to `fresh-1460`) | €12,376 a week against €10,890 for `steep-notes-offers-8`: +€1,486 (1,297 to 1,677), ahead in 117 of 120. 312 orders and 11.2 late a week; no week under 90% on time against 2, the lowest 90.5%, the mean 96.4% |
 | 38 thin worlds, the lowest of `steep-notes-offers-8` among them | +€1,830 a week (1,398 to 2,268); no week under 90% against 5 |
 | Test final, Saturday 14:00 Helsinki, played by `steep-notes-offers-8` at `480d933` | Joined on Thursday after three replayed days, so live for two days: €1,401.25, 68 orders, 97.1% on time, ranked. All 417 live requests quoted by the policy, none by the guard, none missed; at least 3.6 s left at a quote, 4.5 s at the median; no lost connection, no 429 or 5xx, and the longest hold-up of the event stream under a second |
-| Ranking round, Saturday 15:00 Helsinki, played by this variant from the checkout the unseen sets confirmed | €68,743.40 over five weeks, €13,749 a week, every week ranked: €15,686, €13,473, €9,339, €11,968 and €18,278 on 323, 343, 240, 345 and 409 orders; 96.9% on time, the lowest week 95.6%. The place is read when the round closes |
+| Ranking round, Saturday 15:00 Helsinki, played by this variant from the checkout the unseen sets confirmed | €68,743.40 over five weeks, €13,749 a week, every week ranked: €15,686, €13,473, €9,339, €11,968 and €18,278 on 323, 343, 240, 345 and 409 orders; 96.9% on time, the lowest week 95.6%. Place 29 when read at 16:21 Helsinki with 46 teams finished, at 0.83 of tenth place's €82,653; the round closes at 18:00 Helsinki |
 | The final | not played yet at this commit |
+
+The gap to the top 10 in that round is orders won, not price: they won 419 orders a week at €40.9 an
+order with 15.4 late, this variant 332 at €41.4 with 10.4 late (one round of five worlds).
 
 A variant tuned to the simulator for margin may play the final instead, but only if it beats this one on
 unseen weeks with at most 1 week in 60 under 90% on time, thin worlds included. Which variant played
@@ -65,7 +68,10 @@ false alarm. "The final" has the replays, the rehearsal and the standby's proced
 
 **What would break it.** A Friday drop wave: on some Fridays 10 or more drivers drop their bookings in
 the night's first hour, and Thursday's wins must find a driver on the day. The default's three lowest weeks
-(88.4%, 89.9% and 90.2%) are such weeks; see "Nights when drivers drop out". 2 of 255 weeks outside the
+(88.4%, 89.9% and 90.2%) are such weeks; see "Nights when drivers drop out". The default keeps on-time
+share to spare in most weeks and none in its worst: its lowest unseen weeks are 90.5% and 91.5%, and a
+flat way to win more orders, a cheaper waiting-car cost in the quote, had 20.1 late orders a week and a
+week at 89.0% on tuning weeks. 2 of 255 weeks outside the
 search's seeds are under 90%.
 A lost machine with nobody watching, which costs about €2,800 in 5 minutes. A market whose slope differs
 from practice: the day's shift moves the curve's level, not its slope. Note wording that the rules do not
