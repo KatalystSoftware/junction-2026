@@ -1,10 +1,77 @@
-# Spread harness
+# Spread desk
 
-Tools for the Bahn Express "Spread" challenge: scan practice weeks, play policy variants on the same
-seeds, and see where each variant loses money. The challenge brief is in
+A car-delivery desk for the Bahn Express "Spread" challenge, and the harness that measured each of its
+parts on Bahn's practice weeks. The challenge brief is in
 [`docs/challenges/main/bahn-express--spread.md`](../docs/challenges/main/bahn-express--spread.md).
 
-The harness plays practice worlds only. It cannot start a ranking run: that is a decision for a person.
+## How the desk decides
+
+The live desk ([`live.py`](spreadlab/live.py)) plays the variant `slow-friday-late-150-kinds-limits` from
+[`variants.py`](spreadlab/variants.py). Every quote is one formula:
+
+```
+price = argmax over m of  P(sale | m, today's shift) × (m × list price − C)
+C     = typical fee × (1.2 + 0.8 × p × won cars without a driver) + €150 × p
+```
+
+- `p` is the chance that the order ends late ([`slow.py`](spreadlab/slow.py)): a logistic fit over 94,000
+  won orders on what the desk knows at the quote, such as the hours to find a driver, the drivers near the
+  pickup, a premium car, the drive, a Friday deadline and the note. €150 stands for the refund and the
+  dealer's lost trust.
+- `P(sale)` is the win curve ([`curve.py`](spreadlab/curve.py)), fitted once on 50 weeks of random
+  prices. Each day, the day's wins and losses move it along the price ([`curve.shift`](spreadlab/curve.py)).
+- The desk declines only while 25 won cars have no driver. Private pickups, private deliveries and
+  trade-ins are quoted at their own cost, 1.6, 1.3 and 2.3 × the typical fee.
+- A won car's note is read before its first gig ([`notes.py`](spreadlab/notes.py)). The gig opens at the
+  typical fee, rises a tenth of it an hour to 1.2 × and holds, and gets direct offers once it must be
+  collected within 8 hours.
+
+No model is on the quote path: a quote takes 0.4 ms. Four ideas carry the margin. Each was played
+against the same policy without it, on the same weeks:
+
+| Idea | Why | With against without |
+| --- | --- | --- |
+| The day's market is one number, read from the day's answers | At one fixed price the desk won 3% of its quotes on the worst tenth of days and 60% on the best | €6,487 against €5,490 a week on 10 tuning weeks, €5,609 against €4,627 on 10 held-out weeks |
+| Each car is priced by its own late chance | The old stop at 15 waiting cars refused easy requests, with 43 hours to find a driver on average | On the 10 lowest weeks of `steep-notes-offers-8`, the default before it: 0 weeks under 90% on time against 5, and +€2,854 a week (1,942 to 3,929) |
+| Fees stop where drivers stop answering | Drivers book in a gig's first 15 minutes, 19% of looks at 1.0 × and 29% at 1.2 ×, and 2 to 7% after that | €9,053 against €5,816 on 20 fresh weeks: +€3,237 (2,734 to 3,746), better in 20 of 20 |
+| Rules read every note before the first gig | The kit's starter learns what a note says from a failed visit | Failed visits from 8.8 to 1.2 a week over 40 weeks; +€683 (324 to 1,103) on 10 held-out weeks |
+
+The sections below give each idea's evidence, and what was tried beside it and not kept: "The win curve",
+"Slow cars and the backlog", "Driver fees" and "Notes and direct offers". The default adds to the late
+chance the private and trade-in requests and the note's own deadline and site hours; "The default is
+`slow-friday-late-150-kinds-limits`" builds it up one part at a time on 60 unseen weeks.
+
+**Results.** Practice weeks only at this commit:
+
+| Where | Result |
+| --- | --- |
+| 120 unseen practice weeks (`fresh-1301` to `fresh-1360`, `fresh-1401` to `fresh-1460`) | €12,376 a week against €10,890 for `steep-notes-offers-8`: +€1,486 (1,297 to 1,677), ahead in 117 of 120. 312 orders and 11.2 late a week; no week under 90% on time against 2, the lowest 90.5%, the mean 96.4% |
+| 38 thin worlds, the lowest of `steep-notes-offers-8` among them | +€1,830 a week (1,398 to 2,268); no week under 90% against 5 |
+| Ranking rounds, test finals and the final | not played yet at this commit |
+
+A variant tuned to the simulator for margin may play the final instead, but only if it beats this one on
+unseen weeks with at most 1 week in 60 under 90% on time, thin worlds included. Which variant played
+the final is recorded with its result.
+
+**What keeps it running.** The desk answers each event as it comes and sends quotes first. A guard thread
+quotes 1.9 × the typical fee for any request with no quote when a third of its time is left. The books go
+to disk every second, and a desk that starts again rejoins the week without giving any car a second
+gig. "The final" has the replays and the rehearsal.
+
+**What would break it.** A thin world with an early bulk order: the default's worst practice week is
+88.4%, on a set of seeds chosen to be hard, and 2 of 255 weeks outside the search's seeds are under 90%.
+A lost machine with nobody watching, which costs about €2,800 in 5 minutes. A market whose slope differs
+from practice: the day's shift moves the curve's level, not its slope. Note wording that the rules do not
+know, which costs a failed visit and often the deadline.
+
+[`scratch/pitch_charts.py`](scratch/pitch_charts.py) computes the numbers behind the jury slides from
+the saved weeks: the margin of each step, the price moves of the day's correction on 100 days, the failed
+visits with and without the note reader, and the on-time share of the late chance on the 10 lowest weeks.
+
+## The harness
+
+The harness scans practice weeks, plays policy variants on the same seeds, and shows where each variant
+loses money. It plays practice worlds only. It cannot start a ranking run: that is a decision for a person.
 
 ## Setup
 
@@ -91,7 +158,8 @@ Level 8, mean margin a week in euros on the first 10 seeds of each list. Every w
 | `notes-offers-8` | reads the note before the first posting, and sends direct offers for gigs short of time (see "Notes and direct offers") | 10,975 | 10,070 | 93.7% |
 | `steep-notes-offers-8` | prices by the curve fitted with a level for each day, which is steeper (see "The win curve") | 11,290 | 10,325 | 92.7% |
 
-`steep-notes-offers-8` is the reference for new ideas. On 40 seeds that no list holds (`fresh-001`
+`steep-notes-offers-8` is the reference for new ideas. It is not the default any more: the live desk plays
+`slow-friday-late-150-kinds-limits` (see "Slow cars and the backlog"). On 40 seeds that no list holds (`fresh-001`
 to `fresh-040`, every week ranked) it makes 10,269 against 9,288 for `fee-cap-1.2-drop-cost-1.3`:
 981 more (95% interval 689 to 1,279), better in 35 weeks of 40, lowest week 92.0% on time against
 91.3%. The last 20 of those seeds were kept unplayed for this check: on them it makes 932 more (640
@@ -807,8 +875,8 @@ there, 25 ms at the 99th percentile.
 [`watch.py`](spreadlab/watch.py) adds a second reader of the dealers' notes beside the desk. It needs
 `NVIDIA_API_KEY` in the environment; without it, only the log of new notes and drift runs. `NOTE_MODEL_URL`,
 `NOTE_MODEL`, `NOTE_MODEL_KEY` (the name of the variable with the key) and `NOTE_MODEL_RPM` point it at another
-OpenAI-compatible endpoint, such as a dedicated container without the free tier's limit; only Lightning on
-NVIDIA's endpoint has been measured.
+OpenAI-compatible endpoint. Two models have been measured: Nemotron 3.5 Lightning on NVIDIA's free endpoint, the
+default, and Claude Haiku 5.5, which is called with no temperature and with thinking off.
 
 ```bash
 uv run python -m spreadlab.live final --watch-notes                          # the same desk, with the note watcher
@@ -816,7 +884,7 @@ uv run python -m spreadlab.watch review <world id>                           # t
 uv run python -m spreadlab.watch check "Registration tags are off, bring your own."   # one note: the rules, the model, the fix
 ```
 
-- **The check.** For each won order with a note, Nemotron 3.5 Lightning gets the note, what the request states
+- **The check.** For each won order with a note, the model gets the note, what the request states
   (pickup window, both sites' hours, the deadline) and what `notes.read` made of it. It answers yes or no: did the rules capture every operational fact in the note? On a no it names each
   missing or wrong fact. A no counts only when the fact it names would change what the desk knows. A no that names
   only "other" goes to the review queue, not as a no: the model puts spare tyres and parked cars there.
@@ -864,6 +932,10 @@ words, the safe fixes broke three readings on these notes. They added plates to 
 "the customer collects at 12" for a ready time, and read "huomenna" as the day after tomorrow. A call took 0.4 s
 at the median and 1.6 s at the 95th percentile. On this day, though, the free key, which the team's other projects
 also use, refused half of all calls with 429: 552 calls for 273 answers.
+
+Claude Haiku 5.5 with the same prompt, on the same 150 random notes: it caught 22 of 26 incomplete readings (85%) and
+said no on 9 of 124 complete ones (7.3%), 7 of them about summer tyres in the boot. None of its answers changed a
+post. A call took 0.78 s at the median and 0.99 s at the 95th percentile, with 0 errors and 0 refusals in 190 calls.
 
 On replays of `fresh-003` from Thursday, with every fourth won order given a note in words that the rules miss
 (`replay.py --watch-notes --inject 4`), the watcher found every injected fact that got an answer: plates, a
