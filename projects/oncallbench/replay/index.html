@@ -3,6 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>
+  // The replay is drawn for a laptop, 1280 px and up; squeezed onto a phone its labels pile up. So a
+  // phone gets the laptop layout zoomed out, to pinch into, under a note saying so (style.css, .phone).
+  // A phone's screen is under 600 px on its short side, whichever way it is held; a laptop's or a
+  // tablet's is not, however narrow its window.
+  if (Math.min(screen.width, screen.height) < 600) {
+    document.querySelector('meta[name="viewport"]').content = "width=1280";
+    document.documentElement.classList.add("phone");
+  }
+</script>
 <title>OnCallBench: on-call shift replay</title>
 <meta name="description" content="An AI agent and a scripted expert work the same simulated outage, side by side, minute by minute.">
 <link rel="icon" href="logo.svg" type="image/svg+xml">
@@ -15,6 +25,7 @@
 <script src="app.js" defer></script>
 </head>
 <body class="loading">
+<p class="desk-note">Made for a laptop screen, sorry: pinch to zoom in, or open it on a computer.</p>
 <p class="loading-note" role="status">Loading the shift…</p>
 <header class="bar">
   <h1>

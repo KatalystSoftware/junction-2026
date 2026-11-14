@@ -556,3 +556,18 @@ button.chip.protected[aria-pressed="true"], button.chip.wasted[aria-pressed="tru
   .timeline { height: 20rem; }
   .tools { margin-left: 0; }
 }
+
+/* a phone: index.html sets a 1280 px viewport, so this is the laptop layout zoomed out. The page is
+   as tall as a laptop's and scrolls; the note on top is sized in vw so it reads at phone size. */
+.desk-note { display: none; }
+.phone body { height: auto; overflow: auto; grid-template-rows: auto auto auto auto; }
+.phone .desk-note {
+  display: block; grid-row: 1;
+  padding: 1.6vw 2.5vw; background: var(--amber); color: var(--ink);
+  font-size: 3.6vw; font-weight: 650; line-height: 1.3; text-align: center;
+}
+/* held sideways the 1280 px page is shown about twice as large, so the note halves */
+@media (orientation: landscape) { .phone .desk-note { font-size: 1.8vw; padding: 0.8vw 2vw; } }
+.phone .bar { grid-row: 2; }
+.phone .spread { grid-row: 3; }
+.phone main { grid-row: 4; height: 50rem; }
