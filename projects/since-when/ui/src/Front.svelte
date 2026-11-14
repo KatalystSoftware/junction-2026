@@ -53,7 +53,7 @@
 {/if}
 
 <section class="start" aria-label="Topics to start from">
-	<Why id="why-start" label="Found and checked by Nemotron">{modelName(null)} compared each topic's articles passage by passage and suggested these differences, then looked each one up in the whole other article and set aside those it found stated there. A person closed the ones found false on reading both articles. Open a topic to read each edition's own words.</Why>
+	<Why id="why-start" label="Found by a word list and by Nemotron">A word in quotation marks comes from a fixed list of loaded words: it is in the first sentence of the editions dated on its strip and not in the others'. For the other differences, {modelName(null)} compared each topic's articles passage by passage and suggested them, then looked each one up in the whole other article and set aside those it found stated there. A person closed the ones found false on reading both articles. Open a topic to read each edition's own words.</Why>
 	<div class="cards">
 		{#each START as qid}
 			{@const c = cards[qid]}
