@@ -255,6 +255,8 @@ a.link:hover{box-shadow:0 1px 2px oklch(21% 0.03 264 / .06),0 14px 30px -12px #0
 
 .mock .free{border:1.5px solid var(--city-line);border-radius:var(--r);padding:.8rem .9rem;min-height:min(6.5rem,13vh);color:var(--mut);font-size:var(--t-md);line-height:1.4;background:var(--wash)}
 .mock{gap:min(1rem,1.8vh)}
+.cards.four{grid-template-columns:repeat(2,minmax(0,1fr));gap:min(1rem,1.8vh) 1rem}.cards.four .card p{font-size:var(--t-md)}
+@media (max-width:900px){.cards.four{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -462,8 +464,24 @@ a.link:hover{box-shadow:0 1px 2px oklch(21% 0.03 264 / .06),0 14px 30px -12px #0
   </div>
 </section>
 
-<!-- 12 APIs and technologies -->
-<section class="slide dark" id="slide-12">
+<!-- 12 Extra: Context.dev -->
+<section class="slide band" id="slide-12" data-phase="solution">
+  <div class="phase-label">Extra</div>
+  <div class="slide-content stack">
+    <div class="head stack">
+    <h2>How we use Context.dev</h2>
+    <p class="lead">Context.dev is the first call for every company. It decides how the whole sign-up looks, and it keeps watching afterwards.</p>
+    </div>
+    <div class="cards four">
+      <div class="card"><span class="n">Find the company</span><h3>Typed words become the right company</h3><p class="mut">Brand search turns “nitor” or “hamina wireless” into the company and its domain. The brand record then gives name, logo, colours, field, size, city and careers link: that is why every sign-up page arrives in the company’s own look.</p></div>
+      <div class="card"><span class="n">Read its careers page</span><h3>What the company tells candidates itself</h3><p class="mut">The scraper reads the careers page, script-rendered ones included. Statements and needs quote it word for word, with the sentence they rest on. Two or three requests per company, about a dozen credits, every response checked and cached.</p></div>
+      <div class="card"><span class="n">Watch it</span><h3>116 monitors on 74 companies, every six hours</h3><p class="mut">42 careers pages are watched for a role added or removed, and 74 web searches for funding, growth or a new site. A change shows as “changed lately” on the events screen; a person decides what to do with it.</p></div>
+      <div class="card"><span class="n">Read a person, with consent</span><h3>Their own LinkedIn address, nothing stored</h3><p class="mut">An invitee pastes their own profile address; the people lookup returns roles and studies, which become lines they keep or strike. A match under 90 of 100 is refused. Nothing is cached, logged or saved on our side.</p></div>
+    </div>
+  </div>
+</section>
+<!-- 13 APIs and technologies -->
+<section class="slide dark" id="slide-13">
   <div class="grid-lines"></div>
   <div class="slide-content stack">
     <h2 class="enter" style="--d:.05s">Public APIs and technologies we use</h2>
