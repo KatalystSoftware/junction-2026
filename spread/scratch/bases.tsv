@@ -9,21 +9,28 @@
 # and the live desk has the last word).
 # `line`: safe (`trackb-merged`, tags `trackb-merge-<n>`) or aggressive (`trackb-aggressive`, tags `trackb-aggr-<n>`);
 # each aggressive row is the newest safe row plus the aggressive parts, and is judged paired with the safe window.
+# The note cache (6f24267) changed pairs.py, whose hash is `pair_version`, and notes.py, so every fingerprint moved with the
+# same decisions; rows at 3a239ec7 or later carry the new ones, and the `trackb-merge-<n>.1` retags are the old tags' bases
+# on that code, proved by the runner's to-the-cent replays. The default is b03c174e94be there (80a4235be07c before).
 # Columns are tab-separated.
 order	line	tag	commit	variant	fingerprint	state	kind	part
 2	safe	trackb-merge-2	5cbf649	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-all	1f5cc2d99373	known-good	value	every waiting car counted under 760 drivers (60 of 60 thin weeks at 90% or more)
 3	safe		1e6a8e4	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-all-onward-q10-d760	44409f1cda67	known-good	code	lane 2's onward pairs, only at 760 drivers or more
 4	safe	trackb-merge-3	52bbaa8	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760	1348152a78f8	known-good	value	the waiting-car count of a week under 760 drivers over 48 hours instead of all
 5	safe	trackb-merge-4	fb199d4	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss04	5f2044cd7b03	known-good	value	the climb's step04: slow_step 0.4 at 760 drivers or more
-6	safe		334c4901	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02	d4c41b61e12b	window	value	lane 1 A's slow_step 0.2 at 760 drivers or more, on row 5
-A1.6	aggressive		63377da9	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-late100	a49ae65e80d7	superseded	value	lane 1 A's late_cost 100 at 760 drivers or more, on row 6 (moved to row 7)
-7	safe		006ad9fe	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62	797f56b53fba	window	code	lane 4 A's day cap of 62 under 760 drivers (due_cap never ran through the live desk)
-A1.7	aggressive		855fc6bf	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100	0d147dd2a90d	window	value	lane 1 A's late_cost 100 at 760 drivers or more, on row 7
-A-max	aggressive		-	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100-agg-max	d346567af6eb	ready	value	climb's agg-max: slow_step 0, cost 1.05, 6-hour count, gate 40, min_slack 240, cheaper kinds; slot (760+); otherwise row 7
-A-vol105	aggressive		-	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100-vol105	e367e3dbab53	ready	value	search's vol105: cost 1.05, 12-hour count, cheaper kinds, pair_onward_cost 0.9; slot (760+); otherwise row 7
-A-onward-all	aggressive		-	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100-onward-all	1984bee1ac38	ready	value	lane 2 A's onward pairs in weeks under 760 too (pair_more_drivers 0); slot (under 760); otherwise row 7
-A-cost10	aggressive		-	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100-cost10	ad49b638bbe1	ready	value	lane 1 A's cost 1.0; queue 1 (760+); otherwise row 7
-A-h30-c11	aggressive		-	a17-h30-c11	73e494ad4ba1	ready	value	lane 4 B's cost 1.1 for orders with 30 hours or more; queue 2 (760+); otherwise row 7
-A-slack180	aggressive		-	a17-rich-slack180	2939a5a6c776	ready	value	lane 3 A's min_slack 180; queue 3 (760+); otherwise row 7
-A-vol110	aggressive		-	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100-vol110	38fb829b832e	ready	value	search's vol110 = climb agg-mid: cost 1.1, 12-hour count, cheaper kinds; queue 4, if vol105 steps back (760+); otherwise row 7
-A-mild	aggressive		-	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100-mild	cc48aa59aff0	ready	value	climb's agg-r-mild: cost 1.15, 12-hour count, cheaper kinds; held as a step back (760+); otherwise row 7
+6	safe	trackb-merge-5	334c4901	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02	d4c41b61e12b	known-good	value	lane 1 A's slow_step 0.2 at 760 drivers or more
+4.1	safe	trackb-merge-3.1	3a239ec7	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760	fa222389a683	retag	value	trackb-merge-3 on the note cache (1348152a78f8 before); known-good once the runner's replay matches to the cent
+5.1	safe	trackb-merge-4.1	3a239ec7	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss04	c14f0592bbd5	retag	value	trackb-merge-4 on the note cache (5f2044cd7b03 before); known-good once the runner's replay matches to the cent
+6.1	safe	trackb-merge-5.1	3a239ec7	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02	25a755b16eeb	retag	value	trackb-merge-5 on the note cache (d4c41b61e12b before); known-good once the runner's replay matches to the cent
+7	safe		3a239ec7	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62	b2d6c0062dab	window	code	lane 4 A's day cap of 62 under 760 drivers (797f56b53fba before the note cache); the live desk cleared due_cap at 21:40 UTC
+F1	safe		-	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-all-onward-q10-d760-ss02-cap62	e60fccf4b179	held	value	fallback: row 7 with every waiting car counted under 760 drivers
+F2	safe		-	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-default-onward-q10-d760-ss02	508a9dd40f2e	held	code	fallback: row 7 at 760 drivers or more, the default's play under 760 (thin_play.py); needs the live desk's replay
+A1.7	aggressive		3a239ec7	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100	e153e0ac8d69	ready	value	lane 1 A's late_cost 100 at 760 drivers or more, on row 7
+A-max	aggressive		3a239ec7	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100-agg-max	44f32fb946a3	window	value	climb's agg-max: slow_step 0, cost 1.05, 6-hour count, gate 40, min_slack 240, cheaper kinds (760+)
+A-vol105	aggressive		3a239ec7	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100-vol105	cb5ea5170d96	window	value	search's vol105: cost 1.05, 12-hour count, cheaper kinds, pair_onward_cost 0.9 (760+)
+A-onward-all	aggressive		3a239ec7	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100-onward-all	b2b14cdaa7dd	window	value	lane 2 A's onward pairs in weeks under 760 too (under 760)
+A-cost10	aggressive		3a239ec7	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100-cost10	0112e46ca565	window	value	lane 1 A's cost 1.0 (760+)
+A-slack180	aggressive		3a239ec7	a17-rich-slack180	d56fa4ee4db5	window	value	lane 3 A's min_slack 180 (760+)
+A-h30-c11	aggressive		3a239ec7	a17-h30-c11	f63c2300af8c	ready	value	lane 4 B's cost 1.1 for orders with 30 hours or more (760+)
+A-vol110	aggressive		3a239ec7	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100-vol110	cd2d00624ead	ready	value	search's vol110 = climb agg-mid: cost 1.1, 12-hour count, cheaper kinds (760+); if vol105 steps back
+A-mild	aggressive		3a239ec7	fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100-mild	18a81dd857dc	held	value	climb's agg-r-mild: cost 1.15, 12-hour count, cheaper kinds (760+); a step back

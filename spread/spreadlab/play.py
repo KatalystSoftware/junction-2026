@@ -23,6 +23,7 @@ from .late_wide import WidePairPolicy, WidePolicy
 from .pairs import PairPolicy
 from .policy import Policy, fingerprint
 from .riskfee import RiskFeePolicy
+from .thin_play import ThinWidePairPolicy
 from .server import PracticeClient, data_dir, read_json_gz, world_map, write_json_gz
 from .variants import VARIANTS
 
@@ -77,6 +78,8 @@ def policy_class(params: dict) -> type[Policy]:
         chosen = {Policy: WidePolicy, PairPolicy: WidePairPolicy}[chosen]
     if params.get("exposure"):  # the quote's cost by the book's exposure to drops (exposure.py)
         chosen = {Policy: ExposurePolicy}[chosen]
+    if params.get("thin_play"):  # another variant's play in a thin week (thin_play.py)
+        chosen = {WidePairPolicy: ThinWidePairPolicy}[chosen]
     return chosen
 
 

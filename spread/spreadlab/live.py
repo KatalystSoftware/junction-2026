@@ -48,6 +48,7 @@ from . import notes, watch
 from .exposure import ExposurePolicy
 from .late_wide import WideLate
 from .pairs import PairPolicy
+from .thin_play import ThinPlay
 from .policy import DECLINE, OFFERS_A_DRIVER, Policy
 from .server import SERVER, PracticeClient, data_dir, world_map
 from .variants import VARIANTS
@@ -675,7 +676,13 @@ class LiveExposureDesk(ExposurePolicy, LiveDesk):
     """The live desk with the quote's cost by the book's exposure to drops (exposure.py), for a variant that sets `exposure`."""
 
 
+class LiveThinWidePairDesk(ThinPlay, LiveWidePairDesk):
+    """... and another variant's play in a thin week (thin_play.py), for a variant that sets `thin_play`."""
+
+
 def desk_class(params: dict) -> type:
+    if params.get("thin_play"):
+        return {LiveWidePairDesk: LiveThinWidePairDesk}[desk_class({k: v for k, v in params.items() if k != "thin_play"})]
     if params.get("exposure"):
         return LiveExposureDesk
     if params.get("late_wide"):

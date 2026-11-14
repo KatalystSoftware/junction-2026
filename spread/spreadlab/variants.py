@@ -2,7 +2,7 @@
 compare it with the others on the same seeds."""
 from __future__ import annotations
 
-from . import exposure, late_wide, pairs
+from . import exposure, late_wide, pairs, thin_play
 
 GATE_10 = {"same_day": True, "floor": 1.7, "quote_share": 1, "max_unbooked": 10}  # `gate-10`
 # `curve-live-surcharge`: the win curve sets the price, the day's answers correct it, and the backlog raises the cost
@@ -512,3 +512,11 @@ _GROUP_COSTS = (
 for _prefix, _row in (("r7", "fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62"),
                       ("a17", "fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100")):
     VARIANTS.update({f"{_prefix}-{name}": _full_weeks(VARIANTS[_row], **knobs) for name, knobs in _GROUP_COSTS})
+# Track B's fallbacks for the thin side, held for a later thin week that fails: row 7 at 760 drivers or more, and under 760
+# either every waiting car counted (all hours, in place of 48), or the default's play with the wide late chance and pairs
+# off as well (thin_play.py).
+_ROW_7_F = VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62"]
+VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-all-onward-q10-d760-ss02-cap62"] = {
+    **_ROW_7_F, "when_tight": {**_ROW_7_F["when_tight"], "queue_hours": 0}}
+VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-default-onward-q10-d760-ss02"] = {
+    **_ROW_7_F, "thin_play": {"drivers": 760, "params": VARIANTS["slow-friday-late-150-kinds-limits"], "version": thin_play.VERSION}}
