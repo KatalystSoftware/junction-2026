@@ -21,10 +21,11 @@
 	// The strip is drawn once the edits have arrived: before that a day has no edition to sit on.
 	const strip = $derived(lanes(d, events.size ? main : []))
 	const cap = (text: string) => text[0].toUpperCase() + text.slice(1)
+	let row: HTMLDetailsElement
 </script>
 
 <div class="row" style:--lanes={strip.length}>
-	<details class="cdx-accordion" {open}>
+	<details class="cdx-accordion" {open} bind:this={row}>
 		<summary>
 			<h3 class="cdx-accordion__header">
 				<span class="cdx-accordion__header__title" title={d.title}>{#if d.who}<span class="subtle">{d.who}</span>{' '}{/if}{d.what}</span>
@@ -78,7 +79,7 @@
 			{/if}
 		</div>
 	</details>
-	<Strip lanes={strip} place="beside" />
+	<Strip lanes={strip} place="beside" onpick={() => (row.open = !row.open)} />
 </div>
 
 <style>

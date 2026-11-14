@@ -6,7 +6,9 @@
 	import { DECADES, NAMES, day, diffUrl, list, onScale, shortDay } from './lib/format'
 
 	// A row draws it twice: beside its headline, and inside the opened row for a narrow screen.
-	let { lanes, place }: { lanes: Lane[]; place: 'beside' | 'inside' } = $props()
+	// Beside the headline it lies over the row's summary, so a click on a track is handed back to
+	// the row (`onpick`); the summary itself is what the keyboard uses.
+	let { lanes, place, onpick }: { lanes: Lane[]; place: 'beside' | 'inside'; onpick?: () => void } = $props()
 
 	const years = (from: string, to: string) => (from.slice(0, 4) === to.slice(0, 4) ? from.slice(0, 4) : `${from.slice(0, 4)}–${to.slice(0, 4)}`)
 	// A lane in words, for a screen reader and for the pointer.
@@ -21,7 +23,8 @@
 	{#each lanes as l (l.lang)}
 		<div class="lane">
 			<span class="who">{NAMES[l.lang]}</span>
-			<span class="track" role="img" aria-label={told(l)} title="{NAMES[l.lang]}: {told(l)}">
+			<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions (the row's summary is the control; this only keeps the pointer's click from being lost on the picture) -->
+			<span class="track" class:pick={onpick} role="img" aria-label={told(l)} title="{NAMES[l.lang]}: {told(l)}" onclick={onpick}>
 				{#each DECADES as y}<i style:left="{y.at}%"></i>{/each}
 				{#each l.spans as s}
 					<b class:past={s.to} style:left="{onScale(s.from)}%" style:right="{100 - onScale(s.to ?? Date.now())}%"></b>
@@ -31,7 +34,7 @@
 				{#if l.since}
 					{@const label = `${l.since.exact ? '' : 'by '}${shortDay(l.since.at)}`}
 					{#if l.since.edit}
-						<a href={diffUrl(l.lang, l.since.edit.rev, l.since.edit.old)} target="_blank" rel="noopener" title="Opens the {NAMES[l.lang]} edit" aria-label="{label}, the {NAMES[l.lang]} edit">{label}</a>
+						<a href={diffUrl(l.lang, l.since.edit.rev, l.since.edit.old)} target="_blank" rel="noopener" title="Opens the {NAMES[l.lang]} edit{l.since.either ? ', one of two that day' : ''}" aria-label="{label}, the {NAMES[l.lang]} edit{l.since.either ? ', one of two that day' : ''}">{label}</a>
 					{:else}
 						{label}
 					{/if}
@@ -67,6 +70,10 @@
 		height: 100%;
 		background: linear-gradient(var(--border-color-subtle) 0 0) 0 50% / 100% 1px no-repeat;
 		pointer-events: auto;
+	}
+
+	.track.pick {
+		cursor: pointer;
 	}
 
 	/* The decades, ticked on every lane. */

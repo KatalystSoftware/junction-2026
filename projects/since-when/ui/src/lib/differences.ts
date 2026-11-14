@@ -290,7 +290,7 @@ export interface Lane {
 	/** The periods this edition has said what the difference is about, oldest first. `to` is null while it still does. */
 	spans: { from: string; to: string | null }[]
 	/** The day the period that still runs began, and the edit that began it when it is known. */
-	since: { at: string; exact: boolean; edit: { rev: number; old: number } | null } | null
+	since: { at: string; exact: boolean; edit: { rev: number; old: number } | null; either: boolean } | null
 }
 
 /**
@@ -306,7 +306,7 @@ export function lanes(d: Difference, main: Turn[]): Lane[] {
 			const edit = t.edits.find((e) => e.lang === lane.lang)
 			if (lane.since || (t.edits.length ? !edit : !t.pair.includes(lane.lang))) continue
 			lane.spans = [...t.past, { from: t.at, to: null }]
-			lane.since = { at: t.at, exact: t.exact, edit: edit ? { rev: edit.rev, old: edit.old } : null }
+			lane.since = { at: t.at, exact: t.exact, edit: edit ? { rev: edit.rev, old: edit.old } : null, either: t.edits.length > 1 }
 		}
 	}
 	return out
