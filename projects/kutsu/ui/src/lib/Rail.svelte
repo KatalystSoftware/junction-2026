@@ -56,8 +56,9 @@
     const found = app.briefs.filter((b) => nameOf(b).toLowerCase() === q.toLowerCase())
     if (!q) return
     query = ''
-    if (found.length === 1) go(found[0].id)
-    else research(q)
+    const [only] = found
+    if (only && found.length === 1) go(only.id)
+    else void research(q)
   }
 </script>
 
@@ -75,7 +76,7 @@
   </form>
 
   <div class="groups">
-    {#each groups as g, i}
+    {#each groups as g, i (g.label)}
       <button aria-pressed={i === group} title={i === group ? 'Show every company' : undefined} onclick={() => (group = i === group ? -1 : i)}>{g.label}<span>{g.items.length}</span></button>
     {/each}
   </div>

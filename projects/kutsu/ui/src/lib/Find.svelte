@@ -11,7 +11,7 @@
     if (!q) return
     const known = app.briefs.find((b) => nameOf(b).toLowerCase() === q.toLowerCase())
     if (known) location.hash = joinPath(known.id)
-    else research(q, (id) => (location.hash = joinPath(id)))
+    else void research(q, (id) => (location.hash = joinPath(id)))
   }
 </script>
 

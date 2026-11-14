@@ -15,7 +15,7 @@
   import Watch from './lib/Watch.svelte'
   import { app, load, reviewOf, route } from './lib/state.svelte'
 
-  load()
+  void load()
 
   const at = $derived(route())
   // with no employer chosen, Espoo's screen shows its events
@@ -23,7 +23,7 @@
   const plan = $derived(at.event ? plans().find((p) => p.slug === at.event) : undefined)
   const review = $derived(brief && reviewOf(brief))
   const brand = $derived(
-    brandOf(app.research ? ((app.research.steps.findLast((s) => s.stage === 'identity')?.colors as string[]) ?? []) : brief?.identity?.colors),
+    brandOf(app.research ? ((app.research.steps.findLast((s) => s.stage === 'identity')?.colors as string[] | undefined) ?? []) : brief?.identity?.colors),
   )
   const state = $derived(
     review?.status === 'joined'
@@ -32,7 +32,7 @@
         : 'Signed up. These are the company\'s own answers.'
       : review?.status === 'invited'
         ? 'Invited. Waiting for the company to sign up.'
-        : `Drafted from ${brief?.signals.length} public ${brief?.signals.length === 1 ? 'statement' : 'statements'}. Not confirmed by the company.`,
+        : `Drafted from ${String(brief?.signals.length ?? 0)} public ${brief?.signals.length === 1 ? 'statement' : 'statements'}. Not confirmed by the company.`,
   )
 </script>
 
@@ -63,7 +63,7 @@
                   {#if review.status === 'joined'}
                     <p class="reply">
                       <b>At the event they would like:</b> {(review.wants ?? []).join(', ').toLowerCase() || 'nothing extra'}.
-                      {#each Object.entries(review.about ?? {}) as [label, value]}<br /><b>{label}, corrected:</b> {value}{/each}
+                      {#each Object.entries(review.about ?? {}) as [label, value] (label)}<br /><b>{label}, corrected:</b> {value}{/each}
                     </p>
                   {/if}
                 </section>

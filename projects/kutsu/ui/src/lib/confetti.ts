@@ -4,7 +4,9 @@ export function confetti(colors: string[]) {
   const canvas = Object.assign(document.createElement('canvas'), { width: innerWidth, height: innerHeight })
   Object.assign(canvas.style, { position: 'fixed', inset: '0', pointerEvents: 'none', zIndex: '60' })
   document.body.append(canvas)
-  const ctx = canvas.getContext('2d')!
+  const context = canvas.getContext('2d')
+  if (!context) return
+  const ctx: CanvasRenderingContext2D = context
   const pieces = Array.from({ length: 180 }, (_, i) => {
     const left = i % 2 === 0
     return {
@@ -16,7 +18,7 @@ export function confetti(colors: string[]) {
       h: 4 + Math.random() * 6,
       turn: Math.random() * Math.PI,
       spin: (Math.random() - 0.5) * 0.4,
-      color: colors[i % colors.length],
+      color: colors[i % colors.length] ?? '#ffffff',
     }
   })
   const started = performance.now()

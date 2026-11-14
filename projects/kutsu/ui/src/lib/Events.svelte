@@ -15,10 +15,10 @@
   const next = $derived(app.presets.map(upcoming))
   // each suggestion with up to two employers' news as its reason; one employer's news is a reason only once
   const ideas = $derived.by(() => {
-    const used = new Set<string>()
+    const used: string[] = []
     return suggested().map((plan): { plan: Plan; reasons: Invitee[] } => {
-      const reasons = plan.employers.filter((e) => recent(e) && !used.has(e.brief.id)).slice(0, 2)
-      for (const e of reasons) used.add(e.brief.id)
+      const reasons = plan.employers.filter((e) => recent(e) && !used.includes(e.brief.id)).slice(0, 2)
+      used.push(...reasons.map((e) => e.brief.id))
       return { plan, reasons }
     })
   })

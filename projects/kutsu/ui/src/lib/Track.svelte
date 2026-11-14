@@ -7,7 +7,7 @@
   // Where the brief is on its way to the company and back, and the one thing to do next.
   let { brief, review }: { brief: Brief; review: Review } = $props()
   let copied = $state(false)
-  const at = $derived({ draft: 0, invited: 1, joined: 2 }[review.status] ?? 0)
+  const at = $derived({ draft: 0, invited: 1, joined: 2 }[review.status])
   const coming = $derived(isComing(brief.id))
   const names = $derived(stateNames(coming))
   const stops = $derived([
@@ -21,7 +21,7 @@
   const send = () => (saveReview(brief.id, { ...review, status: 'invited', invited_at: now() }), copy())
   const takeBack = () => saveReview(brief.id, { ...review, status: 'draft', invited_at: undefined, joined_at: undefined })
   async function copy() {
-    await copyLink(brief.id)
+    if (!(await copyLink(brief.id))) return
     copied = true
     setTimeout(() => (copied = false), 1600)
   }
@@ -29,7 +29,7 @@
 
 <div class="track">
   <ol>
-    {#each stops as [label, detail], i}
+    {#each stops as [label, detail], i (label)}
       <li class:done={i < at || at === 2} class:now={i === at && at < 2} aria-current={i === at ? 'step' : undefined}>
         <span class="dot">{#if i < at || at === 2}<Icon name="check" size={14} />{/if}</span>
         <span class="text"><b>{label}</b><small>{detail}</small></span>

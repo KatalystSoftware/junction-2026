@@ -32,6 +32,11 @@
     if (review.events?.includes(plan.slug)) return { status: 'invited', says: 'Invited' }
     return review.status === 'joined' ? { status: 'joined', says: 'Profile confirmed' } : undefined
   }
+  /** Nothing left to send: signed up for this event, or, for an event whose employers are already coming, profile confirmed. */
+  const settled = (e: Invitee) => {
+    const at = standing(e)
+    return !!at && (at.says === 'Signed up' || (plan.coming && at.says === 'Profile confirmed'))
+  }
   /** What the person pastes into their own message: why now, and the link to a sign-up that is already filled in. */
   const message = (e: Invitee) =>
     plan.coming
@@ -52,7 +57,7 @@
     const events = plan.coming ? review.events : [...new Set([...(review.events ?? []), plan.slug])]
     if (review.status === 'draft') await saveReview(e.brief.id, { ...review, status: 'invited', invited_at: new Date().toISOString(), events })
     else if (!plan.coming && !review.events?.includes(plan.slug)) await saveReview(e.brief.id, { ...review, events })
-    await copyText(message(e))
+    if (!(await copyText(message(e)))) return
     copied = e.brief.id
     setTimeout(() => (copied = ''), 1600)
   }
@@ -83,14 +88,14 @@
             <div>
               <a class="name" href="#/{encodeURIComponent(e.brief.id)}">{nameOf(e.brief)}</a>
               <p class="roles" title={e.roles.map((r) => r.title).join(', ')}>
-                {e.roles[0]?.title ?? 'No role drafted'}{#if e.roles.length > 1}{' '}<span>+{e.roles.length - 1}</span>{/if}
+                {e.roles[0]?.title ?? 'No role drafted'}{#if e.roles.length > 1}<span>+{e.roles.length - 1}</span>{/if}
               </p>
               {#if e.news}<p class="why">{e.news.line}, {when(e.news.date)}{#if source}<Cite signal={source} n={1} />{/if}</p>{/if}
               <a class="see" href={joinLink(e.brief.id, link)} target="_blank" rel="noopener">Their sign-up<Icon name="out" size={14} /></a>
             </div>
             <div class="act">
               {#if status}<span class="state {status.status}">{status.says}</span>{/if}
-              {#if status?.says !== 'Signed up' && status?.says !== 'Profile confirmed' || !plan.coming && status?.says === 'Profile confirmed'}
+              {#if !settled(e)}
                 <button class="btn" onclick={() => invite(e)}>
                   <Icon name={copied === e.brief.id ? 'check' : 'copy'} size={16} />{copied === e.brief.id ? 'Copied, ready to paste' : 'Copy invitation'}
                 </button>
@@ -286,6 +291,7 @@
     line-height: 1.35;
   }
   .roles span {
+    margin-left: 0.35em;
     color: var(--ink-2);
   }
   .see {

@@ -37,17 +37,22 @@ python3 pool.py                                                                 
 
 `serve.py` without `sops exec-env` still shows every stored company; only new searches need keys.
 
-The test has two parts. `check` type-checks the page and fails on any warning; `deploy.sh` runs it
-first and stops there if it fails. `walk` needs `serve.py` running: it opens every screen in a
-headless Chromium, signs one company up by pressing Enter until the finished page, and fails on any
-error the page reports. `npm --prefix ui run lint` is ESLint with typescript-eslint's strict
-type-checked rules; it still reports 83 findings and is not part of the check yet.
+The test has two parts. `check` is the gate: `deploy.sh` runs it before it builds or copies anything
+and stops if it fails. It runs, in order:
 
-The **Demo** button belongs to the demo, not the product. It is out of sight until the pointer is in
-the top right corner (on a phone it stays faintly visible). It moves between the
-three people Kutsu is for (Espoo's organiser, an invited company, a candidate), fills in example
-sign-ups so the screens can be seen in use, and clears every sign-up. An example sign-up is marked
-as one wherever it shows: no company did it.
+- `svelte-check`, failing on any warning, with `strict` and `noUncheckedIndexedAccess` on;
+- ESLint with typescript-eslint's strict type-checked rules and eslint-plugin-svelte, failing on any
+  warning. Every list in the page must be keyed, non-null assertions and unsafe `any` are errors. One
+  rule option differs from the preset: a number may stand in a template string
+  (`restrict-template-expressions`, `allowNumber`). No rule is turned off for the page; the two
+  config files and the headless walk are linted without type information, being outside the page's
+  TypeScript project;
+- `test_data.py`: every list the page keys has unique keys in the committed data, the server refuses
+  a saved sign-up the page could not key (one shaped like older builds' among them), and reading a
+  person's profile writes no file and prints nothing of the person.
+
+`walk` needs `serve.py` running: it opens every screen in a headless Chromium, signs one company up
+by pressing Enter until the finished page, and fails on any error the page reports.
 
 ## A person's profile, filled in from what they hand over
 

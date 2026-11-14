@@ -3,4 +3,7 @@ import './app.css'
 import { mount } from 'svelte'
 import App from './App.svelte'
 
-export default mount(App, { target: document.getElementById('app')! })
+const target = document.getElementById('app')
+if (!target) throw new Error('index.html has no #app element to mount the page on')
+
+export default mount(App, { target })

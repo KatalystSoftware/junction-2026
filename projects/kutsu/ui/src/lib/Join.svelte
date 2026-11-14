@@ -86,7 +86,8 @@
   // a new card starts at its top, also when the last one was read to its end on a phone
   $effect(() => {
     const key = current.key
-    if (shown && shown !== key && bench && bench.getBoundingClientRect().top < 0) void tick().then(() => bench?.scrollIntoView({ block: 'start' }))
+    const card = bench
+    if (shown && shown !== key && card && card.getBoundingClientRect().top < 0) void tick().then(() => { card.scrollIntoView({ block: 'start' }) })
     shown = key
   })
 
@@ -255,7 +256,7 @@
                 {#if tell.length > SHOWN && !more}<button class="rest" onclick={() => (more = true)}><Icon name="plus" size={14} />{tell.length - SHOWN} more we could tell</button>{/if}
               {/if}
             {:else if item.kind === 'role'}
-              <Role {brief} need={item.need} change={(p) => { patch(item.need.id, p) }} />
+              <Role {brief} need={item.need} change={(p: Partial<Need>) => { patch(item.need.id, p) }} />
             {:else}
               <h2>Anyone else?</h2>
               {#if drafting}

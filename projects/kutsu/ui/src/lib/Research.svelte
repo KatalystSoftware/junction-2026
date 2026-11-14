@@ -4,7 +4,10 @@
   import type { Step } from './types'
 
   // Research as it happens: each line is something the server has actually just done.
-  const run = $derived(app.research!)
+  // shown only while a search runs; between two renders it may already be over
+  const run = $derived(app.research ?? { query: '', steps: [], error: '' })
+  /** A fact the server reported, as text: facts arrive untyped. */
+  const say = (fact: unknown) => (typeof fact === 'string' || typeof fact === 'number' ? String(fact) : '')
   const last = (stage: Step['stage']) => run.steps.findLast((s) => s.stage === stage)
   const identity = $derived(last('identity'))
   const search = $derived(last('search'))
@@ -16,40 +19,40 @@
     {
       done: !!identity,
       now: !identity,
-      text: identity ? (identity.name ? `This is ${identity.name}, ${identity.domain}` : 'No brand record found, searching by name') : 'Finding out who this is',
+      text: identity ? (identity.name ? `This is ${say(identity.name)}, ${say(identity.domain)}` : 'No brand record found, searching by name') : 'Finding out who this is',
     },
     {
       done: !!(careers || read),
       now: !!search && !careers && !read,
       text: careers || read
-        ? `${(careers ?? read)!.pages} pages found on the open web`
+        ? `${say((careers ?? read)?.pages)} pages found on the open web`
         : search
-          ? `Searching the web, ${Number(search.done) + 1} of ${search.of}: ${search.pages} pages so far`
+          ? `Searching the web, ${String(Number(search.done) + 1)} of ${say(search.of)}: ${say(search.pages)} pages so far`
           : 'Search the open web',
     },
-    { done: !!check, now: !!read && !check, text: read ? `Reading ${read.pages} pages` : 'Read every page' },
+    { done: !!check, now: !!read && !check, text: read ? `Reading ${say(read.pages)} pages` : 'Read every page' },
     {
       done: !!card,
       now: !!check && !card,
-      text: check ? `Checking ${check.statements} statements word for word against their pages` : 'Check every quote against its page',
+      text: check ? `Checking ${say(check.statements)} statements word for word against their pages` : 'Check every quote against its page',
     },
-    { done: false, now: !!card, text: card ? `Drafting who they need from ${card.statements} checked statements` : 'Draft who they need' },
+    { done: false, now: !!card, text: card ? `Drafting who they need from ${say(card.statements)} checked statements` : 'Draft who they need' },
   ])
 </script>
 
 <section class="research">
   <div class="plate" class:dark={identity?.logo_on === 'dark'}>
-    {#if identity?.logo}<img src={String(identity.logo)} alt="" />{/if}
+    {#if typeof identity?.logo === 'string'}<img src={identity.logo} alt="" />{/if}
   </div>
   <div class="body">
-    <h1>{identity?.name ?? run.query}</h1>
+    <h1>{say(identity?.name) || run.query}</h1>
     {#if identity?.slogan}<p class="slogan">{identity.slogan}</p>{/if}
     {#if run.error}
       <p class="error" role="alert">{run.error}</p>
       <button class="btn" onclick={() => (app.research = null)}>Back to the list</button>
     {:else}
       <ol aria-live="polite">
-        {#each lines as line}
+        {#each lines as line (line.text)}
           <li class:done={line.done} class:now={line.now}>
             <span class="dot">{#if line.done}<Icon name="check" size={14} />{/if}</span>{line.text}
           </li>
