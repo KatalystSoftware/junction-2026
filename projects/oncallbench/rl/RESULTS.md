@@ -78,8 +78,13 @@ step 10 0.539 / 0.051 / 0.080.
 
 Gemma 4 26B-A4B (`google/gemma-4-26B-A4B-it`), post-trained with a rank-32 LoRA adapter on the
 reference's demos, goes from 0.10 / 0.04 to **0.75 / 0.55** on the held-out seeds at levels 3 / 4,
-the two hardest levels, where the untrained Qwen above scores 0.02 at level 3. The adapter was trained
-on Verda and evaluated on Modal. Every Gemma row below uses the same simulator build (`sim`
+the two hardest levels. The adapter was trained on Verda and evaluated on Modal; it is public at
+<https://storage.googleapis.com/katalyst-fyi-models/oncallbench/gemma4-26b-a4b-sft/> (sha256 below).
+
+Every score here comes from our own runner (env.py): the simulator in-process, at most 48 replies of
+up to 4 tool calls, a 32k context. It is the same reward against the same reference, but not the
+Harbor + OpenCode harness that produced the Opus numbers in the README, so the two are not
+comparable. The Harbor + OpenCode runs of the same two models are in their own table below. Every Gemma row below uses the same simulator build (`sim`
 `eb8d08f157d7` in `out/evals.jsonl` and in the Modal run summaries), sampling at T 1.0 and a 32k
 context. The mean score is ± one standard error.
 
@@ -207,8 +212,10 @@ Winner: WINNER.
   conversation is cut at 16k tokens (32k for Gemma); either cut finishes the shift for the agent and
   charges the rest, as `finish` does. The reference polls every minute (about 480 calls a shift),
   which no context holds.
-- **Seeds**: held-out 101-106 are only evaluated. SFT demos come from build seeds 1-12 and training
-  seeds 200-399; RL draws training seeds from 1000 up.
+- **Seeds**: held-out 101-106 are held out from training: no demo, RL rollout or tuning of the
+  reference used them. They are the seeds the frontier models were run on while the levels were
+  built. SFT demos come from build seeds 1-12 and training seeds 200-399; RL draws training seeds
+  from 1000 up.
 - **Training**: one token sequence per episode built from the model's own chat template, so rollouts,
   SFT and RL see identical tokens. RL is group-relative policy gradient: 8 seeds × 8 rollouts per
   step, advantage = reward − group mean, one on-policy step per batch, token-averaged loss, no KL,
