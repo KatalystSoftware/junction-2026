@@ -78,7 +78,7 @@
 </script>
 
 <main>
-  <a class="back" href="#/"><Icon name="back" size={16} />Events</a>
+  <a class="back" href="#/events"><Icon name="back" size={16} />Events</a>
   <header>
     <h1>{plan.title}</h1>
     {#if plan.date}

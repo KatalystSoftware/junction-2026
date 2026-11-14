@@ -8,12 +8,26 @@ Each side waits for the other: companies ask which candidates will be there, and
 once they know which companies come. Kutsu keeps what past events taught (who came, and what
 employers said they need) and uses it to answer both before either has signed up:
 
-- **Events** (`#/`): the event being prepared, suggested next events, and past events. A suggestion
-  is a field of work where employers have said in public that they need people and the pool of past
-  attendees already has them.
-- **One event** (`#/event/<slug>`): the employers to invite, each with the news that makes now the
-  moment, and the people to invite, as counts. It also writes the sentence each invitation can open
-  with: how many such people there are, and which employers have said what they look for.
+Espoo's side has five sections, each with its own address, named in a navigation at the left (a bar
+across the top on a phone):
+
+- **Home** (`#/`): the state of things at a glance. The upcoming event and how its sign-ups are
+  filling, three proposed events, a snapshot of the talent pool, the companies with the newest news
+  or changes, and what is waiting for a decision. Each block leads to its full page.
+- **Events** (`#/events`): the upcoming events, every proposed event, and past events. A proposal is
+  a field of work where employers have said in public that they need people and the pool of past
+  attendees already has them. One event (`#/event/<slug>`) shows the employers, each with the news
+  that makes now the moment, and the people to invite, as counts.
+- **Companies** (`#/companies`): every employer Kutsu knows, where each one's sign-up stands, and the
+  search that finds or adds any other. One company is at `#/<id>`.
+- **Talent pool** (`#/pool`): the people who came to earlier events, as counts by field, level and
+  language. Nobody is shown as a person.
+- **Applications** (`#/applications`): the applications to the upcoming event, to accept or decline
+  with a reason. Each event's own are at `#/event/<slug>/applications`.
+
+Two flows sit outside that navigation, because a company or a person opening an invitation should
+see their own flow and not the back office:
+
 - **The company's sign-up** (`#/join/<id>`): an invitation in the company's own logo and colours that
   is already filled in. Who it is, what we would tell candidates about it, who it wants to meet, and
   on each role how many people in the pool do that work. The company agrees, corrects, and is in.

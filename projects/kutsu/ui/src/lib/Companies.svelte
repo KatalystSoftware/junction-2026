@@ -7,7 +7,7 @@
   import { app, go, nameOf, research, reviewOf, route, stateNames } from './state.svelte'
   import type { Brief, Status } from './types'
 
-  // The city's side of the screen: which employers there are, and where each brief stands.
+  // The employer pool: every company Kutsu knows, where each one's sign-up stands, and the way to find or add any other.
   // the chosen shortcut; -1 is none, which lists every company
   let group = $state(0)
   let query = $state('')
@@ -63,12 +63,8 @@
   }
 </script>
 
-<aside>
-  <div class="head">
-    <a class="name" href="#/">Kutsu</a>
-    <p>Plan the next event from the last ones: who to invite, and a sign-up that is already filled in.</p>
-  </div>
-  <a class="events" href="#/" aria-current={route().id ? undefined : 'page'}>Events</a>
+<main>
+  <h1>Companies</h1>
 
   <form onsubmit={submit}>
     <Icon name="search" size={18} />
@@ -103,51 +99,34 @@
       <p class="empty">No company here is called “{query.trim()}”. Press Enter to research it.</p>
     {/each}
   </nav>
-</aside>
+</main>
 
 <style>
-  aside {
-    position: sticky;
-    top: 0;
+  /* The list was drawn for the city's dark rail; as a page it sits on the light ground, so the rail's
+     colours are named anew here and every rule below keeps working. */
+  main {
+    --city: var(--ground);
+    --city-raise: var(--wash);
+    --city-line: var(--line);
+    --city-ink: var(--ink);
+    --city-dim: var(--ink-2);
     display: flex;
     flex-direction: column;
     gap: var(--s4);
-    height: 100dvh;
-    padding: var(--s5) var(--s4) 0;
-    overflow-y: auto;
-    background: var(--city);
-    color: var(--city-ink);
-    scrollbar-color: var(--city-line) transparent;
+    max-width: 76rem;
+    padding: var(--s7) var(--s7) var(--s8) var(--s6);
   }
-  aside :focus-visible {
-    outline-color: var(--city-ink);
+  h1 {
+    font: 800 var(--t-2xl) / 0.95 var(--display);
+    letter-spacing: -0.035em;
   }
-  .head {
-    padding: 0 var(--s2);
+  form {
+    max-width: 32rem;
   }
-  .name {
-    font: 800 1.5rem / 1 var(--display);
-    letter-spacing: -0.03em;
-    text-decoration: none;
-  }
-  .events {
-    padding: var(--s2) var(--s3);
-    border-radius: var(--r1);
-    font-weight: 600;
-    text-decoration: none;
-  }
-  .events:hover {
-    background: var(--city-raise);
-  }
-  .events[aria-current] {
-    background: var(--city-ink);
-    color: var(--city);
-  }
-  .head p {
-    margin-top: var(--s2);
-    font-size: var(--t-sm);
-    line-height: 1.35;
-    color: var(--city-dim);
+  ul {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+    gap: 0 var(--s4);
   }
   form {
     display: flex;
@@ -313,39 +292,8 @@
     color: var(--city-dim);
   }
   @media (max-width: 820px) {
-    aside {
-      position: static;
-      height: auto;
-      padding-bottom: var(--s3);
-    }
-    .head p,
-    .count,
-    h2 {
-      display: none;
-    }
-    nav {
-      display: flex;
-      gap: var(--s1);
-      margin: 0 calc(-1 * var(--s4));
-      padding: 0 var(--s4) var(--s2);
-      overflow-x: auto;
-      scrollbar-width: none;
-    }
-    ul {
-      display: flex;
-      gap: var(--s1);
-    }
-    li a {
-      grid-template-columns: 2.75rem;
-      width: 5.5rem;
-      justify-items: center;
-      text-align: center;
-    }
-    .who small {
-      display: none;
-    }
-    .who b {
-      font-size: var(--t-xs);
+    main {
+      padding: var(--s6) var(--s4) var(--s7);
     }
   }
 </style>

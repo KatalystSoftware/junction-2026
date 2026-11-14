@@ -2,15 +2,19 @@
   import { brandOf } from './lib/brand'
   import Demo from './lib/Demo.svelte'
   import Events from './lib/Events.svelte'
-  import { plans } from './lib/events'
+  import { plans, upcoming } from './lib/events'
   import Find from './lib/Find.svelte'
+  import Icon from './lib/Icon.svelte'
   import Join from './lib/Join.svelte'
   import Ledger from './lib/Ledger.svelte'
   import Needs from './lib/Needs.svelte'
   import Person from './lib/Person.svelte'
   import Applications from './lib/Applications.svelte'
   import Plan from './lib/Plan.svelte'
-  import Rail from './lib/Rail.svelte'
+  import Companies from './lib/Companies.svelte'
+  import Home from './lib/Home.svelte'
+  import Nav from './lib/Nav.svelte'
+  import Pool from './lib/Pool.svelte'
   import Research from './lib/Research.svelte'
   import Stage from './lib/Stage.svelte'
   import Track from './lib/Track.svelte'
@@ -24,6 +28,8 @@
   const brief = $derived(app.briefs.find((b) => b.id === at.id))
   const plan = $derived(at.event ? plans().find((p) => p.slug === at.event) : undefined)
   const review = $derived(brief && reviewOf(brief))
+  // the applications page shows the upcoming event's; each event's own stay at its address
+  const forum = $derived(app.presets[0] ? upcoming(app.presets[0]) : undefined)
   const brand = $derived(
     brandOf(app.research ? ((app.research.steps.findLast((s) => s.stage === 'identity')?.colors as string[] | undefined) ?? []) : brief?.identity?.colors),
   )
@@ -47,15 +53,24 @@
       {#if app.research}<Research />{:else if brief}<Join {brief} />{:else if at.id}<p class="missing">This invitation does not point to a company we know.</p>{:else}<Find />{/if}
     {:else}
       <div class="shell">
-        <Rail />
+        <Nav />
         <div class="work">
           {#if app.research}
             <Research />
           {:else if plan}
             {#key plan.slug + at.tab + at.company}{#if at.tab === 'applications'}<Applications {plan} company={at.company} />{:else}<Plan {plan} />{/if}{/key}
-          {:else if !brief || !review}
+          {:else if at.page === 'events'}
             <Events />
+          {:else if at.page === 'companies'}
+            <Companies />
+          {:else if at.page === 'pool'}
+            <Pool />
+          {:else if at.page === 'applications' && forum}
+            <Applications plan={forum} />
+          {:else if !brief || !review}
+            <Home />
           {:else}
+            <a class="back" href="#/companies"><Icon name="back" size={16} />Companies</a>
             <Stage {brief} />
             <Track {brief} {review} />
             <main>
@@ -85,8 +100,22 @@
 <style>
   .shell {
     display: grid;
-    grid-template-columns: var(--rail) minmax(0, 1fr);
+    grid-template-columns: 13rem minmax(0, 1fr);
     min-height: 100dvh;
+  }
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s1);
+    min-height: 2.75rem;
+    padding: 0 var(--s6);
+    font-size: var(--t-sm);
+    font-weight: 600;
+    color: var(--ink-2);
+    text-decoration: none;
+  }
+  .back:hover {
+    color: var(--ink);
   }
   main {
     display: grid;
@@ -137,7 +166,8 @@
   }
   @media (max-width: 820px) {
     .shell {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
+      align-content: start;
     }
     main {
       padding: var(--s6) var(--s5) var(--s7);
