@@ -205,7 +205,7 @@
     if (!data || !data.models.length || params.get("spread") === "0") return;
     const at = (v) => `${(Math.max(0, Math.min(1, v)) * 100).toFixed(2)}%`, two = (v) => v.toFixed(2);
     const rows = data.models.length;
-    const how = `Level ${data.level}, seeds ${data.seeds.join(", ")}, ${data.source}. The mean counts each seed once; `
+    const how = `Level ${data.level}, seeds ${data.seeds}, ${data.source}. The mean counts each seed once; `
       + `its 95% interval is over the seed means (Student's t), because runs on one seed share its outage.`;
     box.replaceChildren(...[
       h("p", { class: "spread-caption", style: "grid-row: 1" }, data.caption,
@@ -309,7 +309,8 @@
             const here = r.seed === ses.seed && ses.runs.find((run) => run.kind === "trial");
             return h("td", {}, chip({ ...r, trial: here ? here.id : null }));
           }))),
-        h("p", { class: "quiet", text: `${head.fresh.source}. The replays here are of these seeds: the shipped tasks' episodes are never published. Click the score with a border to watch this seed's run.` }),
+        h("p", { class: "quiet", text: `${head.fresh.source}. The shipped tasks' episodes are never published.`
+          + (head.fresh.runs.some((r) => r.seed === ses.seed) ? " Click the score with a border to watch this seed's run." : "") }),
       ] : null,
     ].flat().filter(Boolean));
   }

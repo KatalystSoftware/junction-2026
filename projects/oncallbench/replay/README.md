@@ -14,7 +14,7 @@ xdg-open index.html   # macOS: open index.html
 ```
 
 The page is static and has no dependencies; it opens straight from disk with the committed
-bundles in `data/`. Level 4, seed 109 opens first; seed 108 is the second tab in the bar.
+bundles in `data/`. Level 4, seed 418 opens first; seeds 108 and 109 are the other tabs in the bar.
 
 ## Add or refresh an episode
 
@@ -42,6 +42,9 @@ flake: `nix develop -c python3 export.py ...`.
 - `--jobs <folder>` adds the agent trials of that episode found in a Harbor jobs folder; `--trial
   <folder>` adds one trial. `--only a,b` keeps the trials whose job name contains one of the strings.
   A job run with several attempts gives one run per attempt, named `<job>-<attempt>`.
+  Trials of `../run.sh`'s task copies (`aq-incident-<hash>__...`) and of exported tasks
+  (`seed-<seed>__...`, from `../export-tasks.sh`, whose level and seed are read from the task's
+  MCP server) are both recognised.
 - `--policies a,b` picks the scripted policies shown next to the reference.
 - A bundle keeps its trials' action logs and words, so later exports of the same episode keep them
   without the Harbor folders. `--fresh` drops them.
@@ -83,18 +86,19 @@ Every number on the page comes from the simulator and reference on `main`. The r
 matches the closing report at the top of `../LOOP.md`: level 4 as shipped (round 10's
 instruction), graded against the round-11 reference.
 
-Both episodes are fresh seeds with the one Opus 5.5 run each made on the task as shipped
-(round 13). The runs on the shipped seeds 101 to 103 are not replayed here: their bundles would be
-the tasks' answer keys.
+Every episode is a seed no task ships, with one run made on the task as shipped. The runs on the
+shipped seeds 101 to 103 are not replayed here: their bundles would be the tasks' answer keys.
 
-| Episode | Opus 5.5 | What happened |
+| Episode | Run | What happened |
 | --- | --- | --- |
-| **Level 4, seed 109** (`data/l4-s109.js`), opens first | 0.36 | Level with the reference until minute 34. Then it rolled back search-svc without adding capacity first: retries overloaded it and web-storefront went to 72% errors. Minutes 34 to 46 cost it $163,000, the reference $42,000. |
-| Level 4, seed 108 (`data/l4-s108.js`) | 0.34 | The same mistake on checkout-svc, then a 50% throttle once the storm had started. Minutes 34 to 46 cost it $132,000, the reference $36,000. |
+| **Level 4, seed 418** (`data/l4-s418.js`), opens first | Claude Fable 5.2, 0.26 (round 15) | Level with the reference until minute 25. Then it rolled back media-svc without adding capacity first: retries overloaded it and admin-portal, which earns $19,300 a minute, went to 80% errors. Minutes 25 to 34 cost it $112,000, the reference $10,000. |
+| Level 4, seed 109 (`data/l4-s109.js`) | Opus 5.5, 0.36 (round 13) | Level with the reference until minute 34. Then it rolled back search-svc without adding capacity first: retries overloaded it and web-storefront went to 72% errors. Minutes 34 to 46 cost it $163,000, the reference $42,000. |
+| Level 4, seed 108 (`data/l4-s108.js`) | Opus 5.5, 0.34 (round 13) | The same mistake on checkout-svc, then a 50% throttle once the storm had started. Minutes 34 to 46 cost it $132,000, the reference $36,000. |
 
-Seed 109 opens because its run is the clearest case of the level's decisive moment: the agent
-matches the reference until the quiet fault, rolls back unprotected, and says so in its own
-closing message. The scripted baselines (unprotected rollbacks, do nothing and the others) are in
+Seed 418 opens because it shows the level's decisive moment on the newest model: Fable 5.2
+matches the reference until the quiet fault, rolls back unprotected ("I started the rollback
+before checking its headroom"), and costs the most in the ten minutes after. Seed 109 is the
+same mistake by Opus 5.5. The scripted baselines (unprotected rollbacks, do nothing and the others) are in
 the run picker.
 
 The strip in the bar shows all nine Opus scores on the shipped seeds (mean 0.32, median 0.18,
@@ -106,23 +110,24 @@ table.
 
 ## The scores band
 
-Above the replay, one row per model: a dot for every run on the pre-registered level-4 seeds
-(404, 418, 500, 502, 503 and 504, three runs per model per seed), its mean as a tick with the 95%
-interval as a bar, and the numbers on the right. The reference's 1.00 and doing nothing's 0.00 are
+Above the replay, one row per model: a dot for every run on the 24 common level-4 seeds 200000
+to 200023 (Opus 5.5 twice per seed, the others once), its mean as a tick with the 95% interval as
+a bar, and the numbers on the right. The reference's 1.00 and doing nothing's 0.00 are
 the two walls. It shows the gap holds over repeated runs, not one seed and one run.
 
 ```
 python3 export.py --spread && ./deploy.sh   # pick up new runs from ../metrics.json and ship them
 ```
 
-- The runs are `../metrics.json` rows of round 15, level 4, with `run` = `fable`, `opus`,
-  `gemma-ft` or `gemma-base`. `notes.json` under `spread` sets the round, the seeds, the models
+- The runs are `../metrics.json` rows of round 16, level 4, with `run` = `opus`, `fable`,
+  `gemma-base` or `gemma-ft`. Only Harbor trials count (a `trial` of `<job>/<trial>__<id>`):
+  scores from another harness, such as `../rl/`'s own runner, are left out with a note. `notes.json` under `spread` sets the round, the seeds, the models
   in order with their labels, and the caption. A model with no runs yet has no row, and with no
   runs at all the band is not drawn, so the page looks as it did before. To drop a model, delete
   its line there. Runs on other seeds are left out, with a note.
 - The mean counts each seed once. Its 95% interval comes from the seed means (Student's t, seeds
   minus one degrees of freedom), because the runs on one seed share its outage and are not
-  independent. With six seeds that is wider than a t-interval over the 18 runs would be.
+  independent. That is wider than a t-interval over every run would be.
 - It carries scores only, no actions or faults, so it is safe for any seed.
 - `--metrics <file>` reads another file of rows in the same shape, for a look at the band before
   the runs exist. The output is marked as a placeholder, the page says so in red, and `deploy.sh`
@@ -157,12 +162,13 @@ python3 export.py --spread && ./deploy.sh   # pick up new runs from ../metrics.j
 ### For a screen recording
 
 ```
-https://incident.katalyst.fyi/?seed=109&autoplay=1&seconds=25&pause=key&zoom=1.1
+https://incident.katalyst.fyi/?seed=418&autoplay=1&seconds=25&pause=key&zoom=1
 ```
 
-That plays seed 109 from 12 minutes before the page and stops at minute 37, three minutes after
-the unprotected rollback, with web-storefront at 71% errors. `?seed=109&t=37&zoom=1.1` opens
-paused on that minute for a still.
+That plays seed 418 from 12 minutes before the page and stops at minute 28, three minutes after
+Fable's unprotected rollback, with admin-portal at 70% errors against 4% for the reference.
+`?seed=418&t=28&zoom=1` opens paused on that minute for a still. For Opus on seed 109 the same
+moment is `?seed=109&t=37`.
 
 - `seed=109` (with `level=4` if several levels share a seed) opens that episode; `run=<run id>`
   picks another run than the one that opens.
@@ -225,7 +231,7 @@ files. Shape:
   made (the replica count, the throttle share, a shared word). Otherwise the action has its
   rule number at most and the page shows the plain action. On eight episodes (levels 3 and 4,
   seeds 1 and 101 to 103) all 54 mitigations and throttles of the reference get a reason this way.
-  On seeds 108 and 109, 20 of 22 do: the rollback of a leaking deploy, which the reference finds
+  On seeds 108, 109 and 418, 31 of 34 do: the rollback of a leaking deploy, which the reference finds
   from memory rather than from a log line that matches the diff, shows only its rule.
 - **Details are on demand.** The first screen is the two estates, the counters, the line on what
   each run is doing, play and the timeline. The key, the score's definition, each fault's lane,
@@ -277,7 +283,7 @@ files. Shape:
   both runs lose is pale and what only the agent loses is full red: the red area is the gap.
 - **Agent's words** during the run are matched to the receipt by walking the trajectory's tool
   calls in order. Quotes on pinned moments are from the run's closing message (in the bundle as
-  its `report`), verbatim apart from a capital at the start and the bold markers.
+  its `report`), verbatim apart from a capital at the start and the bold and code markers.
 - **Look.** A light page, because it is projected in a lit hall. Two inks: blue-black for what is,
   red for what is lost. Amber marks noise (the decoy), blue marks the run at work. One moving
   thing: failures flowing up the links toward the edge, as thick as the share of calls failing.

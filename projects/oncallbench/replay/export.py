@@ -53,7 +53,7 @@ POLICY_LABELS = {
     "unprotected": "Unprotected rollbacks", "forgetful": "Never lifts a throttle",
 }
 MODELS = {
-    "claude-opus-5-5": "Claude Opus 5.5", "claude-sonnet-5-5": "Claude Sonnet 5.5",
+    "claude-fable-5-2": "Claude Fable 5.2", "claude-opus-5-5": "Claude Opus 5.5", "claude-sonnet-5-5": "Claude Sonnet 5.5",
     "gemini-3.1-pro-preview": "Gemini 3.1 Pro",
     # served from Modal by ../rl/modal_serve.py; the adapter is ../rl/RESULTS.md's SFT adapter
     "gemma26-base": "Gemma 4 26B-A4B (untrained)", "gemma26-sft": "Gemma 4 26B-A4B + our SFT adapter",
@@ -312,21 +312,42 @@ def variants(incident):
             for level in incident.LEVELS for seed in range(2000)}
 
 
+def episode_of(path, config):
+    """The level and seed of a trial run from an exported task (../export-tasks.sh writes
+    tasks-custom/seed-<seed>, with SEED and LEVEL in its MCP server): read from the task the trial
+    ran, which sits next to the jobs folder, else from the job's name (r<round>-l<level>-s<seed>-...)."""
+    seed = int(re.match(r"seed-(\d+)__", path.name)[1])
+    task = path.parents[2] / config.get("task", {}).get("path", "-") / "environment/mcp-server/server.py"
+    if task.exists():
+        found = dict(re.findall(r"^(SEED|LEVEL) = (\d+)", task.read_text(), re.M))
+        if int(found.get("SEED", -1)) == seed and "LEVEL" in found:
+            return int(found["LEVEL"]), seed
+    named = re.search(r"-l(\d+)-s(\d+)-", path.parent.name)
+    if named and int(named[2]) == seed:
+        return int(named[1]), seed
+    return None
+
+
 def read_trial(incident, path, known):
     """A Harbor trial folder -> its episode, action log and, where the agent kept a trajectory,
     what it said around each call. None when the folder is not a finished trial of this task."""
     path = Path(path)
     receipt, config = path / "artifacts/ledger/receipt.json", path / "config.json"
     variant = re.match(r"aq-incident-([0-9a-f]{8})__", path.name)
-    if not (receipt.exists() and config.exists() and variant and variant[1] in known):
+    if not (receipt.exists() and config.exists()):
         return None
-    level, seed = known[variant[1]]
+    if variant and variant[1] in known:  # run.sh's task copies are named by a hash of level and seed
+        level, seed = known[variant[1]]
+    elif re.match(r"seed-\d+__", path.name) and episode_of(path, json.loads(config.read_text())):
+        level, seed = episode_of(path, json.loads(config.read_text()))
+    else:
+        return None
     receipt, agent = json.loads(receipt.read_text()), json.loads(config.read_text())["agent"]
     if receipt.get("sig") != incident.sign(receipt["actions"]):
         print(f"skipped {path.parent.name}: the receipt's signature does not match", file=sys.stderr)
         return None
     model = (agent.get("model_name") or "").split("/")[-1]
-    several = len(list(path.parent.glob("aq-incident-*__*"))) > 1  # a job run with several attempts
+    several = len([p for p in path.parent.iterdir() if p.is_dir() and "__" in p.name]) > 1  # several attempts
     name = f"{path.parent.name}-{path.name.split('__')[-1]}" if several else path.parent.name
     trial = dict(seed=seed, level=level, actions=receipt["actions"], id=name, scripted=not model,
                  label=MODELS.get(model, model) or POLICY_LABELS.get(agent.get("env", {}).get("POLICY"), agent["name"]),
@@ -722,6 +743,12 @@ def spread(cfg, metrics, placeholder=False):
     independent samples of the model."""
     rows = [r for r in json.loads(Path(metrics).read_text())
             if r.get("round") == cfg["round"] and r.get("level") == cfg["level"] and r.get("score") is not None]
+    # Harbor trials only (<job>/<trial>__<id>): scores from another harness, such as rl/'s own runner, stay out
+    harbor = [r for r in rows if re.fullmatch(r"[^/\s]+/[^/\s]+__[A-Za-z0-9]+", r.get("trial") or "")]
+    if len(harbor) < len(rows):
+        print(f"note: spread leaves out {len(rows) - len(harbor)} round-{cfg['round']} rows that are not Harbor trials",
+              file=sys.stderr)
+    rows = harbor
     models = []
     for run, label in cfg["models"]:
         mine = sorted((r for r in rows if r["run"] == run), key=lambda r: (r["seed"], r.get("trial", "")))
@@ -741,7 +768,9 @@ def spread(cfg, metrics, placeholder=False):
         models.append(dict(run=run, label=label, mean=round(statistics.mean(means), 4), n=len(mine), seeds=k,
                            **({"half": round(half, 4)} if half is not None else {}),
                            runs=[dict(seed=s, score=v, k=i) for s, vs in by.items() for i, v in enumerate(vs)]))
-    return dict(caption=cfg["caption"], level=cfg["level"], round=cfg["round"], seeds=cfg["seeds"], models=models,
+    seeds = sorted(cfg["seeds"])
+    named = f"{seeds[0]} to {seeds[-1]}" if seeds == list(range(seeds[0], seeds[-1] + 1)) else ", ".join(map(str, seeds))
+    return dict(caption=cfg["caption"], level=cfg["level"], round=cfg["round"], seeds=named, models=models,
                 source=f"{Path(metrics).name}, round {cfg['round']}", **({"placeholder": True} if placeholder else {}))
 
 
@@ -812,7 +841,7 @@ def main():
     asked = [Path(t) for t in opts.trial]
     folders = list(asked)
     for jobs in opts.jobs:
-        folders += sorted(p.parent for p in Path(jobs).glob("*/aq-incident-*__*/config.json"))
+        folders += sorted(p.parent for p in Path(jobs).glob("*/*__*/config.json"))
     found = [t for t in (read_trial(incident, f, known) for f in folders) if t]
     found = [t for t in found if (not t["scripted"] or any(t["id"].startswith(f.parent.name) for f in asked))
              and (not opts.only or any(s in t["id"] for s in opts.only.split(",")))]

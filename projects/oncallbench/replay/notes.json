@@ -1,36 +1,108 @@
 {
-  "open": "l4-s109",
+  "open": "l4-s418",
   "spread": {
-    "caption": "Every dot is one run on a seed nobody tuned on; the expert script scores 1.00.",
+    "caption": "Each dot is one run on one of 24 seeds no one tuned or trained on; the expert script scores 1.00.",
     "file": "../metrics.json",
-    "round": 15,
+    "round": 16,
     "level": 4,
     "seeds": [
-      404,
-      418,
-      500,
-      502,
-      503,
-      504
+      200000,
+      200001,
+      200002,
+      200003,
+      200004,
+      200005,
+      200006,
+      200007,
+      200008,
+      200009,
+      200010,
+      200011,
+      200012,
+      200013,
+      200014,
+      200015,
+      200016,
+      200017,
+      200018,
+      200019,
+      200020,
+      200021,
+      200022,
+      200023
     ],
     "models": [
-      [
-        "fable",
-        "Fable 5.2"
-      ],
       [
         "opus",
         "Opus 5.5"
       ],
       [
-        "gemma-ft",
-        "Gemma 4 26B-A4B fine-tuned on OnCallBench"
+        "fable",
+        "Fable 5.2"
       ],
       [
         "gemma-base",
         "Gemma 4 26B-A4B untrained"
+      ],
+      [
+        "gemma-ft",
+        "Gemma 4 26B-A4B fine-tuned on OnCallBench"
       ]
     ]
+  },
+  "l4-s418": {
+    "headline": {
+      "label": "Opus 5.5",
+      "file": "../loop-evidence/regrade-l4.json",
+      "receipts": "../loop-evidence/receipts",
+      "round": 10,
+      "run": "opus",
+      "others": {
+        "gemini": "Gemini 3.1 Pro",
+        "sonnet": "Sonnet 5.5"
+      },
+      "source": "LOOP.md closing report: level 4 as shipped, graded against the round-11 reference",
+      "fresh": {
+        "file": "../metrics.json",
+        "round": 13,
+        "source": "metrics.json, round 13: the task as shipped on seeds it does not ship, run once"
+      }
+    },
+    "order": [
+      "r15-l4-s418-fable-232853"
+    ],
+    "runs": {
+      "reference": {
+        "what": "Adds capacity to media-svc before rolling it back, so the rollback starts no storm. Throttles a service only for the minute its fix lands.",
+        "moments": [
+          {
+            "tool": "scale",
+            "service": "media-svc",
+            "label": "adds capacity first, then rolls back"
+          }
+        ]
+      },
+      "r15-l4-s418-fable-232853": {
+        "what": "Level with the reference until minute 25. Then it rolled back media-svc without adding capacity first: retries overloaded it and admin-portal, which earns $19,300 a minute, went to 80% errors. Minutes 25 to 34 cost it $112,000, the reference $10,000.",
+        "source": "metrics.json, round 15: the Claude Fable 5.2 run on seed 418, a seed no shipped task uses. Quotes are from its closing message.",
+        "moments": [
+          {
+            "tool": "rollback",
+            "service": "media-svc",
+            "label": "rolls back unprotected",
+            "quote": "Media-svc was already at 0.86 CPU, and I started the rollback before checking its headroom. The failures it caused pushed it over capacity, and admin-portal ran at roughly 43–70% errors from about minute 26 to 34.",
+            "told": "A service close to capacity"
+          },
+          {
+            "tool": "throttle",
+            "service": "media-svc",
+            "percent": 15,
+            "quote": "My first attempt to drain it with a throttle lifted too early and the storm persisted for three more minutes.",
+            "told": "`throttle(service, percent)`"
+          }
+        ]
+      }
+    }
   },
   "l4-s109": {
     "headline": {
