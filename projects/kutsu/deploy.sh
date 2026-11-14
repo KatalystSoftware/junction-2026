@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Put the talent brief page on the Verda runner: http://31.22.104.106:8046
+# Put Kutsu on the Verda runner: http://31.22.104.106:8046
 #
 #   sops exec-env ../../secrets/secrets.yaml ./deploy.sh
 #
@@ -34,7 +34,7 @@ printf 'EXA_API_KEY=%s\nCONTEXT_DEV_API_KEY=%s\nANTHROPIC_API_KEY=%s\nHOST=0.0.0
   "${SSH[@]}" "$HOST" "umask 077; cat > /etc/talent-brief.env"
 "${SSH[@]}" "$HOST" "chown -R talentbrief: $DIR && cat > /etc/systemd/system/talent-brief.service && systemctl daemon-reload && systemctl enable --now talent-brief && systemctl restart talent-brief && sleep 2 && systemctl is-active talent-brief" <<UNIT
 [Unit]
-Description=Talent brief demo (junction2026 spikes/espoo-companies)
+Description=Kutsu demo (junction2026 projects/kutsu)
 After=network-online.target
 
 [Service]

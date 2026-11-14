@@ -62,7 +62,7 @@
 
 <aside>
   <div class="head">
-    <a class="name" href="#/">Talent brief</a>
+    <a class="name" href="#/">Kutsu</a>
     <p>Find employers worth inviting, and send each a sign-up that is already filled in.</p>
   </div>
 

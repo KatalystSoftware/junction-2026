@@ -1,63 +1,52 @@
-# Espoo companies: who is hiring, from their own job posts
+# Kutsu: a sign-up that is already filled in
 
-Spike for the City of Espoo "Rethinking Recruitment" challenge. The claim it tests: Espoo can stop
-chasing companies for forms. We find who is hiring from the companies' own public job posts and draft
-their profile; the company only confirms.
+Kutsu is Finnish for invitation. It is for the City of Espoo's recruitment events ("Rethinking
+Recruitment" challenge, Junction 2026). Companies are hard to get to an event and say too late what
+talent they need. Kutsu finds a company worth inviting, reads what it has said in public, and sends it
+a sign-up in its own logo and colours that is already filled in: who it is, what we would tell talent
+about it, and who it wants to meet. The company ticks, corrects and is in.
 
-**Result (round 11, Sat 14 Nov 06:43): 46 companies hiring for 208 tech roles, 182 of them located in
-Espoo, and nobody filled in a form.** Every stored fact carries the URL it came from and, where it was
-read from a page, a verbatim quote that `validate.py` finds in the stored copy of that page.
+Live: <http://31.22.104.106:8046> (Espoo's screen) and <http://31.22.104.106:8046/#/join/nitor.com>
+(what a company sees). `PRODUCT.md` says who it is for, `NEXT.md` what the Espoo mentors said and what
+is open.
 
 ## Run and test
 
-From the repo root, inside the project's nix shell:
-
-```sh
-sops exec-env secrets/secrets.yaml 'python3 spikes/espoo-companies/pipeline.py --limit 1081'   # run
-python3 spikes/espoo-companies/validate.py                                                      # test
-```
-
-The run crawls (or re-reads from `cache/`) all 1,081 seed companies, reads each posting once with Claude
-Haiku 5.5 and writes `work/*.raw.json`. A re-run over the cache takes about four minutes and costs only
-the postings that are new. `validate.py` exits non-zero when any quote is not a verbatim substring of its
-source; `validate.py --apply` drops such fields and writes `companies.json` and `roles.json`. Then
-`python3 metrics.py <round>` appends a line to `metrics.jsonl` and `python3 esittely.py` rebuilds
-`esittely-companies.json`. `seeds.py` rebuilds the seed list. `LOOP.md` is the round-by-round log.
-
-### Talent brief: public-image signals for any company
-
-From this folder:
+From this folder, inside the repo's dev shell (`nix develop`):
 
 ```sh
 npm --prefix ui ci && npm --prefix ui run build                                            # the page (Svelte), into ui/dist
-sops exec-env ../../secrets/secrets.yaml 'python3 serve.py'                                # app with live research, http://127.0.0.1:8046
-sops exec-env ../../secrets/secrets.yaml 'python3 signals.py 2639822-1 Varjo wolt.com'     # research from the command line
-npm --prefix ui run check                                                                  # type-check the page
+sops exec-env ../../secrets/secrets.yaml 'python3 serve.py'                                # run: http://127.0.0.1:8046
+npm --prefix ui run check                                                                  # test: type-check the page
+sops exec-env ../../secrets/secrets.yaml 'python3 signals.py 2639822-1 Varjo wolt.com'     # research companies from the command line
 ```
+
+`serve.py` without `sops exec-env` still shows every stored company; only new searches need keys.
+
+## How it works
 
 There are two screens. The company's sign-up (`#/join/<id>`, or `#/join` to find yourself) is an
 invitation to an event that is already filled in: who they are, what we would tell talent about them,
 and who they want to meet, each to tick or correct, ending on their finished card with a job posting
 drafted per role. Espoo's screen (`#/<id>`) lists employers by how fresh their funding and growth news
-is, shows the draft and its sources, and hands out the invitation link. `PRODUCT.md` says who it is
-for and `NEXT.md` what the Espoo mentors said; `ui/` is the Svelte app; `serve.py` serves it and keeps
-sign-up state in `reviews.json`.
+is, shows the draft and its sources, and hands out the invitation link. `ui/` is the Svelte app;
+`serve.py` serves it and keeps sign-up state in `reviews.json`.
 
-An argument is a company id from `companies.json`, or the name or domain of any company. Typing a
-company that is not in our data takes about 20 seconds; anything asked before answers at once.
-`serve.py` without `sops exec-env` still shows every stored brief.
+A company is named by its id in `companies.json`, or by any name or domain. One that is not in our
+data takes about 20 seconds; anything asked before answers at once.
 
-It is live at <http://31.22.104.106:8046> on the Verda runner (plain http: ports 80 and 443 there
-belong to the gap finder). `sops exec-env ../../secrets/secrets.yaml ./deploy.sh` puts the current code
-and cache there and restarts it. Live searches for companies not asked before are capped at 300 per
-restart, four at a time, because each one spends our credits.
+It runs on the Verda runner (plain http: ports 80 and 443 there belong to the gap finder).
+`sops exec-env ../../secrets/secrets.yaml ./deploy.sh` builds the page, puts the current code and cache
+there and restarts it. Live searches for companies not asked before are capped at 300 per restart,
+four at a time, because each one spends our credits.
 
 Which API does what, and why:
 
-- **Context.dev `brand/retrieve`** opens every brief. By domain it gives the name, slogan, logo, brand
-  colour, industry, size and careers link shown in the header; by name (with Finland as the country
-  hint) it also finds the domain, which is what lets someone type any company. The domain then scopes
-  the web searches, so namesakes stay out. 10 credits.
+- **Context.dev `brand/search`** turns a typed name into the right company and domain (Finnish matches
+  first; a match must carry the first word typed). 1 credit.
+- **Context.dev `brand/retrieve`** by that domain opens every sign-up: name, logo, square icon, brand
+  colour, field, size and careers link. The domain then scopes the web searches, so namesakes stay
+  out. 10 credits.
 - **Context.dev `web/scrape`** (markdown) reads the careers page from that record, script-rendered
   ones included, as one more page to quote from: what the company tells candidates itself. 1 credit.
 - **Exa `search`** with page text, four queries: news, funding and growth, interviews and talks, and
@@ -68,16 +57,35 @@ Which API does what, and why:
   drafts a job posting when a company asks for one.
 
 Four Exa searches, two or three Context.dev requests and three Haiku calls per company, about $0.03
-and 11 to 13 credits. Every request and its raw response
-is stored in `api-cache/`, which is in git, so a rerun is free for everyone and needs no keys. The
-cache holds third-party article text with people's names in it: delete it (and its history) before
-this repository is made public. Signals whose quote is not in the cited search result, or that name a
-person, are dropped. Names are found by a second model call and a pattern, which is not a guarantee,
-so read new output before showing it.
+and 11 to 13 credits. Every request and its raw response is stored in `api-cache/`, which is in git,
+so a rerun is free for everyone and needs no keys. The cache holds third-party article text with
+people's names in it: delete it (and its history) before this repository is made public. A statement
+is kept only when its quote is found word for word in the page it cites and it names no person. Names
+are found by a model call and a pattern, which is not a guarantee, so read new output before showing
+it.
 
-All 46 hiring companies are done: 399 signals kept (20 of them from careers pages), 69 dropped,
-$1.29 on Exa, $0.17 on Anthropic and 506 Context.dev credits. Varjo is in `signals.json` as the
-example of a company from outside our data.
+## Where the Espoo company list comes from
+
+The 46 companies under "Hiring in Espoo" come from an overnight run that tested one claim: Espoo can
+stop chasing companies for forms, because who is hiring can be read from the companies' own public job
+posts.
+
+**Result (round 11, Sat 14 Nov 06:43): 46 companies hiring for 208 tech roles, 182 of them located in
+Espoo, and nobody filled in a form.** Every stored fact carries the URL it came from and, where it was
+read from a page, a verbatim quote that `validate.py` finds in the stored copy of that page.
+
+```sh
+sops exec-env ../../secrets/secrets.yaml 'python3 pipeline.py --limit 1081'   # crawl and read; needs cache/ from the run, or re-crawls
+python3 validate.py                                                           # every quote against its source; needs cache/ too
+```
+
+The run crawls (or re-reads from `cache/`) all 1,081 seed companies, reads each posting once with Claude
+Haiku 5.5 and writes `work/*.raw.json`. A re-run over the cache takes about four minutes and costs only
+the postings that are new. `validate.py` exits non-zero when any quote is not a verbatim substring of its
+source; `validate.py --apply` drops such fields and writes `companies.json` and `roles.json`. Then
+`python3 metrics.py <round>` appends a line to `metrics.jsonl` and `python3 esittely.py` rebuilds
+`esittely-companies.json`. `seeds.py` rebuilds the seed list. `LOOP.md` is the round-by-round log. The
+sections from "Headline numbers" on describe that run.
 
 ## Files
 
@@ -86,8 +94,8 @@ example of a company from outside our data.
 | `companies.json` | 1,009 companies: registry identity (PRH), website, careers page, job system, what they do |
 | `roles.json` | 208 open tech roles: title, location, workplace, language requirement, seniority, contract, working time, role family, must-have and nice-to-have items with skill ids |
 | `esittely-companies.json` | the same roles in the company and job-ad shape of `projects/espoo-recruitment/app/data.js` (role family ids and skill ids are the demo's own); `size`, `stand`, `tradeoffs` and minimum experience are left out because nothing public grounds them |
-| `signals.json`, `signals.md` | per company: identity from Context.dev, what public sources state (claim, verbatim quote, URL) and, kept apart, our inferred talent outlook citing those signals |
-| `ui/`, `serve.py` | the talent brief app (Svelte) and the small server behind it: live research, progress, review state |
+| `signals.json`, `signals.md` | per company: identity from Context.dev, what public sources state (claim, verbatim quote, URL) and, kept apart, the inferred card: a pitch and the needs, citing those statements |
+| `ui/`, `serve.py` | the Kutsu app (Svelte) and the small server behind it: live research, progress, sign-up state, drafted postings |
 | `presets.json` | named lists of employers shown first, such as the Deep Tech Talent Forum's |
 | `metrics.jsonl` | one line per round |
 | `LOOP.md` | what each round ran, decisions, spot-check tables, research notes |

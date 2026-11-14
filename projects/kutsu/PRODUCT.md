@@ -1,4 +1,4 @@
-# Talent brief
+# Kutsu
 
 **What it is.** A City of Espoo talent-services officer is preparing employers for a recruitment
 event (the Deep Tech Talent Forum, 26–27 Nov 2026, 27 employers). For each employer the tool drafts,
