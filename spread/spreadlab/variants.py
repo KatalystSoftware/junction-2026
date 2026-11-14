@@ -624,3 +624,30 @@ VARIANTS["m41-l-onq08-820"] = {**VARIANTS["m41-k-q18-760"],
                                "when_rich": {**VARIANTS["m41-k-q18-760"]["when_rich"], "pair_onward_cost": 0.8}}
 VARIANTS["l2bk-head"] = VARIANTS["m41-k-q18-760"]
 VARIANTS["l2bk-onq08"] = VARIANTS["m41-l-onq08-820"]
+
+# Fallback rows if `m41-k` is rolled back on `fresh-9072` (761 drivers, 88.99%): the stack's parts on `trackb-merge-4.1`
+# (`…-ss04`) with every week of 760 to 819 drivers played as 4.1. Under 760 `m41-b`'s cap 62 with onward pairs and `m41-e`'s
+# longer hold; from 820 (`when_rich`) `m41-d`'s `late_cost` 80, `m41-h`'s `slow_step` 0.25 and `m41-l`'s onward quote 0.8;
+# then the 760+ parts at 820+ only: `m41-c` and `m41-f`'s cost by hours, `m41-i`'s long drives, and `m41-j`'s trade-in fee
+# fix (also under 760). `m41-a`'s `late_cost` 100 is under `m41-d`'s 80 from 820, so it has no row. `m41-g` and `m41-k`
+# (760 to 819 only) stay out until bisected.
+def _from820(row: dict, **knobs) -> dict:
+    return {**row, "rich_drivers": 820, "when_rich": {**row.get("when_rich", {}), **knobs}}
+
+
+_X = {"m41x-b-cap62-onward-all": {**_ROW_5, "pair_more_drivers": 0,
+                                  "when_tight": {**_ROW_5["when_tight"], "due_cap": 62, "due_cap_wave": 0}}}
+_XB = _X["m41x-b-cap62-onward-all"]
+_X["m41x-e-thin-hold12-left6"] = {**_XB, "thin_play": {
+    "drivers": 760, "params": {**{k: v for k, v in {**_XB, **_XB["when_tight"]}.items() if k != "when_tight"},
+                               "pair_hold": 12, "pair_left": 6}, "version": thin_play.VERSION}}
+_X["m41x-d-late80-from820"] = _from820(_X["m41x-e-thin-hold12-left6"], late_cost=80)
+_X["m41x-h-ss025-820"] = _from820(_X["m41x-d-late80-from820"], slow_step=0.25)
+_X["m41x-l-onq08-820"] = _from820(_X["m41x-h-ss025-820"], pair_onward_cost=0.8)
+_X["m41x-c-h30-c11-820"] = _from820(_X["m41x-l-onq08-820"], cost=1.1, cost_hours=[[30, 1.2]])
+_X["m41x-f-h24-820"] = _from820(_X["m41x-c-h30-c11-820"], cost_hours=[[24, 1.2]])
+_X["m41x-i-long300-c10-820"] = _from820(_X["m41x-f-h24-820"], long_drive=300, long_cost=1.0)
+_XI = _X["m41x-i-long300-c10-820"]
+_X["m41x-j-kindfee-thin-820"] = {**_from820(_XI, kind_fees=True),
+                                 "thin_play": {**_XI["thin_play"], "params": {**_XI["thin_play"]["params"], "kind_fees": True}}}
+VARIANTS.update(_X)

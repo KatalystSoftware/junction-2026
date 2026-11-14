@@ -943,3 +943,31 @@ def test_each_m41_row_adds_one_part_on_its_own_side_of_760_drivers():
         for n in (700, 800, 900):
             new, old = desk(row, n), desk(below, n)
             assert {k: new[k] for k in new if new[k] != old.get(k)} == part.get(n, {}), (row, n)
+
+
+def test_each_m41x_row_plays_trackb_merge_4_1_at_760_to_819_drivers():
+    from spreadlab import play
+    from spreadlab.variants import VARIANTS
+    roster = lambda n: [{**ROSTER[0], "id": f"x{i}"} for i in range(n)]  # noqa: E731
+
+    def desk(name, n):  # the parameters the week plays with
+        params = VARIANTS[name]
+        played = play.policy_class(params)(None, 8, 0, params, roster(n), MAP).params()
+        return {k: v for k, v in played.items() if k not in ("when_tight", "rich_drivers", "when_rich", "thin_play")}
+    onward = {"pair_more_drivers": 0}  # onward pairs are on from 760 drivers already; this only turns them on below
+    rows = [("fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss04", {}),
+            ("m41x-b-cap62-onward-all", {700: {**onward, "due_cap": 62, "pair_open": True, "pair_onward": 0.8,
+                                               "pair_late": True, "pair_onward_cost": 1.0}, 800: onward, 900: onward}),
+            ("m41x-e-thin-hold12-left6", {700: {"pair_hold": 12, "pair_left": 6}}),
+            ("m41x-d-late80-from820", {900: {"late_cost": 80}}),
+            ("m41x-h-ss025-820", {900: {"slow_step": 0.25}}),
+            ("m41x-l-onq08-820", {900: {"pair_onward_cost": 0.8}}),
+            ("m41x-c-h30-c11-820", {900: {"cost": 1.1, "cost_hours": [[30, 1.2]]}}),
+            ("m41x-f-h24-820", {900: {"cost_hours": [[24, 1.2]]}}),
+            ("m41x-i-long300-c10-820", {900: {"long_drive": 300, "long_cost": 1.0}}),
+            ("m41x-j-kindfee-thin-820", {700: {"kind_fees": True}, 900: {"kind_fees": True}})]
+    for (below, _), (row, part) in zip(rows, rows[1:]):
+        for n in (700, 761, 819, 820, 900):
+            new, old = desk(row, n), desk(below, n)
+            want = part.get(n, {}) if n in (700, 900) else part.get(800, {}) if n < 820 else part.get(900, {})
+            assert {k: new[k] for k in new if new[k] != old.get(k)} == want, (row, n)
