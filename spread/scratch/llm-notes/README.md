@@ -39,6 +39,7 @@ PYTHONPATH=. uv run python scratch/llm-notes/<script>.py
 | `rate.py` | notes a real minute on the final's clock, for all requests and for won orders |
 | `llm_test.py` | `sample`, `run` and `score`: the model test (see its docstring) |
 | `combine.py` | the rules with a model as second reader; `--show` lists each model's errors |
+| `verify.py` | the live desk's note check (`spreadlab/watch.py`): the model's yes or no on the rules' reading against the reveal, and the facts the rules leave out of every won note |
 
 ## The model test
 

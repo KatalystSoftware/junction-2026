@@ -664,6 +664,36 @@ uv run python -m spreadlab.watch check "Registration tags are off, bring your ow
   to the log as `note_new`. It counts the share of the last 200 notes that mention a ready time, a closing time, a
   limit ("by", "ennen"), the delivery, opening hours, plates, a manual car, summer tyres or something new. When a
   share is more than twice the archive's, at 4 standard deviations or more, it prints a line and logs `note_drift`.
+  In 60 archive weeks held out from the rest, 11% of notes have a word or sentence pattern that the other weeks lack.
+
+What the rules leave out, by the reveal of every won note with one car in the archive (24,595 notes in 186
+weeks, `scratch/llm-notes/verify.py misses`): 16.4% of the readings are incomplete. The note's deadline is missing
+on 5.96%, pickup hours or a closing time on 5.91%, delivery hours on 3.33% and summer tyres on 1.18%. Ready times
+(6 notes) and manual gearboxes (8) are read wrong almost never, and plates never.
+
+What the check found offline against the reveal ([`verify.py`](scratch/llm-notes/verify.py), the prompt of the
+live desk). It ran on 150 won notes drawn at random and on 124 notes of the study's sample: every third, and the 14 that
+the rules misread:
+
+| | Random notes | Study sample |
+| --- | --- | --- |
+| A no on a complete reading, as the model says it | 39% (48 of 124) | 27% (16 of 60) |
+| A no on a complete reading, counted as the desk counts it | 4.8% (6 of 124), and 21% more that name only "other" | 8.3% (5 of 60), and 10% more |
+| A no on an incomplete reading | 73% (19 of 26) | 65% (41 of 63) |
+| Safe fixes made: mend, break | none | 7 (5 ready times, 2 manual gearboxes), 0 |
+
+Most false no's name spare tyres in the boot ("other", or "summer tyres"). Before the checks of the note's own
+words, the safe fixes broke three readings on these notes. They added plates to a note about spare tyres, took
+"the customer collects at 12" for a ready time, and read "huomenna" as the day after tomorrow. A call took 0.4 s
+at the median and 1.6 s at the 95th percentile. On this day, though, the free key, which the team's other projects
+also use, refused half of all calls with 429: 552 calls for 273 answers.
+
+On replays of `fresh-003` from Thursday, with every fourth won order given a note in words that the rules miss
+(`replay.py --watch-notes --inject 4`), the watcher found every injected fact that got an answer: plates, a
+manual gearbox, a later ready time. All 386 requests were still quoted by the policy, with at least 4.47 s left.
+Of 19 held first posts, 9 went with the answer and 10 with the rules when it was late, the longest after 1.51 s.
+With the watcher on and no model, `fresh-001` at ten times the final's speed matched the recording in every quote
+and every gig.
 
 ## Rules for policy code
 
