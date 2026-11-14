@@ -102,7 +102,9 @@ class Handler(http.server.BaseHTTPRequestHandler):
     def posting(self, brief, need):
         try:
             need = {"title": str(need["title"])[:120], "why": str(need["why"])[:300], "seniority": str(need["seniority"])[:40],
-                    "skills": [str(k)[:60] for k in need["skills"]][:8]}
+                    "skills": [str(k)[:60] for k in need["skills"]][:8],
+                    "can_do": [str(k)[:120] for k in need.get("can_do") or []][:5],
+                    **{k: str(need[k])[:60] for k in ("language", "workplace", "where") if need.get(k)}}
         except (KeyError, TypeError):
             need = None
         if not brief or not need or not need["title"].strip():
