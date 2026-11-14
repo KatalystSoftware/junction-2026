@@ -653,7 +653,10 @@ there, 25 ms at the 99th percentile.
 ### The note watcher (`--watch-notes`, off by default)
 
 [`watch.py`](spreadlab/watch.py) adds a second reader of the dealers' notes beside the desk. It needs
-`NVIDIA_API_KEY` in the environment; without it, only the log of new notes and drift runs.
+`NVIDIA_API_KEY` in the environment; without it, only the log of new notes and drift runs. `NOTE_MODEL_URL`,
+`NOTE_MODEL`, `NOTE_MODEL_KEY` (the name of the variable with the key) and `NOTE_MODEL_RPM` point it at another
+OpenAI-compatible endpoint, such as a dedicated container without the free tier's limit; only Lightning on
+NVIDIA's endpoint has been measured.
 
 ```bash
 uv run python -m spreadlab.live final --watch-notes                          # the same desk, with the note watcher

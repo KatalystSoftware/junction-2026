@@ -47,11 +47,14 @@ VOCAB = Path(__file__).with_name("note-vocab.json")
 
 # NVIDIA's free endpoint, as in the note study (scratch/llm-notes): Lightning answered in 1.0 s at the median and 2.5 s
 # at the 95th percentile, and read the fewest notes wrong of the three models tried. The free tier takes about 40 calls a minute.
-URL = "https://integrate.api.nvidia.com/v1/chat/completions"
-MODEL = "nvidia/nemotron-3.5-lightning-30b-a3b"
-KEY = "NVIDIA_API_KEY"
-TIMEOUT = 6.0  # seconds for one call; the rules' post is already out, so a late answer only comes later
-PER_MINUTE = 30  # calls a minute, under the free tier's 40
+# Another OpenAI-compatible endpoint, such as a dedicated container without the free tier's limit, comes from the
+# environment: NOTE_MODEL_URL (the base URL), NOTE_MODEL, NOTE_MODEL_KEY (the name of the variable that holds its key)
+# and NOTE_MODEL_RPM. Only Lightning on NVIDIA's endpoint has been measured (scratch/llm-notes/verify.py).
+URL = os.environ.get("NOTE_MODEL_URL", "https://integrate.api.nvidia.com/v1").rstrip("/") + "/chat/completions"
+MODEL = os.environ.get("NOTE_MODEL", "nvidia/nemotron-3.5-lightning-30b-a3b")
+KEY = os.environ.get("NOTE_MODEL_KEY", "NVIDIA_API_KEY")
+TIMEOUT = 6.0  # seconds for one call; a held post goes with the rules after live.HOLD_SECONDS whatever the call does
+PER_MINUTE = int(os.environ.get("NOTE_MODEL_RPM", "30"))  # calls a minute, under the free tier's 40
 STALE = 120.0  # real seconds after the win: a check that has waited this long for the rate limit is dropped
 
 FACTS = ("ready", "no_plates", "manual", "deadline", "pickup_hours", "delivery_hours", "summer_tyres", "other")
