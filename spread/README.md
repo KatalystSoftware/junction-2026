@@ -521,6 +521,19 @@ late model (`slow_model`) adds terms for. Variants on this base, on the first 10
 | `slow-step-gate-25-late-150` | `cost` 1.2 and `late_cost` 150: 150 euros times the late chance in every quote | +874 (436 to 1,367) | 310, 8.9 | 94.9% |
 | `slow-step-gate-25-friday-late-150` | the same with the Friday late model | +905 (368 to 1,537) | 312, 8.5 | 94.9% |
 
+The same on 40 seeds (10 tune, 10 holdout, `fresh-001` to `fresh-020`), where the reference makes
+10,445 with 259 orders and 11.5 late. No week of any row is under 91%.
+
+| Variant | Margin against the reference | Orders, late | Lowest week |
+| --- | --- | --- | --- |
+| `notes-limits` | +244 (-25 to 498) | 263, 9.6 | 92.2% |
+| `slow-step-gate-25` | +633 (339 to 941) | 288, 10.6 | 93.0% |
+| `slow-step-gate-40` | +740 (415 to 1,077) | 290, 10.7 | 93.0% |
+| `slow-step-gate-25-friday-late-150` | +1,063 (772 to 1,388) | 298, 8.9 | 93.0% |
+| `slow-step-gate-25-kinds` | +1,244 (955 to 1,531) | 300, 10.6 | 93.6% |
+| `slow-step-gate-25-kinds-limits` | +1,211 (856 to 1,544) | 300, 10.6 | 93.5% |
+| `slow-friday-late-150-kinds-limits`: the late cost, the Friday model, the kinds and the note limits | +1,479 (1,135 to 1,828) | 306, 9.8 | 92.3% |
+
 - On the reference's 10 lowest worlds `slow-step-gate-25-friday-late-150` makes +2,854 (1,942 to
   3,929) with no week under 90% against 5, and a lowest week of 90.7%.
 - The kinds were a wash on the reference, because the gate handed their wins back; on the wider
@@ -528,15 +541,22 @@ late model (`slow_model`) adds terms for. Variants on this base, on the first 10
 - **Note limits** (`note_limits`, [`notes.limits`](spreadlab/notes.py)): the note's own deadline and
   site hours count at the quote and in the posting. Against the revealed orders the reader finds 457
   of 457 deadlines, 347 of 347 delivery hours and 609 of 610 pickup hours on 10,374 notes, and 57 of
-  57, 45 of 45 and 72 of 73 on 1,291 notes it was not written on. `notes-limits` on the tune seeds:
-  +357 (-62 to 755), visits to a closed site 1.9 to 1.1 a week. Those weeks were played before a
-  change to the posting (the pickup window now ends a minute before closing), which is not played.
+  57, 45 of 45 and 72 of 73 on 1,291 notes it was not written on. On the 40 seeds visits to a
+  closed site go from 1.7 a week to none and waits from 0.9 to 0.2, for +244 (-25 to 498) on the
+  reference. On top of the kinds the limits add nothing: -34 (-218 to 163)
+  ([`scratch/notes_effect.py`](scratch/notes_effect.py)). With the kinds, 18 of the first 80 weeks
+  failed: a private address has its own slot, and the desk posted a delivery window that ended
+  before it. That is fixed, and the 18 weeks are in the numbers above.
 - **`opt`** ([`optquote.py`](spreadlab/optquote.py)): the quote as one optimisation, with its own
   fits of an order's cost and late chance and a belief about the world's price level. On the tune
   seeds `opt-mu-0.2` makes +1,016 (623 to 1,416) with a lowest week of 92.4%, and
   `opt-mu-0.3-lambda-100` +988 (527 to 1,556) with 379 orders, 12.6 late and a lowest week of 94.5%.
-  Its weights were fitted on saved weeks of 9 of those 10 seeds, so these two numbers are not yet a
-  held-out result.
+  Its weights were fitted on saved weeks of 9 of those 10 seeds. On the 30 holdout and fresh seeds
+  `opt-mu-0.3-lambda-100` makes +997 (619 to 1,373) with 16.2 late orders a week and one week at
+  89.8%, and `opt-mu-0.2` +724 with two weeks under 90%. Its gate declines 51 requests a week
+  against 4 for `slow-step-gate-25`: its price hardly moves with the backlog, so the gate sets its
+  volume, and its late chance is too low for orders won with 16 or more cars waiting, which the
+  weeks it was fitted on do not have. Not a candidate as built.
 - **Offers to drivers who live at the destination** (`home_offers`) lose 86 to 152 a week on 40
   seeds at fees of 0.8 to 1.0, with one week at 89.6%. Not kept.
 - `rescue-*` and `late-225-cost-1.19` switch a late cost on from a point of the week; they are there
@@ -544,8 +564,10 @@ late model (`slow_model`) adds terms for. Variants on this base, on the first 10
 
 None of these is the default. The default changes when a candidate has at most 3 weeks under 90% on
 each of two sets of 60 seeds that nothing else has played. [`scratch/search.py`](scratch/search.py)
-searches the parameters above together on the tune seeds; [`scratch/search_check.py`](scratch/search_check.py)
-plays its best trials on other seeds.
+searches the parameters above together on 30 tune seeds; [`scratch/search_check.py`](scratch/search_check.py)
+plays its best trials on other seeds. After 25 trials, 11 of them played in full, its best point is
+of the same family (`search-16`: `slow_step` 0.8, the gate at 40, `cost` 1.22, a small late cost):
++1,192 with a lowest week of 93.6%. A late cost alone on the reference's backlog rules is worth +72.
 
 ## The final
 

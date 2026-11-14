@@ -5,6 +5,7 @@
 A sweep plays a saved week again when policy.py has changed since, because the fingerprint covers the file. An
 edit that only adds a parameter, off at its default, plays the same weeks: the reference replays to the same scores
 after each such edit. This keeps a saved week whose parameters are the ones asked for, whatever its fingerprint.
+No week starts once data/STOP exists, so a run can be ended without leaving a practice world open.
 """
 from __future__ import annotations
 
@@ -14,6 +15,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from spreadlab.play import line, load_score, play
 from spreadlab.policy import DEFAULTS
+from spreadlab.server import data_dir
 from spreadlab.variants import VARIANTS
 
 
@@ -35,11 +37,17 @@ def main() -> None:
             if saved is None or not same_parameters(saved, VARIANTS[variant]):
                 todo.append((variant, seed))
     print(f"{len(todo)} weeks to play, {len(variants) * len(seeds) - len(todo)} saved", flush=True)
+    stop = data_dir() / "STOP"
+
+    def week(variant: str, seed: str):
+        return None if stop.exists() else play(variant, VARIANTS[variant], seed)
+
     with ThreadPoolExecutor(args.parallel) as pool:
-        futures = {pool.submit(play, variant, VARIANTS[variant], seed): (variant, seed) for variant, seed in todo}
+        futures = {pool.submit(week, variant, seed): (variant, seed) for variant, seed in todo}
         for future in as_completed(futures):
             try:
-                print(line(future.result()), flush=True)
+                if future.result() is not None:
+                    print(line(future.result()), flush=True)
             except Exception as error:  # one failed week does not stop the others
                 print(f"{futures[future][0]} {futures[future][1]} FAILED: {error!r}", flush=True)
 
