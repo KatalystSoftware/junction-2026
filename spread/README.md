@@ -55,6 +55,7 @@ and started again.
 1. Add a variant to [`spreadlab/variants.py`](spreadlab/variants.py), or a parameter and its rule to
    [`spreadlab/policy.py`](spreadlab/policy.py).
 2. Sweep it against the reference variant (see "Results so far") on the `tune` list. The first variant named is the reference.
+   Keep `gate-10` in the sweep too: the older results are differences to it.
 3. Read the report: ranked weeks first, then the margin. A week under 90% on time scores nothing.
    - `above zero` counts the weeks that are ranked and beat `decline-all`. Declining every request
      makes 0 and is not ranked, because a week with no orders is not ranked.
@@ -62,7 +63,8 @@ and started again.
      times. When it includes 0, play more seeds before believing the difference.
    - Weeks that are missing or failed are named above the table and left out of it. Play them again first.
 4. Read the ledger for where the money went. `in weeks` tells a habit of the variant from one bad week.
-5. Confirm on the `holdout` list before keeping the change.
+5. Confirm on the `holdout` list before keeping the change, and then on seeds that no list holds:
+   `uv run python -m spreadlab.scan --prefix fresh- --count 40` scans a batch, and `--seeds fresh-021,fresh-022,...` plays it.
 
 ## Results so far
 
@@ -74,9 +76,60 @@ Level 8, mean margin a week in euros on the first 10 seeds of each list. Every w
 | `with-same-day` | offers `same_day` | 1,669 | 1,857 | 91.7% |
 | `floor-1.7` | never quotes under 1.7 x the typical driver fee | 3,472 | 3,579 | 91.8% |
 | `gate-10` | quotes every acceptable request, but none while 10 won cars have no driver | 5,083 | 4,541 | 93.1% |
+| `surcharge-4-gate-15` | the floor rises 0.04 x the typical fee for each won car without a driver; the gate moves to 15 | 5,743 | 5,032 | 91.9% |
+| `curve` | the win curve sets the price (see "The win curve") | 5,490 | 4,627 | 93.1% |
+| `curve-live` | the day's answers correct the curve | 6,487 | 5,609 | 92.2% |
+| `curve-live-surcharge` | each won car without a driver adds 0.04 x the typical fee to the order's cost | 7,032 | 6,359 | 95.0% |
 
-`gate-10` is the reference for new ideas. `floor-1.7-all` shows why the gate is needed: without it, one
-tight week falls to 87.4% on time and is not ranked.
+`curve-live-surcharge` is the reference for new ideas. On 20 seeds that no list holds (`fresh-001` to
+`fresh-020`, every week ranked) it makes 5,816 against 3,978 for `gate-10`: 1,838 more (95% interval
+1,355 to 2,359), better in 19 weeks of 20, lowest week 93.0% on time. Its three numbers are not
+sensitive on the tuning seeds: a cost of 1.3 or 1.4, a day's correction of 0.10 to 0.25, a backlog
+step of 0.04 or 0.08, and the gate at 10, 15 or off all land within 350 of each other, inside the
+noise of 10 weeks. `floor-1.7-all` shows why `gate-10` needs its gate: without it, one tight week
+falls to 87.4% on time and is not ranked.
+
+Tried against `gate-10` and not kept, as the difference in mean margin (95% interval):
+
+| Variant | Idea | Tune | Holdout or fresh |
+| --- | --- | --- | --- |
+| `tight-floor` | a higher floor in weeks with few drivers | not played | -968 (-1,539 to -354) on 12 holdout weeks |
+| `tight-gate` | a lower gate in weeks with few drivers | not played | 0 on holdout, +65 (-5 to 157) on fresh |
+| `gate-10-stop-93`, `gate-10-careful-93` | stop or dearer quotes while the projected on-time share is under 93% | not played | -308 and -35 on fresh |
+| `gate-5`, `gate-15` | the gate at another level | -232, +81 | +107 (-160 to 388) and +14 on fresh; `gate-15` has one week under 90% |
+| `dealer-ladder`, `monday-1.5`, `ladder` | the floor follows the win share at the dealer; 1.5 on Monday | +165, +154, +126 | +256 (-220 to 765) and -319 (-589 to -74) on holdout |
+| `trust-0.5`, `trust-1.0` | the quote rises with the dealer's orders on time | +255, +106 | +136 (-364 to 681) on holdout |
+
+The curve does what the last two rows try by hand, and measures it: the count of orders on time is
+one of its terms, and the day's correction finds a cheap Monday or a price-war day from the answers.
+
+## The win curve
+
+[`curve.py`](spreadlab/curve.py) gives the chance that a dealer buys at a price, and the policy
+quotes the price with the highest (price - cost) x chance. The curve is fitted on 50 weeks that
+quoted a random multiple of the list price on every request (variant `explore`, seeds `explore-001`
+to `explore-050`, 41,306 quotes). What it holds, because it is the same in every world:
+
+- The slope: a price 10% higher multiplies the odds of a sale by 0.42.
+- The dealer's count of orders on time: each one raises the prices it accepts by about 1%, as RULES.md says.
+- The options quoted, the typical fee over the list price, and the pickup and delivery places.
+
+What differs by world and by day is not in the weights: the competitor's level, its day factor and
+the price-war day. The desk measures it as one shift of the curve along the price, from the answers
+it has had so far today (`learn`, the prior spread of a day's shift). On unseen weeks, read in time
+order, the log loss falls from 0.350 without the shift to 0.280 with it. A shift per dealer makes it
+worse (0.297 to 0.331): one shift per day is enough. The cost of an order is 1.4 x its typical fee,
+the mean of fees, failed visits and refunds over the random-price weeks (1.28 to 1.59 by week).
+
+```bash
+uv run python -m spreadlab.sweep --variants explore --seeds explore-001,explore-002  # play random-price weeks
+PYTHONPATH=. uv run python scratch/curve_rows.py                                     # one row per quote
+PYTHONPATH=. uv run --with scikit-learn python scratch/curve_fit.py --write          # fit, test on unseen weeks, write curve.json
+PYTHONPATH=. uv run --with scikit-learn python scratch/curve_live.py                 # what each live correction is worth
+```
+
+Random prices lose money on purpose, so `explore` is never a candidate. It is safe only because
+practice weeks do not count for the ranking.
 
 ## Rules for policy code
 
@@ -100,6 +153,7 @@ request, the driver list, the map and its own history in the week.
 - [`server.py`](spreadlab/server.py): the practice-only client, the data folder, and which drivers are notified of a pickup.
 - [`scan.py`](spreadlab/scan.py), [`catalogue.py`](spreadlab/catalogue.py): the scans, the table of what each week shows, and the seed lists.
 - [`policy.py`](spreadlab/policy.py), [`variants.py`](spreadlab/variants.py): the policy on top of the kit's starter desk, and the named variants.
+- [`curve.py`](spreadlab/curve.py), [`curve.json`](spreadlab/curve.json): the win curve, its best price and its live shift, and the fitted weights.
 - [`play.py`](spreadlab/play.py), [`sweep.py`](spreadlab/sweep.py), [`report.py`](spreadlab/report.py): play, compare.
 - [`ledger.py`](spreadlab/ledger.py): mistakes by variant and situation.
 
