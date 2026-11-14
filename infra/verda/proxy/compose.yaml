@@ -10,12 +10,17 @@ services:
     # BASE_DOMAIN: every app is served as <app>.<base domain>.
     env_file: [proxy.env]
     volumes: [.:/etc/caddy:ro, data:/data]
-    networks: [proxy]
+    networks: [proxy, gapfinder]
     deploy: {resources: {limits: {cpus: "0.5", memory: 256m}}}
 
 networks:
   proxy:
     external: true
+  # The gap finder was live before the proxy. The proxy joins its network, so a redeploy of the
+  # gap finder needs no change and its pages stay reachable as gapfinder-ui-1.
+  gapfinder:
+    external: true
+    name: gapfinder_default
 
 volumes:
   data:

@@ -6,8 +6,12 @@ Docker network `proxy` and publishes no ports.
 
 | App | Address | Upstream on the `proxy` network |
 | --- | --- | --- |
-| Gap finder | `https://gapfinder.<base domain>/` and `https://31-22-104-106.sslip.io/` | `gapfinder-ui:8078` |
+| Gap finder | `https://gapfinder.<base domain>/` and `https://31-22-104-106.sslip.io/` | `gapfinder-ui-1:8078`, on its own network |
 | Since When | `https://since-when.<base domain>/` | `since-when-app:8078` |
+
+The gap finder is the one exception to "apps join the `proxy` network": it was live first, so the
+proxy joins its network `gapfinder_default` and its deploys need no change. If that project is ever
+taken down with `docker compose down`, start it again before restarting the proxy.
 
 Apply a change (run from a checkout, needs SSH access to the machine):
 
