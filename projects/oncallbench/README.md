@@ -55,7 +55,7 @@ change only after reading its diff. On 200 seeds nobody tuned on (3000-3199) it 
 of what an oracle that knows the faults avoids (mean 0.75) and is never worse than doing nothing
 (`python3 generality.py --seeds 3000-3199`).
 
-| Level 4, held-out seeds | Score |
+| Level 4, seeds 101-103 (never used to tune the reference) | Score |
 | --- | --- |
 | Reference | 1.00 |
 | Do-nothing (`nop` agent) | 0.00 |
@@ -65,6 +65,10 @@ of what an oracle that knows the faults avoids (mean 0.75) and is never worse th
 | Opus 5.5 on six fresh seeds, 107-112 (one run each) | 0.55 mean (0.34-0.75) |
 | Gemini 3.1 Pro (seed 101) | 0.00 |
 | Sonnet 5.5 (seed 101) | 0.02 |
+
+Seeds 101-106 were used for the model runs while the levels were built, and the instruction's
+sentence on the healthy baseline was added after Opus runs on seed 101. The reference's generality
+is measured on 3000-3199, which no one ran while building.
 
 Those are runs on the task as shipped. Across all 15 Opus runs on nine seeds the mean is 0.41 and
 the best run 0.80: the gap holds on every seed, and its size varies with the estate (seeds 101-103
@@ -77,10 +81,14 @@ over seven runs on seeds 101-106, Gemini 0.00 (three runs) and Sonnet 0.26.
 
 Every run with its cost: `metrics.json`; how each level was built and checked: `LOOP.md`.
 
-**Pre-registered seeds for the scores spread.** Before any run on them, we fixed six more level-4
-seeds for the per-run spread on the replay site: **404, 418, 500, 502, 503 and 504** (HTTP status
-codes, outside every seed range used to build, tune, validate or train). Each model gets three runs
-per seed, and every result goes into `metrics.json` and this section whatever it is.
+**Common seeds.** Every model is compared on the same 24 level-4 seeds, **200000-200023**, which no
+demo, tuning or training run used: the Gemma adapter was first evaluated there in our own runner
+(`rl/RESULTS.md`). Opus 5.5 gets two Harbor runs per seed, Fable 5.2 one, Gemma untrained and
+fine-tuned their own Harbor runs, plus the reference, do-nothing and stop-early; every result goes
+into `metrics.json` and this section whatever it is. This set replaced an earlier pre-registered
+one, the HTTP status codes 404, 418, 500, 502, 503 and 504 (55aa6f8), so that every model shares
+one larger set. Only three Fable 5.2 test runs were made on that set before the switch (404: 1.00,
+418: 0.26, 500: 0.86); they stay in `metrics.json` as round 15 and are not part of any table.
 
 Known limit: the agent's container reaches the internet, because OpenCode calls the model API
 from it, and this repository is public, so an agent could try to download the reference and run it
@@ -90,8 +98,23 @@ site at localhost, which is why the agent's image is Alpine: there Harbor instal
 from the distro instead of from GitHub. Another mirror could still serve the code. Harbor 0.25's
 `allowlist` network mode would close it fully, but it needs an egress sidecar and nftables support
 on the host's Docker, so the shipped task stays on `public` rather than risk failing on a judge's
-machine. A production benchmark would keep its reference and held-out seeds private
+machine. A production benchmark would keep its reference and evaluation seeds private
 (`redteam/REPORT.md`).
+
+## A smaller model learns from it
+
+Gemma 4 26B-A4B with a LoRA adapter trained on the reference's shifts (`rl/`), run the way Opus was:
+OpenCode in Harbor 0.25.0 against a local vLLM server, three runs on each of shifts 1-3.
+
+| Level 4, seeds 101-103, Harbor + OpenCode (9 runs each) | Mean |
+| --- | --- |
+| Gemma 4 26B-A4B, untrained | 0.06 |
+| Gemma 4 26B-A4B + SFT on the reference's shifts | 0.26 (0.88/0.14/0.00, 0.00/0.26/0.00, 0.00/0.65/0.41) |
+| Opus 5.5 | 0.32 |
+
+Copying the reference took Gemma from 0.06 to about Opus's level in the judges' harness. Its
+scores in our own training runner (`rl/env.py`: a capped number of replies, a shorter context) are
+higher and are not comparable with Harbor's; they stay in `rl/RESULTS.md`, in their own tables.
 
 ## Reproduce
 
@@ -140,7 +163,7 @@ about 5 minutes building the images, then the scripted runs take about a minute 
 it in `reward.json`. `run.sh` writes a Harbor task for the episode to `jobs/variants/` and calls
 `harbor run -p <task> -a opencode -m anthropic/claude-opus-5-5`, so a judge can rerun that folder
 with plain Harbor. Stop-early and the other scripted policies run as Harbor's `oracle` agent with
-`POLICY=<name>`. `SEED` picks the episode (held-out 101-106); `ATTEMPTS=3` gives three Opus runs.
+`POLICY=<name>`. `SEED` picks the episode (the reported seeds are 101-106); `ATTEMPTS=3` gives three Opus runs.
 
 Committed run logs, each trial with its transcript in `agent/opencode.txt`, its action log in
 `artifacts/ledger/receipt.json` and its score in `verifier/reward.txt`:
@@ -165,7 +188,7 @@ uv run --no-project --python 3.13 python3 eval.py --fuzz 200
 (`python3 eval.py --fuzz 200` with a Python 3.13 of your own; about 4 minutes, exit status 0 on a
 pass.)
 
-Plays every scripted policy on the build and held-out seeds, checks that each replay is
+Plays every scripted policy on build seeds 1-5 and reported seeds 101-103, checks that each replay is
 byte-identical, that stopping early and the try-everything exploiter stay below the reference, and
 that 200 random episodes per seed never beat it.
 
