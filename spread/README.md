@@ -1118,6 +1118,18 @@ stopped it after the screen; `exposure` stays off and `day-cap-70` stays the on-
 - The measured rates (`measure.py report`): drops 0.107 a held car-day; a wave drops 34% (26 to 50%) of that day's held
   gigs, 98% of its drops are due that day, and no week of 1,094 has two; a dropped car's late chance by hours left and load.
 - `need` with drivers near the delivery place and daytime hours in hand: left-out AUC 0.809 to 0.827.
+- **The wave part alone, kept by the team as a later replacement for cap 70's count (not built, not screened).** The
+  base's quote as it is, without `due_cap` and `due_cap_wave`, plus κ x V x the change in P(week under 90%), summed only
+  over the scenarios in which a day still to come is the flu day. "No flu day left" is left out, so the term falls to about
+  0 once the week's wave has come: the past nights' likelihood ratio then outweighs the prior of the days still to come.
+  Like the cap, it would drop the exposed option and keep a slower one, through the menu loop of `ExposurePolicy.quote`.
+  That loop now prices each menu on the typical fee x the flat cost plus the exposure euros, not on the base's surcharge
+  and late cost, so the base's cost has to move into the loop through a hook. It starts from two pieces of code: a flag on
+  `Book.risk` that counts only the flu scenarios, which does not exist yet, and Track A's `TailWidePairPolicy`
+  (`exposure_tail`, branch `lane4-exposure-a`, not on main). `TailWidePairPolicy` adds the whole tail to merge 1's quote,
+  "no flu day left" included, through `slow`, and makes no menu choice. Not known: κ, which stays a tuned constant, as 70
+  was, until the flu day is refitted; how an arm with only this term does on the default's own pricing, since none has been
+  screened; and thin worlds.
 
 **Missing before it can go on the live desk.** `LiveExposureDesk` exists but has not been through the crash-and-restart
 replay. At a rejoin, `ExposurePolicy` does not rebuild `needs_since` (the hours each car has waited for a driver) or
