@@ -23,6 +23,7 @@
 <main>
   <h1>Events</h1>
 
+  <h2 class="group">Upcoming events</h2>
   {#each next as plan (plan.slug)}
     <section class="next">
       <div class="title">
@@ -39,14 +40,14 @@
         <Wall briefs={plan.employers.map((e) => e.brief)} />
         <Progress employers={plan.employers} coming={plan.coming} />
       </div>
-      <a class="btn primary" href="#/event/{plan.slug}">Open the event<Icon name="flat" size={18} /></a>
+      <a class="btn primary" href="#/event/{plan.slug}">Manage event<Icon name="flat" size={18} /></a>
     </section>
   {/each}
 
   <Watch />
 
   <section>
-    <h2>Suggested next</h2>
+    <h2>Suggested event ideas</h2>
     <ul class="ideas">
       {#each ideas.slice(0, all ? ideas.length : 3) as plan (plan.slug)}
         <li>
@@ -300,5 +301,9 @@
     .past {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
+  }
+  /* the group heading sits right above its card, not a whole grid gap away */
+  .group {
+    margin-bottom: calc(-1 * var(--s5));
   }
 </style>

@@ -19,7 +19,39 @@ export async function load() {
   Object.assign(app, { briefs, presets, reviews, pool, watch, ready: true })
   // the server asks Context.dev at most every five minutes, so asking it once a minute is cheap
   setInterval(async () => (app.watch = await get('changes.json')), 60_000)
-  addEventListener('hashchange', () => (app.hash = location.hash))
+  // A new screen starts at its top; back or forward through the browser's history returns to where the reader was.
+  // Each history entry is numbered in history.state; the position of the current one follows the reader's scrolling,
+  // and is not touched while a fresh render still moves the page.
+  const scrolls: Record<number, number> = {}
+  let at = typeof history.state?.i === 'number' ? (history.state.i as number) : 0
+  let settling = false
+  if (!history.state) history.replaceState({ i: at }, '')
+  history.scrollRestoration = 'manual'
+  addEventListener('scroll', () => { if (!settling) scrolls[at] = scrollY }, { passive: true })
+  // the page jumps a little when a link is pressed, before the hash changes, so the position to come back to is the one at the press
+  let pressed = -1
+  let pressedAt = 0
+  const press = () => { pressed = scrollY; pressedAt = performance.now() }
+  addEventListener('pointerdown', press, true)
+  addEventListener('keydown', press, true)
+  const settle = (y: number, tries: number) => {
+    scrollTo({ top: y })
+    if (Math.abs(scrollY - y) > 2 && tries > 0) setTimeout(() => settle(y, tries - 1), 50)
+    else settling = false
+  }
+  addEventListener('hashchange', () => {
+    if (pressed >= 0 && performance.now() - pressedAt < 1500) scrolls[at] = pressed
+    pressed = -1
+    settling = true
+    const traverse = typeof history.state?.i === 'number'
+    if (traverse) at = history.state.i as number
+    else {
+      at += 1
+      history.replaceState({ i: at }, '')
+    }
+    app.hash = location.hash
+    requestAnimationFrame(() => settle(traverse ? (scrolls[at] ?? 0) : 0, traverse ? 10 : 0))
+  })
   // a field being typed in would lose its text to a poll, so polls wait for the typing to end
   setInterval(async () => {
     if (!(document.activeElement as HTMLElement | null)?.isContentEditable) app.reviews = await get('reviews.json')

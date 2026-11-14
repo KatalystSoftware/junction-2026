@@ -18,6 +18,9 @@
   let all = $state(false)
   let open = $state('')
   let copied = $state('')
+  let sent = $state(false)
+  // the person's invitation is Esittely, served next to this page by serve.py; in development, the hosted copy
+  const esittely = import.meta.env.DEV ? 'https://esittely.duckymcduck2.workers.dev/esittely/#/join' : './esittely/#/join'
 
   const names = $derived(stateNames(plan.coming))
   // the forum's employers are coming already, so their link needs no event; any other invitation names its own
@@ -97,6 +100,11 @@
 
     <section class="people">
       <h2>People to invite <span class="sample">sample data</span></h2>
+      <div class="go">
+        <a class="btn" href={esittely} target="_blank" rel="noopener"><Icon name="out" size={16} />Preview invitation form</a>
+        <button class="btn primary" onclick={() => (sent = true)} disabled={sent}><Icon name={sent ? 'check' : 'send'} size={16} />{sent ? 'Invitations sent' : 'Send invitations'}</button>
+      </div>
+      {#if sent}<p class="sentnote">Each person gets the invitation below, already filled in from what they agreed we may read. Sample data: nothing was sent.</p>{/if}
 
       {#if field && people}
         {#if plan.fields.length > 1}
@@ -153,7 +161,6 @@
         </ul>
       {/if}
 
-      <a class="btn" href="https://esittely.duckymcduck2.workers.dev/#/cand" target="_blank" rel="noopener">A candidate's invitation<Icon name="out" size={14} /></a>
     </section>
   </div>
 </main>
@@ -329,6 +336,30 @@
     border-radius: var(--r2);
     background: var(--wash);
   }
+  /* the two actions of the people side, one row, the same size, the send as the city's step */
+  .go {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--s2);
+    margin: var(--s3) 0 var(--s4);
+  }
+  .go .btn,
+  .go .btn.primary {
+    justify-content: center;
+    min-height: 2.5rem;
+    padding: 0 var(--s3);
+    font-size: var(--t-sm);
+    background-color: var(--ground);
+  }
+  .go .btn.primary {
+    background-color: var(--brand);
+  }
+  .sentnote {
+    margin: calc(-1 * var(--s2)) 0 var(--s4);
+    font-size: var(--t-sm);
+    line-height: 1.4;
+    color: var(--ok);
+  }
   .sample {
     margin-left: var(--s2);
     padding: 0.2em 0.6em;
@@ -480,9 +511,6 @@
     display: inline-block;
     min-width: 2.25rem;
     margin-right: var(--s2);
-  }
-  .people > .btn {
-    margin-top: var(--s5);
   }
 
   @media (max-width: 1100px) {

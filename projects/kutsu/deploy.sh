@@ -23,6 +23,8 @@ rsync -az -e "${SSH[*]}" \
 # No --delete: a tab opened before a redeploy still asks for the old hashed files under assets/, and
 # deleting them leaves that tab blank until it is reloaded.
 rsync -az -e "${SSH[*]}" ui/dist "$HOST:$DIR/ui/"
+# Esittely (projects/espoo-recruitment/app), the applicant's invitation, which serve.py serves under /esittely/
+rsync -az --delete -e "${SSH[*]}" ../espoo-recruitment/app/ "$HOST:$DIR/esittely/"
 # signals.json grows on the server with every live search: ours replace the same ids, the rest stay
 rsync -az -e "${SSH[*]}" signals.json "$HOST:$DIR/signals.ours.json"
 "${SSH[@]}" "$HOST" "cd $DIR && python3 -" <<'PY'

@@ -2,7 +2,7 @@
 
 Prototype for the City of Espoo challenge **"Rethinking Recruitment"** at Junction 2026.
 
-**Live prototype:** https://esittely.duckymcduck2.workers.dev/
+**Live prototype:** https://esittely.duckymcduck2.workers.dev/ opens on Kutsu, the team's organiser app (events, who to invite); this app, the applicant's invitation, is under https://esittely.duckymcduck2.workers.dev/esittely/ and opens from "Preview invitation form" on an event's page. `tools/deploy.sh` publishes both.
 
 **Principle: the AI pulls the information, and humans make the judgements.** Esittely is a light layer on top of event registration:
 - Companies confirm, in about a minute, who they want to meet. Their stand is then promoted to those attendees.
@@ -21,10 +21,13 @@ Prototype for the City of Espoo challenge **"Rethinking Recruitment"** at Juncti
 ## What's in the prototype
 
 **Working:**
-- **Navigation is a horizontal timeline** of one event: 1 Company (3 weeks before), 2 Candidate (2 weeks before), 3 Organiser (1 week before), 4 Event day (`#/event`: both sides see the same planned conversations), 5 Day after. Each tab is one flow.
+- **Navigation**: the top bar links to the five phases in order (For companies, For job seekers, For organisers, Event day, Day after); `#/event` shows both sides the same planned conversations.
 - **Organiser view** (`#/org`): plain-language needs with ESCO links; overlaps, gaps, checks and conversation starters with sources; organiser-chosen filters and sort; names hidden until a decision; a decision with a required reason; decision log and CSV export; aggregate fairness check.
 - **One-minute employer confirmation** (`#/company/puro`): a draft from the public job ad, with each field's source line highlighted; "Is Finnish truly required?" with counts per answer; live anonymous count with numbers under 5 suppressed; what-if counts for each must-have; a "try another job ad" extractor that runs in the browser.
-- **Candidate** (`#/cand`): a 6-step questionnaire on the same dimensions as the employer form; live "why answer" feedback from the pool; stand recommendations with reasons, with every stand still open; "How organisers see you" with logged corrections.
+- **Applicant joining** (`#/join`): consented scan of the applicant's own sources (LinkedIn, CV, GitHub, portfolio; synthetic documents, and a judge can paste their own CV text), every gathered line shown with its source and confirmed, corrected or removed by the applicant, lines left out on purpose (school names, other languages), the three trade-offs and free text in their own words; the organiser then sees "checked by candidate" and the own words.
+- **Demo controls**: a dropdown in the top bar jumps to each state of the demo (company draft or confirmed, applicant consent / check / confirmed, organiser list / review queue / introduced / fairness flag, event day, day after, reset).
+- **Organiser review queue** (`#/org/<company>/review`): one candidate at a time against the company's needs, Introduce / Maybe later / Not this time with a required reason, skip, auto-advance, a live "still to decide" count, and a summary with the fairness check.
+- **Candidate questionnaire by hand** (`#/cand`): a 6-step questionnaire on the same dimensions as the employer form; live "why answer" feedback from the pool; stand recommendations with reasons, with every stand still open; "How organisers see you" with logged corrections.
 
 **Mock-ups:** work-sample review (`#/cand/evidence`) and the post-event relevance screen (`#/after`).
 
