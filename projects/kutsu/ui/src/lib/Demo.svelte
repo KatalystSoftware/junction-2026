@@ -9,6 +9,9 @@
   let open = $state(false)
   let busy = $state(false)
   const company = $derived(route().id || app.presets[0]?.ids[0] || '')
+  $effect(() => {
+    if (!open) sure = false
+  })
 
   const ago = (hours: number) => new Date(Date.now() - hours * 36e5).toISOString()
   /** Mark some of the upcoming event's employers as sent their profile, and some as having confirmed it. Each is flagged as an example. */
@@ -32,6 +35,7 @@
             wants: i % 2 ? ['1:1 meetings with candidates', 'A virtual booth'] : ['1:1 meetings with candidates'],
             invited_at: ago(60 + i * 3),
             joined_at: ago(8 + i * 2),
+            signed: [upcoming(preset).slug],
             example: true,
           }
         : { ...draft, status: 'invited', invited_at: ago(20 + i * 4), example: true }
@@ -41,8 +45,11 @@
     busy = false
     open = false
   }
-  /** Take out every sign-up, real or example: each company is back to the draft it starts from. */
+  /** Take out every sign-up, real or example: each company is back to the draft it starts from. Asked twice, since it cannot be undone. */
+  let sure = $state(false)
   async function reset() {
+    if (!sure) return void (sure = true)
+    sure = false
     busy = true
     await fetch('reviews', { method: 'DELETE' })
     app.reviews = {}
@@ -60,10 +67,10 @@
       <p>See it as</p>
       <a href="#/" onclick={() => (open = false)}>Espoo's organiser</a>
       <a href={joinPath(company)} onclick={() => (open = false)}>An invited company</a>
-      <a href="https://esittely.duckymcduck2.workers.dev/#/cand" target="_blank" rel="noopener">A candidate</a>
+      <a href="./esittely/#/join" target="_blank" rel="noopener">An invited person</a>
       <p>Sign-ups</p>
       <button disabled={busy} onclick={fill}>Fill in example sign-ups</button>
-      <button disabled={busy} onclick={reset}>Clear every sign-up</button>
+      <button disabled={busy} onclick={reset}>{sure ? 'Press again to clear them all' : 'Clear every sign-up'}</button>
     </div>
   {/if}
 </div>

@@ -64,6 +64,9 @@ as one wherever it shows: no company did it.
   of employers, the presentation times and that places are limited, all from Espoo's event page.
 - **Drafted until confirmed:** the roles an employer looks for are drafted from its public
   statements. Counts of employers say how many have confirmed ("9 employers, 2 confirmed").
+- **One profile, many events:** a company confirms its profile once. An invitation and a sign-up are
+  for one event (`#/join/<company>/<event>`), and "Copy invitation" puts a short message on the
+  clipboard, with the link, for a person to send.
 - **Already coming:** the Deep Tech Talent Forum's 27 employers are the ones on Espoo's event page,
   so the screen does not invite them; it sends each its profile to confirm.
 - **Proposed by us:** that Espoo keeps a pool across events at all, the suggested events, and on the

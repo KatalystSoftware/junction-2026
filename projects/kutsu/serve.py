@@ -33,10 +33,13 @@ import signals
 HOST, PORT = os.environ.get("HOST", "127.0.0.1"), 8046
 LIVE_LIMIT = int(os.environ.get("LIVE_LIMIT", "300"))  # about $0.03 and 11 Context.dev credits each
 DIST = lib.HERE / "ui" / "dist"
+# Esittely, the applicant's side of the same idea (projects/espoo-recruitment), served under /esittely/ so the organiser's
+# screen can open the invitation form: a copy next to this file on the server, the sibling project in the repo
+ESITTELY = next((d for d in (lib.HERE / "esittely", lib.HERE.parent / "espoo-recruitment" / "app") if d.is_dir()), None)
 REVIEWS = lib.HERE / "reviews.json"
 DATA = {"/signals.json": "signals.json", "/presets.json": "presets.json", "/pool.json": "pool.json"}
 TYPES = {".html": "text/html; charset=utf-8", ".js": "text/javascript", ".css": "text/css", ".json": "application/json",
-         ".svg": "image/svg+xml", ".woff2": "font/woff2", ".png": "image/png", ".ico": "image/x-icon"}
+         ".svg": "image/svg+xml", ".woff2": "font/woff2", ".png": "image/png", ".ico": "image/x-icon", ".md": "text/markdown; charset=utf-8"}
 STATUSES = {"draft", "invited", "joined"}
 # What a saved sign-up holds. Raise it whenever that changes: a file saved in another shape is set aside
 # at start, never read, because the page keys its lists by what is in it and must not meet an old one.
@@ -116,6 +119,14 @@ class Handler(http.server.BaseHTTPRequestHandler):
             return self.json(progress.get(q.lower(), []))
         if url.path == "/brief" and q:
             return self.research(q)
+        if url.path == "/esittely":
+            self.send_response(301); self.send_header("location", "/esittely/"); self.end_headers(); return
+        if url.path.startswith("/esittely/") and ESITTELY:
+            rel = url.path[len("/esittely/"):] or "index.html"
+            path = ESITTELY / rel
+            if not re.fullmatch(r"[\w.-]+(/[\w.-]+)*", rel) or ".." in rel or not path.is_file():
+                return self.text(404, "not found")
+            return self.reply(200, path.read_bytes(), TYPES.get(path.suffix, "application/octet-stream"))
         # the built page: index.html, and files under assets/ whose names the build chose
         name = "index.html" if url.path == "/" else url.path.lstrip("/")
         path = DIST / name

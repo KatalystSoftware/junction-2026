@@ -89,6 +89,8 @@ export type Review = {
   joined_at?: string
   /** the events the company has been invited to, by slug; its profile is one and the same for all of them */
   events?: string[]
+  /** the events the company has signed up for, by slug */
+  signed?: string[]
   /** filled in by the demo control to show a screen in use; no company did this */
   example?: boolean
 }

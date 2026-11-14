@@ -1,6 +1,6 @@
 <script lang="ts">
   import Cite from './Cite.svelte'
-  import { asking, confirmed, daysTo, recent, some, sourceOf, suggested, upcoming } from './events'
+  import { daysTo, recent, some, sourceOf, suggested, upcoming, type Invitee, type Plan } from './events'
   import { when } from './format'
   import Icon from './Icon.svelte'
   import Logo from './Logo.svelte'
@@ -13,7 +13,15 @@
   // whose people make up the pool every suggestion draws on.
   let all = $state(false)
   const next = $derived(app.presets.map(upcoming))
-  const ideas = $derived(suggested())
+  // each suggestion with up to two employers' news as its reason; one employer's news is a reason only once
+  const ideas = $derived.by(() => {
+    const used = new Set<string>()
+    return suggested().map((plan): { plan: Plan; reasons: Invitee[] } => {
+      const reasons = plan.employers.filter((e) => recent(e) && !used.has(e.brief.id)).slice(0, 2)
+      for (const e of reasons) used.add(e.brief.id)
+      return { plan, reasons }
+    })
+  })
   const left = (date: string) => {
     const days = daysTo(date)
     return days > 1 ? `in ${String(days)} days` : days === 1 ? 'tomorrow' : days === 0 ? 'today' : ''
@@ -23,43 +31,40 @@
 <main>
   <h1>Events</h1>
 
+  <div class="upcoming">
+  <h2 class="group">Upcoming events</h2>
   {#each next as plan (plan.slug)}
     <section class="next">
       <div class="title">
         <h2><a href="#/event/{plan.slug}">{plan.title}</a></h2>
-        <p>{[when(plan.date), left(plan.date)].filter(Boolean).join(', ')}</p>
+        <p>{[plan.when, left(plan.date)].filter(Boolean).join(', ')}</p>
       </div>
-      <ul class="asked">
-        {#each plan.fields.slice(0, 3) as f (f.name)}
-          <li><b>{f.name}</b><span>{asking(f.employers.length, f.employers.filter(confirmed).length)}, {some(f.people.people)} people</span></li>
-        {/each}
-        <li><span class="sample">people are sample data</span></li>
-      </ul>
       <div class="who">
         <Wall briefs={plan.employers.map((e) => e.brief)} />
         <Progress employers={plan.employers} coming={plan.coming} />
       </div>
-      <a class="btn primary" href="#/event/{plan.slug}">Open the event<Icon name="flat" size={18} /></a>
+      <a class="btn primary" href="#/event/{plan.slug}">Manage event<Icon name="flat" size={18} /></a>
     </section>
   {/each}
+  </div>
 
-  <Watch />
+  {#if app.watch.changes.length}<Watch />{/if}
 
   <section>
-    <h2>Suggested next</h2>
+    <h2>Suggested event ideas</h2>
     <ul class="ideas">
-      {#each ideas.slice(0, all ? ideas.length : 3) as plan (plan.slug)}
+      {#each ideas.slice(0, all ? ideas.length : 3) as { plan, reasons } (plan.slug)}
         <li>
           <div>
             <a class="field" href="#/event/{plan.slug}">{plan.title}<Icon name="flat" size={18} /></a>
             <p class="numbers"><b>{plan.employers.length}</b> employers, <b>{some(plan.fields[0]?.people.people ?? 0)}</b> people</p>
           </div>
           <ul class="news">
-            {#each plan.employers.filter(recent).slice(0, 2) as e (e.brief.id)}
+            {#each reasons as e (e.brief.id)}
               {@const source = sourceOf(e)}
               <li>
                 <span class="tile"><Logo brief={e.brief} small /></span>
-                <span><b>{nameOf(e.brief)}</b> {e.news?.line}{#if source && e.news}{' '}<Cite signal={source} label={when(e.news.date)} />{/if}</span>
+                <span><b>{nameOf(e.brief)}</b> {e.news?.line}{#if e.news}, {when(e.news.date)}{/if}{#if source}<Cite signal={source} n={1} />{/if}</span>
               </li>
             {/each}
           </ul>
@@ -86,6 +91,8 @@
       {/each}
     </ol>
   </section>
+
+  {#if !app.watch.changes.length}<Watch />{/if}
 </main>
 
 <style>
@@ -93,9 +100,12 @@
     --brand: var(--city);
     --brand-ink: var(--city-ink);
     display: grid;
-    gap: var(--s8);
+    gap: var(--s7);
+    padding: 0 0 var(--s8);
+  }
+  main > :global(section):not(.next) {
     max-width: 76rem;
-    padding: var(--s7) var(--s7) var(--s8) var(--s6);
+    padding: 0 var(--s7) 0 var(--s6);
   }
   /* the screen is named in the rail; here the next event is the headline */
   h1 {
@@ -111,11 +121,22 @@
   }
 
   /* the event being prepared: its name, every employer's logo, and how far the sign-ups are */
+  /* a field of the city's colour, as an employer's page opens on a field of its own */
   .next {
+    --ink: var(--city-ink);
+    --ink-2: var(--city-dim);
+    --line: var(--city-line);
+    --brand: var(--city-ink);
+    --brand-ink: var(--city);
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: var(--s6) var(--s7);
-    align-items: start;
+    gap: var(--s6);
+    padding: var(--s4) var(--s7) var(--s7) var(--s6);
+  }
+  .next > * {
+    max-width: 72rem;
+  }
+  .next :global(:focus-visible) {
+    outline-color: var(--city-ink);
   }
   .next h2 {
     font: 800 var(--t-2xl) / 0.95 var(--display);
@@ -129,35 +150,15 @@
     font-size: var(--t-lg);
     color: var(--ink-2);
   }
-  .asked {
-    display: grid;
-    gap: var(--s2);
-    padding-top: var(--s2);
-    font-size: var(--t-sm);
-    line-height: 1.3;
-  }
-  .asked li {
-    display: grid;
-    justify-items: start;
-  }
-  .asked span {
-    color: var(--ink-2);
-  }
   .who {
-    grid-column: 1 / -1;
     display: grid;
     gap: var(--s4);
   }
+  .who :global(ul) {
+    grid-template-columns: repeat(auto-fill, minmax(4.5rem, 1fr));
+  }
   .next .btn {
     justify-self: start;
-  }
-  .asked .sample {
-    margin-top: var(--s1);
-    padding: 0.2em 0.6em;
-    border-radius: 99px;
-    background: var(--wash);
-    font: 600 var(--t-xs) / 1.4 var(--text);
-    white-space: nowrap;
   }
 
   /* suggestions are a ruled list, one line of reasoning each: the field, why now, who */
@@ -211,9 +212,6 @@
   .news b {
     font-weight: 600;
   }
-  .news :global(.cite) {
-    white-space: nowrap;
-  }
   .tile {
     flex: none;
     width: 1.5rem;
@@ -244,16 +242,14 @@
   }
 
   .past {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: var(--s5);
-    margin-top: var(--s4);
+    margin-top: var(--s3);
   }
   .past li {
-    display: grid;
-    align-content: start;
-    padding-top: var(--s2);
-    border-top: 2px solid var(--city);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0 var(--s4);
+    border-top: 1px solid var(--line);
     line-height: 1.3;
   }
   .past a {
@@ -284,12 +280,17 @@
   }
   @media (max-width: 820px) {
     main {
-      padding: var(--s6) var(--s4) var(--s7);
-      gap: var(--s7);
+      gap: var(--s6);
     }
     .next {
-      grid-template-columns: 1fr;
+      padding: var(--s3) var(--s4) var(--s6);
       gap: var(--s5);
+    }
+    main > :global(section):not(.next) {
+      padding: 0 var(--s4);
+    }
+    .who :global(ul) {
+      grid-template-columns: repeat(auto-fill, minmax(3.25rem, 1fr));
     }
     .ideas > li {
       grid-template-columns: 1fr;
@@ -297,8 +298,21 @@
     .news {
       grid-row: auto;
     }
-    .past {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  /* the upcoming events share one field; their group heading sits at its top */
+  .upcoming {
+    background: var(--city-raise);
+    color: var(--city-ink);
+  }
+  .group {
+    padding: var(--s6) var(--s7) 0 var(--s6);
+    font-size: var(--t-lg);
+    letter-spacing: -0.01em;
+    color: var(--city-dim);
+  }
+  @media (max-width: 820px) {
+    .group {
+      padding: var(--s5) var(--s4) 0;
     }
   }
 </style>

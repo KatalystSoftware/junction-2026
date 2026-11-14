@@ -20,6 +20,8 @@ export type Plan = {
   /** its employers are on the event's public page already */
   coming: boolean
   date: string
+  /** its dates as the event's own page gives them */
+  when: string
   url: string
   employers: Invitee[]
   /** the fields its employers look for, most asked first; a suggested event has one */
@@ -76,7 +78,7 @@ const fieldsOf = (employers: Invitee[]): Field[] =>
 export const suggested = (): Plan[] =>
   fieldsOf(app.briefs.map(invitee))
     .filter((f) => f.employers.length >= 3 && f.people.people >= 5)
-    .map((f): Plan => ({ slug: slug(f.name), title: f.name, kind: 'suggested', coming: false, date: '', url: '', employers: f.employers.sort(byNews), fields: [f] }))
+    .map((f): Plan => ({ slug: slug(f.name), title: f.name, kind: 'suggested', coming: false, date: '', when: '', url: '', employers: f.employers.sort(byNews), fields: [f] }))
     .sort((a, b) => b.employers.filter(recent).length - a.employers.filter(recent).length || (b.fields[0]?.people.people ?? 0) - (a.fields[0]?.people.people ?? 0))
 
 /** An event that has its employers already. */
@@ -91,6 +93,7 @@ export const upcoming = (preset: Preset): Plan => {
     kind: 'upcoming',
     coming: !!preset.coming,
     date: preset.date ?? '',
+    when: preset.note.split(',')[0] ?? '',
     url: preset.url,
     employers: employers.sort(byNews),
     fields: fieldsOf(employers),

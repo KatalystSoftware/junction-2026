@@ -79,7 +79,7 @@
       <button aria-pressed={i === group} title={i === group ? 'Show every company' : undefined} onclick={() => (group = i === group ? -1 : i)}>{g.label}<span>{g.items.length}</span></button>
     {/each}
   </div>
-  <p class="count">{confirmed} of {shown.length} {names.joined.toLowerCase()}</p>
+  <p class="count">{confirmed} of {shown.length} {group >= 0 && app.presets[group]?.coming ? 'profiles confirmed' : 'signed up'}</p>
 
   <nav>
     {#each sections as section (section.status)}
