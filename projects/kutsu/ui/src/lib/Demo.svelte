@@ -72,11 +72,8 @@
 <svelte:window onkeydown={(e: KeyboardEvent) => { if (e.key === 'Escape') open = false }} onclick={() => (open = false)} />
 
 <div class="demo" role="presentation" onclick={(e) => { e.stopPropagation() }}>
-  <button class="toggle" aria-expanded={open} onclick={() => (open = !open)}>Demo</button>
-  <!-- said while a visitor's own copy holds anything, so nobody takes it for what everyone sees -->
-  {#if mine.count && !demo.key && !open}
-    <button class="mine" onclick={() => (open = true)}>Your own copy: changes stay in this browser</button>
-  {/if}
+  <!-- while a visitor's own copy holds anything, the button stays faintly in view and says so, so nobody takes it for what everyone sees -->
+  <button class="toggle" class:copy={mine.count && !demo.key} aria-expanded={open} onclick={() => (open = !open)}>{mine.count && !demo.key ? 'Demo · your copy' : 'Demo'}</button>
   {#if open}
     <div class="menu">
       <p>See it as</p>
@@ -91,6 +88,7 @@
       <button disabled={busy} onclick={reset}>{sure ? 'Press again to clear them all' : 'Clear every sign-up'}</button>
       {:else}
       <!-- without the key everything works on the visitor's own copy, in this browser; the next visitor finds the demo as it was -->
+      <p class="note">What you change is your own copy, kept in this browser. Nobody else sees it.</p>
       <button disabled={busy || !mine.count} onclick={reset}>{sure ? 'Press again to clear your changes' : 'Clear my changes'}</button>
       <button disabled={busy} onclick={askKey}>{wrong ? 'Not the key. Try again' : 'Unlock with the demo key'}</button>
       {/if}
@@ -144,15 +142,15 @@
   .menu :focus-visible {
     outline-color: #fff;
   }
-  .mine {
-    min-height: 2rem;
-    padding: 0 var(--s3);
-    border: 0;
-    border-radius: 99px;
-    background: oklch(21% 0.03 264 / 0.9);
-    color: #fff;
-    font-weight: 600;
-    backdrop-filter: blur(8px);
+  .toggle.copy {
+    opacity: 0.6;
+  }
+  .menu .note {
+    max-width: 16rem;
+    padding: var(--s1) var(--s3) var(--s2);
+    font-size: var(--t-xs);
+    font-weight: 500;
+    line-height: 1.35;
   }
   .menu {
     display: grid;
