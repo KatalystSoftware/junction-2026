@@ -228,6 +228,39 @@ PYTHONPATH=. uv run python scratch/notes_check.py rows.jsonl --show 20        # 
 PYTHONPATH=. uv run python scratch/late_causes.py --variant notes-offers-8    # why orders were late
 ```
 
+**The note check** ([`notecheck.py`](spreadlab/notecheck.py)) scores the rules (`notes.read`, `notes.limits` and
+`notes.summer_tyres`) against the reveal on every won note of the archive, field by field: 66,672 notes of 483
+seeds in [`catalogue/note-truth.jsonl.gz`](catalogue/note-truth.jsonl.gz). A fifth of the wordings, chosen by a
+hash of the text with its digits masked, is held out: rules are fixed from the other four fifths, and the held-out
+fifth says whether a fix generalises. CI runs `--check`, which fails when any field misses more notes than
+[`catalogue/note-misses.json`](catalogue/note-misses.json) allows. Misses before and after the fixes of 14 November:
+
+| Field | Dev, 53,828 notes | Held out, 12,844 notes |
+| --- | --- | --- |
+| Ready time | 14 → 0 | 3 → 0 |
+| Plates | 2 → 0 | 0 → 0 |
+| Manual | 18 → 0 | 8 → 1 |
+| Note deadline | 1 → 0 | 3 → 1 |
+| Pickup hours | 12 → 0 | 6 → 3 |
+| Delivery hours | 2 → 0 | 0 → 0 |
+| Summer tyres | 550 → 0 | 173 → 0 |
+
+Hours count only sites whose request states hours, and a note's deadline only when it is earlier than the order's.
+The policy does not act on summer tyres yet; the field is read so that the desk can.
+
+```bash
+python3 -m spreadlab.notecheck                              # the table (plain python3, about 30 s)
+python3 -m spreadlab.notecheck --check                      # what CI runs; add --write after an improvement
+python3 -m spreadlab.notecheck --show 20 --field deadline   # the dev split's misses on one field
+uv run python -m spreadlab.notecheck extract                # rebuild the truth from archive/bundles (git lfs pull first)
+uv run python -m spreadlab.notelabel label data/llm-notes/unlabelled.jsonl --new --limit 1500   # Claude Opus labels notes without a reveal
+uv run python -m spreadlab.notelabel report data/llm-notes/unlabelled.jsonl --show deadline     # where the rules disagree with the labels
+```
+
+`notelabel` needs `ANTHROPIC_API_KEY`. On 317 held-out won notes Claude Opus 5.5 (adaptive thinking, low effort)
+missed one field against the reveal, a pickup closing time, so its labels stand in for the truth on wordings that no
+won note has.
+
 ## The win curve
 
 [`curve.py`](spreadlab/curve.py) gives the chance that a dealer buys at a price, and the policy

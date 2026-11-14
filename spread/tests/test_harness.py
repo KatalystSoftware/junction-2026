@@ -403,6 +403,11 @@ TUESDAY_NOON = 24 * 60 + 12 * 60
     ("Toimitus perille viim. huomenna klo 19! Noudettavissa arkisin 7-20", None),
     ("Not ready before tmorrow 9:00. Collect before 21:00. Correction: 20:00", (2, 9, 0)),
     ("Hi there, ready for pickup from 12:30, booking ref 763890", (1, 12, 30)),
+    ("Not ready before tomorrow 10:30, call the customer an hour before arrival!", (2, 10, 30)),  # the call names the delivery, not the ready time
+    ("Huolto kesken, valmis torstaina klo 13.30. Korjaus: perjantaina.", (4, 13, 30)),  # a day corrected in a sentence of its own
+    ("Valmiina huomenna puoli yhdeksästä alkaen, eikun ylihuomenna", (3, 8, 30)),
+    ("Haettavissa ylihuomenna yhdeksän jälkeen. Pitää hakea ennen puolta neljää. Korjaus: puoli kolmelta!", (3, 9, 0)),  # corrects the closing time
+    ("19.00 jalkeen ei enaa luovutuksia!", None),
 ])
 def test_note_says_when_the_car_can_be_collected(text, pickup_from):
     expected = 0 if pickup_from is None else pickup_from[0] * 24 * 60 + pickup_from[1] * 60 + pickup_from[2]
@@ -413,6 +418,8 @@ def test_note_says_when_the_car_can_be_collected(text, pickup_from):
     ("Ei kilpiä, siirtokilvet mukaan.", True, False), ("Hello. Car has no pltaes, bring trade plates", True, False), ("inga skyltar på bilen.", True, False),
     ("Auto pihalla ruudussa 35, avain tiskiltä.", False, False), ("Huoltokirja ja rekisteriote autossa", False, False),
     ("Manuaalivaihteet, kuski tarvii manuaalikortin.", False, True), ("Automaattivaihteinen, ei manuaali", False, False), ("automaattivaihteinen, ei manuaail", False, False), ("manual gearbox", False, True),
+    ("Huom mnuaali.", False, True), ("Hi. It's a maunal", False, True), ("käivaihteinen", False, True), ("Automatic, not a maanual", False, False),
+    ("Poistettu rekisteristä, tarvitaan siirtokiilvet", True, False),
 ])
 def test_note_says_plates_and_a_manual_licence(text, plates, manual):
     facts = notes.read({"text": text}, TUESDAY_NOON)
