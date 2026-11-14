@@ -43,8 +43,8 @@ The page says nothing the repo does not. When one of these files changes, change
 | Entry | Source |
 | --- | --- |
 | OnCallBench | [`projects/oncallbench/README.md`](../oncallbench/README.md): 120 minutes and 60 services under "What the agent has to do"; "finds the causes, then loses on judgment"; 0.45 (shown as 45%), 21% worse than doing nothing and the 2% solve rate (a run solves at 0.95 of the expert) in the "Common seeds" table (Opus 5.5, 48 runs on seeds 200000-200023), which the replay's header also shows |
-| Since When | [`projects/since-when/README.md`](../since-when/README.md): the first two paragraphs, and the loading table (2,919 topics; every revision for three) |
-| Kutsu | [`projects/kutsu/README.md`](../kutsu/README.md): the first paragraphs (new surveys each time; who came and what employers said they need), the two sign-up flows, and the Context.dev table (brand record, careers page), and "What is real, what is sample" (statements quoted from the page they link to; the pool is sample data) |
+| Since When | [`projects/since-when/README.md`](../since-when/README.md): the first two paragraphs, and the loading table (2,919 topics; every revision for three, one version a year for the rest); Lapua Movement is `#/Q1412941` |
+| Kutsu | [`projects/kutsu/README.md`](../kutsu/README.md): the first paragraphs (new surveys each time; who came and what employers said they need), the two sign-up flows, and the Context.dev table (brand record, careers page), and "What is real, what is sample" (statements quoted from the page they link to; the pool is sample data), and "About a person" (only what they hand over; the sign-up submits nothing) |
 | Spread desk | [`spread/README.md`](../../spread/README.md), "How the desk decides" |
 
 The screenshots are cropped to one readable moment: the replay at minute 34 of seed 200019

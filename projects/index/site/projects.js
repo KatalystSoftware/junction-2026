@@ -11,9 +11,9 @@
 //     live    the address the button and the screenshot open
 //     open    the button's words
 //     more    further links beside the button, as [words, address]
-//     result  optional figures shown as a row, as [figure, what it is]
+//     result  optional figures shown as a row, as [figure, what it is], with resultNote under them
 //     what    what it does, in a sentence or two; every claim and number is in the file the README's table names
-//     how     optional technical note under it, in smaller type
+//     how     optional technical note, folded under "How it works"
 //     source  folder in the repo, joined to `repo`
 //     shot    file in shots/ (960 x 600 WebP of the live app)
 //   also     work that is on the team's table but is not one of its entries
@@ -31,10 +31,11 @@ window.KATALYST = {
       open: "Watch the replay",
       more: [["Jump to the costly rollback", "https://incident.katalyst.fyi/?session=l4-s200019&t=33&intro=0"]],
       result: [
-        ["45%", "Claude Opus 5.5's mean, as a share of what an expert script saves (48 runs, 24 unseen seeds)"],
-        ["21%", "of its runs cost more than doing nothing at all"],
-        ["2%", "come within 5% of the expert"],
+        ["45%", "of an expert script's savings, on average"],
+        ["21%", "of runs cost more than doing nothing"],
+        ["2%", "of runs come within 5% of the expert"],
       ],
+      resultNote: "Claude Opus 5.5, 48 runs on 24 seeds no one tuned on.",
       what: "An AI agent is paged into a 120-minute shift on a simulated online shop: 60 services, several faults at once, and every failed request costs revenue. Claude Opus 5.5 finds the causes, then loses on judgment.",
       source: "projects/oncallbench",
       shot: "incident.webp",
@@ -46,8 +47,9 @@ window.KATALYST = {
       for: [["MariaDB", "Wikipedia Through Time"]],
       live: "https://since-when.katalyst.fyi/",
       open: "Open Since When",
-      what: "Pick a topic and see what the Finnish, Swedish and English articles say differently, with the edit and the date each difference began.",
-      how: "MariaDB 11.8 system-versioned tables keep every version: every revision for three topics, one a year for the other 2,916. One statement pairs passages across the editions by vector search, as they stood on a past date. The SQL button shows the statement behind each screen and runs it.",
+      more: [["See one difference: Lapua Movement", "https://since-when.katalyst.fyi/#/Q1412941"]],
+      what: "Pick a topic and see what the Finnish, Swedish and English articles say differently, and since when: the exact edit for three fully loaded topics, the year for the other 2,916.",
+      how: "MariaDB 11.8 system-versioned tables keep every loaded version of every passage, with Wikipedia's own edit times. One statement pairs passages across the editions by vector search, as the articles stood on a past date. The SQL button opens a statement like it, ready to run.",
       source: "projects/since-when",
       shot: "since-when.webp",
     },
@@ -63,7 +65,7 @@ window.KATALYST = {
         ["A person's sign-up", "https://kutsu.katalyst.fyi/#/me"],
       ],
       what: "Each Espoo recruitment event starts with new surveys, and companies and candidates each wait for the other to sign up. Kutsu keeps who came and what employers said they need, and drafts each side an invitation already filled in, to agree with or correct.",
-      how: "Context.dev reads each company's brand record and careers page, and every statement about a company is quoted from a public page it links to. The pool of people is sample data.",
+      how: "Context.dev reads each company's brand record and careers page; each statement about a company links to the public page it was found on, and the company agrees with it or corrects it. About a person, Kutsu reads only what they hand over in their own sign-up, and it submits nothing. The pool of people on Espoo's screen is sample data.",
       source: "projects/kutsu",
       shot: "kutsu.webp",
     },
