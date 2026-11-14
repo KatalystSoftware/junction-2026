@@ -1,8 +1,7 @@
 # Index page
 
-The page at <https://katalyst.fyi/>: one address for submissions, judges and peer voters, with a short
-introduction to each of team Katalyst's Junction 2026 projects and a link to try it. Plain HTML, CSS and
-JavaScript in [`site/`](site/), with no build step.
+The page at <https://katalyst.fyi/>: team Katalyst's Junction 2026 projects, each with a sentence or
+two and a link to try it. Plain HTML, CSS and JavaScript in [`site/`](site/), with no build step.
 
 Run (the page opens straight from disk):
 
@@ -23,38 +22,30 @@ only when the address does, and is applied with `infra/verda/proxy/deploy.sh`.
 
 ## Add or change a project
 
-Everything the page says about the projects is the one block in [`site/projects.js`](site/projects.js):
-a group per challenge, an entry per tool. The comment at its top names the fields.
+The projects are the one list in [`site/projects.js`](site/projects.js); the comment at its top names
+the fields. Edit `name` or `live` to rename or move one, copy an entry to add one, delete an entry to
+drop one. An empty `live` shows the entry's `note` in place of the button. Then run `./deploy.sh`.
 
-- **A new name or address:** edit `name` or `live` on its entry.
-- **A demo goes public:** set `live`. The entry gets its button and a row in the list at the top of the
-  page, and its `note` is no longer shown. An empty `live` shows the `note` and the source link only.
-- **A new project:** copy an entry. Two tools becoming one submission: delete one entry and edit the
-  other. The page states no count and no decision about which tools are submitted together.
-- **A screenshot:** 1280 × 800 of the live app, scaled to 960 × 600 WebP, in `site/shots/`:
+A screenshot is 1280 × 800 of the live app, scaled to 960 × 600 WebP, in `site/shots/`:
 
-      chromium --headless --hide-scrollbars --window-size=1280,800 --screenshot=shot.png <address>
-      cwebp -q 78 -resize 960 600 shot.png -o site/shots/<name>.webp
+    chromium --headless --hide-scrollbars --window-size=1280,800 --screenshot=shot.png <address>
+    cwebp -q 78 -resize 960 600 shot.png -o site/shots/<name>.webp
 
-  Both tools come from nixpkgs (`nix shell nixpkgs#chromium nixpkgs#libwebp`).
-
-Then run `./deploy.sh`.
+Both tools come from nixpkgs (`nix shell nixpkgs#chromium nixpkgs#libwebp`).
 
 ## Where each claim comes from
 
-The page says nothing the repo does not. When one of these files changes, change the entry with it.
+The page says nothing the repo does not, and quotes no numbers except the 120 minutes of the shift.
 
 | Entry | Source |
 | --- | --- |
-| Since When | [`projects/since-when/README.md`](../since-when/README.md), first paragraphs |
-| Edition Ledger | [`projects/mariadb-wikipedia/README.md`](../mariadb-wikipedia/README.md) and [`ui/README.md`](../../ui/README.md) |
-| On-call incident response | [`spikes/aq-incident/README.md`](../../spikes/aq-incident/README.md); the scores (0.57, 0.26, 0.00 and their run counts) are the status of round 4, level 4, in [`LOOP.md`](../../spikes/aq-incident/LOOP.md) |
-| Esittely | [`projects/espoo-recruitment/README.md`](../espoo-recruitment/README.md); 360 candidates and 12 companies are under "Data" |
-| Kutsu | [`projects/kutsu/README.md`](../kutsu/README.md); 46, 208 and 182 are its "Result (round 11)" |
-| Spread desk | [`spread/README.md`](../../spread/README.md): 0.4 ms under "How the desk decides", €1,401.25, 68 orders and 97.1% in the "Test final" row of its results |
-| The team | the root [`README.md`](../../README.md) |
+| Since When | [`projects/since-when/README.md`](../since-when/README.md) |
+| On-call incident response | [`spikes/aq-incident/README.md`](../../spikes/aq-incident/README.md) and its [`replay/README.md`](../../spikes/aq-incident/replay/README.md); "worse than a scripted expert" is the round 4 status in [`LOOP.md`](../../spikes/aq-incident/LOOP.md) |
+| Esittely | [`projects/espoo-recruitment/README.md`](../espoo-recruitment/README.md) |
+| Kutsu | [`projects/kutsu/README.md`](../kutsu/README.md) |
+| Spread desk | [`spread/README.md`](../../spread/README.md) and the [challenge brief](../../docs/challenges/main/bahn-express--spread.md) |
 
-The source links on the page point at this repository, which is private at the time of writing: they
-open for the team and answer 404 for everyone else until the repository is public.
+The source links point at this repository, which is private at the time of writing: they answer 404
+for everyone outside the team until it is public.
 
 The typeface is Archivo, under the SIL Open Font License ([`site/fonts/OFL.txt`](site/fonts/OFL.txt)).
