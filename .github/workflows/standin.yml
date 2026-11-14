@@ -1,0 +1,57 @@
+name: Spread stand-in
+
+# Fits and checks each design of the Spread stand-in (spread/scratch/standin/designs.json) on its own CRACI runner, in parallel.
+# Offline: the jobs read packed saved weeks from the release `spread-standin-data` and get no secret and no team key.
+# Start a round by pushing the commit to the branch `standin-ci`; each design's report and result are in its artifact.
+on:
+  push:
+    branches: [standin-ci]
+
+permissions:
+  contents: read
+
+jobs:
+  designs:
+    runs-on: craci
+    outputs:
+      names: ${{ steps.names.outputs.names }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: names
+        run: echo "names=$(python3 -c 'import json; print(json.dumps([d["name"] for d in json.load(open("spread/scratch/standin/designs.json"))]))')" >> "$GITHUB_OUTPUT"
+
+  design:
+    needs: designs
+    runs-on: craci
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        name: ${{ fromJSON(needs.designs.outputs.names) }}
+    steps:
+      - uses: cracicorp/setup@v1
+        with:
+          size: "32"
+      - uses: actions/checkout@v4
+      - name: Python packages
+        run: |
+          python3 -m pip install --quiet --user numpy https://spread.bahnexpress.com/kit/spread-0.1.0-py3-none-any.whl ||
+            python3 -m pip install --quiet --user --break-system-packages numpy https://spread.bahnexpress.com/kit/spread-0.1.0-py3-none-any.whl
+      - name: Saved weeks
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python3 spread/scratch/standin/fetch_data.py spread-standin-data "$RUNNER_TEMP/spread-data"
+      - name: Fit and check
+        env:
+          DESIGN: ${{ matrix.name }}
+        run: |
+          export SPREAD_DATA="$RUNNER_TEMP/spread-data"
+          echo "nproc=$(nproc) mem=$(free -g | awk '/Mem:/{print $2}')G python=$(python3 --version)"
+          cd spread && python3 scratch/standin/ci.py "$DESIGN" "$GITHUB_WORKSPACE/out" "$(nproc)"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: standin-${{ matrix.name }}
+          path: out/
+          if-no-files-found: ignore
+          retention-days: 7
