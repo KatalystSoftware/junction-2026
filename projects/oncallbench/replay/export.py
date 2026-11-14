@@ -55,6 +55,8 @@ POLICY_LABELS = {
 MODELS = {
     "claude-opus-5-5": "Claude Opus 5.5", "claude-sonnet-5-5": "Claude Sonnet 5.5",
     "gemini-3.1-pro-preview": "Gemini 3.1 Pro",
+    # served from Modal by ../rl/modal_serve.py; the adapter is ../rl/RESULTS.md's SFT adapter
+    "gemma26-base": "Gemma 4 26B-A4B (untrained)", "gemma26-sft": "Gemma 4 26B-A4B + our SFT adapter",
 }
 FAULT_LABELS = {
     "bad_deploy": "bad deploy", "bad_config": "bad config", "leak": "memory leak",

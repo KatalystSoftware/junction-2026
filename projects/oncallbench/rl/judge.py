@@ -7,6 +7,7 @@ ended, and harness errors. Each trial's signed action log is replayed in its var
 
 import json
 import math
+import statistics
 import sys
 from pathlib import Path
 
@@ -87,7 +88,8 @@ def main(paths, md=False):
         s = [r["score"] or 0.0 for r in rs]
         mean = sum(s) / len(s)
         se = math.sqrt(sum((x - mean) ** 2 for x in s) / max(1, len(s) - 1) / len(s))
-        print(f"{name}: n={len(s)} mean={mean:.3f} se={se:.3f} scores={[round(x, 3) for x in s]}")
+        print(f"{name}: n={len(s)} mean={mean:.3f} se={se:.3f} median={statistics.median(s):.3f} "
+              f"range={min(s):.2f}-{max(s):.2f} scores={[round(x, 3) for x in s]}")
 
 
 if __name__ == "__main__":

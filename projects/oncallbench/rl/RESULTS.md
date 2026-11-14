@@ -92,6 +92,10 @@ context. The mean score is ± one standard error.
 | + SFT (LoRA) | fresh 200000+ | 4 | 0.726 ± 0.026 | 0.587 ± 0.030 |
 | + SFT (LoRA) | its own training seeds 200+ | 4 | 0.772 ± 0.027 | 0.574 ± 0.034 |
 
+The adapter `ckpt/gemma26-sft` (`adapter_model.safetensors`, sha256
+`588e977f6446b7363f979ace352410d9d299910b196eb95296dd780126b046b6`) was trained on
+`cache/demos-l34.jsonl`. That file, like every other demo file (`demos.jsonl`, `demos-l3.jsonl`,
+`demos-l4.jsonl`), contains no seed from 101-106 and none from 200000 up.
 The fresh seeds were never in any demo or evaluation before this run. The adapter scores the same
 on its training seeds, the held-out seeds and the fresh ones, so the gain does not come from
 remembering seeds. It also reads each incident rather than replaying the reference's routine
