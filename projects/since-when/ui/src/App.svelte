@@ -79,7 +79,7 @@
 		<button class="cdx-button cdx-button--action-progressive cdx-button--weight-quiet" onclick={() => (ui.topics = true)}>Topics</button>
 		<span class="grow"></span>
 		{#if flags.fixture}<span class="fixture">Fixture data</span>{/if}
-		<button class="cdx-button" aria-expanded={ui.sql} aria-controls="sql-panel" onclick={() => (ui.sql = !ui.sql)}>SQL</button>
+		<button class="cdx-button" aria-haspopup="dialog" onclick={() => (ui.sql = true)}>SQL</button>
 	</div>
 </header>
 
