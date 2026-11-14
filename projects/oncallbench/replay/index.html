@@ -5,12 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script>
   // The replay is drawn for a laptop, 1280 px and up; squeezed onto a phone its labels pile up. So a
-  // phone gets the laptop layout zoomed out, to pinch into, under a note saying so (style.css, .phone).
+  // phone gets phone.js instead of app.js: the same results as a page that reads at phone width
+  // (style.css, .phone-view). Its "Show the laptop replay" adds ?desk=1, which gives the laptop
+  // layout zoomed out, to pinch into, under a note saying so (style.css, .phone).
   // A phone's screen is under 600 px on its short side, whichever way it is held; a laptop's or a
   // tablet's is not, however narrow its window.
   if (Math.min(screen.width, screen.height) < 600) {
-    document.querySelector('meta[name="viewport"]').content = "width=1280";
-    document.documentElement.classList.add("phone");
+    if (new URLSearchParams(location.search).get("desk") === "1") {
+      document.querySelector('meta[name="viewport"]').content = "width=1280";
+      document.documentElement.classList.add("phone");
+    } else {
+      document.documentElement.classList.add("phone-view");
+    }
   }
 </script>
 <title>OnCallBench: on-call shift replay</title>
@@ -22,7 +28,7 @@
      from file:// where fetch is blocked. export.py writes both. -->
 <script src="data/index.js"></script>
 <script src="data/spread.js"></script>
-<script src="app.js" defer></script>
+<script>document.write('<script src="' + (document.documentElement.classList.contains("phone-view") ? "phone.js" : "app.js") + '" defer><\/script>');</script>
 </head>
 <body class="loading">
 <p class="desk-note">Made for a laptop screen, sorry: pinch to zoom in, or open it on a computer.</p>

@@ -148,6 +148,13 @@ python3 export.py --spread && ./deploy.sh   # pick up new runs from ../metrics.j
 
 ## Using the page
 
+- On a phone (a screen under 600 px on its short side) the replay does not fit: it is drawn for
+  1280 px and up. `index.html` loads `phone.js` there instead of `app.js`, which draws the same
+  episode as a page that reads at 390 px: the scores band as a dot strip, the revenue lost over the
+  shift for the agent's run and the reference, a table of every run's score and cost, each run's
+  fixes and throttles in order (with the reference's reasons), the agent's closing report and the
+  reference's rules. `?session=` and `?run=` pick what it shows. Its "Show the laptop replay" adds
+  `?desk=1`: the laptop layout zoomed out to pinch into, under a note that says so.
 - First visit: a three-line intro (what this is, what to watch, the result). It is shown once;
   the "?" in the bar reopens it. A link to a moment skips it.
 - Under each run's name: what it is doing now, and why. For the reference that is the runbook

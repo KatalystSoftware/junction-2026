@@ -17,6 +17,6 @@ done
 if grep -q '"placeholder":true' data/spread.js 2>/dev/null; then
   echo "refused: data/spread.js holds placeholder scores. Run python3 export.py --spread first." >&2; exit 1
 fi
-tar -c index.html app.js style.css logo.svg fonts data/index.js data/spread.js data/l*-s*.js \
+tar -c index.html app.js phone.js style.css logo.svg fonts data/index.js data/spread.js data/l*-s*.js \
   | ssh "$host" "mkdir -p $dir && rm -rf $dir/data && tar -x --no-same-owner -C $dir && chmod -R a+rX $dir"
 echo "shipped to $host:$dir"
