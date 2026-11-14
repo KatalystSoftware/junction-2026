@@ -104,6 +104,31 @@ unprotected runs as 0.03 to 0.59, which is the highest of them as run; graded ag
 round-11 reference that run is 0.61, and the page shows the regraded score like the report's own
 table.
 
+## The scores band
+
+Above the replay, one row per model: a dot for every run on the pre-registered level-4 seeds
+(404, 418, 500, 502, 503 and 504, three runs per model per seed), its mean as a tick with the 95%
+interval as a bar, and the numbers on the right. The reference's 1.00 and doing nothing's 0.00 are
+the two walls. It shows the gap holds over repeated runs, not one seed and one run.
+
+```
+python3 export.py --spread && ./deploy.sh   # pick up new runs from ../metrics.json and ship them
+```
+
+- The runs are `../metrics.json` rows of round 15, level 4, with `run` = `fable`, `opus`,
+  `gemma-ft` or `gemma-base`. `notes.json` under `spread` sets the round, the seeds, the models
+  in order with their labels, and the caption. A model with no runs yet has no row, and with no
+  runs at all the band is not drawn, so the page looks as it did before. To drop a model, delete
+  its line there. Runs on other seeds are left out, with a note.
+- The mean counts each seed once. Its 95% interval comes from the seed means (Student's t, seeds
+  minus one degrees of freedom), because the runs on one seed share its outage and are not
+  independent. With six seeds that is wider than a t-interval over the 18 runs would be.
+- It carries scores only, no actions or faults, so it is safe for any seed.
+- `--metrics <file>` reads another file of rows in the same shape, for a look at the band before
+  the runs exist. The output is marked as a placeholder, the page says so in red, and `deploy.sh`
+  refuses to ship it.
+- `?spread=0` leaves the band out.
+
 ## Using the page
 
 - First visit: a three-line intro (what this is, what to watch, the result). It is shown once;
@@ -150,7 +175,8 @@ paused on that minute for a still.
 - `t=44` alone opens paused on that minute, for a still.
 - `zoom=1.1` enlarges all type for video compression. On seed 109 at 1920x1080, 1.1 places every
   label clear of the graph; at 1.15 the loyalty-svc caption lands on its neighbours, and at 1.2
-  the bar runs out of room.
+  the bar runs out of room. With the scores band shown the graphs are shorter: use `zoom=1`,
+  which keeps the labels clear, or add `spread=0`.
 
 ## Deploy
 
@@ -158,7 +184,7 @@ paused on that minute for a still.
 ./deploy.sh
 ```
 
-Copies the page, the logo, the font and the bundles to the Verda machine, into the folder the team's shared
+Copies the page, the logo, the font, the scores band and the bundles to the Verda machine, into the folder the team's shared
 proxy serves as `https://incident.katalyst.fyi/` (`infra/verda/proxy/sites/incident.caddy`). It
 replaces the `data/` folder there, copies files only and restarts nothing; the proxy does not
 need a reload for new files. It needs SSH access to the machine (`VERDA_HOST`, or a

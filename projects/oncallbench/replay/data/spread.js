@@ -1,0 +1,1 @@
+window.REPLAY_SPREAD = {"caption":"Every dot is one run on a seed nobody tuned on; the expert script scores 1.00.","level":4,"models":[],"round":15,"seeds":[404,418,500,502,503,504],"source":"metrics.json, round 15"};

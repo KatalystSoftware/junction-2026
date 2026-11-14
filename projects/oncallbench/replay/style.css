@@ -38,7 +38,7 @@ html, body { height: 100%; }
 body {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-rows: auto auto minmax(0, 1fr);  /* the bar, the scores band (when it has runs), the replay */
   background: var(--paper);
   color: var(--ink);
   font: 450 1rem/1.35 "Archivo", system-ui, sans-serif;
@@ -124,6 +124,7 @@ body {
 /* --- the two runs -------------------------------------------------------------- */
 
 main {
+  grid-row: 3;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   grid-template-rows: minmax(0, 1fr) var(--deck);
@@ -131,6 +132,49 @@ main {
   padding: 0.9rem 1.4rem 1rem;
   min-height: 0;
 }
+
+/* --- the scores band: a dot per run, the mean and its 95% interval, the reference's 1.00 and doing nothing's 0 */
+
+.spread {
+  grid-row: 2;
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr) max-content;
+  grid-auto-rows: 1.45rem;
+  column-gap: 1.4rem;
+  align-items: center;
+  margin: 0.7rem 1.4rem 0;
+  padding: 0.3rem 1.2rem 0.2rem;
+  background: var(--sheet);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+}
+.spread[hidden] { display: none; }
+.loading .spread { visibility: hidden; }
+.spread > * { grid-column: 2; }
+.spread-caption { grid-column: 1 / 3; font-size: 1.08rem; font-weight: 600; }
+.spread .placeholder { margin-left: 0.8rem; padding: 0.05rem 0.45rem; border-radius: 3px; font-size: 0.85rem;
+  color: var(--sheet); background: var(--red); }
+.spread-head { grid-column: 3; font-size: 0.85rem; color: var(--ink-2); }
+.spread-name { grid-column: 1; font-weight: 600; white-space: nowrap; }
+.spread-stat { grid-column: 3; white-space: nowrap; }
+.spread-stat b { font-weight: 700; margin-right: 0.6rem; }
+.spread-stat span { color: var(--ink-2); font-size: 0.9rem; }
+/* the plot runs from 0 to 1 inside a margin, so a dot on either wall stays whole */
+.spread-walls, .spread-lane, .spread-axis { position: relative; margin: 0 0.5rem; align-self: stretch; }
+.spread-walls i { position: absolute; top: -0.15rem; bottom: -0.15rem; width: 0; border-left: 1px solid var(--rule); }
+.spread-walls .floor { border-left: 1.5px dashed var(--ink-3); }
+.spread-walls .ceiling { border-left: 2px solid var(--ink); }
+.spread-lane { border-bottom: 1px solid var(--rule-soft); }
+.spread-lane i { position: absolute; }
+.spread-lane .dot { width: 0.66rem; height: 0.66rem; margin: -0.33rem 0 0 -0.33rem; border-radius: 50%;
+  background: oklch(0.38 0.05 263 / 0.62); border: 1px solid oklch(1 0 0 / 0.75); }
+.spread-lane .ci { top: calc(50% - 0.15rem); height: 0.3rem; border-radius: 0.15rem; background: var(--red); opacity: 0.85; }
+.spread-lane .mean { top: 15%; bottom: 15%; width: 0; margin-left: -1.5px; border-left: 3px solid var(--red-deep); }
+.spread-axis { font-size: 0.82rem; color: var(--ink-2); }
+.spread-axis span { position: absolute; top: 0.15rem; transform: translateX(-50%); white-space: nowrap; }
+.spread-axis .start { transform: none; }
+.spread-axis .end { transform: translateX(-100%); color: var(--ink); }
+.spread-axis b { font-weight: 700; color: var(--ink); }
 
 .panel {
   display: grid;
