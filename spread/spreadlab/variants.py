@@ -456,18 +456,15 @@ VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss
 # The aggressive row A1 on safe row 7: the day cap under 760 drivers and `late_cost` 100 at 760 or more.
 VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100"] = _full_weeks(
     VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62"], late_cost=100)
-# The aggressive line's ladder on safe row 7, heaviest first, each only in a week of 760 drivers or more; a thinner week plays
-# row 7 exactly. R-max, R-mid and R-mild are the stand-in climb's `agg-r-*`, R-high and `-ss0` are lane 1 A's `agg-late100-ss0-cost11` and
-# `agg-late100-ss0`, and the lightest rung is A1 (`…-cap62-late100`). The kinds quoted cheaper: trade-in 2.0, private pickup 1.4, private delivery 1.2.
-_ROW_7 = VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62"]
+# More rungs on the aggressive row A1.7 (`…-cap62-late100`), each only in a week of 760 drivers or more and row 7 below that:
+# the climb's `agg-r-mild` (cost 1.15, the 12-hour count, the kinds quoted cheaper: trade-in 2.0, private pickup 1.4, private
+# delivery 1.2) and lane 1 A's `agg-late100-cost10` (cost 1.0).
+_A1_7 = VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100"]
 _CHEAP_KINDS_760 = {"private_pickup": {**KINDS["private_pickup"], "cost": 1.4}, "private_delivery": {**KINDS["private_delivery"], "cost": 1.2},
                     "trade_in": {**KINDS["trade_in"], "cost": 2.0}}
-VARIANTS.update({f"aggr7-{tail}": _full_weeks(_ROW_7, **knobs) for tail, knobs in (
-    ("max", {"late_cost": 100, "kinds": _CHEAP_KINDS_760, "slow_step": 0.0, "cost": 1.05, "queue_hours": 6, "max_unbooked": 40, "min_slack": 240}),
-    ("high", {"late_cost": 100, "slow_step": 0.0, "cost": 1.1}),
-    ("ss0", {"late_cost": 100, "slow_step": 0.0}),
-    ("mid", {"late_cost": 100, "kinds": _CHEAP_KINDS_760, "cost": 1.1, "queue_hours": 12}),
-    ("mild", {"late_cost": 100, "kinds": _CHEAP_KINDS_760, "cost": 1.15, "queue_hours": 12}))})
+VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100-mild"] = _full_weeks(
+    _A1_7, kinds=_CHEAP_KINDS_760, cost=1.15, queue_hours=12)
+VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100-cost10"] = _full_weeks(_A1_7, cost=1.0)
 # The joint search's volume parts on the aggressive row A1.7, only in a week of 760 drivers or more; a thinner week plays A1.7
 # exactly. Every knob here wins orders in the stand-in climb on its own: the quote's flat cost 1.1 (+561 a week on the old base,
 # +273 at 1.15 on step04), the waiting cars counted only when due within 12 hours (+320 on row 6), and the declined kinds at a
@@ -485,3 +482,12 @@ VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss
 for _row in ("fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62",
              "fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100"):
     VARIANTS[f"{_row}-onward-all"] = {**VARIANTS[_row], "pair_more_drivers": 0}
+
+# Aggressive: the heaviest volume rung on row A1, all at 760 drivers or more. No waiting-car surcharge (`slow_step` 0, not 0.2),
+# the cost at 1.05, the waiting cars counted within 6 hours with a gate of 40, 4 hours to find a driver, not 5, and the kinds
+# quoted cheaper (trade-in 2.0, private pickup 1.4, private delivery 1.2). A1's `late_cost` 100 stays. Under 760 drivers it plays A1.
+_A1 = VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100"]
+VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss02-cap62-late100-agg-max"] = _full_weeks(
+    _A1, slow_step=0.0, cost=1.05, queue_hours=6, max_unbooked=40, min_slack=240,
+    kinds={**_A1["kinds"], "private_pickup": {**_A1["kinds"]["private_pickup"], "cost": 1.4},
+           "private_delivery": {**_A1["kinds"]["private_delivery"], "cost": 1.2}, "trade_in": {**_A1["kinds"]["trade_in"], "cost": 2.0}})
