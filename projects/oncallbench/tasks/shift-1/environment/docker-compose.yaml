@@ -5,6 +5,10 @@ services:
         condition: service_healthy
     volumes:
       - ledger:/ledger:ro
+    # The public replay viewer serves this estate's faults and every call the reference made
+    # (redteam/REPORT.md): the agent's container must not reach it.
+    extra_hosts:
+      - "incident.katalyst.fyi:127.0.0.1"
 
   mcp-server:
     build:
