@@ -1,4 +1,4 @@
-"""Gap finder command line. Run from the repository root:
+"""Gap finder command line. Run from projects/since-when/:
 
     python -m gapfinder schema                 # create the tables
     python -m gapfinder load [--only Q…]       # topics, history (fi, sv, en), page views
@@ -9,7 +9,7 @@
     python -m gapfinder findings lexicon pairs.jsonl > lexicon.jsonl   # word-list rows
     python -m gapfinder measure                # index recall and query times, saved to a file
     python -m gapfinder measure --versioned-index mine_a3   # a vector index on a versioned table
-    python -m gapfinder serve [--port 8077]    # the HTTP API (docs/gap-finder/api.md)
+    python -m gapfinder serve [--port 8077]    # the HTTP API (docs/api.md)
 """
 import argparse
 import pathlib

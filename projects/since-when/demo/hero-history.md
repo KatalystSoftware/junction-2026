@@ -10,12 +10,12 @@ All three topics got the full history (no fallback to "since 2022").
 ## Rebuild from a fresh restore of the snapshot
 
 Nothing is refetched and no model runs: the revisions and the embeddings come from
-`~/junction2026-data/mariadb/revisions/` (layout in its `README.md`). Run from the repo root, on
+`~/junction2026-data/mariadb/revisions/` (layout in its `README.md`). Run from `projects/since-when/`, on
 this branch or a branch that has it merged.
 
 ```sh
 M=~/junction2026-data/mariadb
-run=projects/mariadb-wikipedia/demo/hero-history-run.sh   # <container suffix> <memory> <module and arguments>
+run=demo/hero-history-run.sh   # <container suffix> <memory> <module and arguments>
 
 # 1. The full_history table (idempotent).
 sh $run schema 1500m gapfinder schema
@@ -28,7 +28,7 @@ echo "DELETE FROM coverage WHERE wikidata_id IN ('Q1412941','Q736268','Q2457646'
 sh $run align 1500m gapfinder align --only Q1412941 Q736268 Q2457646
 
 # 4. Check through an API that reads the same database (mine ran on 8277, my pages on 8278).
-sh projects/mariadb-wikipedia/demo/hero-history-check.sh http://127.0.0.1:8277
+sh demo/hero-history-check.sh http://127.0.0.1:8277
 ```
 
 Order with builder 4's replay (`hero-findings-notes.md`): my steps 1 to 3 first, then theirs. Their
@@ -254,7 +254,7 @@ unchanged.
 
 On the state after the 06:00 rebuild:
 
-- `sh projects/mariadb-wikipedia/demo/hero-history-check.sh http://127.0.0.1:8277` and the same on
+- `sh demo/hero-history-check.sh http://127.0.0.1:8277` and the same on
   `http://127.0.0.1:8278` (my pages, which pass `/api/*` on): exit 0, 62 lines `ok` (54 compare views, 8 first sentences), none
   `FAIL`. It asks the compare view for each topic, each of the six ordered language pairs and
   three dates (2008-06-15, 2015-06-15, 2026-10-24) and fails on any "not compared yet" row or

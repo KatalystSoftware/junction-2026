@@ -1,6 +1,6 @@
 """Check that every quote of the shortlist is in the revision of Wikipedia it names.
 
-    python3 projects/mariadb-wikipedia/demo/check_quotes.py [hero-findings.json] [--offline] [--write]
+    python3 demo/check_quotes.py [hero-findings.json] [--offline] [--write]
 
 Prints pass or FAIL for each quote and exits 1 if any fails. --write also writes hero-findings.md
 beside the JSON file, from the findings whose quotes all pass. A quote passes when it is an exact

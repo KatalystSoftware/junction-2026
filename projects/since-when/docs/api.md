@@ -1,11 +1,11 @@
-# Gap finder HTTP API
+# Since When HTTP API
 
 The contract between the data service (`gapfinder/`), the UI (`ui/`) and the differences
 classifier (`differences/`). JSON over HTTP, all paths under `/api`. The UI's server proxies
 `/api/*` to the data service when `GAPFINDER_API=http://host:port` is set, so the data service
 sends no CORS headers.
 
-Run the data service from the repository root:
+Run the data service from `projects/since-when/`:
 
 ```sh
 python -m gapfinder serve --port 8077

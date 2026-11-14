@@ -2,7 +2,7 @@
 
 Written by `check_quotes.py --write` from `hero-findings.json`; edit the JSON, not this file.
 
-Every quote below is an exact substring of the plain text of the revision it names, as Wikipedia renders it at the permanent link (`python3 projects/mariadb-wikipedia/demo/check_quotes.py` prints pass or fail per quote; a finding with a failing quote is left out).
+Every quote below is an exact substring of the plain text of the revision it names, as Wikipedia renders it at the permanent link (`python3 demo/check_quotes.py` prints pass or fail per quote; a finding with a failing quote is left out).
 Each finding was reported by the product classifier (Nemotron, prompt version 6) and is in the scratch database; Haiku classified the same passage pairs as a second opinion.
 The main list of a topic has only findings both models put in the same category. A finding the two models categorise differently, or a contradiction, is under "Needs a human look".
 Where a statement says an edition does not mention something, the whole rendered article of that edition was searched by hand for it; the script checks the quotes, not the absence.

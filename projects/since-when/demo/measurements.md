@@ -1,13 +1,13 @@
 # Measurements: notes for the integrator (builder 3)
 
 Branch `feat/mariadb-measurements`. Code: `gapfinder/measure.py` and its options in
-`gapfinder/__main__.py`. Result files: `projects/mariadb-wikipedia/measurements/`.
+`gapfinder/__main__.py`. Result files: `measurements/`.
 
 ## The two commands to rerun on a quiet machine
 
-Run from the checkout root. Both read the shared `gapfinder` database on scratch; the second
+Run from `projects/since-when/`. Both read the shared `gapfinder` database on scratch; the second
 writes only `mine_a3`. Each saves `<kind>-<UTC time>.json` and `.md` under
-`projects/mariadb-wikipedia/measurements/` and prints the file names. Tonight's runs carry
+`measurements/` and prints the file names. Tonight's runs carry
 `--provisional`, which marks the times as taken on a loaded machine; leave it off on a quiet one.
 
 ```bash
@@ -18,8 +18,8 @@ run() {  # run <container name> <measure options...>
     --env-file $M/scratch.env -e DB_HOST=gapfinder-scratch-db -e DB_PORT=3306 \
     -e GAPFINDER_COMMIT=$(git rev-parse --short HEAD) \
     -v $R/gapfinder:/app/gapfinder:ro -v $R/differences:/app/differences:ro -v $R/ui:/app/ui:ro \
-    -v $R/projects/mariadb-wikipedia/measurements:/app/projects/mariadb-wikipedia/measurements \
-    gapfinder-app:live-09f2a79 python -m gapfinder measure "$@" \
+    -v $R/measurements:/app/measurements \
+    since-when python -m gapfinder measure "$@" \
     --note "scratch server: Docker container limited to 3.5 GB of memory and 4 CPUs"
 }
 
@@ -213,7 +213,7 @@ milliseconds."
 # the spike on scratch (1 min)
 docker run --rm --name gapfinder-a3-spike --memory 1500m --network gapfinder-scratch-net \
   --env-file $M/scratch.env -e DB_HOST=gapfinder-scratch-db -e DB_PORT=3306 -e DB_NAME=mine_a3 \
-  -v $R/spikes/mariadb-wikipedia:/spike:ro -w /spike gapfinder-app:live-09f2a79 python svt_vector_recall.py
+  -v $R/../../spikes/mariadb-wikipedia:/spike:ro -w /spike since-when python svt_vector_recall.py
 
 # a throwaway 11.8.6 server; add --mhnsw-max-cache-size=536870912 after the image name for 512 MB
 docker run -d --name gapfinder-a3-db1186 --memory 1g --network gapfinder-scratch-net \
@@ -222,10 +222,10 @@ docker run -d --name gapfinder-a3-db1186 --memory 1g --network gapfinder-scratch
 # the spike against it (1 min at 512 MB, 3.5 min at 16 MB), then the plain-table check
 docker run --rm --name gapfinder-a3-spike --memory 1500m --network gapfinder-scratch-net \
   -e DB_HOST=gapfinder-a3-db1186 -e DB_PORT=3306 \
-  -v $R/spikes/mariadb-wikipedia:/spike:ro -w /spike gapfinder-app:live-09f2a79 python svt_vector_recall.py
+  -v $R/../../spikes/mariadb-wikipedia:/spike:ro -w /spike since-when python svt_vector_recall.py
 docker run --rm --name gapfinder-a3-spike --memory 1500m --network gapfinder-scratch-net \
   -e DB_HOST=gapfinder-a3-db1186 -e DB_USER=wikihistory -e DB_PASSWORD=wikihistory -e DB_NAME=wikihistory \
-  -v $R/projects/mariadb-wikipedia/measurements:/m:ro gapfinder-app:live-09f2a79 python /m/cache_check.py
+  -v $R/measurements:/m:ro since-when python /m/cache_check.py
 docker rm -f gapfinder-a3-db1186
 ```
 
@@ -269,6 +269,7 @@ The `wikihistory` name and password are the spike's public defaults, used only f
 2. These still state 0.13 to 0.23 as the finding and are outside my row:
    `spikes/mariadb-wikipedia/HACKING.md` lines 51 to 53, `docs/research/mariadb-wikipedia.md`
    lines 283 and 428, and the docstring of `spikes/mariadb-wikipedia/svt_vector_recall.py`.
+   Corrected since, on branch `docs/mariadb-recall-correction`.
 3. Builder 1's new table `full_history` (`wikidata_id`, `lang`, `since`; empty at 03:19 UTC)
    already shows in run 3 with an empty description. Give it, and any other new table, a sentence
    in `TABLES` in `gapfinder/measure.py`; I did not guess at its meaning.

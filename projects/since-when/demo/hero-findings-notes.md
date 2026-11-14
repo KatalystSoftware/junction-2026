@@ -4,7 +4,7 @@ Night of 2026-11-14, branch `feat/mariadb-hero-findings`. The shortlist is `hero
 (written from `hero-findings.json` by `check_quotes.py --write`). This file says how the rows got
 into the scratch database, how to put them back, what the two models said, and what I decided.
 
-`M=~/junction2026-data/mariadb`, `R` = the repository root. Topics: Lapua Movement `Q1412941`,
+`M=~/junction2026-data/mariadb`, `R` = `projects/since-when/`, where the commands run. Topics: Lapua Movement `Q1412941`,
 Finnish War `Q736268`, Diet of Porvoo `Q2457646`.
 
 ## Put my rows back after a fresh restore of the snapshot
@@ -13,27 +13,27 @@ No model is called and nothing is fetched: answers come from `$M/classify/nemotr
 rendered revisions from `$M/revisions/agent4/`. The whole replay takes under a minute.
 
 ```bash
-R=$(git rev-parse --show-toplevel); M=$HOME/junction2026-data/mariadb
+R=$PWD; M=$HOME/junction2026-data/mariadb
 run() { docker run --rm --network gapfinder-scratch-net --env-file $M/scratch.env -e DB_HOST=gapfinder-scratch-db -e DB_PORT=3306 \
   -v $R/gapfinder:/app/gapfinder:ro -v $R/differences:/app/differences:ro -v $M/classify:/classify:ro --memory 1500m "$@"; }
 
 # 1. the aligned-but-different pairs of the three topics, as the database has them now
-run --name gapfinder-a4-pairs gapfinder-app:live-09f2a79 \
+run --name gapfinder-a4-pairs since-when \
   python -m gapfinder pairs --only Q1412941 Q736268 Q2457646 > $M/classify/agent4/pairs.jsonl
 
 # 2. Nemotron's answers from the disk cache; must print "this run sent 0 requests" and "0 pairs without an answer"
-nix develop -c python3 projects/mariadb-wikipedia/demo/hero_classify.py nemotron $M/classify/agent4/pairs.jsonl --offline
+nix develop -c python3 demo/hero_classify.py nemotron $M/classify/agent4/pairs.jsonl --offline
 
 # 3. remove the model's older rows of the three topics (the snapshot has Lapua rows of 2026-11-13,
 #    and a pair that is no longer aligned would keep its rows); lexicon rows stay
 echo "delete from difference where wikidata_id in ('Q1412941','Q736268','Q2457646') and source in ('llm','both')" | $M/bin/scratch-sql
 
 # 4. insert the rows and rebuild the three topics' findings (6 s)
-run --name gapfinder-a4-load gapfinder-app:live-09f2a79 \
+run --name gapfinder-a4-load since-when \
   python -m gapfinder findings load /classify/nemotron/differences.jsonl
 
 # 5. the shortlist's quotes against the cached revisions
-nix develop -c python3 projects/mariadb-wikipedia/demo/check_quotes.py --offline
+nix develop -c python3 demo/check_quotes.py --offline
 ```
 
 If step 2 lists pairs without an answer, the passages changed since my last run (the cache key is
@@ -41,15 +41,15 @@ the prompt version, endpoint, model, settings and both passage texts; the pair i
 in it). Classify those through the key, a few calls:
 
 ```bash
-DIFFERENCES_RPM=12 nix develop -c sops exec-env secrets/secrets.yaml \
-  "python3 projects/mariadb-wikipedia/demo/hero_classify.py nemotron $M/classify/agent4/pairs.jsonl --workers 4"
+DIFFERENCES_RPM=12 nix develop -c sops exec-env ../../secrets/secrets.yaml \
+  "python3 demo/hero_classify.py nemotron $M/classify/agent4/pairs.jsonl --workers 4"
 ```
 
 The second opinion and the agreement counts, also from disk:
 
 ```bash
-nix develop -c python3 projects/mariadb-wikipedia/demo/hero_classify.py haiku $M/classify/agent4/pairs.jsonl --offline
-nix develop -c python3 projects/mariadb-wikipedia/demo/hero_agree.py     # writes $M/classify/agreement.json
+nix develop -c python3 demo/hero_classify.py haiku $M/classify/agent4/pairs.jsonl --offline
+nix develop -c python3 demo/hero_agree.py     # writes $M/classify/agreement.json
 ```
 
 Finding ids are stable inside one database (the key of a finding is topic, editions, type, section

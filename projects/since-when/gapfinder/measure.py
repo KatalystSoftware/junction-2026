@@ -26,7 +26,7 @@ from datetime import datetime, timezone
 
 from .align import Run, as_of_sql, nearest_sql
 
-OUT = "projects/mariadb-wikipedia/measurements"
+OUT = "measurements"
 EF = (20, 40, 80, 160)
 DATES = (("now", None), ("AS OF 2010-01-01", "2010-01-01"), ("AS OF 2020-01-01", "2020-01-01"))
 SETTINGS = ("innodb_buffer_pool_size", "mhnsw_max_cache_size", "mhnsw_ef_search", "mhnsw_default_m",

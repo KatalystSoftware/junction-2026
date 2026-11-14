@@ -81,8 +81,8 @@ missing fact 0.5.
    `DIFFERENCES_BASE_URL` and `DIFFERENCES_MODEL` override either, for example
    `DIFFERENCES_MODEL=claude-sonnet-5-5`. With no key, no differences are written. To compare
    models: `DIFFERENCES_PROVIDER=nvidia python -m differences evaluate --workers 2`.
-   The team's `NVIDIA_API_KEY` is in [`../secrets/secrets.yaml`](../secrets/README.md):
-   `sops exec-env secrets/secrets.yaml 'python -m differences evaluate'`.
+   The team's `NVIDIA_API_KEY` is in [`secrets/secrets.yaml`](../../../secrets/README.md):
+   `sops exec-env ../../secrets/secrets.yaml 'python -m differences evaluate'`.
 
    It asks for strict JSON schema output and falls back to plain JSON mode, then to no format,
    when an endpoint refuses one. Answers are cached under `data/differences/cache/` (gitignored),

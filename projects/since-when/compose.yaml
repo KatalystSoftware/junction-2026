@@ -1,0 +1,38 @@
+# Since When on hestia, against its own scratch database (container gapfinder-scratch-db).
+# Run from projects/since-when/: docker compose up --build -d, then http://127.0.0.1:8078.
+# Nothing here reaches the gap finder's live server.
+name: since-when
+
+x-app: &app
+  build: .
+  image: since-when
+  restart: unless-stopped
+  networks: [scratch]
+
+services:
+  api:
+    <<: *app
+    command: python -m gapfinder serve --port 8077
+    # Names only: DB_USER, DB_PASSWORD, DB_NAME, and DB_RO_USER, DB_RO_PASSWORD for the Run button.
+    env_file: ${HOME}/junction2026-data/mariadb/scratch.env
+    environment:
+      DB_HOST: gapfinder-scratch-db
+      DB_PORT: 3306
+    ports: ["127.0.0.1:8077:8077"]
+    # No embedding model is mounted: the pages never call /api/search.
+    mem_limit: 1500m
+    cpus: 4
+
+  ui:
+    <<: *app
+    command: python ui/serve.py --port 8078
+    environment:
+      GAPFINDER_API: http://api:8077
+    ports: ["127.0.0.1:8078:8078"]
+    mem_limit: 512m
+    depends_on: [api]
+
+networks:
+  scratch:
+    external: true
+    name: gapfinder-scratch-net

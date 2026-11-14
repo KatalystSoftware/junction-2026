@@ -1,4 +1,4 @@
-"""The HTTP API the UI calls: docs/gap-finder/api.md. Standard library server, one MariaDB
+"""The HTTP API the UI calls: docs/api.md. Standard library server, one MariaDB
 connection per request. Every response carries the SQL that produced it, as run.
 
     python -m gapfinder serve --port 8077

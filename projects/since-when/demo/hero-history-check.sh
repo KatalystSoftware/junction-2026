@@ -1,6 +1,6 @@
 #!/bin/sh
 # Checks the three hero topics' revision history through a gap finder API (curl and jq):
-#   sh projects/mariadb-wikipedia/demo/hero-history-check.sh http://127.0.0.1:8277
+#   sh demo/hero-history-check.sh http://127.0.0.1:8277
 # 1. Every topic page, timeline and compare view answers; no compare row is "not compared yet"
 #    (status pending) on three past dates, for every ordered pair of editions.
 # 2. The four dated facts about the Lapua Movement's first sentences.

@@ -1,6 +1,6 @@
 """Count where Nemotron and Haiku agree on the hero topics' pairs, per category.
 
-    python3 projects/mariadb-wikipedia/demo/hero_agree.py
+    python3 demo/hero_agree.py
 
 Reads <model>/index.jsonl and <model>/differences.jsonl of both models under $HERO_CLASSIFY
 (default ~/junction2026-data/mariadb/classify), as hero_classify.py wrote them, and compares the

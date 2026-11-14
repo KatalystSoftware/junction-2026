@@ -1,10 +1,10 @@
 """Classify the hero topics' pairs with one model, with every raw answer cached on disk.
 
-    python projects/mariadb-wikipedia/demo/hero_classify.py nemotron PAIRS.jsonl [--workers 4]
-    python projects/mariadb-wikipedia/demo/hero_classify.py haiku PAIRS.jsonl --max-requests 300
-    python projects/mariadb-wikipedia/demo/hero_classify.py nemotron PAIRS.jsonl --offline
+    python demo/hero_classify.py nemotron PAIRS.jsonl [--workers 4]
+    python demo/hero_classify.py haiku PAIRS.jsonl --max-requests 300
+    python demo/hero_classify.py nemotron PAIRS.jsonl --offline
 
-Run from the repository root. PAIRS.jsonl comes from `python -m gapfinder pairs --only Q…`.
+Run from projects/since-when/. PAIRS.jsonl comes from `python -m gapfinder pairs --only Q…`.
 Everything is written under $HERO_CLASSIFY (default ~/junction2026-data/mariadb/classify)/<model>/:
 
     cache/<key>.json     the raw answer, written by differences.classify; the key covers the prompt
@@ -43,7 +43,7 @@ if args.offline:   # the cache key needs the endpoint and model, not the key
     os.environ.setdefault(dict(nvidia="NVIDIA_API_KEY", anthropic="ANTHROPIC_API_KEY")[MODELS[args.model]], "offline")
     os.environ["DIFFERENCES_RPM"] = "6000"   # nothing is sent, so nothing to pace
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from differences import classify, lexicon, llm  # noqa: E402
 
 cfg = llm.config()
