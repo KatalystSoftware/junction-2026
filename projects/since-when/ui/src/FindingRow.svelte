@@ -24,6 +24,7 @@
 		<span class="tag {f.type}">{TYPES[f.type] ?? f.type}</span>
 		<span class="sum">{f.summary}</span>
 		<span class="date subtle small num">{rowDate(f)}</span>
+		<span class="caret subtle" aria-hidden="true">›</span>
 	</summary>
 	<div class="body">
 		<div class="quotes">
@@ -46,11 +47,12 @@
 			{/each}
 		</div>
 		<p class="ids small subtle num">
-			{since(f, shortDay)}{#if f.closed_at}; closed {when(f.closed_after, f.closed_at, shortDay)}{/if}
-			· finding {f.id}
-			{#each sides as l}{#if f.rev_ids?.[l]}
-					· <a href={revisionUrl(l, f.rev_ids[l]!)} target="_blank" rel="noopener">{l} revision {f.rev_ids[l]}</a>{/if}{/each}
-			{#if f.distance != null}· distance {f.distance.toFixed(2)}{/if}
+			<span>{since(f, shortDay)}{#if f.closed_at}; closed {when(f.closed_after, f.closed_at, shortDay)}{/if}</span>
+			<span>finding {f.id}</span>
+			{#each sides as l}
+				{#if f.rev_ids?.[l]}<a href={revisionUrl(l, f.rev_ids[l]!)} target="_blank" rel="noopener">{l} revision {f.rev_ids[l]}</a>{/if}
+			{/each}
+			{#if f.distance != null}<span>distance {f.distance.toFixed(2)}</span>{/if}
 		</p>
 	</div>
 </details>
@@ -62,7 +64,7 @@
 
 	summary {
 		display: grid;
-		grid-template-columns: 7.5rem 1fr auto;
+		grid-template-columns: 7.5rem 1fr auto var(--spacing-75);
 		align-items: baseline;
 		gap: var(--spacing-75);
 		padding: var(--spacing-50) 0;
@@ -84,6 +86,14 @@
 
 	.date {
 		white-space: nowrap;
+	}
+
+	.caret {
+		transition: transform var(--transition-duration-base);
+	}
+
+	details[open] .caret {
+		transform: rotate(90deg);
 	}
 
 	.body {
@@ -119,12 +129,15 @@
 	}
 
 	.ids {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0 var(--spacing-100);
 		margin-top: var(--spacing-75);
 	}
 
 	@media (max-width: 640px) {
 		summary {
-			grid-template-columns: 1fr auto;
+			grid-template-columns: 1fr auto var(--spacing-75);
 			gap: var(--spacing-25) var(--spacing-75);
 		}
 

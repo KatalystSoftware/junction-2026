@@ -165,11 +165,11 @@
 						<p class="ran">
 							<strong class="num">{plural(r.rows.length, 'row', 'rows')}</strong>
 							<strong class="num">{r.ms} ms</strong>
-							<span class="small subtle">{Object.values(r.params).join(' · ')}{r.capped ? ` · first ${r.limits.rows} rows` : ''}</span>
+							<span class="small subtle">{Object.values(r.params).join(', ')}{r.capped ? `, first ${r.limits.rows} rows` : ''}</span>
 						</p>
 						{#if i === 0}
 							{#each r.sql as q}
-								<p class="qhead small"><span>{q.label}</span><span class="subtle num">{q.ms} ms · {plural(q.rows, 'row', 'rows')}</span></p>
+								<p class="qhead small"><span>{q.label}</span><span class="subtle num">{q.ms} ms, {plural(q.rows, 'row', 'rows')}</span></p>
 								{@render statement(q)}
 							{/each}
 						{/if}
@@ -177,7 +177,7 @@
 					</div>
 				{/each}
 			</div>
-			<p class="small subtle">Read-only user · {limits.seconds} s · {limits.rows} rows at most</p>
+			<p class="small subtle">Runs as a read-only user, for {limits.seconds} s and {limits.rows} rows at most.</p>
 		</section>
 	{/if}
 
@@ -187,7 +187,7 @@
 			{#each groups as [group, qs]}
 				{#each qs as q}
 					<details>
-						<summary class="small"><span>{q.label} <span class="subtle">{group}</span></span><span class="subtle num">{q.ms} ms · {plural(q.rows, 'row', 'rows')}</span></summary>
+						<summary class="small"><span>{q.label} <span class="subtle">{group}</span></span><span class="subtle num">{q.ms} ms, {plural(q.rows, 'row', 'rows')}</span></summary>
 						{@render statement(q)}
 					</details>
 				{/each}

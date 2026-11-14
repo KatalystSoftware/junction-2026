@@ -70,7 +70,7 @@
 </script>
 
 <svelte:head>
-	<title>{topic && pair ? `${topic.topic} · ${NAMES[pair.lang]} vs ${NAMES[pair.rich]} · Since When` : 'Since When'}</title>
+	<title>{topic && pair ? `${topic.topic}: ${NAMES[pair.lang]} and ${NAMES[pair.rich]} | Since When` : 'Since When'}</title>
 </svelte:head>
 
 <header class="bar">
@@ -100,7 +100,7 @@
 						{#if topic.titles[l]}
 							<li>
 								<a href={articleUrl(l, topic.titles[l]!)} target="_blank" rel="noopener" lang={l}>{topic.titles[l]}</a>
-								<span class="subtle">{[NAMES[l], topic.size[l] ? kb(topic.size[l]!) : '', topic.refs?.[l] != null ? `${topic.refs[l]} references` : '', topic.quality?.[l] ?? '', views(topic.readers[l])].filter(Boolean).join(' · ')}</span>
+								<span class="subtle">{[NAMES[l], topic.size[l] ? kb(topic.size[l]!) : '', topic.refs?.[l] != null ? `${topic.refs[l]} references` : '', topic.quality?.[l] ?? '', views(topic.readers[l])].filter(Boolean).join(', ')}</span>
 							</li>
 						{/if}
 					{/each}

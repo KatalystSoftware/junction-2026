@@ -52,7 +52,7 @@
 		{#if queue.error}
 			<p class="note error" role="alert">Could not load the topics: {queue.error}</p>
 		{:else if !queue.items.length}
-			<p class="note subtle">{queue.loading ? 'Loading…' : nav.q ? `No topic matches “${nav.q}”.` : 'No topics yet.'}</p>
+			<p class="note subtle">{queue.loading ? 'Loading…' : nav.q ? `No topic matches "${nav.q}".` : 'No topics yet.'}</p>
 		{/if}
 		<ul>
 			{#each queue.items as i (i.wikidata_id + i.lang)}

@@ -68,7 +68,7 @@
 			<a href={href(route, { tab: 'timeline' })} title="See when each difference opened and closed">{since(headline, day)}</a>
 		</p>
 		<p id="claim" class="claim">{headline.summary}</p>
-		<p class="label small subtle">Machine suggestion · {TYPES[headline.type] ?? headline.type}</p>
+		<p class="label small subtle">Machine suggestion <span class="tag {headline.type}">{TYPES[headline.type] ?? headline.type}</span></p>
 	{:else}
 		<p id="claim" class="claim">No open difference found between these articles.</p>
 	{/if}
@@ -77,7 +77,7 @@
 		{#each cards as c (c.lang)}
 			<article class="card" class:first={c.lang === lang}>
 				<h2 class="small">
-					{NAMES[c.lang]}{#if c.where}<span class="subtle" title={c.where}> · {sectionLabel(c.where)}</span>{/if}
+					{NAMES[c.lang]}{#if c.where}<span class="where subtle" title={c.where}>{sectionLabel(c.where)}</span>{/if}
 				</h2>
 				{#if whole && c.full}
 					<p class="words whole" lang={c.lang}><Marked text={c.full} quotes={c.quotes} terms={c.terms} /></p>
@@ -156,6 +156,16 @@
 
 	.label {
 		margin-top: var(--spacing-50);
+	}
+
+	.label .tag {
+		margin-left: var(--spacing-25);
+		color: var(--color-base);
+	}
+
+	.where {
+		margin-left: var(--spacing-50);
+		font-weight: var(--font-weight-normal);
 	}
 
 	.cards {
