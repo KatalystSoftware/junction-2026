@@ -53,6 +53,30 @@ Renders the reference's decisions as demos and replays them through the wrapper:
 score 1.00 and levels 1-2 about 0.97 (the demos check in every 10 minutes, the reference every
 minute).
 
+## Download and check the trained adapter
+
+The Gemma 4 SFT adapter and its training demos are public, no account needed:
+https://storage.googleapis.com/katalyst-fyi-models/oncallbench/gemma4-26b-a4b-sft/ (`README.md`,
+`adapter_config.json`, `adapter_model.safetensors`, `SHA256SUMS`) and
+https://storage.googleapis.com/katalyst-fyi-models/oncallbench/demos/demos-l34.jsonl. Download them into
+one folder, then:
+
+```
+sha256sum --check --strict SHA256SUMS                                           # every file: OK
+jq .seed demos-l34.jsonl | awk '$1>=101&&$1<=106 || $1>=200000' | wc -l           # 0 held-out demos
+```
+
+[`oncallbench-model.yml`](../../../.github/workflows/oncallbench-model.yml) does this on a clean CRACI
+runner (32 vCPU, no GPU). It also fetches `google/gemma-4-26B-A4B-it` anonymously (the model is not
+gated) and checks each weight file against Hugging Face's sha256. It converts base and adapter to GGUF
+with llama.cpp `b12017`, serves them on CPU, and asserts through `/lora-adapters` that the adapter is
+applied. Then it plays one held-out episode through Harbor 0.25.0 + OpenCode, as the judged agents
+do. The job summary lists every hash, the held-out count, the base revision, the score and the time
+per step. Latest passing run: [43650015008](https://github.com/KatalystSoftware/junction2026/actions/runs/43650015008)
+(level 0, seed 101: 18 tool calls, it found the overloaded profile-db but rolled it back instead of scaling it, so 0.00, the same as doing nothing).
+This run is a smoke test that the published files load and drive the environment. It does not
+measure the adapter: it was trained on levels 3 and 4, and CPU inference is too slow for those.
+
 ## How it works
 
 - `env.py`: the environment. System prompt = `task/instruction.md` with `briefing(level)`; tools =
