@@ -24,7 +24,7 @@
 </script>
 
 <span class="cite" class:chip={!!label} role="presentation" onpointerenter={show} onpointerleave={hide} onfocusin={show} onfocusout={hide}>
-  <button bind:this={button} aria-expanded={open} aria-label="Source {n || ''}, {host(signal.source_url)}" onclick={() => (open ? (open = false) : show())}>{label || n}</button>
+  <button bind:this={button} aria-expanded={open} aria-label="Source {n || ''}, {host(signal.source_url)}" onclick={show}>{label || n}</button>
   {#if open}
     <span class="card" style={place}>
       <q>{signal.quote}</q>

@@ -1,6 +1,8 @@
 <script lang="ts">
+  import { tick } from 'svelte'
   import Cite from './Cite.svelte'
   import { text } from './editable'
+  import { terms } from './format'
   import Icon from './Icon.svelte'
   import type { Brief, Need, Posting } from './types'
 
@@ -23,26 +25,45 @@
     const next = tasks.map((t, k) => (k === j ? typed(e) : t)).filter(Boolean)
     if (next.join('|') !== tasks.join('|')) change({ can_do: next })
   }
-  function addSkill(e: KeyboardEvent) {
+  /** Keep what was typed as a skill: on Enter, and when the field is left, so nothing typed is lost. */
+  function addSkill(e: KeyboardEvent | FocusEvent) {
     const input = e.currentTarget as HTMLInputElement
-    if (e.key !== 'Enter' || !input.value.trim()) return
+    if (('key' in e && e.key !== 'Enter') || !input.value.trim()) return
     e.stopPropagation()
     change({ skills: [...need.skills, input.value.trim()] })
     input.value = ''
   }
 
   let posting = $state<Posting | 'drafting' | 'failed' | null>(null)
+  let sheet = $state<HTMLElement>()
+  let copied = $state(false)
   async function draft() {
     posting = 'drafting'
     const r = await fetch(`posting?id=${encodeURIComponent(brief.id)}`, { method: 'POST', body: JSON.stringify(need) }).catch(() => null)
     posting = r?.ok ? await r.json() : 'failed'
+    await tick()
+    sheet?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+  }
+  async function copy() {
+    const words = sheet?.innerText ?? ''
+    try {
+      await navigator.clipboard.writeText(words)
+    } catch {
+      const field = Object.assign(document.createElement('textarea'), { value: words })
+      document.body.append(field)
+      field.select()
+      document.execCommand('copy')
+      field.remove()
+    }
+    copied = true
+    setTimeout(() => (copied = false), 1600)
   }
 </script>
 
 <h2 role="textbox" tabindex="0" aria-label="Role" contenteditable="plaintext-only" spellcheck="false" data-placeholder="Who are you looking for?" onblur={(e) => reword('title', e)} onkeydown={enter} use:text={need.title}></h2>
 {#if need.why || need.signals.length}
   <p class="why">
-    <span role="textbox" tabindex="0" aria-label="Why now" contenteditable="plaintext-only" data-placeholder="Why now?" onblur={(e) => reword('why', e)} onkeydown={enter} use:text={need.why}></span><span class="cites">{#each need.signals.filter(number) as id}<Cite signal={brief.signals[number(id) - 1]} n={number(id)} />{/each}</span>
+    <span role="textbox" tabindex="0" aria-label="Why now" contenteditable="plaintext-only" data-placeholder="Why now?" onblur={(e) => reword('why', e)} onkeydown={enter} use:text={need.why}></span><span class="cites">{#each need.signals.filter(number) as id, k}<Cite signal={brief.signals[number(id) - 1]} n={k + 1} />{/each}</span>
   </p>
 {/if}
 {#if need.roles.length}<p class="open">Open now: {need.roles.join(', ')}</p>{/if}
@@ -68,7 +89,7 @@
       {#each need.skills as skill (skill)}
         <span class="chip">{skill}<button aria-label="Remove {skill}" onclick={() => change({ skills: need.skills.filter((s) => s !== skill) })}><Icon name="x" size={12} /></button></span>
       {/each}
-      <input class="chip" placeholder="Add" aria-label="Add something they know" onkeydown={addSkill} />
+      <input class="chip" placeholder="Add" aria-label="Add something they know" onkeydown={addSkill} onblur={addSkill} />
     </dd>
   </div>
   {#each ASKS as ask (ask.key)}
@@ -77,7 +98,7 @@
       <dd>
         <span class="seg" role="radiogroup" aria-label={ask.label}>
           {#each ask.options as [value, label]}
-            <button role="radio" aria-checked={need[ask.key] === value} onclick={() => change({ [ask.key]: value })}>{label}</button>
+            <button role="radio" data-choice aria-checked={need[ask.key] === value} onclick={() => change({ [ask.key]: value })}>{label}</button>
           {/each}
         </span>
         {#if ask.key === 'workplace' && need.where}<span class="place">{need.where}</span>{/if}
@@ -92,8 +113,9 @@
 </dl>
 
 {#if posting && typeof posting === 'object'}
-  <div class="posting">
+  <div class="posting" bind:this={sheet}>
     <h3>{posting.headline}</h3>
+    <p class="terms">{terms(need).join(' · ')}</p>
     <p>{posting.intro}</p>
     <h4>You will</h4>
     <ul>{#each posting.you_will as line}<li>{line}</li>{/each}</ul>
@@ -102,9 +124,12 @@
     <p class="now">{posting.why_now}</p>
   </div>
 {/if}
-<button class="draft" disabled={posting === 'drafting'} onclick={draft}>
-  {posting === 'drafting' ? 'Drafting the posting' : posting === 'failed' ? 'That did not come through. Try again' : posting ? 'Draft it again' : 'Draft a job posting for this'}
-</button>
+<p class="drafts">
+  <button class="draft" disabled={posting === 'drafting'} onclick={draft}>
+    {posting === 'drafting' ? 'Drafting the posting' : posting === 'failed' ? 'That did not come through. Try again' : posting ? 'Draft it again' : 'Draft a job posting'}
+  </button>
+  {#if posting && typeof posting === 'object'}<button class="draft" onclick={copy}>{copied ? 'Copied' : 'Copy it'}</button>{/if}
+</p>
 
 <style>
   h2 {
@@ -235,7 +260,9 @@
     color: var(--stop);
   }
   input.chip {
-    width: 6rem;
+    field-sizing: content;
+    min-width: 5rem;
+    max-width: 100%;
     border-style: dashed;
     outline: none;
   }
@@ -285,17 +312,28 @@
     font-size: var(--t-xs);
     font-weight: 600;
   }
-  .draft {
+  .drafts {
+    display: flex;
+    gap: var(--s2);
     margin-top: var(--s4);
-    padding: 0;
-    border: 0;
+  }
+  .draft {
+    min-height: 2.25rem;
+    padding: 0 var(--s4);
+    border: 1px solid var(--line);
+    border-radius: 99px;
     background: none;
-    color: var(--ink-2);
     font-size: var(--t-sm);
     font-weight: 600;
   }
   .draft:hover:not(:disabled) {
-    color: var(--ink);
+    border-color: var(--ink);
+  }
+  .posting .terms {
+    margin-bottom: var(--s3);
+    font-size: var(--t-sm);
+    font-weight: 600;
+    color: var(--ink-2);
   }
   .posting {
     margin-top: var(--s5);

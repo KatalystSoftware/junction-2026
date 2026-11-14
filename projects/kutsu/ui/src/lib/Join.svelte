@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { tick } from 'svelte'
   import { flip } from 'svelte/animate'
   import { cubicOut } from 'svelte/easing'
   import { crossfade, fade } from 'svelte/transition'
@@ -68,6 +69,14 @@
     if (seen !== brief.id) [seen, opened, started] = [brief.id, null, !!reviewOf(brief).about_ok]
   })
   const current = $derived(items.find((i) => i.key === opened) ?? items.find((i) => !decided(i)) ?? items.at(-1)!)
+  let bench = $state<HTMLElement>()
+  let shown = ''
+  // a new card starts at its top, also when the last one was read to its end on a phone
+  $effect(() => {
+    const key = current.key
+    if (shown && shown !== key && bench && bench.getBoundingClientRect().top < 0) tick().then(() => bench?.scrollIntoView({ block: 'start' }))
+    shown = key
+  })
 
   const needs = (change: (list: Need[]) => Need[]) => save({ needs: change(review.needs) })
   const patch = (id: string | undefined, p: Partial<Need>) => needs((list) => list.map((n) => (n.id === id ? { ...n, ...p } : n)))
@@ -77,27 +86,38 @@
 
   function accept() {
     const i = current
-    opened = null
+    ;[opened, undo] = [null, null]
     if (i.kind === 'you') save({ about_ok: true })
     else if (i.kind === 'news') save({ facts: { ...review.facts, [i.signal!.id]: true } })
     else if (i.kind === 'role') patch(i.need!.id, { ok: true })
     else if (i.kind === 'add') line.trim() ? draft(line) : save({ added_done: true })
     else if (!joined) save({ status: 'joined', joined_at: new Date().toISOString(), wants })
   }
+  /** The last thing left out or removed, so one wrong key can be taken back. */
+  let undo = $state<null | { said: string; restore: () => void }>(null)
   /** Leave a statement out, or remove a role entirely. */
   function skip() {
     const i = current
     opened = null
-    if (i.kind === 'news') save({ facts: { ...review.facts, [i.signal!.id]: false } })
-    else if (i.kind === 'role') needs((list) => list.filter((n) => n.id !== i.need!.id))
+    if (i.kind === 'news') {
+      const id = i.signal!.id
+      save({ facts: { ...review.facts, [id]: false } })
+      undo = { said: 'Left out.', restore: () => (save({ facts: Object.fromEntries(Object.entries(review.facts ?? {}).filter(([k]) => k !== id)) }), (opened = `news:${id}`)) }
+    } else if (i.kind === 'role') {
+      const need = i.need!, at = review.needs.findIndex((n) => n.id === need.id)
+      needs((list) => list.filter((n) => n.id !== need.id))
+      undo = { said: `Removed ${need.title || 'the role'}.`, restore: () => needs((list) => [...list.slice(0, at), { ...need, ok: false }, ...list.slice(at)]) }
+    }
   }
+  const takeBack = () => (undo?.restore(), (undo = null))
   const back = () => {
     const at = items.findIndex((i) => i.key === current.key)
     if (at > 0) opened = items[at - 1].key
   }
   function keys(e: KeyboardEvent) {
     const el = e.target as HTMLElement
-    if (el.isContentEditable || ['INPUT', 'TEXTAREA', 'BUTTON', 'A'].includes(el.tagName) || e.metaKey || e.ctrlKey || e.altKey) return
+    const choice = el.tagName === 'BUTTON' && 'choice' in el.dataset && e.key === 'Enter'
+    if (!choice && (el.isContentEditable || ['INPUT', 'TEXTAREA', 'BUTTON', 'A'].includes(el.tagName) || e.metaKey || e.ctrlKey || e.altKey)) return
     if (e.key === 'Enter') (e.preventDefault(), started ? accept() : (started = true))
     else if (!started) return
     else if (e.key === 'Backspace' || e.key === 'Delete') skip()
@@ -109,9 +129,10 @@
   let drafting = $state('')
   let failed = $state('')
   const SUGGEST = ['Sales and account leads', 'Customer success managers', 'Data engineers', 'Product managers']
-  const suggestions = $derived((brief.card.also?.length ? brief.card.also : SUGGEST).filter((s) => !review.needs.some((n) => n.title === s)))
+  let used = $state<string[]>([])
+  const suggestions = $derived((brief.card.also?.length ? brief.card.also : SUGGEST).filter((s) => !used.includes(s) && !review.needs.some((n) => n.title === s)))
   async function draft(what: string) {
-    ;[drafting, failed, line] = [what, '', '']
+    ;[drafting, failed, line, used] = [what, '', '', [...used, what]]
     const r = await fetch(`role?id=${encodeURIComponent(brief.id)}`, { method: 'POST', body: JSON.stringify({ line: what }) }).catch(() => null)
     const drafted: Need | null = r?.ok ? await r.json() : null
     if (drafted) needs((list) => [...list, { ...drafted, id: `c${Date.now()}`, by: 'company' }])
@@ -125,6 +146,8 @@
     news: news.filter((s) => review.facts?.[s.id] === true && current.key !== `news:${s.id}`),
     roles: review.needs.filter((n) => n.ok && current.key !== `role:${n.id}`),
   })
+  /** How many of a role's practical questions nobody has answered yet. */
+  const open = (n: Need) => [n.language, n.workplace, n.abroad].filter((v) => v == null).length
   const calm = matchMedia('(prefers-reduced-motion: reduce)').matches
   const [send, receive] = crossfade({ duration: calm ? 0 : 520, easing: cubicOut, fallback: (node) => fade(node, { duration: calm ? 0 : 200 }) })
 </script>
@@ -138,11 +161,11 @@
     <section class="invite">
       <div class="plate" class:dark={identity?.logo_on === 'dark'}><Logo {brief} /></div>
       <h1>{#each `${name}, you're invited.`.split(' ') as word, i}<span style:--i={i}>{word}&nbsp;</span>{/each}</h1>
-      <p class="filled" style:--i={5}>Your sign-up is already filled in.</p>
+      <p class="filled" style:--i={5}>{event?.title}, {event?.note.split(',')[0]}. Online and free: deep-tech professionals from around the world meet Finnish employers. Your sign-up is already filled in.</p>
       <button class="yes big" style:--i={6} onclick={() => (started = true)}>Check it <kbd>Enter</kbd></button>
     </section>
   {:else}
-    <div class="bench">
+    <div class="bench" bind:this={bench}>
       <aside class="left" aria-label="About you">
         {#if settled.you || settled.news.length}<h3>About you</h3>{/if}
         {#if settled.you}
@@ -178,7 +201,7 @@
               <h2 class="claim">{current.signal!.claim}</h2>
               <p class="chips"><Cite signal={current.signal!} label={sourced(current.signal!)} /></p>
               <div class="actions">
-                <button class="yes" onclick={accept}>Tell talent this <kbd>Enter</kbd></button>
+                <button class="yes" onclick={accept}>Show this to candidates <kbd>Enter</kbd></button>
                 <button class="no" onclick={skip}>Leave it out <kbd>Backspace</kbd></button>
               </div>
             {:else if current.kind === 'role'}
@@ -209,13 +232,13 @@
               {/if}
             {:else if joined}
               <h2 class="in">You're in.</h2>
-              <p class="pitch">Espoo has {about('Company')}'s page. Open any role at the right for a drafted job posting.</p>
+              <p class="pitch">Candidates at the forum will see {about('Company')} as it stands on this page, and nothing you left out. Espoo's event team will be in touch before {event?.note.split(',')[0].split('–')[0]} November with your booking. Open any role you chose to change it or to draft its job posting.</p>
               <div class="actions"><button class="no" onclick={() => save({ status: 'invited' })}><Icon name="undo" size={16} />Change my answers</button></div>
             {:else}
-              <h2>At the event</h2>
+              <h2>What would you like at the event?</h2>
               <p class="chips">
                 {#each WANTS as w}
-                  <button class="chip want" aria-pressed={wants.includes(w)} onclick={() => want(w)}>{#if wants.includes(w)}<Icon name="check" size={14} />{/if}{w}</button>
+                  <button class="chip want" data-choice aria-pressed={wants.includes(w)} onclick={() => want(w)}>{#if wants.includes(w)}<Icon name="check" size={14} />{/if}{w}</button>
                 {/each}
               </p>
               <div class="actions">
@@ -229,16 +252,18 @@
           <span class="dots" aria-label="Progress">
             {#each items as i (i.key)}<i class:done={decided(i)} class:now={i.key === current.key}></i>{/each}
           </span>
+          {#if undo}<span class="undone">{undo.said} <button onclick={takeBack}>Undo</button></span>{/if}
           <button class="back" onclick={back} disabled={items[0].key === current.key}><Icon name="undo" size={14} />Back <kbd>←</kbd></button>
         </footer>
       </div>
 
       <aside class="right" aria-label="Who you want to meet">
-        {#if settled.roles.length}<h3>Wants to meet</h3>{/if}
+        {#if settled.roles.length}<h3>You want to meet</h3>{/if}
         {#each settled.roles as n (n.id)}
           <button class="line" onclick={() => (opened = `role:${n.id}`)} in:receive={{ key: `role:${n.id}` }} out:send={{ key: `role:${n.id}` }} animate:flip={{ duration: 300 }}>
             <b>{n.title}</b>
             <span>{terms(n).join(' · ')}</span>
+            {#if open(n)}<span class="todo">{open(n)} still to answer</span>{/if}
             {#each n.can_do ?? [] as task}<span class="more task">{task}</span>{/each}
           </button>
         {/each}
@@ -334,8 +359,10 @@
   }
   .filled {
     display: block;
+    max-width: 40ch;
     margin-top: var(--s4);
-    font-size: clamp(1.1875rem, 1rem + 0.7vw, 1.5rem);
+    font-size: clamp(1.125rem, 1rem + 0.5vw, 1.375rem);
+    line-height: 1.35;
   }
 
   /* three columns: who you are, the card, who you want to meet */
@@ -348,6 +375,8 @@
     margin: clamp(0.5rem, 4vh, 3rem) auto 0;
   }
   aside {
+    position: sticky;
+    top: var(--s4);
     display: grid;
     gap: var(--s1);
     align-content: start;
@@ -414,6 +443,19 @@
   .line .task::before {
     content: '· ';
   }
+  .line .todo {
+    font-weight: 700;
+    color: var(--brand-ink);
+  }
+  .undone button {
+    padding: 0 var(--s1);
+    border: 0;
+    background: none;
+    color: inherit;
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
   .tile {
     width: 3rem;
     height: 3rem;
@@ -433,6 +475,9 @@
   }
   .card {
     grid-row: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 21rem;
     padding: clamp(1.25rem, 3vw, 2.25rem);
     border-radius: 1.25rem;
     background: var(--ground);
@@ -572,7 +617,7 @@
     flex-wrap: wrap;
     align-items: center;
     gap: var(--s3);
-    margin: var(--s5) calc(-1 * clamp(1.25rem, 3vw, 2.25rem)) calc(-1 * clamp(1.25rem, 3vw, 2.25rem));
+    margin: auto calc(-1 * clamp(1.25rem, 3vw, 2.25rem)) calc(-1 * clamp(1.25rem, 3vw, 2.25rem));
     padding: var(--s4) clamp(1.25rem, 3vw, 2.25rem);
     border-radius: 0 0 1.25rem 1.25rem;
     background: var(--ground);
@@ -701,6 +746,9 @@
     }
     .centre {
       order: -1;
+    }
+    aside {
+      position: static;
     }
     .line .more {
       max-height: none;

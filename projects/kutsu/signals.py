@@ -375,7 +375,8 @@ intro: two sentences: what the company does, then why this role exists now, with
 you_will: four lines of 6 to 12 words, each starting with a verb.
 you_bring: four lines of 4 to 10 words, built on what the person must be able to do, knows, and the level.
 State the working language and workplace only when they are given.
-why_now: one sentence with one concrete recent fact from the statements.
+why_now: one sentence with one concrete recent fact from the statements, and not one the intro used.
+Describe the company's products only in the words the description and statements use.
 No praise words, nothing about salary, benefits or culture, and no names of people."""
 
 
