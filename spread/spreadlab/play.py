@@ -17,6 +17,7 @@ from pathlib import Path
 from spread.starter import DAY
 
 from .dealer import DealerPolicy
+from .fallback import ActionDesk
 from .policy import Policy, fingerprint
 from .server import PracticeClient, data_dir, read_json_gz, world_map, write_json_gz
 from .variants import VARIANTS
@@ -60,7 +61,8 @@ def play(variant: str, params: dict, seed: str, level: int = 8) -> dict:
     world = client.create(level=level, seed=seed)
     try:
         snapshot, roster = world.snapshot(), world.roster()
-        desk_class = DealerPolicy if params.get("dealer_sd") else Policy  # the day's correction with an offset for each dealer (dealer.py)
+        # The day's correction with an offset for each dealer (dealer.py), or the note fallback (fallback.py).
+        desk_class = DealerPolicy if params.get("dealer_sd") else ActionDesk if "note_actions" in params else Policy
         desk, ends_at = desk_class(world, level, snapshot["now"], params, roster, map_), snapshot["endsAt"]
         events: list[dict] = []
         while desk.now < ends_at:
@@ -76,7 +78,8 @@ def play(variant: str, params: dict, seed: str, level: int = 8) -> dict:
         summary = {"variant": variant, "seed": seed, "level": level, "params": desk.p, "fingerprint": fingerprint(params),
                    "score": world.score(), "calls": client.calls, "seconds": round(time.time() - started)}
         write_json_gz(run_path(variant, seed, level), {**summary, "events": events, "reveal": world.reveal(), "gigs": world.snapshot()["gigs"],
-                                                       "roster": roster, "decisions": desk.decisions, "refused": desk.refused})
+                                                       "roster": roster, "decisions": desk.decisions, "refused": desk.refused,
+                                                       **({"noteActions": desk.review} if "note_actions" in params else {})})
         score_path(variant, seed, level).write_text(json.dumps(summary) + "\n", encoding="utf-8")
         failure_path(variant, seed, level).unlink(missing_ok=True)
         return summary

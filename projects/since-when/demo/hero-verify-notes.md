@@ -6,6 +6,9 @@ results on the three hero topics (Lapua Movement `Q1412941`, Finnish War `Q73626
 `Q2457646`), against the hand judgements of [`hero-findings-notes.md`](hero-findings-notes.md).
 `M=~/junction2026-data/mariadb`; commands run from `projects/since-when/`.
 
+Gemini Decision as the judge, measured on the same labels:
+[`hero-verify-gemini-decision.md`](hero-verify-gemini-decision.md).
+
 **Pending:** the tables judged by Nemotron 3.5 Super VL. That run is in progress on the Verda
 container. Until it is in, the tables below are judged by Claude Haiku 5.5 and Nemotron 3.5
 Lightning, and `checked_finding` in the scratch database holds the Haiku-judged run.
