@@ -49,7 +49,7 @@ from .policy import DECLINE, Policy
 from .server import SERVER, PracticeClient, data_dir, world_map
 from .variants import VARIANTS
 
-VARIANT = "steep-notes-offers-8"
+VARIANT = "slow-friday-late-150-kinds-limits"
 # A safe quote when the policy cannot answer in time: no same_day, no trade-in, no private address, and the higher of
 # 1.9 x the typical fee and 1.5 x the list price. That is the price of `floor-1.9` in the first sweeps, which won few
 # cars, paid on each, and was 96% on time (README, "Results so far"). It declines while the backlog gate is shut.

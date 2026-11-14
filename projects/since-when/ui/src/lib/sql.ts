@@ -15,3 +15,45 @@ export function sqlHtml(query: string): string {
 		})
 		.join('\n')
 }
+
+/**
+ * The statement a preset will run, for showing before Run is clicked. The server holds the real
+ * templates (gapfinder/api.py, gapfinder/align.py) and never takes SQL from the app; once a
+ * statement has run, the panel shows the text the server reports instead of this one.
+ */
+export function preview(preset: string, v: Record<string, string>): string {
+	if (preset === 'asof')
+		return `SET SESSION system_versioning_asof = '${v.date} 00:00:00';
+
+SELECT @@system_versioning_asof AS session_as_of, c.rev_id, c.row_start,
+       LEFT(p.text, 320) AS text
+FROM chunk AS c
+JOIN passage AS p ON p.sha = c.sha
+WHERE c.wikidata_id = '${v.qid}' AND c.lang = '${v.lang}' AND c.ord = 0`
+	if (preset === 'history')
+		return `SELECT c.rev_id, c.row_start, c.row_end, LEFT(p.text, 200) AS text
+FROM chunk FOR SYSTEM_TIME ALL AS c
+JOIN passage AS p ON p.sha = c.sha
+WHERE c.wikidata_id = '${v.qid}' AND c.lang = '${v.lang}' AND c.ord = 0
+ORDER BY c.row_start DESC`
+	if (preset === 'nearest')
+		return `WITH c AS (
+  SELECT c.id, c.lang, c.ord, c.section, c.chunk_no, c.rev_id, p.embedding
+  FROM chunk FOR SYSTEM_TIME AS OF TIMESTAMP '${v.date} 00:00:00' AS c
+  JOIN passage AS p ON p.sha = c.sha
+  WHERE c.wikidata_id = '${v.qid}' AND p.embedding IS NOT NULL
+), d AS (
+  SELECT x.id, x.lang, x.ord, y.lang AS other_lang, y.id AS other_id,
+         VEC_DISTANCE_COSINE(x.embedding, y.embedding) AS distance,
+         ROW_NUMBER() OVER (PARTITION BY x.id, y.lang
+                            ORDER BY VEC_DISTANCE_COSINE(x.embedding, y.embedding)) AS rn
+  FROM c AS x JOIN c AS y ON y.lang <> x.lang
+  AND x.lang = '${v.a}' AND y.lang = '${v.b}'
+)
+SELECT id, lang, ord, other_lang, other_id, distance,
+       CASE WHEN distance <= 0.3 THEN 'covered'
+            WHEN distance <= 0.38 THEN 'partly' ELSE 'missing' END AS status
+FROM d WHERE rn = 1
+ORDER BY lang, other_lang, ord`
+	return ''
+}
