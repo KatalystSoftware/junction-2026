@@ -181,7 +181,9 @@ jobs:
             kill -0 $! 2>/dev/null || { tail -40 "$RUNNER_TEMP/server.log"; exit 1; }
             sleep 5
           done
-          grep -iE 'lora|adapter' "$RUNNER_TEMP/server.log" | head -5
+          # The server's log does not name the adapter; its endpoint does. Fail unless it is applied at scale 1.
+          curl -s localhost:8100/lora-adapters | tee "$RUNNER_TEMP/lora.json"; echo
+          jq -e 'length == 1 and .[0].scale == 1' "$RUNNER_TEMP/lora.json" >/dev/null
           curl -s localhost:8100/v1/chat/completions -H 'Content-Type: application/json' \
             -d '{"messages":[{"role":"user","content":"Reply with one word: ready?"}],"max_tokens":32}' | jq -c '.choices[0].message, .timings'
           echo "| Model load (llama.cpp CPU) | $(( $(date +%s) - start )) s |" >> "$RUNNER_TEMP/times.md"
@@ -202,6 +204,9 @@ jobs:
           {
             echo "## Episode"
             echo "Level $LEVEL, held-out seed $SEED, Harbor 0.25.0 + OpenCode, the adapter served by llama.cpp on CPU: **score $reward**"
+            echo; echo "Adapter applied: \`$(jq -c '.[] | {path, scale}' "$RUNNER_TEMP/lora.json")\`"
+            echo; echo "Verifier: \`$(cat jobs/model-check/*/verifier/reward.json)\`"
+            echo; echo "Actions: $(jq -r '[.actions[] | .[0] + (.[1].service // "" | if . == "" then "" else "(" + . + ")" end)] | join(", ")' jobs/model-check/*/artifacts/ledger/receipt.json)"
           } >> "$GITHUB_STEP_SUMMARY"
           echo "| Episode | $(( $(date +%s) - start )) s |" >> "$RUNNER_TEMP/times.md"
 
