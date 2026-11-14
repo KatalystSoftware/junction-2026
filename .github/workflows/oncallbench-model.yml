@@ -99,7 +99,10 @@ jobs:
           start=$(date +%s)
           git clone -q --depth 1 --branch "$LLAMA_CPP" https://github.com/ggml-org/llama.cpp "$RUNNER_TEMP/llama.cpp"
           python3 -m venv "$RUNNER_TEMP/venv"
-          "$RUNNER_TEMP/venv/bin/pip" install -q -r "$RUNNER_TEMP/llama.cpp/requirements/requirements-convert_lora_to_gguf.txt" 'huggingface_hub[hf_xet]==0.36.2'
+          "$RUNNER_TEMP/venv/bin/pip" install -q -r "$RUNNER_TEMP/llama.cpp/requirements/requirements-convert_lora_to_gguf.txt"
+          # llama.cpp pins transformers 4.57, which cannot read Gemma 4's tokenizer config; the adapter
+          # was trained with 5.20.2.
+          "$RUNNER_TEMP/venv/bin/pip" install -q 'transformers==5.20.2' 'huggingface_hub[hf_xet]==1.31.0'
           echo "| Converter setup (llama.cpp $LLAMA_CPP, torch CPU) | $(( $(date +%s) - start )) s |" >> "$RUNNER_TEMP/times.md"
 
       - name: Download the base model and convert it to GGUF
