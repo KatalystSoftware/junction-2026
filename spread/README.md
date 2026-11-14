@@ -62,8 +62,10 @@ heartbeat or when a request reaches its deadline without a quote, and a desk tha
 it did not post stops for good. In the 14:00 test final the alarm watched the whole run and raised no
 false alarm. "The final" has the replays, the rehearsal and the standby's procedure.
 
-**What would break it.** A thin world with an early bulk order: the default's worst practice week is
-88.4%, on a set of seeds chosen to be hard, and 2 of 255 weeks outside the search's seeds are under 90%.
+**What would break it.** A Friday drop wave: on some Fridays 10 or more drivers drop their bookings in
+the night's first hour, and Thursday's wins must find a driver on the day. The default's three lowest weeks
+(88.4%, 89.9% and 90.2%) are such weeks; see "Nights when drivers drop out". 2 of 255 weeks outside the
+search's seeds are under 90%.
 A lost machine with nobody watching, which costs about €2,800 in 5 minutes. A market whose slope differs
 from practice: the day's shift moves the curve's level, not its slope. Note wording that the rules do not
 know, which costs a failed visit and often the deadline.
