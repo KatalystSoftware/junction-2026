@@ -12,9 +12,9 @@ small call that only looks for names. The talent outlook is inference and is sto
 the signals it rests on.
 
 Every paid request is cached under api-cache/<service>/ (raw request and response, no keys), so a
-rerun costs nothing and works without keys. The cache is in git so the whole team reuses it; it
-holds third-party article text, people's names included, and has to go before this repository is
-made public. signals.json holds claims, quotes and URLs only.
+rerun costs nothing and works without keys. The cache is not in git: it holds third-party article
+text, people's names included. It stays on the machine that ran this and on the server, and
+./fetch-cache.sh brings the server's copy down. signals.json holds claims, quotes and URLs only.
 """
 
 import hashlib

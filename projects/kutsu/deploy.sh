@@ -3,7 +3,8 @@
 #
 #   sops exec-env ../../secrets/secrets.yaml ./deploy.sh
 #
-# Checks the page and stops if the check fails. Then builds it, copies it with the code, the stored briefs and the request cache to /srv/talent-brief, writes the three API
+# Checks the page and stops if the check fails. Then builds it, copies it with the code and the stored briefs to /srv/talent-brief, adds this
+# machine's request cache to the server's (when there is one here; the cache is not in git), writes the three API
 # keys from the environment into a root-only file there, and (re)starts a systemd service that runs
 # serve.py as its own user. Ports 80 and 443 on that machine belong to the gap finder, so this stays
 # on plain http on its own port. Temporary: `systemctl disable --now talent-brief` takes it down.
@@ -19,7 +20,10 @@ npm --prefix ui run check
 npm --prefix ui run build >/dev/null
 "${SSH[@]}" "$HOST" "id talentbrief >/dev/null 2>&1 || useradd --system --home $DIR --shell /usr/sbin/nologin talentbrief; mkdir -p $DIR/ui; rm -f $DIR/index.html"
 rsync -az -e "${SSH[*]}" \
-  lib.py signals.py serve.py monitors.py person.py presets.json pool.json companies.json roles.json api-cache "$HOST:$DIR/"
+  lib.py signals.py serve.py monitors.py person.py presets.json pool.json companies.json roles.json "$HOST:$DIR/"
+# The request cache is not in git, so a checkout may not have it. What is here is added to the server's copy; nothing
+# on the server is ever deleted or replaced by an older file, so a deploy from a bare checkout leaves that copy whole.
+if [ -d api-cache ]; then rsync -az --update -e "${SSH[*]}" api-cache "$HOST:$DIR/"; fi
 # No --delete: a tab opened before a redeploy still asks for the old hashed files under assets/, and
 # deleting them leaves that tab blank until it is reloaded.
 rsync -az -e "${SSH[*]}" ui/dist "$HOST:$DIR/ui/"
