@@ -19,6 +19,30 @@ On a machine with one 80 GB+ GPU, from this folder:
 evaluating the held-out seeds every 10 steps. Everything lands in `out/` (curves, summaries) and
 `ckpt/` (weights, not in git).
 
+### On Modal
+
+`modal_app.py` runs `run.py` on Modal, one container per run: two GPUs (vLLM on `cuda:0`, the LoRA
+trainer on `cuda:1`), B200s when free and H200s otherwise. The simulator is pinned at `AQ_SIM_REF`
+(default `3bac4f4`, as on Verda) and `AQ_MAX_TURNS=48`. Weights, demos, checkpoints and curves live on
+the `aq-rl` Volume: `ckpt/<tag>/` and `out/<tag>/`. The first lines of `out/<tag>/run.log` are the
+container's `nvidia-smi -L`. From the repo root:
+
+```
+direnv exec . sops exec-env secrets/secrets.yaml 'cd projects/oncallbench/rl && sh -c "
+  G=\"rl --model google/gemma-4-26B-A4B-it --adapter ckpt/gemma26-sft --lora 32 --train-device cuda:1 --groups 4 --per 8 --steps 60 --overlap --max-ctx 32768 --gpu-mem 0.85 --eval-every 15 --eval-samples 8 --eval-temp 1.0 --save-every 5 --final-samples 8\"
+  ~/.local/bin/modal run --detach modal_app.py --runs \"\$G --levels 3,4 --lr 1e-5 --tag gemma26-rl-m; \$G --levels 4 --lr 1e-5 --tag gemma26-rl-l4\"
+"'
+```
+
+Each `;`-separated run gets its own container; `--gpus 1` puts each on one GPU (Qwen). Before the
+first run: `modal run modal_app.py::fetch --model <hf id>` downloads the weights into the Volume
+without a GPU, and `modal volume put aq-rl <local dir> /ckpt/<tag>` (or `/cache/`) uploads adapters
+and demos. To follow a run: `modal app logs <app id>`, or `modal volume get aq-rl /out/<tag> out/`.
+
+Measured on 2× H200 (Gemma 4 26B-A4B, level 4, 4 groups × 8, 32k context, `--overlap`): rollouts take
+53–66 s per step and the LoRA trainer 667–758 s, so a step takes 11–12.5 min at $9.08/h (about $1.80
+per step). B200s were never free on 14 Nov; H200s started in 4–12 s.
+
 ## Test
 
 ```
@@ -42,5 +66,6 @@ minute).
   SFT and RL see identical tokens; batched rollouts on vLLM; the policy-gradient step; in-place
   weight sync from the trainer into vLLM.
 - `run.py`: `eval`, `sft`, `rl`.
+- `modal_app.py`: the same commands on Modal GPUs (above).
 - `verda.py`, `grab.py`: create, list and delete the temporary GPU instance through the Verda API
   (only hostnames starting `aq-rl-`); credentials only via `sops exec-env`.
