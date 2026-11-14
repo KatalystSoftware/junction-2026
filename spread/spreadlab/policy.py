@@ -32,6 +32,10 @@ DEFAULTS = {
     "min_slack": 300,     # offer an option only with this many minutes between the first possible pickup and the last one that is on time
     "min_notified": 0,    # decline when fewer drivers than this are notified of the pickup
     "max_unbooked": 0,    # decline while this many won cars have no driver; 0 is no limit
+    # The Friday drop wave (daycap.py on main): some nights, mostly before a Friday, 10 or more drivers drop their bookings in the
+    # first hour, and the day's cars must then book on the day itself. With `due_cap` the desk quotes no option whose last
+    # pickup falls on a day that already has this many won orders with a car still to deliver; 0 is no cap.
+    "due_cap": 0,
     "fee": 1.2,           # the opening fee, as a multiple of the request's typical fee
     # The fees after the opening. The starter's schedule rises 10% of the opening fee an hour, to 1.5 times. Each is off at its default.
     "fee_cap": 0,         # the fee rises a tenth of the typical fee an hour up to this multiple of it, then holds
@@ -337,7 +341,16 @@ class Policy(Desk):
             return "slow", []
         if share(request["id"]) >= p["quote_share"]:
             return "volume", []
+        if p["due_cap"]:
+            drive = self.drive(request)
+            options = [o for o in options if self.due_on((o["deadline"] - drive) // DAY) < p["due_cap"]]
+            if not options:
+                return "day_full", []
         return None, options
+
+    def due_on(self, day: int) -> int:
+        """The won orders with a car still to deliver whose last minute to collect it falls on the day."""
+        return sum(1 for order in self.orders.values() if order["lastPickupAt"] // DAY == day and None in order["deliveredAt"])
 
     def slack(self, request, option) -> int:
         """The minutes the desk has to find a driver: from the first minute a driver can set out with the first car to
