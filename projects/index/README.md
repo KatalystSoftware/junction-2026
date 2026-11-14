@@ -39,6 +39,13 @@ An entry can set `logo` to a local asset shown beside its name. OnCallBench uses
 and Since When `site/logos/since-when.svg`, the same file as `projects/since-when/ui/public/favicon.svg`
 (its mark, "Since when?": the question mark's dot starts a bar on a time strip).
 
+## The Spread pitch
+
+[`site/spread/index.html`](site/spread/index.html), at <https://katalyst.fyi/spread/>, is the Spread desk's
+jury deck: one self-contained page in the site's typeface and colours, five slides by default. `#7`, `#9`
+or `#10` in the address opens a longer cut; the arrow keys step through it, and Print or Save as PDF gives
+one 16:9 slide a page. The "See the pitch" link under "Also built" points at it.
+
 ## Where each claim comes from
 
 The page says nothing the repo does not. When one of these files changes, change the entry with it.
@@ -49,6 +56,7 @@ The page says nothing the repo does not. When one of these files changes, change
 | Since When | [`projects/since-when/README.md`](../since-when/README.md): the first two paragraphs, and the loading table (2,919 topics; every revision for three, one version a year for the rest); Lapua Movement is `#/Q1412941` |
 | Kutsu | [`projects/kutsu/README.md`](../kutsu/README.md): the first paragraphs (new surveys each time; who came and what employers said they need), the two sign-up flows, and the Context.dev table (brand record, careers page), and "What is real, what is sample" (statements quoted from the page they link to; the pool is sample data), and "About a person" (only what they hand over; the sign-up submits nothing) |
 | Spread desk | [`spread/README.md`](../../spread/README.md), "How the desk decides" |
+| Spread pitch | [`spread/README.md`](../../spread/README.md) holds €12,376, 0.4 ms, the 94,000-order late fit, 441 against 332 orders at €41.6 and €41.4, and merge 1's +€2,180. The fee ladder's +€604, the first version's +€949, the CRACI run (1,442 stand-in weeks in 4 min 41 s; 1 h 53 min from idea to joint search) and the estimates for merges 2 to 4.1 come from the team's submission text and candidate comparison, which are not in the repo; the slide marks the merges as estimates |
 
 The screenshots are cropped to one readable moment: the replay at minute 42 of seed 200019
 (`?session=l4-s200019&t=42&intro=0&still`: the rollback at minute 33 and what it has cost by 42), Since When's first card at 520 px wide, and Kutsu's

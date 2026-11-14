@@ -295,6 +295,7 @@ svg.arrow { width: 0.8em; height: 0.8em; flex: none; }
     var also = el("section", "also");
     var inner = el("div");
     inner.append(el("h2", "", data.also.name + " "), el("p", "", data.also.what));
+    if (data.also.link) inner.append(" ", link("more", data.also.link[0], data.also.link[1]));
     also.append(inner);
     main.append(also);
   }

@@ -17,6 +17,7 @@
 //     source  folder in the repo, joined to `repo`
 //     shot    file in shots/ (960 x 600 WebP of the live app)
 //   also     work that is on the team's table but is not one of its entries
+//     link    optional [words, address] after its sentence
 window.KATALYST = {
   repo: "",
   lede: "Three entries at Junction 2026, each with a live demo.",
@@ -75,5 +76,6 @@ window.KATALYST = {
   also: {
     name: "Also built: Spread desk.",
     what: "A pricing desk for Bahn Express's Spread competition. It runs a simulated car transport company for a week, quoting dealers and paying drivers; every quote is one formula, with no model on the quote path.",
+    link: ["See the pitch", "spread/"],
   },
 };
