@@ -39,7 +39,12 @@ export const linkedinName = (raw: string) =>
     .replace(/^(https?:\/\/)?([a-z]{2,3}\.)?(www\.)?linkedin\.com\/(in\/)?/i, '')
     .replace(/[/?#].*$/, '')
 /** A web address as typed or pasted, without the scheme nobody should have to type. */
-export const bare = (raw: string) => raw.trim().replace(/^https?:\/\//i, '')
+export const bare = (raw: string) =>
+  raw
+    .trim()
+    .replace(/^https?:\/\//i, '')
+    .replace(/^www\./i, '')
+    .replace(/\/$/, '')
 /** The domain, when what was typed is a web address ("https://www.nitor.com/en/careers" is "nitor.com"); otherwise the text as it is. */
 export const asDomain = (raw: string) => /^(?:https?:\/\/)?(?:www\.)?((?:[a-z0-9-]+\.)+[a-z]{2,})(?:[/?#].*)?$/i.exec(raw.trim())?.[1]?.toLowerCase() ?? raw.trim()
 

@@ -264,7 +264,7 @@ h2.second {
 }
 .tell li {
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto minmax(0, 1fr);
   align-items: start;
   column-gap: var(--s3);
   padding: var(--s2) 0;

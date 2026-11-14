@@ -107,9 +107,12 @@ export function keep() {
     // a browser that refuses storage still runs the flow; a reload then starts again
   }
 }
+/** How many times the person has cleared everything: the flow goes back to its cover each time. */
+export const cleared = $state({ n: 0 })
 export function startOver(how: 'blank' | 'sample' | 'typed' = 'blank') {
   me.is = how === 'sample' ? SAMPLE() : { ...blank(), typed: how === 'typed' }
   progress.at = {}
+  if (how === 'blank') cleared.n += 1
   keep()
 }
 
@@ -188,6 +191,8 @@ export async function readAll() {
       }
     }),
   )
+  // a page that gave no line gave nothing: no headline, field or level is kept from it either
+  if (m.can.length + m.skills.length + m.roles.length === 0) Object.assign(m, { name: '', headline: '', field: '', level: '' })
   // three things the person can do are kept by default; the rest are theirs to add
   m.struck = m.can.slice(SHOWN).map((f) => f.id)
   m.wants = m.field ? [m.field] : []
@@ -236,7 +241,11 @@ export const kept = (m: Me, facts: Fact[]) => facts.filter((f) => !m.struck.incl
 const plain = (skill: string) => skill.toLowerCase().replace(/[^a-z0-9+#]/g, '')
 /** Why an employer and this person might want to meet: what the employer asks for, and what of that the person has. */
 export type Match = { employer: Invitee; role: string; shared: string[]; reasons: string[] }
-/** The event's employers that look for what the person does, those asking for most of what the person knows first. Employers are ordered here, never people. */
+/**
+ * The event's employers with a role that asks for something the person knows, those asking for most of it
+ * first; or, when nobody asks for anything they know, a few whose roles are in a field the person chose,
+ * said to be only that. Employers are ordered here, never people.
+ */
 export function matches(m: Me, employers: Invitee[]): Match[] {
   const knows = kept(m, m.skills).map((s) => plain(s.text))
   const out: (Match & { score: number })[] = []
@@ -257,5 +266,7 @@ export function matches(m: Me, employers: Invitee[]): Match[] {
     }
     if (best) out.push(best)
   }
-  return out.sort((a, b) => b.score - a.score || nameOf(a.employer.brief).localeCompare(nameOf(b.employer.brief)))
+  const sorted = out.sort((a, b) => b.score - a.score || nameOf(a.employer.brief).localeCompare(nameOf(b.employer.brief)))
+  const asking = sorted.filter((x) => x.shared.length)
+  return asking.length ? asking : sorted.slice(0, 3)
 }

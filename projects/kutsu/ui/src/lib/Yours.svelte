@@ -65,7 +65,7 @@
     <p class="acts">
       {#if event.dated && url}<a href={url} target="_blank" rel="noopener">Apply for a Networking Pass<Icon name="out" size={16} /></a>{/if}
       <button onclick={change}><Icon name="undo" size={16} />Change my answers</button>
-      <button onclick={forget} onblur={() => (sure = false)}><Icon name="x" size={16} />{sure ? 'Press again to forget everything' : 'Forget me'}</button>
+      <button onclick={forget} onblur={() => (sure = false)}><Icon name="x" size={16} />{sure ? 'Press again to clear' : 'Clear this tab'}</button>
     </p>
   </header>
 
@@ -117,7 +117,7 @@
             {#if match.reasons.length}<p class="reach">{match.reasons.join(' · ')}</p>{/if}
           </li>
         {:else}
-          <li><p class="reach">Nobody ticked. Every employer at the event is still open to you.</p></li>
+          <li><p class="reach">Nobody ticked.</p></li>
         {/each}
       </ul>
     </div>

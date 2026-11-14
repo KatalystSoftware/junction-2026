@@ -10,7 +10,8 @@
   import Logo from './Logo.svelte'
   import Mark from './Mark.svelte'
   import { markOf } from './mark'
-  import { addOwn, chosen, CV_MOST, givenNow, keep, kept, linksOf, matches, me, progress, readAll, seedOf, SHOWN, sourceLabel, sourcesOf, startOver, type Fact } from './person.svelte'
+  import { tick } from 'svelte'
+  import { addOwn, chosen, cleared, CV_MOST, givenNow, keep, kept, linksOf, matches, me, progress, readAll, seedOf, SHOWN, sourceLabel, sourcesOf, startOver, type Fact } from './person.svelte'
   import SiteIcon from './SiteIcon.svelte'
   import { siteOf } from './sites'
   import { nameOf, route } from './state.svelte'
@@ -50,8 +51,6 @@
     }
     m.links[i] = value
     if (field.value !== value) field.value = value
-    // there is always one empty field left to add another link, as long as there is room
-    if (m.links.every((l) => l.trim()) && m.links.length < 6) m.links.push('')
     keep()
   }
   // an obviously wrong value is caught here, before a lookup is spent on it
@@ -100,17 +99,20 @@
   let started = $state(me.is.sample || me.is.typed || Object.keys(me.is.read).length > 0)
   const current = $derived<Key>(opened ?? KEYS.find((k) => !decided(k)) ?? 'meet')
 
+  const on = (f: Fact) => !m.struck.includes(f.id)
   // who they are: three things they can do are kept by default, the rest one press away
   let more = $state(false)
   let detail = $state<string | null>(null)
-  let editing = $state(false)
+  let pressed = $state(false)
+  // a profile typed in by hand is open for typing from the start
+  const editing = $derived(pressed || m.typed)
+  const hidden = $derived(m.can.filter((f, i) => i >= SHOWN && !on(f)).length)
   const typed = (e: FocusEvent) => (e.currentTarget as HTMLElement).innerText.replace(/\s+/g, ' ').trim()
   const enter = (e: KeyboardEvent) => {
     if (e.key !== 'Enter') return
     e.preventDefault()
     ;(e.currentTarget as HTMLElement).blur()
   }
-  const on = (f: Fact) => !m.struck.includes(f.id)
   /** The last line taken out, so one wrong press can be taken back. */
   let undo = $state<null | { id: string }>(null)
   function toggle(f: Fact) {
@@ -157,7 +159,7 @@
 
   function accept() {
     const k = current
-    ;[opened, undo, editing, own] = [null, null, false, '']
+    ;[opened, undo, pressed, own] = [null, null, false, '']
     if (k === 'read') {
       if (!(has && (fresh || m.typed)) && picked.length && !wrong && !reading) void readAll()
     } else if (k === 'you') m.you_ok = true
@@ -221,7 +223,29 @@
             ? "That's what I want"
             : 'My profile is ready',
   )
-  const ready = $derived(current === 'read' ? !reading && !wrong && ((has && (fresh || m.typed)) || picked.length > 0) : current === 'want' ? m.wants.length > 0 : true)
+  const ready = $derived(
+    current === 'read'
+      ? !reading && !wrong && ((has && (fresh || m.typed)) || picked.length > 0)
+      : current === 'you'
+        ? !m.typed || (!!m.name.trim() && kept(m, m.can).length > 0)
+        : current === 'want'
+          ? m.wants.length > 0 || !!m.looking.trim()
+          : true,
+  )
+  // a new card starts at its top, also when the last one was read to its end on a phone
+  let bench = $state<HTMLElement>()
+  let shown = ''
+  $effect(() => {
+    const key = current
+    const card = bench
+    if (shown && shown !== key && card && card.getBoundingClientRect().top < 0) void tick().then(() => { card.scrollIntoView({ block: 'start' }) })
+    shown = key
+  })
+  // clearing everything goes back to the invitation
+  let wiped = cleared.n
+  $effect(() => {
+    if (cleared.n !== wiped) [wiped, started, opened, more, pressed] = [cleared.n, false, null, false, false]
+  })
 </script>
 
 <svelte:window onkeydown={keys} />
@@ -231,18 +255,19 @@
 {/snippet}
 
 <div class="join" class:cover={!started} style:--brand="var(--city)" style:--brand-ink="var(--city-ink)">
-  <p class="host">City of Espoo <span>{event.name}, {event.when}{m.sample ? ' · sample person, made up' : ''}</span></p>
+  <p class="host">City of Espoo <span>{event.name}, {event.when} · demonstration{m.sample ? ' with a sample person, made up' : ''}</span></p>
 
   {#if !started}
     <section class="invite">
       <h1>{#each "You're invited.".split(' ') as word, i (i)}<span style:--i={i}>{word}&nbsp;</span>{/each}</h1>
       <p class="filled" style:--i={3}>{event.name}, {event.when}. {event.facts} Your profile fills itself in from what you choose to show us.</p>
-      <button class="yes big" style:--i={4} onclick={() => (started = true)}>Start <kbd>Enter</kbd></button>
+      <p class="filled demo" style:--i={4}>This is a demonstration. Nothing you enter here reaches Espoo or an employer; the real sign-up is on Espoo's event page.</p>
+      <button class="yes big" style:--i={5} onclick={() => (started = true)}>Start <kbd>Enter</kbd></button>
     </section>
   {:else if m.done}
     <Yours {event} {offered} url={plan?.url ?? ''} seed={seedOf(m)} />
   {:else}
-    <div class="bench">
+    <div class="bench" bind:this={bench}>
       <aside class="left" aria-label="About you">
         {#if settled.you}
           <h3>About you</h3>
@@ -312,7 +337,7 @@
                       <!-- the icon follows the address: nothing to choose, nothing fetched -->
                       <label class="field prefixed">
                         <span class="site" class:known={!!site} aria-hidden="true"><SiteIcon id={site?.id ?? 'globe'} /></span>
-                        <input aria-label="A link of yours" placeholder={i ? 'Another link' : 'A page of yours: a site, GitHub, a portfolio'} value={raw} oninput={(e) => { setLink(i, e.currentTarget) }} disabled={reading} inputmode="url" autocomplete="off" autocapitalize="none" spellcheck="false" />
+                        <input aria-label="A link of yours" placeholder={i ? 'Another page about you' : 'A page about you: a site, GitHub, a portfolio'} value={raw} oninput={(e) => { setLink(i, e.currentTarget) }} disabled={reading} inputmode="url" autocomplete="off" autocapitalize="none" spellcheck="false" />
                       </label>
                       {#if wrongLink(raw)}
                         <p class="failed" role="alert">{wrongLink(raw)}</p>
@@ -323,6 +348,9 @@
                       {/if}
                     </li>
                   {/each}
+                  {#if m.links.every((l) => l.trim()) && m.links.length < 6}
+                    <li class="another"><button class="rest" onclick={() => { m.links.push(''); keep() }}><Icon name="plus" size={14} />Another link</button></li>
+                  {/if}
                   <li class="source" class:on={!!m.cv.trim() && sourceOn('cv')}>
                     <button class="tick" role="checkbox" data-choice aria-checked={!!m.cv.trim() && sourceOn('cv')} aria-label="Read my CV" disabled={!m.cv.trim() || reading} onclick={() => { switchSource('cv') }}>
                       <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4.5 10.5 8.5 14.5 15.5 6" /></svg>
@@ -335,16 +363,18 @@
               {/if}
 
               <ul class="promise">
-                <li><b>Read once</b>and not saved</li>
+                <li><b>Not saved</b>by this site</li>
                 <li><b>Your lines</b>to keep or take out</li>
-                <li><b>Left out</b>photo, age, gender, nationality</li>
+                <li><b>Kept off your profile</b>photo, age, gender, nationality</li>
               </ul>
               <button class="rest" aria-expanded={where} onclick={() => (where = !where)}><Icon name={where ? 'x' : 'plus'} size={14} />Where it goes</button>
               {#if where}
                 <p class="facts where">
-                  What you give is sent whole to this site's server, which keeps none of it: no file, no log. An address is read by Context.dev, a service that fetches public
-                  pages. The text is then turned into lines by a language model run by Anthropic. Those two receive it; what they keep is theirs to answer for. Your draft
-                  lives in this browser tab and is gone when you close it. Employer logos later on are loaded from Context.dev's image server.
+                  What you give is sent to this site's server (a pasted CV up to {CV_MOST.toLocaleString('en')} characters), which keeps none of it: no file, no log. An
+                  address is read by Context.dev, a service that fetches public pages; a LinkedIn profile comes from its own record of it. The text, all of it, then goes to
+                  a language model run by Anthropic, which writes the lines. So give only what you want read, and only pages about you. Those two companies receive it, and
+                  this demo cannot make them delete it. Your draft lives in this browser tab and is gone when you close it. Employer logos later on are loaded from
+                  Context.dev's image server (media.brand.dev).
                 </p>
               {/if}
               {#if !m.sample && !reading}
@@ -354,7 +384,7 @@
                 </p>
               {/if}
             {:else if item === 'you'}
-              <button class="edit" aria-pressed={editing} onclick={() => (editing = !editing)}><Icon name={editing ? 'check' : 'pen'} size={16} />{editing ? 'Done' : 'Edit'}</button>
+              {#if !m.typed}<button class="edit" aria-pressed={editing} onclick={() => (pressed = !pressed)}><Icon name={editing ? 'check' : 'pen'} size={16} />{editing ? 'Done' : 'Edit'}</button>{/if}
               <div class="band mine"><Mark seed={seedOf(m)} /></div>
               <h2 class:unnamed={!m.name && !editing} role={editing ? 'textbox' : undefined} aria-label={editing ? 'Your name' : undefined} contenteditable={editing ? 'plaintext-only' : undefined} spellcheck="false" data-placeholder="Your name" onblur={(e) => { m.name = typed(e); keep() }} onkeydown={enter} use:text={m.name}></h2>
               <p class="pitch" role={editing ? 'textbox' : undefined} aria-label={editing ? 'What you do' : undefined} contenteditable={editing ? 'plaintext-only' : undefined} data-placeholder="What you do, in a line" onblur={(e) => { m.headline = typed(e); keep() }} onkeydown={enter} use:text={m.headline}></p>
@@ -388,8 +418,8 @@
                     </li>
                   {/each}
                 </ul>
-                {#if m.can.length > SHOWN && !more}
-                  <button class="rest" onclick={() => (more = true)}><Icon name="plus" size={14} />{m.can.length - SHOWN} more we read, not on your profile unless you tick them</button>
+                {#if hidden && !more}
+                  <button class="rest" onclick={() => (more = true)}><Icon name="plus" size={14} />{hidden} more we read. Not on your profile unless you tick {hidden === 1 ? 'it' : 'them'}</button>
                 {/if}
               {/if}
               {#if editing || m.typed || more}
@@ -444,7 +474,13 @@
             {:else}
               <h2>Who would you like to meet?</h2>
               {#if offered.length}
-                <p class="facts">Employers at this event whose roles are in your field or ask for something you know. Those asking for most of what you know come first. Tick any, or none.</p>
+                <p class="facts">
+                  {#if offered.some((x) => x.shared.length)}
+                    Employers at this event with a role that asks for something you know, those asking for most of it first. Tick any, or none.
+                  {:else}
+                    No employer at this event has a role asking for what you listed. These have a role in a field you chose. Tick any, or none.
+                  {/if}
+                </p>
                 <ul class="tell meet" aria-label="Employers at this event">
                   {#each offered as match (match.employer.brief.id)}
                     {@const id = match.employer.brief.id}
@@ -453,7 +489,7 @@
                         <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4.5 10.5 8.5 14.5 15.5 6" /></svg>
                       </button>
                       <span class="say">
-                        <b><span class="tile"><Logo brief={match.employer.brief} small /></span>{nameOf(match.employer.brief)}</b>
+                        <button class="name" data-choice onclick={() => { pick(id) }}><span class="tile"><Logo brief={match.employer.brief} small /></span>{nameOf(match.employer.brief)}</button>
                         {#if match.employer.brief.website}<a href={match.employer.brief.website} target="_blank" rel="noopener" aria-label="{nameOf(match.employer.brief)}'s own site"><Icon name="out" size={14} /></a>{/if}
                       </span>
                       <p class="behind"><b>{match.role}</b>{#if match.reasons.length}<br />{match.reasons.join(' · ')}{/if}</p>
@@ -686,10 +722,29 @@
   .meet .say {
     justify-content: flex-start;
   }
-  .meet .say b {
+  /* an employer's name is as dark ticked or not, and pressing it ticks the row */
+  .meet .name {
     display: inline-flex;
     align-items: center;
     gap: var(--s2);
+    padding: 0;
+    border: 0;
+    background: none;
+    font-size: var(--t-lg);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+    text-align: left;
+    color: var(--ink);
+  }
+  .another {
+    border-bottom: 0;
+    padding: 0 0 0 calc(1.5rem + var(--s3));
+  }
+  .demo {
+    max-width: 44ch;
+    font-size: var(--t-md);
+    opacity: 0.85;
   }
   .meet .say a {
     display: grid;
