@@ -59,9 +59,11 @@ def outcome(label, rows):
             continue
         hits = {lang for lang in want if same(want[lang], got[lang])}
         if label["type"] == "missing_fact":
-            # The fact is quoted from the edition that has it; a row without missing_in names none.
+            # The fact is quoted from the edition that has it. Two labelled rows name no edition as
+            # lacking it; the check then names the one it searched, and either counts.
             has = [lang for lang in want if lang != label["missing_in"] and want[lang]]
-            full = bool(has) and all(lang in hits for lang in has) and row.get("missing_in") == label["missing_in"]
+            named = label["missing_in"] in (None, row.get("missing_in"))
+            full = bool(has) and all(lang in hits for lang in has) and named
         else:
             full = hits == set(want)
         if full and row["type"] == label["type"]:

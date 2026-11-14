@@ -30,6 +30,7 @@ do not. What the verdicts do to a row:
     missing fact, contradicted    stays a missing fact: the other edition says something near it,
     and not confirmed             and not this
     numbers or contradiction row with no confirmed contradiction: no finding (set aside)
+    a contradiction that repeats one already written: reported once (the others set aside)
     framing                       unchanged; framing is about words, not checked here
 
 Five steps, the searches in the database:
@@ -43,7 +44,7 @@ Five steps, the searches in the database:
 
 DIR gets differences.jsonl (the finding rows, in the shape of classify.py's with extra fields),
 set-aside.jsonl (rows and claims that are no finding, each with the verdict and the passage that
-settled it) and verdicts.jsonl (every claim with its verdict). Model answers are cached under
+settled it), verdicts.jsonl (every claim with its verdict) and run.json (the judging model). Model answers are cached under
 $DIFFERENCES_CLAIMS_CACHE; --offline never calls the model.
 """
 
@@ -702,23 +703,34 @@ def findings(pairs, rows_by_pair, claims, verdicts, model, reverse=None):
                 continue
             hits = [(c, v) for c, v in checks if confirmed(c, v)]
             if hits:
-                contradictions += hits
+                contradictions += [(c, v, row) for c, v in hits]
             elif row["type"] == "missing_fact" and checks[0][1]["verdict"] != "supported":
                 # not mentioned, unchecked, or a contradiction the other side did not confirm: the
                 # other edition says something near it, and not this
-                kept.append({**row, "missing_in": checks[0][0]["target_lang"], **check(*checks[0])})
+                # missing_in becomes the edition that was searched; the classifier's own value
+                # stays beside it, since the finding it wrote is keyed by that.
+                searched = {"missing_in": checks[0][0]["target_lang"], "classifier_missing_in": row.get("missing_in")}
+                kept.append({**row, **searched, **check(*checks[0])})
             else:
                 aside.append({**row, **check(*checks[0]), "checks": [check(c, v) for c, v in checks[1:]]})
     for c, v in extracted:
         if confirmed(c, v):
-            contradictions.append((c, v))
+            contradictions.append((c, v, None))
         elif v["verdict"] == "contradicted":  # a figure the other side did not confirm
             aside.append({**_contradicted(c, v, model), **check(c, v), "verdict": "unconfirmed"})
+    # The classifier's own numbers and contradiction rows first, then what its missing facts
+    # turned into, then the figures the check listed: of rows that say the same, the first stays.
+    contradictions.sort(key=lambda x: 2 if x[2] is None else x[2]["type"] == "missing_fact")
     seen = []
-    for claim, v in contradictions:
+    for claim, v, first in contradictions:
         row = {**_contradicted(claim, v, model), **check(claim, v)}
+        if first:  # the classifier's row this one comes from, so a loader can find its finding
+            row["original"] = {k: first.get(k) for k in ("pair_id", "type", "missing_in", "quote_a", "quote_b")}
         if not any(_repeats(row, other) for other in seen):
             seen.append(row)
+        elif first and not any(o.get("original") == row["original"] for o in seen + aside):
+            # The difference is reported once; this classifier row's finding is set aside as a repeat.
+            aside.append({**row, "aside": "repeat"})
     return kept + seen, aside
 
 
@@ -844,6 +856,7 @@ def main():
     ):
         with open(out / name, "w", encoding="utf-8") as f:
             f.writelines(json.dumps(item, ensure_ascii=False) + "\n" for item in items)
+    (out / "run.json").write_text(json.dumps({"judge": cfg[2], "prompt_version": PROMPT_VERSION}) + "\n")
     count = lambda items, key: ", ".join(
         f"{k} {sum(1 for i in items if i[key] == k)}" for k in sorted({i[key] for i in items})
     )
