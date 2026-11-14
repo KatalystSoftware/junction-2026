@@ -155,13 +155,14 @@ Needs Docker with Compose v2 (`docker compose version` must work; on Ubuntu's `d
 by itself) and, for the Opus runs only, an `ANTHROPIC_API_KEY` in the environment. No Python
 install is needed: without `python3`, `run.sh` uses uv's, and the other `python3 <script>.py`
 commands here run as `uv run --no-project --python 3.13 python3 <script>.py`. AfterQuery
-provides no inference credits. A run downloads the base images from Docker Hub, `mcp` from PyPI and, for the agent,
-OpenCode through Harbor's installer. Run everything from this folder (`projects/oncallbench`).
+provides no inference credits. A run downloads the base images from Docker Hub, `mcp` from PyPI
+and, for the agent, OpenCode through Harbor's installer. Run everything from this folder
+(`projects/oncallbench`).
 
 The reported seeds ship as ready-to-run Harbor tasks: `tasks/shift-1`, `shift-2` and `shift-3` are
 seeds 101, 102 and 103 at level 4, with the briefing and the verifier's calibration filled in
-(`./export-tasks.sh` writes them). Plain Harbor 0.25.0
-runs them as they are (`alias harbor='uvx --from harbor==0.25.0 harbor'`):
+(`./export-tasks.sh` writes them). Plain Harbor 0.25.0 runs them as they are
+(`alias harbor='uvx --from harbor==0.25.0 harbor'`):
 
 ```
 harbor run -p tasks/shift-1 -a opencode -m anthropic/claude-opus-5-5   # the judged agent
@@ -202,10 +203,12 @@ rollback of quotes-svc set off a retry storm and the shift cost $245,607 against
 doing nothing (`runs/repro-l4-s101-opus-204757/`). The runs go side by side: the first call spends
 about 5 minutes building the images, then the scripted runs take about a minute and an Opus run
 5-8. Each run's score is in `jobs/<name>/<trial>/verifier/reward.txt`, its cost breakdown next to
-it in `reward.json`. `run.sh` writes a Harbor task for the episode to `jobs/variants/` and calls
-`harbor run -p <task> -a opencode -m anthropic/claude-opus-5-5`, so a judge can rerun that folder
-with plain Harbor. Stop-early and the other scripted policies run as Harbor's `oracle` agent with
-`POLICY=<name>`. `SEED` picks the episode (the reported seeds are 101-106); `ATTEMPTS=3` gives three Opus runs.
+it in `reward.json`. `run.sh` writes a Harbor task for the episode to
+`jobs/variants/episode-<random>` (it prints which; `jobs/variants/index.tsv` lists them all) and
+calls `harbor run -p <task> -a opencode -m anthropic/claude-opus-5-5`, so a judge can rerun that
+folder with plain Harbor. Stop-early and the other scripted policies run as Harbor's `oracle` agent
+with `POLICY=<name>`. `SEED` picks the episode (the reported seeds are 101-106); `ATTEMPTS=3` gives
+three Opus runs.
 
 Committed run logs, each trial with its transcript in `agent/opencode.txt`, its action log in
 `artifacts/ledger/receipt.json` and its score in `verifier/reward.txt`:

@@ -28,11 +28,16 @@ else python=(uv run --no-project --python 3.13 python3); fi
 read -ra extra <<<"${HARBOR_ARGS:-}"
 
 # Each episode is a copy of the task with its own hidden seed, calibration and level rules. The folder name is
-# an opaque hash, so neither the seed nor the level shows in anything the agent can read.
+# random, so neither the seed nor the level shows in anything the agent can read: Harbor names the
+# containers after the folder, and Docker's DNS gives those names to anyone in the task's network.
+# jobs/variants/index.tsv says which copy holds which level and seed.
 SEED=${SEED:-1}
 LEVEL=${LEVEL:-$("${python[@]}" -B -c "import sys; sys.path.insert(0, 'sim'); import incident; print(incident.SUBMITTED)")}
-task=jobs/variants/aq-incident-$(echo "$LEVEL-$SEED" | sha1sum | cut -c1-8)
-rm -rf "$task" && mkdir -p jobs/variants && cp -r task "$task"
+mkdir -p jobs/variants
+task=jobs/variants/episode-$(od -An -N4 -tx1 /dev/urandom | tr -d ' \n')
+cp -r task "$task"
+printf '%s\t%s\t%s\n' "${task#jobs/variants/}" "$LEVEL" "$SEED" >>jobs/variants/index.tsv
+echo "$task: level $LEVEL, seed $SEED"
 sed -i "s/^SEED = .*/SEED = $SEED/; s/^LEVEL = .*/LEVEL = $LEVEL/" "$task/environment/mcp-server/server.py"
 "${python[@]}" -B -c "
 import sys; sys.path.insert(0, 'sim'); import incident; from pathlib import Path

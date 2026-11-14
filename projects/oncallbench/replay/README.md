@@ -42,9 +42,9 @@ flake: `nix develop -c python3 export.py ...`.
 - `--jobs <folder>` adds the agent trials of that episode found in a Harbor jobs folder; `--trial
   <folder>` adds one trial. `--only a,b` keeps the trials whose job name contains one of the strings.
   A job run with several attempts gives one run per attempt, named `<job>-<attempt>`.
-  Trials of `../run.sh`'s task copies (`aq-incident-<hash>__...`) and of exported tasks
-  (`episode-<random>__...` from `../export-tasks.sh`, `seed-<seed>__...` from older exports; level
-  and seed are read from the task's MCP server or the job's name) are both recognised.
+  Trials of `../run.sh`'s and `../export-tasks.sh`'s task copies are recognised:
+  `episode-<random>__...`, whose level and seed are read from the task's MCP server or the job's
+  name, and from older copies `aq-incident-<hash>__...` (the hash is inverted) and `seed-<seed>__...`.
 - `--policies a,b` picks the scripted policies shown next to the reference.
 - A bundle keeps its trials' action logs and words, so later exports of the same episode keep them
   without the Harbor folders. `--fresh` drops them.
