@@ -359,6 +359,16 @@ VARIANTS.update({
     "risk-open-due-24": {**_DEFAULT, "risk_fees": True, "risk_raise_late": 0, "risk_queue_hours": 24},
 })
 
+# Merge 1 with every waiting car counted in a week whose driver list is short (`tight_drivers`, known before the first quote).
+# Its 24-hour count lets the desk take orders while cars due later wait, and with few drivers those cars end late: all 7
+# weeks of merge 1's first exam under 92% had 648 to 723 drivers, and counting all hours lifted its three thin weeks under
+# 90% to 93 to 95%. 760 is slow.py's own reference for a full driver list. `-q48` counts the cars due within 48 hours.
+_MERGE_1_BASE = VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75"]
+VARIANTS.update({
+    "fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-all": {**_MERGE_1_BASE, "tight_drivers": 760, "when_tight": {"queue_hours": 0}},
+    "fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48": {**_MERGE_1_BASE, "tight_drivers": 760, "when_tight": {"queue_hours": 48}},
+})
+
 # The live default with a cap on the won orders to collect on one day (`due_cap`): a night's wave of dropped gigs then takes
 # down at most that day's cap. An option due on a full day is not quoted; a slower one of the same request still is. The cap
 # lifts for the rest of the week after the first night with 10 drops in its first hour (`due_cap_wave`).

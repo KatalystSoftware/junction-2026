@@ -804,3 +804,12 @@ def test_a_paired_check_stops_only_when_its_answer_cannot_change(tmp_path, monke
     assert stopcheck.decide("risky", "ref", seeds)[0] is False
     save("risky", seeds[30], 0, ranked=False)  # ... and a second is out, wherever it is in the list
     assert stopcheck.decide("risky", "ref", seeds) == (True, "stop: out, 2 weeks under 90% on time where 60 seeds allow 1")
+
+
+def test_merge_1_counts_every_waiting_car_only_in_a_week_with_a_short_driver_list():
+    from spreadlab import play
+    from spreadlab.variants import VARIANTS
+    params = VARIANTS["fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-all"]
+    roster = lambda n: [{**ROSTER[0], "id": f"x{i}"} for i in range(n)]  # noqa: E731
+    short, full = (play.policy_class(params)(None, 8, 0, params, roster(n), MAP) for n in (700, 800))
+    assert short.params()["queue_hours"] == 0 and full.params()["queue_hours"] == 24
