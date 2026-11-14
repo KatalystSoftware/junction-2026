@@ -566,8 +566,12 @@ class LivePairDesk(LiveDesk, PairPolicy):
                 orders = {s["orderId"]: self.orders[s["orderId"]] for s in gig["stops"] if s["orderId"] in self.orders}
                 latest = self.latest(gig["stops"], orders) if len(orders) > 1 else None
                 self.pair_gigs[gig_id] = self.now if latest is None else latest
-        for order_id in list(self.pair_wait):
-            if order_id not in self.orders or self.leg_gigs.get(order_id):
+        # A join replays each win offline, which holds its car again, and no look releases it there. A car stays held only
+        # while its order is undelivered, has no gig in the world, and its hold has not ended; reconcile posts the others
+        # that still need a gig, as any car without one.
+        for order_id, until in list(self.pair_wait.items()):
+            order = self.orders.get(order_id)
+            if order is None or not undelivered(order) or self.leg_gigs.get(order_id) or until <= self.now:
                 del self.pair_wait[order_id]
 
 

@@ -298,3 +298,40 @@ def test_a_held_car_is_not_posted_at_a_restart_and_goes_alone_when_its_hold_ends
     second.desk.send()
     second.stop()
     assert list(world.gigs) == ["g1"] and second.desk.gigs_of("R1") == ["g1"]
+
+
+def test_a_pair_desk_that_joins_from_the_history_alone_does_not_post_a_car_held_and_delivered_before(tmp_path, monkeypatch):
+    from spreadlab import pairs
+    monkeypatch.setattr(pairs, "RETURNS", {"helsinki>tampere": 20, "tampere>helsinki": 20})
+    out = request("R1", pickup="helsinki")
+    out["legs"] = [{**out["legs"][0], "delivery": {**out["legs"][0]["delivery"], "placeId": "tampere"}}]
+    events = [{"seq": 0, "at": 500, "kind": "price_request", "request": out},
+              {"seq": 1, "at": 515, "kind": "order_won", "order": {"id": "R1", "dealerId": "D01", "option": "next_day", "priceCents": 15000,
+                                                                     "deadline": 2640, "legs": out["legs"], "lastPickupAt": 2520,
+                                                                     "status": "waiting", "deliveredAt": [None]}},
+              {"seq": 2, "at": 760, "kind": "gig_booked", "gigId": "g1", "driverId": "d1", "feeCents": 9000},
+              {"seq": 3, "at": 900, "kind": "delivered", "gigId": "g1", "orderId": "R1", "leg": 0, "placeId": "tampere"}]
+    world = replay.Replay(events, ROSTER, ends_at=20000, start=506, speed=0.001)
+    desk = lambda folder: live.Live(world, world.guard_act, world.minute, 8, VARIANTS["slow-friday-late-150-kinds-limits-pairs-0.7"], MAP, folder, echo=False)  # noqa: E731
+    first = desk(tmp_path / "first")
+    first.join()
+    world.clock.saw(516)  # R1 is won and held for a return that never comes
+    for event in world.events(after=first.desk.seq):
+        first.desk.take(event)
+    first.desk.send()
+    world.clock.saw(515 + 4 * HOUR)  # its hold ends: it goes alone, as g1
+    first.desk.now = 515 + 4 * HOUR
+    first.desk.look()
+    first.desk.send()
+    first.stop()
+    assert list(world.gigs) == ["g1"]
+    world.clock.saw(1000)  # booked and delivered
+
+    second = desk(tmp_path / "second")  # no books: it learns the week from the world's history, which wins R1 again
+    second.join()
+    second.desk.now = 1100  # past the end of the hold that the history replayed
+    second.desk.look()
+    second.desk.send()
+    second.stop()
+    assert list(world.gigs) == ["g1"], "a delivered car gets no second gig"
+    assert not second.desk.pair_wait
