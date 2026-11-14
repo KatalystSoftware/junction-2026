@@ -265,6 +265,61 @@ in every run), and the adapter lands around Opus's 0.32. Over all 27 adapter run
 - **No run overflowed its context.**
 - **Wasted mitigations:** the untrained model wasted 3 in 9 runs, the adapter 2 in 9.
 
+### The 24 common seeds (the benchmark table)
+
+Harbor + OpenCode against the same vLLM endpoint (`serve.sh`, `spread.sh`), level 4, seeds
+200000-200023, two runs per seed for each model, the current `main` simulator (tasks exported at
+`ad7d8e1`). The adapter is `gemma26-rl` (sha256 `f9536c41…`), picked by the rule below before these
+runs. Rows in `metrics.json` round 16; table in `results.json` (`results_table.py`).
+
+| Agent (Harbor + OpenCode) | Valid runs | Seeds with a run | Mean (95% CI, seed bootstrap) |
+| --- | --- | --- | --- |
+| Gemma 4 26B-A4B, untrained (`gemma-base`) | 48 | 24 of 24, two each | 0.05 (0.03-0.07) |
+| + our adapter, SFT then RL on the score (`gemma-ft`) | 48 | 24 of 24, two each | **0.43 (0.35-0.53)** |
+| Opus 5.5, for scale (`metrics.json` round 16) | 48 | 24 of 24, two each | 0.45 (0.35-0.54) |
+
+Per seed (run 1 / run 2):
+
+| Seed | Untrained | + adapter | Opus 5.5 |
+| --- | --- | --- | --- |
+| 200000 | 0.00 / 0.02 | 0.25 / 0.00 | 0.93 / 0.82 |
+| 200001 | 0.00 / 0.00 | 0.00 / 0.45 | 0.00 / 0.26 |
+| 200002 | 0.02 / 0.00 | 0.00 / 0.76 | 0.38 / 0.31 |
+| 200003 | 0.00 / 0.00 | 0.40 / 0.12 | 0.30 / 0.53 |
+| 200004 | 0.00 / 0.00 | 0.34 / 0.38 | 0.00 / 0.37 |
+| 200005 | 0.00 / 0.00 | 1.00 / 0.60 | 0.70 / 0.67 |
+| 200006 | 0.24 / 0.04 | 0.00 / 0.37 | 0.00 / 0.76 |
+| 200007 | 0.00 / 0.00 | 0.77 / 0.30 | 0.73 / 0.75 |
+| 200008 | 0.34 / 0.08 | 0.78 / 0.52 | 0.57 / 0.68 |
+| 200009 | 0.05 / 0.00 | 0.69 / 0.78 | 0.00 / 0.00 |
+| 200010 | 0.00 / 0.00 | 0.44 / 0.71 | 0.76 / 0.73 |
+| 200011 | 0.06 / 0.00 | 0.48 / 0.42 | 0.71 / 0.00 |
+| 200012 | 0.01 / 0.12 | 0.76 / 0.66 | 0.78 / 0.00 |
+| 200013 | 0.09 / 0.00 | 0.52 / 0.50 | 0.52 / 0.00 |
+| 200014 | 0.12 / 0.06 | 0.56 / 0.36 | 0.00 / 0.59 |
+| 200015 | 0.00 / 0.00 | 0.17 / 0.19 | 0.27 / 0.55 |
+| 200016 | 0.03 / 0.18 | 0.00 / 0.64 | 0.09 / 0.11 |
+| 200017 | 0.18 / 0.13 | 0.01 / 0.35 | 0.96 / 0.71 |
+| 200018 | 0.04 / 0.02 | 0.44 / 0.50 | 0.61 / 0.74 |
+| 200019 | 0.00 / 0.00 | 0.24 / 0.00 | 0.00 / 0.43 |
+| 200020 | 0.00 / 0.00 | 0.56 / 0.00 | 0.69 / 0.89 |
+| 200021 | 0.00 / 0.13 | 0.59 / 0.00 | 0.80 / 0.36 |
+| 200022 | 0.00 / 0.05 | 0.90 / 0.69 | 0.71 / 0.00 |
+| 200023 | 0.00 / 0.22 | 0.98 / 0.71 | 0.04 / 0.70 |
+
+- **Model-side limits, kept as results:** 8 adapter runs and 2 untrained runs hit the task's 30-minute
+  agent timeout; the verifier scored what they had done. No adapter run overflowed its context (the
+  server now allows 256k).
+- **Infrastructure failures, rerun:** 88 untrained runs never produced a result and were run again;
+  none is in the table. 44 ran Docker out of network address pools (48 trials at once), so the
+  verifier never started. 44 more were the reruns after a Docker restart that moved the bridge from
+  172.17.0.1 to 10.200.0.1: the agent never reached the model and ended at minute 0. The verifier
+  scored those 0, and `metrics.json` marks them `infrastructure: ...`. The adapter's runs had none
+  (24 at a time). All job folders, failed ones included, are kept in
+  `~/junction2026-data/oncallbench/jobs/` and `jobs-infra-failed/` on hestia.
+- **Cancelled before any result:** 21 jobs on the first spread seeds (404-504), cancelled within a
+  minute of starting when the seed set changed.
+
 ### Which fine-tuned checkpoint runs the scores spread (fixed before those runs)
 
 The spread's seeds were first 404, 418, 500, 502, 503 and 504. Before any run on them finished they
