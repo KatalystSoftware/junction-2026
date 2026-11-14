@@ -247,7 +247,7 @@ live in the demo; nothing below is only described.
 | Endpoint | Why Kutsu calls it | Where a viewer sees it |
 |---|---|---|
 | `GET /v1/brand/search` | A person types "nitor" or "hamina wireless". This turns the words into the right company and its domain (Finnish matches first; a match must carry the first word typed). | The company's proper name appears within a second or two of pressing Enter, on `#/join` and in Espoo's search box. |
-| `POST /v1/brand/retrieve` (by domain) | The company's identity: name, logo, square icon, brand colours, field, size, city, careers link. The domain it confirms also scopes every web search that follows, so namesakes stay out. | Everything branded: the invitation floods with the company's colour from its logo; "Is this you?" is this record, line by line; the square icons in Espoo's list; the logo on the finished card. |
+| `POST /v1/brand/retrieve` (by domain) | The company's identity: name, logo, square icon, brand colours, field, size, city, careers link. The domain it confirms is named in each news search that follows, to keep namesakes out, and restricts the search of the company's own site. | Everything branded: the invitation floods with the company's colour from its logo; "Is this you?" is this record, line by line; the square icons in Espoo's list; the logo on the finished card. |
 | `POST /v1/web/scrape` (markdown) | Reads the company's careers page, script-rendered ones included, as one more page to quote from: what the company tells candidates itself. | Statements and needs that cite the company's own careers page, with the quoted sentence on hover. |
 | `POST /v1/monitors` (page target, with instructions) | Watches each company's careers page for a job opening added or removed. 42 of the 74 companies have a careers link. 1 credit a run. | "Changed lately" on Espoo's events screen, and "Changed since the draft" on an employer. |
 | `POST /v1/monitors` (search target) | Watches the web for news that a company is growing: funding, an acquisition, a new site, a hiring plan. One per company, 74. 2 credits a run. | The same two places. |
@@ -289,7 +289,7 @@ What a need asks for, and where each value comes from:
 | Hiring from abroad | yes, or only people already in Finland | always the company: no post says it |
 
 Four Exa searches, two or three Context.dev requests and three Haiku calls per company, about $0.03
-and 11 to 13 credits. Every request and its raw response is stored in `api-cache/`, so a rerun is
+and 10 to 12 credits (10.8 on average over the 77 companies researched so far). Every request and its raw response is stored in `api-cache/`, so a rerun is
 free and needs no keys. The cache is not in git, because it holds the raw text of third-party pages,
 which names people as news does. It lives on the machine that ran the pipeline and on the server
 (`/srv/talent-brief/api-cache`, the fullest copy); `./fetch-cache.sh` brings the server's copy down,
