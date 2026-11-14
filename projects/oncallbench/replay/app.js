@@ -338,7 +338,7 @@
       if (orphans.length) {
         svg.prepend(
           s("line", { class: "aside-rule", x1: x1 + 0.7 * u, x2: x1 + 0.7 * u, y1: asideTop - 0.7 * u, y2: yZ + 0.6 * u }),
-          s("text", { class: "tier", x: ax, y: asideTop + 0.4 * u, text: "No customer traffic" }));
+          s("text", { class: "tier", x: ax, y: asideTop + 0.4 * u, text: "Outside customer path" }));
         blocked.push({ x: x1 + 0.7 * u, y: 0, w: W, h: H });
       }
 
@@ -1073,11 +1073,13 @@
   const markIntro = () => { try { localStorage.setItem("replay-intro", "seen"); } catch (e) { /* private mode: nothing to remember */ } };
 
   function openIntro(thenPlay) {
-    const dialog = $("#onboard"), first = sessions[0], head = first.headline;
+    const dialog = $("#onboard"), ses = state.ses, head = ses.headline;
     $("#onboard-result").textContent = head
       ? `${head.label} averages ${head.mean.toFixed(2)} of the expert's savings on this level, over ${head.count} runs.`
       : `The score is the share of the expert's savings a run reaches.`;
-    if (!first.rules.storms) $("#onboard-watch").textContent = "The red services, the money counter, and where the two runs part.";
+    $("#onboard-watch").textContent = ses.rules.storms
+      ? "The red services, the money counter, and the moment the agent rolls back without protecting first."
+      : "The red services, the money counter, and where the two runs part.";
     const was = state.playing;
     setPlaying(false);
     dialog.onclose = () => { markIntro(); setPlaying(thenPlay || was); paint(); };
