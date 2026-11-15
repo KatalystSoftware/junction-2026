@@ -32,6 +32,7 @@ LABELS = {
     "opus": "Opus 5.5",
     "gemma-base": "Gemma 4 26B-A4B, untrained",
     "nemotron-lightning": "Nemotron 3.5 Lightning 30B-A3B, untrained",
+    "nemotron-super": "Nemotron 3.5 Super VL (NVFP4), untrained, served with vLLM",
     "gemma-ft": "Gemma 4 26B-A4B + our adapter (SFT, then RL on the score)",
     "gemma-sft-oc": "Gemma 4 26B-A4B + our adapter (SFT in OpenCode's format)",
 }

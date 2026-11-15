@@ -93,6 +93,7 @@ checkpoint was not chosen on them (the base and SFT models had been evaluated th
 | **Opus 5.5** | Harbor + OpenCode | 48 / 24 | **0.45 (0.35-0.54)** | 0.54 | 2% | 21% |
 | Gemma 4 26B-A4B, untrained | Harbor + OpenCode | 48 / 24 | 0.05 (0.02-0.07) | 0.00 | 0% | 38% |
 | Nemotron 3.5 Lightning 30B-A3B, untrained | Harbor + OpenCode | 24 / 24 | 0.04 (0.01-0.08) | 0.00 | 0% | 67% |
+| Nemotron 3.5 Super VL (NVFP4), untrained, served with vLLM | Harbor + OpenCode | 48 / 24 | 0.03 (0.01-0.06) | 0.00 | 0% | 90% |
 | Gemma 4 26B-A4B + our adapter (SFT, then RL on the score) | Harbor + OpenCode | 48 / 24 | 0.44 (0.35-0.53) | 0.45 | 4% | 17% |
 | `shotgun` script: finds the cause, guesses the fix | scripted, replayed in the simulator | 24 / 24 | 0.47 (0.36-0.57) | 0.55 | 0% | 12% |
 | Do-nothing | scripted, replayed in the simulator | 24 / 24 | 0.00 (0.00-0.00) | 0.00 | 0% | 0% |
