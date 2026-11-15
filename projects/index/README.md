@@ -1,24 +1,27 @@
 # Index page
 
-The page at <https://katalyst.fyi/>: team Katalyst's Junction 2026 projects, each with a sentence or
-two and a link to try it. Plain HTML, CSS and JavaScript in [`site/`](site/), with no build step.
+The page at <https://katalystsoftware.github.io/junction-2026/> (on katalyst.fyi during the event): team
+Katalyst's Junction 2026 projects, each with a sentence or two and a link to try it or watch it. Plain
+HTML, CSS and JavaScript in [`site/`](site/), with no build step.
 
 Run (the page opens straight from disk):
 
     xdg-open site/index.html        # macOS: open site/index.html
 
-Test, after a deploy: every address in [`site/projects.js`](site/projects.js) must answer.
+Test, after a deploy: the page, the replay and the Spread pitch must answer.
 
-    grep -o 'live: "http[^"]*"' site/projects.js | cut -d'"' -f2 | xargs -n1 curl -s -o /dev/null -w '%{http_code} %{url}\n'
+    for p in "" incident/ spread/; do curl -s -o /dev/null -w '%{http_code} %{url}\n' https://katalystsoftware.github.io/junction-2026/$p; done
 
 ## Deploy
 
     ./deploy.sh
 
-It copies `site/` to `/srv/katalyst/proxy/static/index` on the Verda machine and restarts nothing. The
-shared proxy serves that folder on the bare domain, and sends `www` there, through
-[`infra/verda/proxy/sites/index.caddy`](../../infra/verda/proxy/sites/index.caddy); that file changes
-only when the address does, and is applied with `infra/verda/proxy/deploy.sh`.
+It publishes one GitHub Pages site on the public repository's `gh-pages` branch: `site/` at the root, and
+the on-call shift replay ([`projects/oncallbench/replay`](../oncallbench/replay/)) under `incident/`.
+During the event the same files were served from our Verda machine, through
+[`infra/verda/proxy/sites/index.caddy`](../../infra/verda/proxy/sites/index.caddy); that machine was
+removed when the event ended. Since When and Kutsu need their own services, so their entries link to
+their videos.
 
 ## Add or change a project
 
@@ -41,14 +44,13 @@ and Since When `site/logos/since-when.svg`, the same file as `projects/since-whe
 
 ## The Spread pitch
 
-[`site/spread/index.html`](site/spread/index.html), at <https://spread.katalyst.fyi/>, is the Spread desk's
+[`site/spread/index.html`](site/spread/index.html), at <https://katalystsoftware.github.io/junction-2026/spread/>, is the Spread desk's
 jury deck: one self-contained page in the site's typeface on the deck's own dark colours, six slides by default, the fifth a hill climb Claude's mascot pushes a boulder up. `#7`, `#9`
 or `#10` in the address opens a longer cut; the arrow keys step through it, and Print or Save as PDF gives
 one 16:9 slide a page. The "See the pitch" link under "Also built" points at it.
 
-It ships with the rest of `site/` (`./deploy.sh`). The proxy serves it on its own name through
-[`infra/verda/proxy/sites/spread.caddy`](../../infra/verda/proxy/sites/spread.caddy), which reads the same
-folder, and sends the first address, `katalyst.fyi/spread/`, there.
+It ships with the rest of `site/` (`./deploy.sh`). During the event the proxy served it on its own name,
+`spread.katalyst.fyi`, through [`infra/verda/proxy/sites/spread.caddy`](../../infra/verda/proxy/sites/spread.caddy).
 
 ## Where each claim comes from
 

@@ -21,7 +21,7 @@
 //     link    optional [words, address] after its sentence
 window.KATALYST = {
   repo: "https://github.com/KatalystSoftware/junction-2026",
-  lede: "Three entries at Junction 2026, each with a live demo.",
+  lede: "Three entries at Junction 2026. The on-call replay still runs here; Since When and Kutsu went offline with the event's servers and link to their videos.",
   videos: ["Watch all the videos", "https://github.com/KatalystSoftware/junction-2026/releases/tag/videos"],
   projects: [
     {
@@ -30,9 +30,9 @@ window.KATALYST = {
       short: "A simulated on-call shift that AI agents still lose money on.",
       logo: "logos/oncallbench.svg",
       for: [["AfterQuery", "Break the Agent"]],
-      live: "https://incident.katalyst.fyi/",
+      live: "incident/",
       open: "Step through the shift",
-      more: [["See what one rollback cost", "https://incident.katalyst.fyi/?session=l4-s200019&t=42&intro=0"]],
+      more: [["See what one rollback cost", "incident/?session=l4-s200019&t=42&intro=0"]],
       result: [
         ["45%", "of an expert script's savings, on average"],
         ["21%", "of runs cost more than doing nothing"],
@@ -49,9 +49,8 @@ window.KATALYST = {
       short: "What three Wikipedias say differently, and since when.",
       logo: "logos/since-when.svg",
       for: [["MariaDB", "Wikipedia Through Time"]],
-      live: "https://since-when.katalyst.fyi/",
-      open: "Open Since When",
-      more: [["See one difference: Lapua Movement", "https://since-when.katalyst.fyi/#/Q1412941"]],
+      live: "https://github.com/KatalystSoftware/junction-2026/releases/download/videos/since-when.mp4",
+      open: "Watch the video",
       what: "Swedish Wikipedia began calling the Lapua Movement “fascist” on 23 October 2026, English in 2022; the Finnish first sentence still does not. Pick a topic and see what the Finnish, Swedish and English articles say differently, and since when: the exact edit for three fully loaded topics, the year for the other 2,916.",
       how: "MariaDB 11.8 system-versioned tables keep every loaded version of every passage, with Wikipedia's own edit times. One statement pairs passages across the editions by vector search, as the articles stood on a past date. The SQL button opens a statement like it, ready to run.",
       source: "projects/since-when",
@@ -63,12 +62,9 @@ window.KATALYST = {
       short: "Recruitment event invitations that arrive filled in.",
       logo: "logos/kutsu.svg",
       for: [["City of Espoo", "Rethinking Recruitment"], ["Context.dev", "The Web Is Your Real-Time Database"]],
-      live: "https://kutsu.katalyst.fyi/#/join/2912625-6/deep-tech-talent-forum",
-      open: "See a company's invitation",
-      more: [
-        ["Espoo's screen", "https://kutsu.katalyst.fyi/"],
-        ["A person's sign-up", "https://kutsu.katalyst.fyi/#/me"],
-      ],
+      live: "https://github.com/KatalystSoftware/junction-2026/releases/download/videos/kutsu-context-dev.mp4",
+      open: "Watch the video",
+      more: [["The video for Espoo", "https://github.com/KatalystSoftware/junction-2026/releases/download/videos/kutsu-espoo.mp4"]],
       what: "Each Espoo recruitment event starts with new surveys, and companies and candidates each wait for the other to sign up. Kutsu keeps who came and what employers said they need, and drafts each side an invitation already filled in, to agree with or correct. Context.dev fills in each company's sign-up from the live web, and its monitors on 74 employers tell Espoo what changed. The companies are real; the people in the demo are sample data.",
       how: "Context.dev reads each company's brand record and careers page; each statement about a company links to the public page it was found on, and the company agrees with it or corrects it. About a person, Kutsu reads only what they hand over in their own sign-up, and it submits nothing.",
       source: "projects/kutsu",
@@ -78,6 +74,6 @@ window.KATALYST = {
   also: {
     name: "Also built: Spread desk.",
     what: "A pricing desk for Bahn Express's Spread competition. It runs a simulated car transport company for a week, quoting dealers and paying drivers; every quote is one formula, with no model on the quote path.",
-    link: ["See the pitch", "https://spread.katalyst.fyi/"],
+    link: ["See the pitch", "spread/"],
   },
 };

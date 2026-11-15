@@ -3,9 +3,11 @@
 What team Katalyst built at Junction 2026 (13-15 November 2026, Espoo): three entries, each of which ran
 live through the event.
 
-All the videos: [one release page](https://github.com/KatalystSoftware/junction-2026/releases/tag/videos).
-The live demos at katalyst.fyi ran on the event's temporary machines and accounts, which were removed when
-it ended on 15 November. To try an entry now, run it yourself.
+All our projects on one page: <https://katalystsoftware.github.io/junction-2026/>. All the videos:
+[one release page](https://github.com/KatalystSoftware/junction-2026/releases/tag/videos).
+
+The OnCallBench replay still runs, on GitHub Pages. Since When and Kutsu ran on the event's temporary
+machines, which were removed when it ended on 15 November; to try one of those now, run it yourself.
 
 ## Our entries
 
@@ -13,9 +15,9 @@ Each entry's README says what it is, how to run it with one command, and how to 
 
 ### <img src="projects/index/site/logos/oncallbench.svg" width="32" height="32" alt=""> [OnCallBench](projects/oncallbench/README.md): an on-call shift that AI agents still lose money on
 
-For AfterQuery's **Break the Agent**. ▶ [Video, 1:24 (mp4, 74 MB)](https://github.com/KatalystSoftware/junction-2026/releases/download/videos/oncallbench.mp4) · [Source and how to run it](projects/oncallbench/README.md)
+For AfterQuery's **Break the Agent**. ▶ [Video, 1:24 (mp4, 74 MB)](https://github.com/KatalystSoftware/junction-2026/releases/download/videos/oncallbench.mp4) · [Step through the shift yourself](https://katalystsoftware.github.io/junction-2026/incident/) · [Source](projects/oncallbench/README.md)
 
-[![OnCallBench replay: Claude Opus 5.5 rolls back geo-svc and sets off a retry storm; partner-api fails 55% of requests](projects/index/site/shots/oncallbench.gif)](https://github.com/KatalystSoftware/junction-2026/releases/download/videos/oncallbench.mp4)
+[![OnCallBench replay: Claude Opus 5.5 rolls back geo-svc and sets off a retry storm; partner-api fails 55% of requests](projects/index/site/shots/oncallbench.gif)](https://katalystsoftware.github.io/junction-2026/incident/?seed=200019&t=32&pause=key&zoom=1.1)
 
 - **Problem:** AI agents are being put on call, and nobody sees how they fail until they fail on a live system.
 - **What it is:** a two-hour on-call shift at a simulated online shop, scored on the money lost: 1.00 is our scripted expert, 0.00 is doing nothing.
@@ -60,7 +62,7 @@ Database**.
 
 ## Also here
 
-- [`projects/index/`](projects/index/README.md): the page that was at katalyst.fyi.
+- [`projects/index/`](projects/index/README.md): the page at <https://katalystsoftware.github.io/junction-2026/>.
 - [`infra/verda/`](infra/verda/main.tf): the Verda machines the demos and evaluations ran on, defined
   with Verda's official OpenTofu provider, and the [proxy](infra/verda/proxy/README.md) every demo
   sat behind; [how we used Verda](infra/verda/README.md).
