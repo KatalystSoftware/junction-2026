@@ -3,7 +3,7 @@ import { nameOf, reviewOf } from './state.svelte'
 import type { Applicant, Brief, Need } from './types'
 
 /**
- * How an applicant fits a drafted role, line by line, the way the first organiser screen (projects/espoo-recruitment) reads a pair: what
+ * How an applicant fits a drafted role, line by line, the way the first organiser screen (projects/kutsu/esittely) reads a pair: what
  * overlaps, what is missing, and what is worth checking in person. No score is shown to anyone; the number here
  * only orders the roles so the closest comes first.
  */

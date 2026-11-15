@@ -47,12 +47,12 @@ LIVE_LIMIT = int(os.environ.get("LIVE_LIMIT", "300"))  # about $0.03 and 11 Cont
 ROLE_LIMIT = int(os.environ.get("ROLE_LIMIT", "150"))  # one Haiku call each, about $0.01
 KEY = os.environ.get("KUTSU_KEY", "")
 DIST = lib.HERE / "ui" / "dist"
-# The first version of the applicant's pages (projects/espoo-recruitment, once called Esittely; the product has one name,
+# The first version of the applicant's pages (projects/kutsu/esittely, once called Esittely; the product has one name,
 # Kutsu), served under /apply/, with /esittely/ kept as a redirect, so the organiser's
-# screen can open the invitation form: a copy next to this file on the server, the sibling project in the repo
-ESITTELY = next((d for d in (lib.HERE / "esittely", lib.HERE.parent / "espoo-recruitment" / "app") if d.is_dir()), None)
-# The pitch deck (projects/espoo-recruitment/pitch), served under /pitch/: a copy next to this file on the server, the sibling folder in the repo
-PITCH = next((d for d in (lib.HERE / "pitch", lib.HERE.parent / "espoo-recruitment" / "pitch") if d.is_dir()), None)
+# screen can open the invitation form: esittely/app in the repo, and deploy.sh copies that app itself to esittely/ on the server
+ESITTELY = next((d for d in (lib.HERE / "esittely" / "app", lib.HERE / "esittely") if (d / "index.html").is_file()), None)
+# The pitch deck (projects/kutsu/pitch), served under /pitch/
+PITCH = lib.HERE / "pitch" if (lib.HERE / "pitch").is_dir() else None
 REVIEWS = lib.HERE / "reviews.json"
 DATA = {"/signals.json": "signals.json", "/presets.json": "presets.json", "/pool.json": "pool.json", "/applications.json": "applications.json"}
 TYPES = {".html": "text/html; charset=utf-8", ".js": "text/javascript", ".css": "text/css", ".json": "application/json",

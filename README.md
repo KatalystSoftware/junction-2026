@@ -46,8 +46,8 @@ Each Espoo recruitment event starts with a new survey for companies and another 
 each side waits for the other. Kutsu keeps who came and what employers said they need, and sends an
 invitation already filled in, every line linked to the sentence it came from, to agree with or
 correct. Context.dev supplies each company's details, brand colours and careers page. People are
-sample data, and a person makes every decision. Its first invitee pages and its pitch deck are in
-[`projects/espoo-recruitment/`](projects/espoo-recruitment/README.md).
+sample data, and a person makes every decision. Its first invitee pages are in
+[`projects/kutsu/esittely/`](projects/kutsu/esittely/README.md), its pitch decks in [`projects/kutsu/pitch/`](projects/kutsu/pitch/).
 
 ## Also here
 

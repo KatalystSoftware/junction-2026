@@ -45,7 +45,7 @@ see their own flow and not the back office:
 
 Live: <https://kutsu.katalyst.fyi/> (Espoo's screen) and <https://kutsu.katalyst.fyi/#/join/nitor.com>
 (what a company sees). The candidate's side of the same idea began as a separate prototype (once called Esittely; the product has one name, Kutsu)
-(`../espoo-recruitment/`). `PRODUCT.md` says who Kutsu is for.
+(`esittely/`; the pitch decks are in `pitch/`). `PRODUCT.md` says who Kutsu is for.
 
 ## Run and test
 
@@ -352,10 +352,12 @@ sections from "Headline numbers" on describe that run.
 |---|---|
 | `companies.json` | 1,009 companies: registry identity (PRH), website, careers page, job system, what they do |
 | `roles.json` | 208 open tech roles: title, location, workplace, language requirement, seniority, contract, working time, role family, must-have and nice-to-have items with skill ids |
-| `esittely-companies.json` | the same roles in the company and job-ad shape of `projects/espoo-recruitment/app/data.js` (role family ids and skill ids are the demo's own); `size`, `stand`, `tradeoffs` and minimum experience are left out because nothing public grounds them |
+| `esittely-companies.json` | the same roles in the company and job-ad shape of `esittely/app/data.js` (role family ids and skill ids are the demo's own); `size`, `stand`, `tradeoffs` and minimum experience are left out because nothing public grounds them |
 | `signals.json`, `signals.md` | per company: identity from Context.dev, what public sources state (claim, verbatim quote, URL) and, kept apart, the inferred card: a pitch and the needs, citing those statements |
 | `ui/`, `serve.py` | the Kutsu app (Svelte) and the small server behind it: live research, progress, sign-up state, a role drafted from one line |
 | `registry.py` | a company's Finnish business ID (Y-tunnus) when it was found by name or domain: the trade register by name, kept only where the registered website is the company's; else the ID printed on its own site, confirmed in the register |
+| `esittely/` | the first version of the invitee's pages (plain HTML, synthetic data, its own README and tests), served at `/apply/` |
+| `pitch/` | the Espoo pitch decks: the full deck, `lite/` and `short/`, served at `/pitch/` |
 | `person.py` | a person's profile from their LinkedIn, a portfolio page or their CV, each line with the words it rests on; keeps nothing |
 | `monitors.py` | creates, lists and deletes the Context.dev monitors, and reads back what changed |
 | `presets.json` | named lists of employers shown first, such as the Deep Tech Talent Forum's |

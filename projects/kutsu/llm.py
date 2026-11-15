@@ -27,7 +27,7 @@ BODY_CHARS = 12000
 
 FAMILIES = ["backend", "frontend", "mobile", "data", "ml", "devops", "qa", "embedded", "design",
             "product", "security", "support", "erp", "game", "other"]
-SKILLS = json.loads((lib.HERE.parent.parent / "projects/espoo-recruitment/data/skills.json").read_text())
+SKILLS = json.loads((lib.HERE / "esittely" / "data" / "skills.json").read_text())
 SKILL_IDS = [s["id"] for s in SKILLS]
 
 

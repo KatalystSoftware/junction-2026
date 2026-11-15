@@ -1,5 +1,5 @@
 """Reshape companies.json and roles.json into the company and job-ad structure of the demo
-(projects/espoo-recruitment/app/data.js), one entry per open role. Run after validate.py --apply.
+(projects/kutsu/esittely/app/data.js), one entry per open role. Run after validate.py --apply.
 
     python3 esittely.py
 
@@ -87,7 +87,7 @@ def main():
         seen[c["id"]] = seen.get(c["id"], 0) + 1
         out.append(entry(c, r, seen[c["id"]]))
     doc = {"note": "Real companies and open roles from public sources, in the shape of DATA.companies in "
-                   "projects/espoo-recruitment/app/data.js. One entry per role. See esittely.py for what is left out.",
+                   "projects/kutsu/esittely/app/data.js. One entry per role. See esittely.py for what is left out.",
            "companies": out}
     (HERE / "esittely-companies.json").write_text(json.dumps(doc, ensure_ascii=False, indent=1) + "\n")
     print(f"wrote {len(out)} entries for {len(seen)} companies; with role family {sum('role' in e['draft'] for e in out)}, "

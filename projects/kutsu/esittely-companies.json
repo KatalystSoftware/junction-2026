@@ -1,5 +1,5 @@
 {
- "note": "Real companies and open roles from public sources, in the shape of DATA.companies in projects/espoo-recruitment/app/data.js. One entry per role. See esittely.py for what is left out.",
+ "note": "Real companies and open roles from public sources, in the shape of DATA.companies in projects/kutsu/esittely/app/data.js. One entry per role. See esittely.py for what is left out.",
  "companies": [
   {
    "id": "iceye-oy-1",
