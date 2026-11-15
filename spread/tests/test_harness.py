@@ -992,3 +992,18 @@ def test_ftop10_from_820_plays_m41y_l_below_820_drivers_and_only_a_lower_ladder_
         assert desk(part_, n) == desk(base, n), n
     part, head = desk(part_, 820), desk(base, 820)
     assert {k: part[k] for k in part if part[k] != head[k]} == {"fee_rules": [[0, 10 ** 6, 16, 10 ** 6, 0.8, 0.1, 1.0]]}
+
+
+def test_m41w_a_plays_m41x_b_under_760_drivers_and_m41y_f_from_760():
+    from spreadlab import play
+    from spreadlab.variants import VARIANTS
+    roster = lambda n: [{**ROSTER[0], "id": f"x{i}"} for i in range(n)]  # noqa: E731
+
+    def desk(name, n):  # the parameters the week plays with
+        params = VARIANTS[name]
+        played = play.policy_class(params)(None, 8, 0, params, roster(n), MAP).params()
+        return {k: v for k, v in played.items() if k not in ("when_tight", "rich_drivers", "when_rich", "thin_play")}
+    for n in (700, 759):
+        assert desk("m41w-a", n) == desk("m41x-b-cap62-onward-all", n), n
+    for n in (760, 819, 820, 900):
+        assert desk("m41w-a", n) == desk("m41y-f-h24-820", n), n

@@ -676,3 +676,6 @@ VARIANTS["m41y-l-ftop11-820-ftop10"] = _from820(VARIANTS["m41y-l-ftop11-820"], f
 # Lane 3 A's fee top 1.0 from 820 on `m41y-m` (the review's order: `late_cost` 100 at 760 to 819 first, then the fee step):
 # only `when_rich` `fee_rules` moves, from a top of 1.1 to 1.0. A week under 820 plays `m41y-m` to the cent.
 VARIANTS["m41y-o-ftop10-820"] = _from820(VARIANTS["m41y-m-late100-760"], fee_rules=[[0, 10 ** 6, 16, 10 ** 6, 0.8, 0.1, 1.0]])
+# `m41x-e` (the thin pair hold 12 and `pair_left` 6) lost `fresh-9594` (686 drivers, 87.23%), which `m41x-b` alone holds at 91.58%
+# and 4.1 at 91.08%, so `m41w-a` is `m41y-f` without its thin play: under 760 drivers it plays `m41x-b`, at 760 or more `m41y-f`.
+VARIANTS["m41w-a"] = {k: v for k, v in _Y["m41y-f-h24-820"].items() if k != "thin_play"}
