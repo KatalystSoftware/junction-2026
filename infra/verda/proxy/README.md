@@ -10,6 +10,7 @@ Docker network `proxy` and publishes no ports.
 | Since When | `https://since-when.<base domain>/` and `https://since-when.31-22-104-106.sslip.io/` | `since-when-app:8078` |
 | On-call shift replay | `https://incident.<base domain>/` | static files in `static/incident`, shipped by `projects/oncallbench/replay/deploy.sh` |
 | Kutsu | `https://kutsu.<base domain>/` | `172.19.0.1:8046`: a systemd service on the machine, not a container, listening only on the `proxy` network's gateway; shipped by `projects/kutsu/deploy.sh` |
+| Prize board | `https://prizes.<base domain>/` | `172.19.0.1:8047`: a systemd service like Kutsu's, shipped by `projects/prizes/deploy.sh` |
 | Index page | `https://<base domain>/` | static files in `static/index`, shipped by `projects/index/deploy.sh` |
 | Spread pitch | `https://spread.<base domain>/` (`<base domain>/spread/` redirects there) | `static/index/spread/index.html` and `static/index/fonts`, shipped with the index page |
 

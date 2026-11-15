@@ -1,0 +1,8 @@
+# The prize board (projects/prizes): a systemd service on the machine itself (prizes.service, port 8047), not a
+# container, listening only on the gateway address of the `proxy` network, like Kutsu. No `encode`: the page holds
+# one /api/state request open for up to 25 s, and its small JSON answers gain nothing from compression.
+prizes.{$BASE_DOMAIN} {
+	import cache
+	import access
+	reverse_proxy 172.19.0.1:8047
+}
