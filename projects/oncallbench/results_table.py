@@ -6,7 +6,7 @@ Writes results.json, which the README table and the deck render from, and prints
 
     python3 results_table.py
 
-Definitions, fixed before the numbers were computed:
+Definitions for this table's calculations:
 - score: (cost_do_nothing - cost) / (cost_do_nothing - cost_reference), clipped to 0..1.
 - solve rate: share of runs scoring at least SOLVED (0.95) of the expert's score.
 - worse than doing nothing: the run's cost is strictly above the do-nothing cost on its seed.
@@ -94,7 +94,7 @@ def main():
     rows = [scripted_rows[0], *model_rows, *scripted_rows[1:]]
     out = dict(level=4, seeds="200000-200023", solved_threshold=SOLVED,
                ci=f"cluster bootstrap over seeds, {RESAMPLES} resamples",
-               definitions=__doc__.split("computed:\n")[1].strip(), rows=rows, partial=partial)
+               definitions=__doc__.split("calculations:\n")[1].strip(), rows=rows, partial=partial)
     (HERE / "results.json").write_text(json.dumps(out, indent=1) + "\n")
 
     print("| Agent | Harness | Runs / seeds | Mean (95% CI) | Median | Solve rate | Worse than doing nothing |")
