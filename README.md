@@ -50,6 +50,20 @@ correct. Context.dev fills in each company's sign-up from the live web, and its 
 employers tell Espoo what changed. People are sample data, and a person makes every decision. Its first invitee pages are in
 [`projects/kutsu/esittely/`](projects/kutsu/esittely/README.md), its pitch decks in [`projects/kutsu/pitch/`](projects/kutsu/pitch/).
 
+## What we built on
+
+| Partner tech | What it does here | Entry |
+| --- | --- | --- |
+| **Verda** | The server behind every live demo and the agent evaluations; GPUs rented through the API to train Gemma and Qwen; the container serving Nemotron. Machines defined with Verda's official OpenTofu provider ([how we used Verda](infra/verda/README.md)) | All |
+| **Gemma** | Gemma 4 26B-A4B, post-trained by us on OnCallBench: 0.05 → 0.44, level with Opus 5.5 | OnCallBench |
+| **Modal** | Gemma's evaluations, audit and RL on H200s; the post-trained Gemma served live from Modal | OnCallBench |
+| **Gemini** | Gemini 3.1 Pro, one of the two frontier models each level was made harder against | OnCallBench |
+| **NVIDIA Nemotron** | Nemotron 3.5 Super VL names what each pair of passages says differently, then checks every claim against the whole other article | Since When |
+| **MariaDB** | 11.8 system-versioned tables and vector search: the nearest passage in another edition, as both stood on a past date, in one statement | Since When |
+| **Context.dev** | Brand search and retrieve fill in each company's sign-up; web scrape reads careers pages; 116 monitors watch 74 employers | Kutsu |
+| **OpenAI Codex** | Fresh GPT 6.1 Sol reviewers checked each round of the environment and of the page | OnCallBench, Since When |
+| **CRACI** | Our CI runs on CRACI runners, including a job that downloads, verifies and runs the published Gemma adapter | All |
+
 ## Also here
 
 - [`projects/index/`](projects/index/README.md): the page at <https://katalyst.fyi/>.
