@@ -1,0 +1,48 @@
+name: Spread stand-in
+
+# Fits and checks each design of the Spread stand-in (spread/spreadlab/standin/designs.json) on its own CRACI runner, in parallel.
+# Offline: the jobs read packed saved weeks from the release `spread-standin-data` and get no secret and no team key.
+# Start a round by pushing the commit to the branch `standin-ci`; each design's report and result are in its artifact.
+on:
+  push:
+    branches: [standin-ci]
+
+permissions:
+  contents: read
+
+jobs:
+  design:
+    runs-on: craci
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        # One job a design, by its place in designs.json; a place past the end of the list ends at once.
+        slot: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+    steps:
+      - uses: cracicorp/setup@v1
+        with:
+          size: "32"
+      - uses: actions/checkout@v4
+      - name: Python packages
+        run: |
+          python3 -m pip install --quiet --user numpy https://spread.bahnexpress.com/kit/spread-0.1.0-py3-none-any.whl ||
+            python3 -m pip install --quiet --user --break-system-packages numpy https://spread.bahnexpress.com/kit/spread-0.1.0-py3-none-any.whl
+      - name: Saved weeks
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python3 spread/scratch/standin/fetch_data.py spread-standin-data "$RUNNER_TEMP/spread-data"
+      - name: Fit and check
+        env:
+          DESIGN: ${{ matrix.slot }}
+        run: |
+          export SPREAD_DATA="$RUNNER_TEMP/spread-data"
+          echo "nproc=$(nproc) mem=$(free -g | awk '/Mem:/{print $2}')G python=$(python3 --version)"
+          cd spread && python3 scratch/standin/ci.py "$DESIGN" "$GITHUB_WORKSPACE/out" "$(nproc)"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: standin-${{ matrix.slot }}
+          path: out/
+          if-no-files-found: ignore
+          retention-days: 7

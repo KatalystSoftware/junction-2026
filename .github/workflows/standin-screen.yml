@@ -1,0 +1,98 @@
+name: Spread stand-in screen
+
+# Screens Spread policy variants on the offline stand-in (spread/spreadlab/standin) on a CRACI runner, before they bid for practice worlds.
+#   gh workflow run standin-screen.yml --ref spread-standin -f ref=<branch with the variants> -f arms=<variant,variant,...> \
+#     -f baseline=<the current base's variant> -f half=a      (then half=b)
+# The arms and the baseline play the same 206 saved seeds (114 natural, 92 thin) with the desk code of `ref`. Rows and a summary, with
+# natural and thin worlds apart, are in the run's summary page and its artifact `standin-screen`. Each arm gets PASS, FAIL or
+# NEEDS PLAYED THIN WEEKS: the merge gate of spread/spreadlab/standin/README.md.
+# Offline: the job reads packed saved weeks from the release `spread-standin-screen`. It gets no secret and no team key.
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Branch, tag or commit whose spread/ desk code and variants.py to screen
+        required: true
+        type: string
+      arms:
+        description: Variant names in that ref's variants.py, comma-separated
+        required: true
+        type: string
+      baseline:
+        description: The variant to compare with. For the merge gate, the current base (what origin/trackb-merged plays). Empty is merge 1
+        default: ""
+        type: string
+      draws:
+        description: Stand-in weeks a seed and arm (more draws, narrower intervals)
+        default: "1"
+        type: string
+      sets:
+        description: Seed sets, space-separated (natural, thin)
+        default: natural thin
+        type: string
+      half:
+        description: "Every other seed of each set: a to climb on, b to confirm on, empty for all 206"
+        default: ""
+        type: string
+      anchor:
+        description: The variant whose played week of each seed its market is measured on (empty is the default desk; for seeds it never played)
+        default: ""
+        type: string
+  push:
+    branches: [standin-screen-ci]
+
+permissions:
+  contents: read
+
+run-name: "Stand-in screen: ${{ inputs.arms || 'self-test' }} @ ${{ inputs.ref || github.ref_name }}"
+
+jobs:
+  screen:
+    runs-on: craci
+    timeout-minutes: 45
+    steps:
+      - uses: cracicorp/setup@v1
+        with:
+          size: "32"
+      - name: The stand-in
+        uses: actions/checkout@v4
+        with:
+          path: tool
+      - name: The desk code to screen
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.sha }}
+          path: lane
+      - name: Python packages
+        run: |
+          python3 -m pip install --quiet --user numpy https://spread.bahnexpress.com/kit/spread-0.1.0-py3-none-any.whl ||
+            python3 -m pip install --quiet --user --break-system-packages numpy https://spread.bahnexpress.com/kit/spread-0.1.0-py3-none-any.whl
+      - name: Saved weeks
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python3 tool/spread/scratch/standin/fetch_data.py spread-standin-screen "$RUNNER_TEMP/spread-data"
+      - name: Screen
+        env:
+          ARMS: ${{ inputs.arms || 'fee16-wide-pairs-0.6-return-0.75' }}
+          BASELINE: ${{ inputs.baseline }}
+          DRAWS: ${{ inputs.draws || '1' }}
+          SETS: ${{ inputs.sets || 'natural thin' }}
+          LIMIT: ${{ github.event_name == 'push' && '8' || '0' }}
+          HALF: ${{ inputs.half }}
+          ANCHOR: ${{ inputs.anchor }}
+        run: |
+          export SPREAD_DATA="$RUNNER_TEMP/spread-data"
+          # The stand-in of this workflow's commit plays the desk code of the screened ref.
+          rm -rf lane/spread/spreadlab/standin && cp -r tool/spread/spreadlab/standin lane/spread/spreadlab/standin
+          cd lane/spread
+          echo "desk code $(git rev-parse --short HEAD), stand-in $(git -C "$GITHUB_WORKSPACE/tool" rev-parse --short HEAD), nproc=$(nproc)"
+          # shellcheck disable=SC2086
+          python3 -m spreadlab.standin.screen --arms "$ARMS" --baseline "$BASELINE" --draws "$DRAWS" --sets $SETS --limit "$LIMIT" --half "$HALF" --anchor "$ANCHOR" --jobs "$(nproc)" --out "$GITHUB_WORKSPACE/out"
+          cat "$GITHUB_WORKSPACE/out/summary.md" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: standin-screen
+          path: out/
+          if-no-files-found: ignore
+          retention-days: 7

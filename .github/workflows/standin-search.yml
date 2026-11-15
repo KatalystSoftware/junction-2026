@@ -1,0 +1,91 @@
+name: Spread stand-in search
+
+# Plays one shard of a joint parameter search on the offline stand-in (spread/spreadlab/standin/search.py) on a CRACI runner.
+#   gh workflow run standin-search.yml --ref spread-search -f ref=<desk code: branch, tag or commit> \
+#     -f spec=spread/scratch/search/<batch>.json -f half=a -f shard=3/12
+# The spec names a base variant of `ref` and the arms' parameters; an arm differs from the base only in weeks with 760 drivers or
+# more. One dispatch is one runner: launch every shard of a batch at once. Rows are in the artifact `standin-search-<shard>`.
+# Offline: the job reads packed saved weeks from the release `spread-standin-screen`. It gets no secret and no team key.
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Branch, tag or commit whose spread/ desk code and variants.py play
+        required: true
+        type: string
+      spec:
+        description: The batch, a path in this workflow's checkout
+        required: true
+        type: string
+      half:
+        description: "a to search, b to confirm, empty for both"
+        default: "a"
+        type: string
+      shard:
+        description: "i/n: this runner plays arms i, i+n, ..."
+        default: "0/1"
+        type: string
+      draws:
+        description: Stand-in weeks a seed and arm
+        default: "1"
+        type: string
+  push:
+    branches: [standin-search-ci]
+
+permissions:
+  contents: read
+
+run-name: "Stand-in search: ${{ inputs.spec || 'self-test' }} half ${{ inputs.half }} shard ${{ inputs.shard }}"
+
+jobs:
+  search:
+    runs-on: craci
+    timeout-minutes: 60
+    steps:
+      - uses: cracicorp/setup@v1
+        with:
+          size: "32"
+      - name: The stand-in and the batch
+        uses: actions/checkout@v4
+        with:
+          path: tool
+      - name: The desk code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || 'trackb-merge-3' }}
+          path: lane
+      - name: Python packages
+        run: |
+          python3 -m pip install --quiet --user numpy https://spread.bahnexpress.com/kit/spread-0.1.0-py3-none-any.whl ||
+            python3 -m pip install --quiet --user --break-system-packages numpy https://spread.bahnexpress.com/kit/spread-0.1.0-py3-none-any.whl
+      - name: Saved weeks
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python3 tool/spread/scratch/standin/fetch_data.py spread-standin-screen "$RUNNER_TEMP/spread-data"
+      - name: Search
+        env:
+          SPEC: ${{ inputs.spec || 'spread/scratch/search/selftest.json' }}
+          HALF: ${{ github.event_name == 'push' && 'a' || inputs.half }}
+          SHARD: ${{ inputs.shard || '0/1' }}
+          DRAWS: ${{ inputs.draws || '1' }}
+          LIMIT: ${{ github.event_name == 'push' && '6' || '0' }}
+        run: |
+          export SPREAD_DATA="$RUNNER_TEMP/spread-data"
+          rm -rf lane/spread/spreadlab/standin && cp -r tool/spread/spreadlab/standin lane/spread/spreadlab/standin
+          cd lane/spread
+          echo "desk code $(git rev-parse --short HEAD), stand-in $(git -C "$GITHUB_WORKSPACE/tool" rev-parse --short HEAD), nproc=$(nproc)"
+          python3 -m spreadlab.standin.search --spec "$GITHUB_WORKSPACE/tool/$SPEC" --half "$HALF" --shard "$SHARD" --draws "$DRAWS" \
+            --limit "$LIMIT" --jobs "$(nproc)" --out "$GITHUB_WORKSPACE/out"
+      - name: Name the artifact
+        id: name
+        if: always()
+        env:
+          SHARD: ${{ inputs.shard || '0/1' }}
+        run: echo "name=standin-search-${SHARD%%/*}" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ${{ steps.name.outputs.name }}
+          path: out/
+          if-no-files-found: ignore
+          retention-days: 7
