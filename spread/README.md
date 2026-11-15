@@ -1119,8 +1119,8 @@ that holds the tail (16 with the gate at 25, 32) the extra orders carry no margi
 alike. The waiting-car surcharge it replaces is a brake that bites hardest where cars wait, which is the hard weeks; the
 fitted load weight adds €2 to €3 where `slow_step` adds about €20, so κ can only buy the tail back by cutting volume in
 every week. The heavy Friday-wave weeks are not what failed: the arms lose on ordinary hard weeks (`fresh-1439`, a wave of
-15 drops and 94 due, 91.5% to 84-86%; `fresh-1304`, no wave and 98 due, 91.5% to 89-90%) and thin worlds. The team
-stopped it after the screen; `exposure` stays off and `day-cap-70` stays the on-time rule.
+15 drops and 94 due, 91.5% to 84-86%; `fresh-1304`, no wave and 98 due, 91.5% to 89-90%) and thin worlds. It was
+stopped after the screen; `exposure` stays off and `day-cap-70` stays the on-time rule.
 
 **What holds up for later use.**
 - The flu-day weights: a night's first-hour drops of the held cars due that day, as a likelihood ratio, tell a wave from a
@@ -1130,7 +1130,7 @@ stopped it after the screen; `exposure` stays off and `day-cap-70` stays the on-
 - The measured rates (`measure.py report`): drops 0.107 a held car-day; a wave drops 34% (26 to 50%) of that day's held
   gigs, 98% of its drops are due that day, and no week of 1,094 has two; a dropped car's late chance by hours left and load.
 - `need` with drivers near the delivery place and daytime hours in hand: left-out AUC 0.809 to 0.827.
-- **The wave part alone, kept by the team as a later replacement for cap 70's count (not built, not screened).** The
+- **The wave part alone, kept as a later replacement for cap 70's count (not built, not screened).** The
   base's quote as it is, without `due_cap` and `due_cap_wave`, plus κ x V x the change in P(week under 90%), summed only
   over the scenarios in which a day still to come is the flu day. "No flu day left" is left out, so the term falls to about
   0 once the week's wave has come: the past nights' likelihood ratio then outweighs the prior of the days still to come.
@@ -1301,8 +1301,8 @@ Rehearse it in a test final. Stop the first desk on purpose with Ctrl-C in its l
 and time the gap from the alarm's first ring to the standby's "Joined" line. In the Sunday 01:00 test final this took
 26.1 s from the kill to the join, 5 requests went unquoted in the gap, and the week was ranked at 96.4% on time.
 
-**As set up for the final.** The standby is the Verda instance `the standby instance` in FIN-01, another data
-centre than the runner's FIN-03, made with the API outside `infra/verda` (4 vCPU, €0.05 an hour). Its user `amp` has
+**As set up for the final.** The standby is a second Verda instance in another data
+centre than the runner's, made with the API outside `infra/verda` (4 vCPU, €0.05 an hour). Its user `amp` has
 a checkout of `origin/main` in `~/code/junction2026` with `uv sync` done, and the team key and the note model's
 settings in `~/.config/spread/` (mode 600). Two systemd services run the alarm there and push to an ntfy topic
 named in `~/.config/spread/alarm.env`: `spread-alarm` reads the runner's desk over ssh as `amp`, with a
