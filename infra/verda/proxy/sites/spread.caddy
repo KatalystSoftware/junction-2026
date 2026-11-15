@@ -4,6 +4,7 @@
 spread.{$BASE_DOMAIN} {
 	encode zstd gzip
 	import cache
+	import access
 	root * /etc/caddy/static/index
 	handle / {
 		rewrite * /spread/index.html

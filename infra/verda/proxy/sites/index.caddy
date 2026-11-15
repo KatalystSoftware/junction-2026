@@ -4,6 +4,7 @@
 {$BASE_DOMAIN} {
 	encode zstd gzip
 	import cache
+	import access
 	# The Spread pitch lives on its own name now (spread.caddy); its first address sends people there.
 	redir /spread https://spread.{$BASE_DOMAIN}/
 	redir /spread/* https://spread.{$BASE_DOMAIN}/

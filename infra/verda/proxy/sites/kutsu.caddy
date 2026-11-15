@@ -4,5 +4,6 @@
 kutsu.{$BASE_DOMAIN} {
 	encode zstd gzip
 	import cache
+	import access
 	reverse_proxy 172.19.0.1:8046
 }

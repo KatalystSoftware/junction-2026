@@ -3,6 +3,7 @@
 incident.{$BASE_DOMAIN} {
 	encode zstd gzip
 	import cache
+	import access
 	root * /etc/caddy/static/incident
 	file_server
 }

@@ -19,4 +19,10 @@
 	header @rest ?Cache-Control "no-cache"
 }
 
+# One JSON line per request on the container's output (`docker logs proxy-caddy-1`), so we can see who
+# visits which site. visitors.sh summarises it.
+(access) {
+	log
+}
+
 import sites/*.caddy
