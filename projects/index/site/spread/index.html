@@ -66,6 +66,7 @@
 			<p class="lab">Best ranking round</p>
 			<b class="amber">€77,653</b>
 			<p class="sm"><b>over five weeks, 96.49% on time</b>, 8th on the board at 07:45 Helsinki, with 53 of the round's 54 teams complete. Sunday 06:00 Helsinki, played by merge 8.2: the final's code without the on-time budget.</p>
+			<p class="sm"><b>The other rounds:</b> Saturday 15:00, the first desk, 40th of 62 ranked; Sunday 02:10, merge 4.1, 19th of 55 on an early read.</p>
 		</div>
 	</div>
 	<div class="ans-ideas in" style="--d:4">
@@ -148,7 +149,7 @@
 	<p class="nerd only-11 in" style="--d:1"><b>For the technical jury</b>Under the hood. Peer reviewers: we built a pretend Finland. Skip ahead freely.</p>
 	<h2 class="h in" style="--d:1">Play was the bottleneck, so we built our own digital twin of Bahn's world: the simulator</h2>
 	<div class="body uses iwe">
-		<div class="in" style="--d:2"><p class="lab">The bottleneck</p><b class="big cyan">8</b><p class="sm"><b>practice worlds per team key</b>: too few weeks to test ideas. A recorded week can be replayed, but it can't say how dealers and drivers answer a different price.</p></div>
+		<div class="in" style="--d:2"><p class="lab">The bottleneck</p><b class="big cyan">8</b><p class="sm"><b>practice worlds per team key</b>: too few weeks to test ideas. Saturday's round showed what to fix: the top ten won 441 orders a week, we won 332, at nearly the same margin an order.</p></div>
 		<div class="in" style="--d:3"><p class="lab">Checked against our recorded weeks</p><b class="big cyan">43 of 46</b><p class="sm"><b>pairs play could decide came out the same way</b> on natural worlds, and gain sizes correlate with play at 0.96 to 0.97. On thin worlds only 0.37.</p></div>
 		<div class="in" style="--d:4"><p class="lab">Where it was wrong</p><b class="big cyan">9 of 9</b><p class="sm"><b>played steps called the right way</b> after the fixes of 14 November, up from 6 of 9. Before, it read fee holds and repriced late costs backwards.</p></div>
 		<p class="sm iwe-foot in" style="--d:5"><b>The rule it gave us:</b> a failing simulator run is trusted. A passing one is only a reason to play the part on real weeks, paired seed by seed with the version without it. A part stays only if it wins there and no week falls under 90% on time.</p>
@@ -209,7 +210,7 @@
 		<div class="r-foot in" style="--d:3">
 			<p class="sm"><b id="r-clock">0:00</b> of 4:41 &nbsp;<button class="ghost" id="r-again" type="button">Play again</button></p>
 			<p class="sm"><b>Saturday 21:33 the idea, 23:26 a joint search on 16 runners: 1 h 53 min.</b> A stand-in week takes 3 to 6 CPU-seconds, 97% of them in our own desk code, and every week is independent: the work needs cores and nothing else.</p>
-			<p class="sm only-11 r-late"><b class="cyan">Later that night: 412 weeks in 32 s of play</b>, about 13 weeks a second against about 5 above, once the farm played faster copies of the desk's note reader, pair search and waiting-car count that make the same decisions on every saved week. One idea against the base: about 65 s from asking to the answer.</p>
+			<div class="vs only-11"><div><p class="lab">Bahn's server</p><b class="amber">8</b><p class="sm">practice worlds per team key, on one request bucket, each week played at the world's own pace; a ranking round is 5 weeks</p></div><div><p class="lab">Our simulator on CRACI</p><b class="cyan">1,442</b><p class="sm">weeks in 4 min 41 s on one runner. Later that night, with faster copies of the desk's hot code: 412 weeks in 32 s of play. The joint search ran on 16 runners: 512 cores</p></div><div><p class="lab">Do they agree?</p><b class="cyan">43 of 46</b><p class="sm">pairs the simulator ranked as Bahn's server did; gain sizes correlate at 0.96 to 0.97 on natural worlds, 0.37 with few drivers</p></div></div>
 		</div>
 	</div>
 </section>
@@ -1635,8 +1636,19 @@
 		color: var(--cyan);
 		margin-bottom: 0.2em;
 	}
-	.r-late {
+	.vs {
 		grid-column: 1 / -1;
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: calc(2.4 * var(--k));
+		border-top: 1px solid var(--line);
+		padding-top: calc(1 * var(--k));
+	}
+	.vs > div > b {
+		display: block;
+		font-size: calc(2.4 * var(--k));
+		font-weight: 800;
+		line-height: 1.1;
 	}
 	.iwe-foot {
 		grid-column: 1 / -1;
