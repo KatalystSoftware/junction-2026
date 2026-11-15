@@ -1,5 +1,6 @@
 # Since When on the shared Verda machine, behind the proxy in infra/verda/proxy. See README.md.
-# Limits: 3 GB of memory and 3 CPUs in all, so the machine's other apps keep theirs.
+# Limits: 7 GB of memory and 5 CPUs in all, of the machine's 31 GB and 8 CPUs, so its other apps keep theirs.
+# The buffer pool holds the live database and the snapshot up.sh loads beside it before switching.
 name: since-when
 
 services:
@@ -12,7 +13,7 @@ services:
       MARIADB_USER: since_when
       MARIADB_PASSWORD: ${DB_PASSWORD:?}
     command:
-      - --innodb-buffer-pool-size=1G
+      - --innodb-buffer-pool-size=3G
       - --innodb-log-file-size=256M
       - --max-allowed-packet=256M
       - --mhnsw-max-cache-size=256M
@@ -24,7 +25,7 @@ services:
       test: [CMD, healthcheck.sh, --connect, --innodb_initialized]
       interval: 5s
       retries: 60
-    deploy: {resources: {limits: {cpus: "1", memory: 2g}}}
+    deploy: {resources: {limits: {cpus: "3", memory: 6g}}}
 
   app:
     build: ..
