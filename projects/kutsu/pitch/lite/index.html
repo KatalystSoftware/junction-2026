@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>/* kutsu.katalyst.fyi/pitch/ opens the short deck (the user, 2026-11-15). The full deck stays at /pitch/?full, at any #slide link, and through the links inside the short and light decks. Only on the web, only at the deck's own address: the PDF build (file://) and the light deck are unaffected. */
+if(/^https?:$/.test(location.protocol)&&/\/pitch\/(index\.html)?$/.test(location.pathname)&&!/[?&]full\b/.test(location.search)&&!/\/pitch\/(short|lite)\//.test(document.referrer)&&!location.hash)location.replace("short/")</script>
+
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Light · Kutsu · pitch</title>
@@ -506,7 +509,7 @@ body.pdfshot .progress,body.pdfshot .dots,body.pdfshot .hint,body.pdfshot .pdf{d
         <li><b>Numbers</b> <span>1,009 Espoo-area companies, 36 synthetic sample applications, 0 automated decisions</span></li>
       </ul></div>
     </div>
-    <p class="mut" style="font-size:var(--t-sm)">Team Katalyst · Junction 2026 · City of Espoo, Rethinking Recruitment · the full deck: kutsu.katalyst.fyi/pitch/</p>
+    <p class="mut" style="font-size:var(--t-sm)">Team Katalyst · Junction 2026 · City of Espoo, Rethinking Recruitment · the full deck: kutsu.katalyst.fyi/pitch/?full</p>
   </div>
 </section>
 

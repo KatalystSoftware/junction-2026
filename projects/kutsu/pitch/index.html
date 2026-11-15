@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>/* kutsu.katalyst.fyi/pitch/ opens the short deck (the user, 2026-11-15). The full deck stays at /pitch/?full, at any #slide link, and through the links inside the short and light decks. Only on the web, only at the deck's own address: the PDF build (file://) and the light deck are unaffected. */
+if(/^https?:$/.test(location.protocol)&&/\/pitch\/(index\.html)?$/.test(location.pathname)&&!/[?&]full\b/.test(location.search)&&!/\/pitch\/(short|lite)\//.test(document.referrer)&&!location.hash)location.replace("short/")</script>
+
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Kutsu · pitch</title>
