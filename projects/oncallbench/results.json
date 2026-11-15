@@ -78,6 +78,30 @@
    }
   },
   {
+   "label": "Nemotron 3.5 Lightning 30B-A3B, untrained",
+   "harness": "Harbor + OpenCode",
+   "runs": 24,
+   "seeds": 24,
+   "mean": 0.0403375,
+   "ci95": [
+    0.011220833333333333,
+    0.07608333333333334
+   ],
+   "median": 0.0,
+   "solve_rate": 0.0,
+   "worse_than_nothing": 0.6666666666666666,
+   "display": {
+    "mean": "0.04",
+    "ci95": [
+     "0.01",
+     "0.08"
+    ],
+    "median": "0.00",
+    "solve_rate": "0%",
+    "worse_than_nothing": "67%"
+   }
+  },
+  {
    "label": "Gemma 4 26B-A4B + our adapter (SFT, then RL on the score)",
    "harness": "Harbor + OpenCode",
    "runs": 48,
