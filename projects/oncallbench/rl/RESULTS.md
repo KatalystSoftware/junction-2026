@@ -113,8 +113,8 @@ The adapter `ckpt/gemma26-sft` (`adapter_model.safetensors`, sha256
 `cache/demos-l34.jsonl`. That file, like every other demo file (`demos.jsonl`, `demos-l3.jsonl`,
 `demos-l4.jsonl`), contains no seed from 101-106 and none from 200000 up.
 The fresh seeds were never in any demo or evaluation before this run. The adapter scores the same
-on its training seeds, the held-out seeds and the fresh ones, so the gain does not come from
-remembering seeds. It also reads each incident rather than replaying the reference's routine
+on its training seeds, the held-out seeds and the fresh ones, so the gain is not limited to the
+training seeds. It also reads each incident rather than replaying the reference's routine
 (`audit.py`):
 
 - **A replayed routine scores nothing.** The reference's own calls from one seed, replayed unchanged
@@ -154,8 +154,8 @@ the SFT adapter after 60 RL steps on the score (next section). It passes the sam
 every step in Modal containers on 15 Nov, about $1.20). The outputs of every step are in
 `out/audit-gemma26-rl.txt`.
 
-- **It acts on what it observed.** These are its 48 held-out level-4 episodes (its final eval,
-  seeds 101-106, our own runner, 0.776 ± 0.030):
+- **It acts on what it observed.** These are its 48 held-out level-4 episodes in our own harness
+  (`env.py`, not Harbor; its final eval, seeds 101-106, 0.776 ± 0.030):
   - every one of its 133 rollbacks and config reverts came after it read that service's diff;
   - 100% of its undos hit a planted fault (the SFT adapter's precision was 97%);
   - none of its 135 mitigations went to a service that is a fault in another seed but not in this one;
@@ -169,13 +169,23 @@ every step in Modal containers on 15 Nov, about $1.20). The outputs of every ste
   - Remove the harmful hunk from the diff: it skips the undo 10 times out of 10 (the SFT adapter:
     8), mostly to read the other change's diff.
   - Make the metrics calm before a scale-up: it scales anyway 10 times out of 10 (the SFT adapter:
-    7). As with the SFT adapter this edit leaves the overload alerts and the retry-storm logs in
-    place, so it is not decisive.
+    7). This probe is not decisive: the edit leaves the overload alerts and the retry-storm logs in
+    place, so scaling anyway can still follow the observations.
 
   Without edits it repeats its transcript's action at all 30 points. The untrained model mitigates
   at none of them.
 - **A replayed routine still scores nothing.** The replay and seed checks do not depend on the
   adapter and give the numbers above again: 0.00 on all 20 pairs, against 0.74 for `alerts_only`.
+- **The same holds in the judges' harness.** Its 48 Harbor + OpenCode runs on the common seeds
+  (`gemma-ft`, round 16), checked against each seed's planted faults from the signed action logs:
+  - 142 of its 145 undos hit a planted fault;
+  - 134 of the 145 came after it read that service's diff;
+  - its first 12 calls form 46 different sequences in the 48 runs, so it does not open every shift
+    the same way.
+- **It never calls `finish`.** None of the 48 Harbor runs ends its shift early, and 8 of them hit
+  the task's 30-minute agent timeout, still calling `wait` after the shift is over. The verifier
+  scores what they did, so the score is unaffected, but the behaviour is learnt: none of the 423
+  SFT demos calls `finish` either. Each demo waits out the shift and ends with `get_status`.
 - **RL refined the SFT update; it did not replace it.** The adapter's total update differs from the
   SFT adapter's by 11% of its size, with a cosine of 0.994 between the two, about evenly across the
   seven modules (`audit.py lora-diff`). Per layer it looks like the SFT adapter: the most change in
@@ -365,7 +375,9 @@ Rule (the orchestrator's, written here before any fine-tuned run on the spread s
 (seeds 101-106, 8 samples each); the higher mean wins, and a tie goes to `gemma26-rl-l4`, which
 trained on level 4 only, the environment we submit. Both runs log an eval at their last step and an
 end-of-run eval of the same weights, so for both "the last two" are those two rows of
-`out/evals.jsonl`.
+`out/evals.jsonl`. The rule was committed (23:32 on 14 Nov) before `gemma26-rl`'s two final evals
+(00:49 and 00:53) and before any fine-tuned Harbor run, but after `gemma26-rl-l4`'s two evals
+(0.640 and 0.752) were known.
 
 | Candidate | Trained on | Last step eval | End-of-run eval | Mean |
 | --- | --- | --- | --- | --- |
