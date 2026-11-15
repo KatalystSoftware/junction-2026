@@ -55,6 +55,29 @@
 <div class="frame">
 <div class="stage" id="stage">
 
+<!-- jury: the answer -->
+<section data-cuts="11" class="slide s-title s-ans" aria-label="Spread desk, the answer">
+	<div class="t-left">
+		<p class="kick in">Junction 2026 &nbsp;/&nbsp; Bahn Express Spread</p>
+		<h1 class="t-h in" style="--d:1">Spread desk</h1>
+		<p class="t-lede in f-line" style="--d:2" data-wait="The final plays Sunday 09:00 Helsinki, with merge 8.3."></p>
+		<p class="sm in h-line" style="--d:2"></p>
+		<div class="ans-best in" style="--d:3">
+			<p class="lab">Best ranking round</p>
+			<b class="amber">€77,653</b>
+			<p class="sm"><b>over five weeks, 96.49% on time</b>, 8th on the board at 07:45 Helsinki, with 53 of the round's 54 teams complete. Sunday 06:00 Helsinki, played by merge 8.2: the final's code without the on-time budget.</p>
+		</div>
+	</div>
+	<div class="ans-ideas in" style="--d:4">
+		<p class="lab">One formula prices every request. The ideas that carry it:</p>
+		<p class="it"><span class="amber">1</span> Each car is priced by its own chance of being late</p>
+		<p class="it"><span class="amber">2</span> Fees stop where drivers stop answering</p>
+		<p class="it"><span class="amber">3</span> One driver takes two cars when the routes meet</p>
+		<p class="it"><span class="amber">4</span> The week's rules are chosen from the number of drivers</p>
+		<p class="it"><span class="amber">5</span> A budget for the week's on-time share</p>
+	</div>
+</section>
+
 <!-- 1 -->
 <section data-cuts="5 7 9 10" class="slide s-title" aria-label="Spread desk">
 	<div class="t-left">
@@ -92,7 +115,7 @@
 </section>
 
 <!-- 3 -->
-<section data-cuts="5 7 9 10" class="slide" aria-label="The formula">
+<section data-cuts="5 7 9 10 11" class="slide" aria-label="The formula">
 	<p class="kick in"><span class="no"></span>The desk</p>
 	<h2 class="h in" style="--d:1">One formula makes every quote, and a car likely to be late costs more</h2>
 	<div class="body">
@@ -114,6 +137,19 @@
 				<p class="c-out" id="c-out" aria-live="polite"></p>
 			</div>
 		</div>
+		<p class="sm only-11 in" style="--d:5"><b>The day's market is read from the day's answers.</b> At one fixed price the desk won 3% of its quotes on the worst tenth of days and 60% on the best; shifting the win curve by each day's answers gave €5,609 against €4,627 a week on 10 held-out weeks. The first desk made <b>€12,376 a week</b> on 120 unseen practice weeks, +&#8288;€1,486 (1,297 to 1,677) over the desk before it, ahead in 117 of 120.</p>
+	</div>
+</section>
+
+<!-- jury: one idea a slide -->
+<section data-cuts="11" class="slide" aria-label="The simulator">
+	<p class="kick in"><span class="no"></span>The simulator</p>
+	<h2 class="h in" style="--d:1">We built a world to test ideas in, and trusted it only where it earned it</h2>
+	<div class="body uses iwe">
+		<div class="in" style="--d:2"><p class="lab">Why we built it</p><b class="big cyan">8</b><p class="sm"><b>practice worlds per team key</b>: too few weeks to test ideas. A recorded week can be replayed, but it can't say how dealers and drivers answer a different price.</p></div>
+		<div class="in" style="--d:3"><p class="lab">Checked against our recorded weeks</p><b class="big cyan">43 of 46</b><p class="sm"><b>pairs play could decide came out the same way</b> on natural worlds, and gain sizes correlate with play at 0.96 to 0.97. On thin worlds only 0.37.</p></div>
+		<div class="in" style="--d:4"><p class="lab">Where it was wrong</p><b class="big cyan">9 of 9</b><p class="sm"><b>played steps called the right way</b> after the fixes of 14 November, up from 6 of 9. Before, it read fee holds and repriced late costs backwards.</p></div>
+		<p class="sm iwe-foot in" style="--d:5"><b>The rule it gave us:</b> a failing simulator run is trusted. A passing one is only a reason to play the part on real weeks, paired seed by seed with the version without it. A part stays only if it wins there and no week falls under 90% on time.</p>
 	</div>
 </section>
 
@@ -159,7 +195,7 @@
 </section>
 
 <!-- 6 -->
-<section data-cuts="5 7 9 10" class="slide" aria-label="CRACI speed" data-race>
+<section data-cuts="5 7 9 10 11" class="slide" aria-label="CRACI speed" data-race>
 	<p class="kick cyan in"><span class="no"></span>CRACI as the farm</p>
 	<h2 class="h in" style="--d:1">One CRACI runner played 1,442 stand-in weeks in 4 min 41 s</h2>
 	<div class="body race">
@@ -216,7 +252,7 @@
 </section>
 
 <!-- 9 -->
-<section data-cuts="10" class="slide" aria-label="The overnight loop">
+<section data-cuts="10 11" class="slide" aria-label="The overnight loop">
 	<p class="kick in"><span class="no"></span>The overnight loop</p>
 	<h2 class="h in" style="--d:1">A merge queue and a minute loop decide every part on played weeks</h2>
 	<div class="body">
@@ -233,13 +269,13 @@
 			<div aria-hidden="true">
 				<div class="halves"><div><div class="cells"></div><p class="cl">under 760</p></div><div><div class="cells r"></div><p class="cl">760 or more</p></div></div>
 			</div>
-			<p class="sm"><b>A tag needs 20 weeks of its own on each side of 760 drivers, none under 90%.</b> Once a minute the loop promotes the next part in the queue, or rolls the head back at any week under 90%. Merge 5 lost a week at 89.4% that merge 4 held at 91.3%, so the head went back to merge 4.1.</p>
+			<p class="sm"><b>A tag needs 20 weeks of its own on each side of 760 drivers, none under 90%.</b> Once a minute the loop promotes the next part in the queue, or rolls the head back at any week under 90%.</p>
 		</div>
 	</div>
 </section>
 
 <!-- hill -->
-<section data-cuts="5 7 9 10" class="slide" aria-label="The hill climb" data-hill>
+<section data-cuts="5 7 9 10 11" class="slide" aria-label="The hill climb" data-hill>
 	<p class="kick cyan in"><span class="no"></span>The hill climb</p>
 	<h2 class="h in" style="--d:1;max-width:34ch">Claude pushed about 35 ideas up the stand-in's hill. One held in play.</h2>
 	<div class="body hc">
@@ -258,14 +294,71 @@
 	</div>
 </section>
 
+<!-- hill, in 3D -->
+<section data-cuts="x" class="slide" aria-label="The hill climb, in 3D" data-hill3d>
+	<p class="kick cyan in"><span class="no"></span>The hill climb</p>
+	<h2 class="h in" style="--d:1;max-width:34ch">Claude pushed about 35 ideas up the stand-in's hill. One held in play.</h2>
+	<div class="body h3">
+		<canvas class="in" id="h3-cv" style="--d:2" role="img" aria-label="A mountain turns while Claude's mascot pushes a boulder up a spiral path; the summit is tenth place."></canvas>
+		<div class="h3-r in" style="--d:3">
+			<p class="sm h3-time" id="h3-time"></p>
+			<b class="big" id="h3-num"></b>
+			<p class="it h3-cap" id="h3-cap" aria-live="polite"></p>
+			<p class="sm h3-head">Merge 4.1 <b id="h3-head"></b> a week, estimate</p>
+		</div>
+	</div>
+</section>
+
 <!-- 10 -->
-<section data-cuts="5 7 9 10" class="slide" aria-label="Gains over the default">
+<section data-cuts="5 7 9 10 11" class="slide" aria-label="Gains over the default">
 	<p class="kick in"><span class="no"></span>What the night added</p>
 	<h2 class="h in" style="--d:1;max-width:38ch" id="g-title"></h2>
 	<div class="body">
 		<div class="cols-wrap in" style="--d:2"><div class="cols" id="gains" role="img"></div></div>
 		<p class="sm g-key in" style="--d:3"><i class="k1"></i>played against the default on the same unseen weeks &nbsp; <i class="k2"></i>estimate: merge 1 plus paired gains on separate seeds &nbsp; Default: €12,376 a week</p>
-		<div class="g-end in" style="--d:4"><p class="tag">One formula. <span class="cyan">A world of our own to test it.</span> <span class="amber">Play has the last word.</span></p><p class="final" id="final"></p></div>
+		<div class="g-end in" style="--d:4"><p class="tag">One formula. <span class="cyan">A world of our own to test it.</span> <span class="amber">Play has the last word.</span></p><p class="final best">Best ranking round: Sunday 06:00, merge 8.2 (merge 4.1 at 760+ drivers), €15,531 a week, 96.5% on time, <b>8th</b> on the board at 07:45, with 53 of 54 teams in, not final. The final plays merge 8.3, the same code plus an on-time budget.</p><p class="final f-line"></p><p class="final hash h-line"></p></div>
+	</div>
+</section>
+
+<!-- jury: after the gains -->
+<section data-cuts="11" class="slide" aria-label="Combining cars">
+	<p class="kick in"><span class="no"></span>Combining cars</p>
+	<h2 class="h in" style="--d:1">One driver takes two cars when one car's drop-off is near the next one's pickup</h2>
+	<div class="body uses iwe">
+		<div class="in" style="--d:2"><p class="lab">What the desk does</p><p class="sm">One gig carries both cars, out and back or onward.</p></div>
+		<div class="in" style="--d:3"><p class="lab">What we saw</p><p class="sm">A driver coming back empty is paid for a leg that earns nothing.</p></div>
+		<div class="in" style="--d:4"><p class="lab">With and without it</p><b class="big amber">+€1,161</b><p class="sm"><b>a week from onward pairs</b> on worlds under 760 drivers, on 13 paired weeks, with no week under 92% in 15. Letting the two ends lie up to 40 km apart added <b>+&#8288;€672</b> (347 to 1,017) on 51 paired weeks, better in 37.</p></div>
+	</div>
+</section>
+
+<section data-cuts="11" class="slide" aria-label="The number of drivers">
+	<p class="kick in"><span class="no"></span>The number of drivers</p>
+	<h2 class="h in" style="--d:1">The week's rules are chosen from the number of drivers, before the first quote</h2>
+	<div class="body uses iwe">
+		<div class="in" style="--d:2"><p class="lab">What the desk does</p><p class="sm">It reads the driver list first. Under 760 drivers it counts every won car still without a driver, and caps any day at 62 won orders to deliver.</p></div>
+		<div class="in" style="--d:3"><p class="lab">What we saw</p><p class="sm">Merge 1, which counted only cars due within a day, failed 3 of 60 thin weeks: with few drivers it won more cars than they could move, piled up on one due day.</p></div>
+		<div class="in" style="--d:4"><p class="lab">With and without it</p><b class="big amber">0 of 60</b><p class="sm"><b>unseen thin weeks under 90% on time</b>, the lowest at 92.0%, at a cost of €1,290 a week there. The day cap took one thin week from 88.6% to 95.2% on time: 36 → 16 late orders, and 13 more orders.</p></div>
+	</div>
+</section>
+
+<section data-cuts="11" class="slide" aria-label="The newest, and least certain">
+	<p class="kick in"><span class="no"></span>The newest, and least certain</p>
+	<h2 class="h in" style="--d:1">An on-time budget: the final's newest part, and the one we're least sure of</h2>
+	<div class="body uses iwe">
+		<div class="in" style="--d:2"><p class="lab">What the desk does</p><p class="sm">Under 720 drivers and from 820 up, it projects the week's final on-time share at each quote, from the orders already late plus the open orders at their fitted late rates. While that is safely over 90%, it lowers the late cost in the quote, to as little as 0.5 ×.</p></div>
+		<div class="in" style="--d:3"><p class="lab">With and without it</p><b class="big amber">+€307</b><p class="sm"><b>a week</b> (+11 to +603) on its first 39 paired weeks, but <b>+&#8288;€159</b> (−48 to +363) on all 74. The range crosses zero, so the gain isn't proven.</p></div>
+		<div class="in" style="--d:4"><p class="lab">What would break it</p><b class="big red">89.2%</b><p class="sm"><b>on time</b> on one practice world with 665 drivers, a week merge 8.2, the same code without the budget, held at 90.55%.</p></div>
+	</div>
+</section>
+
+<section data-cuts="11" class="slide" aria-label="What didn't work">
+	<p class="kick in"><span class="no"></span>What didn't work</p>
+	<h2 class="h in" style="--d:1">What didn't work, what would break the desk, and how it survives a restart</h2>
+	<div class="body uses iwe">
+		<div class="in" style="--d:2"><p class="lab">Lost in play</p><p class="sm"><b>Cheaper quotes on their own. Lower opening fees on their own. Bigger pushes for volume. Every fee rule for days when drivers drop their gigs.</b></p></div>
+		<div class="in" style="--d:3"><p class="lab">Would break it</p><p class="sm"><b>A night when drivers drop their gigs.</b> Such a wave hits cars already won, so no price can reach it.</p></div>
+		<div class="in" style="--d:4"><p class="lab">Survives a restart</p><b class="big amber">26.1 s</b><p class="sm"><b>In the Sunday 01:00 Helsinki test final we killed the desk on purpose.</b> The standby joined 26.1 s later with 5 requests unquoted, and the week was ranked at 96.4% on time, 20th of 41.</p></div>
+		<p class="sm iwe-foot in" style="--d:5"><b>No other team's code or constants are in our desk.</b> &nbsp; <span class="tag">One formula. <span class="cyan">A world of our own to test it.</span> <span class="amber">Play has the last word.</span></span></p>
 	</div>
 </section>
 
@@ -1166,6 +1259,22 @@
 	.g-end .final {
 		font-size: max(9px, calc(1.2 * var(--k)));
 	}
+	.g-end .best {
+		flex-basis: 100%;
+	}
+	.g-end .best b {
+		color: var(--amber);
+	}
+	.g-end .hash {
+		flex-basis: 100%;
+		color: var(--dim);
+	}
+	.g-end .hash .blank {
+		display: inline-block;
+		width: 22em;
+		border-bottom: 1px solid var(--dim);
+		vertical-align: baseline;
+	}
 	.cuts {
 		display: flex;
 		gap: 2px;
@@ -1399,6 +1508,153 @@
 		margin-bottom: calc(0.6 * var(--k));
 	}
 
+	/* hill climb, in 3D */
+	.h3 {
+		display: grid;
+		grid-template-columns: minmax(0, 1.75fr) minmax(0, 1fr);
+		gap: calc(3.4 * var(--k));
+	}
+	#h3-cv {
+		width: 100%;
+		height: 100%;
+		min-height: 0;
+		display: block;
+	}
+	.h3-r {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		gap: calc(0.9 * var(--k));
+	}
+	.h3-r .big {
+		margin-bottom: 0;
+		transition: opacity 0.2s;
+	}
+	.h3-time {
+		font-weight: 650;
+	}
+	.h3-cap {
+		min-height: 5.4em;
+		font-weight: 500;
+	}
+	.h3-cap b {
+		color: var(--amber);
+	}
+	.h3-head {
+		margin-top: calc(1 * var(--k));
+		padding-top: calc(1 * var(--k));
+		border-top: 1px solid var(--line);
+	}
+	.h3-head b {
+		color: var(--amber);
+		font-size: 1.3em;
+	}
+
+	/* jury cut */
+	.lab {
+		font-size: max(8px, calc(1.05 * var(--k)));
+		font-weight: 700;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--dim);
+	}
+	.iwe > div .big {
+		font-size: calc(3.4 * var(--k));
+		margin: 0;
+	}
+	.iwe > div .sm {
+		font-size: max(9px, calc(1.4 * var(--k)));
+	}
+	.deck:not(.c11) .only-11 {
+		display: none;
+	}
+	.rounds {
+		display: flex;
+		flex-direction: column;
+		gap: calc(1.6 * var(--k));
+	}
+	.rd {
+		display: grid;
+		grid-template-columns: minmax(0, 11em) minmax(0, 1fr) 8.5em minmax(0, 15em);
+		gap: calc(2 * var(--k));
+		align-items: center;
+		border-top: 1px solid var(--line);
+		padding-top: calc(1.2 * var(--k));
+	}
+	.rd > p:first-child {
+		display: flex;
+		flex-direction: column;
+		font-size: max(10px, calc(1.5 * var(--k)));
+	}
+	.rd > p:first-child span {
+		color: var(--dim);
+		font-size: 0.85em;
+	}
+	.rd .tr {
+		height: calc(1.6 * var(--k));
+		background: var(--panel);
+	}
+	.rd .tr i {
+		display: block;
+		height: 100%;
+		width: var(--w);
+		background: var(--amber);
+	}
+	.rd > b {
+		font-size: calc(2.2 * var(--k));
+		font-weight: 800;
+		text-align: right;
+	}
+	.iwe-foot {
+		grid-column: 1 / -1;
+	}
+	.s-ans .t-h {
+		font-size: calc(7 * var(--k));
+	}
+	.s-ans .t-lede {
+		max-width: 36ch;
+	}
+	.s-ans .t-lede.done {
+		color: var(--amber);
+	}
+	.s-ans .h-line {
+		margin-top: calc(1 * var(--k)) !important;
+	}
+	.s-ans .h-line .blank {
+		display: inline-block;
+		width: 22em;
+		border-bottom: 1px solid var(--dim);
+	}
+	.ans-best {
+		margin-top: auto;
+		border-top: 1px solid var(--line);
+		padding-top: calc(1.2 * var(--k));
+		display: flex;
+		flex-direction: column;
+		gap: calc(0.6 * var(--k));
+	}
+	.ans-best > b {
+		font-size: calc(4.2 * var(--k));
+		font-weight: 800;
+		font-stretch: 112%;
+		letter-spacing: -0.03em;
+		line-height: 1;
+	}
+	.ans-ideas {
+		flex: 1;
+		min-width: 0;
+		align-self: center;
+		display: flex;
+		flex-direction: column;
+		gap: calc(1.6 * var(--k));
+		border-left: 1px solid var(--line);
+		padding-left: calc(3 * var(--k));
+	}
+	.ans-ideas .it span {
+		font-weight: 800;
+		margin-right: 0.5em;
+	}
+
 	/* narrow: the slides become one scrolling page */
 	@container deck (max-width: 620px) {
 		.stage {
@@ -1472,6 +1728,12 @@
 		#hill {
 			flex: none;
 			height: 220px;
+		}
+		.h3 {
+			grid-template-columns: minmax(0, 1fr);
+		}
+		#h3-cv {
+			height: 260px;
 		}
 		.cols-wrap {
 			height: 300px;
@@ -1551,6 +1813,8 @@
 		// The final's line. Fill in after the final ends, such as
 		// 'The final: merge 5, €00,000, 000 orders, 00.0% on time.'
 		const FINAL = null
+		// The submission hash from spread.bahnexpress.com/team, typed in by hand: no API returns it.
+		const HASH = '3eeda-7412e-64415-12d32'
 
 		const deck = document.getElementById('deck')
 		const stage = document.getElementById('stage')
@@ -1633,7 +1897,7 @@
 				{ name: 'Merge 1', sub: '40 weeks', gain: 2180, played: true },
 				{ name: 'Merge 2', sub: 'the step back: safe on thin worlds', gain: 2180 - 560, back: true },
 				{ name: 'Merge 3', sub: 'onward pairs', gain: 2180 + 224 },
-				{ name: 'Merge 4.1', sub: 'the head, about €15,700 a week', gain: 2180 + 465 },
+				{ name: 'Merge 4.1', sub: 'played €15,723 a week in the 02:10 round', gain: 2180 + 465 },
 			]
 			const max = 3000
 			const g = document.getElementById('gains')
@@ -1653,11 +1917,14 @@
 
 		// ---------- final ----------
 		{
-			const f = document.getElementById('final')
-			if (FINAL) {
-				f.textContent = FINAL
-				f.classList.add('done')
-			} else f.textContent = 'Test final, Sunday 01:00 Helsinki: merge 2 on the live desk, €10,192, 96.4% on time, ranked. We killed the desk on purpose; the standby took over in 26.1 s. The final plays at 09:00.'
+			const test = 'Test final, Sunday 01:00 Helsinki: merge 2 on the live desk, €10,192, 96.4% on time, ranked. We killed the desk on purpose; the standby took over in 26.1 s. The final plays at 09:00.'
+			document.querySelectorAll('.f-line').forEach((f) => {
+				f.textContent = FINAL || f.dataset.wait || test
+				f.classList.toggle('done', !!FINAL)
+			})
+			document.querySelectorAll('.h-line').forEach((h) => {
+				h.innerHTML = HASH ? `Submission hash: <code>${HASH}</code>` : 'Submission hash: <span class="blank"></span>'
+			})
 		}
 
 		// ---------- counters ----------
@@ -1756,7 +2023,7 @@
 			{ cap: 'A newer stack fell to <b>89.0% on time</b> on one week and was rolled back at once.' },
 			{ push: 600, quiet: true }, { wait: 0.3 }, { back: 0, lost: true, hush: true },
 		]
-		const HILL_END = `About 35 one-knob arms, one step held. The head: <b>${HEAD.name}, about ${eur(HEAD.eur)} a week</b>; tenth place is about ${eur(TENTH)}.`
+		const HILL_END = `About 35 one-knob arms, one step held. <b>${HEAD.name}: about ${eur(HEAD.eur)} a week</b>; tenth place is about ${eur(TENTH)}.`
 		const hill = (() => {
 			const svg = document.getElementById('hill')
 			const ns = 'http://www.w3.org/2000/svg'
@@ -1909,16 +2176,269 @@
 			return { run, finish }
 		})()
 
+		// ---------- hill climb, in 3D ----------
+		// Height on the mountain is the head's € a week: the base ring €14,600, the summit tenth place.
+		// Times are Helsinki, from the climb's own log, the candidate comparison and the main Space.
+		const h3 = (() => {
+			const cv = document.getElementById('h3-cv')
+			const g = cv.getContext('2d')
+			const css = getComputedStyle(deck)
+			const C = (n) => css.getPropertyValue('--' + n).trim()
+			const COL = { amber: C('amber'), cyan: C('cyan'), red: C('red'), ink: C('ink'), dim: C('dim'), bg: C('bg') }
+			const EMIN = 14600, TENTH = 17200, M3 = 15460, HEAD = 15700
+			const EV = [
+				{ time: 'Saturday 22:31', num: '+€395', col: 'cyan', cap: 'Round 1: 9 one-knob arms on the stand-in. The best reads +€395, under the €500 bar. Back down.', go: [[M3 + 395, 0.9], [M3, 0.7]] },
+				{ time: 'Saturday 22:44', num: '+€897', col: 'cyan', cap: '<b>slow_step 0.4</b> at 760+ drivers reads +€622, then +€897 on the other half of the seeds.', go: [[M3 + 622, 0.9], [M3 + 897, 0.7]] },
+				{ time: 'Saturday 23:14', num: '+€423', col: 'amber', cap: 'Tagged merge 4. Play pays less than the stand-in read: <b>+€423 a week</b> over merge 3 at 760+ drivers.', go: [[HEAD, 1.2]], head: HEAD },
+				{ time: 'Saturday 23:23', num: '0 of 23', col: 'dim', cap: 'Rounds 4 and 5: 23 more arms from the new base. None holds.', go: [[HEAD + 320, 0.8], [HEAD, 0.6]] },
+				{ time: 'Saturday 23:39', num: '−€5,341', col: 'red', cap: 'R-max goes to play. The stand-in read such stacks at +€600 to +€900; in play it lost <b>€5,341 a week</b>.', go: [[HEAD + 900, 1], [EMIN, 1.3], [HEAD, 1.5]] },
+				{ time: 'Saturday 23:47', num: '−€20', col: 'red', cap: 'The climb stops. slow_step 0.2 read +€585 on the stand-in and −€20 in play.', go: [[HEAD + 585, 0.8], [HEAD - 20, 0.6]] },
+				{ time: 'Sunday 01:26', num: '9 of 9', col: 'cyan', cap: 'The stand-in is fixed: it calls the direction of 9 of 9 played steps, up from 6 of 9.', go: [] },
+				{ time: 'Sunday 01:34', num: '89.0%', col: 'red', cap: 'A newer stack falls to 89.0% on time on one week and is rolled back. The head is merge 4.1 again.', go: [[HEAD + 300, 0.7], [HEAD, 0.5]] },
+				{ time: 'Now', num: eur(HEAD), col: 'amber', cap: `<b>Merge 4.1: about ${eur(HEAD)} a week.</b> The final plays merge 8.3: 4.1 at 720 to 819 drivers, longer onward pairs under 760, an on-time budget under 720 and from 820. Tenth place, the summit, is about ${eur(TENTH)}.`, go: [] },
+			]
+			const HOLD = 1.5
+			const H = 0.95, NR = 22, NA = 52, RMAX = 1.3
+			const hgt = (r, a) => (r >= 1 ? 0 : H * Math.pow(1 - r, 1.7) * (1 + 0.07 * Math.sin(3 * a + 1) * r) + 0.05 * Math.sin(5 * a) * r * (1 - r))
+			const P = []
+			for (let i = 0; i <= NR; i++) {
+				const row = []
+				for (let j = 0; j < NA; j++) {
+					const a = (j / NA) * Math.PI * 2, r = (i / NR) * RMAX
+					row.push([r * Math.cos(a), hgt(r, a), r * Math.sin(a)])
+				}
+				P.push(row)
+			}
+			const quads = []
+			for (let i = 0; i < NR; i++)
+				for (let j = 0; j < NA; j++) {
+					const q = [P[i][j], P[i][(j + 1) % NA], P[i + 1][(j + 1) % NA], P[i + 1][j]]
+					const u = q[2].map((v, k) => v - q[0][k]), v = q[3].map((w, k) => w - q[1][k])
+					let n = [u[1] * v[2] - u[2] * v[1], u[2] * v[0] - u[0] * v[2], u[0] * v[1] - u[1] * v[0]]
+					if (n[1] < 0) n = n.map((x) => -x)
+					const l = Math.hypot(...n) || 1
+					quads.push({ q, n: n.map((x) => x / l), alt: (q[0][1] + q[2][1]) / 2 / H, ground: (i / NR) * RMAX >= 1 })
+				}
+			const path = (t) => {
+				t = Math.max(0, Math.min(1, t))
+				const r = 0.96 - 0.9 * t, a = 2.4 + 1.7 * 2 * Math.PI * t
+				return [r * Math.cos(a), hgt(r, a) + 0.018, r * Math.sin(a)]
+			}
+			const tOf = (e) => (e - EMIN) / (TENTH - EMIN)
+			const face = (e) => -Math.PI / 2 - 0.5 - (2.4 + 1.7 * 2 * Math.PI * Math.max(0, Math.min(1, tOf(e))))
+			let W = 0, Ht = 0, dpr = 1, phi = 0
+			const EL = 0.42, D = 3.3
+			const Lv = (() => { const v = [-0.55, 0.75, -0.4], l = Math.hypot(...v); return v.map((x) => x / l) })()
+			const rot = ([x, y, z]) => {
+				const c = Math.cos(phi), s = Math.sin(phi)
+				const x1 = x * c - z * s, z1 = x * s + z * c
+				return [x1, y * Math.cos(EL) + z1 * Math.sin(EL), z1 * Math.cos(EL) - y * Math.sin(EL)]
+			}
+			const proj = (pt) => {
+				const [X, Y, Z] = rot(pt)
+				const k = Math.min(W * 0.55, Ht * 0.9) / (D + Z)
+				return { x: W * 0.5 + X * k, y: Ht * 0.6 - (Y - 0.3) * k, z: Z, k }
+			}
+			const mix = (a, b, x) => a.map((v, i) => Math.round(v + (b[i] - v) * x))
+			const DARK = [16, 23, 40], LIT = [62, 76, 112], HIGH = [86, 101, 140]
+			const ART = ['.########.', '.#o####o#.', '##########', '.########.', '.#.#..#.#.']
+			const font = (px) => `600 ${px}px Archivo, system-ui, sans-serif`
+			let e = M3, head = M3
+			function size() {
+				const r = cv.getBoundingClientRect()
+				if (!r.width) return false
+				dpr = devicePixelRatio || 1
+				W = r.width * dpr
+				Ht = r.height * dpr
+				cv.width = Math.round(W)
+				cv.height = Math.round(Ht)
+				return true
+			}
+			function draw(bob = 0) {
+				if (!W && !size()) return
+				g.clearRect(0, 0, W, Ht)
+				const items = []
+				for (const f of quads) {
+					const p = f.q.map(proj)
+					const n = rot(f.n)
+					const b = Math.max(0, n[0] * Lv[0] + n[1] * Lv[1] + n[2] * Lv[2])
+					const col = f.ground ? mix(DARK, [24, 32, 52], b * 0.6) : mix(mix(DARK, LIT, b), HIGH, Math.max(0, f.alt - 0.55) * 0.9 * b)
+					items.push({ z: (p[0].z + p[1].z + p[2].z + p[3].z) / 4, d: () => {
+						g.beginPath()
+						g.moveTo(p[0].x, p[0].y)
+						for (let i = 1; i < 4; i++) g.lineTo(p[i].x, p[i].y)
+						g.closePath()
+						g.fillStyle = `rgb(${col})`
+						g.fill()
+						g.strokeStyle = 'rgba(152,160,179,0.09)'
+						g.lineWidth = dpr
+						g.stroke()
+					} })
+				}
+				const N = 200, reached = tOf(Math.max(head, M3))
+				for (let i = 0; i < N; i++) {
+					const a = proj(path(i / N)), b = proj(path((i + 1) / N)), lit = (i + 1) / N <= reached + 1e-6
+					if (!lit && i % 2) continue
+					items.push({ z: (a.z + b.z) / 2 - 0.04, d: () => {
+						g.strokeStyle = lit ? COL.amber : 'rgba(152,160,179,0.55)'
+						g.lineWidth = (lit ? 3 : 1.6) * dpr
+						g.beginPath()
+						g.moveTo(a.x, a.y)
+						g.lineTo(b.x, b.y)
+						g.stroke()
+					} })
+				}
+				const fs = Math.max(10 * dpr, W * 0.017)
+				const labels = []
+				const mark = (m, text, color) => {
+					const p = proj(path(tOf(m)))
+					items.push({ z: p.z - 0.06, d: () => {
+						g.fillStyle = color
+						g.beginPath()
+						g.arc(p.x, p.y, 3.2 * dpr, 0, 7)
+						g.fill()
+					} })
+					if (p.z < 0) labels.push(() => {
+						g.font = font(fs)
+						g.fillStyle = color
+						g.textAlign = 'end'
+						g.fillText(text, p.x - 9 * dpr, p.y + 4 * dpr)
+						g.textAlign = 'start'
+					})
+				}
+				mark(M3, 'merge 3', COL.dim)
+				mark(HEAD, 'merge 4.1', COL.amber)
+				const top = proj([0, hgt(0, 0), 0]), pole = proj([0, hgt(0, 0) + 0.3, 0])
+				items.push({ z: top.z - 0.2, d: () => {
+					g.strokeStyle = COL.ink
+					g.lineWidth = 1.5 * dpr
+					g.beginPath()
+					g.moveTo(top.x, top.y)
+					g.lineTo(pole.x, pole.y)
+					g.stroke()
+					const fw = (top.y - pole.y) * 0.45
+					g.fillStyle = COL.cyan
+					g.beginPath()
+					g.moveTo(pole.x, pole.y)
+					g.lineTo(pole.x + fw, pole.y + fw * 0.3)
+					g.lineTo(pole.x + fw * 0.8, pole.y + fw * 0.6)
+					g.lineTo(pole.x, pole.y + fw * 0.6)
+					g.closePath()
+					g.fill()
+					g.fillStyle = COL.ink
+					g.font = font(fs)
+					g.textAlign = 'center'
+					g.fillText(`tenth place, about ${eur(TENTH)}`, pole.x, pole.y - 10 * dpr)
+					g.textAlign = 'start'
+				} })
+				const t = tOf(e), rock = proj(path(t + 0.045)), me = proj(path(t))
+				items.push({ z: rock.z - 0.09, d: () => {
+					const r = 0.07 * rock.k
+					g.fillStyle = COL.amber
+					g.beginPath()
+					g.arc(rock.x, rock.y - r, r, 0, 7)
+					g.fill()
+				} })
+				items.push({ z: me.z - 0.1, d: () => {
+					const px = 0.02 * me.k, flip = rock.x < me.x
+					const x0 = me.x - 5 * px, y0 = me.y - 5 * px - bob * px
+					ART.forEach((row, y) =>
+						[...row].forEach((c, x) => {
+							if (c === '.') return
+							g.fillStyle = c === 'o' ? COL.bg : '#d97757'
+							g.fillRect(x0 + (flip ? 9 - x : x) * px, y0 + y * px, px + 0.6, px + 0.6)
+						}),
+					)
+				} })
+				items.sort((a, b) => b.z - a.z)
+				for (const it of items) it.d()
+				for (const l of labels) l()
+			}
+			const $ = (id) => document.getElementById(id)
+			function show(v) {
+				$('h3-time').textContent = v.time === 'Now' ? 'Now' : v.time + ', Helsinki'
+				$('h3-num').textContent = v.num
+				$('h3-num').style.color = COL[v.col]
+				$('h3-cap').innerHTML = v.cap
+			}
+			const setHead = (v) => {
+				head = v
+				$('h3-head').textContent = eur(v)
+			}
+			const steps = []
+			{
+				let at = M3
+				EV.forEach((v) => {
+					steps.push({ v, from: at, to: at, dur: 0.01 })
+					for (const [to, dur] of v.go) {
+						steps.push({ from: at, to, dur })
+						at = to
+					}
+					steps.push({ from: at, to: at, dur: HOLD })
+				})
+			}
+			const ease = (x) => (x < 0.5 ? 2 * x * x : 1 - (-2 * x + 2) ** 2 / 2)
+			let si = 0, st = 0, last = 0, raf = 0
+			const slide = cv.closest('.slide')
+			function tick(now) {
+				if (!slide.classList.contains('cur') && !stacked()) return
+				const dt = Math.min(0.05, (now - (last || now)) / 1000)
+				last = now
+				const sp = steps[si]
+				let moving = false
+				if (sp) {
+					if (st === 0 && sp.v) {
+						show(sp.v)
+						if (sp.v.head) setHead(sp.v.head)
+					}
+					st += dt
+					const x = Math.min(1, st / sp.dur)
+					e = sp.from + (sp.to - sp.from) * ease(x)
+					moving = sp.from !== sp.to
+					if (x >= 1) {
+						st = 0
+						si++
+					}
+				}
+				phi = face(e)
+				draw(moving ? Math.abs(Math.sin(now / 90)) * 0.8 : 0)
+				raf = requestAnimationFrame(tick)
+			}
+			function finish() {
+				cancelAnimationFrame(raf)
+				si = steps.length
+				e = HEAD
+				phi = face(e)
+				setHead(HEAD)
+				show(EV[EV.length - 1])
+				size()
+				draw()
+			}
+			function run() {
+				cancelAnimationFrame(raf)
+				size()
+				if (reduce) return finish()
+				si = st = last = 0
+				e = M3
+				setHead(M3)
+				raf = requestAnimationFrame(tick)
+			}
+			addEventListener('resize', () => size() && draw())
+			finish()
+			return { run, finish }
+		})()
+
 		// ---------- navigation ----------
 		let cur = 0
 		const ticks = document.getElementById('ticks')
 		const cutsEl = document.getElementById('cuts')
-		const CUTS = [5, 7, 9, 10]
+		const CUTS = [11, 5, 7, 9, 10]
 		let cut = 10
 		const size = (n) => all.filter((s) => s.dataset.cuts.split(' ').includes(String(n))).length
-		cutsEl.innerHTML = CUTS.map((n) => `<button type="button" data-n="${n}" aria-label="${size(n)} slides">${size(n)}</button>`).join('')
+		cutsEl.innerHTML = CUTS.map((n) => `<button type="button" data-n="${n}" aria-label="${n === 11 ? 'Jury cut, ' : ''}${size(n)} slides">${n === 11 ? 'Jury ' : ''}${size(n)}</button>`).join('')
 		function setCut(n) {
 			cut = n
+			deck.classList.toggle('c11', n === 11)
 			const was = slides[cur]
 			all.forEach((s) => s.classList.toggle('out', !s.dataset.cuts.split(' ').includes(String(n))))
 			slides = all.filter((s) => !s.classList.contains('out'))
@@ -1944,6 +2464,7 @@
 			s.querySelectorAll('[data-count]').forEach(count)
 			if (s.hasAttribute('data-race')) race.run()
 			if (s.hasAttribute('data-hill')) hill.run()
+			if (s.hasAttribute('data-hill3d')) h3.run()
 		}
 		function go(i) {
 			i = Math.max(0, Math.min(slides.length - 1, i))
@@ -1984,6 +2505,7 @@
 			requestAnimationFrame(() => {
 				race.finish()
 				hill.finish()
+				h3.finish()
 			})
 		})
 		document.addEventListener('keydown', (e) => {
@@ -2022,9 +2544,9 @@
 			else go(cur)
 			race.draw()
 		}).observe(stage)
-		// Six slides by default; open a longer cut (8, 10 or 11 slides) with #7, #9 or #10 in the address, such as for a PDF export.
+		// The 10-slide jury cut by default; open the others with #5, #7, #9 or #10 in the address.
 		const h = +location.hash.slice(1)
-		setCut(CUTS.includes(h) ? h : 5)
+		setCut(CUTS.includes(h) ? h : 11)
 	}
 </script>
 </body>
