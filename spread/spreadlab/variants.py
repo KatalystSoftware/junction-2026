@@ -749,3 +749,8 @@ VARIANTS["m41v-d-km40-thin"] = {**_V_C, "thin_play": {"drivers": 760, "params": 
 _V_B = VARIANTS["m41v-b-late100-760"]
 VARIANTS["m41u-a"] = {**_V_B, "thin_play": {"drivers": 760, "params": {
     **{k: v for k, v in {**_V_B, **_V_B["when_tight"]}.items() if k != "when_tight"}, "pair_km": 40}, "version": thin_play.VERSION}}
+# If `late_cost` 100 at 760 to 819 is out too (`m41u-a` played `fresh-9678`, 801 drivers, under 90%): `m41u-b` is `m41v-a` with
+# the same thin play under 760, so a week of 760 drivers or more plays `trackb-merge-4.1` exactly.
+_V_A = VARIANTS["m41v-a"]
+VARIANTS["m41u-b"] = {**_V_A, "thin_play": {"drivers": 760, "params": {
+    **{k: v for k, v in {**_V_A, **_V_A["when_tight"]}.items() if k != "when_tight"}, "pair_km": 40}, "version": thin_play.VERSION}}
