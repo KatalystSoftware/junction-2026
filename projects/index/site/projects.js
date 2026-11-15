@@ -19,7 +19,7 @@
 //   also     work that is on the team's table but is not one of its entries
 //     link    optional [words, address] after its sentence
 window.KATALYST = {
-  repo: "",
+  repo: "https://github.com/KatalystSoftware/junction-2026",
   lede: "Three entries at Junction 2026, each with a live demo.",
   projects: [
     {

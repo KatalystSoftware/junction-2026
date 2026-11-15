@@ -134,6 +134,28 @@ def test_a_return_pairs_with_a_car_whose_own_gig_is_still_open_only_once_that_gi
         assert d.gigs_of("R1") == ["G1"] and d.gigs_of("R2") == ["G3"] and not d.pair_gigs
 
 
+def test_a_pair_gig_plans_no_more_driving_than_pair_drive(monkeypatch):
+    posts = {}
+    for hours in (0, 4, 3):  # out and back is 120 + 25 + 120 minutes of driving: 4 hours and 25 minutes
+        d = desk(monkeypatch, pair_drive=hours)
+        win(d, request("R1", "helsinki", "tampere", MON_9), MON_9 + 15)
+        win(d, request("R2", "tampere", "helsinki", MON_9 + 60), MON_9 + 75)
+        posts[hours] = (d.decisions["R2"].get("pair"), [len(a["stops"]) for a in d.world.sent if a["type"] == "post"], sorted(d.pair_wait))
+    assert posts[0] == ("R1", [4], [])  # the rule's 12 hours: the return is quoted as a pair and both cars go in one gig
+    assert posts[4] == posts[3] == (None, [], ["R1", "R2"])  # over the cap: no pair quote and no pair gig; each car waits for a shorter partner
+    # With `pair_drive_drivers` the cap acts only on a driver list that long: this list of 8 keeps the 12 hours and plays as without it.
+    d = desk(monkeypatch, pair_drive=3, pair_drive_drivers=760)
+    assert d.p["pair_drive"] == 0
+    win(d, request("R1", "helsinki", "tampere", MON_9), MON_9 + 15)
+    win(d, request("R2", "tampere", "helsinki", MON_9 + 60), MON_9 + 75)
+    assert (d.decisions["R2"].get("pair"), [len(a["stops"]) for a in d.world.sent if a["type"] == "post"], sorted(d.pair_wait)) == posts[0]
+    monkeypatch.setattr(pairs, "RETURNS", {"helsinki>tampere": 20, "tampere>helsinki": 20})
+    long_list = [{**ROSTER[0], "id": f"d{i}"} for i in range(760)]
+    capped = pairs.PairPolicy(World(), 8, MON_9, {"quote_share": 1, "curve": True, "cost": 1.2, "fee": 1.0, "fee_cap": 1.2, "pair_hold": 4,
+                                                  "pair_drive": 3, "pair_drive_drivers": 760}, long_list, MAP)
+    assert capped.p["pair_drive"] == 3
+
+
 def test_a_held_car_goes_onward_with_a_car_collected_where_it_is_delivered_at_the_onward_fee(monkeypatch):
     three = {"places": MAP["places"] + [{"id": "pori", "lat": 61.48, "lon": 21.80}],
              "roads": [{"from": a, "to": b, "km": 100.0, "minutes": 25 if a == b else 120} for a in ("helsinki", "tampere", "pori") for b in ("helsinki", "tampere", "pori")]}

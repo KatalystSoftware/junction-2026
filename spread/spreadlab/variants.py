@@ -670,3 +670,77 @@ VARIANTS["m41y-k-late100-760"] = _full_weeks(_Y["m41y-i-long300-c10-820"], late_
 # `late_cost` 100 at 760 to 819 drivers on it (80 from 820, 150 under 760), held until 760 to 819 may move again.
 VARIANTS["m41y-l-ftop11-820"] = _from820(_Y["m41y-i-long300-c10-820"], fee_rules=[[0, 10 ** 6, 16, 10 ** 6, 0.8, 0.1, 1.1]])
 VARIANTS["m41y-m-late100-760"] = _full_weeks(VARIANTS["m41y-l-ftop11-820"], late_cost=100)
+# Lane 3 A's next fee step on `m41y-l`: the 16-hour fee ladder stops at 1.0 of the typical fee, not 1.1, in a week of 820 drivers
+# or more (`when_rich`). A week under 820 plays `m41y-l` to the cent.
+VARIANTS["m41y-l-ftop11-820-ftop10"] = _from820(VARIANTS["m41y-l-ftop11-820"], fee_rules=[[0, 10 ** 6, 16, 10 ** 6, 0.8, 0.1, 1.0]])
+# Lane 3 A's fee top 1.0 from 820 on `m41y-m` (the review's order: `late_cost` 100 at 760 to 819 first, then the fee step):
+# only `when_rich` `fee_rules` moves, from a top of 1.1 to 1.0. A week under 820 plays `m41y-m` to the cent.
+VARIANTS["m41y-o-ftop10-820"] = _from820(VARIANTS["m41y-m-late100-760"], fee_rules=[[0, 10 ** 6, 16, 10 ** 6, 0.8, 0.1, 1.0]])
+# `m41x-e` (the thin pair hold 12 and `pair_left` 6) lost `fresh-9594` (686 drivers, 87.23%), which `m41x-b` alone holds at 91.58%
+# and 4.1 at 91.08%, so `m41w-a` is `m41y-f` without its thin play: under 760 drivers it plays `m41x-b`, at 760 or more `m41y-f`.
+VARIANTS["m41w-a"] = {k: v for k, v in _Y["m41y-f-h24-820"].items() if k != "thin_play"}
+
+# A cap on the driving a pair gig plans (`pair_drive`, hours), only in a week of 760 drivers or more (`pair_drive_drivers`); a
+# thinner week plays its base to the cent. On 16 played weeks of the onward base at 760 drivers or more (scratch/pair_drive.py),
+# a pair gig with 8 hours or more of driving found no driver 44% of the time, against 14% at 6 to 8 hours and 3% under 6; the
+# cars of a pair gig that no driver took then went alone and were 23% late, against 3.6% for other cars alone. That path was 4
+# of the 13 late orders a week. Over the cap no pair forms and no pair quote is given: the cars go as they would without a
+# partner. On `trackb-merge-4.1` (`…-ss04`, row 5), which every week of 760 to 819 drivers plays after the roll-back on
+# `fresh-9072`, on the fallback stack's last merged row (`m41x-h`), on its ready head (`m41y-l`) and on `m41y-m`, held until 01:04
+# UTC, with 7 hours beside 8. The stand-in ranks it from `pair_long` on (spread-standin d2d6e53), which books a long pair gig slower.
+for _hours in (7, 8):
+    VARIANTS[f"fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss04-pd{_hours}-d760"] = {
+        **_ROW_5, "pair_drive": _hours, "pair_drive_drivers": 760}
+    VARIANTS[f"m41x-h-pd{_hours}-d760"] = {**VARIANTS["m41x-h-ss025-820"], "pair_drive": _hours, "pair_drive_drivers": 760}
+    VARIANTS[f"m41y-l-pd{_hours}-d760"] = {**VARIANTS["m41y-l-ftop11-820"], "pair_drive": _hours, "pair_drive_drivers": 760}
+    VARIANTS[f"m41y-m-pd{_hours}-d760"] = {**VARIANTS["m41y-m-late100-760"], "pair_drive": _hours, "pair_drive_drivers": 760}
+# Lane 4 A's drop-wave fee jump (`wave_from`, `wave_fee`, `wave_days` in policy.py) on the head `m41y-f`: once `wave_from` of the
+# desk's gigs drop in a night's first hour, every open gig whose car must be collected that day shows at least `wave_fee` x the
+# typical fee at once, and so do its later posts. Set in every band, in the week's parameters and in the thin play's own (it
+# replaces the set under 760). On the stand-in with drop waves (ce230c6, 102 wave seeds under 760 drivers, 3 draws) the jump on
+# `trackb-merge-4.1` took the weeks under 90% from 19 of 306 to 10 (10 drops, 1.5x) and 6 (10 drops, 2.0x).
+_HEAD_Y = _Y["m41y-f-h24-820"]
+for _from, _fee in ((10, 1.5), (10, 2.0), (15, 1.5), (15, 2.0)):
+    _wave = {"wave_from": _from, "wave_fee": _fee, "wave_days": 1}
+    VARIANTS[f"l4w-{_from}-{int(_fee * 10)}"] = {**_HEAD_Y, **_wave, "thin_play": {
+        **_HEAD_Y["thin_play"], "params": {**_HEAD_Y["thin_play"]["params"], **_wave}}}
+
+# The stack on `m41w-a`, each row one part: `m41w-b` `late_cost` 100 at 760 to 819 drivers (80 stays from 820, 150 under 760);
+# `m41w-c` the pair thread's 8-hour cap on a pair gig's planned driving at 760 or more; `m41w-d` the search's drop-wave fee
+# jump under 760 only (11 drops in a night's first hour, 1.3 x the typical fee, the wave day), in `when_tight` since `m41w-a`
+# has no thin play. `hyb-a` is a final candidate only: `m41w-b` under 820 drivers, `trackb-merge-4.1` exactly from 820.
+VARIANTS["m41w-b-late100-760"] = _full_weeks(VARIANTS["m41w-a"], late_cost=100)
+VARIANTS["m41w-c-pd8-d760"] = {**VARIANTS["m41w-b-late100-760"], "pair_drive": 8, "pair_drive_drivers": 760}
+VARIANTS["m41w-d-w11-130-thin"] = {**VARIANTS["m41w-c-pd8-d760"], "when_tight": {
+    **VARIANTS["m41w-c-pd8-d760"]["when_tight"], "wave_from": 11, "wave_fee": 1.3, "wave_days": 1}}
+
+
+def _hyb(row: dict) -> dict:
+    """`row` under 820 drivers and `trackb-merge-4.1` exactly from 820: `when_rich` sets every key where they differ there."""
+    from .policy import DEFAULTS
+    from .pairs import PARAMS as PAIR_PARAMS
+    keys = set(DEFAULTS) | set(PAIR_PARAMS)
+    base = {**DEFAULTS, **PAIR_PARAMS, **{k: v for k, v in row.items() if k not in ("when_rich", "rich_drivers")}}
+    target = {**DEFAULTS, **PAIR_PARAMS, **_ROW_5}
+    return {**row, "rich_drivers": 820, "when_rich": {k: target[k] for k in sorted(keys - {"when_tight", "when_rich", "rich_drivers",
+            "tight_drivers", "when_behind", "behind_from", "min_on_time"}) if target.get(k) != base.get(k)}}
+
+
+VARIANTS["hyb-a"] = _hyb(VARIANTS["m41w-b-late100-760"])
+# Lane 2 A's `km40` on `m41w-c` (the wave part `m41w-d` is out): in a week under 760 drivers the two ends of a pair may lie 40 km
+# apart, not the 30 km notification distance (`pair_km`), through the thin play, since pairs don't read `when_tight`. A week of
+# 760 drivers or more plays `m41w-c` to the cent.
+_W_C = VARIANTS["m41w-c-pd8-d760"]
+VARIANTS["m41w-e-km40-thin"] = {**_W_C, "thin_play": {"drivers": 760, "params": {
+    **{k: v for k, v in {**_W_C, **_W_C["when_tight"]}.items() if k != "when_tight"}, "pair_km": 40}, "version": thin_play.VERSION}}
+# At 820 drivers or more the stack goes back to `trackb-merge-4.1` exactly: on `fresh-9340` (823 drivers) `m41w-a`/`-b` played
+# 88.30% where 4.1 held 92.78%, and `m41y-f`'s parts there (late_cost 80, slow_step 0.25, the cost by hours) never beat 4.1 in
+# play (-59 to -327 a week on paired seeds). `m41v-a` is `m41w-a` without its 820+ level: `m41x-b` under 760, 4.1 from 760.
+# `m41v-b` adds `late_cost` 100 at 760 to 819 (150 from 820, as 4.1), the same play as `hyb-a`; `m41v-c` the 8-hour pair-drive
+# cap at 760+; `m41v-d` lane 2 A's `km40` under 760 through the thin play.
+VARIANTS["m41v-a"] = {k: v for k, v in VARIANTS["m41w-a"].items() if k not in ("rich_drivers", "when_rich")}
+VARIANTS["m41v-b-late100-760"] = dict(VARIANTS["hyb-a"])
+VARIANTS["m41v-c-pd8-d760"] = {**VARIANTS["m41v-b-late100-760"], "pair_drive": 8, "pair_drive_drivers": 760}
+_V_C = VARIANTS["m41v-c-pd8-d760"]
+VARIANTS["m41v-d-km40-thin"] = {**_V_C, "thin_play": {"drivers": 760, "params": {
+    **{k: v for k, v in {**_V_C, **_V_C["when_tight"]}.items() if k != "when_tight"}, "pair_km": 40}, "version": thin_play.VERSION}}

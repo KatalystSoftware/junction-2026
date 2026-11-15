@@ -969,9 +969,113 @@ def test_each_m41x_row_plays_trackb_merge_4_1_at_760_to_819_drivers():
     # m41y: on m41x-h without m41x-l, then late_cost 100 at 760-819 (m41y-j, kind_fees, never plays)
     rows_y = [rows[4]] + [(n.replace("m41x-", "m41y-"), part) for n, part in rows[6:9]] + [
         ("m41y-l-ftop11-820", {900: {"fee_rules": [[0, 10 ** 6, 16, 10 ** 6, 0.8, 0.1, 1.1]]}}),
-        ("m41y-m-late100-760", {800: {"late_cost": 100}})]  # m41y-k is the same late_cost row on m41y-i
+        ("m41y-m-late100-760", {800: {"late_cost": 100}}),  # m41y-k is the same late_cost row on m41y-i
+        ("m41y-o-ftop10-820", {900: {"fee_rules": [[0, 10 ** 6, 16, 10 ** 6, 0.8, 0.1, 1.0]]}})]
     for (below, _), (row, part) in [*zip(rows, rows[1:]), *zip(rows_y, rows_y[1:])]:
         for n in (700, 761, 819, 820, 900):
             new, old = desk(row, n), desk(below, n)
             want = part.get(n, {}) if n in (700, 900) else part.get(800, {}) if n < 820 else part.get(900, {})
             assert {k: new[k] for k in new if new[k] != old.get(k)} == want, (row, n)
+
+
+def test_ftop10_from_820_plays_m41y_l_below_820_drivers_and_only_a_lower_ladder_top_above():
+    from spreadlab import play
+    from spreadlab.variants import VARIANTS
+    roster = lambda n: [{**ROSTER[0], "id": f"x{i}"} for i in range(n)]  # noqa: E731
+    base, part_ = "m41y-l-ftop11-820", "m41y-l-ftop11-820-ftop10"
+
+    def desk(name, n):  # the parameters the week plays with
+        params = VARIANTS[name]
+        played = play.policy_class(params)(None, 8, 0, params, roster(n), MAP).params()
+        return {k: v for k, v in played.items() if k not in ("when_tight", "rich_drivers", "when_rich", "thin_play")}
+    for n in (700, 760, 819):
+        assert desk(part_, n) == desk(base, n), n
+    part, head = desk(part_, 820), desk(base, 820)
+    assert {k: part[k] for k in part if part[k] != head[k]} == {"fee_rules": [[0, 10 ** 6, 16, 10 ** 6, 0.8, 0.1, 1.0]]}
+
+
+def test_m41w_a_plays_m41x_b_under_760_drivers_and_m41y_f_from_760():
+    from spreadlab import play
+    from spreadlab.variants import VARIANTS
+    roster = lambda n: [{**ROSTER[0], "id": f"x{i}"} for i in range(n)]  # noqa: E731
+
+    def desk(name, n):  # the parameters the week plays with
+        params = VARIANTS[name]
+        played = play.policy_class(params)(None, 8, 0, params, roster(n), MAP).params()
+        return {k: v for k, v in played.items() if k not in ("when_tight", "rich_drivers", "when_rich", "thin_play")}
+    for n in (700, 759):
+        assert desk("m41w-a", n) == desk("m41x-b-cap62-onward-all", n), n
+    for n in (760, 819, 820, 900):
+        assert desk("m41w-a", n) == desk("m41y-f-h24-820", n), n
+
+
+def test_the_wave_fee_jump_on_m41y_f_plays_in_every_band_and_changes_nothing_else():
+    from spreadlab import play
+    from spreadlab.variants import VARIANTS
+    roster = lambda n: [{**ROSTER[0], "id": f"x{i}"} for i in range(n)]  # noqa: E731
+
+    def desk(params, n):
+        return play.policy_class(params)(None, 8, 0, params, roster(n), MAP).params()
+    head = VARIANTS["m41y-f-h24-820"]
+    for n in (700, 790, 900):
+        for name in ("l4w-10-15", "l4w-15-20"):
+            jump = VARIANTS[name]
+            assert desk(jump, n) == {**desk(head, n), "wave_from": jump["wave_from"], "wave_fee": jump["wave_fee"], "wave_days": 1}, (name, n)
+
+
+def test_the_m41w_rows_each_add_one_part_and_hyb_a_plays_4_1_from_820():
+    from spreadlab import play
+    from spreadlab.variants import VARIANTS
+    roster = lambda n: [{**ROSTER[0], "id": f"x{i}"} for i in range(n)]  # noqa: E731
+
+    def desk(name, n):  # the parameters the week plays with
+        params = VARIANTS[name]
+        played = play.policy_class(params)(None, 8, 0, params, roster(n), MAP).params()
+        return {k: v for k, v in played.items() if k not in ("when_tight", "rich_drivers", "when_rich", "thin_play")}
+
+    def changed(a, b):
+        return {k: a[k] for k in a if a[k] != b.get(k)}
+    cap = {"pair_drive": 8, "pair_drive_drivers": 760}
+    wave = {"wave_from": 11, "wave_fee": 1.3}  # wave_days 1 is the default
+    rows = [("m41w-b-late100-760", "m41w-a", {761: {"late_cost": 100}, 819: {"late_cost": 100}}),
+            ("m41w-c-pd8-d760", "m41w-b-late100-760", {700: {"pair_drive_drivers": 760}, **{n: cap for n in (761, 819, 820, 900)}}),
+            ("m41w-d-w11-130-thin", "m41w-c-pd8-d760", {700: wave}),
+            ("m41w-e-km40-thin", "m41w-c-pd8-d760", {700: {"pair_km": 40}})]
+    for row, below, part in rows:
+        for n in (700, 761, 819, 820, 900):
+            assert changed(desk(row, n), desk(below, n)) == part.get(n, {}), (row, n)
+    four_one = "fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss04"
+    for n in (700, 761, 819):
+        assert desk("hyb-a", n) == desk("m41w-b-late100-760", n), n
+    for n in (820, 900):
+        assert changed(desk("hyb-a", n), desk(four_one, n)) == {}, n
+
+
+def test_the_m41v_rows_play_4_1_from_820_and_each_add_one_part():
+    from spreadlab import play
+    from spreadlab.variants import VARIANTS
+    roster = lambda n: [{**ROSTER[0], "id": f"x{i}"} for i in range(n)]  # noqa: E731
+
+    def desk(name, n):  # the parameters the week plays with
+        params = VARIANTS[name]
+        played = play.policy_class(params)(None, 8, 0, params, roster(n), MAP).params()
+        return {k: v for k, v in played.items() if k not in ("when_tight", "rich_drivers", "when_rich", "thin_play")}
+
+    def changed(a, b):
+        return {k: a[k] for k in a if a[k] != b.get(k)}
+    four_one = "fee16-80-q24-wide-pairs-0.6-return-0.75-thin760-q48-onward-q10-d760-ss04"
+    onward = {"pair_more_drivers": 0}  # onward pairs are on from 760 drivers either way
+    for n in (700, 759):
+        assert desk("m41v-a", n) == desk("m41x-b-cap62-onward-all", n), n
+    for n in (760, 819, 820, 900):
+        assert changed(desk("m41v-a", n), desk(four_one, n)) == onward, n
+    cap = {"pair_drive": 8, "pair_drive_drivers": 760}
+    rows = [("m41v-b-late100-760", "m41v-a", {761: {"late_cost": 100}, 819: {"late_cost": 100}, 820: {"pair_more_drivers": 760},
+                                              900: {"pair_more_drivers": 760}}),
+            ("m41v-c-pd8-d760", "m41v-b-late100-760", {700: {"pair_drive_drivers": 760}, **{n: cap for n in (761, 819, 820, 900)}}),
+            ("m41v-d-km40-thin", "m41v-c-pd8-d760", {700: {"pair_km": 40}})]
+    for row, below, part in rows:
+        for n in (700, 761, 819, 820, 900):
+            assert changed(desk(row, n), desk(below, n)) == part.get(n, {}), (row, n)
+    for n in (700, 759):
+        assert desk("m41v-d-km40-thin", n) == desk("m41w-e-km40-thin", n), n

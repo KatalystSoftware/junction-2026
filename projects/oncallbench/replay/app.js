@@ -219,7 +219,7 @@
         h("div", { class: "spread-lane", style: `grid-row: ${i + 2}`, role: "img",
             "aria-label": `${m.label}, ${m.n} runs: ${m.runs.map((r) => two(r.score)).join(", ")}` },
           m.low != null ? h("i", { class: "ci", style: `left: ${at(m.low)}; right: calc(100% - ${at(m.high)})` }) : null,
-          m.runs.map((r) => h("i", { class: "dot", style: `left: ${at(r.score)}; top: calc(50% + ${(r.k % 3) - 1} * 0.32rem)`,
+          m.runs.map((r) => h("i", { class: "dot", style: `left: ${at(r.score)}; top: calc(50% + ${(r.k % 3) - 1} * 0.26rem)`,
             title: `Seed ${r.seed}: ${two(r.score)}` })),
           h("i", { class: "mean", style: `left: ${at(m.mean)}` })),
         h("p", { class: "spread-stat", style: `grid-row: ${i + 2}`, title: how },

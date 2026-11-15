@@ -49,19 +49,14 @@ correct. Context.dev supplies each company's details, brand colours and careers 
 sample data, and a person makes every decision. Its first invitee pages and its pitch deck are in
 [`projects/espoo-recruitment/`](projects/espoo-recruitment/README.md).
 
-## Other work in this repository
+## Also here
 
-- [`projects/mariadb-wikipedia/`](projects/mariadb-wikipedia/README.md), with the root `gapfinder/`,
-  `differences/` and `ui/`: Edition Ledger, the MariaDB tool Since When was forked from.
-- [`spread/`](spread/README.md), `projects/spread-alloc/` and `projects/spread-factory/`: a car-delivery
-  desk and its test harness for the Bahn Express "Spread" challenge.
 - [`projects/index/`](projects/index/README.md): the page at <https://katalyst.fyi/>.
-- `spikes/`: experiments we tried and did not submit, such as other domains we probed for AfterQuery.
-- `infra/`: OpenTofu for the machines and the shared proxy the live demos run on.
+
+This repository holds the projects we submitted, with their history. Our notes, experiments and other
+work from the event stay in the team's private repository.
 
 ## Working in it
 
 The tools come from Nix: `direnv allow`, or `nix develop`. Each project's README has its own run and test
-commands; anything that needs the team's API keys says so and has a no-key path. `AGENTS.md` holds the
-instructions our coding agents worked under during the event, including paths to notes and machines that
-are not part of this copy.
+commands; anything that needs the team's API keys says so and has a no-key path.

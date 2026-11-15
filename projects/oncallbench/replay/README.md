@@ -14,10 +14,12 @@ xdg-open index.html   # macOS: open index.html
 ```
 
 The page is static and has no dependencies; it opens straight from disk with the committed
-bundles in `data/`. Every episode is level 4, as shipped, so the tabs in the bar name only the
-seed: 200019 opens first, then 108 and 109. Each bundle carries every Harbor run on its seed except
-those cut by infrastructure (a Fable 5.2 run on 200019 hit a usage limit); a model with several
-runs is listed as "run 1", "run 2" in the order `notes.json` gives.
+bundles in `data/`. Every episode is level 4, as shipped, so a tab in the bar names only the seed;
+today there is one, seed 200019. A bundle carries every Harbor run on its seed except those cut by
+infrastructure (on 200019, a Fable 5.2 run hit a usage limit and two untrained Gemma runs never
+reached the model); a model with several runs is listed as "run 1", "run 2" in the order
+`notes.json` gives. More runs on the seed are made on CRACI or the Verda runner, never on hestia,
+and added with `export.py --jobs <folder>`.
 
 ## Add or refresh an episode
 
@@ -85,38 +87,26 @@ replay. A clean diff means the simulator and the reference still give the bundle
 
 ## The bundles
 
-Every number on the page comes from the simulator and reference on `main`. The results strip
-matches the closing report at the top of `../LOOP.md`: level 4 as shipped (round 10's
-instruction), graded against the round-11 reference.
+Every number on the page comes from the simulator and reference on `main`.
 
-Every episode is a seed no task ships, with one run made on the task as shipped. The runs on the
-shipped seeds 101 to 103 are not replayed here: their bundles would be the tasks' answer keys.
+The episode is one of the 24 common seeds, with the runs made on the task as shipped. The runs on
+the shipped seeds 101 to 103 are not replayed here: their bundles would be the tasks' answer keys.
 
-| Episode | Run | What happened |
+| Episode | Runs | What happened in the run that opens |
 | --- | --- | --- |
-| **Level 4, seed 200019** (`data/l4-s200019.js`), opens first | Opus 5.5 run 1, 0.00, opens; run 2, 0.43 (round 16, a common seed) | Ahead of the reference until minute 33. Then it rolled back geo-svc without adding capacity first: retries overloaded it, and partner-api, which earns $29,100 a minute, went to 72% errors. Minutes 33 to 42 cost it $185,000, the reference $1,000. |
-| Level 4, seed 109 (`data/l4-s109.js`) | Opus 5.5, 0.36 (round 13) | Level with the reference until minute 34. Then it rolled back search-svc without adding capacity first: retries overloaded it and web-storefront went to 72% errors. Minutes 34 to 46 cost it $163,000, the reference $42,000. |
-| Level 4, seed 108 (`data/l4-s108.js`) | Opus 5.5, 0.34 (round 13) | The same mistake on checkout-svc, then a 50% throttle once the storm had started. Minutes 34 to 46 cost it $132,000, the reference $36,000. |
+| **Level 4, seed 200019** (`data/l4-s200019.js`) | Opus 5.5 run 1 0.00 (opens) and run 2 0.43; Gemma 4 26B-A4B fine-tuned 0.24 and 0.00; untrained 0.00 and 0.00 (round 16) | Ahead of the reference until minute 33. Then it rolled back geo-svc without adding capacity first: retries overloaded it, and partner-api, which earns $29,100 a minute, went to 72% errors. Minutes 33 to 42 cost it $185,000, the reference $1,000. |
 
-Seed 200019 opens because it is one of the 24 common seeds of the scores band above it, and its run
-shows the level's decisive moment most plainly: Opus 5.5 is ahead of the reference until the quiet
-fault, rolls back unprotected, and says in its closing message that "throttling or scaling geo-svc
-before the rollback would have prevented it". On this tab the band stands in for the strip in the
-bar, so the page shows one Opus mean. Seeds 108 and 109 also carry three runs each of Gemma 4
-26B-A4B, untrained and with the SFT adapter, added by the Gemma thread. The scripted baselines (unprotected rollbacks, do nothing and the others) are in
-the run picker.
-
-The strip in the bar shows all nine Opus scores on the shipped seeds (mean 0.32, median 0.18,
-range 0.03 to 0.80); its sheet lists them by seed and by what the run did, then the six fresh-seed
-runs (mean 0.55, 0.34 to 0.75). One number differs from the report's text: it gives the
-unprotected runs as 0.03 to 0.59, which is the highest of them as run; graded against the
-round-11 reference that run is 0.61, and the page shows the regraded score like the report's own
-table.
+Seed 200019 is in the band above it, and its first Opus run shows the level's decisive moment most
+plainly: ahead of the reference until the quiet fault, it rolls back unprotected and says in its
+closing message that "throttling or scaling geo-svc before the rollback would have prevented it".
+The other runs and the scripted baselines (unprotected rollbacks, do nothing and the others) are
+in the run picker, models first. The bar's older results strip (a `headline` entry in
+`notes.json`, Opus's nine runs on the shipped seeds) is off: the band carries the scores.
 
 ## The scores band
 
 Above the replay, one row per model: a dot for every run on the 24 common level-4 seeds 200000
-to 200023 (Opus 5.5 twice per seed, Gemma 4 26B-A4B untrained and fine-tuned once), its mean as a
+to 200023 (each model twice per seed), its mean as a
 tick with the 95% interval as a bar, and the numbers on the right. The caption's second sentence
 ("Opus 5.5 averages 0.45; all 45 runs are below the expert") is computed from the runs, so it stays
 true as runs land. Fable 5.2 is left off: its mean on these seeds is 0.88. The reference's 1.00 and doing nothing's 0.00 are
@@ -164,8 +154,6 @@ python3 export.py --spread && ./deploy.sh   # pick up new runs from ../metrics.j
   reference why, for the agent the sentence of the task instruction that covers it and its own
   words, and what the call returned. Hover a mark for the short version.
 - "How the reference decides": its seven rules. The rule in use lights up as the shift plays.
-- The strip in the bar: every measured run of the headline model on this level. Its sheet lists
-  the scores by seed; the ones on this seed switch the view to that run.
 - "Show each fault": one lane per fault with how long it stayed live in each run.
 - "Key": every mark on the graphs and the timeline, and how the score is defined.
 - Space plays and pauses. Drag the timeline to scrub. Left and right step through the agent's
@@ -174,22 +162,23 @@ python3 export.py --spread && ./deploy.sh   # pick up new runs from ../metrics.j
 - "Go to the key moment" jumps to the call the agent's run turns on and pauses there. While that
   call holds the agent's line, the reference's line shows what it did at its own moment on the
   same service, so the two decisions sit side by side.
-- Links to a moment: `index.html?session=l4-s108&run=<run id>&t=54`, `&a=<action index>` to open
+- Links to a moment: `index.html?session=l4-s200019&run=<run id>&t=54`, `&a=<action index>` to open
   an action (`&side=ref` for the reference), `&lanes=1`, `&sheet=runbook|results|key`,
   `&intro=1` or `&intro=0`, `&speed=2`, `&still` to switch motion off for screenshots.
 
 ### For a screen recording
 
 ```
-https://incident.katalyst.fyi/?seed=200019&autoplay=1&seconds=25&pause=key&zoom=1
+https://incident.katalyst.fyi/?seed=200019&autoplay=1&seconds=25&pause=key&zoom=1.1
 ```
 
 That plays seed 200019 from 12 minutes before the page and stops at minute 36, three minutes after
 Opus's unprotected rollback, with partner-api at 70% errors against 0% for the reference.
-`?seed=200019&t=36&zoom=1` opens paused on that minute for a still. On seed 109 the same moment is
-`?seed=109&t=37`.
+`?seed=200019&t=36&zoom=1.1` opens paused on that minute for a still, and
+`?seed=200019&t=32&pause=key&zoom=1.1` opens just before the rollback and stops at minute 36 when
+played.
 
-- `seed=109` (with `level=4` if several levels share a seed) opens that episode; `run=<run id>`
+- `seed=200019` (with `level=4` if several levels share a seed) opens that episode; `run=<run id>`
   picks another run than the one that opens.
 - `autoplay=1` plays at once and skips the intro.
 - `seconds=25` plays what is left of the shift in that many seconds; `speed=1.5` sets a multiple
@@ -198,10 +187,9 @@ Opus's unprotected rollback, with partner-api at 70% errors against 0% for the r
 - `pause=key` stops the playback at the key moment (three minutes after the agent's decisive
   call, when its effect shows); `pause=44` stops at that minute. Space resumes.
 - `t=44` alone opens paused on that minute, for a still.
-- `zoom=1.1` enlarges all type for video compression. On seed 109 at 1920x1080, 1.1 places every
-  label clear of the graph; at 1.15 the loyalty-svc caption lands on its neighbours, and at 1.2
-  the bar runs out of room. With the scores band shown the graphs are shorter: use `zoom=1`,
-  which keeps the labels clear, or add `spread=0`.
+- `zoom=1.1` enlarges all type for video compression. On seed 200019, 1.1 and 1 keep the graph's
+  labels clear at 1920x1080 and 1280x800; at 1280 wide the small edge figures above the bars run
+  into each other. `spread=0` leaves the band out, which gives the graphs more height.
 
 ## Deploy
 
@@ -250,11 +238,12 @@ files. Shape:
   made (the replica count, the throttle share, a shared word). Otherwise the action has its
   rule number at most and the page shows the plain action. On eight episodes (levels 3 and 4,
   seeds 1 and 101 to 103) all 54 mitigations and throttles of the reference get a reason this way.
-  On seeds 108, 109 and 200019, 30 of 32 do: the rollback of a leaking deploy, which the reference finds
-  from memory rather than from a log line that matches the diff, shows only its rule.
+  On seed 200019 all 10 do. On seeds 108 and 109, earlier episodes, 20 of 22 did: the rollback of a
+  leaking deploy, which the reference finds from memory rather than from a log line that matches
+  the diff, shows only its rule.
 - **Details are on demand.** The first screen is the two estates, the counters, the line on what
   each run is doing, play and the timeline. The key, the score's definition, each fault's lane,
-  the action details, the runbook and the nine-run results each open from one control.
+  the action details and the runbook each open from one control.
 - **The intro is a dialog, once.** It pauses the replay until it is dismissed, so the first thing
   a visitor reads is what they are about to watch. The dismissal is remembered in localStorage
   where the browser allows it.

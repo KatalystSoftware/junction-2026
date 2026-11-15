@@ -49,8 +49,8 @@
 </style>
 </head>
 <body>
-<!-- The deck below is the same page as the team's "How Spread works" visual. Five slides by default;
-     #7, #9 or #10 in the address opens a longer cut. Print or Save as PDF gives one 16:9 slide a page. -->
+<!-- The deck below is the same page as the team's "How Spread works" visual. Six slides by default;
+     #7, #9 or #10 in the address opens a longer cut (8, 10 or 11 slides). Print or Save as PDF gives one 16:9 slide a page. -->
 <div class="deck" id="deck" tabindex="0" aria-roledescription="presentation" aria-label="Spread desk, the jury pitch">
 <div class="frame">
 <div class="stage" id="stage">
@@ -234,6 +234,26 @@
 				<div class="halves"><div><div class="cells"></div><p class="cl">under 760</p></div><div><div class="cells r"></div><p class="cl">760 or more</p></div></div>
 			</div>
 			<p class="sm"><b>A tag needs 20 weeks of its own on each side of 760 drivers, none under 90%.</b> Once a minute the loop promotes the next part in the queue, or rolls the head back at any week under 90%. Merge 5 lost a week at 89.4% that merge 4 held at 91.3%, so the head went back to merge 4.1.</p>
+		</div>
+	</div>
+</section>
+
+<!-- hill -->
+<section data-cuts="5 7 9 10" class="slide" aria-label="The hill climb" data-hill>
+	<p class="kick cyan in"><span class="no"></span>The hill climb</p>
+	<h2 class="h in" style="--d:1;max-width:34ch">Claude pushed about 35 ideas up the stand-in's hill. One held in play.</h2>
+	<div class="body hc">
+		<div class="hc-l in" style="--d:2">
+			<svg id="hill" viewBox="0 0 100 50" role="img" aria-label="Claude's mascot pushes a boulder up a hill. Trial boulders roll up and back down; one step stays up."></svg>
+			<div class="hc-foot">
+				<p class="sm hc-cap" id="hc-cap" aria-live="polite"></p>
+				<button class="ghost" id="hc-again" type="button">Play again</button>
+			</div>
+		</div>
+		<div class="hc-r">
+			<div class="in" style="--d:3"><b class="big amber">1 of ~35</b><p class="sm">one-knob arms held: <code>slow_step</code> 0.4 at 760+ drivers, <b>+€423&nbsp;a&nbsp;week over merge&nbsp;3</b> on such weeks, 20 played pairs</p></div>
+			<div class="in" style="--d:4"><b class="big red">−€5,341</b><p class="sm">a week for R-max in play against its safe twin, worse on all 5 seeds. The stand-in had read such stacks at +€600&nbsp;to&nbsp;+€900.</p></div>
+			<div class="in" style="--d:5"><b class="big cyan">9 of 9</b><p class="sm">played steps the fixed stand-in now calls the right way, up from 6 of 9</p></div>
 		</div>
 	</div>
 </section>
@@ -1263,6 +1283,122 @@
 		opacity: 1;
 	}
 
+	/* hill climb */
+	.hc {
+		display: grid;
+		grid-template-columns: minmax(0, 1.75fr) minmax(0, 1fr);
+		gap: calc(3.4 * var(--k));
+		align-items: stretch;
+	}
+	.hc-l {
+		display: flex;
+		flex-direction: column;
+		min-height: 0;
+	}
+	#hill {
+		flex: 1;
+		min-height: 0;
+		width: 100%;
+		overflow: hidden;
+	}
+	#hill .ground {
+		fill: var(--panel);
+		stroke: var(--line);
+		stroke-width: 0.3;
+	}
+	#hill .edge {
+		fill: none;
+		stroke: var(--dim);
+		stroke-width: 0.35;
+		stroke-linejoin: round;
+	}
+	#hill .lbl {
+		font-family: var(--sans);
+		font-size: 1.9px;
+		fill: var(--dim);
+	}
+	#hill .lbl.hd {
+		fill: var(--amber);
+		font-weight: 700;
+	}
+	#hill .tick {
+		stroke: var(--dim);
+		stroke-width: 0.3;
+	}
+	#hill .flag {
+		stroke: var(--ink);
+		stroke-width: 0.3;
+	}
+	#hill .flag + path {
+		fill: var(--cyan);
+	}
+	#hill .rock {
+		fill: var(--amber);
+	}
+	#hill .rock-crack {
+		stroke: var(--bg);
+		stroke-width: 0.35;
+		fill: none;
+		stroke-linecap: round;
+	}
+	#hill .try {
+		fill: color-mix(in oklch, var(--cyan) 22%, transparent);
+		stroke: var(--cyan);
+		stroke-width: 0.35;
+		stroke-dasharray: 0.9 0.6;
+		transition: fill 0.2s, stroke 0.2s;
+	}
+	#hill .try.lost {
+		fill: color-mix(in oklch, var(--red) 25%, transparent);
+		stroke: var(--red);
+	}
+	#hill .read {
+		font-family: var(--sans);
+		font-size: 2.2px;
+		font-weight: 800;
+		fill: var(--cyan);
+		text-anchor: middle;
+	}
+	#hill .read.lost {
+		fill: var(--red);
+	}
+	/* Claude Code's mascot, in its own terracotta */
+	#hill .who .px {
+		fill: #d97757;
+	}
+	#hill .who .eye {
+		fill: var(--bg);
+	}
+	.hc-foot {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: calc(1.5 * var(--k));
+		margin-top: calc(1 * var(--k));
+		min-height: calc(4.2 * var(--k));
+	}
+	#hc-again {
+		white-space: nowrap;
+		flex: none;
+	}
+	.hc-cap b {
+		color: var(--ink);
+	}
+	.hc-r {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		gap: calc(2 * var(--k));
+	}
+	.hc-r > div {
+		border-top: 1px solid var(--line);
+		padding-top: calc(1 * var(--k));
+	}
+	.hc-r .big {
+		font-size: calc(3 * var(--k));
+		margin-bottom: calc(0.6 * var(--k));
+	}
+
 	/* narrow: the slides become one scrolling page */
 	@container deck (max-width: 620px) {
 		.stage {
@@ -1329,6 +1465,13 @@
 			flex-direction: row;
 			flex-wrap: wrap;
 			white-space: normal;
+		}
+		.hc {
+			grid-template-columns: minmax(0, 1fr);
+		}
+		#hill {
+			flex: none;
+			height: 220px;
 		}
 		.cols-wrap {
 			height: 300px;
@@ -1590,13 +1733,190 @@
 			return { run, draw, finish }
 		})()
 
+		// ---------- hill climb ----------
+		// The boulder is the head, at its estimated € a week; a trial (cyan, dashed) rolls up to what the
+		// stand-in read and back down to what play paid. Every figure is in the slide's notes on the right.
+		const HEAD = { name: 'merge 4.1', eur: 15700 }
+		const START = { name: 'merge 3', eur: 15460 }
+		const TENTH = 17200
+		const HILL = [
+			{ cap: 'One knob at a time, each read on the stand-in against the base. Most read under the <b>€500 bar</b> and rolled back.' },
+			{ push: 395 }, { back: 0 }, { push: 294 }, { back: 0 }, { push: 344 }, { back: 0 },
+			{ cap: '<b>slow_step 0.4 at 760+ drivers</b>: +€622 and +€897 on the stand-in, <b>+€423 a week over merge 3</b> in play. It held.' },
+			{ climb: HEAD.eur },
+			{ wait: 1.2 },
+			{ cap: 'The next rounds pushed from the new base. None cleared the bar.' },
+			{ push: 273 }, { back: 0 }, { push: 320 }, { back: 0 },
+			{ cap: 'Bigger stacks read +€600 to +€900 on the stand-in. In play <b>R-max lost €5,341 a week</b>, worse on all 5 seeds.' },
+			{ push: 900, slow: true, quiet: true }, { wait: 0.5 }, { back: -5341, lost: true },
+			{ cap: '<b>slow_step 0.2</b> read +€585 to +€697 on the stand-in and <b>−€20</b> in play.' },
+			{ push: 585 }, { wait: 0.3 }, { back: -20, lost: true },
+			{ cap: 'The stand-in was fixed: it now calls the direction of <b>9 of 9</b> played steps, up from 6 of 9.' },
+			{ wait: 2 },
+			{ cap: 'A newer stack fell to <b>89.0% on time</b> on one week and was rolled back at once.' },
+			{ push: 600, quiet: true }, { wait: 0.3 }, { back: 0, lost: true, hush: true },
+		]
+		const HILL_END = `About 35 one-knob arms, one step held. The head: <b>${HEAD.name}, about ${eur(HEAD.eur)} a week</b>; tenth place is about ${eur(TENTH)}.`
+		const hill = (() => {
+			const svg = document.getElementById('hill')
+			const ns = 'http://www.w3.org/2000/svg'
+			const M0 = 14900, M1 = 17400
+			const t = (m) => (m - M0) / (M1 - M0)
+			// the slope: steeper towards the top
+			const P = (u) => [10 + 78 * u, 44 - 34 * u + (u > 0 && u < 1 ? 3 * Math.sin(Math.PI * u) : 0) + (u > 1 ? 4 * (u - 1) : 0)]
+			const R = 2.6
+			const along = (m, off = 0) => {
+				const u = t(m) + off
+				const [x, y] = P(u)
+				const [x2, y2] = P(u + 0.001)
+				const d = Math.hypot(x2 - x, y2 - y)
+				const nx = (y2 - y) / d, ny = -(x2 - x) / d
+				return { x, y, cx: x + nx * R, cy: y + ny * R, a: Math.atan2(y2 - y, x2 - x) }
+			}
+			const el = (tag, attrs, parent = svg) => {
+				const e = document.createElementNS(ns, tag)
+				for (const k in attrs) e.setAttribute(k, attrs[k])
+				parent.append(e)
+				return e
+			}
+			const pts = []
+			for (let u = -2.4; u <= 1.4; u += 0.02) pts.push(P(u).map((v) => v.toFixed(2)).join(','))
+			el('polygon', { class: 'ground', points: pts.join(' ') + ` ${P(1.4)[0]},60 ${P(-2.4)[0]},60` })
+			el('polyline', { class: 'edge', points: pts.join(' ') })
+			const mark = (m, text, cls, below) => {
+				const p = along(m)
+				el('line', { class: 'tick', x1: p.x, y1: p.y, x2: p.x, y2: p.y + 1.6 })
+				const tx = el('text', { class: 'lbl ' + cls, x: p.x + (below === 'end' ? -0.6 : 0.6), y: p.y + 4, 'text-anchor': below === 'end' ? 'end' : 'start' })
+				tx.textContent = text
+			}
+			mark(START.eur, START.name, '', 'end')
+			mark(HEAD.eur, `${HEAD.name}, about ${eur(HEAD.eur)}`, 'hd', 'start')
+			const top = along(TENTH)
+			el('line', { class: 'flag', x1: top.x, y1: top.y, x2: top.x, y2: top.y - 7 })
+			el('path', { d: `M${top.x} ${top.y - 7}h4l-1 1.3 1 1.3h-4z` })
+			el('text', { class: 'lbl', x: top.x - 1, y: top.y - 7.8, 'text-anchor': 'middle' }).textContent = `tenth place, about ${eur(TENTH)}`
+			const trial = el('g', { opacity: 0 })
+			const tc = el('circle', { class: 'try', r: R }, trial)
+			const read = el('text', { class: 'read' }, trial)
+			const rock = el('g', {})
+			el('circle', { class: 'rock', r: R }, rock)
+			el('path', { class: 'rock-crack', d: 'M-1.4 -0.6l1 0.4 0.6 -0.9M0.4 0.9l0.8 0.5' }, rock)
+			// Claude Code's mascot, in pixels, facing uphill with an arm on the rock
+			const who = el('g', { class: 'who' })
+			const body = el('g', {}, who)
+			const PX = 0.85
+			const ART = ['.########.', '.#o####o#.', '##########', '.########.', '.#.#..#.#.']
+			ART.forEach((row, y) =>
+				[...row].forEach((c, x) => {
+					if (c === '.') return
+					el('rect', { class: c === 'o' ? 'eye' : 'px', x: (x * PX).toFixed(2), y: (y * PX).toFixed(2), width: PX + 0.02, height: PX + 0.02 }, body)
+				}),
+			)
+			const cap = document.getElementById('hc-cap')
+			let st, raf = 0
+			const put = (g, m) => {
+				const p = along(m)
+				g.setAttribute('transform', `translate(${p.cx.toFixed(2)} ${p.cy.toFixed(2)}) rotate(${((((m - M0) / (M1 - M0)) * 85 * 180) / (Math.PI * R)) % 360})`)
+				return p
+			}
+			const place = (m) => {
+				// the figure stands just downhill of the rock it pushes, hands on it
+				const p = along(m)
+				who.setAttribute('transform', `translate(${p.cx.toFixed(2)} ${p.cy.toFixed(2)}) rotate(${((p.a * 180) / Math.PI).toFixed(1)})`)
+				// a small hop with each push
+				const hop = Math.abs(Math.sin((m - M0) / 60)) * 0.35
+				body.setAttribute('transform', `translate(${(-R - 10 * PX - 0.05).toFixed(2)} ${(R - 5 * PX - hop).toFixed(2)})`)
+			}
+			function draw(s) {
+				put(rock, s.head)
+				if (s.trial == null) trial.setAttribute('opacity', 0)
+				else {
+					trial.setAttribute('opacity', 1)
+					const p = along(s.trial)
+					tc.setAttribute('cx', p.cx)
+					tc.setAttribute('cy', p.cy)
+					read.setAttribute('x', p.cx)
+					read.setAttribute('y', p.cy - R - 1)
+					read.textContent = s.quiet && !s.lost ? '' : s.hush ? '' : signed(s.trial - s.head)
+					tc.classList.toggle('lost', !!s.lost)
+					read.classList.toggle('lost', !!s.lost)
+				}
+				place(s.fig)
+			}
+			// one second of play per step, eased
+			const ease = (x) => (x < 0.5 ? 2 * x * x : 1 - (-2 * x + 2) ** 2 / 2)
+			function plan() {
+				const out = []
+				let s = { head: START.eur, trial: null, fig: START.eur }
+				for (const e of HILL) {
+					if (e.cap) out.push({ dur: 0, cap: e.cap, from: s, to: s })
+					else if (e.wait) out.push({ dur: e.wait, from: s, to: s })
+					else if (e.climb) {
+						const to = { head: e.climb, trial: null, fig: e.climb }
+						out.push({ dur: 1.4, from: s, to })
+						s = to
+					} else if (e.push != null) {
+						const from = { ...s, trial: s.head, fig: s.head, quiet: e.quiet }
+						const to = { ...from, trial: s.head + e.push, fig: s.head + e.push }
+						out.push({ dur: e.slow ? 1.4 : 0.8, from, to })
+						s = to
+					} else if (e.back != null) {
+						const from = { ...s, lost: e.lost, hush: e.hush }
+						const to = { ...from, trial: s.head + e.back, fig: s.head }
+						out.push({ dur: e.back < -1000 ? 1.6 : 0.6, from, to, gone: true })
+						s = { head: s.head, trial: null, fig: s.head }
+					}
+				}
+				return out
+			}
+			const steps = plan()
+			const mix = (a, b, x) => ({
+				head: a.head + (b.head - a.head) * x,
+				trial: a.trial == null ? null : a.trial + ((b.trial ?? a.trial) - a.trial) * x,
+				fig: a.fig + (b.fig - a.fig) * x,
+				lost: b.lost,
+				quiet: b.quiet,
+				hush: b.hush,
+			})
+			function finish() {
+				cancelAnimationFrame(raf)
+				draw({ head: HEAD.eur, trial: null, fig: HEAD.eur })
+				cap.innerHTML = HILL_END
+			}
+			function run() {
+				cancelAnimationFrame(raf)
+				if (reduce) return finish()
+				let i = 0, t0 = performance.now() + 600
+				draw({ head: START.eur, trial: null, fig: START.eur })
+				cap.innerHTML = ''
+				const tick = (now) => {
+					while (i < steps.length && steps[i].dur === 0) cap.innerHTML = steps[i++].cap
+					if (i >= steps.length) return finish()
+					const sp = steps[i]
+					const x = Math.max(0, Math.min(1, (now - t0) / (sp.dur * 1000)))
+					draw(mix(sp.from, sp.to, ease(x)))
+					if (x >= 1) {
+						if (sp.gone) draw({ ...sp.to, trial: null })
+						t0 = now
+						i++
+					}
+					raf = requestAnimationFrame(tick)
+				}
+				raf = requestAnimationFrame(tick)
+			}
+			document.getElementById('hc-again').addEventListener('click', run)
+			finish()
+			return { run, finish }
+		})()
+
 		// ---------- navigation ----------
 		let cur = 0
 		const ticks = document.getElementById('ticks')
 		const cutsEl = document.getElementById('cuts')
 		const CUTS = [5, 7, 9, 10]
 		let cut = 10
-		cutsEl.innerHTML = CUTS.map((n) => `<button type="button" data-n="${n}" aria-label="${n} slides">${n}</button>`).join('')
+		const size = (n) => all.filter((s) => s.dataset.cuts.split(' ').includes(String(n))).length
+		cutsEl.innerHTML = CUTS.map((n) => `<button type="button" data-n="${n}" aria-label="${size(n)} slides">${size(n)}</button>`).join('')
 		function setCut(n) {
 			cut = n
 			const was = slides[cur]
@@ -1623,6 +1943,7 @@
 			s.classList.add('play')
 			s.querySelectorAll('[data-count]').forEach(count)
 			if (s.hasAttribute('data-race')) race.run()
+			if (s.hasAttribute('data-hill')) hill.run()
 		}
 		function go(i) {
 			i = Math.max(0, Math.min(slides.length - 1, i))
@@ -1660,7 +1981,10 @@
 		document.getElementById('fs').addEventListener('click', fullscreen)
 		addEventListener('beforeprint', () => {
 			stage.querySelectorAll('[data-count]').forEach((el) => (el.textContent = eur(+el.dataset.count)))
-			requestAnimationFrame(() => race.finish())
+			requestAnimationFrame(() => {
+				race.finish()
+				hill.finish()
+			})
 		})
 		document.addEventListener('keydown', (e) => {
 			if (e.target.closest && e.target.closest('input')) return
@@ -1698,7 +2022,7 @@
 			else go(cur)
 			race.draw()
 		}).observe(stage)
-		// Five slides by default; open at another length with #7, #9 or #10 in the address, such as for a PDF export.
+		// Six slides by default; open a longer cut (8, 10 or 11 slides) with #7, #9 or #10 in the address, such as for a PDF export.
 		const h = +location.hash.slice(1)
 		setCut(CUTS.includes(h) ? h : 5)
 	}

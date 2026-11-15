@@ -67,3 +67,29 @@ def test_the_charging_stop_goes_only_on_routes_over_charge_km():
         return next(s for s in d.outbox[-1]["stops"] if s["kind"] == "pickup")["withCharging"]
     # The harness's roads are 100 km
     assert charging() and charging(charge_km=90) and not charging(charge_km=100)
+
+
+def test_a_wave_of_drops_raises_the_open_gigs_of_its_day_at_once_and_later_posts_of_that_day_open_there():
+    def setup(**wave):
+        d = desk(fee=1.0, fee_cap=1.2, **wave)
+        for id_, last in (("W1", DAY + 600), ("W2", 2 * DAY + 600)):  # due on Tuesday, the wave's day, and on Wednesday
+            win(d, id_, last)
+            d.read_results([d.outbox[-1]], [{"ok": True, "id": "G" + id_[1]}])
+        d.now = DAY + 30
+        return d
+    drop = {"kind": "gig_dropped", "driverId": "d1", "seq": 0}
+    d = setup(wave_from=3, wave_fee=1.5)
+    for n, at in enumerate((DAY + 5, DAY + 20, DAY + 70)):  # two in Tuesday's first hour, one after it: no wave yet
+        d.handle({**drop, "gigId": f"x{n}", "at": at})
+    assert not [a for a in d.outbox if a["type"] == "reprice"]
+    d.handle({**drop, "gigId": "x9", "at": DAY + 30})  # the third in the first hour
+    assert [a for a in d.outbox if a["type"] == "reprice"] == [{"type": "reprice", "gigId": "G1", "schedule": [{"at": DAY + 30, "feeCents": 13500}]}]
+    d.handle({**drop, "gigId": "x10", "at": DAY + 40})  # a fourth raises nothing twice
+    assert len([a for a in d.outbox if a["type"] == "reprice"]) == 1
+    d.quote(request("W3"))  # a car due on Tuesday won after the wave opens at the wave's fee
+    d.win({"id": "W3", "legs": request("W3")["legs"], "deliveredAt": [None], "deadline": DAY + 720, "option": "next_day", "lastPickupAt": DAY + 600})
+    assert d.outbox[-1]["schedule"][0]["feeCents"] == 13500
+    off = setup()  # without `wave_from` the same night changes nothing
+    for n, at in enumerate((DAY + 5, DAY + 20, DAY + 30, DAY + 40)):
+        off.handle({**drop, "gigId": f"x{n}", "at": at})
+    assert not [a for a in off.outbox if a["type"] == "reprice"] and off.night_drops == {}

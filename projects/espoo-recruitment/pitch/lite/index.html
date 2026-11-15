@@ -304,6 +304,8 @@ body.pdfshot .progress,body.pdfshot .dots,body.pdfshot .hint,body.pdfshot .pdf{d
 .slide.extra .cols{grid-template-columns:repeat(3,minmax(0,1fr))}
 .slide.extra .cols ul{font-size:var(--t-md);gap:min(.7rem,1.3vh)}.slide.extra .cols li span{font-size:var(--t-sm);line-height:1.35}
 .slide.extra h2{font-size:min(var(--t-xl),5vh)}
+/* light hero */
+.slide.hero .where{font-size:var(--t-lg);color:var(--city-dim)}.slide.hero .where b{color:#fff}
 @media (max-width:900px){.slide.extra .cols{grid-template-columns:1fr}.slide.plain ul.list li{font-size:1.3rem;padding-left:2rem}}
 </style>
 </head>
@@ -316,13 +318,7 @@ body.pdfshot .progress,body.pdfshot .dots,body.pdfshot .hint,body.pdfshot .pdf{d
   <div class="slide-content two" style="align-items:center">
     <h1 class="enter" style="--d:.1s">Full platform for managing the events worth making</h1>
     <div class="text stack" style="gap:1.6rem">
-      <p class="lead" style="--d:.2s;color:var(--city-dim)"><b style="color:#fff">Kutsu</b> plans Espoo’s recruitment events from public data and leaves every decision to a person.</p>
-      <div class="stats enter" style="--d:.3s">
-        <div class="stat"><b>1,009</b><span>Espoo-area companies researched from public sources</span></div>
-        <div class="stat"><b>36</b><span>sample applications, each decided by a person</span></div>
-        <div class="stat"><b>0</b><span>automated decisions about people</span></div>
-      </div>
-      <p class="where">City of Espoo · Rethinking Recruitment · Junction 2026</p>
+      <p class="where"><b>Kutsu</b> · City of Espoo · Rethinking Recruitment · Junction 2026</p>
     </div>
     <div class="enter" style="--d:.25s"><img class="shot tilt" src="../img/hero.jpg" alt="Kutsu: the upcoming Deep Tech Talent Forum, 26–27 Nov 2026, with the logos of its 27 employers"></div>
   </div>
@@ -359,7 +355,6 @@ body.pdfshot .progress,body.pdfshot .dots,body.pdfshot .hint,body.pdfshot .pdf{d
       <h2 class="enter" style="--d:.05s">Step 1:<br>Choose which events to hold</h2>
       <ul class="list">
         <li>You see event ideas drawn from public signals: funding, growth and new roles.</li>
-        <li>You see which employers are behind each idea, with the source.</li>
         <li>You pick the theme and the date.</li>
       </ul>
     </div>
@@ -375,8 +370,7 @@ body.pdfshot .progress,body.pdfshot .dots,body.pdfshot .hint,body.pdfshot .pdf{d
       <h2 class="enter" style="--d:.05s">Step 2:<br>Invite the right companies and people</h2>
       <ul class="list">
         <li>You get a suggested list of employers, each with a one-click invitation.</li>
-        <li>You reach consented past attendees by field, shown as counts only.</li>
-        <li>You write the message and press send yourself.</li>
+        <li>You reach consented past attendees by field, as numbers.</li>
       </ul>
     </div>
     <div class="enter" style="--d:.15s"><img class="shot" src="../img/people.jpg" alt="Kutsu event page: employers coming, each with a Copy invitation button, and people to invite by field with counts and a Send to 1,432 past attendees button" loading="lazy"><p class="cap">Kutsu: employers coming and people to invite for one event.</p></div>
@@ -391,8 +385,7 @@ body.pdfshot .progress,body.pdfshot .dots,body.pdfshot .hint,body.pdfshot .pdf{d
       <h2 class="enter" style="--d:.05s">Step 3:<br>Research any public company</h2>
       <ul class="list">
         <li>You type any company name and get its page drafted from public sources.</li>
-        <li>Every fact carries a footnote to its source.</li>
-        <li>The company confirms or corrects its draft.</li>
+        <li>That public data then informs candidates and helps the matchmaking.</li>
       </ul>
     </div>
     <div class="duo" style="--d:.15s"><img class="shot a" src="../img/search.jpg" alt="Kutsu search box with Vaisala typed and a Research button: no company here is called Vaisala, press Enter to research it" loading="lazy"><img class="shot b" src="../img/employer.jpg" alt="Kutsu page for Lotus Sirius in the company's colours: drafted from 18 public pages, with the roles it is looking for and footnote numbers" loading="lazy"><p class="cap">Kutsu: a company not in the list yet is researched on demand (left); a drafted company page, every fact with its footnote (right).</p></div>
@@ -407,8 +400,8 @@ body.pdfshot .progress,body.pdfshot .dots,body.pdfshot .hint,body.pdfshot .pdf{d
       <h2 class="enter" style="--d:.05s">Step 4:<br>Send prefilled quiz pages</h2>
       <ul class="list">
         <li>Recruiters get their needs drafted from their own job ads.</li>
-        <li>Attendees get this event’s questions, prefilled from sources they chose to share.</li>
-        <li>Both sides keep or take out every line.</li>
+        <li>Attendees get questions dedicated to this event’s companies, prefilled from sources they chose to share.</li>
+        <li>Both sides verify every line before it is used.</li>
       </ul>
     </div>
     <div class="cascade" style="--d:.15s"><img class="shot a" src="../img/general.jpg" alt="Kutsu, the invitee’s page: What may we read? Nothing is read until you say so. LinkedIn, a page about you, or a CV read in the browser; photo, age, gender and nationality are kept off the profile" loading="lazy"><img class="shot b" src="../img/eventq.jpg" alt="Kutsu, the invitee’s page for the sample person Olena K.: three drafted lines, each ticked, to keep or take out, with an Edit link" loading="lazy"><p class="cap">Kutsu, the invitee’s page: nothing is read until they say so; then every drafted line, ticked, to keep or take out.</p></div>
@@ -422,12 +415,12 @@ body.pdfshot .progress,body.pdfshot .dots,body.pdfshot .hint,body.pdfshot .pdf{d
     <div class="text stack">
       <h2 class="enter" style="--d:.05s">Step 5:<br>Decide who gets in, with AI support</h2>
       <ul class="list">
-        <li>You see the AI summary labelled as a draft.</li>
-        <li>You read each fit in words: no score, no ranking.</li>
+        <li>You as an organiser see the AI summary.</li>
+        <li>You read how each applicant matches an employer, in words: no score, no ranking.</li>
         <li>You accept or decline under your own name.</li>
       </ul>
     </div>
-    <div class="cascade" style="--d:.15s"><img class="shot a" src="../img/apps.jpg" alt="Kutsu: one application open, GitHub and LinkedIn read with consent, with the AI summary labelled as drafted" loading="lazy"><img class="shot b" src="../img/fit.jpg" alt="Kutsu: fit against the event and the pool for one employer, written as overlap and check lines" loading="lazy"><p class="cap">Kutsu: the applications queue, and fit written as overlap, gap and check.</p></div>
+    <div class="cascade" style="--d:.15s"><img class="shot a" src="../img/apps.jpg" alt="Kutsu: one application open, GitHub and LinkedIn read with consent, with the AI summary labelled as drafted" loading="lazy"><img class="shot b" src="../img/fit.jpg" alt="Kutsu: fit against the event and the pool for one employer, written as overlap and check lines" loading="lazy"><p class="cap">Kutsu: the applications queue, and the match written as overlap, gap and check.</p></div>
   </div>
 </section>
 
@@ -481,7 +474,7 @@ body.pdfshot .progress,body.pdfshot .dots,body.pdfshot .hint,body.pdfshot .pdf{d
     <div class="stack" style="--d:.15s">
       <a class="link qr" href="https://kutsu.katalyst.fyi/" target="_blank" rel="noopener"><img src="../img/qr.svg" alt="QR code to the live prototype" width="150" height="150"><span><b>Kutsu · organiser</b><code>kutsu.katalyst.fyi</code><span>Events, who to invite, any company, applications</span></span></a>
       <a class="link" href="https://kutsu.katalyst.fyi/apply/" target="_blank" rel="noopener"><b>Kutsu · the invitee's page</b><code>kutsu.katalyst.fyi/apply/</code></a>
-      <a class="link" href="https://github.com/KatalystSoftware/junction-2026/tree/main/projects/kutsu" target="_blank" rel="noopener"><b>Source</b><code>github.com/KatalystSoftware/junction-2026</code></a>
+      <a class="link" href="https://github.com/KatalystSoftware/junction2026" target="_blank" rel="noopener"><b>Source</b><code>github.com/KatalystSoftware/junction2026</code></a>
     </div>
   </div>
 </section>

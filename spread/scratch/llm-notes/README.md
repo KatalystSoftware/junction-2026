@@ -3,8 +3,7 @@
 Offline scripts behind the estimate that an LLM reader is not worth adding to `steep-notes-offers-8`.
 None plays a week or needs the team key. They score the rule reader (`spreadlab/notes.py`) and three
 Nemotron models against the reveal of the saved weeks, and count what note facts cost in the account.
-The findings are in the document
-[LLM note reader estimate]((a team document)).
+The full write-up is a team document outside the repository; the figures below are its findings.
 
 What they found, on the archive as of `133de93`:
 
