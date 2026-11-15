@@ -4,9 +4,9 @@ A seven-slide version of the Kutsu pitch, about two and a half minutes spoken. T
 [`index.html`](index.html) in this folder; it uses the main deck's stylesheet and screenshots
 (`../img/`). The full twelve-slide deck stays at [`../index.html`](../index.html).
 
-The thread through it: AI makes recruiting harder, which makes meeting in person worth more. Small
-in-person events are the best format but the hardest to set up. Kutsu does the setup, so the time
-goes to the people.
+The thread through it: AI now matches skills on paper, but motivation and fit show only in person,
+so meeting in person is worth more. Small in-person events are the best format but the hardest to
+set up. Kutsu does the setup, so the time goes to the people.
 
 ## What to say
 
@@ -15,16 +15,17 @@ Recruitment is hard, and it is getting harder. Kutsu takes the setup work off th
 recruitment events, so the city can hold many small, well-matched ones and spend its time on the
 people.
 
-**2. AI writes the application. AI reads it.**
-Applicants write their CVs with AI, and employers screen them with AI. Every CV reads well, so the
-text says little. What AI can't write for you is ten minutes face to face: a recruiter hears how
-someone thinks, and the person sees who they would work with. So meeting in person is worth more
-than ever, as long as the right people meet.
+**2. Skill matching is solved. Motivation and fit aren't.**
+Espoo's organisers name three things a good match needs: skill, motivation and fit. Skill is the
+easy one now: AI writes the CV, AI reads it, and it can match a LinkedIn profile to a role. What it
+can't find is why someone wants the job and whether they fit the team. Those show in ten minutes
+face to face. So meeting in person is worth more than ever.
 
-**3. But a good meeting needs a good match, and matching is hard.**
-Companies say what they need too late. Job seekers struggle to say what they can do. Organisers
-can't judge fit for tech roles. And every event starts from zero: the sign-up survey and both
-invitation lists are built again by hand.
+**3. But setting up the right meetings is hard.**
+Time in person is expensive, so who meets whom has to be right, and today it is arranged by hand.
+Companies say what they need too late. Job seekers can't tell which companies are worth meeting.
+Organisers pair people by hand, often without the tech background to judge an application. And
+every event starts from zero: the sign-up survey and both invitation lists are built again.
 
 **4. Big events are bloated. Small events are laborious.**
 At a big event, employers are swamped by irrelevant approaches and spend a day at a stand to find a
@@ -36,8 +37,8 @@ the one that is hardest to run.
 This is the core of it. AI drafts, people confirm. A company's sign-up arrives filled in from its
 public pages, and a job seeker's from sources they choose; each side confirms every line and says
 what it wants, so joining takes a minute. Kutsu watches companies' public pages, so the data keeps
-itself current and the next event suggests itself. And fit is written in words, with no scores, so
-organisers and recruiters spend their hours in conversations, not sorting.
+itself current and the next event suggests itself. And the skill match is written in words, with no
+scores, so the meeting itself is left for motivation and fit.
 
 **6. Two pools break the chicken-and-egg problem.**
 Companies ask who will be there before they commit, and people wait for the company list. Kutsu
@@ -60,5 +61,6 @@ series of small themed events, with Espoo's own past-attendee list and consent t
 - 1,140 past attendees and 173 in AI and data: the sample talent pool, `projects/kutsu/pool.json`.
   Nobody in it is real, and the slide says so.
 - The quotes on slides 3 and 4: the City of Espoo's challenge brief, "Rethinking Recruitment".
-- "Every event starts from zero" and the chicken-and-egg problem: what Espoo's organisers told us,
+- Skill, motivation and fit as what makes a match, "every event starts from zero" and the
+  chicken-and-egg problem: what Espoo's organisers told us,
   `projects/kutsu/NEXT.md`.
