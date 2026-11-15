@@ -324,6 +324,7 @@ def hand(path):
                 if f["type"] == x["type"]
                 and all(w in (f["quotes"].get(lang) or "") for lang, w in x["quotes"].items())
                 and x.get("outcome") in (None, (f["check"] or {}).get("outcome"))
+                and x.get("about", "") in (f["summary"] or "")
             ]
             if not hits:
                 print(f"{qid}: no {x['type']} row quotes {x['quotes']}")

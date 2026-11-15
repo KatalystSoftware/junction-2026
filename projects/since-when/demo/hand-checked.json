@@ -1,5 +1,5 @@
 {
-  "about": "What a review decided after reading both articles (language-model reviewers given the cited revisions, each reason naming its review), for rows the claim check let stand. Applied with `python -m gapfinder.checked hand demo/hand-checked.json`, after every load: a row is found by its topic, type and the words of its quotes as the page shows them, since finding ids change with each restore. An optional `outcome` limits a row to findings the check gave that outcome. `close` marks the row not a difference (finding.status, or checked_finding.status for a row the check found itself), with the reason; `summary` replaces the check's one-line summary with the classifier's own, where the check's rewrite lost the point; `quote` puts back an edition's words as the article has them, where an older cleaner of the text cut them. The reasons are those of hero-labels.json and hero-verify-notes.md.",
+  "about": "What a review decided after reading both articles (language-model reviewers given the cited revisions, each reason naming its review), for rows the claim check let stand. Applied with `python -m gapfinder.checked hand demo/hand-checked.json`, after every load: a row is found by its topic, type and the words of its quotes as the page shows them, since finding ids change with each restore. An optional `outcome` limits a row to findings the check gave that outcome, and an optional `about` to findings whose one-line summary has those words, where two claims quote the same sentence. `close` marks the row not a difference (finding.status, or checked_finding.status for a row the check found itself), with the reason; `summary` replaces the check's one-line summary with the classifier's own, where the check's rewrite lost the point; `quote` puts back an edition's words as the article has them, where an older cleaner of the text cut them. The reasons are those of hero-labels.json and hero-verify-notes.md.",
   "rows": [
     {
       "topic": "Q1412941",
@@ -410,6 +410,532 @@
         "sv": "Statskuppen 1809 eller revolutionen 1809"
       },
       "close": "Another name, not a label: all three first sentences call it a coup, and English and Swedish give the Revolution of 1809 as its other name. (review of the word-list rows outside the checked topics, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q2441292",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "On 2 March 1932, President Pehr Evind Svinhufvud gave a radio speech in which he urged the militiamen to return home and promised that only the leaders would be punished"
+      },
+      "outcome": "kept",
+      "about": "The English passage states that on 2 March 1932 President Svinhufvud g",
+      "close": "Stated elsewhere: the Finnish article has the 2 March radio speech (\"Svinhufvud totesi Yleisradiossa kello 19.15 pitämässään puheessa\"). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q2441292",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "Army units prepared as the Chief of Defence, Lieutenant General Aarne Sihvo was prepared to use force to end the rebellion"
+      },
+      "outcome": "kept",
+      "about": "The English passage says Chief of Defence Aarne Sihvo was prepared to ",
+      "close": "Stated elsewhere: the Finnish article has Sihvo (\"vaati edelleen kapinan totaalista aseellista murskaamista\"). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q497749",
+      "type": "framing",
+      "quotes": {
+        "en": "After his release, Kosola took part in the Finnish Civil War of 1918 against the Red Guards, serving as a platoon leader on the Tavastia front from the outset",
+        "fi": "Hän kuului niihin, joille sota oli ehdottomasti ”Suomen vapaussota”"
+      },
+      "outcome": "unchecked",
+      "about": "The Finnish passage calls the 1918 war a \"War of Liberation\"; the Engl",
+      "close": "Not the edition's label: the Finnish article itself calls it \"Sisällissodassa\"; \"vapaussota\" is Kosola's own view. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q497749",
+      "type": "framing",
+      "quotes": {
+        "en": "According to some contemporaries, he was widely seen as Finland's prospective fascist dictator",
+        "fi": "Vastustajat näkivät hänessä Mussolinin kaltaisen ehdokkaan Suomen tulevaksi diktaattoriksi ja jyrkimmät kannattajat hänestä sellaista toivoivatkin"
+      },
+      "outcome": "unchecked",
+      "about": "The English passage calls Kosola a prospective fascist dictator, while",
+      "close": "Not a difference: the Finnish lead has \"fasistityyppistä Suomen diktaattoria\". (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q497749",
+      "type": "framing",
+      "quotes": {
+        "en": "Kosola became the nominal leader of its successor party, the Patriotic People's Movement (IKL), although in practice he served more as a figurehead than as the party's actual leader",
+        "fi": "Isänmaallisen kansanliikkeen (IKL) puheenjohtajana vuosina 1932–1936"
+      },
+      "outcome": "unchecked",
+      "about": "The Finnish passage presents Kosola as chairman of IKL from 1932 to 19",
+      "close": "Not a difference: the Finnish article also calls him the IKL's figurehead (\"IKL:n keulakuva\"). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q497749",
+      "type": "framing",
+      "quotes": {
+        "sv": "i praktiken var en galjonsfigur snarare än verklig ledare",
+        "fi": "puheenjohtajana vuosina 1932–1936"
+      },
+      "outcome": "unchecked",
+      "about": "The Finnish passage presents Kosola as chairman of IKL from 1932 to 19",
+      "close": "Not a difference: the Finnish article also calls him the IKL's figurehead (\"IKL:n keulakuva\"). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q497749",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "In November 1929 a communist meeting in Lapua was broken up, mainly by local schoolboys, and a group of townspeople gathered to consider further action"
+      },
+      "outcome": "kept",
+      "about": "The English passage describes the breaking up of a communist meeting i",
+      "close": "Stated elsewhere: the Finnish article has the November 1929 meeting; what differs is who broke it up (English \"mainly by local schoolboys\", Finnish \"Kosolan johtama väkijoukko\"). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q4794672",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "Based in Germany during the First World War he enrolled in the German Army as an officer in 1916, serving until the armistice"
+      },
+      "outcome": "kept",
+      "about": "The English passage says he served as an officer in the German Army du",
+      "close": "Stated elsewhere: the Finnish article has \"Hän osallistui sotaan Saksan armeijan joukoissa ja sai kaksi rautaristiä\". (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q11895169",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "The camp operated from April 1918 to March 1919"
+      },
+      "outcome": "kept",
+      "about": "The English passage states the camp operated from April 1918 to March ",
+      "close": "Stated elsewhere: the Finnish article has the camp's opening (12–13 April 1918) and closing (14 March 1919). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q11895169",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Lisäksi Santahaminassa on muistomerkki saarelle haudatuille vangeille, joiden joukossa on lähes 1 000 Suomenlinnassa kuollutta",
+        "en": "A memorial erected in 1949 by the sculptor Uuno F. Inkinen stands on the Santahamina mass grave"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage says nearly 1,000 who died in Suomenlinna are amon",
+      "close": "Stated elsewhere: the English article has about 1,100 prisoners dead and buried in a mass grave on Santahamina. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q11895169",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Leireillä oli yhteensä 13 000 punavankia, joista Suomen sotasurmat -tietokannan mukaan kuoli 1 468"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage states the camps held 13,000 Red prisoners of whom",
+      "close": "Different scopes: the Finnish 13,000 prisoners and 1,468 dead cover all four Helsinki camps. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q19313989",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "Between May and September 1918 nearly 3,000 of the 8,700 prisoners died of executions, disease or malnutrition"
+      },
+      "outcome": "kept",
+      "about": "The English passage states that nearly 3,000 of 8,700 prisoners died b",
+      "close": "A difference of figures, not a missing fact: the Finnish article gives the death toll too (\"2 873 … noin joka kolmas\"). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q19313989",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "Between May and September 1918 nearly 3,000 of the 8,700 prisoners died of executions, disease or malnutrition"
+      },
+      "outcome": "kept",
+      "about": "The English passage states that nearly 3,000 of 8,700 prisoners died b",
+      "close": "A difference of figures, not a missing fact: the Swedish article gives the death toll too (\"avled cirka 2.800\"). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q19313989",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "According to the War Victims of Finland 1914–1922 internet database, a total number of 2,997 prisoners died in Ekenäs between May and December 1918"
+      },
+      "outcome": "kept",
+      "about": "The English passage states that according to a database 2,997 prisoner",
+      "close": "A difference of figures, not a missing fact: the Swedish article gives the death toll too (\"avled cirka 2.800\"). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q19313989",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "In July 1933 more than 370 prisoners went on a hunger strike and finally after 11 days, five died of force-feeding"
+      },
+      "outcome": "kept",
+      "about": "The English passage describes a July 1933 hunger strike by more than 3",
+      "close": "Stated elsewhere: the Swedish article has the hunger strike (\"hungerstrejk 1932 … minst två\"); what differs is its year and toll. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q19313989",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "Ekenäs camp was then turned into a forced labour camp for convicted Reds and later in the early 1920s into a facility for political prisoners"
+      },
+      "outcome": "kept",
+      "about": "The English passage describes the camp's later use as a forced labour ",
+      "close": "Stated elsewhere: the Swedish article has the forced-labour institution and its political prisoners (\"tvångsarbetsinrättning … politiska fångar\"). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q11890831",
+      "type": "numbers",
+      "quotes": {
+        "sv": "Förbundet hörde till de organisationer som upplöstes enligt stipulationerna i vapenstilleståndet med Sovjetunionen i september 1944",
+        "fi": "Rintamamiesliiton johdolle tarjottiin vielä mahdollisuutta lakkauttaa järjestönsä itse, mutta puheenjohtaja Lindh ja liittohallituksen enemmistö kieltäytyivät, joten liitto lakkautettiin valtioneuvoston päätöksellä 19. lokakuuta 1944"
+      },
+      "outcome": "changed",
+      "about": "The Swedish article dates the dissolution of the organization to Septe",
+      "close": "Not a difference: September 1944 is the armistice that required the dissolution, not the day of the dissolution. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q11890831",
+      "type": "framing",
+      "quotes": {
+        "sv": "Frihetskrigets frontmannaförbund",
+        "en": "War of Independence Front Soldiers' League"
+      },
+      "outcome": "unchecked",
+      "about": "The English passage calls the pre-1940 organization the “War of Indepe",
+      "close": "Not a difference: the two names mean the same. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q11890831",
+      "type": "framing",
+      "quotes": {
+        "sv": "med högerextrem inriktning",
+        "en": "the organization that carried the legacy of White Finland"
+      },
+      "outcome": "unchecked",
+      "about": "The Swedish passage calls the organisation far-right; the English pass",
+      "close": "Not a difference: the English lead also says \"extreme right-wing\". (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q11890831",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Vid vinterkrigets utbrott hade förbundet närmare 23 000 medlemmar i drygt 200 lokalavdelningar"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage states the league had nearly 23,000 members in ove",
+      "close": "Stated elsewhere: the English article has \"more than 20,000 members\" and \"about 200 local chapters\". (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q11890831",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Vid vinterkrigets utbrott hade förbundet närmare 23 000 medlemmar i drygt 200 lokalavdelningar"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage gives the membership as nearly 23,000 in over 200 ",
+      "close": "Stated elsewhere: the English article has \"more than 20,000 members\" and \"about 200 local chapters\". (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q2334896",
+      "type": "framing",
+      "quotes": {
+        "en": "The Coup of 1809 , also referred to as the Revolution of 1809 (Swedish: Revolutionen 1809), was a Swedish coup d'état on 13 March of that year by a group of noblemen led by Georg Adlersparre, with support from the Western Army",
+        "sv": "Statskuppen 1809 eller revolutionen 1809 var ett uppror mot Gustav IV Adolf"
+      },
+      "outcome": "unchecked",
+      "about": "The Swedish passage calls the event a rebellion ('uppror'); the Englis",
+      "close": "Not a difference: the Swedish article calls it \"Statskuppen\", a coup, itself. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q2334896",
+      "type": "framing",
+      "quotes": {
+        "fi": "Vallankaappauksen tapahtumat alkoivat yöllä 7. maaliskuuta 1809, jolloin 400 kapinallista sotilasta Ruotsin länsiarmeijasta otti Karlstadin kaupungin haltuunsa",
+        "sv": "Fem dagar efter revolutionens början fick kungen vetskap om Västra arméns antågande och den 12 mars utgick från Stockholms slott en kungörelse undertecknad av kungen angående det uppror som utbrutit i Värmland"
+      },
+      "outcome": "unchecked",
+      "about": "The Finnish passage calls the 1809 event a coup (vallankaappaus), whil",
+      "close": "Not a difference: the Swedish article calls it \"Statskuppen\", a coup, itself. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q2334896",
+      "type": "framing",
+      "quotes": {
+        "fi": "Valtionhoitajaksi nousi Kaarle-herttua, joka sai vallan kapinallisten johtajien tuella",
+        "sv": "Därmed gick luften ur revolutionen, i synnerhet som Adlersparre före valet hade lämnat ifrån sig ledningen för att visa att han oegennyttigt gjorde revolutionen för att rädda landet och inte för att komma åt makten"
+      },
+      "outcome": "unchecked",
+      "about": "The Finnish passage describes the 1809 uprising's leaders as rebels (\"",
+      "close": "Not a difference: the Swedish article calls it \"Statskuppen\", a coup, itself. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q2334896",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Hän ei kuitenkaan päässyt matkaan, sillä 13. maaliskuuta kello yhdeksän aamulla kenraali Carl Johan Adlercreutz pidätti hänet"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage states that Gustav IV Adolf was arrested by Genera",
+      "close": "Stated elsewhere: the Swedish article has Adlercreutz seizing the king. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q2334896",
+      "type": "numbers",
+      "quotes": {
+        "en": "The Coup of 1809 , also referred to as the Revolution of 1809 (Swedish: Revolutionen 1809), was a Swedish coup d'état on 13 March of that year by a group of noblemen led by Georg Adlersparre, with support from the Western Army",
+        "sv": "Statskuppen började den 7 mars 1809 genom spridandet av ett tryckt revolutionsmanifest, där medborgarna uppmanas till sammanhållning i kampen att rädda Sverige"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage dates the coup to 7 March 1809, while the English ",
+      "close": "Two steps of one event: the coup began on 7 March and the king was arrested on 13 March. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q4115635",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "Under and to our flag I swear by all that is sacred and dear to me, to sacrifice my work and life to my Fatherland, to Finnish national awakening, for Karelia and Ingria, for Greater Finland"
+      },
+      "outcome": "kept",
+      "about": "The English passage quotes the oath text; the Finnish passage only int",
+      "close": "Stated elsewhere: the Finnish article quotes the oath. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q4115635",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "The archives of AKS, which were originally located in the New Student House in the heart of Helsinki, were hidden or destroyed by its members because they were considered insignificant at the time"
+      },
+      "outcome": "kept",
+      "about": "The English passage says the archives were originally in the New Stude",
+      "close": "Stated elsewhere: the Finnish article has the archives burned (\"arkistoa poltettiin\"). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q701803",
+      "type": "numbers",
+      "quotes": {
+        "en": "In early February 1918, an advance detachment under Harald Öhquist was sent to Finland, and the main force landed in Vaasa on 25 February 1918, where they were received by Gustaf Mannerheim",
+        "fi": "27. lokakuuta 1917 Ensimmäinen etukomennusjoukko ja aseita lähtee Saksasta Suomeen"
+      },
+      "outcome": "new",
+      "about": "The English article says an advance detachment was sent to Finland in ",
+      "close": "Two different events: two different advance detachments. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q701803",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Inte alla jägare deltog i kriget 1918 på de vitas sida; en del stod på grund av sin arbetarbakgrund ideologiskt nära de röda"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage notes that not all jägers fought on the White side",
+      "close": "Stated elsewhere: the Finnish article has a section on the Red Jägers (\"Punajääkärit\"). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q615902",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Maailmansodan voittajavaltiot ilmoittivat asettavansa Friedrich Karlin kruunustaluopumisen ehdoksi Suomen itsenäisyyden tunnustamiselle"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage states that the First World War victors made Fried",
+      "close": "Stated elsewhere: the English article has the victors' condition (another row quotes it). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q615902",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Maaliskuun 1919 eduskuntavaaleissa tasavaltalaiset saivat eduskuntaan murskaenemmistön, minkä jälkeen lepäämään hyväksytyt monarkistiset hallitusmuotoesitykset hylättiin äänin 139–38 ja 138–36"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage reports that republicans won a crushing majority i",
+      "close": "Stated elsewhere: the English article has \"republicans won a crushing victory\". (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q615902",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "En ny konstitution, som istället hade stark presidentmakt, godkändes 1919 av den riksdag som valts samma år"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage states that a new constitution with strong preside",
+      "close": "Stated elsewhere: the Finnish article has the 1919 constitution. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q2043711",
+      "type": "numbers",
+      "quotes": {
+        "sv": "Operationerna mot Tammerfors inleddes den 16 mars 1918 under ledning av överbefälhavare Gustaf Mannerheim",
+        "en": "The Whites reached Tampere on 23 March and besieged the city with 17,000 men in the largest military operation of the war"
+      },
+      "outcome": "changed",
+      "about": "The English article says the Whites reached Tampere and began besiegin",
+      "close": "Two different events: the start of the operations and the start of the siege. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q2043711",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Valkoisia johti C. G. E. Mannerheim"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage states that the Whites were led by C. G. E. Manner",
+      "close": "Stated elsewhere: the English article names Mannerheim twice. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q2043711",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "The fiercest were the Battle of Länkipohja in Jämsä on 16 March and the Battle of Orivesi two days later"
+      },
+      "outcome": "kept",
+      "about": "The English passage describes earlier heavy fighting at Jämsä, Orivesi",
+      "close": "Stated elsewhere: the Finnish article has the Battle of Länkipohja. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q2043711",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "The Reds, in turn, launched a 3,500-man counterattack in Lempäälä, under the command of Eino Rahja"
+      },
+      "outcome": "kept",
+      "about": "The English passage says the Reds launched a 3,500-man counterattack i",
+      "close": "A difference of figures, not a missing fact: the Finnish article gives Rahja's counterattack too, with \"noin 2 000\" men against 3,500. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q154940",
+      "type": "numbers",
+      "quotes": {
+        "sv": "De upprättade förråd i området och då Finland undertecknade ett eldupphöravtal med Sovjetunionen den 4 september 1944, var tyskarna redo",
+        "en": "The announcement on 2 September 1944 of the ceasefire and the Moscow Armistice between Finland and the USSR triggered frantic efforts by the 20th Mountain Army, which immediately started Operation Birke"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage dates the Finnish–Soviet ceasefire to 4 September ",
+      "close": "Two steps of one event: the ceasefire was announced on 2 September and signed on 4 September. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q154940",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Den finländske generalen Hjalmar Siilasvuo, som hade segrat vid slaget vid Suomussalmi, ledde de finländska manövrerna mot tyskarna och under oktober och november 1944 lyckades han fördriva dem från större delen av norra Finland"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage identifies General Hjalmar Siilasvuo as the Finnis",
+      "close": "Stated elsewhere: the English and Finnish articles both name Siilasvuo as the commander. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q154940",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Den finländske generalen Hjalmar Siilasvuo, som hade segrat vid slaget vid Suomussalmi, ledde de finländska manövrerna mot tyskarna och under oktober och november 1944 lyckades han fördriva dem från större delen av norra Finland"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage notes that Siilasvuo had won at Suomussalmi, a det",
+      "close": "Stated elsewhere: the Finnish article mentions Suomussalmi. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q154940",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "The Finns attacked Kemi on 7 October, attempting to encircle the Germans into a with a frontal attack by the 15th Brigade and an attack from the rear by Detachment Pennanen"
+      },
+      "outcome": "kept",
+      "about": "The English passage describes the Finnish attack on Kemi on 7 October ",
+      "close": "Stated elsewhere: the Finnish article has the capture of Kemi on 7–8 October. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q154940",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "On 30 September, the Finns attempted to encircle the Germans at Pudasjärvi into a pocket (called a motti in Finnish, originally meaning of firewood) with flanking movements through the forests and managed to cut the road leading north",
+        "fi": "Syyskuun 30. päivänä suomalaisten 6. divisioona ja Panssaridivisioona kohtasivat Pudasjärvellä ja jatkoivat kohti pohjoista Ranualle ja Posion kautta Rovaniemen suuntaan"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage states that on 30 September the 6th Division and A",
+      "close": "Stated elsewhere: the English article has the encirclement at Pudasjärvi on 30 September. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q2014199",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Föregångare till skyddskårerna var de skyddsgarden som bildades för att upprätthålla lag och ordning under storstrejken 1905 samt det så kallade Voimaförbundet, som bildades i december 1906 men snart upplöstes"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage states that predecessors of the protection corps w",
+      "close": "Stated elsewhere: the Finnish article has a section on the guards of the 1905 general strike. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q2014199",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Föregångare till skyddskårerna var de skyddsgarden som bildades för att upprätthålla lag och ordning under storstrejken 1905 samt det så kallade Voimaförbundet, som bildades i december 1906 men snart upplöstes"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage identifies predecessor protection guards from the ",
+      "close": "Stated elsewhere: the Finnish article has a section on the guards of the 1905 general strike. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q2014199",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Hösten 1921 uppstod en politisk kris i skyddskårernas ledning, den så kallade skyddskårskonflikten, och man sökte en utomstående person som kunde inta en medlande roll som ny befälhavare"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage describes the 1921 Guard leadership conflict and t",
+      "close": "Stated elsewhere: the English article names the White Guard Affair and Malmberg taking command in its aftermath. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q2014199",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Hösten 1921 uppstod en politisk kris i skyddskårernas ledning, den så kallade skyddskårskonflikten, och man sökte en utomstående person som kunde inta en medlande roll som ny befälhavare"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage describes the autumn 1921 protection corps leaders",
+      "close": "Stated elsewhere: the Finnish article has the 1921 White Guard Affair (\"Suojeluskuntaselkkaus\"). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q2014199",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Suojeluskunnat lakkautettiin 19. syyskuuta 1944 allekirjoitetun Välirauhansopimuksen 21. artiklan nojalla"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage states that the disbandment was based on Article 2",
+      "close": "Stated elsewhere: the English lead says it was \"disbanded according to the terms of the 1944 Moscow Armistice\". (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q2441292",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "Army units prepared as the Chief of Defence, Lieutenant General Aarne Sihvo was prepared to use force to end the rebellion"
+      },
+      "outcome": "kept",
+      "about": "The English passage describes army preparations under Chief of Defence",
+      "close": "Stated elsewhere: the Finnish article has Sihvo (\"vaati edelleen kapinan totaalista aseellista murskaamista\"). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q2334896",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Hän ei kuitenkaan päässyt matkaan, sillä 13. maaliskuuta kello yhdeksän aamulla kenraali Carl Johan Adlercreutz pidätti hänet"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage states that Adlercreutz arrested the king at 9 a.m",
+      "close": "Stated elsewhere: the Swedish article has Adlercreutz seizing the king. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q615902",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Maailmansodan voittajavaltiot ilmoittivat asettavansa Friedrich Karlin kruunustaluopumisen ehdoksi Suomen itsenäisyyden tunnustamiselle"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage states that the victorious powers of World War I m",
+      "close": "Stated elsewhere: the English article has the victors' condition (another row quotes it). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q154940",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "The Finns attacked Kemi on 7 October, attempting to encircle the Germans into a with a frontal attack by the 15th Brigade and an attack from the rear by Detachment Pennanen"
+      },
+      "outcome": "kept",
+      "about": "The English passage describes the Finnish attack on Kemi on 7 October ",
+      "close": "Stated elsewhere: the Finnish article has the capture of Kemi on 7–8 October. (review of the topics checked on 15 November, Claude Opus 5.5)"
     }
   ]
 }
