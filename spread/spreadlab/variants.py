@@ -704,3 +704,26 @@ for _from, _fee in ((10, 1.5), (10, 2.0), (15, 1.5), (15, 2.0)):
     _wave = {"wave_from": _from, "wave_fee": _fee, "wave_days": 1}
     VARIANTS[f"l4w-{_from}-{int(_fee * 10)}"] = {**_HEAD_Y, **_wave, "thin_play": {
         **_HEAD_Y["thin_play"], "params": {**_HEAD_Y["thin_play"]["params"], **_wave}}}
+
+# The stack on `m41w-a`, each row one part: `m41w-b` `late_cost` 100 at 760 to 819 drivers (80 stays from 820, 150 under 760);
+# `m41w-c` the pair thread's 8-hour cap on a pair gig's planned driving at 760 or more; `m41w-d` the search's drop-wave fee
+# jump under 760 only (11 drops in a night's first hour, 1.3 x the typical fee, the wave day), in `when_tight` since `m41w-a`
+# has no thin play. `hyb-a` is a final candidate only: `m41w-b` under 820 drivers, `trackb-merge-4.1` exactly from 820.
+VARIANTS["m41w-b-late100-760"] = _full_weeks(VARIANTS["m41w-a"], late_cost=100)
+VARIANTS["m41w-c-pd8-d760"] = {**VARIANTS["m41w-b-late100-760"], "pair_drive": 8, "pair_drive_drivers": 760}
+VARIANTS["m41w-d-w11-130-thin"] = {**VARIANTS["m41w-c-pd8-d760"], "when_tight": {
+    **VARIANTS["m41w-c-pd8-d760"]["when_tight"], "wave_from": 11, "wave_fee": 1.3, "wave_days": 1}}
+
+
+def _hyb(row: dict) -> dict:
+    """`row` under 820 drivers and `trackb-merge-4.1` exactly from 820: `when_rich` sets every key where they differ there."""
+    from .policy import DEFAULTS
+    from .pairs import PARAMS as PAIR_PARAMS
+    keys = set(DEFAULTS) | set(PAIR_PARAMS)
+    base = {**DEFAULTS, **PAIR_PARAMS, **{k: v for k, v in row.items() if k not in ("when_rich", "rich_drivers")}}
+    target = {**DEFAULTS, **PAIR_PARAMS, **_ROW_5}
+    return {**row, "rich_drivers": 820, "when_rich": {k: target[k] for k in sorted(keys - {"when_tight", "when_rich", "rich_drivers",
+            "tight_drivers", "when_behind", "behind_from", "min_on_time"}) if target.get(k) != base.get(k)}}
+
+
+VARIANTS["hyb-a"] = _hyb(VARIANTS["m41w-b-late100-760"])
