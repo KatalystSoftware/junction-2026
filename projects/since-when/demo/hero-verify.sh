@@ -30,6 +30,12 @@
 # The model key comes from the environment: run this through
 #   nix develop -c sops exec-env ../../secrets/secrets.yaml 'sh demo/hero-verify.sh ...'
 # or with --offline. The database login comes from $M/scratch.env.
+#
+# Another database, such as a copy on the Verda machine: DB_ENV (the login file), NETWORK, DB_HOST,
+# MODELS (the volume holding bge-m3) and CPUS (a cap for the search container). PYTHON runs the
+# model steps, python3 by default; a command such as `docker run … since-when python` runs them in
+# a container, which then needs the DIFFERENCES_* variables passed through and $out mounted at the
+# same path.
 set -eu
 
 name=$1 pairs=$2 rows=$3
@@ -65,22 +71,23 @@ fi
 mkdir -p "$out" "$DIFFERENCES_CLAIMS_CACHE"
 
 model="--workers ${WORKERS:-12} --retries ${RETRIES:-60} --batch ${BATCH:-6} $offline"
+py=${PYTHON:-python3}
 
 search() {   # search IN OUT: the claims of $out/IN with their evidence, as $out/OUT
-  docker run --rm --name "since-when-verify-$name" --network gapfinder-scratch-net --env-file "$M/scratch.env" \
-    -e DB_HOST=gapfinder-scratch-db -e DB_PORT=3306 -e HF_HUB_OFFLINE=1 \
-    -v "$PWD/gapfinder:/app/gapfinder:ro" -v "$PWD/differences:/app/differences:ro" \
-    -v gapfinder-scratch-models:/models -v "$out:/work" --memory 3500m "${IMAGE:-since-when}" \
-    sh -c "python -m gapfinder.evidence search /work/$1 > /work/$2"
+  docker run --rm --name "since-when-verify-$name" --network "${NETWORK:-gapfinder-scratch-net}" \
+    --env-file "${DB_ENV:-$M/scratch.env}" -e DB_HOST="${DB_HOST:-gapfinder-scratch-db}" -e DB_PORT=3306 \
+    -e HF_HUB_OFFLINE=1 -v "$PWD/gapfinder:/app/gapfinder:ro" -v "$PWD/differences:/app/differences:ro" \
+    -v "${MODELS:-gapfinder-scratch-models}:/models" -v "$out:/work" --memory 3500m ${CPUS:+--cpus "$CPUS"} \
+    "${IMAGE:-since-when}" sh -c "python -m gapfinder.evidence search /work/$1 > /work/$2"
 }
 
 # A step that fails stops the run (set -e); the model's progress and errors are in judge.log.
 # shellcheck disable=SC2086
-python3 -m differences.claims claims "$pairs" "$rows" $extract $model > "$out/claims.jsonl"
+$py -m differences.claims claims "$pairs" "$rows" $extract $model > "$out/claims.jsonl"
 search claims.jsonl evidence.jsonl
 # shellcheck disable=SC2086
-python3 -m differences.claims reverse "$out/evidence.jsonl" $model > "$out/reverse.jsonl" 2> "$out/judge.log"
+$py -m differences.claims reverse "$out/evidence.jsonl" $model > "$out/reverse.jsonl" 2> "$out/judge.log"
 search reverse.jsonl reverse-evidence.jsonl
 # shellcheck disable=SC2086
-python3 -m differences.claims findings "$out/evidence.jsonl" "$pairs" "$rows" \
+$py -m differences.claims findings "$out/evidence.jsonl" "$pairs" "$rows" \
   --reverse "$out/reverse-evidence.jsonl" --out "$out" $model 2>> "$out/judge.log"
