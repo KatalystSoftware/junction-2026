@@ -755,5 +755,6 @@ _BUD = {"floor": 0.90, "z_lo": 2, "z_hi": 5, "lo": 0.5, "hi": 1.5, "sd_by": 2, "
 for _name, _rule in {"unit": {"lo": 1, "hi": 1}, "a": {}, "b": {"hi": 1}, "c": {"z_lo": 3, "z_hi": 6, "lo": 0.25},
                      "d": {"drivers": 760}, "e": {"lo": 0, "hi": 1}, "f": {"z_lo": 3, "z_hi": 8, "lo": 0.25, "hi": 2},
                      "g": {"sd_by": 1, "lo": 0.5, "hi": 1}, "h": {"lo": 0.25, "hi": 1}, "i": {"hi": 1, "z_lo": 3, "z_hi": 6},
-                     "j": {"hi": 1, "z_lo": 1.5, "z_hi": 4}, "k": {"hi": 1, "sd_by": 3}}.items():
+                     "j": {"hi": 1, "z_lo": 1.5, "z_hi": 4}, "k": {"hi": 1, "sd_by": 3},
+                     "flat70": {"lo": 0.7, "hi": 0.7}, "flat50": {"lo": 0.5, "hi": 0.5}}.items():
     VARIANTS[f"m41u-a-bud-{_name}"] = {**VARIANTS["m41u-a"], "budget": {**_BUD, **_rule}}
