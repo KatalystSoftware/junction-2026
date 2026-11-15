@@ -2,15 +2,21 @@
 # Caddy gets a certificate for each hostname by itself, over HTTP on port 80 or TLS on 443,
 # so the machine holds no DNS provider key.
 
-# Browser caching, imported by every site. Vite's /assets/ names carry a content hash, so they never
-# change; images and fonts may be replaced under the same name, so they keep an hour. HTML gets no
-# header and is revalidated on every visit, so a deploy shows at once. `?` only sets the header when
-# the app hasn't set one itself.
+# Browser caching, imported by every site. Vite's /assets/ names carry a content hash (checked on
+# every site), so they never change; images and fonts may be replaced under the same name, so they
+# keep an hour. Everything else (HTML, unhashed scripts and styles, data) is `no-cache`: the browser
+# asks every time and gets a cheap 304 when nothing changed, so a deploy shows at once. `?` only sets
+# the header when the app hasn't set one itself.
 (cache) {
 	@hashed path /assets/*
 	header @hashed ?Cache-Control "public, max-age=31536000, immutable"
-	@media path *.webp *.png *.jpg *.jpeg *.gif *.svg *.avif *.ico *.woff2 *.woff
+	@media {
+		not path /assets/*
+		path *.webp *.png *.jpg *.jpeg *.gif *.svg *.avif *.ico *.woff2 *.woff
+	}
 	header @media ?Cache-Control "public, max-age=3600"
+	@rest not path /assets/* *.webp *.png *.jpg *.jpeg *.gif *.svg *.avif *.ico *.woff2 *.woff
+	header @rest ?Cache-Control "no-cache"
 }
 
 import sites/*.caddy
