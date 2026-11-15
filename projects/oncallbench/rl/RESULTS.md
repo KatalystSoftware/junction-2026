@@ -147,6 +147,40 @@ remembering seeds. It also reads each incident rather than replaying the referen
   `q_proj` changed most of all; layers 0-7 changed least (`out/lora-sft.png`). The updates use
   about 10-16 of the 32 ranks for 90% of their size.
 
+### Audit of `gemma26-rl`
+
+`gemma26-rl` (sha256 `f9536c41…`) is the adapter behind the README's "Gemma + adapter" row. It is
+the SFT adapter after 60 RL steps on the score (next section). It passes the same audit (`audit.py`,
+every step in Modal containers on 15 Nov, about $1.20). The outputs of every step are in
+`out/audit-gemma26-rl.txt`.
+
+- **It acts on what it observed.** These are its 48 held-out level-4 episodes (its final eval,
+  seeds 101-106, our own runner, 0.776 ± 0.030):
+  - every one of its 133 rollbacks and config reverts came after it read that service's diff;
+  - 100% of its undos hit a planted fault (the SFT adapter's precision was 97%);
+  - none of its 135 mitigations went to a service that is a fault in another seed but not in this one;
+  - it recovers 69% of the faults with the right tool.
+  - At level 3: 146 of 146 undos after reading the diff, precision 98%.
+- **Edited observations change its action.** The same 30 kinds of decision point, taken from its own
+  transcripts, at T 0 (`out/probes-gemma26-rl-audit.jsonl`):
+  - Swap the service's name with a healthy one's: it acts on the new service 10 times out of 10. In
+    9 of them it uses the same tool. In the tenth it scales the new service where the transcript
+    rolled back, consistent with RL having taught it to add capacity before a rollback.
+  - Remove the harmful hunk from the diff: it skips the undo 10 times out of 10 (the SFT adapter:
+    8), mostly to read the other change's diff.
+  - Make the metrics calm before a scale-up: it scales anyway 10 times out of 10 (the SFT adapter:
+    7). As with the SFT adapter this edit leaves the overload alerts and the retry-storm logs in
+    place, so it is not decisive.
+
+  Without edits it repeats its transcript's action at all 30 points. The untrained model mitigates
+  at none of them.
+- **A replayed routine still scores nothing.** The replay and seed checks do not depend on the
+  adapter and give the numbers above again: 0.00 on all 20 pairs, against 0.74 for `alerts_only`.
+- **RL refined the SFT update; it did not replace it.** The adapter's total update differs from the
+  SFT adapter's by 11% of its size, with a cosine of 0.994 between the two, about evenly across the
+  seven modules (`audit.py lora-diff`). Per layer it looks like the SFT adapter: the most change in
+  layers 11-23, `q_proj` most of all, about 8-16 of the 32 ranks for 90% of each update (`out/lora-rl.png`).
+
 ### RL on the score, from the SFT adapter
 
 Two runs start from the SFT adapter: 4 groups × 8 episodes per step on training seeds 1000+, lr 1e-5,

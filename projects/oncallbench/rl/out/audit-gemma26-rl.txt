@@ -1,0 +1,164 @@
+# Audit of gemma26-rl (sha256 f9536c41...), run in Modal containers on 15 Nov; see RESULTS.md
+
+## python3 audit.py seeds
+100 mobile-api [('overload', 'pricing-svc'), ('primary_down', 'risk-db'), ('bad_config', 'vouchers-svc'), ('bad_deploy', 'flags-svc')] 
+101 partner-api [('bad_deploy', 'sms-svc'), ('overload', 'pricing-svc'), ('bad_config', 'address-svc'), ('bad_deploy', 'quotes-svc')] shared services with seed-1: 0.62
+102 admin-portal [('overload', 'currency-svc'), ('bad_deploy', 'couriers-svc'), ('bad_config', 'geo-svc'), ('bad_deploy', 'import-svc')] shared services with seed-1: 0.56
+103 admin-portal [('overload', 'payments-svc'), ('bad_deploy', 'pricing-svc'), ('bad_config', 'labels-svc'), ('bad_deploy', 'inventory-svc')] shared services with seed-1: 0.65
+104 admin-portal [('bad_deploy', 'loyalty-svc'), ('overload', 'auth-svc'), ('bad_config', 'flags-svc'), ('bad_deploy', 'checkout-svc')] shared services with seed-1: 0.58
+105 admin-portal [('overload', 'giftcards-svc'), ('leak', 'shipping-svc'), ('bad_deploy', 'currency-svc'), ('bad_deploy', 'emails-svc')] shared services with seed-1: 0.58
+106 partner-api [('overload', 'profile-db'), ('leak', 'tracking-svc'), ('bad_deploy', 'geo-svc'), ('bad_deploy', 'orders-db')] shared services with seed-1: 0.56
+107 web-storefront [('bad_config', 'giftcards-svc'), ('bad_deploy', 'currency-svc'), ('bad_config', 'couriers-svc'), ('bad_deploy', 'refunds-svc')] shared services with seed-1: 0.62
+108 web-storefront [('leak', 'ledger-svc'), ('overload', 'vouchers-svc'), ('bad_config', 'emails-svc'), ('bad_deploy', 'checkout-svc')] shared services with seed-1: 0.56
+109 web-storefront [('bad_deploy', 'loyalty-svc'), ('leak', 'inventory-svc'), ('bad_config', 'sessions-svc'), ('bad_deploy', 'search-svc')] shared services with seed-1: 0.58
+110 web-storefront [('bad_config', 'shipping-svc'), ('leak', 'refunds-svc'), ('bad_deploy', 'stock-svc'), ('bad_deploy', 'ledger-db')] shared services with seed-1: 0.58
+200000 partner-api [('bad_deploy', 'audit-svc'), ('bad_config', 'limits-svc'), ('bad_config', 'checkout-svc'), ('bad_deploy', 'stock-svc')] shared services with seed-1: 0.53
+200001 mobile-api [('leak', 'push-svc'), ('overload', 'ranking-svc'), ('bad_deploy', 'identity-svc'), ('bad_deploy', 'catalog-db')] shared services with seed-1: 0.56
+999999 web-storefront [('bad_config', 'sessions-cache'), ('overload', 'notifications-svc'), ('bad_deploy', 'labels-svc'), ('bad_deploy', 'events-queue')] shared services with seed-1: 0.58
+held-out 101-106: 23/24 faults (kind, service) also planted in some demo seed; identical full fault sets with a demo seed: 0
+fresh 200000-200023: 94/96 faults (kind, service) also planted in some demo seed; identical full fault sets with a demo seed: 0
+
+## python3 audit.py replay
+A=298 -> B=   101: script -0.565  mitigations-only -0.565  B's own reference 0.990  undos on a B fault 0/3
+A=394 -> B=   102: script -0.235  mitigations-only -0.235  B's own reference 0.995  undos on a B fault 0/4
+A=307 -> B=   103: script -0.674  mitigations-only -0.738  B's own reference 0.978  undos on a B fault 1/4
+A=210 -> B=   104: script -0.010  mitigations-only -0.010  B's own reference 1.000  undos on a B fault 1/3
+A=266 -> B=   105: script -0.064  mitigations-only -0.070  B's own reference 0.990  undos on a B fault 0/4
+A=330 -> B=   106: script -0.320  mitigations-only -0.322  B's own reference 0.994  undos on a B fault 0/4
+A=324 -> B=200000: script -0.196  mitigations-only -0.196  B's own reference 1.000  undos on a B fault 0/4
+A=303 -> B=200001: script -0.412  mitigations-only -0.416  B's own reference 1.000  undos on a B fault 0/3
+A=277 -> B=200002: script -0.145  mitigations-only -0.146  B's own reference 0.978  undos on a B fault 0/3
+A=322 -> B=200003: script -0.131  mitigations-only -0.232  B's own reference 0.990  undos on a B fault 1/3
+A=291 -> B=200004: script -0.156  mitigations-only -0.156  B's own reference 0.984  undos on a B fault 0/4
+A=349 -> B=200005: script -0.413  mitigations-only -0.422  B's own reference 0.993  undos on a B fault 0/3
+A=255 -> B=200006: script -0.195  mitigations-only -0.203  B's own reference 1.000  undos on a B fault 1/3
+A=329 -> B=200007: script -0.097  mitigations-only -0.097  B's own reference 0.906  undos on a B fault 0/4
+A=235 -> B=200008: script -0.006  mitigations-only -0.007  B's own reference 1.000  undos on a B fault 0/4
+A=272 -> B=200009: script +0.000  mitigations-only +0.000  B's own reference 0.890  undos on a B fault 0/3
+A=235 -> B=200010: script -0.936  mitigations-only -0.935  B's own reference 0.934  undos on a B fault 0/4
+A=393 -> B=200011: script -0.020  mitigations-only -0.023  B's own reference 0.968  undos on a B fault 0/3
+A=224 -> B=200012: script -0.416  mitigations-only -1.031  B's own reference 0.981  undos on a B fault 0/3
+A=358 -> B=200013: script -0.597  mitigations-only -0.597  B's own reference 1.000  undos on a B fault 0/4
+script: raw -0.279 ± 0.058 (n=20)  clipped score 0.000
+acts: raw -0.320 ± 0.069 (n=20)  clipped score 0.000
+own: raw 0.979 ± 0.007 (n=20)  clipped score 0.979
+baselines on the same B seeds (clipped score):
+  nothing: 0.000 ± 0.000 (n=20)
+  stop_early: 0.000 ± 0.000 (n=20)
+  one_fix: 0.125 ± 0.020 (n=20)
+  alerts_only: 0.737 ± 0.012 (n=20)
+  shotgun: 0.412 ± 0.059 (n=20)
+  reference: 1.000 ± 0.000 (n=20)
+
+## python3 audit.py behaviour
+level 3: n=48 reward 0.874 ± 0.032 (n=48) ended {'shift': 39, 'cap': 9}
+  undo/restart/failover precision (on a planted fault) 0.981 ± 0.011 (n=48); fault recall with the right tool 0.734 ± 0.009 (n=48)
+  rollbacks/reverts preceded by get_diff of that service: 146/146; first mitigation on a service an observation named: 48/48
+  mitigations on a service that is a fault in another eval seed but not this one: 0/148
+  call-sequence similarity (difflib ratio): same seed 0.86, different seeds 0.71
+  ended shift: reward 0.959, last minute seen 110, replies 34.1, calls/reply 1.30, queries 18.6, waits 10.3
+  ended cap: reward 0.508, last minute seen 86, replies 48.0, calls/reply 1.08, queries 37.4, waits 3.9
+level 4: n=48 reward 0.776 ± 0.030 (n=48) ended {'cap': 21, 'shift': 27}
+  undo/restart/failover precision (on a planted fault) 1.000 ± 0.000 (n=48); fault recall with the right tool 0.693 ± 0.017 (n=48)
+  rollbacks/reverts preceded by get_diff of that service: 133/133; first mitigation on a service an observation named: 48/48
+  mitigations on a service that is a fault in another eval seed but not this one: 0/135
+  call-sequence similarity (difflib ratio): same seed 0.71, different seeds 0.64
+  ended cap: reward 0.593, last minute seen 87, replies 48.0, calls/reply 1.10, queries 31.7, waits 4.7
+  ended shift: reward 0.919, last minute seen 110, replies 42.1, calls/reply 1.23, queries 22.6, waits 9.4
+
+## python3 audit.py probes
+30 probes from 10 episodes: Counter({'swap': 10, 'diff': 10, 'scale': 10}) -> cache/probes-gemma26-rl.jsonl
+
+## python3 audit.py lora
+205 adapted matrices, 30 layers, modules ['q_proj', 'k_proj', 'v_proj', 'o_proj', 'gate_proj', 'up_proj', 'down_proj'], alpha/r 2.0
+module totals (sqrt of summed squared norms) and median 90%-energy rank:
+  q_proj: 2.31, rank90 median 14.0, top layers [17, 23, 11, 29, 19]
+  k_proj: 1.35, rank90 median 15.5, top layers [22, 16, 19, 14, 15]
+  v_proj: 1.24, rank90 median 11, top layers [18, 13, 15, 14, 19]
+  o_proj: 1.73, rank90 median 8.5, top layers [18, 17, 11, 23, 13]
+  gate_proj: 1.58, rank90 median 15.0, top layers [12, 11, 13, 14, 15]
+  up_proj: 1.47, rank90 median 16.0, top layers [12, 14, 13, 16, 15]
+  down_proj: 1.59, rank90 median 13.5, top layers [17, 18, 13, 11, 14]
+top layers overall: [13, 17, 11, 19, 14, 16, 18, 15]
+-> /tmp/rl-ma8ueihy/rl/out/lora-rl.png
+
+## python3 audit.py lora-diff
+ckpt/gemma26-rl against ckpt/gemma26-sft: relative change ||dW - dW0|| / ||dW0||, cosine(dW, dW0)
+  all: 0.112, cosine 0.9938
+  down_proj: 0.116, cosine 0.9933
+  gate_proj: 0.110, cosine 0.9941
+  up_proj: 0.113, cosine 0.9937
+  k_proj: 0.110, cosine 0.9940
+  o_proj: 0.119, cosine 0.9931
+  q_proj: 0.104, cosine 0.9947
+  v_proj: 0.121, cosine 0.9927
+
+## python3 audit.py probe-report
+== base
+  swap: n=10 unedited {'other': 10} | edited {'other': 10} | edited, where unedited repeats the transcript's action: {}
+     0-swap: rollback sms-svc -> thumbnails-svc: other [('get_status', None)]
+     1-swap: scale currency-svc -> tracking-svc: other [('get_metrics', 'suggest-svc')]
+     2-swap: scale payments-svc -> feeds-svc: other [('get_changes', 'feeds-svc')]
+     3-swap: scale auth-svc -> couriers-svc: other [('get_metrics', 'loyalty-svc')]
+     4-swap: rollback shipping-svc -> stock-svc: other [('get_metrics', 'catalog-db')]
+     5-swap: scale profile-db -> audit-log: other [('get_changes', 'audit-log')]
+     6-swap: rollback sms-svc -> consent-svc: other [('get_status', None)]
+     7-swap: scale currency-svc -> inventory-svc: other [('get_metrics', 'auth-svc')]
+     8-swap: scale payments-svc -> disputes-svc: other [('get_metrics', 'checkout-svc')]
+     9-swap: scale auth-svc -> search-svc: other [('get_metrics', 'loyalty-svc')]
+  diff: n=10 unedited {'follows': 8, 'repeats': 2} | edited {'follows': 10} | edited, where unedited repeats the transcript's action: {'follows': 2}
+     0-diff: rollback sms-svc: follows [('get_metrics', 'sms-svc')]
+     1-diff: rollback import-svc: follows [('get_diff', 'import-svc')]
+     2-diff: rollback inventory-svc: follows [('get_changes', 'shipping-svc')]
+     3-diff: rollback loyalty-svc: follows [('get_metrics', 'loyalty-svc')]
+     4-diff: rollback emails-svc: follows [('get_diff', 'emails-svc')]
+     5-diff: rollback orders-db: follows [('get_diff', 'orders-db')]
+     6-diff: rollback sms-svc: follows [('get_metrics', 'sms-svc')]
+     7-diff: rollback couriers-svc: follows [('get_diff', 'couriers-svc')]
+     8-diff: rollback inventory-svc: follows [('get_changes', 'shipping-svc')]
+     9-diff: rollback loyalty-svc: follows [('get_metrics', 'loyalty-svc')]
+  scale: n=10 unedited {'follows': 10} | edited {'follows': 10} | edited, where unedited repeats the transcript's action: {}
+     0-scale: scale pricing-svc: follows [('get_metrics', 'sms-svc')]
+     1-scale: scale currency-svc: follows [('get_changes', 'currency-svc')]
+     2-scale: scale payments-svc: follows [('get_status', None)]
+     3-scale: scale auth-svc: follows [('get_metrics', 'loyalty-svc')]
+     4-scale: scale giftcards-svc: follows [('get_changes', 'giftcards-svc')]
+     5-scale: scale profile-db: follows [('get_metrics', 'profile-db')]
+     6-scale: scale pricing-svc: follows [('get_metrics', 'sms-svc')]
+     7-scale: scale currency-svc: follows [('get_metrics', 'auth-svc')]
+     8-scale: scale payments-svc: follows [('get_metrics', 'payments-svc')]
+     9-scale: scale auth-svc: follows [('get_metrics', 'loyalty-svc')]
+== sft
+  swap: n=10 unedited {'repeats': 10} | edited {'follows': 9, 'other': 1} | edited, where unedited repeats the transcript's action: {'follows': 9, 'other': 1}
+     0-swap: rollback sms-svc -> thumbnails-svc: follows [('rollback', 'thumbnails-svc')]
+     1-swap: scale currency-svc -> tracking-svc: follows [('scale', 'tracking-svc')]
+     2-swap: scale payments-svc -> feeds-svc: follows [('scale', 'feeds-svc')]
+     3-swap: scale auth-svc -> couriers-svc: follows [('scale', 'couriers-svc')]
+     4-swap: rollback shipping-svc -> stock-svc: other [('scale', 'stock-svc')]
+     5-swap: scale profile-db -> audit-log: follows [('scale', 'audit-log')]
+     6-swap: rollback sms-svc -> consent-svc: follows [('rollback', 'consent-svc')]
+     7-swap: scale currency-svc -> inventory-svc: follows [('scale', 'inventory-svc')]
+     8-swap: scale payments-svc -> disputes-svc: follows [('scale', 'disputes-svc')]
+     9-swap: scale auth-svc -> search-svc: follows [('scale', 'search-svc')]
+  diff: n=10 unedited {'repeats': 10} | edited {'follows': 10} | edited, where unedited repeats the transcript's action: {'follows': 10}
+     0-diff: rollback sms-svc: follows [('get_diff', 'sms-svc')]
+     1-diff: rollback import-svc: follows [('get_diff', 'import-svc')]
+     2-diff: rollback inventory-svc: follows [('get_logs', 'pricing-svc')]
+     3-diff: rollback loyalty-svc: follows [('get_metrics', 'loyalty-svc')]
+     4-diff: rollback emails-svc: follows [('get_diff', 'emails-svc')]
+     5-diff: rollback orders-db: follows [('get_diff', 'orders-db')]
+     6-diff: rollback sms-svc: follows [('get_diff', 'sms-svc')]
+     7-diff: rollback couriers-svc: follows [('get_diff', 'couriers-svc')]
+     8-diff: rollback inventory-svc: follows [('wait', None), ('get_status', None)]
+     9-diff: rollback loyalty-svc: follows [('get_metrics', 'loyalty-svc')]
+  scale: n=10 unedited {'repeats': 10} | edited {'repeats': 10} | edited, where unedited repeats the transcript's action: {'repeats': 10}
+     0-scale: scale pricing-svc: repeats [('scale', 'pricing-svc')]
+     1-scale: scale currency-svc: repeats [('scale', 'currency-svc')]
+     2-scale: scale payments-svc: repeats [('scale', 'payments-svc')]
+     3-scale: scale auth-svc: repeats [('scale', 'auth-svc')]
+     4-scale: scale giftcards-svc: repeats [('scale', 'giftcards-svc')]
+     5-scale: scale profile-db: repeats [('scale', 'profile-db')]
+     6-scale: scale pricing-svc: repeats [('scale', 'pricing-svc')]
+     7-scale: scale currency-svc: repeats [('scale', 'currency-svc')]
+     8-scale: scale payments-svc: repeats [('scale', 'payments-svc')]
+     9-scale: scale auth-svc: repeats [('scale', 'auth-svc')]

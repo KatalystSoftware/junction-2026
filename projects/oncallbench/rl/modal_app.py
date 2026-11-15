@@ -32,6 +32,7 @@ image = (
     modal.Image.from_registry("nvidia/cuda:13.0.1-devel-ubuntu24.04", add_python="3.12")
     .uv_pip_install("vllm==0.33.0", "transformers==5.20.2", "peft==0.21.3", "flash-linear-attention==0.6.0",
                     "accelerate==1.15.0")  # the Verda box's versions
+    .uv_pip_install("matplotlib")  # audit.py lora
     .env({"HF_HOME": f"{VOL}/hf", "HF_XET_HIGH_PERFORMANCE": "1", "AQ_MAX_TURNS": "48",
           "AQ_SIM": "/root/pin/spikes/aq-incident/sim", "AQ_TASK": "/root/pin/spikes/aq-incident/task"})
 )
@@ -46,7 +47,9 @@ app = modal.App("aq-rl", image=image)
 
 def _tag(argv):
     args = shlex.split(argv)
-    return args[args.index("--tag") + 1]
+    if "--tag" in args:
+        return args[args.index("--tag") + 1]
+    return "-".join(a.removesuffix(".py") for a in args[:2])  # audit.py seeds -> audit-seeds
 
 
 @app.function(gpu=GPUS, volumes={VOL: vol}, timeout=HOURS * 3600)
@@ -59,13 +62,19 @@ def run1(argv: str, submitted: float = 0.0):
     return _run(argv, submitted)
 
 
+@app.function(cpu=4, memory=16384, volumes={VOL: vol}, timeout=HOURS * 3600)
+def run0(argv: str, submitted: float = 0.0):
+    """No GPU: the CPU-only audit steps (audit.py seeds, replay, behaviour, probes, lora, probe-report)."""
+    return _run(argv, submitted)
+
+
 def _run(argv, submitted):
     """`python run.py <argv>`, or `python <argv>` when argv starts with a script (`audit.py complete ...`),
     with cache/, ckpt/ and out/ on the Volume, committed every two minutes. The container's
     `nvidia-smi -L` is the first lines of out/<tag>/run.log."""
     t0 = time.time()
     tag = _tag(argv)
-    work, out = Path("/root/rl"), Path(f"{VOL}/out/{tag}")
+    work, out = Path(tempfile.mkdtemp(prefix="rl-")) / "rl", Path(f"{VOL}/out/{tag}")  # a reused container gets a fresh copy
     subprocess.run(["cp", "-r", "/root/code", str(work)], check=True)
     for d in ("cache", "ckpt"):
         Path(f"{VOL}/{d}").mkdir(parents=True, exist_ok=True)
@@ -116,9 +125,9 @@ def fetch(model: str):
 @app.local_entrypoint()
 def main(runs: str, gpus: int = 2):
     """Start every `;`-separated run in its own container and wait for all of them; `--gpus 1` takes
-    one GPU per run (GPUS_1) instead of two (GPUS)."""
+    one GPU per run (GPUS_1) instead of two (GPUS), `--gpus 0` none."""
     argvs = [r.strip() for r in runs.split(";") if r.strip()]
-    fn = run1 if gpus == 1 else run
+    fn = {0: run0, 1: run1}.get(gpus, run)
     calls = [fn.spawn(a, time.time()) for a in argvs]
     for a, c in zip(argvs, calls):
         print(f"started {_tag(a)}: {c.object_id}")

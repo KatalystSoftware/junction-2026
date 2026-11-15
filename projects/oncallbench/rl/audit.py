@@ -7,6 +7,7 @@
     python3 run.py ... ; python3 audit.py complete --adapter ckpt/gemma26-sft --tag T   # GPU: next action, base and SFT
     python3 audit.py probe-report out/probes-T.jsonl
     python3 audit.py lora ckpt/gemma26-sft          # per-layer size of the adapter's update -> out/lora-*.png
+    python3 audit.py lora-diff ckpt/gemma26-rl ckpt/gemma26-sft   # how far RL moved the SFT update
 
 Set AQ_SIM/AQ_TASK to the pinned simulator, as for run.py.
 """
@@ -213,6 +214,7 @@ def calm_metrics(d):
 
 
 def cmd_probes(path, n=10, out=HERE / "cache" / "probes.jsonl"):
+    n, out = int(n), Path(out)
     rows = [json.loads(line) for line in open(path) if json.loads(line)["level"] == 4]
     rng = random.Random(0)
     by_seed = defaultdict(list)
@@ -336,7 +338,8 @@ def cmd_probe_report(path):
 # --- the adapter ----------------------------------------------------------------------------------
 
 
-def cmd_lora(adapter):
+def cmd_lora(adapter, name="sft"):
+    """`name` names the outputs (out/lora-<name>.png) and the chart: sft, rl, ..."""
     import numpy as np
     from safetensors.numpy import load_file
 
@@ -359,7 +362,7 @@ def cmd_lora(adapter):
                          shape=list(b.shape[:1]) + list(a.shape[1:])))
     out = HERE / "out"
     out.mkdir(exist_ok=True)
-    (out / "lora-sft.json").write_text(json.dumps(rows))
+    (out / f"lora-{name}.json").write_text(json.dumps(rows))
     mods = sorted({r["module"] for r in rows}, key=lambda m: ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj",
                                                                "up_proj", "down_proj"].index(m))
     layers = sorted({r["layer"] for r in rows})
@@ -385,7 +388,7 @@ def cmd_lora(adapter):
         ax.bar(layers, v, bottom=bottom, color=c, label=m, width=0.8)
         bottom += v
     ax.set_ylabel("‖ΔW‖²_F (stacked by module)")
-    ax.set_title("Gemma 4 26B-A4B SFT adapter: how much each layer changed (ΔW = α/r · B·A)")
+    ax.set_title(f"Gemma 4 26B-A4B {name.upper()} adapter: how much each layer changed (ΔW = α/r · B·A)")
     ax.legend(ncol=len(mods), fontsize=8, frameon=False, loc="upper left")
     ax.spines[["top", "right"]].set_visible(False)
     for m, c in zip(mods, colors):
@@ -395,8 +398,39 @@ def cmd_lora(adapter):
     ax2.set_ylim(0, cfg["r"] + 1)
     ax2.spines[["top", "right"]].set_visible(False)
     fig.tight_layout()
-    fig.savefig(out / "lora-sft.png", dpi=150)
-    print(f"-> {out / 'lora-sft.png'}")
+    fig.savefig(out / f"lora-{name}.png", dpi=150)
+    print(f"-> {out / f'lora-{name}.png'}")
+
+
+def cmd_lora_diff(adapter, start):
+    """How far training moved an adapter from the one it started from: per module and overall,
+    ||dW_adapter - dW_start||_F / ||dW_start||_F and the cosine between the two updates."""
+    import numpy as np
+    from safetensors.numpy import load_file
+
+    def deltas(path):
+        cfg = json.loads((Path(path) / "adapter_config.json").read_text())
+        w = load_file(str(Path(path) / "adapter_model.safetensors"))
+        s = cfg["lora_alpha"] / cfg["r"]
+        return {k: s * w[k.replace(".lora_A.", ".lora_B.")].astype(np.float64) @ w[k].astype(np.float64)
+                for k in w if ".lora_A." in k}
+
+    a, b = deltas(adapter), deltas(start)
+    by = defaultdict(lambda: [0.0, 0.0, 0.0])  # module -> [|a-b|^2, |b|^2, <a,b>]
+    na = 0.0
+    for k in b:
+        mod = re.search(r"\.(\w+_proj)\.lora_A", k)[1]
+        d = a[k] - b[k]
+        for key in (mod, "all"):
+            by[key][0] += float(np.sum(d * d))
+            by[key][1] += float(np.sum(b[k] * b[k]))
+            by[key][2] += float(np.sum(a[k] * b[k]))
+        na += float(np.sum(a[k] * a[k]))
+    print(f"{adapter} against {start}: relative change ||dW - dW0|| / ||dW0||, cosine(dW, dW0)")
+    for mod, (dd, bb, ab) in sorted(by.items(), key=lambda x: x[0] != "all"):
+        nb = bb ** 0.5
+        cos = ab / (nb * (na if mod == "all" else sum(float(np.sum(a[k] ** 2)) for k in a if f".{mod}." in k)) ** 0.5)
+        print(f"  {mod}: {dd ** 0.5 / nb:.3f}, cosine {cos:.4f}")
 
 
 if __name__ == "__main__":
@@ -405,4 +439,4 @@ if __name__ == "__main__":
         cmd_complete(args)
     else:
         dict(seeds=cmd_seeds, replay=cmd_replay, behaviour=cmd_behaviour, probes=cmd_probes,
-             lora=cmd_lora, **{"probe-report": cmd_probe_report})[cmd](*args)
+             lora=cmd_lora, **{"probe-report": cmd_probe_report, "lora-diff": cmd_lora_diff})[cmd](*args)
