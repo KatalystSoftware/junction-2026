@@ -2,6 +2,7 @@
 //
 //   repo     the public repository; "" hides every source link until there is one
 //   lede     the line under the team's name
+//   videos   optional [words, address] of the folder with every video, a button under the lede
 //   projects the submitted entries, in the order shown; the header lists them too
 //     id      anchor on the page
 //     name    what the page calls it
@@ -21,6 +22,7 @@
 window.KATALYST = {
   repo: "https://github.com/KatalystSoftware/junction-2026",
   lede: "Three entries at Junction 2026, each with a live demo.",
+  videos: ["Watch all the videos", "https://drive.google.com/drive/folders/1ZvjuwvxUiQuxcSLc5QU5W5LgKgM31Kpz"],
   projects: [
     {
       id: "oncallbench",

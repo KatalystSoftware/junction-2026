@@ -82,6 +82,8 @@ svg.arrow { width: 0.8em; height: 0.8em; flex: none; }
   letter-spacing: -0.035em;
 }
 .mast p { margin-top: 0.6rem; color: var(--field-soft); font-size: 1.12em; line-height: 1.4; }
+/* The header is dark green in both themes, so its button takes the spark colour. */
+.mast .btn { margin-top: 1rem; background: var(--spark); color: var(--spark-ink); }
 
 /* The three entries, listed in the header so all of them are on the first screen. */
 .toc { margin-top: clamp(1.1rem, 3vw, 2rem); display: grid; }
@@ -217,7 +219,13 @@ svg.arrow { width: 0.8em; height: 0.8em; flex: none; }
   }
 
   // The header: the lede, then one row per entry linking down to it.
-  document.getElementById("lede").textContent = data.lede;
+  var lede = document.getElementById("lede");
+  lede.textContent = data.lede;
+  if (data.videos) {
+    var videos = link("btn", data.videos[0] + " ", data.videos[1]);
+    videos.insertAdjacentHTML("beforeend", ARROW);
+    lede.after(videos);
+  }
   var toc = document.getElementById("toc");
   data.projects.forEach(function (entry) {
     var a = link("", "", "#" + entry.id);
