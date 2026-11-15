@@ -53,7 +53,7 @@ chance the private and trade-in requests and the note's own deadline and site ho
 | Ranking round played from Sunday 00:10 UTC, by tag `trackb-merge-4.1` | €78,614 over five weeks, about €15,723 a week, 96.3% on time. Place 19 of 55 on the board read at 00:40 UTC, before the round's board was final |
 | Ranking round played from Sunday 01:00 UTC, by tag `trackb-merge-4.1` | €68,867 over five weeks, about €13,773 a week, 95.8% on time. Place 26 of 31 on the board read at 01:30 UTC, with few teams in |
 | Ranking round played from Sunday 04:00 UTC, by tag `trackb-merge-8.2` (variant `m41u-b`: `trackb-merge-4.1` at 760 drivers or more, with `km40` under 760) | €77,653.41 over five weeks, about €15,531 a week, every week ranked: €12,432.10, €13,098.20, €17,230.93, €12,754.37 and €22,137.81 on worlds of 801, 796, 936, 647 and 801 drivers; 96.49% on time, the lowest week 95.09%. Place 8 on the board read at 05:45 UTC, with 53 of the round's 54 teams complete, so not yet final (5 of 33 ranked at 04:40 UTC) |
-| The final, Sunday 09:00 Helsinki, played by tag `trackb-merge-8.3` (see below) | still playing when this entry was submitted; the result is on Bahn's final board |
+| The final, Sunday 09:00 Helsinki, played by tag `trackb-merge-8.3` (see below) | €17,087.76, 350 orders, 97.4% on time, ranked. All 1,034 requests quoted by the policy, no fallback, no error and no takeover |
 
 The gap to the top 10 in that round is orders won, not price: they won 441 orders a week at €41.6 an
 order with 16.7 late, this variant 332 at €41.4 with 10.4 late (one round of five worlds).
