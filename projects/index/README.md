@@ -42,7 +42,7 @@ and Since When `site/logos/since-when.svg`, the same file as `projects/since-whe
 ## The Spread pitch
 
 [`site/spread/index.html`](site/spread/index.html), at <https://spread.katalyst.fyi/>, is the Spread desk's
-jury deck: one self-contained page in the site's typeface on the deck's own dark colours, five slides by default. `#7`, `#9`
+jury deck: one self-contained page in the site's typeface on the deck's own dark colours, six slides by default, the fifth a hill climb Claude's mascot pushes a boulder up. `#7`, `#9`
 or `#10` in the address opens a longer cut; the arrow keys step through it, and Print or Save as PDF gives
 one 16:9 slide a page. The "See the pitch" link under "Also built" points at it.
 
@@ -60,7 +60,7 @@ The page says nothing the repo does not. When one of these files changes, change
 | Since When | [`projects/since-when/README.md`](../since-when/README.md): the first two paragraphs, and the loading table (2,919 topics; every revision for three, one version a year for the rest); Lapua Movement is `#/Q1412941` |
 | Kutsu | [`projects/kutsu/README.md`](../kutsu/README.md): the first paragraphs (new surveys each time; who came and what employers said they need), the two sign-up flows, and the Context.dev table (brand record, careers page), and "What is real, what is sample" (statements quoted from the page they link to; the pool is sample data), and "About a person" (only what they hand over; the sign-up submits nothing) |
 | Spread desk | [`spread/README.md`](../../spread/README.md), "How the desk decides" |
-| Spread pitch | [`spread/README.md`](../../spread/README.md) holds €12,376, 0.4 ms, the 94,000-order late fit, 441 against 332 orders at €41.6 and €41.4, and merge 1's +€2,180. The fee ladder's +€604, the first version's +€949, the CRACI run (1,442 stand-in weeks in 4 min 41 s; 1 h 53 min from idea to joint search) and the estimates for merges 2 to 4.1 come from the team's submission text and candidate comparison, which are not in the repo; the slide marks the merges as estimates |
+| Spread pitch | [`spread/README.md`](../../spread/README.md) holds €12,376, 0.4 ms, the 94,000-order late fit, 441 against 332 orders at €41.6 and €41.4, and merge 1's +€2,180. The fee ladder's +€604, the first version's +€949, the CRACI run (1,442 stand-in weeks in 4 min 41 s; 1 h 53 min from idea to joint search) and the estimates for merges 2 to 4.1 come from the team's submission text and candidate comparison, which are not in the repo; the slide marks the merges as estimates. The hill climb (about 35 one-knob arms, one held: `slow_step` 0.4 at 760+ drivers, +€423 a week over merge 3 on 20 played pairs; R-max −€5,341 a week on 5 seeds; `slow_step` 0.2 +€585 on the stand-in, −€20 in play; 9 of 9 played steps called right by the fixed stand-in) comes from the climb's own log, the candidate comparison and `spread-standin` d2d6e532 |
 
 The screenshots are cropped to one readable moment: the replay at minute 42 of seed 200019
 (`?session=l4-s200019&t=42&intro=0&still`: the rollback at minute 33 and what it has cost by 42), Since When's first card at 520 px wide, and Kutsu's
