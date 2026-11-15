@@ -22,7 +22,7 @@
 window.KATALYST = {
   repo: "https://github.com/KatalystSoftware/junction-2026",
   lede: "Three entries at Junction 2026, each with a live demo.",
-  videos: ["Watch all the videos", "https://drive.google.com/drive/folders/1ZvjuwvxUiQuxcSLc5QU5W5LgKgM31Kpz"],
+  videos: ["Watch all the videos", "https://github.com/KatalystSoftware/junction-2026/releases/tag/videos"],
   projects: [
     {
       id: "oncallbench",

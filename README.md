@@ -1,9 +1,11 @@
 # Team Katalyst at Junction 2026
 
-What team Katalyst built at Junction 2026 (13-15 November 2026, Espoo): three entries, each running
-live.
+What team Katalyst built at Junction 2026 (13-15 November 2026, Espoo): three entries, each of which ran
+live through the event.
 
-All our projects, with a link to try each: <https://katalyst.fyi/>. All the videos: [one Drive folder](https://drive.google.com/drive/folders/1ZvjuwvxUiQuxcSLc5QU5W5LgKgM31Kpz).
+All the videos: [one release page](https://github.com/KatalystSoftware/junction-2026/releases/tag/videos).
+The live demos at katalyst.fyi ran on the event's temporary machines and accounts, which were removed when
+it ended on 15 November. To try an entry now, run it yourself.
 
 ## Our entries
 
@@ -11,9 +13,9 @@ Each entry's README says what it is, how to run it with one command, and how to 
 
 ### <img src="projects/index/site/logos/oncallbench.svg" width="32" height="32" alt=""> [OnCallBench](projects/oncallbench/README.md): an on-call shift that AI agents still lose money on
 
-For AfterQuery's **Break the Agent**. ▶ [Video, 1:24](https://drive.google.com/file/d/1LLFac0BTz1-NQPbWwD01wSXNc8atQUeQ/view) · [Step through the shift yourself](https://incident.katalyst.fyi/) · [Source](projects/oncallbench/README.md)
+For AfterQuery's **Break the Agent**. ▶ [Video, 1:24 (mp4, 74 MB)](https://github.com/KatalystSoftware/junction-2026/releases/download/videos/oncallbench.mp4) · [Source and how to run it](projects/oncallbench/README.md)
 
-[![OnCallBench replay: Claude Opus 5.5 rolls back geo-svc and sets off a retry storm; partner-api fails 55% of requests](https://storage.googleapis.com/katalyst-fyi-models/shots/oncallbench.gif)](https://incident.katalyst.fyi/?seed=200019&t=32&pause=key&zoom=1.1)
+[![OnCallBench replay: Claude Opus 5.5 rolls back geo-svc and sets off a retry storm; partner-api fails 55% of requests](projects/index/site/shots/oncallbench.gif)](https://github.com/KatalystSoftware/junction-2026/releases/download/videos/oncallbench.mp4)
 
 - **Problem:** AI agents are being put on call, and nobody sees how they fail until they fail on a live system.
 - **What it is:** a two-hour on-call shift at a simulated online shop, scored on the money lost: 1.00 is our scripted expert, 0.00 is doing nothing.
@@ -22,9 +24,9 @@ For AfterQuery's **Break the Agent**. ▶ [Video, 1:24](https://drive.google.com
 
 ### <img src="projects/index/site/logos/since-when.svg" width="32" height="32" alt=""> [Since When](projects/since-when/README.md): what three Wikipedias say differently, and since when
 
-For MariaDB's **Wikipedia Through Time**. ▶ [Video, 1:16](https://drive.google.com/file/d/1K0Nr7LWR8XBzMgtPlUPCEZ1KFA06I424/view) · [Open Since When](https://since-when.katalyst.fyi/#/Q1412941) · [Source](projects/since-when/README.md)
+For MariaDB's **Wikipedia Through Time**. ▶ [Video, 1:16 (mp4, 58 MB)](https://github.com/KatalystSoftware/junction-2026/releases/download/videos/since-when.mp4) · [Source and how to run it](projects/since-when/README.md)
 
-[![Since When: the Lapua Movement, called fascist in the first sentence of Swedish Wikipedia since 23 October 2026 and of English Wikipedia since 30 May 2022, not in Finnish](https://storage.googleapis.com/katalyst-fyi-models/shots/since-when.gif)](https://since-when.katalyst.fyi/#/Q1412941)
+[![Since When: the Lapua Movement, called fascist in the first sentence of Swedish Wikipedia since 23 October 2026 and of English Wikipedia since 30 May 2022, not in Finnish](projects/index/site/shots/since-when.gif)](https://github.com/KatalystSoftware/junction-2026/releases/download/videos/since-when.mp4)
 
 - **Hook:** Swedish Wikipedia began calling the Lapua Movement “fascist” on 23 October 2026, English in 2022; Finnish still doesn't.
 - **What it is:** for a topic, what the Finnish, Swedish and English articles say differently, and the edit each difference began with.
@@ -34,9 +36,9 @@ For MariaDB's **Wikipedia Through Time**. ▶ [Video, 1:16](https://drive.google
 
 For the City of Espoo's **Rethinking Recruitment** and Context.dev's **The Web Is Your Real-Time
 Database**.
-▶ Videos: [for Espoo, 0:41](https://drive.google.com/file/d/1cdSGMa33-0_t015rzm84aLsCupmzFP6o/view) · [for Context.dev, 0:43](https://drive.google.com/file/d/1AHWZPTAmzVQuI-QcckK_smcDKy68OEuO/view) · [A company's invitation](https://kutsu.katalyst.fyi/#/join/nitor.com/deep-tech-talent-forum) · [Espoo's screen](https://kutsu.katalyst.fyi/) · [Source](projects/kutsu/README.md)
+▶ Videos: [for Espoo, 0:41 (mp4, 4 MB)](https://github.com/KatalystSoftware/junction-2026/releases/download/videos/kutsu-espoo.mp4) · [for Context.dev, 0:43 (mp4, 28 MB)](https://github.com/KatalystSoftware/junction-2026/releases/download/videos/kutsu-context-dev.mp4) · [Source and how to run it](projects/kutsu/README.md)
 
-[![Kutsu: Nitor's invitation to an Espoo recruitment event, filled in from public sources, asking whom else it wants to meet](https://storage.googleapis.com/katalyst-fyi-models/shots/kutsu.gif)](https://kutsu.katalyst.fyi/#/join/nitor.com/deep-tech-talent-forum)
+[![Kutsu: Nitor's invitation to an Espoo recruitment event, filled in from public sources, asking whom else it wants to meet](projects/index/site/shots/kutsu.gif)](https://github.com/KatalystSoftware/junction-2026/releases/download/videos/kutsu-context-dev.mp4)
 
 - **Problem:** every Espoo recruitment event starts with new surveys, and organisers learn late whom companies want to hire.
 - **What it is:** an invitation that arrives filled in from the live web via Context.dev, every line linked to its source, for the company to confirm or correct.
@@ -58,10 +60,10 @@ Database**.
 
 ## Also here
 
-- [`projects/index/`](projects/index/README.md): the page at <https://katalyst.fyi/>.
-- [`infra/verda/`](infra/verda/main.tf): the Verda machines the demos and evaluations run on, defined
+- [`projects/index/`](projects/index/README.md): the page that was at katalyst.fyi.
+- [`infra/verda/`](infra/verda/main.tf): the Verda machines the demos and evaluations ran on, defined
   with Verda's official OpenTofu provider, and the [proxy](infra/verda/proxy/README.md) every demo
-  sits behind; [how we used Verda](infra/verda/README.md).
+  sat behind; [how we used Verda](infra/verda/README.md).
 
 This repository holds the projects we submitted, with their history. Our notes, experiments and other
 work from the event stay in the team's private repository.
