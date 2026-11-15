@@ -21,7 +21,8 @@ at once, and every failed request costs revenue. Claude Opus 5.5 finds the cause
 judgment: it rolls back a busy service without making room first, and the retries flood it. Opus 5.5
 averages 0.45 on 24 fresh seeds: all 48 runs below the expert, and 10 cost more than doing nothing,
 every one through an unprotected rollback. Scored by replaying the agent's action log; one command per
-shift reruns the reference, both baselines and the agent.
+shift reruns the reference, both baselines and the agent. Gemma 4 26B-A4B, which we trained on it,
+went from 0.05 to 0.44: [statistically indistinguishable from Opus](projects/oncallbench/README.md#a-smaller-model-learns-from-it).
 
 ### [Since When](projects/since-when/README.md): what three Wikipedias say differently, and since when
 
@@ -29,7 +30,8 @@ For MariaDB's **Wikipedia Through Time**. [Open Since When](https://since-when.k
 
 [![Since When: the Lapua Movement, called fascist in the first sentence of Swedish Wikipedia since 23 October 2026 and of English Wikipedia since 30 May 2022, not in Finnish](projects/index/site/shots/since-when.webp)](https://since-when.katalyst.fyi/)
 
-For a topic, what the Finnish, Swedish and English articles say differently, and the edit each
+Swedish Wikipedia began calling the Lapua Movement “fascist” on 23 October 2026, English in 2022;
+the Finnish first sentence still does not. For a topic, what the Finnish, Swedish and English articles say differently, and the edit each
 difference began with. MariaDB 11.8 system-versioned tables keep every loaded version, and one
 statement pairs passages across editions by vector search as they stood on a past date. Every screen
 shows the SQL behind it, and you can run it.
@@ -45,8 +47,8 @@ or [Espoo's screen](https://kutsu.katalyst.fyi/).
 Each Espoo recruitment event starts with a new survey for companies and another for candidates, and
 each side waits for the other. Kutsu keeps who came and what employers said they need, and sends an
 invitation already filled in, every line linked to the sentence it came from, to agree with or
-correct. Context.dev supplies each company's details, brand colours and careers page. People are
-sample data, and a person makes every decision. Its first invitee pages are in
+correct. Context.dev fills in each company's sign-up from the live web, and its monitors on 74
+employers tell Espoo what changed. People are sample data, and a person makes every decision. Its first invitee pages are in
 [`projects/kutsu/esittely/`](projects/kutsu/esittely/README.md), its pitch decks in [`projects/kutsu/pitch/`](projects/kutsu/pitch/).
 
 ## Also here
@@ -54,7 +56,7 @@ sample data, and a person makes every decision. Its first invitee pages are in
 - [`projects/index/`](projects/index/README.md): the page at <https://katalyst.fyi/>.
 - [`infra/verda/`](infra/verda/main.tf): the Verda machines the demos and evaluations run on, defined
   with Verda's official OpenTofu provider, and the [proxy](infra/verda/proxy/README.md) every demo
-  sits behind.
+  sits behind; [how we used Verda](infra/verda/README.md).
 
 This repository holds the projects we submitted, with their history. Our notes, experiments and other
 work from the event stay in the team's private repository.
