@@ -2,7 +2,7 @@
 compare it with the others on the same seeds."""
 from __future__ import annotations
 
-from . import exposure, late_wide, pairs, thin_play
+from . import budget, exposure, late_wide, pairs, thin_play
 
 GATE_10 = {"same_day": True, "floor": 1.7, "quote_share": 1, "max_unbooked": 10}  # `gate-10`
 # `curve-live-surcharge`: the win curve sets the price, the day's answers correct it, and the backlog raises the cost
@@ -749,3 +749,10 @@ VARIANTS["m41v-d-km40-thin"] = {**_V_C, "thin_play": {"drivers": 760, "params": 
 _V_B = VARIANTS["m41v-b-late100-760"]
 VARIANTS["m41u-a"] = {**_V_B, "thin_play": {"drivers": 760, "params": {
     **{k: v for k, v in {**_V_B, **_V_B["when_tight"]}.items() if k != "when_tight"}, "pair_km": 40}, "version": thin_play.VERSION}}
+# The on-time budget (budget.py) on `m41u-a`: the late cost by how far the week's projected on-time share is above 90%, in z of
+# its spread. `-unit` holds the multiple at 1 and must play `m41u-a` to the cent. The waiting-car charge stays.
+_BUD = {"floor": 0.90, "z_lo": 2, "z_hi": 5, "lo": 0.5, "hi": 1.5, "sd_by": 2, "drivers": 0, "version": budget.VERSION}
+for _name, _rule in {"unit": {"lo": 1, "hi": 1}, "a": {}, "b": {"hi": 1}, "c": {"z_lo": 3, "z_hi": 6, "lo": 0.25},
+                     "d": {"drivers": 760}, "e": {"lo": 0, "hi": 1}, "f": {"z_lo": 3, "z_hi": 8, "lo": 0.25, "hi": 2},
+                     "g": {"sd_by": 1, "lo": 0.5, "hi": 1}}.items():
+    VARIANTS[f"m41u-a-bud-{_name}"] = {**VARIANTS["m41u-a"], "budget": {**_BUD, **_rule}}
