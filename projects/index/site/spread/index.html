@@ -208,10 +208,14 @@
 			<p class="ln"><span class="cyan">One CRACI runner: 32 cores, 94 GB, 206 saved seeds</span><b class="cyan" id="r-sim">0</b></p>
 			<canvas id="cv-sim" aria-hidden="true"></canvas>
 		</div>
+		<div class="lane only-11 in" style="--d:2">
+			<p class="ln"><span class="amber">Bahn's server, our full practice budget: about 330 weeks an hour</span><b class="amber" id="r-bahn">0</b></p>
+			<canvas id="cv-bahn" aria-hidden="true"></canvas>
+		</div>
 		<div class="r-foot in" style="--d:3">
 			<p class="sm"><b id="r-clock">0:00</b> of 4:41 &nbsp;<button class="ghost" id="r-again" type="button">Play again</button></p>
 			<p class="sm"><b>Saturday 21:33 the idea, 23:26 a joint search on 16 runners: 1 h 53 min.</b> A stand-in week takes 3 to 6 CPU-seconds, 97% of them in our own desk code, and every week is independent: the work needs cores and nothing else.</p>
-			<div class="vs only-11"><div><p class="lab">Bahn's server</p><b class="amber">about 330</b><p class="sm">weeks an hour on our full practice budget: 127 weeks in 23 minutes, 8 practice worlds on one request bucket at 170 requests a second</p></div><div><p class="lab">Our digital twin² on CRACI</p><b class="cyan">about 18,500</b><p class="sm">weeks an hour: 1,442 weeks in 4 min 41 s, <b>about 55× Bahn's server, on one runner</b>. <b>At peak, the farm played 97,980 weeks in one hour, about 300× Bahn's server</b>, on up to 39 runners at once.</p></div><div><p class="lab">Do they agree?</p><b class="cyan">43 of 46</b><p class="sm">pairs the simulator ranked as Bahn's server did; gain sizes correlate at 0.96 to 0.97 on natural worlds, 0.37 with few drivers</p></div></div>
+			<div class="vs only-11"><div><p class="lab">Bahn's server</p><b class="amber">about 330</b><p class="sm">weeks an hour: 127 weeks in 23 minutes on our full practice budget, 8 worlds on one request bucket</p></div><div><p class="lab">Our digital twin² on CRACI</p><b class="cyan">about 18,500</b><p class="sm">weeks an hour: <b>about 55× Bahn's server, on one runner</b>. At peak the farm played 97,980 weeks in one hour on up to 39 runners: <b>about 300×</b>.</p></div><div><p class="lab">Do they agree?</p><b class="cyan">43 of 46</b><p class="sm">pairs ranked as Bahn's server did; gains correlate at 0.96 to 0.97 on natural worlds, 0.37 with few drivers</p></div></div>
 		</div>
 	</div>
 </section>
@@ -1645,6 +1649,12 @@
 		border-top: 1px solid var(--line);
 		padding-top: calc(1 * var(--k));
 	}
+	.deck.c11 .r-foot > p:nth-child(2) {
+		display: none;
+	}
+	.deck.c11 .race {
+		gap: calc(1.4 * var(--k));
+	}
 	.vs > div > b {
 		display: block;
 		font-size: calc(2.4 * var(--k));
@@ -2008,8 +2018,9 @@
 			function paint(cv, total, filled, color) {
 				const w = cv.getBoundingClientRect().width
 				if (!w) return
-				const pitch = w / COLS
-				const rows = Math.ceil(total / COLS)
+				const C = deck.classList.contains('c11') ? 130 : COLS
+				const pitch = w / C
+				const rows = Math.ceil(total / C)
 				const h = rows * pitch
 				const dpr = devicePixelRatio || 1
 				cv.style.height = h + 'px'
@@ -2020,13 +2031,19 @@
 				const s = pitch * 0.74
 				for (let i = 0; i < total; i++) {
 					g.fillStyle = i < filled ? color : col.line
-					g.fillRect((i % COLS) * pitch, Math.floor(i / COLS) * pitch, s, s)
+					g.fillRect((i % C) * pitch, Math.floor(i / C) * pitch, s, s)
 				}
 			}
 			function draw() {
 				const ns = Math.floor(SIM * frac)
 				paint(sim, SIM, ns, col.cyan)
 				document.getElementById('r-sim').textContent = ns.toLocaleString('en-US') + ' weeks'
+				const bahn = document.getElementById('cv-bahn')
+				if (bahn) {
+					const nb = Math.floor(26 * frac)
+					paint(bahn, 26, nb, col.amber)
+					document.getElementById('r-bahn').textContent = nb + ' weeks'
+				}
 				const secs = Math.round(281 * frac)
 				document.getElementById('r-clock').textContent = `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`
 			}
