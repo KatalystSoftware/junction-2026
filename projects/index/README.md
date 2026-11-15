@@ -66,8 +66,8 @@ The screenshots are cropped to one readable moment: the replay at minute 42 of s
 (`?session=l4-s200019&t=42&intro=0&still`: the rollback at minute 33 and what it has cost by 42), Since When's first card at 520 px wide, and Kutsu's
 invitation for IQM (`#/join/2912625-6/deep-tech-talent-forum`, the company the Kutsu video uses) at 1280 × 800; all taken at twice the pixel density.
 
-Source links are off: `repo` in `projects.js` is empty because this repository is private. Set it to
-the public copy's address once `scripts/publish-public.sh` has pushed one, and every entry gets a
-"Source" link to its folder.
+Source links go to the public copy, `repo` in `projects.js`, which `scripts/publish-public.sh` cuts from
+this private repository. Each entry's `source` folder must exist there; the copy leaves out `docs/`,
+`TODO.md` and `projects/videos/`.
 
 The typeface is Archivo, under the SIL Open Font License ([`site/fonts/OFL.txt`](site/fonts/OFL.txt)).
