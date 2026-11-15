@@ -11,6 +11,8 @@
 4. With a demo key set, as on the server: a sign-up is saved only with the key or the company's own link
    token, every sign-up is taken out only with the key, role drafts stop at their cap, and a sign-ups
    file that is not JSON is set aside instead of breaking every load.
+5. Every business ID stored for a company passes the Y-tunnus check digit, and a company keyed by its business
+   ID carries that same one.
 """
 import contextlib
 import http.server
@@ -24,6 +26,7 @@ import threading
 import urllib.request
 
 import person
+import registry
 import serve
 import signals
 
@@ -68,6 +71,14 @@ for preset in presets:
     unique(f"{preset['title']}: employers", preset["ids"])
 pool = json.loads((HERE / "pool.json").read_text())
 unique("past events by id", (e["id"] for e in pool["events"]))
+for brief in briefs:
+    bid = (brief.get("business_id") or {}).get("value")
+    if bid and not registry.valid(bid):
+        failures.append(f"{brief['name']}: business ID {bid} fails its check digit")
+    if registry.ID.fullmatch(brief["id"]) and bid != brief["id"]:
+        failures.append(f"{brief['name']}: keyed by business ID {brief['id']}, but carries {bid!r}")
+if not registry.valid("2084527-0") or registry.valid("2084527-1"):
+    failures.append("the Y-tunnus check digit is computed wrong")
 if set(pool["fields"]) - set(signals.FAMILIES):
     failures.append(f"the pool has fields the roles do not: {sorted(set(pool['fields']) - set(signals.FAMILIES))}")
 
@@ -202,4 +213,5 @@ if failures:
     print("\n".join(failures), file=sys.stderr)
     sys.exit(1)
 print(f"data: {len(briefs)} companies keyed uniquely, {len(kept) + len(refused)} sign-up shapes judged right, a profile read left no trace "
-      f"and was read once, {len(expected)} writes with and without the key answered right")
+      f"and was read once, {len(expected)} writes with and without the key answered right, "
+      f"{sum(1 for b in briefs if b.get('business_id'))} business IDs pass their check digit")

@@ -82,15 +82,17 @@ over seven runs on seeds 101-106, Gemini 0.00 (three runs) and Sonnet 0.26.
 Every run behind the scores above, with its cost: `metrics.json` (the clean-machine reruns under
 Reproduce are in `runs/` instead); how each level was built and checked: `LOOP.md`.
 
-**Common seeds.** Every model is compared on the same 24 level-4 seeds, **200000-200023**, which no
-demo, tuning or training run used: the Gemma adapter was first evaluated there in our own runner
-(`rl/RESULTS.md`). Every result goes into `metrics.json` (round 16) and this section whatever it is.
+**Common seeds.** Every model is compared on the same 24 level-4 seeds, **200000-200023**, kept out
+of all training and model selection: no demo, tuning or training run used them, and the Gemma
+checkpoint was not chosen on them (the base and SFT models had been evaluated there in our own runner,
+`rl/RESULTS.md`). Every result goes into `metrics.json` (round 16) and this section whatever it is.
 
 | Agent (level 4, seeds 200000-200023) | Harness | Runs / seeds | Mean (95% CI) | Median | Solve rate | Worse than doing nothing |
 | --- | --- | --- | --- | --- | --- | --- |
 | Reference (expert script) | scripted, replayed in the simulator | 24 / 24 | 1.00 (1.00-1.00) | 1.00 | 100% | 0% |
 | **Opus 5.5** | Harbor + OpenCode | 48 / 24 | **0.45 (0.35-0.54)** | 0.54 | 2% | 21% |
 | Gemma 4 26B-A4B, untrained | Harbor + OpenCode | 48 / 24 | 0.05 (0.02-0.07) | 0.00 | 0% | 38% |
+| Nemotron 3.5 Lightning 30B-A3B, untrained | Harbor + OpenCode | 24 / 24 | 0.04 (0.01-0.08) | 0.00 | 0% | 67% |
 | Gemma 4 26B-A4B + our adapter (SFT, then RL on the score) | Harbor + OpenCode | 48 / 24 | 0.44 (0.35-0.53) | 0.45 | 4% | 17% |
 | `shotgun` script: finds the cause, guesses the fix | scripted, replayed in the simulator | 24 / 24 | 0.47 (0.36-0.57) | 0.55 | 0% | 12% |
 | Do-nothing | scripted, replayed in the simulator | 24 / 24 | 0.00 (0.00-0.00) | 0.00 | 0% | 0% |
@@ -98,7 +100,15 @@ demo, tuning or training run used: the Gemma adapter was first evaluated there i
 Partial, so not in the table: Fable 5.2, 13 runs on 13 of the 24 seeds (mean 0.88, 95% CI
 0.81-0.93); an Anthropic usage limit cut the other eleven.
 
-Definitions, fixed before the numbers were computed: the score is the share of the avoidable cost
+Exclusions: runs cut by infrastructure were excluded and rerun (untrained Gemma 44, an unreachable
+model endpoint; Opus 3 and Fable 11, an Anthropic usage limit, Fable's not rerun). Timeouts (Gemma
+with the adapter 8, untrained 2) and context overflows were kept and scored as the shifts they
+left. Runs whose Docker network could not be created never started and never reached
+`metrics.json`. Every excluded run stays in `metrics.json`, marked `infrastructure:`. Round 16 ran
+every model, Opus included, from task folders named `tasks-custom/seed-2000NN`; folder names are
+random since 0d92463f. No transcript mentions a seed.
+
+Definitions for this table's calculations: the score is the share of the avoidable cost
 avoided, `(cost_do_nothing - cost) / (cost_do_nothing - cost_reference)` clipped to 0..1; a run
 **solves** the shift when it scores at least 0.95 of the expert; **worse than doing nothing** means
 its cost is strictly above the do-nothing cost on its seed; the 95% CI is a cluster bootstrap over
@@ -132,12 +142,22 @@ machine. A production benchmark would keep its reference and evaluation seeds pr
 
 ## A smaller model learns from it
 
-Gemma 4 26B-A4B with a LoRA adapter trained on OnCallBench (`rl/`): first on the reference's shifts
-(SFT), then by reinforcement learning on the score, with the checkpoint chosen by a rule fixed before
-any evaluation run (`rl/RESULTS.md`). Run the way Opus was, OpenCode in Harbor 0.25.0 against a
-local vLLM server, two runs on each common seed (table above): untrained it averages **0.05**; with
-the adapter **0.44 (0.35-0.53)**, about Opus 5.5's 0.45. Training on the environment took an open 26B
-model from near nothing to Opus's level in the judges' harness. Its scores in our own training
+Gemma 4 26B-A4B with a LoRA adapter trained on OnCallBench (`rl/`): first by imitating the scripted
+reference's shifts (SFT), then by reinforcement learning on the score. The RL checkpoint was picked
+on held-out seeds 101-106 by a rule committed before the final candidate's evaluation and before the
+fine-tuned Harbor runs; the 24 common seeds were not used for the choice, though the base and SFT
+models had been evaluated on them first (`rl/RESULTS.md`). Run the way Opus was, OpenCode in Harbor
+0.25.0 against a local vLLM server, two runs on each common seed (table above).
+
+Imitating our scripted expert and then fine-tuning on the score took Gemma 4 26B-A4B from **0.05 to
+0.44** in the judges' Harbor + OpenCode harness, on 24 seeds kept out of all training and model
+selection: a gain of +0.39 (95% interval +0.30 to +0.48), ahead of the untrained model on all 24
+seeds. That is statistically indistinguishable from Opus 5.5's 0.45 (paired difference -0.01, 95%
+interval -0.15 to +0.13; the adapter is ahead on 13 of 24 seeds), though it gets there differently:
+it fixes every fault in 23 of 48 runs where Opus does in 48 of 48, and it rolls back without
+protecting the service less often (36 of 95 undos without capacity first, against Opus's 80 of
+122). It remains well below the expert it copied. The share of RL in the gain is not measured in
+this harness: there is no SFT-only Harbor row on these seeds. Its scores in our own training
 runner (`rl/env.py`: a capped number of replies, a shorter context) are higher and not comparable
 with Harbor's; they stay in `rl/RESULTS.md`. The adapter is public, with its sha256 and a model card:
 https://storage.googleapis.com/katalyst-fyi-models/oncallbench/gemma4-26b-a4b-rl/.

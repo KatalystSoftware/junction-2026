@@ -744,3 +744,8 @@ VARIANTS["m41v-c-pd8-d760"] = {**VARIANTS["m41v-b-late100-760"], "pair_drive": 8
 _V_C = VARIANTS["m41v-c-pd8-d760"]
 VARIANTS["m41v-d-km40-thin"] = {**_V_C, "thin_play": {"drivers": 760, "params": {
     **{k: v for k, v in {**_V_C, **_V_C["when_tight"]}.items() if k != "when_tight"}, "pair_km": 40}, "version": thin_play.VERSION}}
+# If the pair-drive cap is out (`m41v-d` lost `fresh-9572` at 820 drivers, where only the cap acts): `m41u-a` is `m41v-b` with
+# lane 2 A's `km40` under 760 through the thin play, the same thin path as `m41v-d`, and `m41v-b` at 760 or more.
+_V_B = VARIANTS["m41v-b-late100-760"]
+VARIANTS["m41u-a"] = {**_V_B, "thin_play": {"drivers": 760, "params": {
+    **{k: v for k, v in {**_V_B, **_V_B["when_tight"]}.items() if k != "when_tight"}, "pair_km": 40}, "version": thin_play.VERSION}}

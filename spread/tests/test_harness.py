@@ -1079,3 +1079,7 @@ def test_the_m41v_rows_play_4_1_from_820_and_each_add_one_part():
             assert changed(desk(row, n), desk(below, n)) == part.get(n, {}), (row, n)
     for n in (700, 759):
         assert desk("m41v-d-km40-thin", n) == desk("m41w-e-km40-thin", n), n
+    for n in (700, 759):  # m41u-a: m41v-d's thin play without the pair cap
+        assert changed(desk("m41u-a", n), desk("m41v-d-km40-thin", n)) == {"pair_drive_drivers": 0}, n
+    for n in (760, 819, 820, 900):
+        assert desk("m41u-a", n) == desk("m41v-b-late100-760", n), n

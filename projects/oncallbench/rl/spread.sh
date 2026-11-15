@@ -4,8 +4,8 @@
 #
 #   ./spread.sh <base|ft> <served model> <tasks-custom dir> <runs per seed> <seed>...
 #
-# Jobs are named <ROUND>-l4-s<seed>-gemma-<base|ft>-HHMMSS (ROUND defaults to r16, the common seeds)
-# and land in <tasks-custom dir>/../jobs.
+# Jobs are named <ROUND>-l4-s<seed>-<NAME>-HHMMSS (ROUND defaults to r16, the common seeds; NAME to
+# gemma-<base|ft>, the run name in metrics.json) and land in <tasks-custom dir>/../jobs.
 set -e
 kind=$1 served=$2 tasks=$3 runs=$4
 shift 4
@@ -21,7 +21,7 @@ for seed in "$@"; do
   for _ in $(seq "$runs"); do
     # at most MAXPAR runs at once (default 24): 48 at once ran Docker out of networks and slowed the endpoint
     while [ "$(for p in $pids; do kill -0 "$p" 2>/dev/null && echo; done | wc -l)" -ge "${MAXPAR:-24}" ]; do sleep 10; done
-    job="${ROUND:-r16}-l4-s$seed-gemma-$kind-$(date +%H%M%S)"
+    job="${ROUND:-r16}-l4-s$seed-${NAME:-gemma-$kind}-$(date +%H%M%S)"
     echo "$job"
     # export-tasks.sh lists its folders in index.tsv; older exports were named seed-<seed>
     task=$(awk -F'\t' -v s="$seed" '$2 == 4 && $3 == s { print $1 }' "$tasks/index.tsv" 2>/dev/null | tail -1)
