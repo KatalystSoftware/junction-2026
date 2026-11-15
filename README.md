@@ -11,7 +11,7 @@ Each entry's README says what it is, how to run it with one command, and how to 
 
 ### <img src="projects/index/site/logos/oncallbench.svg" width="32" height="32" alt=""> [OnCallBench](projects/oncallbench/README.md): an on-call shift that AI agents still lose money on
 
-For AfterQuery's **Break the Agent**. ▶ [Video, 1:24](https://drive.google.com/file/d/1LLFac0BTz1-NQPbWwD01wSXNc8atQUeQ/view) · [Watch the replay](https://incident.katalyst.fyi/) · [Source](projects/oncallbench/README.md)
+For AfterQuery's **Break the Agent**. ▶ [Video, 1:24](https://drive.google.com/file/d/1LLFac0BTz1-NQPbWwD01wSXNc8atQUeQ/view) · [Step through the shift yourself](https://incident.katalyst.fyi/) · [Source](projects/oncallbench/README.md)
 
 [![OnCallBench replay: Claude Opus 5.5 rolls back geo-svc and sets off a retry storm; partner-api fails 55% of requests](https://storage.googleapis.com/katalyst-fyi-models/shots/oncallbench.gif)](https://incident.katalyst.fyi/?seed=200019&t=32&pause=key&zoom=1.1)
 

@@ -29,7 +29,7 @@ window.KATALYST = {
       logo: "logos/oncallbench.svg",
       for: [["AfterQuery", "Break the Agent"]],
       live: "https://incident.katalyst.fyi/",
-      open: "Watch the replay",
+      open: "Step through the shift",
       more: [["See what one rollback cost", "https://incident.katalyst.fyi/?session=l4-s200019&t=42&intro=0"]],
       result: [
         ["45%", "of an expert script's savings, on average"],
