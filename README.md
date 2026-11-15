@@ -1,8 +1,7 @@
 # Team Katalyst at Junction 2026
 
-What team Katalyst built at Junction 2026 (13-15 November 2026, Espoo). Every project here was
-written by AI agents, directed by the team: the agents wrote the code, tests, documentation and
-commits; the team chose the problems, set the direction and reviewed the results.
+What team Katalyst built at Junction 2026 (13-15 November 2026, Espoo): three entries, each running
+live.
 
 All our projects, with a link to try each: <https://katalyst.fyi/>. All the videos: [one Drive folder](https://drive.google.com/drive/folders/1ZvjuwvxUiQuxcSLc5QU5W5LgKgM31Kpz).
 
