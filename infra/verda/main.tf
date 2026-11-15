@@ -50,6 +50,8 @@ resource "verda_instance" "runner" {
 
   os_volume = {
     name = "junction2026-runner-os"
+    # Grown to 200 GB in place through the Verda API on Sun 15 Nov (and growpart + resize2fs on the box).
+    # The provider still records 100, and changing this number would replace the instance: leave it.
     size = 100
     type = "NVMe"
     # Most instance changes force replacement; keep the disk (and our eval results) when that happens.
