@@ -1,7 +1,7 @@
 {
   "open": "l4-s200019",
   "spread": {
-    "caption": "Each dot is one run on one of 24 seeds no one tuned or trained on; the expert script scores 1.00.",
+    "caption": "Each dot is one run on one of 24 seeds kept out of all training and model selection; the expert script scores 1.00.",
     "file": "../metrics.json",
     "round": 16,
     "level": 4,
