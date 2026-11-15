@@ -3,6 +3,7 @@
 # any other path goes back to the deck.
 spread.{$BASE_DOMAIN} {
 	encode zstd gzip
+	import cache
 	root * /etc/caddy/static/index
 	handle / {
 		rewrite * /spread/index.html

@@ -3,5 +3,6 @@
 # reaches and the internet does not, so this proxy is the only way in.
 kutsu.{$BASE_DOMAIN} {
 	encode zstd gzip
+	import cache
 	reverse_proxy 172.19.0.1:8046
 }

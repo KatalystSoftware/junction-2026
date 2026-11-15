@@ -2,6 +2,7 @@
 # puts them in /srv/katalyst/proxy/static/incident, which the proxy sees under /etc/caddy.
 incident.{$BASE_DOMAIN} {
 	encode zstd gzip
+	import cache
 	root * /etc/caddy/static/incident
 	file_server
 }

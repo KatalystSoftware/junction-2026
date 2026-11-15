@@ -1,5 +1,6 @@
 # Since When (projects/since-when). The second name is the address it was first published under.
 since-when.{$BASE_DOMAIN}, since-when.31-22-104-106.sslip.io {
 	encode zstd gzip
+	import cache
 	reverse_proxy since-when-app:8078
 }
