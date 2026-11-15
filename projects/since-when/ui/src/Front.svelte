@@ -67,7 +67,7 @@
 	<p class="db">
 		Every date here is read from MariaDB {db.version}: a system-versioned table keeps
 		<span class="num">{db.versions.toLocaleString('en')}</span> versions of
-		<span class="num">{db.passages.toLocaleString('en')}</span> passages, each from the Wikipedia edit that wrote it (every revision for the three topics below, one a year for the rest).
+		<span class="num">{db.passages.toLocaleString('en')}</span> passages, each from the Wikipedia edit that wrote it (every revision for the three topics above, one a year for the rest).
 		{#if ui.runnable}<button class="cdx-button cdx-button--action-progressive cdx-button--weight-quiet" aria-haspopup="dialog" onclick={() => showSql('history', { qid: START[0], lang: 'en' })}>See the versions of one passage</button>{/if}
 	</p>
 {/if}

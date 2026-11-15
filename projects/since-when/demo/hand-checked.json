@@ -936,6 +936,1861 @@
       "outcome": "kept",
       "about": "The English passage describes the Finnish attack on Kemi on 7 October ",
       "close": "Stated elsewhere: the Finnish article has the capture of Kemi on 7–8 October. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q211855",
+      "type": "numbers",
+      "quotes": {
+        "en": "342 on 30 November 1917",
+        "fi": "Lokakuun lopusta lähtien ja marraskuun 1917 suurlakon aikana kaarteja perustettiin runsaasti, niiden lukumäärä oli lakon jälkeen noin 350"
+      },
+      "outcome": "new",
+      "about": "The English article says there were 342 guards on 30 November 1917; th",
+      "close": "Not a difference: the Finnish \"noin 350\" guards rounds the English 342. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q211855",
+      "type": "numbers",
+      "quotes": {
+        "sv": "Sammanlagt hade ungefär 1 900 finländska män deltagit i \"jägarrörelsen\"",
+        "fi": "(1 300 miestä mukana sodassa)"
+      },
+      "outcome": "new",
+      "about": "The Finnish Wikipedia article gives 1,300 men for the German-trained J",
+      "close": "Not a contradiction: the Swedish 1,900 are all who joined the Jäger movement, the Finnish 1,300 those who fought in the war (English has both figures). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q211855",
+      "type": "numbers",
+      "quotes": {
+        "en": "The first local battles were fought during 9–21 January 1918 in southern and southeastern Finland, mainly to win the arms race and to control Viipuri",
+        "fi": "17.–20. tammikuuta"
+      },
+      "outcome": "new",
+      "about": "The Finnish article says both parties began war-like action in Viipuri",
+      "close": "Not a contradiction: the Finnish 17–20 January in Karelia falls within the English 9–21 January. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q211855",
+      "type": "numbers",
+      "quotes": {
+        "en": "The fight for the area of Tampere began on 28 March, on the eve of Easter 1918, later called \"Bloody Maundy Thursday\", in the Kalevankangas Cemetery",
+        "fi": "Tampereen taistelu alkoi 16. maaliskuuta ja päättyi 6. huhtikuuta C. G. E. Mannerheimin johtamien valkoisten joukkojen voittoon"
+      },
+      "outcome": "changed",
+      "about": "The Finnish article says the Battle of Tampere began on 16 March and e",
+      "close": "Not a contradiction: the English 28 March is the fight in the town itself; English also has the main assault on 16 March. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q211855",
+      "type": "framing",
+      "quotes": {
+        "sv": "Man hade sedan några år förberett ett frihetskrig mot Ryssland",
+        "en": "In March 1918, the German Empire intervened in the Finnish Civil War on the side of the White Army"
+      },
+      "outcome": "unchecked",
+      "about": "The Swedish passage calls the 1918 war a war of liberation; the Englis",
+      "close": "Not a label for 1918: the Swedish \"frihetskrig mot Ryssland\" is the war against Russia the activists had prepared for. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q211855",
+      "type": "framing",
+      "quotes": {
+        "sv": "Man hade sedan några år förberett ett frihetskrig mot Ryssland",
+        "en": "After the power struggle of 1917 and the bloody civil war"
+      },
+      "outcome": "unchecked",
+      "about": "The Swedish passage calls the 1918 war a 'frihetskrig'; the English pa",
+      "close": "Not a label for 1918: the Swedish \"frihetskrig mot Ryssland\" is the war against Russia the activists had prepared for. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q211855",
+      "type": "numbers",
+      "quotes": {
+        "sv": "Den 16 maj höll den vita armén i överbefälhavare Mannerheims åsyn ett högtidligt intåg längs Norra esplanaden i Helsingfors och kriget var därmed slut",
+        "fi": "Sisällissota päättyi venäläisten sotilaiden vetäydyttyä 14. toukokuuta Karjalankannaksella Inon linnoituksesta ja suomalaisten valkoisten miehittäessä sen tuhotut tykkiasemat 15. toukokuuta"
+      },
+      "outcome": "changed",
+      "about": "The Finnish article says the Civil War ended when Russians left Ino on",
+      "close": "Not a contradiction: the Swedish 16 May is the parade; the Swedish lead ends the war on 15 May. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q211855",
+      "type": "numbers",
+      "quotes": {
+        "sv": "Den 16 maj höll den vita armén i överbefälhavare Mannerheims åsyn ett högtidligt intåg längs Norra esplanaden i Helsingfors och kriget var därmed slut",
+        "en": "The war of 1918 ended on 15 May 1918, when the Whites took over Fort Ino, a Russian coastal artillery base on the Karelian Isthmus, from the Russian troops"
+      },
+      "outcome": "changed",
+      "about": "The Swedish article dates the end of the war to 16 May with the parade",
+      "close": "Not a contradiction: the Swedish 16 May is the parade; the Swedish lead ends the war on 15 May. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q211855",
+      "type": "numbers",
+      "quotes": {
+        "sv": "Ovetande om andras åtgärder gav befälhavaren för Helsingfors röda garde samma dag order om att arrestera regeringen och upprätta en revolutionär regering kallad Finlands folkkommissariat",
+        "en": "established on 28 January 1918 in Helsinki"
+      },
+      "outcome": "new",
+      "about": "The English article dates the Finnish People's Delegation's establishm",
+      "close": "Not a contradiction: the Swedish article also dates the Folkkommissariat's name to 28 January. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q211855",
+      "type": "numbers",
+      "quotes": {
+        "en": "Between 1870 and 1916 industrialisation gradually improved social conditions and the self-confidence of workers, but while the standard of living of the common people rose in absolute terms, the rift between rich and poor deepened markedly",
+        "fi": "1800-luvun lopulta lähtien"
+      },
+      "outcome": "new",
+      "about": "The Finnish article says industrial capitalism raised workers' living ",
+      "close": "Not a different date: \"from the end of the 1800s\" and \"between 1870 and 1916\" describe the same period. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q211855",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Samma dag inrättades Vörå krigsskola för att skyndsamt ge befälsutbildning åt en kontingent på 700 man"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage says the Vörå War School was founded the same day ",
+      "close": "Stated elsewhere: the Finnish article has the Vöyri war school (\"Vöyrin sotakoulu aloitti toimintansa 26. tammikuuta 1918\"). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q211855",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Den 16 maj höll den vita armén i överbefälhavare Mannerheims åsyn ett högtidligt intåg längs Norra esplanaden i Helsingfors och kriget var därmed slut"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage reports that the war ended with a White Army trium",
+      "close": "Stated elsewhere: the Finnish article has the victory parade in Helsinki (\"suuren voitonparaatin Helsingissä\"). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q211855",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "They cut off the Reds' southward connection at Lempäälä on 24 March and westward ones at Siuro, Nokia, and Ylöjärvi on 25 March"
+      },
+      "outcome": "kept",
+      "about": "The English passage states that the Whites cut westward connections at",
+      "close": "Stated elsewhere: the Finnish article has Lempäälä on 24 March and Siuro (\"Tampere saarrettiin Lempäälän taistelussa 24. maaliskuuta ja Siuron valtauksessa\"); the Siuro date is a numbers row of its own. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q211855",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "The eastern parts of the city, consisting mostly of wooden buildings, were completely destroyed"
+      },
+      "outcome": "kept",
+      "about": "The English passage states that the eastern parts of Tampere, mostly w",
+      "close": "Stated elsewhere: the Finnish article has the eastern districts destroyed (\"Tammela ja Kyttälä tuhoutuivat lähes täysin\"). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q211855",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Den 14 maj 1918 förstörde ryssarna batterierna och lämnade Ino med slagskeppet Respublika"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage states that on 14 May 1918 the Russians destroyed ",
+      "close": "Stated elsewhere: the Finnish article has the Russians leaving Ino on 14 May. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q211855",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Molempien osapuolten sotilaallinen vahvuus oli noin 80 000 sotilasta"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage states that both sides had about 80,000 soldiers; ",
+      "close": "Stated elsewhere: the English article gives the troops on each side (\"varied from 70,000 to 90,000\"); a numbers row of its own. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q211855",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "I allmänhet kom de vita trupperna att bestå av värnpliktiga inkallade enligt lagen om allmän värnplikt med endast 1 100–1 500 frivilliga, medan röda gardena å andra sidan bestod av en majoritet frivilliga"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage states that the White troops consisted mainly of c",
+      "close": "A numbers difference, not a missing fact: the Finnish article gives 11,000–15,000 White volunteers (another row sets them against the Swedish 1,100–1,500). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q211855",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "i hemlighet skicka nära tvåtusen unga män till Tyskland för att få militärutbildning, den så kallade Jägarrörelsen"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage says nearly 2,000 young men were secretly sent to ",
+      "close": "Stated elsewhere: the English article has the Jäger battalion (\"1,450 soldiers of the 1,900-strong, Jäger battalion\"). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q211855",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Suomen valkoisen armeijan merkittävin sotaliike oli taistelu Tampereen hallinnasta 16. maaliskuuta – 6. huhtikuuta 1918"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage states that the battle for Tampere lasted from 16 ",
+      "close": "Stated elsewhere: the English article has the Battle of Tampere (\"the bloodiest action of the Civil War\", \"16,000 White and 14,000 Red soldiers\"). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q211855",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Efter det att striderna avslutats, upprättades så kallade domstolar för statsförbrytelser"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage states that after the fighting ended, so-called co",
+      "close": "Stated elsewhere: the English article has the treason courts (\"68,000 Reds were convicted, primarily for treason\"). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q211855",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Efter det att striderna avslutats, upprättades så kallade domstolar för statsförbrytelser"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage states that courts for state crimes were established after the fighting, while t",
+      "close": "Stated elsewhere: the English article has the treason courts (\"68,000 Reds were convicted, primarily for treason\"). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q211855",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Efter det att striderna avslutats, upprättades så kallade domstolar för statsförbrytelser"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage says courts for state crimes were established afte",
+      "close": "Stated elsewhere: the Finnish article has the courts (\"Valtiorikosoikeudet tuomitsivat kaikkiaan noin 70 000 suomalaista\"). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q211855",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Efter det att striderna avslutats, upprättades så kallade domstolar för statsförbrytelser"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage states that courts for state crimes were established after the fighting; the Fin",
+      "close": "Stated elsewhere: the Finnish article has the courts (\"Valtiorikosoikeudet tuomitsivat kaikkiaan noin 70 000 suomalaista\"). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q211855",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Efter Februarirevolutionen i Ryssland och kejsarens abdikation antog den finska lantdagen den så kallade maktlagen, som överförde statsöverhuvudets befogenheter beträffande Finland på lantdagen"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage states that after the February Revolution and the ",
+      "close": "Stated elsewhere: the English article has the Power Act (\"Law of Supreme Power\"). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q211855",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Efter Februarirevolutionen i Ryssland och kejsarens abdikation antog den finska lantdagen den så kallade maktlagen, som överförde statsöverhuvudets befogenheter beträffande Finland på lantdagen"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage states that after the February Revolution the Finn",
+      "close": "Stated elsewhere: the English article has the Power Act (\"Law of Supreme Power\"). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q211855",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Kenraalimajuri Rüdiger von der Goltzin johtama Saksan armeijan Itämeren divisioona oli noussut 3. huhtikuuta maihin Etelä-Suomeen noin 13 000 sotilaan vahvuisin joukoin, jotka valtasivat saman kuun aikana Helsingin, Lahden ja muita eteläsuomalaisia kaupunkeja"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage dates the German Baltic Sea Division's landing in ",
+      "close": "Stated elsewhere: the English article has the Baltic Sea Division landing at Hanko on 3 April under von der Goltz. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q211855",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Venäjän romahduksen seurauksena keisarikunnan osa, Suomen suuriruhtinaskunta, julistautui itsenäiseksi Suomeksi 6. joulukuuta 1917"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage gives Finland's independence date as 6 December 19",
+      "close": "Stated elsewhere: the English article has independence adopted on 6 December 1917. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q211855",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Kaikkiaan kuusi senaatin jäsentä siirtyi pääkaupungista Vaasaan, missä he jatkoivat hallituksen työskentelyä Vaasan senaattina"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage states that six Senate members moved to Vaasa and ",
+      "close": "Stated elsewhere: the English article has the Vaasa Senate. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q211855",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Kaikkiaan kuusi senaatin jäsentä siirtyi pääkaupungista Vaasaan, missä he jatkoivat hallituksen työskentelyä Vaasan senaattina"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage states that six Senate members moved from the capi",
+      "close": "Stated elsewhere: the Swedish article has the Senate fleeing to Vasa (\"merparten av senaten flydde till Vasa\"). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q211855",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Folkkommissariatet antog den 28 januari benämningen Finlands socialistiska arbetarrepublik, medan merparten av senaten flydde till Vasa"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage states that on 28 January the People's Commissaria",
+      "close": "Stated elsewhere: the English article has the Finnish Socialist Workers' Republic and the People's Delegation of 28 January 1918. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q211855",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Folkkommissariatet antog den 28 januari benämningen Finlands socialistiska arbetarrepublik, medan merparten av senaten flydde till Vasa"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage says the People's Delegation adopted the name Finn",
+      "close": "Stated elsewhere: the English article has the Finnish Socialist Workers' Republic and the People's Delegation of 28 January 1918. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q211855",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "yleisen ja yhtäläisen äänioikeuden puuttuminen kunnallis­vaaleissa"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage identifies the lack of general and equal suffrage ",
+      "close": "Stated elsewhere: the English article has universal suffrage in local elections. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q211855",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "työaika­lainsäädäntö"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage cites working hours legislation as a source of ind",
+      "close": "Stated elsewhere: the English article has the eight-hour working day. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q211855",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Valkoisia saapui tukemaan lisäksi Saksan armeijan 13 000 sotilaan vahvuiset joukot"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage states that the Whites were additionally supported",
+      "close": "Stated elsewhere: the English article gives the German force (the 10,000-strong Baltic Sea Division and a 2,000–3,000 brigade). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q211855",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "An agricultural worker was shot during a local strike on 9 August 1917 at Ypäjä and a Civil Guard member was killed in a local political crisis at Malmi on 24 September"
+      },
+      "outcome": "kept",
+      "about": "The English passage states that an agricultural worker was shot at Ypä",
+      "close": "Stated elsewhere: the Finnish article has the shooting at Ypäjä in August 1917. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q211855",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "An agricultural worker was shot during a local strike on 9 August 1917 at Ypäjä and a Civil Guard member was killed in a local political crisis at Malmi on 24 September"
+      },
+      "outcome": "kept",
+      "about": "The English passage records the shooting at Ypäjä on 9 August 1917 and",
+      "close": "Stated elsewhere: the Finnish article has the shooting at Ypäjä in August 1917. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q211855",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "The Social Democratic Party gained an absolute majority in the parliamentary elections of 1916"
+      },
+      "outcome": "kept",
+      "about": "The English passage states that the Social Democratic Party won an absolute majority in the 1916 parliamentary elections, while th",
+      "close": "Stated elsewhere: the Finnish article has the 1916 election victory and a socialist-majority parliament. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q211855",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "The Social Democratic Party gained an absolute majority in the parliamentary elections of 1916"
+      },
+      "outcome": "kept",
+      "about": "The English passage states that the Social Democrats won an absolute m",
+      "close": "Stated elsewhere: the Finnish article has the 1916 election victory and a socialist-majority parliament. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q211855",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Slaget om Viborg pågick mellan 23 och 29 april"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage states that the Battle of Viborg lasted from 23 to",
+      "close": "Stated elsewhere: the Finnish article has the Battle of Vyborg (\"vallattiin 29. huhtikuuta. Viipurin taisteluun osallistui 18 500 valkoista\"). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q211855",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "On 13 April, German troops took over the Market Square, the Smolna, the Presidential Palace and the Senate-Ritarihuone area"
+      },
+      "outcome": "kept",
+      "about": "The English passage states that German troops took over key Helsinki l",
+      "close": "Stated elsewhere: the Swedish article has Helsinki taken on 13 April (\"Den 13 april kapitulerade de sista röda i Helsingfors\"). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q211855",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "Red Finland was led by the Finnish People's Delegation , established on 28 January 1918 in Helsinki, which was supervised by the Central Workers' Council"
+      },
+      "outcome": "kept",
+      "about": "The English passage states that Red Finland was led by the Finnish Peo",
+      "close": "Stated elsewhere: the Swedish article has the Folkkommissariat formed and named on 28 January. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q211855",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Punaisen puolen hallitukseksi perustettiin Helsingissä 28. tammikuuta Suomen kansanvaltuuskunta"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage reports that the Finnish People's Delegation was f",
+      "close": "Stated elsewhere: the Swedish article has the Folkkommissariat formed and named on 28 January. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q134949",
+      "type": "contradiction",
+      "quotes": {
+        "fi": "Rauhansopimuksessa Suomi luovutti Neuvostoliitolle osan Sallaa ja Kuusamoa, Kalastajasaarennon Petsamosta, Suomenlahden ulkosaaret ja suuren osan Karjalaa mukaan lukien neljänneksi suurimman kaupunkinsa Viipurin",
+        "en": "The region of Petsamo, captured by the Red Army during the war, was returned to Finland according to the treaty"
+      },
+      "outcome": "changed",
+      "about": "The English article says Petsamo was returned to Finland by the treaty",
+      "close": "Not a contradiction: the Finnish \"Kalastajasaarennon Petsamosta\" is the Rybachy Peninsula, which Finland ceded; the English article also has the Rybachy Peninsula ceded and Petsamo returned. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q134949",
+      "type": "numbers",
+      "quotes": {
+        "fi": "viisi päivää myöhemmin",
+        "en": "The supply convoys would sail on 12 March and the landings would begin on 20 March"
+      },
+      "outcome": "new",
+      "about": "The English article says the convoys would sail on 12 March and the la",
+      "close": "Not a contradiction: both editions have the landings on 20 March (the Finnish five days count from the departure on 15 March, a numbers row of its own). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q134949",
+      "type": "numbers",
+      "quotes": {
+        "fi": "viisi",
+        "en": "Troops were increased from ten divisions to 25–26 divisions with six or seven tank brigades and several independent tank platoons as support, totalling 600,000 soldiers"
+      },
+      "outcome": "new",
+      "about": "The Finnish article says Timoshenko received five new tank brigades; t",
+      "close": "Not the same measure: the Finnish five are new tank brigades given to Timoshenko, the English six or seven the tank brigades of the whole build-up. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q134949",
+      "type": "framing",
+      "quotes": {
+        "fi": "puhuttiin ”vuosien 1939–1940 neuvostoliittolais-suomalaisesta paikallisesta aseellisesta konfliktista”",
+        "en": "The Winter War was a war between the Soviet Union and Finland"
+      },
+      "outcome": "unchecked",
+      "about": "The Finnish passage reports that the Soviet Union called the conflict ",
+      "close": "Not a label of the Finnish article: it reports the Soviet name \"local armed conflict\" as the Soviet name. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q134949",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Vid anfall runt Tolvajärvi norr om Ladoga lyckades man besegra två divisioner genom att anfalla flankerna, döda 4 000 soldater ur Röda armén och ta 600 fångar"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage states that Finnish forces defeated two Soviet div",
+      "close": "Stated elsewhere: the English article has the Finnish victory at Tolvajärvi. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q134949",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Vid anfall runt Tolvajärvi norr om Ladoga lyckades man besegra två divisioner genom att anfalla flankerna, döda 4 000 soldater ur Röda armén och ta 600 fångar"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage says the Finns defeated the Soviet divisions at To",
+      "close": "Stated elsewhere: the English article has the Finnish victory at Tolvajärvi. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q134949",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Vid anfall runt Tolvajärvi norr om Ladoga lyckades man besegra två divisioner genom att anfalla flankerna, döda 4 000 soldater ur Röda armén och ta 600 fångar"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage reports that at Tolvajärvi the Finns defeated two ",
+      "close": "Stated elsewhere: the English article has the Finnish victory at Tolvajärvi. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q134949",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Den finländska mottitaktiken som innebar att man försökte inringa sovjetiska förband visade sig vara så effektiv att hela den sovjetiska offensiven hade kört fast längs östgränsen vid årsskiftet 1939/1940"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage states that the Finnish motti tactic stalled the e",
+      "close": "Stated elsewhere: the English article has the motti tactic (\"split the enemy force into smaller mottis\"). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q134949",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Den finländska mottitaktiken som innebar att man försökte inringa sovjetiska förband visade sig vara så effektiv att hela den sovjetiska offensiven hade kört fast längs östgränsen vid årsskiftet 1939/1940"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage says the entire Soviet offensive had become stuck ",
+      "close": "Stated elsewhere: the English article has the motti tactic (\"split the enemy force into smaller mottis\"). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q134949",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Under genommarschen skulle man kunna ockupera Narvik och malmfälten som var mycket viktiga för den tyska industrin"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage says the force could occupy Narvik and the ore fie",
+      "close": "Stated elsewhere: the English article has the landing at Narvik and the route through the Swedish ore fields. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q134949",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Suomen sotilasjohto kuitenkin arvioi, että lännen apu olisi ollut riittämätöntä eikä se olisi ehtinyt ajoissa"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage states the Finnish military leadership judged West",
+      "close": "Stated elsewhere: the English article has the Western expedition that \"would not arrive in time\". (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q134949",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Suomen sotilasjohto kuitenkin arvioi, että lännen apu olisi ollut riittämätöntä eikä se olisi ehtinyt ajoissa"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage states that the Finnish military leadership assess",
+      "close": "Stated elsewhere: the English article has the Western expedition that \"would not arrive in time\". (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q134949",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Sotaa seurasi välirauha, jonka aikana Suomi lähentyi Saksan kanssa, ja jota kesällä 1941 seurasi jatkosota"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage states that the war was followed by an interim pea",
+      "close": "Stated elsewhere: the English article has the Interim Peace and the Continuation War from June 1941. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q134949",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Tidigt på morgonen den 30 november öppnade sovjetiskt artilleri eld följt av att infanteri gick över gränsen på Karelska näset, norr om sjön Ladoga och vid Petsamo"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage says Soviet artillery opened fire and infantry cro",
+      "close": "Stated elsewhere: the English article has the invasion on 30 November 1939. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q134949",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Tidigt på morgonen den 30 november öppnade sovjetiskt artilleri eld följt av att infanteri gick över gränsen på Karelska näset, norr om sjön Ladoga och vid Petsamo"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage states that the Soviet attack began on the morning",
+      "close": "Stated elsewhere: the English article has the invasion on 30 November 1939. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q134949",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "under krigets 105 dagar skedde nästan 1 000 bombanfall mot civila mål där 100 000 bomber fälldes"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage states that during the war's 105 days nearly 1,000",
+      "close": "A numbers difference, not a missing fact: the English article counts 2,075 bombing attacks in 516 localities. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q134949",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "under krigets 105 dagar skedde nästan 1 000 bombanfall mot civila mål där 100 000 bomber fälldes"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage states that nearly 1,000 bomb raids dropped 100,00",
+      "close": "A numbers difference, not a missing fact: the English article counts 2,075 bombing attacks in 516 localities. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q134949",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "på Näset fanns åtta finländska divisioner mot 22 sovjetiska"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage states there were eight Finnish divisions against ",
+      "close": "A numbers difference covered by another row: the English article has 25–26 Soviet divisions on the Isthmus. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q134949",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "vid ett möte i Moskva i oktober förklarade Josef Stalin att de sovjetiska kraven inte var eftergivliga"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage states that Stalin declared the Soviet demands non",
+      "close": "Covered by a contradiction row: the English article has the October meetings, with Stalin lessening his demands. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q134949",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "Stalin's purges in the 1930s had devastated the officer corps of the Red Army; those purged included three of its five marshals, 220 of its 264 division or higher-level commanders and 36,761 officers of all ranks"
+      },
+      "outcome": "kept",
+      "about": "The English passage details the Stalinist purges of the Red Army offic",
+      "close": "Stated elsewhere: the Finnish article has Stalin's purges of 1937–1938 and the officer corps killed or imprisoned. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q134949",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "År 1937 greps, avskedades, fängslades eller avrättades ett stort antal officerare, vilket slog hårt mot Röda arméns ledning"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage describes the 1937 purges of officers and their im",
+      "close": "Stated elsewhere: the English article has Stalin's purges devastating the Red Army's officer corps. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q134949",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Vintern 1939/1940 var i Finland en av de kallaste som uppmätts, det var konstant minusgrader och ofta låg temperaturen mellan –20 och –40 °C"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage says temperatures in Finland often lay between –20",
+      "close": "Stated elsewhere: the English article has the exceptionally cold winter of 1939–40. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q134949",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Vid anfall runt Tolvajärvi norr om Ladoga lyckades man besegra två divisioner genom att anfalla flankerna, döda 4 000 soldater ur Röda armén och ta 600 fångar",
+        "en": "To the north, the Finns retreated from Ägläjärvi to Tolvajärvi on 5 December and then repelled a Soviet offensive in the battle of Tolvajärvi on 11 December"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage gives casualty and prisoner figures for the fighti",
+      "close": "Stated elsewhere: the Swedish article has the battle at Tolvajärvi. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q134949",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "On 12 December, the advancing Soviet 139th Rifle Division, supported by the 56th Rifle Division, was defeated by a much smaller Finnish force under Paavo Talvela in Tolvajärvi, the first Finnish victory of the war"
+      },
+      "outcome": "kept",
+      "about": "The English passage describes Tolvajärvi as the first Finnish victory ",
+      "close": "Stated elsewhere: the Swedish article has the battle at Tolvajärvi. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q134949",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Neuvostoliitto oli jo elokuussa 1939 solminut Saksan kanssa Molotov–Ribbentrop-sopimuksen, jonka salaisessa lisäpöytäkirjassa Suomi laskettiin osaksi Neuvostoliiton etupiiriä"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage mentions the August 1939 Molotov–Ribbentrop pact a",
+      "close": "Stated elsewhere: the Swedish article has the Molotov–Ribbentrop Pact and the free hand it gave over Finland. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q134949",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "The battles focused mainly on Taipale along the Karelian Isthmus, on Kollaa in Ladoga Karelia and on Raate Road in Kainuu, but there were also battles in Lapland and North Karelia"
+      },
+      "outcome": "kept",
+      "about": "The English passage lists the main battle locations as Taipale, Kollaa",
+      "close": "Stated elsewhere: the Finnish article has the fighting at Taipale, Kollaa and on the Raate road. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q122100",
+      "type": "contradiction",
+      "quotes": {
+        "sv": "19 juni",
+        "fi": "Mannerheim pyysi 19. kesäkuuta presidentti Rytin suostumuksella Saksalta suurempaa apua, kuutta divisioonaa sekä panssarivaunuja ja lentokoneita maavoimien tueksi"
+      },
+      "outcome": "new",
+      "about": "The Swedish article says Finland's Chief of General Staff Heinrichs co",
+      "close": "Not a contradiction: both editions date it 19 June; Heinrichs's contact with the Germans and Mannerheim's request for help can both be true. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q122100",
+      "type": "numbers",
+      "quotes": {
+        "fi": "Talvisodassa luovutetun Karjalan alueet vallattiin takaisin heinä-elokuussa 1941 laajojen taisteluiden ja huomattavien menetysten jälkeen",
+        "en": "By September 1941, Finland had regained its post–Winter War concessions to the Soviet Union in Karelia"
+      },
+      "outcome": "new",
+      "about": "The Finnish article says the ceded Karelia areas were recaptured in Ju",
+      "close": "Not a contradiction: the Finnish July–August 1941 fits the English \"By September 1941\". (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q122100",
+      "type": "numbers",
+      "quotes": {
+        "sv": "I slutet av augusti hade den karelska armén, som leddes av generallöjtnant Erik Heinrichs, nått fram till den gamla gränsen som gällde fram till Vinterkriget",
+        "en": "By September 1941, Finland had regained its post–Winter War concessions to the Soviet Union in Karelia"
+      },
+      "outcome": "new",
+      "about": "The Swedish article says the Karelian Army reached the old Winter War ",
+      "close": "Not a contradiction: the Swedish end of August fits the English \"By September 1941\". (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q122100",
+      "type": "numbers",
+      "quotes": {
+        "fi": "Heinäkuun 12. päivänä Leningradin rintaman komentaja Leonid Govorov keskeytti hyökkäyksen",
+        "en": "The Soviet Vyborg–Petrozavodsk offensive in June and August 1944"
+      },
+      "outcome": "new",
+      "about": "The Finnish article says the offensive was halted on 12 July 1944; the",
+      "close": "Not a contradiction: the Finnish 12 July is Govorov halting the attack on the Isthmus; the English June and August span the whole offensive, Karelia included. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q122100",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "I slutet av augusti hade den karelska armén, som leddes av generallöjtnant Erik Heinrichs, nått fram till den gamla gränsen som gällde fram till Vinterkriget"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage states that the Karelian Army under Lieutenant Gen",
+      "close": "Stated elsewhere: the English article has the old border regained (\"By September 1941, Finland had regained its post–Winter War concessions\"). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q122100",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Talvisodassa luovutetun Karjalan alueet vallattiin takaisin heinä-elokuussa 1941 laajojen taisteluiden ja huomattavien menetysten jälkeen"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage states that the areas of Karelia ceded in the Wint",
+      "close": "Stated elsewhere: the English article has the old border regained (\"By September 1941, Finland had regained its post–Winter War concessions\"). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q122100",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Därtill skulle Porkala utarrenderas till Sovjet på 50 år"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage states that Porkala was to be leased to the Soviet",
+      "close": "Stated elsewhere: the English article has the lease of the Porkkala Peninsula. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q122100",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "De tyska trupperna skulle fördrivas från landet och tysk egendom skulle överlämnas till de allierade"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage states that German troops were to be expelled and ",
+      "close": "Stated elsewhere: the English article has the German troops to be expelled from Finnish territory. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q122100",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "De tyska trupperna skulle fördrivas från landet och tysk egendom skulle överlämnas till de allierade"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage says German troops were to be expelled from the co",
+      "close": "Stated elsewhere: the English article has the German troops to be expelled from Finnish territory. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q122100",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Antisovjetiska och \"fascistiska\" organisationer skulle permanent förbjudas (däribland Lotta Svärd, som senare kom att inspirera Svenska Lottakåren)"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage states that antisoviet and \"fascist\" organizations",
+      "close": "Stated elsewhere: the English article has the ban on fascist elements. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q122100",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Antisovjetiska och \"fascistiska\" organisationer skulle permanent förbjudas (däribland Lotta Svärd, som senare kom att inspirera Svenska Lottakåren)"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage says anti-Soviet and \"fascist\" organizations were ",
+      "close": "Stated elsewhere: the English article has the ban on fascist elements. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q122100",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Krigsförbrytarna skulle dömas"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage states that war criminals were to be sentenced, wh",
+      "close": "Stated elsewhere: the English article has the war-responsibility trials. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q122100",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Krigsförbrytarna skulle dömas"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage says war criminals were to be sentenced; the Engli",
+      "close": "Stated elsewhere: the English article has the war-responsibility trials. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q122100",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Neuvostoliiton ulkoministeri Vjatšeslav Molotov vieraili marraskuussa 1940 Berliinissä pyytämässä Hitleriltä varmistusta siihen, että Suomi laskettaisiin edelleen Neuvostoliiton valtapiiriin. Hitler kuitenkin ilmaisi, ettei hän sallisi uutta sotaa Suomessa"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage says that Molotov visited Berlin in November 1940 ",
+      "close": "Stated elsewhere: the English article has Molotov's visit to Berlin on 12–13 November 1940. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q122100",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Neuvostoliiton ulkoministeri Vjatšeslav Molotov vieraili marraskuussa 1940 Berliinissä pyytämässä Hitleriltä varmistusta siihen, että Suomi laskettaisiin edelleen Neuvostoliiton valtapiiriin"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage states that in November 1940 Soviet Foreign Minist",
+      "close": "Stated elsewhere: the English article has Molotov's visit to Berlin on 12–13 November 1940. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q122100",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Tyska trupper började anlända till landet och deras storlek skulle slutligen uppgå till omkring 200 000 man"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage says German troop numbers eventually reached aroun",
+      "close": "Stated elsewhere: the English article has the 200,000-strong German 20th Mountain Army. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q122100",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Från krigets slut fram till slutet av 1980-talet förklarades Finlands vägval med hjälp av den så kallade ”drivvedsteorin”"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage mentions the 'driftwood theory' used to explain Fi",
+      "close": "Stated elsewhere: the English article has the \"driftwood theory\". (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q122100",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Vapenvilan inleddes den 4 september klockan 07.00 för finländsk del, och Sovjetunionen avslutade krigsaktionerna ett dygn senare, den 5 september"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage states that the armistice began on 4 September at ",
+      "close": "Stated elsewhere: the English article has the ceasefire on 4 September and the Red Army following a day later. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q122100",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Vid Tysklands inledande av Operation Barbarossa – anfallet mot Sovjetunionen den 22 juni 1941 – deklarerade Adolf Hitler att Finland stred sida vid sida med Tyskland"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage says Hitler declared that Finland fought alongside",
+      "close": "Stated elsewhere: the English article has Hitler's proclamation of 22 June (\"Together with their Finnish comrades in arms\"). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q122100",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Vid Tysklands inledande av Operation Barbarossa – anfallet mot Sovjetunionen den 22 juni 1941 – deklarerade Adolf Hitler att Finland stred sida vid sida med Tyskland"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage states that Hitler declared Finland fought alongsi",
+      "close": "Stated elsewhere: the English article has Hitler's proclamation of 22 June (\"Together with their Finnish comrades in arms\"). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q122100",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Därtill stred de finländska trupperna tillsammans med tyska trupper speciellt under fortsättningskrigets inledningsskeden och de finländska operationerna var helt beroende av de tyska"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage states that Finnish troops fought together with Ge",
+      "close": "Stated elsewhere: the English article has the joint Finnish–German operations (Operation Silver Fox, the counterattacks in Kestenga). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q122100",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Neuvostoliiton puna-armeijan esikunta oli antanut Leningradin sotilaspiirille ohjeen Suomea vastaan käytävän uuden sodan varalle 18. syyskuuta 1940"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage states that the Soviet Red Army staff gave the Len",
+      "close": "Stated elsewhere: the English article has the Soviet plans for a new war drawn up during the Interim Peace. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q122100",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Neuvostoliiton puna-armeijan esikunta oli antanut Leningradin sotilaspiirille ohjeen Suomea vastaan käytävän uuden sodan varalle 18. syyskuuta 1940"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage states that the Soviet Red Army headquarters order",
+      "close": "Stated elsewhere: the English article has the Soviet plans for a new war drawn up during the Interim Peace. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q122100",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "On 10 July, Mannerheim drafted his order of the day, the Sword Scabbard Declaration, in which he pledged to liberate Karelia; in December 1941 in private letters, he made known his doubts of the need to push beyond the previous borders"
+      },
+      "outcome": "kept",
+      "about": "The English passage states that Mannerheim drafted the Sword Scabbard ",
+      "close": "Stated elsewhere: the Finnish article has the Sword Scabbard order of the day (\"Mannerheimin miekantuppipäiväkäsky\"). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q122100",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "Finnish Prime Minister Edwin Linkomies formed a new cabinet in March 1943 with peace as the top priority"
+      },
+      "outcome": "kept",
+      "about": "The English passage says Edwin Linkomies formed a new cabinet in March",
+      "close": "Stated elsewhere: the Finnish article has Linkomies's government formed in March 1943. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q122100",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "Stalin decided to force Finland to surrender with a bombing campaign on Helsinki"
+      },
+      "outcome": "kept",
+      "about": "The English passage states that Stalin decided to force Finland to sur",
+      "close": "Stated elsewhere: the Finnish article has the bombings of Helsinki to force Finland to peace (\"Helsingin suurpommituksilla\"). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q122100",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "Finland primarily aimed to reverse its territorial losses from the 1940 Moscow Peace Treaty and, depending on the success of the German invasion of the Soviet Union, to possibly expand its borders, especially into East Karelia"
+      },
+      "outcome": "kept",
+      "about": "The English passage states that Finland primarily aimed to reverse its",
+      "close": "Stated elsewhere: the Finnish article has regaining the territory lost in the Winter War as the main aim. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q122100",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "Finland began to seek an exit from the war after the German defeat at the Battle of Stalingrad in February 1943"
+      },
+      "outcome": "kept",
+      "about": "The English passage states that Finland began seeking an exit from the",
+      "close": "Stated elsewhere: the Finnish article has Finland distancing itself from Germany after Stalingrad on 2 February 1943. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q122100",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "The Soviet Union had received the Hanko Naval Base, on Finland's southern coast near the capital Helsinki, where it deployed over 30,000 Soviet military personnel"
+      },
+      "outcome": "kept",
+      "about": "The English passage states that the Soviet Union received the Hanko Na",
+      "close": "Stated elsewhere: the Swedish article has the Soviet base at Hanko. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q122100",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "Three days later, the Soviet Union conducted an air raid on Finnish cities which prompted Finland to declare war and allow German troops in Finland to begin offensive warfare"
+      },
+      "outcome": "kept",
+      "about": "The English passage states that three days after the Axis invasion the",
+      "close": "Stated elsewhere: the Swedish article has the bombing of 25 June 1941 and it becoming Finland's declaration of war. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q122100",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Sodan alussa eteläisellä rintamaosalla suomalaiset joukot valtasivat talvisodassa menetetyt alueet ja etenivät yli Syvärin ja Leningradin puolustuslinjojen tuntumaan"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage says Finnish troops recaptured areas lost in the W",
+      "close": "Stated elsewhere: the Swedish article has the lost areas retaken and the fighting on the Svir. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q122100",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Heinäkuussa Neuvostoliitto esitti vaatimuksen Ahvenanmaan demilitarisoinnista ja oikeutta junakuljetuksiin Suomen alueen poikki Hankoon"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage describes Soviet pressure in 1940, including a Jul",
+      "close": "A numbers difference covered by another row: the Swedish article dates the Soviet demand to 8 September 1940. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q152306",
+      "type": "numbers",
+      "quotes": {
+        "fi": "ratsuväenkenraali, 28.1.1918 (ylennys takautuvasti 7.3.1918)",
+        "en": "7 March 1918: General of Cavalry"
+      },
+      "outcome": "changed",
+      "about": "The English article gives 7 March 1918 for Mannerheim's promotion to g",
+      "close": "Not a contradiction: the Finnish article gives both dates, General of Cavalry from 28 January 1918 with the promotion made on 7 March 1918. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q152306",
+      "type": "numbers",
+      "quotes": {
+        "sv": "Across Asia from West to East in 1906−1908 I–II (1940, ny rev. utg. 2008)",
+        "en": "C.G. Mannerheim, Across Asia From West to East in 1906–1908. (1969) Anthropological Publications. Oosterhout N.B. – The Netherlands Across Asia: Vol. 1 – digital images"
+      },
+      "outcome": "new",
+      "about": "The English article gives 1969 for Across Asia From West to East in 19",
+      "close": "Not a contradiction: the Swedish 1940 is the first edition of Across Asia, the English 1969 a later edition. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q152306",
+      "type": "numbers",
+      "quotes": {
+        "sv": "Den 4 mars 1946 begärde han avsked från sitt ämbete och avgick den 11 mars och efterträddes av statsministern Juho Kusti Paasikivi",
+        "en": "Mannerheim resigned as president on 4 March 1946, giving as his reason his declining health and his view that the tasks he had been selected to carry out had been accomplished"
+      },
+      "outcome": "changed",
+      "about": "The English article says Mannerheim resigned as president on 4 March 1",
+      "close": "Not a contradiction: both editions have 4 March 1946 for the resignation (the Swedish adds that he left office on 11 March). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q152306",
+      "type": "numbers",
+      "quotes": {
+        "sv": "Från november 1945 till februari 1946 var han sjukskriven",
+        "en": "Mannerheim was troubled by recurring health problems during 1945, and was absent on medical leave from his duties as president from November until February 1946"
+      },
+      "outcome": "new",
+      "about": "The Swedish article says Mannerheim was on sick leave from November 19",
+      "close": "Not a difference: both editions have the medical leave from November 1945 to February 1946. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q152306",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "kom Mannerheim som 20-åring in på Nikolajevska kavalleriskolan i Sankt Petersburg 1887"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage states that he entered the Nikolayev Cavalry Schoo",
+      "close": "Stated elsewhere: the English article has the Nicholas Cavalry College (graduated 10 August 1889). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q152306",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "kom Mannerheim som 20-åring in på Nikolajevska kavalleriskolan i Sankt Petersburg 1887"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage states that Mannerheim entered the Nikolajevska ca",
+      "close": "Stated elsewhere: the English article has the Nicholas Cavalry College (graduated 10 August 1889). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q152306",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Bland annat till Storbritannien då han företrädde Finland vid Georg V:s begravning 1936 och stod i kontakt med de brittiska luftstridskrafterna och flygplansindustrin, samt till Tyskland genom att jaga tillsammans med Hermann Göring"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage mentions Mannerheim represented Finland at George ",
+      "close": "Stated elsewhere: the English article has him representing Finland at the funeral of George V in 1936. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q152306",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Niissä olosuhteissa katkeroitunut Mannerheim ei enää halunnut jatkaa ylipäällikkönä, ja hallitus myönsi hänelle eron 31. toukokuuta 1918"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage reports that Mannerheim resigned as commander-in-c",
+      "close": "Stated elsewhere: the English article has him resigning as commander-in-chief after the civil war. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q152306",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Förhandlingarna med Sovjetunionen hösten 1939 gällde överlåtelse av finländskt territorium, främst på Karelska näset och några öar i Finska viken, mot kompensation i form av mångdubbelt större områden i gränsområdet till nordöstra Finland"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage states that the autumn 1939 negotiations with the ",
+      "close": "Stated elsewhere: the English article has the Soviet demand of 1939 that Finland cede territory. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q152306",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Muiden toimiensa ohella Mannerheim johti Suomen Punaista Ristiä 30 vuotta ja perusti Mannerheimin Lastensuojeluliiton"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage says Mannerheim led the Finnish Red Cross for 30 y",
+      "close": "Stated elsewhere: the Swedish article has him leading the Finnish Red Cross and founding the child welfare league. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q152306",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Mannerheim suoritti protokollan edellyttämän vastavierailun Saksaan 27.–28. kesäkuuta 1942"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage notes Mannerheim's protocol-required return visit ",
+      "close": "Stated elsewhere: the English article has his return visit to Hitler's headquarters in East Prussia. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q152306",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Mannerheim suoritti protokollan edellyttämän vastavierailun Saksaan 27.–28. kesäkuuta 1942",
+        "en": "Shortly thereafter, Mannerheim returned the visit, travelling to Hitler's headquarters in East Prussia"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage dates the return visit to 27–28 June 1942; the Eng",
+      "close": "Stated elsewhere: the Finnish article has his return visit to Germany on 27–28 June 1942. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q3098938",
+      "type": "numbers",
+      "quotes": {
+        "fi": "Karl Schnurre saapui Suomeen 5. toukokuuta tunnustelemaan suomalaisten poliittisia mielialoja",
+        "en": "Finland had queried about the possibility of buying arms from Germany on 9 May, but Germany refused to even discuss the matter"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage dates the German arms feeler to 5 May, while the E",
+      "close": "Not a contradiction: Schnurre's arrival on 5 May and Finland's query about buying arms on 9 May are different events. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q3098938",
+      "type": "numbers",
+      "quotes": {
+        "fi": "Molotov matkusti Berliiniin 10. marraskuuta 1940",
+        "en": "When Soviet Foreign Minister Molotov visited Berlin on 12 November, he demanded that Germany stop supporting Finland, and the right to handle Finland in a similar way to Baltic states, but Hitler demanded that there should be no new military activities in Northern Europe before summer"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage dates Molotov's Berlin visit to 10 November 1940, ",
+      "close": "Not a contradiction: the Finnish article has Molotov setting off for Berlin on 10 November, the English article has him there on 12 November. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q3098938",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Den 22 september 1940 undertecknades transiteringsavtalet som möjliggjorde tyska trupp- och vapentransporter genom Finland till Nordnorge"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage says that on 22 September 1940 a transit agreement",
+      "close": "Stated elsewhere: the English article has the troop transfer agreement with Germany and the first troops landing at Vaasa on 21 September. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q3098938",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Den 22 september 1940 undertecknades transiteringsavtalet som möjliggjorde tyska trupp- och vapentransporter genom Finland till Nordnorge"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage describes a 22 September 1940 transit agreement al",
+      "close": "Stated elsewhere: the English article has the troop transfer agreement with Germany and the first troops landing at Vaasa on 21 September. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q3098938",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Den 22 september 1940 undertecknades transiteringsavtalet som möjliggjorde tyska trupp- och vapentransporter genom Finland till Nordnorge"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage states that a 22 September 1940 transit agreement ",
+      "close": "Stated elsewhere: the English article has the troop transfer agreement with Germany and the first troops landing at Vaasa on 21 September. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q3098938",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Den 22 september 1940 undertecknades transiteringsavtalet som möjliggjorde tyska trupp- och vapentransporter genom Finland till Nordnorge"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage describes the 22 September 1940 transit agreement ",
+      "close": "Stated elsewhere: the English article has the troop transfer agreement with Germany and the first troops landing at Vaasa on 21 September. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q3098938",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Den 22 september 1940 undertecknades transiteringsavtalet som möjliggjorde tyska trupp- och vapentransporter genom Finland till Nordnorge"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage says a transit agreement was signed on 22 Septembe",
+      "close": "Stated elsewhere: the Finnish article has the transit agreement (\"Solmittu kauttakulkusopimus pysyi salassa\"). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q3098938",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Den 22 september 1940 undertecknades transiteringsavtalet som möjliggjorde tyska trupp- och vapentransporter genom Finland till Nordnorge"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage states that the transit agreement was signed on 22",
+      "close": "Stated elsewhere: the Finnish article has the transit agreement (\"Solmittu kauttakulkusopimus pysyi salassa\"). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q3098938",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Den 22 september 1940 undertecknades transiteringsavtalet som möjliggjorde tyska trupp- och vapentransporter genom Finland till Nordnorge"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage mentions the 22 September 1940 transit agreement e",
+      "close": "Stated elsewhere: the Finnish article has the transit agreement (\"Solmittu kauttakulkusopimus pysyi salassa\"). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q3098938",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Som en lösning på det osäkra politiska läget diskuterade Finland och Sverige såväl ett försvarsförbund som ett statsförbund"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage says Finland and Sweden discussed both a defence a",
+      "close": "Stated elsewhere: the English article has the Finnish–Swedish alliance and union plans. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q3098938",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Som en lösning på det osäkra politiska läget diskuterade Finland och Sverige såväl ett försvarsförbund som ett statsförbund"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage says Finland and Sweden discussed a defense union and a state union, which the E",
+      "close": "Stated elsewhere: the English article has the Finnish–Swedish alliance and union plans. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q3098938",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Som en lösning på det osäkra politiska läget diskuterade Finland och Sverige såväl ett försvarsförbund som ett statsförbund"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage includes Finnish–Swedish union plans, the 22 Septe",
+      "close": "Stated elsewhere: the English article has the Finnish–Swedish alliance and union plans. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q3098938",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Som en lösning på det osäkra politiska läget diskuterade Finland och Sverige såväl ett försvarsförbund som ett statsförbund"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage says Finland and Sweden discussed a defense union and a state union, while the F",
+      "close": "Stated elsewhere: the Finnish article has the Finnish–Swedish defence alliance and union (\"puolustusliittoa\", \"valtioliiton muodostamista\"). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q3098938",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Som en lösning på det osäkra politiska läget diskuterade Finland och Sverige såväl ett försvarsförbund som ett statsförbund"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage says Finland and Sweden discussed a defence union ",
+      "close": "Stated elsewhere: the Finnish article has the Finnish–Swedish defence alliance and union (\"puolustusliittoa\", \"valtioliiton muodostamista\"). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q3098938",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Molotov antoi Paasikivelle listan, jossa lueteltiin ei-toivottavat vaihtoehdot presidentiksi: Toivo Kivimäki, Mannerheim, Väinö Tanner ja Svinhufvud. Neuvostoliitolle sopiva Ryti valittiin"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage states that Molotov gave Paasikivi a list of unacc",
+      "close": "Stated elsewhere: the English article has the Soviet warning against Mannerheim, Tanner, Kivimäki or Svinhufvud as president. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q3098938",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Samtidigt fick Finland möjlighet att köpa vapen av Tyskland"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage says Finland received the opportunity to buy weapo",
+      "close": "Stated elsewhere: the English article has Finland buying arms from Germany (generals visiting Germany in the autumn of 1940 to purchase arms). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q3098938",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Under sommaren 1940 försämrades Finlands utrikespolitiska läge då Tyskland ockuperade Danmark och Norge medan Sovjetunionen tvingade de baltiska staterna ansluta sig till Sovjetunionen"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage says Germany's occupation of Denmark and Norway an",
+      "close": "A numbers difference covered by another row: the English article dates the occupation of Denmark and Norway to 9 April 1940. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q3098938",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "After Nazi Germany's assault on Scandinavia on 9 April 1940, Operation Weserübung, Finland was physically isolated from her traditional trade markets in the west"
+      },
+      "outcome": "kept",
+      "about": "The English passage says Germany's 9 April 1940 assault isolated Finla",
+      "close": "A numbers difference covered by another row: the Swedish article places the occupation of Denmark and Norway in the summer of 1940. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q3098938",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "I november 1940 tvingades president Kyösti Kallio avgå på grund hälsoskäl"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage describes Kyösti Kallio's resignation in November ",
+      "close": "Stated elsewhere: the Finnish article has Kallio resigning for health reasons (\"luopui presidentin virasta terveydellisiin syihin vedoten\"). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q3098938",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Under mellankrigstiden förstärkte Finland sin armé och började bygget av en ny försvarslinje, Salpalinjen längs den nya östgränsen"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage states that Finland strengthened its army and bega",
+      "close": "Stated elsewhere: the Finnish article has the new defence line, later named the Salpa Line. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q695285",
+      "type": "contradiction",
+      "quotes": {
+        "en": "There was also an area that the Russians captured during the war that remained in Finnish hands according to the treaty: Petsamo",
+        "fi": "Petsamosta"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage lists Petsamo among the ceded areas; the English p",
+      "close": "Not a contradiction: the Finnish list cedes only the Finnish part of the Rybachy Peninsula (\"Suomen hallitsema osa Kalastajasaarentoa Petsamosta\"); Petsamo itself stayed Finnish, as in English. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q695285",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Dessutom innehöll fredsavtalet också andra krav: Finland skulle arrendera ut Hangö udd till Sovjetunionen som flottbas på 30 år Finland skulle ersätta industrier och dylikt som evakuerats från Karelen Finland skulle inte alliera sig mot Sovjetunionen"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage lists additional demands such as a 30-year lease o",
+      "close": "Stated elsewhere: the English article has the Hanko Peninsula leased to the Soviet Union as a naval base. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q1321586",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "The Armistice restored the Moscow Peace Treaty of 1940, with a number of modifications"
+      },
+      "outcome": "kept",
+      "about": "The Finnish and English passages differ in that the English lead state",
+      "close": "Stated elsewhere: the Finnish article has the terms of the 1940 Moscow Peace restored (\"vaadittiin Moskovan 1940 rauhansopimuksen saattamista voimaan\"). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q2328052",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "År 1910 utfärdades en ny lag som på väsentliga punkter överensstämde med februarimanifestet 1899"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage states that a 1910 law corresponded to the Februar",
+      "close": "Stated elsewhere: the English article has the 1910 law on all-Empire legislation that took legislative power from the Finnish Parliament. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q2328052",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "The above-mentioned February Manifesto of 1899, the decree by Emperor Nicholas II which asserted the imperial government's right to rule Finland without the consent of local legislative bodies, under which: the Orthodox Russian Church's status was strengthened; including, for example, criminalizing the act of subjecting a follower of the Orthodox church to a Lutheran church service; the press was subjected to tighter Russian censorship than before; the Military of the Grand Duchy of Finland was made subject to Russian rules of military service",
+        "sv": "År 1910 utfärdades en ny lag som på väsentliga punkter överensstämde med februarimanifestet 1899"
+      },
+      "outcome": "kept",
+      "about": "The English passage details the February Manifesto of 1899, including ",
+      "close": "Stated elsewhere: the English article has the 1910 law on all-Empire legislation that took legislative power from the Finnish Parliament. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q525893",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "statstjänsteman"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage describes him as a civil servant; the English pass",
+      "close": "Stated elsewhere: the English article has his career as a clerk in the senate. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q525893",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "finlandssvensk"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage identifies him as Finland-Swedish; the English pas",
+      "close": "Stated elsewhere: the English article has him born to Swedish-speaking Finnish parents. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q525893",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "Finnish nationalist activist"
+      },
+      "outcome": "kept",
+      "about": "The English passage describes him as a Finnish nationalist activist; t",
+      "close": "Stated elsewhere: the Swedish lead calls him an activist (\"finlandssvensk aktivist\"). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q209439",
+      "type": "numbers",
+      "quotes": {
+        "sv": "Från december 1917 var Svinhufvud det självständiga Finlands första regeringschef som senatens ordförande",
+        "fi": "27. marraskuuta 1917 – 27. toukokuuta 1918"
+      },
+      "outcome": "new",
+      "about": "The Finnish article says Svinhufvud was Senate chairman from 27 Novemb",
+      "close": "Not a contradiction: the Swedish \"from December 1917\", as head of government of independent Finland, fits the Finnish term as Senate chairman from 27 November 1917. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q209439",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Siinä asemassa hän myös antoi itsenäisyysjulistuksen eduskunnalle Helsingissä Heimolan talossa 4. joulukuuta 1917"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage states that Svinhufvud gave the declaration of ind",
+      "close": "Stated elsewhere: the English article has him presenting the Declaration of Independence to Parliament. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q209439",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Svinhufvud ryhtyi myös heti hakemaan tunnustusta vastahankitulle itsenäisyydelle vierailemalla Pietarissa Vladimir Leninin luona 31. joulukuuta 1917"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage states that Svinhufvud visited Vladimir Lenin in P",
+      "close": "Stated elsewhere: the English article has his visit to Lenin, who recognised Finnish independence. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q209439",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "När Svinhufvud ställde upp i presidentvalet 1937 blev han inte återvald på grund av sitt motstånd mot att Socialdemokraterna skulle få komma i regeringsställning"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage says Svinhufvud was not re-elected in 1937 because",
+      "close": "Stated elsewhere: the English article has the 1937 election lost because the Social Democrats and Agrarians voted against him over his stance on their government. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q209439",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Vuonna 1918 hänestä tuli kokoomuslainen, kun puolue perustettiin"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage says he became a National Coalition Party member w",
+      "close": "Stated elsewhere: the Swedish article has him in the National Coalition Party. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q214029",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Den 25 juli 1919 utnämndes Ståhlberg till Finlands första president av senaten, med 143 röster, och han svors in i ämbetet dagen därpå"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage states that Ståhlberg was appointed Finland's firs",
+      "close": "Stated elsewhere: the English article has his election as president on 25 July 1919 (the Swedish senate and 143 votes are a contradiction row of their own). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q214029",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "När han styrt Finland i sex framgångsrika år avstod han att kandidera för omval, för att lämna ett gott föredöme för framtiden"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage states that after six successful years Ståhlberg d",
+      "close": "Stated elsewhere: the English article has him not seeking re-election in 1925. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q209435",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Pitkän harkinnan jälkeen Paasikivi päätti toukokuussa 1949 armahtaa Rytin nojautuen tämän lääkärien antamaan lausuntoon, jonka mukaan Rytin sairaus oli laadultaan erittäin vakava ja parantumaton"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage states that Paasikivi decided in May 1949 to pardo",
+      "close": "Stated elsewhere: the English article has him pardoned by President Paasikivi in 1949. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q116190",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Vuosina 1946–1948 hän oli vankilassa sotasyyllisyydestä tuomittuna, mutta palasi vielä vanhoilla päivillään politiikkaan"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage reports that Tanner was imprisoned from 1946 to 19",
+      "close": "Stated elsewhere: the English article has his war-responsibility sentence, his time in prison and his return to politics. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q116190",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Vuosina 1946–1948 hän oli vankilassa sotasyyllisyydestä tuomittuna, mutta palasi vielä vanhoilla päivillään politiikkaan"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage states that Tanner was imprisoned from 1946 to 194",
+      "close": "Stated elsewhere: the Swedish article has his prison sentence, his release in 1948 and his return to politics. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q116190",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Poliittisen uransa ohella Tanner oli Osuusliike Elannon toimitusjohtaja vuosina 1915–1946"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage states that Tanner was CEO of Osuusliike Elanto fr",
+      "close": "A numbers difference, not a missing fact: the Swedish article has him Elanto's CEO from 1915, but until 1956 where the Finnish says 1946. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q116190",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "han kom att stanna på vd-posten fram till 1956"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage says Tanner remained Elanto’s CEO until 1956; the ",
+      "close": "A numbers difference, not a missing fact: the Finnish article has him Elanto's CEO, but until 1946 where the Swedish says 1956. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q116190",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Under sin långa karriär hann han också fungera som finansminister (1937–39, 1942–44) samt utrikesminister (1936–37), och efter vinterkriget som folkförsörjningsminister (1940) och handels- och industriminister (1940–42)"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage states that during his long career Tanner also ser",
+      "close": "Covered by a numbers row: the Finnish article has his ministerial posts of 1937–1944, set against these years in another row. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q2348453",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "The organisation was disbanded by the government after the war",
+        "sv": "Efter kriget tvångsupplöstes organisationen 1944 på order av den allierade Kontrollkommissionen, i enlighet med villkoren i Mellanfreden i Moskva"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage says the 1944 dissolution was in accordance with t",
+      "close": "Stated elsewhere: the English article has the post-war Soviet demand to ban the organisations it considered fascist, and the disbanding. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q2348453",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Valvontakomissio luokittelikin Lotta Svärdin rauhanehtojen tarkoittamaksi fasistiseksi järjestöksi ja vaati sen lakkauttamista"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage states that the Control Commission classified Lott",
+      "close": "Stated elsewhere: the English article has the post-war Soviet demand to ban the organisations it considered fascist, and the disbanding. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q2348453",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "When the Continuation War (1941–1944) ended, the Soviet Union demanded the ban of all organisations that it considered to be paramilitary, fascist or semi-fascist"
+      },
+      "outcome": "kept",
+      "about": "The English passage says the Soviet Union demanded the ban of organisations it considered paramilitary, fascist or semi-fascist, w",
+      "close": "Stated elsewhere: the Finnish article has the Control Commission classing Lotta Svärd as fascist under the peace terms and demanding its dissolution. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q2348453",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "When the Continuation War (1941–1944) ended, the Soviet Union demanded the ban of all organisations that it considered to be paramilitary, fascist or semi-fascist"
+      },
+      "outcome": "kept",
+      "about": "The English passage says the Soviet Union demanded the ban of organisations it considered paramilitary, fascist or semi-fascist; t",
+      "close": "Stated elsewhere: the Finnish article has the Control Commission classing Lotta Svärd as fascist under the peace terms and demanding its dissolution. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q2348453",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Järjestö perustettiin tukemaan suojeluskuntia"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage states that the organisation was founded to suppor",
+      "close": "Stated elsewhere: the Swedish article has the organisation fully joined with the Civil Guards (\"helt samorganiserad med skyddskårerna\"). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q2348453",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "The organisation expanded during the 1920s and it included 60,000 members in 1930"
+      },
+      "outcome": "kept",
+      "about": "The English passage reports that the organisation had 60,000 members i",
+      "close": "Stated elsewhere: the Swedish article has about 60,000 Lottas when Luukkonen became chair in 1929. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q2348453",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "The organisation expanded during the 1920s and it included 60,000 members in 1930"
+      },
+      "outcome": "kept",
+      "about": "The English passage reports that the organisation included 60,000 memb",
+      "close": "Stated elsewhere: the Swedish article has about 60,000 Lottas when Luukkonen became chair in 1929. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q1799569",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Efter Finlands självständighet 1917 levde fennomanins tankearv vidare i den radikala mellankrigsrörelsen äktfinskheten, som i sin tur möttes av en finlandssvensk motmobilisering, östsvenskheten"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage says that after independence in 1917 fennomani's l",
+      "close": "Stated elsewhere: the Finnish article has the interwar aitosuomalainen movement (\"Aitosuomalainen liike pyrki nostamaan suomalais-kansallista sivistystä\"). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q2573930",
+      "type": "numbers",
+      "quotes": {
+        "fi": "1800-luvun jälkipuoliskolla",
+        "en": "It took shape from about 1860 in opposition to the Fennoman movement, which held that Finnish should replace Swedish as the language of government, the courts, the schools and educated life"
+      },
+      "outcome": "new",
+      "about": "The Finnish article places Svekomania in the latter half of the 19th c",
+      "close": "Not a contradiction: the English \"from about 1860\" falls within the Finnish \"latter half of the 19th century\". (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q2573930",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Valtaosa Liberaalisen puolueen jäsenistöstä siirtyi Ruotsalaiseen puolueeseen 1880-luvun aikana"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage states that the majority of the Liberal Party's me",
+      "close": "Stated elsewhere: the English article has the liberals going over to the Swedish Party in the 1880s. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q2573930",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Valtaosa Liberaalisen puolueen jäsenistöstä siirtyi Ruotsalaiseen puolueeseen 1880-luvun aikana"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage says most Liberal Party members moved to the Swedish Party during the 1880s, whi",
+      "close": "Stated elsewhere: the English article has the liberals going over to the Swedish Party in the 1880s. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q2573930",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Valtaosa Liberaalisen puolueen jäsenistöstä siirtyi Ruotsalaiseen puolueeseen 1880-luvun aikana"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage says most Liberal Party members moved to the Swedish Party during the 1880s; the English p",
+      "close": "Stated elsewhere: the English article has the liberals going over to the Swedish Party in the 1880s. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q2573930",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Valtaosa Liberaalisen puolueen jäsenistöstä siirtyi Ruotsalaiseen puolueeseen 1880-luvun aikana"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage says most Liberal Party members joined the Swedish",
+      "close": "Stated elsewhere: the English article has the liberals going over to the Swedish Party in the 1880s. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q2573930",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "The Swedish Party grew directly out of the Viking group, and in 1882 Axel Lille founded Nya Pressen as its organ",
+        "sv": "Därtill uppkom även Svenska partiet på 1860-talet ur Vikingagrupperingen i Helsingfors, som en spegelbild till det äldre Finska partiet"
+      },
+      "outcome": "kept",
+      "about": "The English edition says Axel Lille founded Nya Pressen in 1882 as the",
+      "close": "Stated elsewhere: the English article has the Swedish Party growing out of the Viking group. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q2573930",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Därtill uppkom även Svenska partiet på 1860-talet ur Vikingagrupperingen i Helsingfors, som en spegelbild till det äldre Finska partiet"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage says the Swedish Party arose in the 1860s from the",
+      "close": "Stated elsewhere: the English article has the Swedish Party growing out of the Viking group. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q2573930",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Svekomaniaan vaikuttivat myös tuolloin yleiseurooppalaiset rotuopit, joiden mukaan itäiset kansat, joihin suomalaiset kuuluivat, eivät kyenneet luomaan kulttuuria tai kansakuntaa"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage says that Svekomania was influenced by contemporar",
+      "close": "Stated elsewhere: the English article has the period's racial science describing the two nationalities as separate races. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q2573930",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Svekomaniaan vaikuttivat myös tuolloin yleiseurooppalaiset rotuopit, joiden mukaan itäiset kansat, joihin suomalaiset kuuluivat, eivät kyenneet luomaan kulttuuria tai kansakuntaa"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage says that contemporary European racial theories he",
+      "close": "Stated elsewhere: the English article has the period's racial science describing the two nationalities as separate races. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q179858",
+      "type": "numbers",
+      "quotes": {
+        "fi": "Urho Kekkosen varhaisimmat tunnetut esi-isät asettuivat Savon seudulle mahdollisesti jo ennen 1500-lukua",
+        "en": "They most likely settled in the Savonia region before the 16th century"
+      },
+      "outcome": "changed",
+      "about": "Both articles state that the Kekkonens most likely settled in Savonia ",
+      "close": "Not a difference: by its own summary both articles say the family most likely settled in Savonia before the 16th century. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q179858",
+      "type": "numbers",
+      "quotes": {
+        "fi": "hän sai neljän suuren puolueen tukemana 82 prosenttia äänistä ja 260 valitsijamiestä",
+        "en": "nine political parties supported Kekkonen's candidacy in the 1978 presidential election"
+      },
+      "outcome": "new",
+      "about": "The Finnish article says Kekkonen was supported by four major parties ",
+      "close": "Not a contradiction: the Finnish \"four major parties\" and the English \"nine political parties\" can both be true of the 1978 candidacy. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q179858",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Kekkonen valittiin eduskunnan puhemieheksi 22.7.1948"
+      },
+      "outcome": "kept",
+      "about": "The Finnish passage says Kekkonen was elected Speaker of Parliament on",
+      "close": "Stated elsewhere: the English article has him Speaker of Parliament from 1948 to 1950. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q179858",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "1924 gick han med i det högerradikala Akademiska Karelen-Sällskapet (Akateeminen Karjala-Seura, AKS)"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage states that Kekkonen joined the right-wing radical",
+      "close": "Stated elsewhere: the English article has him joining the Academic Karelia Society. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q179858",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "1924 gick han med i det högerradikala Akademiska Karelen-Sällskapet (Akateeminen Karjala-Seura, AKS)"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage says that Kekkonen joined the right-radical Academ",
+      "close": "Stated elsewhere: the Finnish article has him in the Academic Karelia Society (AKS). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q179858",
+      "type": "missing_fact",
+      "quotes": {
+        "sv": "Kekkonen var ordförande för Finlands olympiska kommitté från 1938 till 1946"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage describes his athletics career, including a 1924 F",
+      "close": "Stated elsewhere: the Finnish article has him leading the Finnish Olympic Committee. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q179858",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "Critical commentators referred to this policy of appeasement pejoratively as Finlandization"
+      },
+      "outcome": "kept",
+      "about": "The English passage describes the Paasikivi–Kekkonen doctrine of \"acti",
+      "close": "Stated elsewhere: the Finnish article has the term \"suomettuminen\" (Finlandization) entering the debate in his second term. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q179858",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "During the Finnish Civil War, Kekkonen fought for the Kajaani chapter of the White Guard, fighting in the battles of Kuopio, Varkaus, Mouhu, and Viipuri, and taking part in mop-up operations, including leading a firing squad in Hamina"
+      },
+      "outcome": "kept",
+      "about": "The English passage describes Kekkonen’s Civil War service with the Wh",
+      "close": "Stated elsewhere: the Finnish article has him in the Kajaani White Guard in the Civil War. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q179858",
+      "type": "missing_fact",
+      "quotes": {
+        "fi": "Viimeinen presidenttikausi jäi kesken sairauden takia",
+        "sv": "Han avgick slutligen 1982, inte efter nederlag i ett presidentval, utan av hälsoskäl"
+      },
+      "outcome": "kept",
+      "about": "The Swedish passage states that Kekkonen resigned in 1982 for health r",
+      "close": "Stated elsewhere: the Finnish article has his resignation for health reasons (officially 27 October 1981). (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q179858",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "It promoted friendly relations and bilateral trade with the Soviet Union"
+      },
+      "outcome": "kept",
+      "about": "The English passage says the K-linja promoted friendly relations and b",
+      "close": "Stated elsewhere: the Finnish article has him promoting Finland's eastern trade with the Soviet Union. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q179858",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "It promoted friendly relations and bilateral trade with the Soviet Union"
+      },
+      "outcome": "kept",
+      "about": "The English passage says the K-policy promoted friendly relations and ",
+      "close": "Stated elsewhere: the Finnish article has him promoting Finland's eastern trade with the Soviet Union. (review of the topics checked on 15 November, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q179858",
+      "type": "missing_fact",
+      "quotes": {
+        "en": "His family were farmers, though not poor tenant farmers, as some of his supporters later claimed"
+      },
+      "outcome": "kept",
+      "about": "The English passage says his family were farmers, not poor tenant farm",
+      "close": "Covered by a contradiction row: the Finnish article calls his father a crofter, set against this English sentence in another row. (review of the topics checked on 15 November, Claude Opus 5.5)"
     }
   ]
 }

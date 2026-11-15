@@ -87,7 +87,7 @@ for the Swedish and English history, which MariaDB does not provide.
 | Finnish history | Dataset M (`m-2026-10`): every Finnish version, 862,076 in all | 48,461 versions of 2,919 articles: the one current on each 1 January from 2005 to 2026, and the latest |
 | Swedish and English history | Fetched from the Wikimedia API ([`fetch_history.py`](../../spikes/mariadb-wikipedia/fetch_history.py)), because dataset M is Finnish only | 25,394 Swedish versions of 2,369 articles and 34,664 English versions of 2,365, at the same dates |
 | Every revision, not one a year | The same sources | The three demo topics: Lapua Movement, Finnish War, Diet of Porvoo |
-| Differences suggested and checked by Nemotron | NVIDIA Nemotron 3.5 Super VL on the pairs of the alignment | 17 topics: the three demo topics, and 14 more on 15 November, Mäntsälä rebellion to Red Guards |
+| Differences suggested and checked by Nemotron | NVIDIA Nemotron 3.5 Super VL on the pairs of the alignment | 40 topics: the three demo topics, and 37 more on 15 November, from Mäntsälä rebellion and the Winter War to Urho Kekkonen |
 
 In MariaDB that is 108,519 article versions and 225,816 passage versions in system-versioned tables, 39,330
 passages current today, 60,594 passage texts with a bge-m3 vector (1,024 dimensions), and 1.18 GB in all.
@@ -155,7 +155,7 @@ in, and nothing runs before **Run** is clicked.
   [Lapua Movement](https://since-when.katalyst.fyi/#/Q1412941), where Swedish and English Wikipedia say
   "fascist" in the first sentence and Finnish does not. NVIDIA Nemotron 3.5 Super VL suggests the
   differences and then checks each one against the whole other article, and the page says so. It has
-  compared 17 Finnish history topics so far, which the topic list puts first; the others show what the
+  compared 40 Finnish history topics so far, which the topic list puts first; the others show what the
   vector alignment alone finds, marked "not compared yet";
   [`demo/hero-findings-notes.md`](demo/hero-findings-notes.md) and [`demo/hero-verify-notes.md`](demo/hero-verify-notes.md)
   measure how often they are right before and after the check, against labels from reviews that language
