@@ -1,0 +1,2622 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Spread desk: the pitch</title>
+<meta name="description" content="One formula prices every car; a stand-in world on CRACI tested every idea. Team Katalyst's Spread desk for Bahn Express at Junction 2026." />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230f3d33'/%3E%3Cpath d='M10 7v18M22 7l-9.5 9L22 25' fill='none' stroke='%23b9f27c' stroke-width='4'/%3E%3C/svg%3E" />
+<link rel="preload" href="../fonts/archivo-latin-wdth-normal.woff2" as="font" type="font/woff2" crossorigin />
+<style>
+@font-face {
+	font-family: 'Archivo';
+	src: url('../fonts/archivo-latin-wdth-normal.woff2') format('woff2');
+	font-weight: 100 900;
+	font-stretch: 62% 125%;
+	font-display: swap;
+}
+	/* The page around the deck: the site's ground, the deck as large as the window allows at 16:9. */
+	html,
+	body {
+		margin: 0;
+		background: oklch(97% 0.012 165);
+	}
+	@media (prefers-color-scheme: dark) {
+		html,
+		body {
+			background: oklch(19% 0.022 170);
+		}
+	}
+	body {
+		min-height: 100vh;
+		display: grid;
+		place-items: center;
+	}
+	.deck {
+		width: 100%;
+	}
+	.deck .frame {
+		width: min(100vw, 177.78vh);
+	}
+	.deck .stage {
+		border-radius: 0;
+		border: 0;
+	}
+	.deck .cuts {
+		display: none;
+	}
+</style>
+</head>
+<body>
+<!-- The deck below is the same page as the team's "How Spread works" visual. Six slides by default;
+     #7, #9 or #10 in the address opens a longer cut (8, 10 or 11 slides). Print or Save as PDF gives one 16:9 slide a page. -->
+<div class="deck" id="deck" tabindex="0" aria-roledescription="presentation" aria-label="Spread desk, the jury pitch">
+<div class="frame">
+<div class="stage" id="stage">
+
+<!-- jury: the answer -->
+<section data-cuts="11" class="slide s-title s-ans" aria-label="Digital Twin², the answer">
+	<div class="t-left">
+		<p class="kick in">Junction 2026 &nbsp;/&nbsp; Bahn Express Spread</p>
+		<h1 class="t-h in" style="--d:1">Digital Twin²</h1>
+		<p class="it in t-twin" style="--d:1">A simulator of Bahn's simulator, and the Spread desk it taught.</p>
+		<p class="sm in h-line" style="--d:2"></p>
+		<div class="ans-best in" style="--d:3">
+			<p class="lab">What the night gained</p>
+			<b class="amber">40th → 11th</b>
+			<p class="sm"><b>Ranking rounds:</b> 40th of 62 on Saturday 15:00 with the first desk; 11th of 51 on Sunday 06:00 with merge 8.2, €77,653 over five weeks at 96.5% on time.</p>
+		</div>
+	</div>
+	<div class="ans-ideas in" style="--d:4">
+		<p class="lab">One formula prices every request. The ideas that carry it:</p>
+		<p class="it"><span class="amber">1</span> Each car is priced by its own chance of being late</p>
+		<p class="it"><span class="amber">2</span> Fees stop where drivers stop answering</p>
+		<p class="it"><span class="amber">3</span> One driver takes two cars when the routes meet</p>
+		<p class="it"><span class="amber">4</span> The week's rules are chosen from the number of drivers</p>
+		<p class="it"><span class="amber">5</span> A budget for the week's on-time share</p>
+	</div>
+</section>
+
+<!-- 1 -->
+<section data-cuts="5 7 9 10" class="slide s-title" aria-label="Spread desk">
+	<div class="t-left">
+		<p class="kick in">Junction 2026 &nbsp;/&nbsp; Bahn Express Spread</p>
+		<h1 class="t-h in" style="--d:1">Spread<br />desk</h1>
+		<p class="t-lede in" style="--d:2">One formula prices every car. When play ran short, we built our own world to test ideas in, and ran it on CRACI.</p>
+		<div class="t-stats in" style="--d:3">
+			<div><b class="amber">€12,376</b><span>a week on 120 unseen practice weeks</span></div>
+			<div><b class="amber">0.4 ms</b><span>a quote, no model on the quote path</span></div>
+			<div><b class="cyan">1,442</b><span>stand-in weeks in 4&nbsp;min&nbsp;41&nbsp;s on one runner</span></div>
+		</div>
+	</div>
+	<svg class="map in" style="--d:1" id="map" role="img" aria-label="Cars moving between towns across Finland, from Helsinki to Rovaniemi"></svg>
+</section>
+
+<!-- 2 -->
+<section data-cuts="9 10" class="slide" aria-label="The job">
+	<p class="kick in"><span class="no"></span>The job</p>
+	<h2 class="h in" style="--d:1">A week of car deliveries, scored in euros, and void below 90% on time</h2>
+	<div class="body">
+		<div class="flow in" style="--d:2;--n:4">
+			<div class="fn main" style="grid-column:1"><b>Dealer request</b><span>about 1,000 a week</span></div>
+			<div class="fn main" style="grid-column:2"><b>Our quote</b><span>15 minutes to answer</span></div>
+			<div class="fn br" style="grid-column:2"><i class="cond">competitor wins</i><b>Dealer buys elsewhere</b><span>costs us nothing</span></div>
+			<div class="fn main" style="grid-column:3"><b>Gig for a driver</b><span>we set the fee</span></div>
+			<div class="fn br" style="grid-column:3"><i class="cond">no driver in time</i><b>Late</b><span>part of the price back</span></div>
+			<div class="fn main last" style="grid-column:4"><b>Delivered on time</b><span>the dealer pays our price</span></div>
+		</div>
+		<div class="facts in" style="--d:3">
+			<div><b class="amber">90%</b><span>of orders on time, or the week is not ranked, whatever its margin</span></div>
+			<div><b>10–50%</b><span>of the price goes back to the dealer for a late car</span></div>
+			<div><b>⅓</b><span>of the usual drivers at level 8, the final's level, against a dearer competitor</span></div>
+		</div>
+	</div>
+</section>
+
+<!-- 3 -->
+<section data-cuts="5 7 9 10 11" class="slide" aria-label="The formula">
+	<p class="kick in"><span class="no"></span>The desk</p>
+	<p class="nerd only-11 in" style="--d:1"><b>For the technical jury</b>Engine room. Peer reviewers may admire the maths from a safe distance.</p>
+	<h2 class="h in" style="--d:1">One formula makes every quote, and a car likely to be late costs more</h2>
+	<div class="body">
+		<div class="formula in" style="--d:2">
+			<p><i>price</i> = argmax<sub><i>m</i></sub>&nbsp; P(sale | <i>m</i>, today's shift) × (<i>m</i> × list price − <i>C</i>)</p>
+			<p><i>C</i> = typical fee × (1.2 + 0.8 × <i class="amber">p</i> × won cars without a driver) + €150 × <i class="amber">p</i></p>
+		</div>
+		<div class="f-grid">
+			<div class="notes in" style="--d:3">
+				<p><b class="amber">p</b> the chance the order ends late: a logistic fit over 94,000 won orders, from what is known at the quote</p>
+				<p><b>P(sale)</b> the win curve, fitted on 50 weeks of random prices and shifted each day by that day's wins and losses</p>
+				<p><b>€150</b> the refund and the dealer's lost trust</p>
+				<p><b>0.4 ms</b> a quote: no model on the quote path</p>
+			</div>
+			<div class="calc in" style="--d:4">
+				<label><span>Late chance of this car</span><output id="o-late"></output><input id="i-late" type="range" min="0" max="30" value="10" /></label>
+				<label><span>Won cars still without a driver</span><output id="o-cars"></output><input id="i-cars" type="range" min="0" max="25" value="5" /></label>
+				<div class="c-bar" aria-hidden="true"><i id="c1"></i><i id="c2"></i><i id="c3"></i></div>
+				<p class="c-out" id="c-out" aria-live="polite"></p>
+			</div>
+		</div>
+		<p class="sm only-11 in" style="--d:5"><b>The day's market is read from the day's answers.</b> At one fixed price the desk won 3% of its quotes on the worst tenth of days and 60% on the best; shifting the win curve by each day's answers gave €5,609 against €4,627 a week on 10 held-out weeks. The first desk made <b>€12,376 a week</b> on 120 unseen practice weeks, +&#8288;€1,486 (1,297 to 1,677) over the desk before it, ahead in 117 of 120.</p>
+	</div>
+</section>
+
+<!-- jury: one idea a slide -->
+<section data-cuts="11" class="slide" aria-label="The simulator">
+	<p class="kick in"><span class="no"></span>The simulator</p>
+	<p class="nerd only-11 in" style="--d:1"><b>For the technical jury</b>Under the hood. Peer reviewers: we built a pretend Finland. Skip ahead freely.</p>
+	<h2 class="h in" style="--d:1">Play was the bottleneck, so we built a digital twin²: a simulator of Bahn's simulator</h2>
+	<div class="body uses iwe">
+		<div class="in" style="--d:2"><p class="lab">The bottleneck</p><b class="big cyan">8</b><p class="sm"><b>practice worlds per team key</b>: too few weeks to test ideas. Saturday's round showed what to fix: the top ten won 441 orders a week, we won 332, at nearly the same margin an order.</p></div>
+		<div class="in" style="--d:3"><p class="lab">Checked against our recorded weeks</p><b class="big cyan">43 of 46</b><p class="sm"><b>pairs play could decide came out the same way</b> on natural worlds, and gain sizes correlate with play at 0.96 to 0.97. On thin worlds only 0.37.</p></div>
+		<div class="in" style="--d:4"><p class="lab">Where it was wrong</p><b class="big cyan">9 of 9</b><p class="sm"><b>played steps called the right way</b> after the fixes of 14 November, up from 6 of 9. Before, it read fee holds and repriced late costs backwards.</p></div>
+		<p class="sm iwe-foot in" style="--d:5"><b>The rule it gave us:</b> a failing simulator run is trusted. A passing one is only a reason to play the part on real weeks, paired seed by seed with the version without it. A part stays only if it wins there and no week falls under 90% on time.</p>
+	</div>
+</section>
+
+<!-- 4 -->
+<section data-cuts="7 9 10" class="slide" aria-label="Four ideas">
+	<p class="kick in"><span class="no"></span>What carries the margin</p>
+	<h2 class="h in" style="--d:1">Four ideas carry the margin, each played against the same desk without it</h2>
+	<div class="body ideas">
+		<div class="in" style="--d:2"><b class="big amber">+€982</b><p class="it">The day's market is one number</p><p class="sm">Read from the day's wins and losses: €5,609 against €4,627 a week on 10 held-out weeks</p></div>
+		<div class="in" style="--d:3"><b class="big amber">5 → 0</b><p class="it">Each car's late chance is in its price</p><p class="sm">Weeks under 90% on time, on the 10 lowest weeks; +€2,854 a week there</p></div>
+		<div class="in" style="--d:4"><b class="big amber">+€3,237</b><p class="it">Fees stop where drivers stop answering</p><p class="sm">Drivers book in a gig's first 15 minutes; ahead in 20 of 20 fresh weeks</p></div>
+		<div class="in" style="--d:5"><b class="big amber">8.8 → 1.2</b><p class="it">Rules read every note before the first gig</p><p class="sm">Failed visits a week, against the kit's starter that learns a note from a failed visit</p></div>
+		<div class="strip in" style="--d:6"><b class="amber" data-count="12376" data-fmt="eur">€12,376</b><p class="sm"><b>a week on 120 unseen practice weeks, with no week under 90% on time.</b> Saturday's 15:00 ranking round: place 40 of 62, at 0.81 of tenth place.</p></div>
+	</div>
+</section>
+
+<!-- 5 -->
+<section data-cuts="5 7 9 10" class="slide" aria-label="Why we built our own world">
+	<p class="kick cyan in"><span class="no"></span>The stand-in</p>
+	<h2 class="h in" style="--d:1">We needed more orders and had little play, so we built a world the desk plays offline</h2>
+	<div class="body why">
+		<div class="lim in" style="--d:2">
+			<div class="cmp">
+				<p class="sm">Saturday's 15:00 ranking round, a week</p>
+				<div class="cm"><span>Orders, top ten</span><div class="tr"><i class="g" style="--w:100%"></i></div><b>441</b></div>
+				<div class="cm"><span>Orders, ours</span><div class="tr"><i class="a" style="--w:75.3%"></i></div><b class="amber">332</b></div>
+				<p class="sm">at nearly the same margin an order: €41.4 against €41.6</p>
+			</div>
+			<div class="lm"><b class="amber">8</b><span>practice worlds per team key, on one request bucket, until practice closed at 02:57</span></div>
+			<p class="sm">A recorded week can be replayed, but it cannot say how dealers and drivers answer a different price.</p>
+		</div>
+		<div class="sim in" style="--d:3">
+			<div class="desk"><b>Our desk</b><span>the same code that plays on Bahn's server</span></div>
+			<div class="pipe"><span>quotes, gigs, offers →</span><span>← requests, bookings, money</span></div>
+			<div class="world">
+				<b class="cyan">Stand-in world</b>
+				<p><em>Dealers</em> answer by our win curve at each day's level, measured on the played week of the same seed</p>
+				<p><em>Drivers</em> book an open gig by a fitted chance a minute: a Poisson regression on 4.6 million slices of 2,771 played weeks</p>
+				<p><em>Rules</em> follow Bahn's: fee schedules, stop windows, expiry, direct offers</p>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!-- 6 -->
+<section data-cuts="5 7 9 10 11" class="slide" aria-label="CRACI speed" data-race>
+	<p class="kick cyan in"><span class="no"></span>CRACI as the farm</p>
+	<p class="nerd only-11 in" style="--d:1"><b>For the technical jury</b>Engine room. Peer reviewers, the short version is: fast.</p>
+	<h2 class="h in" style="--d:1">One CRACI runner played 1,442 stand-in weeks in 4 min 41 s</h2>
+	<div class="body race">
+		<div class="lane in" style="--d:2">
+			<p class="ln"><span class="cyan">One CRACI runner: 32 cores, 94 GB, 206 saved seeds</span><b class="cyan" id="r-sim">0</b></p>
+			<canvas id="cv-sim" aria-hidden="true"></canvas>
+		</div>
+		<div class="lane only-11 in" style="--d:2">
+			<p class="ln"><span class="amber">Bahn's server, our full practice budget: about 330 weeks an hour</span><b class="amber" id="r-bahn">0</b></p>
+			<canvas id="cv-bahn" aria-hidden="true"></canvas>
+		</div>
+		<div class="r-foot in" style="--d:3">
+			<p class="sm"><b id="r-clock">0:00</b> of 4:41 &nbsp;<button class="ghost" id="r-again" type="button">Play again</button></p>
+			<p class="sm"><b>Saturday 21:33 the idea, 23:26 a joint search on 16 runners: 1 h 53 min.</b> A stand-in week takes 3 to 6 CPU-seconds, 97% of them in our own desk code, and every week is independent: the work needs cores and nothing else.</p>
+			<div class="vs only-11"><div><p class="lab">Bahn's server</p><b class="amber">about 330</b><p class="sm">weeks an hour: 127 weeks in 23 minutes on our full practice budget, 8 worlds on one request bucket</p></div><div><p class="lab">Our digital twin² on CRACI</p><b class="cyan">about 18,500</b><p class="sm">weeks an hour: <b>about 55× Bahn's server, on one runner</b>. At peak the farm played 97,980 weeks in one hour on up to 39 runners: <b>about 300×</b>.</p></div><div><p class="lab">Do they agree?</p><b class="cyan">43 of 46</b><p class="sm">pairs ranked as Bahn's server did; gains correlate at 0.96 to 0.97 on natural worlds, 0.37 with few drivers</p></div></div>
+		</div>
+	</div>
+</section>
+
+<!-- 7 -->
+<section data-cuts="9 10" class="slide" aria-label="Three uses of the farm">
+	<p class="kick cyan in"><span class="no"></span>Three jobs on the farm</p>
+	<h2 class="h in" style="--d:1">CRACI ran the stand-in as a CI matrix, a merge gate and a joint search</h2>
+	<div class="body uses">
+		<div class="in" style="--d:2"><b class="big cyan">15 + 14</b><p class="it">Calibration as a CI matrix</p><p class="sm">Each design of the world is fitted and scored on its own runner against held-out played weeks, in two rounds</p></div>
+		<div class="in" style="--d:3"><b class="big cyan">206</b><p class="it">A screen as the merge gate</p><p class="sm">One dispatch plays any branch's variants against the base on 206 saved seeds</p></div>
+		<div class="in" style="--d:4"><b class="big cyan">192</b><p class="it">A joint search</p><p class="sm">17 settings move together: arms in a Latin hypercube, 16 shards on 16 runners, read by a ridge model with pair terms</p></div>
+		<div class="u-foot in" style="--d:5">
+			<p class="sm"><b>No secret in the job.</b> The workflows hold no team key. A small broker checks the job's GitHub OIDC token and returns a read-only token for the saved weeks.</p>
+			<p class="sm"><b>263 jobs, 37 runner-hours</b> in the farm's first two and a half hours.</p>
+		</div>
+	</div>
+</section>
+
+<!-- 8 -->
+<section data-cuts="7 9 10" class="slide" aria-label="Where the stand-in was right and where it lied">
+	<p class="kick cyan in"><span class="no"></span>Trust, measured</p>
+	<h2 class="h in" style="--d:1">The stand-in ranks like play on natural worlds, and where it lied, the lie went into the rules</h2>
+	<div class="body trust">
+		<div class="in" style="--d:2">
+			<div class="dots" id="dots" aria-hidden="true"></div>
+			<p class="it"><b class="cyan">43 of 46</b> decided pairs ranked as play ranks them, on seeds its fit never saw</p>
+		</div>
+		<div class="in" style="--d:3">
+			<p class="sm">Correlation of its gains with play's</p>
+			<div class="cm"><span>Natural worlds</span><div class="tr"><i class="c" style="--w:96%"></i></div><b class="cyan">0.96</b></div>
+			<div class="cm"><span>Few drivers</span><div class="tr"><i class="c" style="--w:37%"></i></div><b class="cyan">0.37</b></div>
+		</div>
+		<div class="in" style="--d:4">
+			<p class="sm">A fee held low, € a week</p>
+			<div class="div">
+				<div class="dv"><span>Stand-in</span><div class="dt"><i class="pos c" style="--w:29%"></i></div><b class="cyan">+€540</b></div>
+				<div class="dv"><span>Play</span><div class="dt"><i class="neg a" style="--w:71%"></i></div><b class="red">−€1,323</b></div>
+			</div>
+			<p class="sm red">read backwards</p>
+		</div>
+		<p class="rule in" style="--d:5">A FAIL is trusted. A PASS is a reason to play a part, not to merge it.</p>
+	</div>
+</section>
+
+<!-- 9 -->
+<section data-cuts="10 11" class="slide" aria-label="The overnight loop">
+	<p class="kick in"><span class="no"></span>The overnight loop</p>
+	<p class="nerd only-11 in" style="--d:1"><b>For the technical jury</b>Plumbing. Peer reviewers: it fixes itself, so you can skip it too.</p>
+	<h2 class="h in" style="--d:1">A merge queue and a minute loop decide every part on played weeks</h2>
+	<div class="body">
+		<div class="flow in" style="--d:2;--n:5">
+			<div class="fn main cy" style="grid-column:1"><b>Lane</b><span>tests on the stand-in only</span></div>
+			<div class="fn main" style="grid-column:2"><b>Entry gate</b><span>tests, a to-the-cent replay, CI, a stand-in run</span></div>
+			<div class="fn br" style="grid-column:2"><i class="cond">fails</i><b>Back to its lane</b><span>never queued</span></div>
+			<div class="fn main" style="grid-column:3"><b>Head of main</b><span>all 8 worlds: the head and a twin</span></div>
+			<div class="fn br" style="grid-column:3"><i class="cond">a week under 90%</i><b>Rolled back</b><span>within the minute</span></div>
+			<div class="fn main" style="grid-column:4"><b>Tag</b><span>20 own weeks each side of 760 drivers</span></div>
+			<div class="fn main last" style="grid-column:5"><b>Rounds and final</b><span>the final's tag needs 60</span></div>
+		</div>
+		<div class="streak in" style="--d:3">
+			<div aria-hidden="true">
+				<div class="halves"><div><div class="cells"></div><p class="cl">under 760</p></div><div><div class="cells r"></div><p class="cl">760 or more</p></div></div>
+			</div>
+			<p class="sm"><b>A tag needs 20 weeks of its own on each side of 760 drivers, none under 90%.</b> Once a minute the loop promotes the next part in the queue, or rolls the head back at any week under 90%. <b>Two tracks fed the queue:</b> one distilled the qualifying track's candidate into the safe line the merges built on; the aggressive line added parts the safe line refused for their on-time risk, and kept only what held in play.</p>
+		</div>
+	</div>
+</section>
+
+<!-- hill -->
+<section data-cuts="5 7 9 10 11" class="slide" aria-label="The hill climb" data-hill>
+	<p class="kick cyan in"><span class="no"></span>The hill climb</p>
+	<h2 class="h in" style="--d:1;max-width:34ch">Claude pushed about 35 ideas up the stand-in's hill. One held in play.</h2>
+	<div class="body hc">
+		<div class="hc-l in" style="--d:2">
+			<svg id="hill" viewBox="0 0 100 50" role="img" aria-label="Claude's mascot pushes a boulder up a hill. Trial boulders roll up and back down; one step stays up."></svg>
+			<div class="hc-foot">
+				<p class="sm hc-cap" id="hc-cap" aria-live="polite"></p>
+				<button class="ghost" id="hc-again" type="button">Play again</button>
+			</div>
+		</div>
+		<div class="hc-r">
+			<div class="in" style="--d:3"><b class="big amber">1 of ~35</b><p class="sm">one-knob arms held: <code>slow_step</code> 0.4 at 760+ drivers, <b>+€423&nbsp;a&nbsp;week over merge&nbsp;3</b> on such weeks, 20 played pairs</p></div>
+			<div class="in" style="--d:4"><b class="big red">−€5,341</b><p class="sm">a week for R-max in play against its safe twin, worse on all 5 seeds. The stand-in had read such stacks at +€600&nbsp;to&nbsp;+€900.</p></div>
+			<div class="in" style="--d:5"><b class="big cyan">9 of 9</b><p class="sm">played steps the fixed stand-in now calls the right way, up from 6 of 9</p></div>
+		</div>
+	</div>
+</section>
+
+<!-- hill, in 3D -->
+<section data-cuts="x" class="slide" aria-label="The hill climb, in 3D" data-hill3d>
+	<p class="kick cyan in"><span class="no"></span>The hill climb</p>
+	<h2 class="h in" style="--d:1;max-width:34ch">Claude pushed about 35 ideas up the stand-in's hill. One held in play.</h2>
+	<div class="body h3">
+		<canvas class="in" id="h3-cv" style="--d:2" role="img" aria-label="A mountain turns while Claude's mascot pushes a boulder up a spiral path; the summit is tenth place."></canvas>
+		<div class="h3-r in" style="--d:3">
+			<p class="sm h3-time" id="h3-time"></p>
+			<b class="big" id="h3-num"></b>
+			<p class="it h3-cap" id="h3-cap" aria-live="polite"></p>
+			<p class="sm h3-head">Merge 4.1 <b id="h3-head"></b> a week, estimate</p>
+		</div>
+	</div>
+</section>
+
+<!-- 10 -->
+<section data-cuts="5 7 9 10 11" class="slide" aria-label="Gains over the default">
+	<p class="kick in"><span class="no"></span>What the night added</p>
+	<h2 class="h in" style="--d:1;max-width:38ch" id="g-title"></h2>
+	<div class="body">
+		<div class="cols-wrap in" style="--d:2"><div class="cols" id="gains" role="img"></div></div>
+		<p class="sm g-key in" style="--d:3"><i class="k1"></i>played against the default on the same unseen weeks &nbsp; <i class="k2"></i>estimate: merge 1 plus paired gains on separate seeds &nbsp; Default: €12,376 a week. Merges 8.2 and 8.3 built on merge 4.1 with rules for few drivers; neither was paired against the default.</p>
+		<div class="g-end in" style="--d:4"><p class="tag">One formula. <span class="cyan">A world of our own to test it.</span> <span class="amber">Play has the last word.</span></p><p class="final best">Best ranking round: Sunday 06:00, merge 8.2 (merge 4.1 at 760+ drivers), €15,531 a week, 96.5% on time, <b>11th of 51</b> ranked. The final played merge 8.3, the same code plus an on-time budget.</p><p class="final hash h-line"></p></div>
+	</div>
+</section>
+
+<!-- jury: after the gains -->
+<section data-cuts="11" class="slide" aria-label="Combining cars">
+	<p class="kick in"><span class="no"></span>Combining cars</p>
+	<h2 class="h in" style="--d:1">One driver takes two cars when one car's drop-off is near the next one's pickup</h2>
+	<div class="body uses iwe">
+		<div class="in" style="--d:2"><p class="lab">What the desk does</p><p class="sm">One gig carries both cars, out and back or onward.</p></div>
+		<div class="in" style="--d:3"><p class="lab">What we saw</p><p class="sm">A driver coming back empty is paid for a leg that earns nothing.</p></div>
+		<div class="in" style="--d:4"><p class="lab">With and without it</p><b class="big amber">+€1,161</b><p class="sm"><b>a week from onward pairs</b> on worlds under 760 drivers, on 13 paired weeks, with no week under 92% in 15. Letting the two ends lie up to 40 km apart added <b>+&#8288;€672</b> (347 to 1,017) on 51 paired weeks, better in 37.</p></div>
+	</div>
+</section>
+
+<section data-cuts="11" class="slide" aria-label="The number of drivers">
+	<p class="kick in"><span class="no"></span>The number of drivers</p>
+	<p class="nerd only-11 in" style="--d:1"><b>For the technical jury</b>Fine print. Peer reviewers: fewer drivers, stricter rules. That's the slide.</p>
+	<h2 class="h in" style="--d:1">The week's rules are chosen from the number of drivers, before the first quote</h2>
+	<div class="body uses iwe">
+		<div class="in" style="--d:2"><p class="lab">What the desk does</p><p class="sm">It reads the driver list first. Under 760 drivers it counts every won car still without a driver, and caps any day at 62 won orders to deliver.</p></div>
+		<div class="in" style="--d:3"><p class="lab">What we saw</p><p class="sm">Merge 1, which counted only cars due within a day, failed 3 of 60 thin weeks: with few drivers it won more cars than they could move, piled up on one due day.</p></div>
+		<div class="in" style="--d:4"><p class="lab">With and without it</p><b class="big amber">0 of 60</b><p class="sm"><b>unseen thin weeks under 90% on time</b>, the lowest at 92.0%, at a cost of €1,290 a week there. The day cap took one thin week from 88.6% to 95.2% on time: 36 → 16 late orders, and 13 more orders.</p></div>
+	</div>
+</section>
+
+<section data-cuts="11" class="slide" aria-label="The newest, and least certain">
+	<p class="kick in"><span class="no"></span>The newest, and least certain</p>
+	<p class="nerd only-11 in" style="--d:1"><b>For the technical jury</b>Fine print. Peer reviewers: we're not sure either, and we say so.</p>
+	<h2 class="h in" style="--d:1">An on-time budget: the final's newest part, and the one we're least sure of</h2>
+	<div class="body uses iwe">
+		<div class="in" style="--d:2"><p class="lab">What the desk does</p><p class="sm">Under 720 drivers and from 820 up, it projects the week's final on-time share at each quote, from the orders already late plus the open orders at their fitted late rates. While that is safely over 90%, it lowers the late cost in the quote, to as little as 0.5 ×.</p></div>
+		<div class="in" style="--d:3"><p class="lab">With and without it</p><b class="big amber">+€307</b><p class="sm"><b>a week</b> (+11 to +603) on its first 39 paired weeks, but <b>+&#8288;€159</b> (−48 to +363) on all 74. The range crosses zero, so the gain isn't proven.</p></div>
+		<div class="in" style="--d:4"><p class="lab">What would break it</p><b class="big red">89.2%</b><p class="sm"><b>on time</b> on one practice world with 665 drivers, a week merge 8.2, the same code without the budget, held at 90.55%.</p></div>
+	</div>
+</section>
+
+<section data-cuts="11" class="slide" aria-label="What didn't work">
+	<p class="kick in"><span class="no"></span>What didn't work</p>
+	<h2 class="h in" style="--d:1">What didn't work, what would break the desk, and how it survives a restart</h2>
+	<div class="body uses iwe">
+		<div class="in" style="--d:2"><p class="lab">Lost in play</p><p class="sm"><b>Cheaper quotes on their own. Lower opening fees on their own. Bigger pushes for volume. Every fee rule for days when drivers drop their gigs.</b></p></div>
+		<div class="in" style="--d:3"><p class="lab">Would break it</p><p class="sm"><b>A night when drivers drop their gigs.</b> Such a wave hits cars already won, so no price can reach it.</p></div>
+		<div class="in" style="--d:4"><p class="lab">Survives a restart</p><b class="big amber">26.1 s</b><p class="sm"><b>In the Sunday 01:00 Helsinki test final we killed the desk on purpose.</b> The standby joined 26.1 s later with 5 requests unquoted, and the week was ranked at 96.4% on time, 20th of 41.</p></div>
+		<p class="sm iwe-foot in" style="--d:5"><b>No other team's code or constants are in our desk.</b> &nbsp; <span class="tag">One formula. <span class="cyan">A world of our own to test it.</span> <span class="amber">Play has the last word.</span></span></p>
+	</div>
+</section>
+
+<nav class="nav" aria-label="Slides">
+	<span class="cnt" id="cnt"></span>
+	<div class="cuts" id="cuts" role="group" aria-label="Deck length"></div>
+	<div class="ticks" id="ticks"></div>
+	<button type="button" class="nb" id="prev" aria-label="Previous slide">←</button>
+	<button type="button" class="nb" id="next" aria-label="Next slide">→</button>
+	<button type="button" class="nb" id="fs" aria-label="Full screen">⤢</button>
+</nav>
+<p class="toast" id="toast" role="status"></p>
+</div>
+</div>
+</div>
+
+<style>
+	.deck {
+		--bg: #0a0f1d;
+		--panel: #111829;
+		--ink: #f3efe4;
+		--dim: #98a0b3;
+		--line: #26304a;
+		/* amber: the desk and play; cyan: the stand-in and the farm. */
+		--amber: #ffb22e;
+		--cyan: #46d9cf;
+		--red: #ff6b5e;
+		--sans: 'Archivo', system-ui, sans-serif;
+		--serif: var(--sans);
+		--mono: var(--sans);
+		color: var(--ink);
+		font-family: var(--sans);
+		font-stretch: 100%;
+		-webkit-font-smoothing: antialiased;
+		outline: none;
+	}
+	.deck *,
+	.deck *::before,
+	.deck *::after {
+		box-sizing: border-box;
+	}
+	.deck p,
+	.deck h1,
+	.deck h2 {
+		margin: 0;
+	}
+	.frame {
+		container: deck / inline-size;
+		width: 100%;
+		margin: 0 auto;
+	}
+	.stage {
+		--k: 1cqw;
+		position: relative;
+		aspect-ratio: 16 / 9;
+		overflow: hidden;
+		border-radius: 10px;
+		background:
+			radial-gradient(120% 90% at 85% 10%, #16213d 0%, rgba(10, 15, 29, 0) 55%),
+			var(--bg);
+		font-variant-numeric: tabular-nums;
+	}
+	.deck:fullscreen {
+		background: #05080f;
+		display: grid;
+		place-items: center;
+	}
+	.deck:fullscreen .frame {
+		width: min(100vw, 177.78vh);
+	}
+	.deck:fullscreen .stage {
+		border-radius: 0;
+	}
+
+	/* slides */
+	.slide {
+		position: absolute;
+		inset: 0;
+		padding: calc(4.2 * var(--k)) calc(5.4 * var(--k)) calc(5.6 * var(--k));
+		display: flex;
+		flex-direction: column;
+		opacity: 0;
+		visibility: hidden;
+		transform: translateX(calc(1.2 * var(--k)));
+		transition:
+			opacity 0.35s ease-out,
+			transform 0.35s ease-out,
+			visibility 0s linear 0.35s;
+	}
+	.slide.cur {
+		opacity: 1;
+		visibility: visible;
+		transform: none;
+		transition:
+			opacity 0.35s ease-out,
+			transform 0.35s ease-out;
+	}
+	.slide::after {
+		content: '';
+		position: absolute;
+		left: calc(5.4 * var(--k));
+		right: calc(5.4 * var(--k));
+		bottom: calc(4.4 * var(--k));
+		border-top: 2px dashed rgba(255, 178, 46, 0.18);
+	}
+	.in {
+		opacity: 0;
+		transform: translateY(calc(0.8 * var(--k)));
+	}
+	.play .in {
+		opacity: 1;
+		transform: none;
+		transition:
+			opacity 0.5s ease-out,
+			transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
+		transition-delay: calc(var(--d, 0) * 110ms);
+	}
+	.kick {
+		font-family: var(--mono);
+		font-size: max(8px, calc(1.15 * var(--k)));
+		font-weight: 700;
+		font-stretch: 112%;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--amber);
+		margin-bottom: calc(1.2 * var(--k)) !important;
+	}
+	.h {
+		font-size: calc(3.1 * var(--k));
+		line-height: 1.1;
+		font-weight: 800;
+		font-stretch: 118%;
+		letter-spacing: -0.02em;
+		max-width: 30ch;
+		text-wrap: balance;
+	}
+	.body {
+		flex: 1;
+		min-height: 0;
+		margin-top: calc(2.8 * var(--k));
+		display: flex;
+		flex-direction: column;
+		gap: calc(2.4 * var(--k));
+	}
+	.amber {
+		color: var(--amber);
+	}
+	.cyan {
+		color: var(--cyan);
+	}
+	.red {
+		color: var(--red);
+	}
+	.sm {
+		font-size: max(9px, calc(1.3 * var(--k)));
+		line-height: 1.45;
+		color: var(--dim);
+		text-wrap: pretty;
+	}
+	.sm b {
+		color: var(--ink);
+		font-weight: 600;
+	}
+	.it {
+		font-size: max(10px, calc(1.55 * var(--k)));
+		line-height: 1.35;
+		font-weight: 600;
+		text-wrap: pretty;
+	}
+	.big {
+		display: block;
+		font-size: calc(4.2 * var(--k));
+		line-height: 1;
+		font-weight: 800;
+		font-stretch: 112%;
+		letter-spacing: -0.03em;
+		margin-bottom: calc(1.2 * var(--k));
+		white-space: nowrap;
+	}
+	.deck code {
+		font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+		font-size: 0.92em;
+		color: var(--ink);
+	}
+
+	/* title */
+	.s-title {
+		flex-direction: row;
+		gap: calc(3 * var(--k));
+	}
+	.t-left {
+		flex: 1.25;
+		min-width: 0;
+		display: flex;
+		flex-direction: column;
+	}
+	.t-h {
+		font-size: calc(9.6 * var(--k));
+		line-height: 0.95;
+		font-weight: 800;
+		font-stretch: 125%;
+		letter-spacing: -0.035em;
+		margin-top: calc(1 * var(--k)) !important;
+	}
+	.t-lede {
+		margin-top: calc(2.4 * var(--k)) !important;
+		font-size: calc(1.95 * var(--k));
+		line-height: 1.35;
+		max-width: 32ch;
+		text-wrap: pretty;
+	}
+	.t-stats {
+		margin-top: auto;
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: calc(2 * var(--k));
+	}
+	.t-stats div,
+	.facts div,
+	.lim .lm {
+		display: flex;
+		flex-direction: column;
+		gap: calc(0.5 * var(--k));
+		border-top: 1px solid var(--line);
+		padding-top: calc(1 * var(--k));
+	}
+	.t-stats b {
+		font-size: calc(2.3 * var(--k));
+		font-weight: 800;
+		font-stretch: 112%;
+		letter-spacing: -0.02em;
+	}
+	.t-stats span,
+	.facts span,
+	.lim .lm span {
+		font-size: max(9px, calc(1.2 * var(--k)));
+		line-height: 1.4;
+		color: var(--dim);
+	}
+	.map {
+		flex: 0.75;
+		min-width: 0;
+		height: 100%;
+		overflow: visible;
+	}
+	.map .road {
+		stroke: color-mix(in oklch, var(--dim) 30%, transparent);
+		stroke-width: 0.035;
+		fill: none;
+		stroke-linejoin: round;
+	}
+	.map .town {
+		fill: var(--dim);
+	}
+	.map .tl {
+		fill: var(--dim);
+		font-size: 0.24px;
+		font-family: var(--sans);
+	}
+	.map .car {
+		fill: var(--amber);
+	}
+	.map .halo {
+		fill: color-mix(in oklch, var(--amber) 25%, transparent);
+	}
+
+	/* flows */
+	.flow {
+		display: grid;
+		grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+		grid-auto-rows: auto;
+		column-gap: calc(3 * var(--k));
+		row-gap: calc(3.6 * var(--k));
+		align-items: start;
+	}
+	.fn {
+		position: relative;
+		grid-row: 1;
+		display: flex;
+		flex-direction: column;
+		gap: calc(0.3 * var(--k));
+		padding: calc(1.1 * var(--k)) calc(1.3 * var(--k));
+		border-radius: calc(0.8 * var(--k));
+		background: var(--panel);
+		border: 1px solid var(--line);
+	}
+	.fn b {
+		font-size: max(10px, calc(1.55 * var(--k)));
+		font-weight: 650;
+		line-height: 1.2;
+	}
+	.fn span {
+		font-size: max(9px, calc(1.2 * var(--k)));
+		color: var(--dim);
+		line-height: 1.3;
+	}
+	.fn.main {
+		border-color: color-mix(in oklch, var(--amber) 60%, transparent);
+	}
+	.fn.main.cy {
+		border-color: color-mix(in oklch, var(--cyan) 70%, transparent);
+	}
+	.fn.main:not(.last)::after {
+		content: '';
+		position: absolute;
+		left: 100%;
+		top: 50%;
+		width: calc(3 * var(--k) - 6px);
+		height: 2px;
+		margin-top: -1px;
+		background: var(--amber);
+	}
+	.fn.main:not(.last)::before {
+		content: '';
+		position: absolute;
+		left: calc(100% + 3 * var(--k) - 8px);
+		top: 50%;
+		margin-top: -5px;
+		border: 5px solid transparent;
+		border-left: 7px solid var(--amber);
+		border-right: 0;
+	}
+	.fn.br {
+		grid-row: 2;
+		background: transparent;
+		border: 1px dashed color-mix(in oklch, var(--dim) 50%, transparent);
+	}
+	.fn.br::before {
+		content: '';
+		position: absolute;
+		left: 50%;
+		bottom: 100%;
+		height: calc(3.6 * var(--k));
+		border-left: 1.5px dashed color-mix(in oklch, var(--dim) 70%, transparent);
+	}
+	.fn.br b {
+		color: var(--dim);
+	}
+	.cond {
+		position: absolute;
+		left: calc(50% + 0.8 * var(--k));
+		bottom: calc(100% + 1.1 * var(--k));
+		font-style: normal;
+		font-family: var(--mono);
+		font-size: max(8px, calc(1.1 * var(--k)));
+		color: var(--red);
+		white-space: nowrap;
+	}
+	.facts {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: calc(3 * var(--k));
+		margin-top: auto;
+	}
+	.facts b {
+		font-size: calc(3.6 * var(--k));
+		font-weight: 800;
+		font-stretch: 112%;
+		letter-spacing: -0.03em;
+		line-height: 1;
+	}
+
+	/* formula */
+	.formula {
+		font-family: var(--serif);
+		font-size: calc(2.15 * var(--k));
+		line-height: 1.55;
+		padding: calc(1.2 * var(--k)) calc(1.8 * var(--k));
+		border-left: 3px solid var(--amber);
+		background: var(--panel);
+		border-radius: 0 calc(0.8 * var(--k)) calc(0.8 * var(--k)) 0;
+		overflow-wrap: anywhere;
+	}
+	.formula i {
+		font-style: italic;
+	}
+	.formula sub {
+		font-size: 0.6em;
+	}
+	.f-grid {
+		display: grid;
+		grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+		gap: calc(4 * var(--k));
+	}
+	.notes {
+		display: grid;
+		gap: calc(0.9 * var(--k));
+		font-size: max(9px, calc(1.3 * var(--k)));
+		line-height: 1.4;
+		color: var(--dim);
+	}
+	.notes p {
+		display: grid;
+		grid-template-columns: calc(6.5 * var(--k)) minmax(0, 1fr);
+	}
+	.notes b {
+		color: var(--ink);
+		font-weight: 700;
+	}
+	.notes .amber {
+		color: var(--amber);
+	}
+	.calc {
+		display: flex;
+		flex-direction: column;
+		gap: calc(0.9 * var(--k));
+	}
+	.calc label {
+		display: grid;
+		grid-template-columns: 1fr auto;
+		font-size: max(9px, calc(1.25 * var(--k)));
+		color: var(--dim);
+	}
+	.calc output {
+		color: var(--ink);
+		font-weight: 600;
+	}
+	.calc input {
+		grid-column: 1 / -1;
+		width: 100%;
+		margin: calc(0.4 * var(--k)) 0 0;
+		accent-color: var(--amber);
+	}
+	.c-bar {
+		display: flex;
+		height: calc(1.4 * var(--k));
+		min-height: 8px;
+		border-radius: 3px;
+		overflow: hidden;
+		background: color-mix(in oklch, var(--line) 60%, transparent);
+		margin-top: calc(0.4 * var(--k));
+	}
+	.c-bar i {
+		display: block;
+		height: 100%;
+		transition: width 0.2s ease-out;
+	}
+	#c1 {
+		background: color-mix(in oklch, var(--amber) 45%, var(--bg));
+	}
+	#c2 {
+		background: var(--amber);
+	}
+	#c3 {
+		background: var(--red);
+	}
+	.c-out {
+		font-size: max(9px, calc(1.3 * var(--k)));
+		line-height: 1.4;
+		color: var(--dim);
+	}
+	.c-out b {
+		font-size: 1.7em;
+		color: var(--ink);
+		font-weight: 800;
+		margin-right: 0.3em;
+	}
+
+	/* ideas, uses */
+	.ideas,
+	.uses {
+		display: grid;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		gap: calc(2.6 * var(--k));
+		align-content: center;
+	}
+	.uses {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+	.ideas > div,
+	.uses > div:not(.u-foot) {
+		border-top: 2px solid var(--line);
+		padding-top: calc(1.6 * var(--k));
+		display: flex;
+		flex-direction: column;
+		gap: calc(0.8 * var(--k));
+	}
+	.ideas .big {
+		font-size: calc(3.6 * var(--k));
+	}
+	.u-foot {
+		grid-column: 1 / -1;
+		display: grid;
+		grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+		gap: calc(3 * var(--k));
+		margin-top: calc(0.6 * var(--k));
+		padding-top: calc(1.2 * var(--k));
+		border-top: 1px solid var(--line);
+	}
+
+	/* bars */
+	.cmp,
+	.trust > div {
+		display: flex;
+		flex-direction: column;
+		gap: calc(1.1 * var(--k));
+	}
+	.cm {
+		display: grid;
+		grid-template-columns: minmax(0, 13em) minmax(0, 1fr) 4.2em;
+		gap: calc(1.2 * var(--k));
+		align-items: center;
+		font-size: max(9px, calc(1.3 * var(--k)));
+		color: var(--dim);
+	}
+	.cm b {
+		text-align: right;
+		font-size: 1.25em;
+		color: var(--ink);
+	}
+	.tr,
+	.dt {
+		position: relative;
+		height: calc(1.5 * var(--k));
+		min-height: 8px;
+	}
+	.tr i,
+	.dt i {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		width: 0;
+		border-radius: 2px;
+		transition: width 1s cubic-bezier(0.2, 0.7, 0.2, 1) 0.4s;
+	}
+	.play .tr i,
+	.play .dt i {
+		width: var(--w);
+	}
+	.tr .g {
+		background: color-mix(in oklch, var(--dim) 45%, transparent);
+	}
+	.tr .a,
+	.dt .a {
+		background: var(--amber);
+	}
+	.tr .c,
+	.dt .c {
+		background: var(--cyan);
+	}
+
+	/* why */
+	.why {
+		display: grid;
+		grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.4fr);
+		gap: calc(4 * var(--k));
+		align-items: start;
+	}
+	.lim {
+		display: flex;
+		flex-direction: column;
+		gap: calc(1.2 * var(--k));
+	}
+	.lim .lm {
+		flex-direction: row;
+		align-items: baseline;
+		gap: calc(1.2 * var(--k));
+	}
+	.lim b {
+		font-size: calc(2.8 * var(--k));
+		font-weight: 800;
+		font-stretch: 112%;
+		letter-spacing: -0.03em;
+		min-width: 3.4ch;
+	}
+	.sim {
+		display: grid;
+		grid-template-columns: minmax(0, 0.8fr) auto minmax(0, 1.45fr);
+		gap: calc(1.4 * var(--k));
+		align-items: center;
+	}
+	.desk,
+	.world {
+		border-radius: calc(1 * var(--k));
+		padding: calc(1.4 * var(--k));
+		display: flex;
+		flex-direction: column;
+		gap: calc(0.8 * var(--k));
+	}
+	.desk {
+		border: 1.5px solid var(--amber);
+		background: color-mix(in oklch, var(--amber) 6%, transparent);
+	}
+	.world {
+		border: 1.5px solid var(--cyan);
+		background: color-mix(in oklch, var(--cyan) 7%, transparent);
+	}
+	.desk b,
+	.world > b {
+		font-size: calc(1.9 * var(--k));
+		font-weight: 800;
+	}
+	.desk span,
+	.world p {
+		font-size: max(9px, calc(1.2 * var(--k)));
+		line-height: 1.4;
+		color: var(--dim);
+	}
+	.world em {
+		font-style: normal;
+		color: var(--ink);
+		font-weight: 650;
+	}
+	.pipe {
+		display: flex;
+		flex-direction: column;
+		gap: calc(1 * var(--k));
+		font-family: var(--mono);
+		font-size: max(8px, calc(1.1 * var(--k)));
+		color: var(--dim);
+		white-space: nowrap;
+	}
+
+	/* race */
+	.race {
+		gap: calc(1.6 * var(--k));
+	}
+	.lane canvas {
+		display: block;
+		width: 100%;
+	}
+	.ln {
+		display: flex;
+		justify-content: space-between;
+		font-size: max(9px, calc(1.35 * var(--k)));
+		margin-bottom: calc(0.6 * var(--k)) !important;
+	}
+	.ln b {
+		font-size: 1.3em;
+		font-weight: 800;
+	}
+	.r-foot {
+		display: grid;
+		grid-template-columns: auto minmax(0, 1fr);
+		gap: calc(4 * var(--k));
+		align-items: start;
+		margin-top: auto;
+	}
+	.ghost {
+		font: inherit;
+		color: var(--ink);
+		background: transparent;
+		border: 1px solid var(--line);
+		border-radius: 999px;
+		padding: 0.1em 0.8em;
+		margin-left: 0.6em;
+		cursor: pointer;
+	}
+
+	/* trust */
+	.trust {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr) minmax(0, 1fr);
+		gap: calc(4 * var(--k));
+		align-items: start;
+	}
+	.trust .cm {
+		grid-template-columns: minmax(0, 7.5em) minmax(0, 1fr) 3em;
+	}
+	.dots {
+		display: grid;
+		grid-template-columns: repeat(12, minmax(0, 1fr));
+		gap: calc(0.55 * var(--k));
+		max-width: calc(22 * var(--k));
+		margin-bottom: calc(0.8 * var(--k));
+	}
+	.dots i {
+		aspect-ratio: 1;
+		border-radius: 50%;
+		background: var(--cyan);
+		transform: scale(0);
+		transition: transform 0.3s ease-out;
+		transition-delay: calc(var(--i) * 18ms + 300ms);
+	}
+	.play .dots i {
+		transform: none;
+	}
+	.dots i.x {
+		background: transparent;
+		border: 2px solid var(--red);
+	}
+	.div {
+		display: flex;
+		flex-direction: column;
+		gap: calc(1 * var(--k));
+	}
+	.dv {
+		display: grid;
+		grid-template-columns: 4.6em minmax(0, 1fr) 5.4em;
+		gap: calc(1 * var(--k));
+		align-items: center;
+		font-size: max(9px, calc(1.3 * var(--k)));
+		color: var(--dim);
+	}
+	.dv b {
+		white-space: nowrap;
+		text-align: right;
+		font-size: 1.2em;
+	}
+	.dt {
+		border-left: 1px solid var(--dim);
+	}
+	.dt .pos {
+		left: 50%;
+	}
+	.dt .neg {
+		left: auto;
+		right: 50%;
+		background: var(--red) !important;
+	}
+	.play .dt .pos,
+	.play .dt .neg {
+		width: calc(var(--w) / 2);
+	}
+	.dt {
+		border-left: 0;
+		background: linear-gradient(var(--dim), var(--dim)) 50% 0 / 1px 100% no-repeat;
+	}
+	.rule {
+		grid-column: 1 / -1;
+		font-size: calc(2.2 * var(--k));
+		font-weight: 750;
+		letter-spacing: -0.01em;
+		padding: calc(1.2 * var(--k)) calc(1.6 * var(--k));
+		border: 1.5px solid var(--cyan);
+		border-radius: calc(0.8 * var(--k));
+		color: var(--ink);
+	}
+
+	/* streak */
+	.streak {
+		display: grid;
+		grid-template-columns: auto minmax(0, 1fr);
+		gap: calc(3 * var(--k));
+		align-items: center;
+		margin-top: auto;
+	}
+	.cells {
+		display: grid;
+		grid-template-columns: repeat(5, calc(1.6 * var(--k)));
+		gap: calc(0.4 * var(--k));
+	}
+	.cells i {
+		height: calc(1.6 * var(--k));
+		border-radius: 2px;
+		background: var(--line);
+		transition: background 0.15s;
+		transition-delay: calc(var(--i) * 45ms + 500ms);
+	}
+	.play .cells i {
+		background: var(--amber);
+	}
+	.halves {
+		display: flex;
+		gap: calc(1.2 * var(--k));
+	}
+	.cl {
+		margin-top: calc(0.6 * var(--k)) !important;
+		font-family: var(--mono);
+		font-size: max(8px, calc(0.95 * var(--k)));
+		color: var(--dim);
+	}
+	.play .cells.r i {
+		background: color-mix(in oklch, var(--amber) 55%, var(--bg));
+	}
+
+	/* gains: one column a version */
+	.cols {
+		display: grid;
+		grid-template-columns: repeat(var(--n, 6), minmax(0, 1fr));
+		column-gap: calc(2.2 * var(--k));
+		flex: 1;
+		min-height: 0;
+		position: relative;
+		border-bottom: 2px solid var(--dim);
+		padding-top: calc(2.4 * var(--k));
+	}
+	.col {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-end;
+		min-height: 0;
+	}
+	.col .cb {
+		position: relative;
+		height: 0;
+		border-radius: calc(0.5 * var(--k)) calc(0.5 * var(--k)) 0 0;
+		background: var(--amber);
+		transition: height 0.9s cubic-bezier(0.2, 0.7, 0.2, 1);
+		transition-delay: calc(var(--i) * 120ms + 300ms);
+	}
+	.col .cb.co {
+		background: repeating-linear-gradient(135deg, color-mix(in oklch, var(--amber) 24%, transparent) 0 6px, color-mix(in oklch, var(--amber) 6%, transparent) 6px 12px);
+		box-shadow: inset 0 0 0 2px var(--amber);
+	}
+	.play .col .cb {
+		height: var(--h);
+	}
+	.col .cv {
+		font-style: normal;
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: calc(100% + 0.5 * var(--k));
+		text-align: center;
+		font-size: calc(1.75 * var(--k));
+		font-weight: 800;
+		font-stretch: 112%;
+		letter-spacing: -0.02em;
+		white-space: nowrap;
+	}
+	.col .cv small {
+		display: block;
+		font-size: max(8px, calc(0.95 * var(--k)));
+		font-weight: 500;
+		color: var(--dim);
+		letter-spacing: 0;
+	}
+	.col .cn {
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: calc(100% + 0.8 * var(--k));
+		text-align: center;
+		font-size: max(9px, calc(1.2 * var(--k)));
+		font-weight: 650;
+		line-height: 1.25;
+	}
+	.col .cn small {
+		display: block;
+		font-weight: 400;
+		color: var(--dim);
+		font-size: 0.9em;
+	}
+	.col.back .cn small {
+		color: var(--cyan);
+	}
+	.cols-wrap {
+		flex: 1;
+		min-height: 0;
+		display: flex;
+		flex-direction: column;
+		padding-bottom: calc(4.6 * var(--k));
+	}
+	.g-key {
+		margin-top: auto;
+	}
+	.g-key i {
+		display: inline-block;
+		width: 1.6em;
+		height: 0.7em;
+		margin-right: 0.4em;
+		border-radius: 2px;
+	}
+	.g-key .k1 {
+		background: var(--amber);
+	}
+	.g-key .k2 {
+		box-shadow: inset 0 0 0 1.5px var(--amber);
+	}
+
+	.strip {
+		grid-column: 1 / -1;
+		display: flex;
+		align-items: baseline;
+		gap: calc(2 * var(--k));
+		margin-top: calc(1 * var(--k));
+		padding-top: calc(1.4 * var(--k));
+		border-top: 1px solid var(--line);
+	}
+	.strip > b {
+		font-size: calc(3.6 * var(--k));
+		font-weight: 800;
+		font-stretch: 112%;
+		letter-spacing: -0.03em;
+		line-height: 1;
+	}
+	.why .cm {
+		grid-template-columns: minmax(0, 9em) minmax(0, 1fr) 3.4em;
+	}
+	.why .cmp {
+		margin-bottom: calc(0.6 * var(--k));
+	}
+	.g-end {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: calc(1 * var(--k)) calc(2 * var(--k));
+	}
+	.tag {
+		font-size: calc(1.8 * var(--k));
+		font-weight: 800;
+		letter-spacing: -0.015em;
+	}
+	.g-end .final {
+		font-size: max(9px, calc(1.2 * var(--k)));
+	}
+	.g-end .best {
+		flex-basis: 100%;
+	}
+	.g-end .best b {
+		color: var(--amber);
+	}
+	.g-end .hash {
+		flex-basis: 100%;
+		color: var(--dim);
+	}
+	.g-end .hash .blank {
+		display: inline-block;
+		width: 22em;
+		border-bottom: 1px solid var(--dim);
+		vertical-align: baseline;
+	}
+	.cuts {
+		display: flex;
+		gap: 2px;
+		margin-right: calc(0.6 * var(--k));
+	}
+	.cuts button {
+		font-family: var(--mono);
+		font-size: max(9px, calc(1 * var(--k)));
+		padding: 0.25em 0.6em;
+		border: 1px solid var(--line);
+		background: transparent;
+		color: var(--dim);
+		border-radius: 999px;
+		cursor: pointer;
+	}
+	.cuts button[aria-pressed='true'] {
+		color: var(--bg);
+		background: var(--amber);
+		border-color: var(--amber);
+	}
+	.slide.out {
+		display: none !important;
+	}
+
+	/* nav */
+	.nav {
+		position: absolute;
+		left: calc(5.4 * var(--k));
+		right: calc(5.4 * var(--k));
+		bottom: calc(1.2 * var(--k));
+		height: calc(2.6 * var(--k));
+		display: flex;
+		align-items: center;
+		gap: calc(1 * var(--k));
+		z-index: 2;
+	}
+	.cnt {
+		font-family: var(--mono);
+		font-size: max(8px, calc(1.05 * var(--k)));
+		color: var(--dim);
+		min-width: 5em;
+	}
+	.ticks {
+		flex: 1;
+		display: flex;
+		gap: 4px;
+	}
+	.ticks button {
+		flex: 1;
+		height: 14px;
+		padding: 0;
+		border: 0;
+		background: transparent;
+		cursor: pointer;
+		position: relative;
+	}
+	.ticks button::after {
+		content: '';
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: 6px;
+		height: 3px;
+		border-radius: 2px;
+		background: var(--line);
+	}
+	.ticks button.done::after {
+		background: color-mix(in oklch, var(--amber) 45%, transparent);
+	}
+	.ticks button.on::after {
+		background: var(--amber);
+	}
+	.nb {
+		font: inherit;
+		font-size: max(12px, calc(1.3 * var(--k)));
+		line-height: 1;
+		width: max(26px, calc(2.6 * var(--k)));
+		height: max(26px, calc(2.6 * var(--k)));
+		border-radius: 50%;
+		border: 1px solid var(--line);
+		background: var(--panel);
+		color: var(--ink);
+		cursor: pointer;
+	}
+	@media (hover: hover) {
+		.nb:hover,
+		.ghost:hover {
+			border-color: var(--amber);
+		}
+		.ticks button:hover::after {
+			background: var(--dim);
+		}
+	}
+	.deck button:focus-visible,
+	.deck input:focus-visible {
+		outline: 2px solid var(--cyan);
+		outline-offset: 2px;
+	}
+	.toast {
+		position: absolute;
+		right: calc(5.4 * var(--k));
+		bottom: calc(4.6 * var(--k));
+		font-size: max(9px, calc(1.2 * var(--k)));
+		color: var(--ink);
+		background: var(--panel);
+		border: 1px solid var(--line);
+		border-radius: 6px;
+		padding: 0.4em 0.8em;
+		opacity: 0;
+		transition: opacity 0.2s;
+		pointer-events: none;
+		max-width: 40ch;
+	}
+	.toast.on {
+		opacity: 1;
+	}
+
+	/* hill climb */
+	.hc {
+		display: grid;
+		grid-template-columns: minmax(0, 1.75fr) minmax(0, 1fr);
+		gap: calc(3.4 * var(--k));
+		align-items: stretch;
+	}
+	.hc-l {
+		display: flex;
+		flex-direction: column;
+		min-height: 0;
+	}
+	#hill {
+		flex: 1;
+		min-height: 0;
+		width: 100%;
+		overflow: hidden;
+	}
+	#hill .ground {
+		fill: var(--panel);
+		stroke: var(--line);
+		stroke-width: 0.3;
+	}
+	#hill .edge {
+		fill: none;
+		stroke: var(--dim);
+		stroke-width: 0.35;
+		stroke-linejoin: round;
+	}
+	#hill .lbl {
+		font-family: var(--sans);
+		font-size: 1.9px;
+		fill: var(--dim);
+	}
+	#hill .lbl.hd {
+		fill: var(--amber);
+		font-weight: 700;
+	}
+	#hill .tick {
+		stroke: var(--dim);
+		stroke-width: 0.3;
+	}
+	#hill .flag {
+		stroke: var(--ink);
+		stroke-width: 0.3;
+	}
+	#hill .flag + path {
+		fill: var(--cyan);
+	}
+	#hill .rock {
+		fill: var(--amber);
+	}
+	#hill .rock-crack {
+		stroke: var(--bg);
+		stroke-width: 0.35;
+		fill: none;
+		stroke-linecap: round;
+	}
+	#hill .try {
+		fill: color-mix(in oklch, var(--cyan) 22%, transparent);
+		stroke: var(--cyan);
+		stroke-width: 0.35;
+		stroke-dasharray: 0.9 0.6;
+		transition: fill 0.2s, stroke 0.2s;
+	}
+	#hill .try.lost {
+		fill: color-mix(in oklch, var(--red) 25%, transparent);
+		stroke: var(--red);
+	}
+	#hill .read {
+		font-family: var(--sans);
+		font-size: 2.2px;
+		font-weight: 800;
+		fill: var(--cyan);
+		text-anchor: middle;
+	}
+	#hill .read.lost {
+		fill: var(--red);
+	}
+	/* Claude Code's mascot, in its own terracotta */
+	#hill .who .px {
+		fill: #d97757;
+	}
+	#hill .who .eye {
+		fill: var(--bg);
+	}
+	.hc-foot {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: calc(1.5 * var(--k));
+		margin-top: calc(1 * var(--k));
+		min-height: calc(4.2 * var(--k));
+	}
+	#hc-again {
+		white-space: nowrap;
+		flex: none;
+	}
+	.hc-cap b {
+		color: var(--ink);
+	}
+	.hc-r {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		gap: calc(2 * var(--k));
+	}
+	.hc-r > div {
+		border-top: 1px solid var(--line);
+		padding-top: calc(1 * var(--k));
+	}
+	.hc-r .big {
+		font-size: calc(3 * var(--k));
+		margin-bottom: calc(0.6 * var(--k));
+	}
+
+	/* hill climb, in 3D */
+	.h3 {
+		display: grid;
+		grid-template-columns: minmax(0, 1.75fr) minmax(0, 1fr);
+		gap: calc(3.4 * var(--k));
+	}
+	#h3-cv {
+		width: 100%;
+		height: 100%;
+		min-height: 0;
+		display: block;
+	}
+	.h3-r {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		gap: calc(0.9 * var(--k));
+	}
+	.h3-r .big {
+		margin-bottom: 0;
+		transition: opacity 0.2s;
+	}
+	.h3-time {
+		font-weight: 650;
+	}
+	.h3-cap {
+		min-height: 5.4em;
+		font-weight: 500;
+	}
+	.h3-cap b {
+		color: var(--amber);
+	}
+	.h3-head {
+		margin-top: calc(1 * var(--k));
+		padding-top: calc(1 * var(--k));
+		border-top: 1px solid var(--line);
+	}
+	.h3-head b {
+		color: var(--amber);
+		font-size: 1.3em;
+	}
+
+	/* jury cut */
+	.lab {
+		font-size: max(8px, calc(1.05 * var(--k)));
+		font-weight: 700;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--dim);
+	}
+	.iwe > div .big {
+		font-size: calc(3.4 * var(--k));
+		margin: 0;
+	}
+	.iwe > div .sm {
+		font-size: max(9px, calc(1.4 * var(--k)));
+	}
+	.deck:not(.c11) .only-11 {
+		display: none;
+	}
+	.rounds {
+		display: flex;
+		flex-direction: column;
+		gap: calc(1.6 * var(--k));
+	}
+	.rd {
+		display: grid;
+		grid-template-columns: minmax(0, 11em) minmax(0, 1fr) 8.5em minmax(0, 15em);
+		gap: calc(2 * var(--k));
+		align-items: center;
+		border-top: 1px solid var(--line);
+		padding-top: calc(1.2 * var(--k));
+	}
+	.rd > p:first-child {
+		display: flex;
+		flex-direction: column;
+		font-size: max(10px, calc(1.5 * var(--k)));
+	}
+	.rd > p:first-child span {
+		color: var(--dim);
+		font-size: 0.85em;
+	}
+	.rd .tr {
+		height: calc(1.6 * var(--k));
+		background: var(--panel);
+	}
+	.rd .tr i {
+		display: block;
+		height: 100%;
+		width: var(--w);
+		background: var(--amber);
+	}
+	.rd > b {
+		font-size: calc(2.2 * var(--k));
+		font-weight: 800;
+		text-align: right;
+	}
+	.nerd {
+		position: absolute;
+		top: calc(4.4 * var(--k));
+		right: calc(5 * var(--k));
+		max-width: 26ch;
+		padding: calc(0.8 * var(--k)) calc(1.2 * var(--k));
+		border: 1px dashed var(--line);
+		border-radius: calc(0.8 * var(--k));
+		font-size: max(9px, calc(1.15 * var(--k)));
+		line-height: 1.4;
+		color: var(--dim);
+		font-style: italic;
+		rotate: 1.5deg;
+	}
+	.nerd b {
+		display: block;
+		font-style: normal;
+		font-size: 0.85em;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--cyan);
+		margin-bottom: 0.2em;
+	}
+	.vs {
+		grid-column: 1 / -1;
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: calc(2.4 * var(--k));
+		border-top: 1px solid var(--line);
+		padding-top: calc(1 * var(--k));
+	}
+	.deck.c11 .r-foot > p:nth-child(2) {
+		display: none;
+	}
+	.deck.c11 .race {
+		gap: calc(1.4 * var(--k));
+	}
+	.vs > div > b {
+		display: block;
+		font-size: calc(2.4 * var(--k));
+		font-weight: 800;
+		line-height: 1.1;
+	}
+	.iwe-foot {
+		grid-column: 1 / -1;
+	}
+	.s-ans .t-h {
+		font-size: calc(5.6 * var(--k));
+	}
+	.s-ans .t-lede {
+		margin-top: calc(1.4 * var(--k)) !important;
+		font-size: calc(1.7 * var(--k));
+	}
+	.s-ans .t-twin {
+		margin-top: calc(1 * var(--k)) !important;
+		color: var(--cyan);
+	}
+	.s-ans .t-lede {
+		max-width: 36ch;
+	}
+	.s-ans .t-lede.done {
+		color: var(--amber);
+	}
+	.s-ans .h-line {
+		margin-top: calc(1 * var(--k)) !important;
+	}
+	.s-ans .h-line .blank {
+		display: inline-block;
+		width: 22em;
+		border-bottom: 1px solid var(--dim);
+	}
+	.ans-best {
+		margin-top: auto;
+		border-top: 1px solid var(--line);
+		padding-top: calc(1.2 * var(--k));
+		display: flex;
+		flex-direction: column;
+		gap: calc(0.6 * var(--k));
+	}
+	.ans-best > b {
+		font-size: calc(4.2 * var(--k));
+		font-weight: 800;
+		font-stretch: 112%;
+		letter-spacing: -0.03em;
+		line-height: 1;
+	}
+	.ans-ideas {
+		flex: 1;
+		min-width: 0;
+		align-self: center;
+		display: flex;
+		flex-direction: column;
+		gap: calc(1.6 * var(--k));
+		border-left: 1px solid var(--line);
+		padding-left: calc(3 * var(--k));
+	}
+	.ans-ideas .it span {
+		font-weight: 800;
+		margin-right: 0.5em;
+	}
+
+	/* narrow: the slides become one scrolling page */
+	@container deck (max-width: 620px) {
+		.stage {
+			--k: 9px;
+			aspect-ratio: auto;
+		}
+		.slide {
+			position: relative;
+			inset: auto;
+			opacity: 1;
+			visibility: visible;
+			transform: none;
+			padding: 36px 20px 40px;
+			border-bottom: 1px solid var(--line);
+		}
+		.slide::after,
+		.nav,
+		.toast {
+			display: none;
+		}
+		.s-title {
+			flex-direction: column;
+		}
+		.map {
+			height: 340px;
+		}
+		.t-stats,
+		.facts,
+		.ideas,
+		.uses,
+		.u-foot,
+		.why,
+		.sim,
+		.trust,
+		.f-grid,
+		.streak,
+		.r-foot {
+			grid-template-columns: minmax(0, 1fr);
+		}
+		.t-stats {
+			margin-top: 28px;
+		}
+		.flow {
+			grid-template-columns: minmax(0, 1fr);
+			row-gap: 10px;
+		}
+		.fn,
+		.fn.br {
+			grid-column: auto !important;
+			grid-row: auto;
+		}
+		.fn.br {
+			margin-left: 28px;
+		}
+		.fn::before,
+		.fn::after {
+			display: none;
+		}
+		.cond {
+			position: static;
+			margin-bottom: 2px;
+		}
+		.pipe {
+			flex-direction: row;
+			flex-wrap: wrap;
+			white-space: normal;
+		}
+		.hc {
+			grid-template-columns: minmax(0, 1fr);
+		}
+		#hill {
+			flex: none;
+			height: 220px;
+		}
+		.h3 {
+			grid-template-columns: minmax(0, 1fr);
+		}
+		#h3-cv {
+			height: 260px;
+		}
+		.cols-wrap {
+			height: 300px;
+			flex: none;
+		}
+		.col .cv {
+			font-size: 13px;
+		}
+		.cm {
+			grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 3.6em;
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.deck *,
+		.deck *::before,
+		.deck *::after {
+			transition: none !important;
+		}
+	}
+	@page {
+		size: 16in 9in;
+		margin: 0;
+	}
+	@media print {
+		.frame {
+			width: 16in;
+		}
+		.stage {
+			aspect-ratio: auto;
+			border-radius: 0;
+		}
+		.tr i {
+			width: var(--w) !important;
+			transition: none !important;
+		}
+		.col .cb {
+			height: var(--h) !important;
+			transition: none !important;
+		}
+		.dt .pos,
+		.dt .neg {
+			width: calc(var(--w) / 2) !important;
+		}
+		.cells i {
+			background: var(--amber) !important;
+		}
+		.dots i {
+			transform: none !important;
+		}
+		.deck * {
+			-webkit-print-color-adjust: exact;
+			print-color-adjust: exact;
+		}
+		.slide {
+			position: relative;
+			opacity: 1;
+			visibility: visible;
+			transform: none;
+			height: 9in;
+			break-after: page;
+			background: var(--bg);
+		}
+		.in {
+			opacity: 1;
+			transform: none;
+		}
+		.nav,
+		.toast,
+		.ghost {
+			display: none;
+		}
+	}
+</style>
+
+<script>
+	{
+		// The final's line. Fill in after the final ends, such as
+		// 'The final: merge 5, €00,000, 000 orders, 00.0% on time.'
+		const FINAL = null
+		// The submission hash from spread.bahnexpress.com/team, typed in by hand: no API returns it.
+		const HASH = '3eeda-7412e-64415-12d32'
+
+		const deck = document.getElementById('deck')
+		const stage = document.getElementById('stage')
+		const all = [...stage.querySelectorAll('.slide')]
+		let slides = all
+		const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches
+		const eur = (v) => '€' + Math.round(v).toLocaleString('en-US')
+		const signed = (v) => (v < 0 ? '−' : '+') + '€' + Math.abs(Math.round(v)).toLocaleString('en-US')
+
+		// ---------- map of the towns ----------
+		{
+			const towns = [
+				['Helsinki', 60.17, 24.94, 1], ['Tampere', 61.5, 23.76, 1], ['Turku', 60.45, 22.27], ['Oulu', 65.01, 25.47, 1],
+				['Rovaniemi', 66.5, 25.73, 1], ['Jyväskylä', 62.24, 25.75], ['Kuopio', 62.89, 27.68], ['Lahti', 60.98, 25.66],
+				['Vaasa', 63.1, 21.6], ['Joensuu', 62.6, 29.76], ['Pori', 61.48, 21.8], ['Seinäjoki', 62.79, 22.84],
+				['Kajaani', 64.22, 27.73], ['Kokkola', 63.84, 23.13], ['Lappeenranta', 61.06, 28.19], ['Mikkeli', 61.69, 27.27],
+				['Kotka', 60.47, 26.95], ['Hämeenlinna', 61.0, 24.46], ['Kemi', 65.74, 24.56], ['Savonlinna', 61.87, 28.88],
+			]
+			const P = {}
+			for (const [n, lat, lon, lab] of towns) P[n] = { x: (lon - 21.2) * 0.454, y: 66.9 - lat, lab }
+			const routes = [
+				['Helsinki', 'Hämeenlinna', 'Tampere'], ['Helsinki', 'Lahti', 'Jyväskylä', 'Oulu'], ['Turku', 'Tampere', 'Jyväskylä', 'Kuopio'],
+				['Tampere', 'Seinäjoki', 'Vaasa'], ['Oulu', 'Kemi', 'Rovaniemi'], ['Lahti', 'Mikkeli', 'Kuopio', 'Joensuu'],
+				['Helsinki', 'Kotka', 'Lappeenranta', 'Savonlinna'], ['Pori', 'Tampere', 'Lahti'], ['Kuopio', 'Kajaani', 'Oulu'],
+				['Kokkola', 'Oulu'], ['Seinäjoki', 'Kokkola'], ['Turku', 'Helsinki'],
+			]
+			const d = (r) => r.map((n, i) => `${i ? 'L' : 'M'}${P[n].x.toFixed(3)},${P[n].y.toFixed(3)}`).join('')
+			let s = `<defs>${routes.map((r, i) => `<path id="rt${i}" d="${d(r)}" fill="none"/>`).join('')}</defs>`
+			s += routes.map((r) => `<path class="road" d="${d(r)}"/>`).join('')
+			for (const [n, p] of Object.entries(P)) {
+				s += `<circle class="town" cx="${p.x}" cy="${p.y}" r="${p.lab ? 0.09 : 0.06}"/>`
+				if (p.lab) s += `<text class="tl" x="${p.x + 0.18}" y="${p.y + 0.14}">${n}</text>`
+			}
+			const cars = [[0, 7, 0], [1, 13, 2], [2, 11, 5], [3, 8, 1], [4, 9, 4], [5, 12, 3], [6, 10, 6], [8, 9, 2], [1, 13, 8], [7, 8, 3], [11, 7, 1]]
+			for (const [r, dur, delay] of cars)
+				s += `<g><circle class="halo" r="0.2"/><circle class="car" r="0.085"/><animateMotion dur="${dur}s" begin="-${delay}s" repeatCount="indefinite" ${r % 2 ? 'keyPoints="1;0" keyTimes="0;1" calcMode="linear"' : ''}><mpath href="#rt${r}"/></animateMotion></g>`
+			const map = document.getElementById('map')
+			map.setAttribute('viewBox', '0 -0.2 4.4 7.1')
+			map.setAttribute('preserveAspectRatio', 'xMidYMid meet')
+			map.innerHTML = s
+			if (reduce) map.pauseAnimations()
+		}
+
+		// ---------- streak cells, dots ----------
+		{
+			stage.querySelectorAll('.cells').forEach((c, h) => (c.innerHTML = Array.from({ length: 20 }, (_, i) => `<i style="--i:${i + h * 20}"></i>`).join('')))
+			document.getElementById('dots').innerHTML = Array.from({ length: 46 }, (_, i) => `<i class="${i >= 43 ? 'x' : ''}" style="--i:${i}"></i>`).join('')
+		}
+
+		// ---------- calculator ----------
+		{
+			const late = document.getElementById('i-late')
+			const cars = document.getElementById('i-cars')
+			const upd = () => {
+				const p = late.value / 100
+				const c = +cars.value
+				const parts = [1.2, 0.8 * p * c, 1.5 * p]
+				const tot = parts.reduce((a, b) => a + b)
+				document.getElementById('o-late').textContent = late.value + '%'
+				document.getElementById('o-cars').textContent = c
+				const scale = 7.5
+				;['c1', 'c2', 'c3'].forEach((id, i) => (document.getElementById(id).style.width = (c >= 25 ? 0 : (parts[i] / scale) * 100) + '%'))
+				document.getElementById('c-out').innerHTML =
+					c >= 25
+						? `<b class="red">Declined.</b> The desk stops quoting only while 25 won cars have no driver.`
+						: `<b>${tot.toFixed(2)} ×</b>the typical fee is the cost a quote must beat: ${eur(tot * 100)} on a €100 typical fee. Driver fee, waiting cars, late risk.`
+			}
+			late.addEventListener('input', upd)
+			cars.addEventListener('input', upd)
+			upd()
+		}
+
+		// ---------- gains ----------
+		{
+			// Gain a week over the default. Played: against the default on the same unseen weeks.
+			// Estimates: merge 1's +2,180 plus the candidate comparison's paired gains over merge 1.
+			const v = [
+				{ name: 'Fee ladder', sub: '119 weeks', gain: 604, played: true },
+				{ name: 'First version', sub: '30 weeks', gain: 949, played: true },
+				{ name: 'Merge 1', sub: '40 weeks', gain: 2180, played: true },
+				{ name: 'Merge 2', sub: 'the step back: safe on thin worlds', gain: 2180 - 560, back: true },
+				{ name: 'Merge 3', sub: 'onward pairs', gain: 2180 + 224 },
+				{ name: 'Merge 4.1', sub: 'played €15,723 a week in the 02:10 round', gain: 2180 + 465 },
+			]
+			const max = 3000
+			const g = document.getElementById('gains')
+			g.style.setProperty('--n', v.length)
+			g.setAttribute('aria-label', v.map((c) => `${c.name} ${c.played ? '' : 'about '}${signed(c.gain)}`).join(', '))
+			g.innerHTML = v
+				.map(
+					(c, i) =>
+						`<div class="col${c.back ? ' back' : ''}"><i class="cb${c.played ? '' : ' co'}" style="--h:${(c.gain / max) * 100}%;--i:${i}"><span class="cv">${c.played ? '' : '<small>about</small>'}${signed(c.gain)}</span></i><span class="cn">${c.name}<small>${c.sub}</small></span></div>`,
+				)
+				.join('')
+			const merges = v.filter((c) => /^Merge/.test(c.name)).map((c) => c.gain)
+			const nw = (t) => `<span style="white-space:nowrap">${t}</span>`
+			document.getElementById('g-title').innerHTML =
+				`The night's versions added ${nw(signed(v[0].gain))} to about ${nw(signed(Math.max(...merges)))} a week over the default`
+		}
+
+		// ---------- final ----------
+		{
+			const test = 'Test final, Sunday 01:00 Helsinki: merge 2 on the live desk, €10,192, 96.4% on time, ranked. We killed the desk on purpose; the standby took over in 26.1 s. The final plays at 09:00.'
+			document.querySelectorAll('.f-line').forEach((f) => {
+				f.textContent = FINAL || f.dataset.wait || test
+				f.classList.toggle('done', !!FINAL)
+			})
+			document.querySelectorAll('.h-line').forEach((h) => {
+				h.innerHTML = HASH ? `Submission hash: <code>${HASH}</code>` : 'Submission hash: <span class="blank"></span>'
+			})
+		}
+
+		// ---------- counters ----------
+		function count(el) {
+			const to = +el.dataset.count
+			if (reduce) return
+			const t0 = performance.now()
+			const step = (t) => {
+				const k = Math.min(1, (t - t0) / 1200)
+				const e = 1 - Math.pow(1 - k, 3)
+				el.textContent = eur(to * e)
+				if (k < 1) requestAnimationFrame(step)
+			}
+			el.textContent = eur(0)
+			requestAnimationFrame(step)
+		}
+
+		// ---------- race ----------
+		const race = (() => {
+			const sim = document.getElementById('cv-sim')
+			const COLS = 90
+			const SIM = 1442
+			let raf = 0
+			let frac = 1
+			const css = getComputedStyle(deck)
+			const col = { cyan: css.getPropertyValue('--cyan').trim(), amber: css.getPropertyValue('--amber').trim(), line: css.getPropertyValue('--line').trim() }
+			function paint(cv, total, filled, color) {
+				const w = cv.getBoundingClientRect().width
+				if (!w) return
+				const C = deck.classList.contains('c11') ? 130 : COLS
+				const pitch = w / C
+				const rows = Math.ceil(total / C)
+				const h = rows * pitch
+				const dpr = devicePixelRatio || 1
+				cv.style.height = h + 'px'
+				cv.width = Math.round(w * dpr)
+				cv.height = Math.round(h * dpr)
+				const g = cv.getContext('2d')
+				g.scale(dpr, dpr)
+				const s = pitch * 0.74
+				for (let i = 0; i < total; i++) {
+					g.fillStyle = i < filled ? color : col.line
+					g.fillRect((i % C) * pitch, Math.floor(i / C) * pitch, s, s)
+				}
+			}
+			function draw() {
+				const ns = Math.floor(SIM * frac)
+				paint(sim, SIM, ns, col.cyan)
+				document.getElementById('r-sim').textContent = ns.toLocaleString('en-US') + ' weeks'
+				const bahn = document.getElementById('cv-bahn')
+				if (bahn) {
+					const nb = Math.floor(26 * frac)
+					paint(bahn, 26, nb, col.amber)
+					document.getElementById('r-bahn').textContent = nb + ' weeks'
+				}
+				const secs = Math.round(281 * frac)
+				document.getElementById('r-clock').textContent = `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`
+			}
+			function run() {
+				cancelAnimationFrame(raf)
+				if (reduce) {
+					frac = 1
+					draw()
+					return
+				}
+				const t0 = performance.now() + 500
+				const tick = (t) => {
+					frac = Math.max(0, Math.min(1, (t - t0) / 5000))
+					draw()
+					if (frac < 1) raf = requestAnimationFrame(tick)
+				}
+				raf = requestAnimationFrame(tick)
+			}
+			document.getElementById('r-again').addEventListener('click', run)
+			const finish = () => {
+				cancelAnimationFrame(raf)
+				frac = 1
+				draw()
+			}
+			return { run, draw, finish }
+		})()
+
+		// ---------- hill climb ----------
+		// The boulder is the head, at its estimated € a week; a trial (cyan, dashed) rolls up to what the
+		// stand-in read and back down to what play paid. Every figure is in the slide's notes on the right.
+		const HEAD = { name: 'merge 4.1', eur: 15700 }
+		const START = { name: 'merge 3', eur: 15460 }
+		const TENTH = 17200
+		const HILL = [
+			{ cap: 'One knob at a time, each read on the stand-in against the base. Most read under the <b>€500 bar</b> and rolled back.' },
+			{ push: 395 }, { back: 0 }, { push: 294 }, { back: 0 }, { push: 344 }, { back: 0 },
+			{ cap: '<b>slow_step 0.4 at 760+ drivers</b>: +€622 and +€897 on the stand-in, <b>+€423 a week over merge 3</b> in play. It held.' },
+			{ climb: HEAD.eur },
+			{ wait: 1.2 },
+			{ cap: 'The next rounds pushed from the new base. None cleared the bar.' },
+			{ push: 273 }, { back: 0 }, { push: 320 }, { back: 0 },
+			{ cap: 'Bigger stacks read +€600 to +€900 on the stand-in. In play <b>R-max lost €5,341 a week</b>, worse on all 5 seeds.' },
+			{ push: 900, slow: true, quiet: true }, { wait: 0.5 }, { back: -5341, lost: true },
+			{ cap: '<b>slow_step 0.2</b> read +€585 to +€697 on the stand-in and <b>−€20</b> in play.' },
+			{ push: 585 }, { wait: 0.3 }, { back: -20, lost: true },
+			{ cap: 'The stand-in was fixed: it now calls the direction of <b>9 of 9</b> played steps, up from 6 of 9.' },
+			{ wait: 2 },
+			{ cap: 'A newer stack fell to <b>89.0% on time</b> on one week and was rolled back at once.' },
+			{ push: 600, quiet: true }, { wait: 0.3 }, { back: 0, lost: true, hush: true },
+		]
+		const HILL_END = `About 35 one-knob arms, one step held. <b>${HEAD.name}: about ${eur(HEAD.eur)} a week</b>; tenth place is about ${eur(TENTH)}.`
+		const hill = (() => {
+			const svg = document.getElementById('hill')
+			const ns = 'http://www.w3.org/2000/svg'
+			const M0 = 14900, M1 = 17400
+			const t = (m) => (m - M0) / (M1 - M0)
+			// the slope: steeper towards the top
+			const P = (u) => [10 + 78 * u, 44 - 34 * u + (u > 0 && u < 1 ? 3 * Math.sin(Math.PI * u) : 0) + (u > 1 ? 4 * (u - 1) : 0)]
+			const R = 2.6
+			const along = (m, off = 0) => {
+				const u = t(m) + off
+				const [x, y] = P(u)
+				const [x2, y2] = P(u + 0.001)
+				const d = Math.hypot(x2 - x, y2 - y)
+				const nx = (y2 - y) / d, ny = -(x2 - x) / d
+				return { x, y, cx: x + nx * R, cy: y + ny * R, a: Math.atan2(y2 - y, x2 - x) }
+			}
+			const el = (tag, attrs, parent = svg) => {
+				const e = document.createElementNS(ns, tag)
+				for (const k in attrs) e.setAttribute(k, attrs[k])
+				parent.append(e)
+				return e
+			}
+			const pts = []
+			for (let u = -2.4; u <= 1.4; u += 0.02) pts.push(P(u).map((v) => v.toFixed(2)).join(','))
+			el('polygon', { class: 'ground', points: pts.join(' ') + ` ${P(1.4)[0]},60 ${P(-2.4)[0]},60` })
+			el('polyline', { class: 'edge', points: pts.join(' ') })
+			const mark = (m, text, cls, below) => {
+				const p = along(m)
+				el('line', { class: 'tick', x1: p.x, y1: p.y, x2: p.x, y2: p.y + 1.6 })
+				const tx = el('text', { class: 'lbl ' + cls, x: p.x + (below === 'end' ? -0.6 : 0.6), y: p.y + 4, 'text-anchor': below === 'end' ? 'end' : 'start' })
+				tx.textContent = text
+			}
+			mark(START.eur, START.name, '', 'end')
+			mark(HEAD.eur, `${HEAD.name}, about ${eur(HEAD.eur)}`, 'hd', 'start')
+			const top = along(TENTH)
+			el('line', { class: 'flag', x1: top.x, y1: top.y, x2: top.x, y2: top.y - 7 })
+			el('path', { d: `M${top.x} ${top.y - 7}h4l-1 1.3 1 1.3h-4z` })
+			el('text', { class: 'lbl', x: top.x - 1, y: top.y - 7.8, 'text-anchor': 'middle' }).textContent = `tenth place, about ${eur(TENTH)}`
+			const trial = el('g', { opacity: 0 })
+			const tc = el('circle', { class: 'try', r: R }, trial)
+			const read = el('text', { class: 'read' }, trial)
+			const rock = el('g', {})
+			el('circle', { class: 'rock', r: R }, rock)
+			el('path', { class: 'rock-crack', d: 'M-1.4 -0.6l1 0.4 0.6 -0.9M0.4 0.9l0.8 0.5' }, rock)
+			// Claude Code's mascot, in pixels, facing uphill with an arm on the rock
+			const who = el('g', { class: 'who' })
+			const body = el('g', {}, who)
+			const PX = 0.85
+			const ART = ['.########.', '.#o####o#.', '##########', '.########.', '.#.#..#.#.']
+			ART.forEach((row, y) =>
+				[...row].forEach((c, x) => {
+					if (c === '.') return
+					el('rect', { class: c === 'o' ? 'eye' : 'px', x: (x * PX).toFixed(2), y: (y * PX).toFixed(2), width: PX + 0.02, height: PX + 0.02 }, body)
+				}),
+			)
+			const cap = document.getElementById('hc-cap')
+			let st, raf = 0
+			const put = (g, m) => {
+				const p = along(m)
+				g.setAttribute('transform', `translate(${p.cx.toFixed(2)} ${p.cy.toFixed(2)}) rotate(${((((m - M0) / (M1 - M0)) * 85 * 180) / (Math.PI * R)) % 360})`)
+				return p
+			}
+			const place = (m) => {
+				// the figure stands just downhill of the rock it pushes, hands on it
+				const p = along(m)
+				who.setAttribute('transform', `translate(${p.cx.toFixed(2)} ${p.cy.toFixed(2)}) rotate(${((p.a * 180) / Math.PI).toFixed(1)})`)
+				// a small hop with each push
+				const hop = Math.abs(Math.sin((m - M0) / 60)) * 0.35
+				body.setAttribute('transform', `translate(${(-R - 10 * PX - 0.05).toFixed(2)} ${(R - 5 * PX - hop).toFixed(2)})`)
+			}
+			function draw(s) {
+				put(rock, s.head)
+				if (s.trial == null) trial.setAttribute('opacity', 0)
+				else {
+					trial.setAttribute('opacity', 1)
+					const p = along(s.trial)
+					tc.setAttribute('cx', p.cx)
+					tc.setAttribute('cy', p.cy)
+					read.setAttribute('x', p.cx)
+					read.setAttribute('y', p.cy - R - 1)
+					read.textContent = s.quiet && !s.lost ? '' : s.hush ? '' : signed(s.trial - s.head)
+					tc.classList.toggle('lost', !!s.lost)
+					read.classList.toggle('lost', !!s.lost)
+				}
+				place(s.fig)
+			}
+			// one second of play per step, eased
+			const ease = (x) => (x < 0.5 ? 2 * x * x : 1 - (-2 * x + 2) ** 2 / 2)
+			function plan() {
+				const out = []
+				let s = { head: START.eur, trial: null, fig: START.eur }
+				for (const e of HILL) {
+					if (e.cap) out.push({ dur: 0, cap: e.cap, from: s, to: s })
+					else if (e.wait) out.push({ dur: e.wait, from: s, to: s })
+					else if (e.climb) {
+						const to = { head: e.climb, trial: null, fig: e.climb }
+						out.push({ dur: 1.4, from: s, to })
+						s = to
+					} else if (e.push != null) {
+						const from = { ...s, trial: s.head, fig: s.head, quiet: e.quiet }
+						const to = { ...from, trial: s.head + e.push, fig: s.head + e.push }
+						out.push({ dur: e.slow ? 1.4 : 0.8, from, to })
+						s = to
+					} else if (e.back != null) {
+						const from = { ...s, lost: e.lost, hush: e.hush }
+						const to = { ...from, trial: s.head + e.back, fig: s.head }
+						out.push({ dur: e.back < -1000 ? 1.6 : 0.6, from, to, gone: true })
+						s = { head: s.head, trial: null, fig: s.head }
+					}
+				}
+				return out
+			}
+			const steps = plan()
+			const mix = (a, b, x) => ({
+				head: a.head + (b.head - a.head) * x,
+				trial: a.trial == null ? null : a.trial + ((b.trial ?? a.trial) - a.trial) * x,
+				fig: a.fig + (b.fig - a.fig) * x,
+				lost: b.lost,
+				quiet: b.quiet,
+				hush: b.hush,
+			})
+			function finish() {
+				cancelAnimationFrame(raf)
+				draw({ head: HEAD.eur, trial: null, fig: HEAD.eur })
+				cap.innerHTML = HILL_END
+			}
+			function run() {
+				cancelAnimationFrame(raf)
+				if (reduce) return finish()
+				let i = 0, t0 = performance.now() + 600
+				draw({ head: START.eur, trial: null, fig: START.eur })
+				cap.innerHTML = ''
+				const tick = (now) => {
+					while (i < steps.length && steps[i].dur === 0) cap.innerHTML = steps[i++].cap
+					if (i >= steps.length) return finish()
+					const sp = steps[i]
+					const x = Math.max(0, Math.min(1, (now - t0) / (sp.dur * 1000)))
+					draw(mix(sp.from, sp.to, ease(x)))
+					if (x >= 1) {
+						if (sp.gone) draw({ ...sp.to, trial: null })
+						t0 = now
+						i++
+					}
+					raf = requestAnimationFrame(tick)
+				}
+				raf = requestAnimationFrame(tick)
+			}
+			document.getElementById('hc-again').addEventListener('click', run)
+			finish()
+			return { run, finish }
+		})()
+
+		// ---------- hill climb, in 3D ----------
+		// Height on the mountain is the head's € a week: the base ring €14,600, the summit tenth place.
+		// Times are Helsinki, from the climb's own log, the candidate comparison and the main Space.
+		const h3 = (() => {
+			const cv = document.getElementById('h3-cv')
+			const g = cv.getContext('2d')
+			const css = getComputedStyle(deck)
+			const C = (n) => css.getPropertyValue('--' + n).trim()
+			const COL = { amber: C('amber'), cyan: C('cyan'), red: C('red'), ink: C('ink'), dim: C('dim'), bg: C('bg') }
+			const EMIN = 14600, TENTH = 17200, M3 = 15460, HEAD = 15700
+			const EV = [
+				{ time: 'Saturday 22:31', num: '+€395', col: 'cyan', cap: 'Round 1: 9 one-knob arms on the stand-in. The best reads +€395, under the €500 bar. Back down.', go: [[M3 + 395, 0.9], [M3, 0.7]] },
+				{ time: 'Saturday 22:44', num: '+€897', col: 'cyan', cap: '<b>slow_step 0.4</b> at 760+ drivers reads +€622, then +€897 on the other half of the seeds.', go: [[M3 + 622, 0.9], [M3 + 897, 0.7]] },
+				{ time: 'Saturday 23:14', num: '+€423', col: 'amber', cap: 'Tagged merge 4. Play pays less than the stand-in read: <b>+€423 a week</b> over merge 3 at 760+ drivers.', go: [[HEAD, 1.2]], head: HEAD },
+				{ time: 'Saturday 23:23', num: '0 of 23', col: 'dim', cap: 'Rounds 4 and 5: 23 more arms from the new base. None holds.', go: [[HEAD + 320, 0.8], [HEAD, 0.6]] },
+				{ time: 'Saturday 23:39', num: '−€5,341', col: 'red', cap: 'R-max goes to play. The stand-in read such stacks at +€600 to +€900; in play it lost <b>€5,341 a week</b>.', go: [[HEAD + 900, 1], [EMIN, 1.3], [HEAD, 1.5]] },
+				{ time: 'Saturday 23:47', num: '−€20', col: 'red', cap: 'The climb stops. slow_step 0.2 read +€585 on the stand-in and −€20 in play.', go: [[HEAD + 585, 0.8], [HEAD - 20, 0.6]] },
+				{ time: 'Sunday 01:26', num: '9 of 9', col: 'cyan', cap: 'The stand-in is fixed: it calls the direction of 9 of 9 played steps, up from 6 of 9.', go: [] },
+				{ time: 'Sunday 01:34', num: '89.0%', col: 'red', cap: 'A newer stack falls to 89.0% on time on one week and is rolled back. The head is merge 4.1 again.', go: [[HEAD + 300, 0.7], [HEAD, 0.5]] },
+				{ time: 'Now', num: eur(HEAD), col: 'amber', cap: `<b>Merge 4.1: about ${eur(HEAD)} a week.</b> The final was played by merge 8.3: 4.1 at 720 to 819 drivers, longer onward pairs under 760, an on-time budget under 720 and from 820. Tenth place, the summit, is about ${eur(TENTH)}.`, go: [] },
+			]
+			const HOLD = 1.5
+			const H = 0.95, NR = 22, NA = 52, RMAX = 1.3
+			const hgt = (r, a) => (r >= 1 ? 0 : H * Math.pow(1 - r, 1.7) * (1 + 0.07 * Math.sin(3 * a + 1) * r) + 0.05 * Math.sin(5 * a) * r * (1 - r))
+			const P = []
+			for (let i = 0; i <= NR; i++) {
+				const row = []
+				for (let j = 0; j < NA; j++) {
+					const a = (j / NA) * Math.PI * 2, r = (i / NR) * RMAX
+					row.push([r * Math.cos(a), hgt(r, a), r * Math.sin(a)])
+				}
+				P.push(row)
+			}
+			const quads = []
+			for (let i = 0; i < NR; i++)
+				for (let j = 0; j < NA; j++) {
+					const q = [P[i][j], P[i][(j + 1) % NA], P[i + 1][(j + 1) % NA], P[i + 1][j]]
+					const u = q[2].map((v, k) => v - q[0][k]), v = q[3].map((w, k) => w - q[1][k])
+					let n = [u[1] * v[2] - u[2] * v[1], u[2] * v[0] - u[0] * v[2], u[0] * v[1] - u[1] * v[0]]
+					if (n[1] < 0) n = n.map((x) => -x)
+					const l = Math.hypot(...n) || 1
+					quads.push({ q, n: n.map((x) => x / l), alt: (q[0][1] + q[2][1]) / 2 / H, ground: (i / NR) * RMAX >= 1 })
+				}
+			const path = (t) => {
+				t = Math.max(0, Math.min(1, t))
+				const r = 0.96 - 0.9 * t, a = 2.4 + 1.7 * 2 * Math.PI * t
+				return [r * Math.cos(a), hgt(r, a) + 0.018, r * Math.sin(a)]
+			}
+			const tOf = (e) => (e - EMIN) / (TENTH - EMIN)
+			const face = (e) => -Math.PI / 2 - 0.5 - (2.4 + 1.7 * 2 * Math.PI * Math.max(0, Math.min(1, tOf(e))))
+			let W = 0, Ht = 0, dpr = 1, phi = 0
+			const EL = 0.42, D = 3.3
+			const Lv = (() => { const v = [-0.55, 0.75, -0.4], l = Math.hypot(...v); return v.map((x) => x / l) })()
+			const rot = ([x, y, z]) => {
+				const c = Math.cos(phi), s = Math.sin(phi)
+				const x1 = x * c - z * s, z1 = x * s + z * c
+				return [x1, y * Math.cos(EL) + z1 * Math.sin(EL), z1 * Math.cos(EL) - y * Math.sin(EL)]
+			}
+			const proj = (pt) => {
+				const [X, Y, Z] = rot(pt)
+				const k = Math.min(W * 0.55, Ht * 0.9) / (D + Z)
+				return { x: W * 0.5 + X * k, y: Ht * 0.6 - (Y - 0.3) * k, z: Z, k }
+			}
+			const mix = (a, b, x) => a.map((v, i) => Math.round(v + (b[i] - v) * x))
+			const DARK = [16, 23, 40], LIT = [62, 76, 112], HIGH = [86, 101, 140]
+			const ART = ['.########.', '.#o####o#.', '##########', '.########.', '.#.#..#.#.']
+			const font = (px) => `600 ${px}px Archivo, system-ui, sans-serif`
+			let e = M3, head = M3
+			function size() {
+				const r = cv.getBoundingClientRect()
+				if (!r.width) return false
+				dpr = devicePixelRatio || 1
+				W = r.width * dpr
+				Ht = r.height * dpr
+				cv.width = Math.round(W)
+				cv.height = Math.round(Ht)
+				return true
+			}
+			function draw(bob = 0) {
+				if (!W && !size()) return
+				g.clearRect(0, 0, W, Ht)
+				const items = []
+				for (const f of quads) {
+					const p = f.q.map(proj)
+					const n = rot(f.n)
+					const b = Math.max(0, n[0] * Lv[0] + n[1] * Lv[1] + n[2] * Lv[2])
+					const col = f.ground ? mix(DARK, [24, 32, 52], b * 0.6) : mix(mix(DARK, LIT, b), HIGH, Math.max(0, f.alt - 0.55) * 0.9 * b)
+					items.push({ z: (p[0].z + p[1].z + p[2].z + p[3].z) / 4, d: () => {
+						g.beginPath()
+						g.moveTo(p[0].x, p[0].y)
+						for (let i = 1; i < 4; i++) g.lineTo(p[i].x, p[i].y)
+						g.closePath()
+						g.fillStyle = `rgb(${col})`
+						g.fill()
+						g.strokeStyle = 'rgba(152,160,179,0.09)'
+						g.lineWidth = dpr
+						g.stroke()
+					} })
+				}
+				const N = 200, reached = tOf(Math.max(head, M3))
+				for (let i = 0; i < N; i++) {
+					const a = proj(path(i / N)), b = proj(path((i + 1) / N)), lit = (i + 1) / N <= reached + 1e-6
+					if (!lit && i % 2) continue
+					items.push({ z: (a.z + b.z) / 2 - 0.04, d: () => {
+						g.strokeStyle = lit ? COL.amber : 'rgba(152,160,179,0.55)'
+						g.lineWidth = (lit ? 3 : 1.6) * dpr
+						g.beginPath()
+						g.moveTo(a.x, a.y)
+						g.lineTo(b.x, b.y)
+						g.stroke()
+					} })
+				}
+				const fs = Math.max(10 * dpr, W * 0.017)
+				const labels = []
+				const mark = (m, text, color) => {
+					const p = proj(path(tOf(m)))
+					items.push({ z: p.z - 0.06, d: () => {
+						g.fillStyle = color
+						g.beginPath()
+						g.arc(p.x, p.y, 3.2 * dpr, 0, 7)
+						g.fill()
+					} })
+					if (p.z < 0) labels.push(() => {
+						g.font = font(fs)
+						g.fillStyle = color
+						g.textAlign = 'end'
+						g.fillText(text, p.x - 9 * dpr, p.y + 4 * dpr)
+						g.textAlign = 'start'
+					})
+				}
+				mark(M3, 'merge 3', COL.dim)
+				mark(HEAD, 'merge 4.1', COL.amber)
+				const top = proj([0, hgt(0, 0), 0]), pole = proj([0, hgt(0, 0) + 0.3, 0])
+				items.push({ z: top.z - 0.2, d: () => {
+					g.strokeStyle = COL.ink
+					g.lineWidth = 1.5 * dpr
+					g.beginPath()
+					g.moveTo(top.x, top.y)
+					g.lineTo(pole.x, pole.y)
+					g.stroke()
+					const fw = (top.y - pole.y) * 0.45
+					g.fillStyle = COL.cyan
+					g.beginPath()
+					g.moveTo(pole.x, pole.y)
+					g.lineTo(pole.x + fw, pole.y + fw * 0.3)
+					g.lineTo(pole.x + fw * 0.8, pole.y + fw * 0.6)
+					g.lineTo(pole.x, pole.y + fw * 0.6)
+					g.closePath()
+					g.fill()
+					g.fillStyle = COL.ink
+					g.font = font(fs)
+					g.textAlign = 'center'
+					g.fillText(`tenth place, about ${eur(TENTH)}`, pole.x, pole.y - 10 * dpr)
+					g.textAlign = 'start'
+				} })
+				const t = tOf(e), rock = proj(path(t + 0.045)), me = proj(path(t))
+				items.push({ z: rock.z - 0.09, d: () => {
+					const r = 0.07 * rock.k
+					g.fillStyle = COL.amber
+					g.beginPath()
+					g.arc(rock.x, rock.y - r, r, 0, 7)
+					g.fill()
+				} })
+				items.push({ z: me.z - 0.1, d: () => {
+					const px = 0.02 * me.k, flip = rock.x < me.x
+					const x0 = me.x - 5 * px, y0 = me.y - 5 * px - bob * px
+					ART.forEach((row, y) =>
+						[...row].forEach((c, x) => {
+							if (c === '.') return
+							g.fillStyle = c === 'o' ? COL.bg : '#d97757'
+							g.fillRect(x0 + (flip ? 9 - x : x) * px, y0 + y * px, px + 0.6, px + 0.6)
+						}),
+					)
+				} })
+				items.sort((a, b) => b.z - a.z)
+				for (const it of items) it.d()
+				for (const l of labels) l()
+			}
+			const $ = (id) => document.getElementById(id)
+			function show(v) {
+				$('h3-time').textContent = v.time === 'Now' ? 'Now' : v.time + ', Helsinki'
+				$('h3-num').textContent = v.num
+				$('h3-num').style.color = COL[v.col]
+				$('h3-cap').innerHTML = v.cap
+			}
+			const setHead = (v) => {
+				head = v
+				$('h3-head').textContent = eur(v)
+			}
+			const steps = []
+			{
+				let at = M3
+				EV.forEach((v) => {
+					steps.push({ v, from: at, to: at, dur: 0.01 })
+					for (const [to, dur] of v.go) {
+						steps.push({ from: at, to, dur })
+						at = to
+					}
+					steps.push({ from: at, to: at, dur: HOLD })
+				})
+			}
+			const ease = (x) => (x < 0.5 ? 2 * x * x : 1 - (-2 * x + 2) ** 2 / 2)
+			let si = 0, st = 0, last = 0, raf = 0
+			const slide = cv.closest('.slide')
+			function tick(now) {
+				if (!slide.classList.contains('cur') && !stacked()) return
+				const dt = Math.min(0.05, (now - (last || now)) / 1000)
+				last = now
+				const sp = steps[si]
+				let moving = false
+				if (sp) {
+					if (st === 0 && sp.v) {
+						show(sp.v)
+						if (sp.v.head) setHead(sp.v.head)
+					}
+					st += dt
+					const x = Math.min(1, st / sp.dur)
+					e = sp.from + (sp.to - sp.from) * ease(x)
+					moving = sp.from !== sp.to
+					if (x >= 1) {
+						st = 0
+						si++
+					}
+				}
+				phi = face(e)
+				draw(moving ? Math.abs(Math.sin(now / 90)) * 0.8 : 0)
+				raf = requestAnimationFrame(tick)
+			}
+			function finish() {
+				cancelAnimationFrame(raf)
+				si = steps.length
+				e = HEAD
+				phi = face(e)
+				setHead(HEAD)
+				show(EV[EV.length - 1])
+				size()
+				draw()
+			}
+			function run() {
+				cancelAnimationFrame(raf)
+				size()
+				if (reduce) return finish()
+				si = st = last = 0
+				e = M3
+				setHead(M3)
+				raf = requestAnimationFrame(tick)
+			}
+			addEventListener('resize', () => size() && draw())
+			finish()
+			return { run, finish }
+		})()
+
+		// ---------- navigation ----------
+		let cur = 0
+		const ticks = document.getElementById('ticks')
+		const cutsEl = document.getElementById('cuts')
+		const CUTS = [11, 5, 7, 9, 10]
+		let cut = 10
+		const size = (n) => all.filter((s) => s.dataset.cuts.split(' ').includes(String(n))).length
+		cutsEl.innerHTML = CUTS.map((n) => `<button type="button" data-n="${n}" aria-label="${n === 11 ? 'Jury cut, ' : ''}${size(n)} slides">${n === 11 ? 'Jury ' : ''}${size(n)}</button>`).join('')
+		function setCut(n) {
+			cut = n
+			deck.classList.toggle('c11', n === 11)
+			const was = slides[cur]
+			all.forEach((s) => s.classList.toggle('out', !s.dataset.cuts.split(' ').includes(String(n))))
+			slides = all.filter((s) => !s.classList.contains('out'))
+			slides.forEach((s, i) => {
+				const no = s.querySelector('.no')
+				if (no) no.textContent = String(i).padStart(2, '0') + '\u2002'
+			})
+			ticks.innerHTML = slides.map((s, i) => `<button type="button" aria-label="Slide ${i + 1}: ${s.getAttribute('aria-label')}"></button>`).join('')
+			;[...cutsEl.children].forEach((b) => b.setAttribute('aria-pressed', String(+b.dataset.n === n)))
+			const keep = slides.indexOf(was)
+			cur = -1
+			go(keep >= 0 ? keep : 0)
+		}
+		cutsEl.addEventListener('click', (e) => {
+			const b = e.target.closest('button')
+			if (b) setCut(+b.dataset.n)
+		})
+		const stacked = () => stage.getBoundingClientRect().width <= 620
+		function enter(s) {
+			s.classList.remove('play')
+			void s.offsetWidth
+			s.classList.add('play')
+			s.querySelectorAll('[data-count]').forEach(count)
+			if (s.hasAttribute('data-race')) race.run()
+			if (s.hasAttribute('data-hill')) hill.run()
+			if (s.hasAttribute('data-hill3d')) h3.run()
+		}
+		function go(i) {
+			i = Math.max(0, Math.min(slides.length - 1, i))
+			const changed = i !== cur || !slides[i].classList.contains('cur')
+			cur = i
+			all.forEach((s) => {
+				s.classList.toggle('cur', s === slides[i])
+				if (!stacked()) s.inert = s !== slides[i]
+			})
+			;[...ticks.children].forEach((b, j) => {
+				b.classList.toggle('on', j === i)
+				b.classList.toggle('done', j < i)
+			})
+			document.getElementById('cnt').textContent = `${String(i + 1).padStart(2, '0')} / ${slides.length}`
+			if (changed && !stacked()) enter(slides[i])
+		}
+		ticks.addEventListener('click', (e) => {
+			const b = e.target.closest('button')
+			if (b) go([...ticks.children].indexOf(b))
+		})
+		document.getElementById('prev').addEventListener('click', () => go(cur - 1))
+		document.getElementById('next').addEventListener('click', () => go(cur + 1))
+		const toast = (msg) => {
+			const t = document.getElementById('toast')
+			t.textContent = msg
+			t.classList.add('on')
+			setTimeout(() => t.classList.remove('on'), 3200)
+		}
+		const fullscreen = () => {
+			if (document.fullscreenElement) return document.exitFullscreen()
+			const p = deck.requestFullscreen?.()
+			if (!p) return toast('Full screen is not available here. Open the artifact on its own page and use the browser’s full screen.')
+			p.catch(() => toast('Full screen is not available here. Open the artifact on its own page and use the browser’s full screen.'))
+		}
+		document.getElementById('fs').addEventListener('click', fullscreen)
+		addEventListener('beforeprint', () => {
+			stage.querySelectorAll('[data-count]').forEach((el) => (el.textContent = eur(+el.dataset.count)))
+			requestAnimationFrame(() => {
+				race.finish()
+				hill.finish()
+				h3.finish()
+			})
+		})
+		document.addEventListener('keydown', (e) => {
+			if (e.target.closest && e.target.closest('input')) return
+			if (stacked()) return
+			const k = e.key
+			if (k === 'ArrowRight' || k === 'PageDown' || k === ' ') go(cur + 1)
+			else if (k === 'ArrowLeft' || k === 'PageUp') go(cur - 1)
+			else if (k === 'Home') go(0)
+			else if (k === 'End') go(slides.length - 1)
+			else if (k === 'f' || k === 'F') fullscreen()
+			else if (k === '5' || k === '7' || k === '9' || k === '0') setCut(k === '0' ? 10 : +k)
+			else return
+			e.preventDefault()
+		})
+		let sx = null
+		stage.addEventListener('touchstart', (e) => (sx = e.touches[0].clientX), { passive: true })
+		stage.addEventListener('touchend', (e) => {
+			if (sx == null || stacked()) return
+			const dx = e.changedTouches[0].clientX - sx
+			if (Math.abs(dx) > 50) go(cur + (dx < 0 ? 1 : -1))
+			sx = null
+		})
+
+		// Narrow frames show every slide as one scrolling page; each animates as it scrolls in.
+		const io = new IntersectionObserver(
+			(es) => {
+				for (const en of es)
+					if (en.isIntersecting && stacked() && !en.target.classList.contains('play')) enter(en.target)
+			},
+			{ threshold: 0.25 },
+		)
+		all.forEach((s) => io.observe(s))
+		new ResizeObserver(() => {
+			if (stacked()) all.forEach((s) => (s.inert = false))
+			else go(cur)
+			race.draw()
+		}).observe(stage)
+		// The 10-slide jury cut by default; open the others with #5, #7, #9 or #10 in the address.
+		const h = +location.hash.slice(1)
+		setCut(CUTS.includes(h) ? h : 11)
+	}
+</script>
+</body>
+</html>

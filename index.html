@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Katalyst at Junction 2026</title>
+<meta name="description" content="Team Katalyst at Junction 2026: OnCallBench, an on-call shift that AI agents still lose money on; Since When, what three Wikipedias say differently and since when; and Kutsu, recruitment event invitations that arrive filled in.">
+<meta property="og:title" content="Katalyst at Junction 2026">
+<meta property="og:description" content="Three entries, each with a live demo.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230f3d33'/%3E%3Cpath d='M10 7v18M22 7l-9.5 9L22 25' fill='none' stroke='%23b9f27c' stroke-width='4'/%3E%3C/svg%3E">
+<link rel="preload" href="fonts/archivo-latin-wdth-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="shots/incident.webp" as="image" type="image/webp">
+<style>
+@font-face {
+  font-family: "Archivo";
+  src: url("fonts/archivo-latin-wdth-normal.woff2") format("woff2");
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
+  font-display: swap;
+}
+
+:root {
+  --ground: oklch(97% 0.012 165);
+  --raised: oklch(99.5% 0.004 165);
+  --ink: oklch(24% 0.035 170);
+  --soft: oklch(42% 0.03 170);
+  --rule: oklch(86% 0.025 165);
+  --field: oklch(32% 0.065 168);
+  --field-ink: oklch(96% 0.02 150);
+  --field-soft: oklch(84% 0.045 160);
+  --field-rule: oklch(46% 0.06 168);
+  --spark: oklch(89% 0.19 128);
+  --spark-ink: oklch(25% 0.06 150);
+  --action: oklch(36% 0.085 168);
+  --action-ink: oklch(97% 0.02 150);
+  --link: oklch(38% 0.1 168);
+  --shadow: 0 1px 2px oklch(24% 0.035 170 / 0.08), 0 10px 28px -14px oklch(24% 0.035 170 / 0.28);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ground: oklch(19% 0.022 170);
+    --raised: oklch(23% 0.026 170);
+    --ink: oklch(94% 0.015 160);
+    --soft: oklch(76% 0.03 162);
+    --rule: oklch(33% 0.03 168);
+    --field: oklch(26% 0.05 168);
+    --field-ink: oklch(96% 0.02 150);
+    --field-soft: oklch(82% 0.04 160);
+    --field-rule: oklch(40% 0.05 168);
+    --action: oklch(89% 0.19 128);
+    --action-ink: oklch(25% 0.06 150);
+    --link: oklch(88% 0.15 132);
+    --shadow: 0 1px 2px oklch(10% 0.02 170 / 0.5), 0 12px 30px -14px oklch(8% 0.02 170 / 0.8);
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font: 400 clamp(1rem, 0.93rem + 0.3vw, 1.25rem)/1.55 "Archivo", system-ui, sans-serif;
+  font-stretch: 100%;
+  -webkit-font-smoothing: antialiased;
+}
+::selection { background: var(--spark); color: var(--spark-ink); }
+a { color: var(--link); text-underline-offset: 0.18em; text-decoration-thickness: 0.08em; }
+a:focus-visible { outline: 3px solid var(--spark); outline-offset: 3px; border-radius: 4px; }
+h1, h2, h3, p, ul { margin: 0; }
+ul { padding: 0; list-style: none; }
+.wrap { width: min(100% - 2rem, 68rem); margin-inline: auto; }
+svg.arrow { width: 0.8em; height: 0.8em; flex: none; }
+
+.mast { background: var(--field); color: var(--field-ink); padding-block: clamp(1.3rem, 4vw, 3rem) clamp(1.4rem, 3.5vw, 2.6rem); }
+.mast h1 {
+  font-weight: 800;
+  font-stretch: 125%;
+  font-size: clamp(2.4rem, 10vw, 4.6rem);
+  line-height: 0.95;
+  letter-spacing: -0.035em;
+}
+.mast p { margin-top: 0.6rem; color: var(--field-soft); font-size: 1.12em; line-height: 1.4; }
+/* The header is dark green in both themes, so its button takes the spark colour. */
+.mast .btn { margin-top: 1rem; background: var(--spark); color: var(--spark-ink); }
+
+/* The three entries, listed in the header so all of them are on the first screen. */
+.toc { margin-top: clamp(1.1rem, 3vw, 2rem); display: grid; }
+/* Each row: the name with its partner beside it in small type, then what it is. */
+.toc a {
+  display: grid; grid-template-columns: 1fr auto; align-items: baseline; column-gap: 1rem; align-content: start;
+  padding-block: 0.6rem;
+  border-top: 1px solid var(--field-rule);
+  color: var(--field-soft); text-decoration: none; line-height: 1.35;
+}
+.toc b { color: var(--field-ink); font-weight: 750; font-stretch: 112%; font-size: 1.15em; }
+.toc .who { font-size: 0.8em; text-align: right; }
+.toc .short { grid-column: 1 / -1; }
+.toc b::after { content: " ↓"; color: var(--spark); font-weight: 600; font-size: 0.8em; }
+.toc a:hover b { color: var(--spark); }
+@media (min-width: 46rem) {
+  .toc { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2rem; }
+  .toc a { padding-block: 0.8rem 0; }
+}
+
+/* One article per entry. */
+.entry {
+  display: grid; gap: 1.1rem 2.5rem;
+  padding-block: clamp(1.6rem, 3.5vw, 2.6rem);
+  border-bottom: 1px solid var(--rule);
+  scroll-margin-top: 0.5rem;
+}
+.entry .shot {
+  display: block; overflow: hidden;
+  border-radius: 8px; border: 1px solid var(--rule); background: var(--raised);
+  box-shadow: var(--shadow);
+}
+.entry .shot img { display: block; width: 100%; height: auto; aspect-ratio: 8 / 5; object-fit: cover; object-position: top left; transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+.entry a.shot:hover img { transform: scale(1.025); }
+.entry h2 {
+  display: flex; align-items: center; gap: 0.4em;
+  font-weight: 800; font-stretch: 118%;
+  font-size: clamp(1.5rem, 1.15rem + 1.4vw, 2.2rem);
+  line-height: 1.1; letter-spacing: -0.02em; text-wrap: balance;
+}
+.entry .project-logo { width: 1.15em; height: 1.15em; flex: none; }
+.entry .for { margin-top: 0.3rem; color: var(--soft); font-size: 0.86em; }
+.entry .for + .for { margin-top: 0; }
+.entry .for b { font-weight: 600; }
+.entry .pitch { margin-top: 0.7rem; font-size: 1.15em; font-weight: 600; line-height: 1.35; text-wrap: balance; }
+.entry .what { max-width: 34em; text-wrap: pretty; }
+.entry .how { margin-top: 0.7rem; max-width: 38em; color: var(--soft); font-size: 0.9em; line-height: 1.5; }
+.entry .how summary { cursor: pointer; width: fit-content; min-height: 44px; display: flex; align-items: center; gap: 0.45rem; font-weight: 650; color: var(--link); list-style: none; }
+.entry .how summary::-webkit-details-marker { display: none; }
+.entry .how summary::before { content: ""; width: 0.45em; height: 0.45em; border: solid currentColor; border-width: 0 0.13em 0.13em 0; transform: rotate(-45deg); transition: transform 0.2s; }
+.entry .how[open] summary::before { transform: rotate(45deg); }
+.entry .how p { text-wrap: pretty; padding-bottom: 0.2rem; }
+.entry .note { margin: -0.4rem 0 1rem; color: var(--soft); font-size: 0.8em; }
+/* Figures: a row on wide screens, a stack of figure-and-label lines on a phone. */
+.result { margin: 0 0 1rem; display: grid; gap: 0.55rem; }
+.result div { display: grid; grid-template-columns: 4.2rem 1fr; align-items: baseline; gap: 0.8rem; border-top: 1px solid var(--rule); padding-top: 0.5rem; }
+.result dt { font-weight: 800; font-stretch: 112%; font-size: 1.5em; line-height: 1; font-variant-numeric: tabular-nums; }
+.result dd { margin: 0; color: var(--soft); font-size: 0.86em; line-height: 1.35; }
+@media (min-width: 46rem) {
+  .result { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+  .result div { display: block; border-top: 2px solid var(--ink); padding-top: 0.45rem; }
+  .result dt { font-size: 1.6em; }
+  .result dd { margin-top: 0.35rem; font-size: 0.8em; }
+}
+.entry .acts { margin-top: 1.15rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem 1.3rem; }
+.btn {
+  display: inline-flex; align-items: center; gap: 0.55rem;
+  min-height: 48px; padding: 0.6rem 1.15rem;
+  background: var(--action); color: var(--action-ink);
+  font-weight: 700; font-stretch: 108%; text-decoration: none;
+  border-radius: 8px;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s;
+}
+.btn:hover { transform: translateY(-1px); box-shadow: var(--shadow); }
+.btn:active { transform: none; }
+.links { display: flex; flex-wrap: wrap; column-gap: 1.3rem; }
+.more { display: inline-flex; align-items: center; min-height: 44px; font-weight: 600; }
+
+.entry { grid-template-areas: "head" "shot" "detail"; }
+.entry .shot { grid-area: shot; }
+.entry .head { grid-area: head; }
+.entry .detail { grid-area: detail; }
+@media (min-width: 46rem) {
+  /* The screenshot's top lines up with the name beside it. */
+  .entry { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); grid-template-rows: auto 1fr; grid-template-areas: "shot head" "shot detail"; row-gap: 1.3rem; align-items: start; }
+  .entry .shot { margin-top: 0.35rem; }
+}
+
+.also { padding-block: clamp(1.4rem, 3vw, 2rem); border-bottom: 1px solid var(--rule); }
+.also > div { max-width: 44em; }
+.also h2 { font-size: 1em; font-weight: 750; font-stretch: 108%; display: inline; }
+.also p { display: inline; color: var(--soft); }
+.foot { padding-block: 1.4rem 3rem; color: var(--soft); font-size: 0.92em; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
+</style>
+</head>
+<body>
+<header class="mast">
+  <div class="wrap">
+    <h1>Katalyst</h1>
+    <p id="lede"></p>
+    <nav class="toc" id="toc" aria-label="Entries"></nav>
+  </div>
+</header>
+
+<main class="wrap" id="projects">
+  <noscript><p style="padding-top:2rem">This page lists its entries with JavaScript: <a href="incident/">OnCallBench</a>, <a href="https://github.com/KatalystSoftware/junction-2026/tree/main/projects/since-when">Since When</a> and <a href="https://github.com/KatalystSoftware/junction-2026/tree/main/projects/kutsu">Kutsu</a>.</p></noscript>
+</main>
+
+<footer class="wrap foot">
+  <p>Team Katalyst, Junction 2026, Espoo. AI agents wrote the code; the team picked the problems and reviewed the results.<span id="repo"></span></p>
+</footer>
+
+<script src="projects.js"></script>
+<script>
+(function () {
+  var data = window.KATALYST;
+  var ARROW = '<svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 9l6-6M4 3h5v5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  function el(tag, cls, text) {
+    var node = document.createElement(tag);
+    if (cls) node.className = cls;
+    if (text) node.textContent = text;
+    return node;
+  }
+  function link(cls, text, href) {
+    var a = el("a", cls, text);
+    a.href = href;
+    return a;
+  }
+
+  // The header: the lede, then one row per entry linking down to it.
+  var lede = document.getElementById("lede");
+  lede.textContent = data.lede;
+  if (data.videos) {
+    var videos = link("btn", data.videos[0] + " ", data.videos[1]);
+    videos.insertAdjacentHTML("beforeend", ARROW);
+    lede.after(videos);
+  }
+  var toc = document.getElementById("toc");
+  data.projects.forEach(function (entry) {
+    var a = link("", "", "#" + entry.id);
+    a.append(el("b", "", entry.name), el("span", "who", entry.for.map(function (f) { return f[0]; }).join(" · ")), el("span", "short", entry.short));
+    toc.append(a);
+  });
+
+  var main = document.getElementById("projects");
+  data.projects.forEach(function (entry) {
+    var article = el("article", "entry");
+    article.id = entry.id;
+
+    var frame = link("shot", "", entry.live);
+    frame.tabIndex = -1;
+    frame.setAttribute("aria-hidden", "true");
+    var img = el("img");
+    img.src = "shots/" + entry.shot;
+    img.alt = "";
+    img.width = 960; img.height = 600;
+    frame.append(img);
+
+    // head: name, challenges, promise and button; detail: figures and how it works.
+    // On a phone the screenshot sits between them, so the button comes first.
+    var body = el("div", "head");
+    var detail = el("div", "detail");
+    var heading = el("h2");
+    if (entry.logo) {
+      var logo = el("img", "project-logo");
+      logo.src = entry.logo;
+      logo.alt = "";
+      logo.width = 36; logo.height = 36;
+      heading.append(logo);
+    }
+    heading.append(el("span", "", entry.name));
+    body.append(heading);
+    entry.for.forEach(function (f) {
+      var line = el("p", "for", "For ");
+      line.append(el("b", "", f[0]), ": " + f[1]);
+      body.append(line);
+    });
+    body.append(el("p", "pitch", entry.short));
+    if (entry.result) {
+      var figures = el("dl", "result");
+      entry.result.forEach(function (r) {
+        var item = el("div");
+        item.append(el("dt", "", r[0]), el("dd", "", r[1]));
+        figures.append(item);
+      });
+      detail.append(figures);
+      if (entry.resultNote) detail.append(el("p", "note", entry.resultNote));
+    }
+    detail.append(el("p", "what", entry.what));
+    // The technical note is there for judges who want it, folded away for everyone else.
+    if (entry.how) {
+      var how = el("details", "how");
+      how.append(el("summary", "", "How it works"), el("p", "", entry.how));
+      detail.append(how);
+    }
+    var acts = el("div", "acts");
+    var open = link("btn", entry.open + " ", entry.live);
+    open.insertAdjacentHTML("beforeend", ARROW);
+    acts.append(open);
+    // Secondary links wrap as one group, never one at a time.
+    var links = el("span", "links");
+    (entry.more || []).forEach(function (m) { links.append(link("more", m[0], m[1])); });
+    if (data.repo) links.append(link("more", "Source", data.repo + "/tree/main/" + entry.source));
+    if (links.childNodes.length) acts.append(links);
+    body.append(acts);
+
+    article.append(frame, body, detail);
+    main.append(article);
+  });
+
+  if (data.also) {
+    var also = el("section", "also");
+    var inner = el("div");
+    inner.append(el("h2", "", data.also.name + " "), el("p", "", data.also.what));
+    if (data.also.link) inner.append(" ", link("more", data.also.link[0], data.also.link[1]));
+    also.append(inner);
+    main.append(also);
+  }
+  if (data.repo) document.getElementById("repo").append(" ", link("", "Source on GitHub", data.repo), ".");
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-labelledby="t">
+  <title id="t">Since When</title>
+  <!-- The name's question mark, whose dot is where a bar starts on the time strip: the answer is a date. -->
+  <rect width="32" height="32" rx="7" fill="#202122"/>
+  <path d="M10.5 10a5.5 5.5 0 1 1 7.5 5.1c-1.3.6-2 1.4-2 2.9" fill="none" stroke="#f8f9fa" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M5 25H27" stroke="#72777d" stroke-width="2"/>
+  <path d="M16 25H27" stroke="#ffe49c" stroke-width="3"/>
+  <circle cx="16" cy="25" r="3.3" fill="#ffe49c"/>
+</svg>
