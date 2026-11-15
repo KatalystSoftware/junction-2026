@@ -139,7 +139,8 @@ local vLLM server, two runs on each common seed (table above): untrained it aver
 the adapter **0.44 (0.35-0.53)**, about Opus 5.5's 0.45. Training on the environment took an open 26B
 model from near nothing to Opus's level in the judges' harness. Its scores in our own training
 runner (`rl/env.py`: a capped number of replies, a shorter context) are higher and not comparable
-with Harbor's; they stay in `rl/RESULTS.md`.
+with Harbor's; they stay in `rl/RESULTS.md`. The adapter is public, with its sha256 and a model card:
+https://storage.googleapis.com/katalyst-fyi-models/oncallbench/gemma4-26b-a4b-rl/.
 
 ## Reproduce
 

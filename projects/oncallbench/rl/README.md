@@ -55,11 +55,14 @@ minute).
 
 ## Download and check the trained adapter
 
-The Gemma 4 SFT adapter and its training demos are public, no account needed:
-https://storage.googleapis.com/katalyst-fyi-models/oncallbench/gemma4-26b-a4b-sft/ (`README.md`,
-`adapter_config.json`, `adapter_model.safetensors`, `SHA256SUMS`) and
-https://storage.googleapis.com/katalyst-fyi-models/oncallbench/demos/demos-l34.jsonl. Download them into
-one folder, then:
+The Gemma 4 adapter in the benchmark table (SFT, then RL on the score; 0.44 against untrained 0.05
+in Harbor + OpenCode on the 24 common seeds) is public, no account needed:
+https://storage.googleapis.com/katalyst-fyi-models/oncallbench/gemma4-26b-a4b-rl/ (`README.md`,
+`adapter_config.json`, `adapter_model.safetensors`, `SHA256SUMS`; the weights' sha256 is `f9536c41…`,
+the one the evaluation served). The SFT adapter it started from and its training demos are next to
+it, in `gemma4-26b-a4b-sft/` and
+https://storage.googleapis.com/katalyst-fyi-models/oncallbench/demos/demos-l34.jsonl. Download a folder
+(and, for the SFT one, the demos) into one place, then:
 
 ```
 sha256sum --check --strict SHA256SUMS                                           # every file: OK
