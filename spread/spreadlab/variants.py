@@ -733,3 +733,14 @@ VARIANTS["hyb-a"] = _hyb(VARIANTS["m41w-b-late100-760"])
 _W_C = VARIANTS["m41w-c-pd8-d760"]
 VARIANTS["m41w-e-km40-thin"] = {**_W_C, "thin_play": {"drivers": 760, "params": {
     **{k: v for k, v in {**_W_C, **_W_C["when_tight"]}.items() if k != "when_tight"}, "pair_km": 40}, "version": thin_play.VERSION}}
+# At 820 drivers or more the stack goes back to `trackb-merge-4.1` exactly: on `fresh-9340` (823 drivers) `m41w-a`/`-b` played
+# 88.30% where 4.1 held 92.78%, and `m41y-f`'s parts there (late_cost 80, slow_step 0.25, the cost by hours) never beat 4.1 in
+# play (-59 to -327 a week on paired seeds). `m41v-a` is `m41w-a` without its 820+ level: `m41x-b` under 760, 4.1 from 760.
+# `m41v-b` adds `late_cost` 100 at 760 to 819 (150 from 820, as 4.1), the same play as `hyb-a`; `m41v-c` the 8-hour pair-drive
+# cap at 760+; `m41v-d` lane 2 A's `km40` under 760 through the thin play.
+VARIANTS["m41v-a"] = {k: v for k, v in VARIANTS["m41w-a"].items() if k not in ("rich_drivers", "when_rich")}
+VARIANTS["m41v-b-late100-760"] = dict(VARIANTS["hyb-a"])
+VARIANTS["m41v-c-pd8-d760"] = {**VARIANTS["m41v-b-late100-760"], "pair_drive": 8, "pair_drive_drivers": 760}
+_V_C = VARIANTS["m41v-c-pd8-d760"]
+VARIANTS["m41v-d-km40-thin"] = {**_V_C, "thin_play": {"drivers": 760, "params": {
+    **{k: v for k, v in {**_V_C, **_V_C["when_tight"]}.items() if k != "when_tight"}, "pair_km": 40}, "version": thin_play.VERSION}}
