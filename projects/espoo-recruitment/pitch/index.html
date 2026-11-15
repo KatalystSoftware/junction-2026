@@ -276,6 +276,9 @@ a.link:hover{box-shadow:0 1px 2px oklch(21% 0.03 264 / .06),0 14px 30px -12px #0
 }
 /* body.pdfshot: what pitch-tools/pdf.js hides while it photographs each slide for the PDF (never name this class "pdf": .pdf is the download button, and body.pdf turned the whole page into that pill, 2026-11-15) */
 body.pdfshot .progress,body.pdfshot .dots,body.pdfshot .hint,body.pdfshot .pdf{display:none!important}
+/* the link to the short deck sits left of the PDF button */
+.pdf.alt{right:10.5rem}
+@media (max-width:900px){.pdf.alt{right:auto;left:16px}}
 @media print{
   .enter{animation:none!important;opacity:1!important;transform:none!important}
   .slide,.slide::before,.band .head::before,.split .two>:last-child::before{background-attachment:scroll!important}
@@ -539,6 +542,7 @@ body.pdfshot .progress,body.pdfshot .dots,body.pdfshot .hint,body.pdfshot .pdf{d
 <nav class="dots" id="navDots" aria-label="Slides"></nav>
 <div class="counter" id="counter"></div>
 <div class="hint">← → to move · F fullscreen</div>
+<a class="pdf alt" href="short/">Short version · 7 slides</a>
 <a class="pdf" href="kutsu-pitch.pdf" download="Kutsu-pitch-deck.pdf">Download as PDF</a>
 
 <script>
