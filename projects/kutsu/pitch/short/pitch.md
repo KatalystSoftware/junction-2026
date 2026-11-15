@@ -24,9 +24,9 @@ Those show in minutes face to face. So meeting in person is worth more than ever
 **3. Matching is hard, because it takes people connecting.**
 Matching by CV skills is easy now. Real matching, on motivation and fit, needs the right people in
 the same room. Every meeting costs time, so who meets whom has to be right, and today it is arranged
-by hand. Companies say what they need too late. Job seekers can't tell which companies are worth
-meeting. Organisers pair people by hand, often without the tech background to judge an application.
-And every event starts from zero: the sign-up survey and both invitation lists are built again.
+by hand. Companies say what they need too late. Job seekers can't tell which companies match them.
+Organisers pair people by hand, often without the tech background to judge an application. And every
+event starts from zero: the sign-up survey and both invitation lists are built again.
 
 **4. Big events are bloated. Focused events are laborious.**
 At a big event, employers are swamped by irrelevant approaches and spend a day at a stand to find a
