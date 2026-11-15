@@ -1007,3 +1007,17 @@ def test_m41w_a_plays_m41x_b_under_760_drivers_and_m41y_f_from_760():
         assert desk("m41w-a", n) == desk("m41x-b-cap62-onward-all", n), n
     for n in (760, 819, 820, 900):
         assert desk("m41w-a", n) == desk("m41y-f-h24-820", n), n
+
+
+def test_the_wave_fee_jump_on_m41y_f_plays_in_every_band_and_changes_nothing_else():
+    from spreadlab import play
+    from spreadlab.variants import VARIANTS
+    roster = lambda n: [{**ROSTER[0], "id": f"x{i}"} for i in range(n)]  # noqa: E731
+
+    def desk(params, n):
+        return play.policy_class(params)(None, 8, 0, params, roster(n), MAP).params()
+    head = VARIANTS["m41y-f-h24-820"]
+    for n in (700, 790, 900):
+        for name in ("l4w-10-15", "l4w-15-20"):
+            jump = VARIANTS[name]
+            assert desk(jump, n) == {**desk(head, n), "wave_from": jump["wave_from"], "wave_fee": jump["wave_fee"], "wave_days": 1}, (name, n)

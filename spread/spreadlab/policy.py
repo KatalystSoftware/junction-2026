@@ -107,6 +107,12 @@ DEFAULTS = {
     "push_from": 0,       # once this many won cars have no driver, the open gigs that are short of time show a higher fee at once; 0 is never
     "push_hours": 24,     # ... those whose order must be collected within this many hours
     "push_fee": 1.4,      # ... at least this multiple of the typical fee
+    # The drop wave seen as it lands: once this many of the desk's gigs drop in a night's first hour, every open gig whose car must
+    # be collected that day (or in the `wave_days` from it) shows at least `wave_fee` x the typical fee from then on, and so do
+    # its gigs posted or dropped later. The wave's orders were all won on earlier days, so only the fee can still reach them. 0 is never.
+    "wave_from": 0,
+    "wave_fee": 1.5,
+    "wave_days": 1,
     # [[drivers from, drivers under, hours from, hours under, opening fee, rise an hour, top fee], ...]: the fees of a gig by the drivers
     # notified of its pickup and the hours left to collect the car when it is posted, as multiples of the typical fee. The first rule that fits applies.
     "fee_rules": [],
@@ -193,7 +199,8 @@ class Policy(Desk):
         self.refused: list[dict] = []  # the actions that the world refused
         self.opt = optquote.Quotes(map_, roster) if self.p["opt"] else None
         self.forecasts: list[dict] = []  # the snow forecasts so far: places, and the minutes from and to
-        self.night_drops: dict[int, int] = {}  # day -> the desk's gigs dropped in its first hour, with `due_cap_wave`
+        self.night_drops: dict[int, int] = {}  # day -> the desk's gigs dropped in its first hour, with `due_cap_wave` or `wave_from`
+        self.waved: set[str] = set()  # the open gigs the desk raised for a drop wave
 
     def params(self) -> dict:
         """The parameters at this minute: those of the week, of a desk that is behind, or of one whose backlog is filling."""
@@ -550,6 +557,8 @@ class Policy(Desk):
             usual *= p["snow_fee"]  # drivers who stay at home leave fewer to book it: the whole schedule is dearer
         rule = self.fee_rule(order, p)
         fee = usual * (rule[0] if rule else self.opening(request, p)) * opening
+        if p["wave_from"] and self.in_wave(order, p):
+            fee = max(fee, usual * p["wave_fee"])
         if order["id"] in self.urgent:
             return steep(self.now, fee, self.level)
         if self.level == 1 or not (p["fee_cap"] or p["jump"] or rule):
@@ -596,6 +605,30 @@ class Policy(Desk):
                 if shown < usual * p["push_fee"]:
                     opens = (self.fee_rule(order, p) or [self.opening(request, p)])[0]
                     self.outbox.append({"type": "reprice", "gigId": gig_id, "schedule": self.fees_for(order, pickups(action), p["push_fee"] / opens)})
+
+    def in_wave(self, order, p: dict) -> bool:
+        """Whether the order's car must be collected on a day that a drop wave has hit, or in the `wave_days` from it."""
+        day = order["lastPickupAt"] // DAY
+        return any(self.night_drops.get(day - k, 0) >= p["wave_from"] for k in range(p["wave_days"]))
+
+    def wave(self, day: int) -> None:
+        """Once a drop wave is seen, each open gig whose car must be collected that day shows at least `wave_fee` x the
+        typical fee from now: the night's drops leave the day's other gigs short of drivers too."""
+        p = self.params()
+        if not p["wave_from"] or self.night_drops.get(day, 0) < p["wave_from"]:
+            return
+        for id_, order in self.orders.items():
+            if id_ in self.urgent or not self.in_wave(order, p):
+                continue
+            for gig_id in self.gigs_of(id_):
+                action = self.posts.get(gig_id)
+                if action is None or gig_id in self.booked or gig_id in self.waved:
+                    continue
+                self.waved.add(gig_id)
+                usual = self.usual_fee(self.requests[id_], p) * pickups(action) / len(order["legs"])
+                shown = max((step["feeCents"] for step in self.fees.get(gig_id, []) if step["at"] <= self.now), default=0)
+                if shown < usual * p["wave_fee"]:
+                    self.outbox.append({"type": "reprice", "gigId": gig_id, "schedule": self.fees_for(order, pickups(action))})
 
     def chased(self) -> list[tuple[str, dict]]:
         """The open gigs that get direct offers now: (gig id, order). Its order must be collected within `offer_hours`,
@@ -726,13 +759,16 @@ class Policy(Desk):
             self.gave_back.setdefault(event["gigId"], set()).add(event["driverId"])
             if self.p["home_offers"] and event["gigId"] in self.posts and pickups(self.posts[event["gigId"]]) == 1:
                 self.home[event["gigId"]] = self.p["home_rounds"]
-            if self.p["due_cap_wave"] and event["at"] % DAY < HOUR:
+            if (self.p["due_cap_wave"] or self.p["wave_from"]) and event["at"] % DAY < HOUR:
                 self.night_drops[event["at"] // DAY] = self.night_drops.get(event["at"] // DAY, 0) + 1
         super().handle(event)
         if event["kind"] == "gig_dropped" and self.p["drop_fee"]:
             self.reopen(event["gigId"])
         if event["kind"] == "gig_dropped":
             self.push()
+            if self.p["wave_from"]:
+                self.waved.discard(event["gigId"])  # reopened by `drop_fee` from its opening: it gets the wave's fee again
+                self.wave(event["at"] // DAY)
 
     def delivered(self, order_id: str, leg: int, at: int) -> None:
         super().delivered(order_id, leg, at)

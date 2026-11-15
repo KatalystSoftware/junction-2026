@@ -694,3 +694,13 @@ for _hours in (7, 8):
     VARIANTS[f"m41x-h-pd{_hours}-d760"] = {**VARIANTS["m41x-h-ss025-820"], "pair_drive": _hours, "pair_drive_drivers": 760}
     VARIANTS[f"m41y-l-pd{_hours}-d760"] = {**VARIANTS["m41y-l-ftop11-820"], "pair_drive": _hours, "pair_drive_drivers": 760}
     VARIANTS[f"m41y-m-pd{_hours}-d760"] = {**VARIANTS["m41y-m-late100-760"], "pair_drive": _hours, "pair_drive_drivers": 760}
+# Lane 4 A's drop-wave fee jump (`wave_from`, `wave_fee`, `wave_days` in policy.py) on the head `m41y-f`: once `wave_from` of the
+# desk's gigs drop in a night's first hour, every open gig whose car must be collected that day shows at least `wave_fee` x the
+# typical fee at once, and so do its later posts. Set in every band, in the week's parameters and in the thin play's own (it
+# replaces the set under 760). On the stand-in with drop waves (ce230c6, 102 wave seeds under 760 drivers, 3 draws) the jump on
+# `trackb-merge-4.1` took the weeks under 90% from 19 of 306 to 10 (10 drops, 1.5x) and 6 (10 drops, 2.0x).
+_HEAD_Y = _Y["m41y-f-h24-820"]
+for _from, _fee in ((10, 1.5), (10, 2.0), (15, 1.5), (15, 2.0)):
+    _wave = {"wave_from": _from, "wave_fee": _fee, "wave_days": 1}
+    VARIANTS[f"l4w-{_from}-{int(_fee * 10)}"] = {**_HEAD_Y, **_wave, "thin_play": {
+        **_HEAD_Y["thin_play"], "params": {**_HEAD_Y["thin_play"]["params"], **_wave}}}
