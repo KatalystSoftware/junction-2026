@@ -239,7 +239,8 @@ class Began(unittest.TestCase):
 
 
 class BeganRun(unittest.TestCase):
-    """api.began: the run of revisions that hold a quote goes on past vandalism and its revert."""
+    """api.began: the run of revisions that hold a quote goes on past vandalism and its revert; where
+    only yearly versions are loaded, the words are dated by a version."""
 
     def test_a_short_gap_does_not_start_the_run(self):
         from datetime import datetime as dt
@@ -254,10 +255,31 @@ class BeganRun(unittest.TestCase):
         def r(label, sql):
             return [{"lang": "sv", "rev_id": v[2], "row_start": v[0], "row_end": v[1], "text": v[3]} for v in versions]
 
-        f = {"id": 1, "status": "open", "type": "numbers", "summary": "x", "quotes": {"sv": quote}}
+        f: dict = {"id": 1, "status": "open", "type": "numbers", "summary": "x", "quotes": {"sv": quote}}
         api._BEGAN.pop("QTEST", None)
         api.began(r, "QTEST", [f])
         self.assertEqual(f["began"]["sv"]["at"], dt(2009, 12, 26))
+
+    def test_yearly_versions_date_the_words_by_a_version_and_link_no_edit(self):
+        from datetime import datetime as dt
+
+        quote = "Mäntsälän kapina oli lapuanliikkeen kannattajien yritys kaataa Suomen hallitus"
+        versions = [  # the text current on two 1 Januarys; the edition is not in full_history
+            (dt(2025, 9, 11), dt(2026, 6, 19), 23549014, "Mäntsälän kapina oli keväällä 1932."),
+            (dt(2026, 6, 19), dt(2106, 2, 7), 24074324, quote + " keväällä 1932."),
+        ]
+
+        def r(label, sql):
+            if "full_history" in sql:
+                return []
+            return [{"lang": "fi", "rev_id": v[2], "row_start": v[0], "row_end": v[1], "text": v[3]} for v in versions]
+
+        f: dict = {"id": 2, "status": "open", "type": "numbers", "summary": "x", "quotes": {"fi": quote}}
+        api._BEGAN.pop("QYEAR", None)
+        api.began(r, "QYEAR", [f])
+        self.assertEqual(f["began"]["fi"]["at"], dt(2026, 6, 19))
+        self.assertIsNone(f["began"]["fi"]["old"])
+        self.assertTrue(f["began"]["fi"]["first"])
 
 
 if __name__ == "__main__":

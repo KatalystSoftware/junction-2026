@@ -12,6 +12,7 @@ import re
 import threading
 import time
 from datetime import date, datetime
+from typing import Any
 
 import mariadb
 import uvicorn
@@ -94,18 +95,24 @@ WITH rich AS (
          CASE WHEN SUM(status = 'open') > 0 THEN 'open'
               WHEN SUM(status = 'raised_on_talk') > 0 THEN 'reviewed' ELSE 'closed' END AS status
   FROM finding GROUP BY wikidata_id, lang
+), d AS (
+  -- the topics with differences to show: an open row that is not coverage, or the claim check's rows
+  SELECT wikidata_id FROM finding WHERE status = 'open' AND type <> 'coverage'
+  UNION SELECT wikidata_id FROM checked_finding
 ), q AS (
   -- coverage is shown, not scored: a shorter article is not a defect
   SELECT t.wikidata_id, t.title_en AS topic, r.lang, r.rich_lang,
          COALESCE(rd.readers, 0) AS readers, c.coverage,
          COALESCE(f.weight, 0) AS gap,
-         COALESCE(f.findings, 0) AS findings, f.top_type, COALESCE(f.status, 'open') AS status
+         COALESCE(f.findings, 0) AS findings, f.top_type, COALESCE(f.status, 'open') AS status,
+         d.wikidata_id IS NOT NULL AS compared
   FROM topic AS t
   JOIN rich AS r ON r.wikidata_id = t.wikidata_id AND r.rn = 1
   JOIN coverage AS c ON c.wikidata_id = r.wikidata_id AND c.lang = r.lang
                     AND c.rich_lang = r.rich_lang AND c.is_current
   LEFT JOIN readers AS rd ON rd.wikidata_id = r.wikidata_id AND rd.lang = r.lang
-  LEFT JOIN f ON f.wikidata_id = r.wikidata_id AND f.lang = r.lang{where}
+  LEFT JOIN f ON f.wikidata_id = r.wikidata_id AND f.lang = r.lang
+  LEFT JOIN d ON d.wikidata_id = t.wikidata_id{where}
 )
 SELECT q.*, ROUND(q.readers * q.gap) AS score, COUNT(*) OVER () AS total,
        (SELECT JSON_OBJECTAGG(a.lang, a.bytes) FROM article AS a
@@ -114,7 +121,7 @@ SELECT q.*, ROUND(q.readers * q.gap) AS score, COUNT(*) OVER () AS total,
         WHERE a.wikidata_id = q.wikidata_id AND a.quality IS NOT NULL) AS quality
 FROM q
 WHERE q.findings > 0
-ORDER BY score DESC, q.gap DESC, q.coverage, q.wikidata_id, q.lang
+ORDER BY q.compared DESC, score DESC, q.gap DESC, q.coverage, q.wikidata_id, q.lang
 LIMIT {int(limit)} OFFSET {int(offset)}"""
 
 
@@ -133,6 +140,7 @@ def queue_item(x):
         "top_type": x["top_type"],
         "status": x["status"],
         "quality": quality(json.loads(x["quality"] or "{}").items()),
+        "compared": bool(x["compared"]),
     }
 
 
@@ -265,7 +273,7 @@ def apply_checks(findings, checks):
     out = []
     for f in findings:
         k = by_finding.get(f["id"])
-        f = dict(f, check=check_of(k) if k else None)
+        f: dict[str, Any] = dict(f, check=check_of(k) if k else None)
         if k and k["outcome"] == "changed":
             before = f["quotes"], f.get("citations") or {}, f.get("paragraph_citations") or {}
             f.update(_as_checked(k))
@@ -331,7 +339,11 @@ def began(r, qid, findings):
     words, read from the article's full history (chunk FOR SYSTEM_TIME ALL). An edit that only
     reformats the words, or touches another part of the passage, does not start a run. Sets
     `began` on each such finding: {lang: {"at", "rev", "old", "first"}}, `first` when the run
-    reaches back to the oldest version loaded; `quoted` is the same day, kept for the page."""
+    reaches back to the oldest version loaded; `quoted` is the same day, kept for the page.
+
+    Where an edition has only the text of each 1 January loaded (not in full_history), the words
+    stood by that version, but the edit that put them there is not known: `old` is None, so the
+    page links no edit, and `first` is set, so it dates the words "by" that day."""
     wanted = [
         f
         for f in findings
@@ -353,6 +365,12 @@ JOIN passage AS p ON p.sha = c.sha
 WHERE c.wikidata_id = {lit(qid)}
 ORDER BY c.lang, c.row_start""",
     )
+    every = {
+        x["lang"]
+        for x in r(
+            "Editions with every revision loaded", f"SELECT lang FROM full_history WHERE wikidata_id = {lit(qid)}"
+        )
+    }
     by_lang = {}
     for x in rows:
         by_lang.setdefault(x["lang"], []).append((x["row_start"], x["row_end"], x["rev_id"], _norm(x["text"])))
@@ -389,8 +407,8 @@ ORDER BY c.lang, c.row_start""",
                     break
                 i = back
             rev = max(v[2] for v in vs if v[0] == ts[i])
-            old = max(v[2] for v in vs if v[0] == ts[i - 1]) if i > 0 else None
-            out[lang] = {"at": ts[i], "rev": rev, "old": old, "first": i == 0, "quoted": ts[i]}
+            old = max(v[2] for v in vs if v[0] == ts[i - 1]) if i > 0 and lang in every else None
+            out[lang] = {"at": ts[i], "rev": rev, "old": old, "first": i == 0 or lang not in every, "quoted": ts[i]}
         if out:
             f["began"] = out
     _BEGAN[qid] = {f["id"]: f["began"] for f in wanted if "began" in f}
@@ -471,7 +489,7 @@ ORDER BY c.lang, c.ord""",
             lead[x["lang"]]["also"] = x["text"]
     found = r("Findings (latest version of each)", findings_sql(qid))
     findings, checked = apply_checks([finding(x) for x in found], checks(r, qid))
-    if checked:  # the topics checked have their full history loaded
+    if checked:  # every revision where full_history has the edition, else the text of each 1 January
         began(r, qid, findings)
     return {
         "wikidata_id": qid,
@@ -955,9 +973,9 @@ def live_run(body):
             ms = round((time.perf_counter() - t0) * 1000, 1)
             # As sent: the connector writes the bound values into the text as literals.
             shown = (
-                "".join(part + (lit(binds[i]) if i < len(binds) else "") for i, part in enumerate(sql.split("?")))
+                "".join(part + (lit(binds[i]) if i < len(binds) else "") for i, part in enumerate(str(sql).split("?")))
                 if binds
-                else sql
+                else str(sql)
             )
             log.append({"label": label, "query": shown.strip(), "ms": ms, "rows": len(got)})
             if cur.description:

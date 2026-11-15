@@ -29,6 +29,8 @@ export interface QueueItem {
 	lang: Lang
 	rich_lang: Lang
 	findings: number
+	/** Whether the topic has differences to show; only the alignment's passages when false. */
+	compared?: boolean
 }
 
 /** What the claim check made of a finding: looked up in every passage of the other edition by a second model. */

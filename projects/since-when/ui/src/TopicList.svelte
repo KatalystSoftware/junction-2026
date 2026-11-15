@@ -28,6 +28,7 @@
 	}
 
 	// The API lists a topic once for each edition; the page is about the topic, so it is listed once.
+	// Topics with differences to show come first; the rest are marked "not compared yet".
 	const topics = $derived(queue.items.filter((i, n, all) => all.findIndex((x) => x.wikidata_id === i.wikidata_id) === n))
 
 	function filter(l: Lang | 'all') {
@@ -66,6 +67,7 @@
 				<li>
 					<a href={href(i.wikidata_id)} aria-current={nav.route?.qid === i.wikidata_id ? 'page' : undefined} onclick={() => dialog?.close()}>
 						<span class="name">{i.topic}</span>
+						{#if i.compared === false}<span class="small subtle">not compared yet</span>{/if}
 					</a>
 				</li>
 			{/each}
@@ -152,7 +154,7 @@
 
 	li a {
 		display: grid;
-		grid-template-columns: 1fr;
+		grid-template-columns: 1fr auto;
 		align-items: baseline;
 		gap: var(--spacing-50);
 		padding: var(--spacing-35) var(--spacing-50);

@@ -14,6 +14,7 @@
 	// The edits behind each difference, by finding. They arrive after the topic; until then a
 	// difference shows its date without the link to the edit.
 	let events = $state(new Map<number, TimelineEvent[]>())
+	let history = $state(false)
 	let failure = $state('')
 	let seq = 0
 
@@ -30,6 +31,7 @@
 		log.topic = []
 		log.history = []
 		events = new Map()
+		history = false
 		api<Topic>(`/topics/${encodeURIComponent(id)}`).then(
 			(t) => {
 				if (token !== seq) return
@@ -46,6 +48,7 @@
 			const by = new Map<number, TimelineEvent[]>()
 			for (const e of answers.flatMap((a) => a?.events ?? [])) by.set(e.finding_id, [...(by.get(e.finding_id) ?? []), e])
 			events = by
+			history = true
 			log.history = answers.flatMap((a, i) => (a?.sql ?? []).map((q) => ({ ...q, label: `${q.label} (${NAMES[LANGS[i]]})` })))
 		})
 	})
@@ -85,7 +88,7 @@
 	{:else}
 		<h1>{topic.topic}</h1>
 		{#key topic.wikidata_id}
-			<Differences {topic} {events} />
+			<Differences {topic} {events} {history} />
 		{/key}
 		<section class="articles small" aria-labelledby="articles-title">
 			<h2 id="articles-title">Articles</h2>

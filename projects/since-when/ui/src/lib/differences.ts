@@ -201,16 +201,22 @@ function merge(rows: Finding[]): Difference[] {
 /**
  * The topic's differences. Where the claim check has run, only the rows it let stand: figures and
  * conflicting accounts, each looked up in the whole other article. Wording was not checked and is
- * listed apart (`wording`). On other topics, every open row where both editions say something.
+ * listed apart (`wording`). On other topics, every open row a language model wrote where both
+ * editions say something. The word list's rows are listed apart on every topic (`wordList`).
  */
 export function differences(topic: Topic): Difference[] {
 	const open = topic.findings.filter((f) => f.status === 'open' && DIFFERS.includes(f.type))
-	return merge(topic.checked ? open.filter((f) => f.type !== 'framing' && stands(f)) : open)
+	if (topic.checked) return merge(open.filter((f) => f.type !== 'framing' && stands(f)))
+	const listedIds = new Set(wordList(topic).flatMap((d) => d.members.map((f) => f.id)))
+	return merge(open.filter((f) => !listedIds.has(f.id)))
 }
 
-// Differences of wording on a checked topic, which the check does not cover. They are of two kinds.
-const framing = (topic: Topic) => (topic.checked ? merge(topic.findings.filter((f) => f.status === 'open' && f.type === 'framing')) : [])
-const listed = (d: Difference) => d.members.some((f) => !!word(f))
+/** Whether the word list wrote this row, not a language model. */
+export const fromWordList = (f: Finding) => !!word(f)
+
+// Differences of wording, which the check does not cover. They are of two kinds.
+const framing = (topic: Topic) => merge(topic.findings.filter((f) => f.status === 'open' && f.type === 'framing'))
+const listed = (d: Difference) => d.members.some(fromWordList)
 
 /**
  * Loaded words the word list found in one edition's first sentence and not in another's. A word is
@@ -220,9 +226,9 @@ export function wordList(topic: Topic): Difference[] {
 	return framing(topic).filter(listed)
 }
 
-/** Differences of wording the language model suggested: not checked. */
+/** Differences of wording the language model suggested, on a checked topic: not checked. */
 export function wording(topic: Topic): Difference[] {
-	return framing(topic).filter((d) => !listed(d))
+	return topic.checked ? framing(topic).filter((d) => !listed(d)) : []
 }
 
 /** The difference a topic leads with: a loaded word from the word list, else its first difference. */

@@ -1,13 +1,13 @@
 <script lang="ts">
 	// The topic's page: the few places where the editions say different things, each with its time
 	// strip, then, collapsed, what each edition says that another leaves out.
-	import { FIRST, differences, missing, setAside, wordList, wording } from './lib/differences'
+	import { FIRST, differences, fromWordList, missing, setAside, wordList, wording } from './lib/differences'
 	import { DECADES, NAMES, articleUrl, day, linkParts, list, modelName, plural, revisionUrl, rowDate, sectionLabel, sourceOf } from './lib/format'
 	import { LANGS, type TimelineEvent, type Topic } from './lib/types'
 	import Difference from './Difference.svelte'
 	import Why from './Why.svelte'
 
-	let { topic, events }: { topic: Topic; events: Map<number, TimelineEvent[]> } = $props()
+	let { topic, events, history }: { topic: Topic; events: Map<number, TimelineEvent[]>; history: boolean } = $props()
 
 	const SOME = 10
 	let all = $state(false)
@@ -15,11 +15,12 @@
 
 	const editions = $derived(LANGS.filter((l) => topic.titles[l]))
 	const found = $derived(differences(topic))
-	// Whether a language model has read this topic at all: the alignment alone writes coverage rows.
-	const compared = $derived(!!topic.checked || topic.findings.some((f) => f.type !== 'coverage'))
+	// Whether a language model has read this topic at all: the alignment alone writes coverage rows,
+	// and the word list reads only first sentences.
+	const compared = $derived(!!topic.checked || topic.findings.some((f) => f.type !== 'coverage' && !fromWordList(f)))
 	const shown = $derived(all ? found : found.slice(0, FIRST))
 	const left = $derived(missing(topic))
-	// On a topic the claim check has run on: the word list's loaded words, which lead the page, the
+	// The word list's loaded words, which lead the page; on a topic the claim check has run on, the
 	// model's wording rows, which the check does not cover, and what the check set aside.
 	const loaded = $derived(wordList(topic))
 	const words = $derived(wording(topic))
@@ -64,7 +65,7 @@
 		{@render key()}
 		<div class="rows">
 			{#each loaded as d, i (d.id)}
-				<Difference {d} {topic} {events} open={i === 0} />
+				<Difference {d} {topic} {events} {history} open={i === 0} />
 			{/each}
 		</div>
 	</section>
@@ -96,7 +97,7 @@
 	{#if found.length}
 		<div class="rows">
 			{#each shown as d, i (d.id)}
-				<Difference {d} {topic} {events} open={i === 0 && !loaded.length} />
+				<Difference {d} {topic} {events} {history} open={i === 0 && !loaded.length} />
 			{/each}
 		</div>
 		{#if found.length > shown.length}
@@ -113,7 +114,7 @@
 		</header>
 		<div class="rows">
 			{#each words as d (d.id)}
-				<Difference {d} {topic} {events} />
+				<Difference {d} {topic} {events} {history} />
 			{/each}
 		</div>
 	</section>

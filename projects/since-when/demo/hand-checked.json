@@ -360,6 +360,56 @@
         "en": "Kamensky's 11,000-strong corps"
       },
       "close": "A part against the whole, possibly: a corps' strength against the troops at the two battles (two editor reviews could not tell). (round 3 of the blind review, GPT editor reviewer)"
+    },
+    {
+      "topic": "Q11890831",
+      "type": "framing",
+      "quotes": {
+        "fi": "Vapaussodan Rintamamiesten Liitto"
+      },
+      "close": "A name, not a label: \"War of Liberation\" is only in the league's name until 1940; all three first sentences call the war the civil war. (review of the word-list rows outside the checked topics, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q11890831",
+      "type": "framing",
+      "quotes": {
+        "sv": "Frihetskrigets frontmannaförbund"
+      },
+      "close": "A name, not a label: \"Frihetskrigets\" is the league's Swedish name; the Swedish sentence calls the war inbördeskriget, the civil war, as the others do. (review of the word-list rows outside the checked topics, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q211855",
+      "type": "framing",
+      "quotes": {
+        "sv": "även frihetskrig, medborgarkrig, revolution",
+        "en": "The Finnish Civil War was fought"
+      },
+      "close": "A list of other names, not a label: the Swedish sentence calls the war inbördeskriget, the civil war, and lists frihetskrig among its other names. (review of the word-list rows outside the checked topics, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q211855",
+      "type": "framing",
+      "quotes": {
+        "sv": "även frihetskrig, medborgarkrig, revolution",
+        "fi": "Suomen sisällissota"
+      },
+      "close": "A list of other names, not a label: the Swedish sentence calls the war inbördeskriget, the civil war, and lists frihetskrig among its other names. (review of the word-list rows outside the checked topics, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q2334896",
+      "type": "framing",
+      "quotes": {
+        "en": "also referred to as the Revolution of 1809"
+      },
+      "close": "Another name, not a label: all three first sentences call it a coup, and English and Swedish give the Revolution of 1809 as its other name. (review of the word-list rows outside the checked topics, Claude Opus 5.5)"
+    },
+    {
+      "topic": "Q2334896",
+      "type": "framing",
+      "quotes": {
+        "sv": "Statskuppen 1809 eller revolutionen 1809"
+      },
+      "close": "Another name, not a label: all three first sentences call it a coup, and English and Swedish give the Revolution of 1809 as its other name. (review of the word-list rows outside the checked topics, Claude Opus 5.5)"
     }
   ]
 }

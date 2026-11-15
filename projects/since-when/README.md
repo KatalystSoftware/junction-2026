@@ -53,15 +53,16 @@ deployed with [`deploy/`](deploy/README.md).
 From this directory, with uv, Node and MariaDB Connector/C as above (the repository's `nix develop` shell
 has all three):
 
-    uv run ruff format --check && uv run ruff check && uv run ty check && uv run python -m unittest differences.test_differences differences.test_claims differences.test_decide differences.test_figures gapfinder.test_wikitext gapfinder.test_live_sql gapfinder.test_evidence gapfinder.test_checked && npm --prefix ui ci --silent && npm --prefix ui run check
+    uv run ruff format --check && uv run ruff check && uv run ty check --exit-zero-on-warning && uv run python -m unittest differences.test_differences differences.test_claims differences.test_decide differences.test_figures gapfinder.test_wikitext gapfinder.test_live_sql gapfinder.test_evidence gapfinder.test_checked && npm --prefix ui ci --silent && npm --prefix ui run check
 
 The eight tests that run the SQL presets against MariaDB skip without a database login; with `DB_HOST` and
 `DB_RO_USER` set they run against that database. The torch and DuckDB wheels the loaders and the embedder
 use may not load outside a container on some systems (NixOS among them); the Docker image has them.
 
-Dependencies are pinned in `uv.lock` and the image installs from it. `ty check` passes: its remaining
-findings are kept as warnings per file in [`pyproject.toml`](pyproject.toml), so a new kind of finding
-still fails, and were 46 at the last check. They stay because the fix is a restructure or ty is wrong. The
+Dependencies are pinned in `uv.lock` and the image installs from it. `ty check` passes with no errors: its
+remaining findings are kept as warnings per file in [`pyproject.toml`](pyproject.toml), so a new kind of
+finding still fails, and were 33 at the last check (ty exits 1 on a warning unless told not to, hence
+`--exit-zero-on-warning`). They stay because the fix is a restructure or ty is wrong. The
 main ones:
 
 - `gapfinder/api.py` and `gapfinder/test_live_sql.py`: `PRESETS` keeps a title, a parameter list and a
@@ -147,7 +148,9 @@ in, and nothing runs before **Run** is clicked.
 - **Usefulness for readers and editors.** A reader sees each edition's exact words side by side, and each edition's
   date links to the Wikipedia edit that began it: for a loaded word, the edit that put the word in the first
   sentence; for other differences, the edit that put the quoted words there word for word (an older wording
-  of the same claim can be earlier):
+  of the same claim can be earlier). That needs every revision, which the three demo topics have; on other
+  topics, which have the text of each 1 January, a date reads "by" the version that first has the words, and
+  links no edit:
   [Lapua Movement](https://since-when.katalyst.fyi/#/Q1412941), where Swedish and English Wikipedia say
   "fascist" in the first sentence and Finnish does not. NVIDIA Nemotron 3.5 Super VL suggests the
   differences and then checks each one against the whole other article, and the page says so;

@@ -138,7 +138,7 @@ class Refused(Served):
     def test_asof_for_a_finding_writes_only_a_session_variable(self):
         # With a finding, the quoted words are read into @quote first; nothing else is new.
         _, values = api.live_params({"preset": "asof", "params": {"finding": "14115"}})
-        texts = [sql for _, sql, _ in api.PRESETS["asof"]["statements"](values)]
+        texts = [str(sql) for _, sql, _ in api.PRESETS["asof"]["statements"](values)]
         self.assertEqual(len(texts), 3)
         self.assertEqual(texts[0].count("INTO"), 1)
         self.assertIn("INTO @quote", texts[0])

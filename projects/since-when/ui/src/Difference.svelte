@@ -9,7 +9,7 @@
 	import Strip from './Strip.svelte'
 	import Why from './Why.svelte'
 
-	let { d, topic, events, open = false }: { d: Difference; topic: Topic; events: Map<number, TimelineEvent[]>; open?: boolean } = $props()
+	let { d, topic, events, history, open = false }: { d: Difference; topic: Topic; events: Map<number, TimelineEvent[]>; history: boolean; open?: boolean } = $props()
 
 	const terms = $derived([...new Set(d.members.flatMap((f) => f.terms ?? []))])
 	const marks = $derived(figureMarks(d))
@@ -21,6 +21,9 @@
 	const related = $derived(d.primary.began ? [] : story.filter((t) => !main.includes(t)))
 	// The strip is drawn once the edits have arrived: before that a day has no edition to sit on.
 	const strip = $derived(lanes(d, events.size ? main : []))
+	// A difference only the current text dates (no earlier version was compared) has no strip once the
+	// edits have arrived: its lanes would say "not said" of an edition whose words are quoted below.
+	const dated = $derived(!history || strip.some((l) => l.since || l.spans.length))
 	const cap = (text: string) => text[0].toUpperCase() + text.slice(1)
 	// What the claim check found for the row that speaks for this difference.
 	const check = $derived(d.primary.check && d.primary.check.outcome !== 'unchecked' ? d.primary.check : null)
@@ -41,7 +44,7 @@
 	let row: HTMLDetailsElement
 </script>
 
-<div class="row" style:--lanes={strip.length}>
+<div class="row" style:--lanes={dated ? strip.length : 0}>
 	<details class="cdx-accordion" {open} bind:this={row}>
 		<summary>
 			<h3 class="cdx-accordion__header">
@@ -49,7 +52,7 @@
 			</h3>
 		</summary>
 		<div class="cdx-accordion__content">
-			<Strip lanes={strip} place="inside" />
+			{#if dated}<Strip lanes={strip} place="inside" />{/if}
 			<div class="quotes" class:two={d.quotes.length === 2}>
 				{#each d.quotes as q (q.lang)}
 					{@const section = q.from ? sectionOf(q.from, q.lang) : ''}
@@ -119,7 +122,7 @@
 			{/if}
 		</div>
 	</details>
-	<Strip lanes={strip} place="beside" onpick={() => (row.open = !row.open)} />
+	{#if dated}<Strip lanes={strip} place="beside" onpick={() => (row.open = !row.open)} />{/if}
 </div>
 
 <style>
