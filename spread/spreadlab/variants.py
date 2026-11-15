@@ -2,7 +2,7 @@
 compare it with the others on the same seeds."""
 from __future__ import annotations
 
-from . import budget, exposure, late_wide, pairs, thin_play
+from . import budget, budget_band, exposure, late_wide, pairs, thin_play
 
 GATE_10 = {"same_day": True, "floor": 1.7, "quote_share": 1, "max_unbooked": 10}  # `gate-10`
 # `curve-live-surcharge`: the win curve sets the price, the day's answers correct it, and the backlog raises the cost
@@ -758,3 +758,5 @@ for _name, _rule in {"unit": {"lo": 1, "hi": 1}, "a": {}, "b": {"hi": 1}, "c": {
                      "j": {"hi": 1, "z_lo": 1.5, "z_hi": 4}, "k": {"hi": 1, "sd_by": 3},
                      "flat70": {"lo": 0.7, "hi": 0.7}, "flat50": {"lo": 0.5, "hi": 0.5}}.items():
     VARIANTS[f"m41u-a-bud-{_name}"] = {**VARIANTS["m41u-a"], "budget": {**_BUD, **_rule}}
+# `m41u-a-bud-b` with the budget off at 720-759 drivers, the one band it lost on both halves: `m41u-a` there, `bud-b` elsewhere.
+VARIANTS["m41u-a-bud-b-x720"] = {**VARIANTS["m41u-a-bud-b"], "budget_off": {"drivers": [720, 760], "version": budget_band.VERSION}}

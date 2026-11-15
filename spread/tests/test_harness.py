@@ -1101,3 +1101,17 @@ def test_the_on_time_budget_relaxes_a_banked_friday_and_not_a_week_near_90():
     assert multiple(friday, on_time=340, late=0) == 0.5  # nothing can pull a banked week under 90% now
     assert multiple(friday, on_time=305, late=34) == 1.0  # 90% on the dot: the full late cost
     assert 0.5 < multiple(1440 + 10 * 60, on_time=60, late=1, open_=20) < 1.0  # Tuesday: most of the week is still to come
+
+
+def test_bud_b_x720_plays_m41u_a_at_720_to_759_drivers_and_bud_b_elsewhere():
+    from spreadlab.variants import VARIANTS
+
+    def desk(name, n):  # the budget and the parameters a week plays with
+        params = VARIANTS[name]
+        played = play.policy_class(params)(None, 8, 0, params, (ROSTER * n)[:n], MAP)
+        return getattr(played, "budget", None), played.params()
+
+    for n in (720, 759):
+        assert desk("m41u-a-bud-b-x720", n) == (None, desk("m41u-a", n)[1]), n
+    for n in (700, 719, 760, 819, 820, 900):
+        assert desk("m41u-a-bud-b-x720", n) == desk("m41u-a-bud-b", n) and desk("m41u-a-bud-b", n)[0], n
