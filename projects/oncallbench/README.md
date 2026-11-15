@@ -93,6 +93,8 @@ checkpoint was not chosen on them (the base and SFT models had been evaluated th
 | **Opus 5.5** | Harbor + OpenCode | 48 / 24 | **0.45 (0.35-0.54)** | 0.54 | 2% | 21% |
 | Gemma 4 26B-A4B, untrained | Harbor + OpenCode | 48 / 24 | 0.05 (0.02-0.07) | 0.00 | 0% | 38% |
 | Nemotron 3.5 Lightning 30B-A3B, untrained | Harbor + OpenCode | 24 / 24 | 0.04 (0.01-0.08) | 0.00 | 0% | 67% |
+| Nemotron 3.5 Super VL (NVFP4), untrained, served with vLLM | Harbor + OpenCode | 48 / 24 | 0.03 (0.01-0.06) | 0.00 | 0% | 90% |
+| Gemma 4 26B-A4B + our SFT adapter alone (no RL) | Harbor + OpenCode | 48 / 24 | 0.39 (0.32-0.47) | 0.41 | 0% | 15% |
 | Gemma 4 26B-A4B + our adapter (SFT, then RL on the score) | Harbor + OpenCode | 48 / 24 | 0.44 (0.35-0.53) | 0.45 | 4% | 17% |
 | `shotgun` script: finds the cause, guesses the fix | scripted, replayed in the simulator | 24 / 24 | 0.47 (0.36-0.57) | 0.55 | 0% | 12% |
 | Do-nothing | scripted, replayed in the simulator | 24 / 24 | 0.00 (0.00-0.00) | 0.00 | 0% | 0% |
@@ -100,13 +102,50 @@ checkpoint was not chosen on them (the base and SFT models had been evaluated th
 Partial, so not in the table: Fable 5.2, 13 runs on 13 of the 24 seeds (mean 0.88, 95% CI
 0.81-0.93); an Anthropic usage limit cut the other eleven.
 
-Exclusions: runs cut by infrastructure were excluded and rerun (untrained Gemma 44, an unreachable
-model endpoint; Opus 3 and Fable 11, an Anthropic usage limit, Fable's not rerun). Timeouts (Gemma
-with the adapter 8, untrained 2) and context overflows were kept and scored as the shifts they
-left. Runs whose Docker network could not be created never started and never reached
-`metrics.json`. Every excluded run stays in `metrics.json`, marked `infrastructure:`. Round 16 ran
+Exclusions: runs cut by something outside the agent were excluded and rerun. Untrained Gemma lost 88
+attempts: 44 whose agent never reached the model endpoint (no tool call), 41 whose agent container's
+Docker network failed and 3 whose verifier container's did (`audit/GEMMA.md`); the adapter row lost
+none. Opus lost 3 and Fable 11 to an Anthropic usage limit (Fable's were not rerun). Those were partly
+played, and their partial scores stay in `metrics.json`, marked `infrastructure:`: Opus's were 0.64,
+0.21 and 0.00, and counting them as well, Opus would average 0.44 over 51 attempts instead of 0.45
+over the 48 in the table. Timeouts (Gemma with the adapter 8, untrained 2) and context overflows were
+kept and scored as the shifts they left. The SFT-alone row lost 12 attempts to a full disk on the runner
+and reran them. The replay site shows seed 200019, one of these seeds; the task blocks that host, and
+none of the SFT-alone row's counted runs fetched it. Round 16 ran
 every model, Opus included, from task folders named `tasks-custom/seed-2000NN`; folder names are
 random since 0d92463f. No transcript mentions a seed.
+
+How the runs end, from each run's signed receipt replayed in the simulator. The fault counter is the
+verifier's and leaves overload faults out (`task/tests/grade.py`):
+
+| Agent | Every counted fault fixed | Ended by `finish` | Reached the shift's end | Stopped mid-shift |
+| --- | --- | --- | --- | --- |
+| Opus 5.5 | 48 of 48 | 33 | 15 | 0 |
+| Gemma 4 26B-A4B, untrained | 0 of 48 | 30 | 8 | 10 (minute 20, 26, 27, 71, 76, 83, 85, 87, 104, 118) |
+| Nemotron 3.5 Lightning 30B-A3B, untrained | 0 of 24 | 11 | 13 | 0 |
+| Nemotron 3.5 Super VL (NVFP4), untrained, served with vLLM | 9 of 48 | 8 | 35 | 5 (minute 114, 116, 117, 119, 119) |
+| Gemma 4 26B-A4B + our SFT adapter alone (no RL) | 13 of 48 | 1 | 47 | 0 |
+| Gemma 4 26B-A4B + our adapter (SFT, then RL on the score) | 23 of 48 | 0 | 47 | 1 (minute 54) |
+
+Not calling `finish` costs nothing extra: the rest of the shift is simulated and charged either way.
+Timeouts at the task's 30-minute agent limit: Gemma with the adapter 8, of which one came
+mid-incident (seed 200019, run 2, minute 54, scored 0.00) and seven after the shift had already
+reached minute 120 (the model kept making rejected calls; the score covers the whole shift); the SFT adapter alone
+8; untrained Gemma 2.
+
+Inference settings. Every round-16 run got the same task message (sha256 `36c50158a50d...`) through
+OpenCode 1.19.5 in Harbor 0.25.0, with OpenCode's own system prompt for the provider and no sampling
+settings of ours. Opus 5.5 and Fable 5.2: the Anthropic API with OpenCode's defaults. Gemma 4
+26B-A4B (all three rows): vLLM with the `gemma4` tool-call and reasoning parsers, the adapter as
+a LoRA module, sampling from the model's generation config; untrained and SFT-then-RL on Verda
+(`rl/serve.sh`, vLLM 0.33, `--max-model-len 262144`), SFT alone on Modal (`rl/modal_app.py`). Nemotron
+3.5 Lightning: vLLM 0.33 on the BF16 weights, 256k context, the `qwen3_coder` tool parser and
+`nemotron_v3` reasoning parser. Nemotron 3.5 Super VL: vLLM on NVIDIA's NVFP4 release (no FP8 build
+is published).
+
+Scope: these are 24 new seeds of one simulator. They recombine its eight symptom and harmful-change
+templates (`sim/incident.py`), so a score here measures how a model handles new incidents of this
+kind, not on-call skill in general.
 
 Definitions for this table's calculations: the score is the share of the avoidable cost
 avoided, `(cost_do_nothing - cost) / (cost_do_nothing - cost_reference)` clipped to 0..1; a run
@@ -156,8 +195,14 @@ seeds. That is statistically indistinguishable from Opus 5.5's 0.45 (paired diff
 interval -0.15 to +0.13; the adapter is ahead on 13 of 24 seeds), though it gets there differently:
 it fixes every fault in 23 of 48 runs where Opus does in 48 of 48, and it rolls back without
 protecting the service less often (36 of 95 undos without capacity first, against Opus's 80 of
-122). It remains well below the expert it copied. The share of RL in the gain is not measured in
-this harness: there is no SFT-only Harbor row on these seeds. Its scores in our own training
+122). It remains well below the expert it copied. The SFT adapter alone, run the same way, averages
+0.39 (0.32-0.47): RL on the score adds about 0.05 to the mean, inside overlapping intervals, and its
+clearer effect is on finishing the job, every counted fault fixed in 23 of 48 runs against 13 of 48
+without it. None of this shows equivalence to Opus. One shift shows the difference: on seed 200009 the
+fine-tuned Gemma reads sms-svc's metrics, scales it from 8 to 13 replicas, reads the diff, and rolls
+back once the capacity is there (`r16-l4-s200009-gemma-ft-231645`, steps 15-19); Opus on the same
+seed rolls back unprotected at step 13 and the storefront's errors reach about 52%
+(`r16-l4-s200009-opus-215320`). Its scores in our own training
 runner (`rl/env.py`: a capped number of replies, a shorter context) are higher and not comparable
 with Harbor's; they stay in `rl/RESULTS.md`. The adapter is public, with its sha256 and a model card:
 https://storage.googleapis.com/katalyst-fyi-models/oncallbench/gemma4-26b-a4b-rl/.

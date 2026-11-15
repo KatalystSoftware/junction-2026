@@ -49,6 +49,8 @@ from .exposure import ExposurePolicy
 from .late_wide import WideLate
 from .pairs import PairPolicy
 from .thin_play import ThinPlay
+from .budget import Budget
+from .budget_band import BudgetBand
 from .policy import DECLINE, OFFERS_A_DRIVER, Policy
 from .server import SERVER, PracticeClient, data_dir, world_map
 from .variants import VARIANTS
@@ -680,7 +682,19 @@ class LiveThinWidePairDesk(ThinPlay, LiveWidePairDesk):
     """... and another variant's play in a thin week (thin_play.py), for a variant that sets `thin_play`."""
 
 
+class LiveBudgetThinWidePairDesk(Budget, LiveThinWidePairDesk):
+    """... and the late cost by the week's projected on-time share (budget.py), for a variant that sets `budget`."""
+
+
+class LiveBandBudgetThinWidePairDesk(BudgetBand, LiveBudgetThinWidePairDesk):
+    """... with the budget off in a band of driver lists (budget_band.py), for a variant that sets `budget_off`."""
+
+
 def desk_class(params: dict) -> type:
+    if params.get("budget_off"):
+        return {LiveBudgetThinWidePairDesk: LiveBandBudgetThinWidePairDesk}[desk_class({k: v for k, v in params.items() if k != "budget_off"})]
+    if params.get("budget"):
+        return {LiveThinWidePairDesk: LiveBudgetThinWidePairDesk}[desk_class({k: v for k, v in params.items() if k != "budget"})]
     if params.get("thin_play"):
         return {LiveWidePairDesk: LiveThinWidePairDesk}[desk_class({k: v for k, v in params.items() if k != "thin_play"})]
     if params.get("exposure"):

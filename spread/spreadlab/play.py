@@ -24,6 +24,8 @@ from .pairs import PairPolicy
 from .policy import Policy, fingerprint
 from .riskfee import RiskFeePolicy
 from .thin_play import ThinWidePairPolicy
+from .budget import BudgetThinWidePairPolicy
+from .budget_band import BandBudgetThinWidePairPolicy
 from .server import PracticeClient, data_dir, read_json_gz, world_map, write_json_gz
 from .variants import VARIANTS
 
@@ -80,6 +82,10 @@ def policy_class(params: dict) -> type[Policy]:
         chosen = {Policy: ExposurePolicy}[chosen]
     if params.get("thin_play"):  # another variant's play in a thin week (thin_play.py)
         chosen = {WidePairPolicy: ThinWidePairPolicy}[chosen]
+    if params.get("budget"):  # the late cost by the week's projected on-time share (budget.py)
+        chosen = {ThinWidePairPolicy: BudgetThinWidePairPolicy}[chosen]
+    if params.get("budget_off"):  # the budget off in a band of driver lists (budget_band.py)
+        chosen = {BudgetThinWidePairPolicy: BandBudgetThinWidePairPolicy}[chosen]
     return chosen
 
 
