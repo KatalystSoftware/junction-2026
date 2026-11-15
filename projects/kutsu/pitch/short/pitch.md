@@ -5,14 +5,14 @@ A seven-slide version of the Kutsu pitch, about two and a half minutes spoken. T
 (`../img/`). The full twelve-slide deck stays at [`../index.html`](../index.html).
 
 The thread through it: AI now matches the skills in a CV, but motivation and fit show only in person,
-so meeting in person is worth more. Small in-person events are the best format but the hardest to
+so meeting in person is worth more. Focused in-person events are the best format but the hardest to
 set up. Kutsu does the setup, so the time goes to the people.
 
 ## What to say
 
 **1. Recruitment is hard. Kutsu makes it easier.**
 Recruitment is hard, and it is getting harder. Kutsu takes the setup work off the City of Espoo's
-recruitment events, so the city can hold many small, well-matched ones and spend its time on the
+recruitment events, so the city can hold many focused, well-matched ones and spend its time on the
 people.
 
 **2. Matching by CV skills is solved. Motivation and fit aren't.**
@@ -28,11 +28,11 @@ by hand. Companies say what they need too late. Job seekers can't tell which com
 meeting. Organisers pair people by hand, often without the tech background to judge an application.
 And every event starts from zero: the sign-up survey and both invitation lists are built again.
 
-**4. Big events are bloated. Small events are laborious.**
+**4. Big events are bloated. Focused events are laborious.**
 At a big event, employers are swamped by irrelevant approaches and spend a day at a stand to find a
-few people. A small themed event fixes that, since almost every conversation is relevant. But it
-takes the same setup as a big one, so the city can afford only a few. The format that works best is
-the one that is hardest to run.
+few people. A focused event, on one theme, fixes that, since almost every conversation is relevant.
+But it takes the same setup as a big one, so the city can afford only a few. The format that works
+best is the one that is hardest to run.
 
 **5. Kutsu: less time on setup, more time with people.**
 This is the core of it. AI drafts, people confirm. A company's sign-up arrives filled in from its
@@ -46,14 +46,14 @@ Companies ask who will be there before they commit, and people wait for the comp
 keeps a company pool, 1,081 Espoo companies checked from public sources, 46 of them hiring for 208
 tech roles right now, and a talent pool of past attendees who agreed to be invited again. So before
 anyone signs up, a company hears "173 people in our pool work in AI and data", and a job seeker hears
-that where a role names a language, four in five say English is enough. Each small event draws from
+that where a role names a language, four in five say English is enough. Each focused event draws from
 both pools and gives back to both.
 
-**7. More small events, more real conversations.**
+**7. More focused events, more real conversations.**
 Connections get easier to make, and the time goes to them. Kutsu runs today on real public company
 data and synthetic people, with no scores and no automated decisions. Our ask: pilot it on a short
-series of small themed events, with Espoo's own past-attendee list and consent texts. And then,
-after a beat: "Connecting people".
+series of focused events, with Espoo's own past-attendee list and consent texts. And then, after a
+beat: "Connecting people".
 
 The closing line nods to the slogan of Nokia, which has its head office in Espoo. Say it lightly,
 without naming the company; the slide shows no logo or artwork.
