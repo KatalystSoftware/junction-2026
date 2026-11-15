@@ -1334,6 +1334,24 @@ ssh amp@<runner> 'tmux kill-session -t final'   # the first desk's loop; or stop
 Before a final, move the standby's checkout to the commit the runner plays (`git checkout --detach origin/main`,
 `uv sync`), so both desks would play the same code.
 
+### How the final played (Sunday 15 November, world `f08312f6894c3a962e71b`)
+
+The runner's desk played `trackb-merge-8.3`: `--variant m41u-b-bud-b-x720-819` at 2942593c (fingerprint
+94782d66abf0), without `--watch-notes`, because that is how its crash replays ran. It joined at 06:30 UTC, when the
+world was set, and played 07:00 to 07:34 with no takeover. The week had 749 drivers, inside the 720–819 band where
+the budget is off, so every quote was `m41u-b`'s. Result: margin €17,087.76 on revenue €38,686.08, 350 won orders,
+97.4% on time, ranked. All 1,034 requests were quoted by the policy, with 0 fallback quotes, 0 late quotes, 0 errors
+and 0 throttled, and at least 4.40 s left on every quote.
+
+The desk's log and the end with the reveal are in [`archive/final/f08312f6894c3a962e71b/`](archive/final/f08312f6894c3a962e71b/)
+(gzipped, Git LFS). [`deploy/desk-loop.sh`](deploy/desk-loop.sh) is the loop that played it, and
+[`deploy/start-desk.sh`](deploy/start-desk.sh) is the standby's `~/bin/start-desk`.
+
+One lesson for the next final: at 07:19 a restart of the shared Amp runner's systemd service killed the watcher's
+alarm and takeover processes. They had been started from runner threads, so they lived in that service's cgroup,
+and `setsid nohup` did not take them out of it. The desk survived only because it ran in its own ssh session's
+tmux. Run anything the final depends on in a systemd unit or a tmux session of its own, not from the runner.
+
 ### The note watcher (`--watch-notes`, off by default)
 
 [`watch.py`](spreadlab/watch.py) adds a second reader of the dealers' notes beside the desk. It needs
