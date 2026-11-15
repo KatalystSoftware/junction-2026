@@ -101,11 +101,14 @@ checkpoint was not chosen on them (the base and SFT models had been evaluated th
 Partial, so not in the table: Fable 5.2, 13 runs on 13 of the 24 seeds (mean 0.88, 95% CI
 0.81-0.93); an Anthropic usage limit cut the other eleven.
 
-Exclusions: runs cut by infrastructure were excluded and rerun (untrained Gemma 44, an unreachable
-model endpoint; Opus 3 and Fable 11, an Anthropic usage limit, Fable's not rerun). Timeouts (Gemma
-with the adapter 8, untrained 2) and context overflows were kept and scored as the shifts they
-left. Runs whose Docker network could not be created never started and never reached
-`metrics.json`. Every excluded run stays in `metrics.json`, marked `infrastructure:`. Round 16 ran
+Exclusions: runs cut by something outside the agent were excluded and rerun. Untrained Gemma lost 88
+attempts: 44 whose agent never reached the model endpoint (no tool call), 41 whose agent container's
+Docker network failed and 3 whose verifier container's did (`audit/GEMMA.md`); the adapter row lost
+none. Opus lost 3 and Fable 11 to an Anthropic usage limit (Fable's were not rerun). Those were partly
+played, and their partial scores stay in `metrics.json`, marked `infrastructure:`: Opus's were 0.64,
+0.21 and 0.00, and counting them as well, Opus would average 0.44 over 51 attempts instead of 0.45
+over the 48 in the table. Timeouts (Gemma with the adapter 8, untrained 2) and context overflows were
+kept and scored as the shifts they left. Round 16 ran
 every model, Opus included, from task folders named `tasks-custom/seed-2000NN`; folder names are
 random since 0d92463f. No transcript mentions a seed.
 
@@ -185,7 +188,8 @@ seeds. That is statistically indistinguishable from Opus 5.5's 0.45 (paired diff
 interval -0.15 to +0.13; the adapter is ahead on 13 of 24 seeds), though it gets there differently:
 it fixes every fault in 23 of 48 runs where Opus does in 48 of 48, and it rolls back without
 protecting the service less often (36 of 95 undos without capacity first, against Opus's 80 of
-122). It remains well below the expert it copied. One shift shows the difference: on seed 200009 the
+122). It remains well below the expert it copied. The comparison measures the combined SFT-then-RL
+pipeline; it does not isolate RL's contribution or show equivalence to Opus. One shift shows the difference: on seed 200009 the
 fine-tuned Gemma reads sms-svc's metrics, scales it from 8 to 13 replicas, reads the diff, and rolls
 back once the capacity is there (`r16-l4-s200009-gemma-ft-231645`, steps 15-19); Opus on the same
 seed rolls back unprotected at step 13 and the storefront's errors reach about 52%
