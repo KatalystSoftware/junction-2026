@@ -207,6 +207,17 @@ runner (`rl/env.py`: a capped number of replies, a shorter context) are higher a
 with Harbor's; they stay in `rl/RESULTS.md`. The adapter is public, with its sha256 and a model card:
 https://storage.googleapis.com/katalyst-fyi-models/oncallbench/gemma4-26b-a4b-rl/.
 
+**Try it on Modal.** The same adapter is served from Modal behind an OpenAI-compatible endpoint
+(`rl/modal_serve.py`, one H200 or B200), as `gemma26-rl`, beside the untrained `gemma26-base` and
+the SFT-only `gemma26-sft`. The logs print each served adapter's sha256, and `gemma26-rl`'s matches
+the published one (`f9536c41…`). It scales to zero, so the first request starts a GPU and takes
+about six minutes. `curl -L` follows Modal's redirect while it waits:
+
+    URL=https://mikael-87302--oncallbench-gemma-serve.us-east.modal.run
+    curl -L $URL/v1/models
+    harbor run -p tasks/shift-1 -a opencode -m vllm/gemma26-rl --base-url $URL/v1 \
+      --api-format openai_chat_completions --api-key-name VLLM_API_KEY --ae VLLM_API_KEY=none
+
 ## Reproduce
 
 Needs Docker with Compose v2 (`docker compose version` must work; on Ubuntu's `docker.io` install
