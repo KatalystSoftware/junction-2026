@@ -53,7 +53,7 @@ chance the private and trade-in requests and the note's own deadline and site ho
 | Ranking round played from Sunday 00:10 UTC, by tag `trackb-merge-4.1` | €78,614 over five weeks, about €15,723 a week, 96.3% on time. Place 19 of 55 on the board read at 00:40 UTC, before the round's board was final |
 | Ranking round played from Sunday 01:00 UTC, by tag `trackb-merge-4.1` | €68,867 over five weeks, about €13,773 a week, 95.8% on time. Place 26 of 31 on the board read at 01:30 UTC, with few teams in |
 | Ranking round played from Sunday 04:00 UTC, by tag `trackb-merge-8.2` (variant `m41u-b`: `trackb-merge-4.1` at 760 drivers or more, with `km40` under 760) | €77,653.41 over five weeks, about €15,531 a week, every week ranked: €12,432.10, €13,098.20, €17,230.93, €12,754.37 and €22,137.81 on worlds of 801, 796, 936, 647 and 801 drivers; 96.49% on time, the lowest week 95.09%. Place 5 of 33 ranked teams on the board read at 04:40 UTC, before the round's board was final |
-| The final, Sunday 09:00 Helsinki, played by tag `trackb-merge-8.3` (see below) | not played yet at this commit |
+| The final, Sunday 09:00 Helsinki, played by tag `trackb-merge-8.2` (see below) | not played yet at this commit |
 
 The gap to the top 10 in that round is orders won, not price: they won 441 orders a week at €41.6 an
 order with 16.7 late, this variant 332 at €41.4 with 10.4 late (one round of five worlds).
@@ -62,23 +62,18 @@ A variant tuned to the simulator for margin may play the final instead, but only
 unseen weeks with at most 1 week in 60 under 90% on time, thin worlds included. Which variant played
 the final is recorded with its result.
 
-**The final's version** is tag `trackb-merge-8.3` (variant `m41u-b-bud-b-x720-819`, commit `2942593`, fingerprint
-`94782d66abf0`), with `trackb-merge-8.2` (`m41u-b`, `2f5ad40`) as the fallback. It chooses its rules before the first
-quote from the length of the driver list:
+**The final's version** is tag `trackb-merge-8.2` (variant `m41u-b`, commit `2f5ad40`, fingerprint `de281bfefa09`).
+It chooses its rules before the first quote from the length of the driver list: under 760 drivers onward pairs may
+reach 40 km (`km40`), and at 760 or more it plays `trackb-merge-4.1` exactly. Against `trackb-merge-4.1` under 760
+drivers, `km40` made +€672 a week (347 to 1,017) on 51 paired practice weeks, better in 37, with no week under 90% on
+either side. Its weeks under 90% at 760 drivers or more were lost by `trackb-merge-4.1` too. It played the 04:00 UTC
+ranking round above. The live desk replayed it through a crash on Wednesday 12:00 and a cold join, with no errors and
+no 429, and it reproduces practice weeks to the cent.
 
-- under 760 drivers, onward pairs may reach 40 km (`km40`): +€672 a week (347 to 1,017) over `trackb-merge-4.1` on 51
-  paired practice weeks, better in 37;
-- under 720 and at 820 or more, an on-time budget: at each quote it projects the week's final on-time share and lowers
-  the late-order cost, to as little as 0.5 ×, while the week stays safely over 90%. Against `trackb-merge-8.2` it made
-  +€333 a week (50 to 611) on 42 paired weeks while it played the arm, and +€159 (−48 to +363) on all 74 pairs, so its
-  gain is not shown beyond doubt;
-- from 720 to 819 drivers it plays `trackb-merge-4.1` exactly.
-
-It had 2 weeks under 90% in 142 under 760 drivers and 2 in 142 at 760 or more, 0.85 per 60 a side. Three of the four
-were lost by `trackb-merge-8.2` or `trackb-merge-4.1` too. The fourth, `fresh-11087` (665 drivers), shows what would break
-it: the budget played it at 89.2% on time, where `trackb-merge-8.2` held 90.55% and `trackb-merge-4.1` 94.09%. The code
-without the budget, `trackb-merge-8.2`, played the 04:00 UTC ranking round above. The live desk replayed it through a
-crash on Wednesday 12:00 and a cold join, with no errors and no 429, and every quote kept its budget after the restart.
+A version with an on-time budget on top (`trackb-merge-8.3`), which lowers the late-order cost while the week stays
+safely over 90%, was left out of the final: its gain over this one was not shown beyond doubt (+€159 a week, −48 to
++363, on 74 pairs), and it lost a thin week (`fresh-11087`, 665 drivers) at 89.2% on time that this version held at
+90.55%.
 
 The first such version, `fee16-80-q24-wide-pairs-0.6-return-0.75`, made +€2,180 a week (1,867 to 2,511) on 40 unseen
 weeks and then failed a 120-week exam: 3 of 60 thin weeks under 90% on time (87.1%, 89.0%, 89.1%) and 1 of 60 natural
