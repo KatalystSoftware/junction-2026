@@ -52,6 +52,9 @@ sample data, and a person makes every decision. Its first invitee pages and its 
 ## Also here
 
 - [`projects/index/`](projects/index/README.md): the page at <https://katalyst.fyi/>.
+- [`infra/verda/`](infra/verda/main.tf): the Verda machines the demos and evaluations run on, defined
+  with Verda's official OpenTofu provider, and the [proxy](infra/verda/proxy/README.md) every demo
+  sits behind.
 
 This repository holds the projects we submitted, with their history. Our notes, experiments and other
 work from the event stay in the team's private repository.
