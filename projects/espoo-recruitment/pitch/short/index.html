@@ -336,6 +336,34 @@ body.pdfshot .progress,body.pdfshot .dots,body.pdfshot .hint,body.pdfshot .pdf{d
 .unlock p{font-size:var(--t-lg);line-height:1.35;color:#fff;border-left:4px solid var(--ok-light);padding-left:1rem}
 .unlock p span{display:block;font-size:var(--t-sm);color:var(--city-dim);letter-spacing:.06em;text-transform:uppercase;font-weight:700;margin-bottom:.2rem}
 .slide.hero h1 .soft{color:var(--city-dim)}
+.ledger{display:grid;margin-top:min(.6rem,1.2vh)}
+.ledger>div{display:grid;grid-template-columns:minmax(0,12rem) minmax(0,1fr);gap:1.5rem;align-items:baseline;padding:min(1.1rem,2vh) 0;border-top:1px solid oklch(100% 0 0 / .2)}
+.ledger>div:last-child{border-bottom:1px solid oklch(100% 0 0 / .2)}
+.ledger span{color:var(--wait-light);font-size:var(--t-sm);font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+.ledger p{font-size:min(var(--t-xl),2rem,4.2vh);font-weight:700;letter-spacing:-.01em;line-height:1.2;color:#fff}
+.ledger small{font-size:.62em;font-weight:500;letter-spacing:0;color:var(--city-dim);margin-left:.5em}
+.versus{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(2rem,5vw,5rem);margin-top:min(1rem,2vh)}
+.side{display:grid;gap:min(.9rem,1.6vh);align-content:start}
+.side-name{font-size:var(--t-sm);font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--city-dim)}
+.field{height:min(11.5rem,22vh);display:flex;align-items:flex-end}
+.dotgrid{display:grid;gap:min(.5rem,.95vh)}
+.dotgrid.big{grid-template-columns:repeat(12,min(1rem,1.9vh))}
+.dotgrid.small{grid-template-columns:repeat(4,min(1rem,1.9vh))}
+.dotgrid i,.legend i{display:block;width:min(1rem,1.9vh);aspect-ratio:1;border-radius:50%;background:oklch(100% 0 0 / .22)}
+.dotgrid i.g,.legend i.g{background:var(--ok-light)}
+.setup{background:var(--wait);color:#fff;font-weight:700;font-size:var(--t-sm);letter-spacing:.02em;border-radius:6px;padding:min(.55rem,1vh) .9rem}
+.side-text{font-size:var(--t-lg);line-height:1.35;color:#fff}
+.side-text q{color:var(--city-dim)}
+.legend{display:flex;align-items:center;gap:.5rem;font-size:var(--t-sm);color:var(--city-dim)}
+.legend i{display:inline-block;width:.8rem;margin-left:.6rem}.legend i:first-child{margin-left:0}
+.pool{display:grid;gap:min(.4rem,.8vh);align-content:center;color:#fff}
+.pool .n{font-size:var(--t-sm);font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ok-light)}
+.pool b.big{font-size:min(clamp(2.6rem,1.4rem + 3vw,4.4rem),8vh);font-weight:800;letter-spacing:-.03em;line-height:1;color:#fff}
+.pool h3{font-size:min(var(--t-xl),1.8rem,3.9vh);color:#fff}
+.pool p{font-size:var(--t-md);color:var(--city-dim);line-height:1.4}
+.pool .tag{background:oklch(100% 0 0 / .14);color:var(--city-dim)}
+@media (max-width:900px){.ledger>div{grid-template-columns:minmax(0,1fr);gap:.3rem}.ledger small{display:block;margin:0}.versus{grid-template-columns:minmax(0,1fr)}.field{height:auto}}
+
 .nod{font-size:min(var(--t-xl),1.7rem,3.6vh);font-weight:700;letter-spacing:-.01em;color:#fff;margin-top:min(.8rem,1.4vh)}
 .wires{display:grid;gap:min(2.6rem,5vh);margin:min(2.2rem,4vh) 0 min(1.2rem,2vh)}
 .wire{display:grid;grid-template-columns:auto minmax(0,1fr) auto minmax(0,24rem);align-items:center;gap:.8rem 1.4rem}
@@ -406,11 +434,11 @@ body.pdfshot .progress,body.pdfshot .dots,body.pdfshot .hint,body.pdfshot .pdf{d
       <h2>Matching is hard, because it takes people connecting</h2>
       <p class="lead">Matching by CV skills is easy now. Real matching, on motivation and fit, needs the right people in the same room. Every meeting costs time, and today who meets whom is arranged by hand, from too little information.</p>
     </div>
-    <div class="cards four">
-      <div class="card"><span class="n">Companies</span><h3>Say what they need too late</h3><q>…they provide this information to the event organizer too late, only just before the event day.</q></div>
-      <div class="card"><span class="n">Job seekers</span><h3>Can’t tell which companies are worth meeting</h3><p class="mut">The company list and what each wants arrive late, if at all.</p></div>
-      <div class="card"><span class="n">Organisers</span><h3>Pair people by hand</h3><p class="mut">They read every application themselves, often without the tech background to judge it.</p></div>
-      <div class="card"><span class="n">Every event</span><h3>Starts from zero</h3><p class="mut">The sign-up survey and both invitation lists are built again, by hand, for each event.</p></div>
+    <div class="ledger">
+      <div><span>Companies</span><p>Say what they need too late <small>“only just before the event day”</small></p></div>
+      <div><span>Job seekers</span><p>Can’t tell which companies are worth meeting</p></div>
+      <div><span>Organisers</span><p>Pair people by hand <small>often without the tech background to judge</small></p></div>
+      <div><span>Every event</span><p>Starts from zero <small>sign-up and both invitation lists, built again</small></p></div>
     </div>
   </div>
 </section>
@@ -422,22 +450,21 @@ body.pdfshot .progress,body.pdfshot .dots,body.pdfshot .hint,body.pdfshot .pdf{d
     <div class="head stack">
       <h2>Big events are bloated. Small events are laborious.</h2>
     </div>
-    <div class="duel">
-      <div class="card tint"><span class="n">Big event</span><h3>Hundreds of people, dozens of stands</h3>
-        <ul>
-          <li>Employers are <q class="in">overwhelmed by large volumes of largely irrelevant candidate approaches</q>.</li>
-          <li>Staff spend a day at a stand to find a few relevant people.</li>
-          <li>Job seekers queue at the well-known names and miss the rest.</li>
-        </ul>
+    <div class="versus" role="img" aria-label="At a big event few of the many conversations are relevant; at a small event almost all are. Both take the same setup work.">
+      <div class="side">
+        <p class="side-name">Big event</p>
+        <div class="field"><div class="dotgrid big"><i></i><i></i><i></i><i></i><i></i><i class="g"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="g"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="g"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="g"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="g"></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="g"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="g"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="g"></i><i></i><i></i><i></i><i></i><i></i></div></div>
+        <div class="setup">Setup: find the companies, find the people, match them</div>
+        <p class="side-text">Employers are <q class="in">overwhelmed by large volumes of largely irrelevant candidate approaches</q>.</p>
       </div>
-      <div class="card good"><span class="n">Small event</span><h3>One theme, a few employers, the right people</h3>
-        <ul>
-          <li>Almost every conversation is relevant, on both sides.</li>
-          <li class="but">But each takes the same setup as a big one: find the companies, find the people, match them.</li>
-          <li class="but">So the city can afford only a few.</li>
-        </ul>
+      <div class="side">
+        <p class="side-name">Small event</p>
+        <div class="field"><div class="dotgrid small"><i class="g"></i><i class="g"></i><i class="g"></i><i class="g"></i><i></i><i class="g"></i><i class="g"></i><i class="g"></i><i class="g"></i><i></i><i class="g"></i><i class="g"></i></div></div>
+        <div class="setup">The same setup</div>
+        <p class="side-text">Almost every conversation is relevant, but the city can afford only a few.</p>
       </div>
     </div>
+    <p class="legend"><i class="g"></i>relevant conversation <i></i>not relevant</p>
     <p class="punch">The format that works best is the one that is hardest to run.</p>
   </div>
 </section>
@@ -470,13 +497,13 @@ body.pdfshot .progress,body.pdfshot .dots,body.pdfshot .hint,body.pdfshot .pdf{d
       <p class="lead">Companies ask which candidates will be there before they commit. People sign up once they know which companies come. A one-off event starts that wait from zero, every time.</p>
     </div>
     <div class="pools">
-      <div class="card"><span class="n">Company pool</span><b class="big">1,081</b><h3>Espoo companies</h3><p class="mut">Checked from public sources: 46 of them are hiring for 208 tech roles right now.</p></div>
+      <div class="pool"><span class="n">Company pool</span><b class="big">1,081</b><h3>Espoo companies</h3><p class="mut">Checked from public sources: 46 of them are hiring for 208 tech roles right now.</p></div>
       <div class="hub" aria-label="Each small event draws from both pools and gives back to both">
         <div class="flow"><span>companies →</span><span>← people</span></div>
         <div class="event">Each small event</div>
         <div class="flow"><span>← confirmed needs</span><span>new attendees →</span></div>
       </div>
-      <div class="card"><span class="n">Talent pool</span><b class="big">1,140</b><h3>Past attendees <span class="tag">sample data</span></h3><p class="mut">People who came before and agreed to be invited again. Shown only as counts by field; nobody is ranked.</p></div>
+      <div class="pool"><span class="n">Talent pool</span><b class="big">1,140</b><h3>Past attendees <span class="tag">sample data</span></h3><p class="mut">People who came before and agreed to be invited again. Shown only as counts by field; nobody is ranked.</p></div>
     </div>
     <div class="unlock">
       <p><span>To a company, before anyone signs up</span>“173 people in our pool work in AI and data.”</p>
