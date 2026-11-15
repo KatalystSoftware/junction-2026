@@ -2,7 +2,7 @@
 compare it with the others on the same seeds."""
 from __future__ import annotations
 
-from . import exposure, late_wide, pairs, thin_play
+from . import budget, budget_band, exposure, late_wide, pairs, thin_play
 
 GATE_10 = {"same_day": True, "floor": 1.7, "quote_share": 1, "max_unbooked": 10}  # `gate-10`
 # `curve-live-surcharge`: the win curve sets the price, the day's answers correct it, and the backlog raises the cost
@@ -754,3 +754,19 @@ VARIANTS["m41u-a"] = {**_V_B, "thin_play": {"drivers": 760, "params": {
 _V_A = VARIANTS["m41v-a"]
 VARIANTS["m41u-b"] = {**_V_A, "thin_play": {"drivers": 760, "params": {
     **{k: v for k, v in {**_V_A, **_V_A["when_tight"]}.items() if k != "when_tight"}, "pair_km": 40}, "version": thin_play.VERSION}}
+# The on-time budget (budget.py) on `m41u-a`: the late cost by how far the week's projected on-time share is above 90%, in z of
+# its spread. `-unit` holds the multiple at 1 and must play `m41u-a` to the cent. The waiting-car charge stays.
+_BUD = {"floor": 0.90, "z_lo": 2, "z_hi": 5, "lo": 0.5, "hi": 1.5, "sd_by": 2, "drivers": 0, "version": budget.VERSION}
+for _name, _rule in {"unit": {"lo": 1, "hi": 1}, "a": {}, "b": {"hi": 1}, "c": {"z_lo": 3, "z_hi": 6, "lo": 0.25},
+                     "d": {"drivers": 760}, "e": {"lo": 0, "hi": 1}, "f": {"z_lo": 3, "z_hi": 8, "lo": 0.25, "hi": 2},
+                     "g": {"sd_by": 1, "lo": 0.5, "hi": 1}, "h": {"lo": 0.25, "hi": 1}, "i": {"hi": 1, "z_lo": 3, "z_hi": 6},
+                     "j": {"hi": 1, "z_lo": 1.5, "z_hi": 4}, "k": {"hi": 1, "sd_by": 3},
+                     "flat70": {"lo": 0.7, "hi": 0.7}, "flat50": {"lo": 0.5, "hi": 0.5}}.items():
+    VARIANTS[f"m41u-a-bud-{_name}"] = {**VARIANTS["m41u-a"], "budget": {**_BUD, **_rule}}
+# `m41u-a-bud-b` with the budget off at 720-759 drivers, the one band it lost on both halves: `m41u-a` there, `bud-b` elsewhere.
+VARIANTS["m41u-a-bud-b-x720"] = {**VARIANTS["m41u-a-bud-b"], "budget_off": {"drivers": [720, 760], "version": budget_band.VERSION}}
+# `m41u-b-bud-b-x720`: bud-b's budget, off at 720-759, on `m41u-b`. At 760-819 it scales 4.1's late_cost 150 as it scales m41u-a's 100.
+VARIANTS["m41u-b-bud-b-x720"] = {**VARIANTS["m41u-b"], "budget": VARIANTS["m41u-a-bud-b"]["budget"],
+                                 "budget_off": VARIANTS["m41u-a-bud-b-x720"]["budget_off"]}
+# `m41u-b-bud-b-x720-819`: the budget off at 720-819 as well: lowering late_cost there lost fresh-9678 in play, a week 4.1 held.
+VARIANTS["m41u-b-bud-b-x720-819"] = {**VARIANTS["m41u-b-bud-b-x720"], "budget_off": {**VARIANTS["m41u-b-bud-b-x720"]["budget_off"], "drivers": [720, 820]}}
