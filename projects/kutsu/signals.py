@@ -28,6 +28,7 @@ import urllib.parse
 import urllib.request
 
 import lib
+import registry
 
 API_CACHE = lib.HERE / "api-cache"
 EXA = "https://api.exa.ai/search"
@@ -546,8 +547,12 @@ def brief(key, companies, all_roles, step=lambda stage, facts: None):
     signals, dropped = check(answer, results, named)
     step("card", {"statements": len(signals)})
     needs, card_usd = card(company, posts, signals, named)
+    # its Finnish business ID: from our register list, or looked up by name and domain (registry.py)
+    bid = c.get("business_id") if c else None
+    bid = ({"value": bid["value"], "name": c["name"]["value"], "source_url": bid["source_url"], "found_on": None,
+            "retrieved_at": bid["retrieved_at"], "kind": "registry"} if bid else registry.business_id(company["name"], domain))
     return {"id": key if c else domain or key, "name": c["name"]["value"] if c else company["name"],
-            "website": company["website"], "in_espoo_data": bool(c), "open_roles": len(roles),
+            "website": company["website"], "in_espoo_data": bool(c), "open_roles": len(roles), "business_id": bid,
             "identity": ident or None, "signals": signals, "card": needs, "generated_at": lib.now_iso(),
             "stats": {"results_read": len(results), "signals_dropped": dropped, "exa_usd": round(exa_usd, 4),
                       "llm_usd": round(llm_usd + names_usd + card_usd, 4), "context_credits": credits}}

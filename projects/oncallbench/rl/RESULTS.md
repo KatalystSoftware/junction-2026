@@ -364,6 +364,51 @@ Per seed (run 1 / run 2):
 - **Cancelled before any result:** 21 jobs on the first spread seeds (404-504), cancelled within a
   minute of starting when the seed set changed.
 
+### Nemotron 3.5 Super VL (NVFP4), untrained, served with vLLM
+
+`nvidia/NVIDIA-Nemotron-3.5-Super-VL-120B-A12B-NVFP4` (120B total, 12B active, hybrid Mamba-MoE),
+served by vLLM 0.33 on one B200 (`serve-nemotron-super.sh`: qwen3_coder tool calls, nemotron_v3
+reasoning, MTP speculative decoding, 256k context). NVIDIA publishes Super VL only as BF16 (249 GB,
+more than one B200 holds) and NVFP4, with no FP8 checkpoint. Same tasks (`ad7d8e1` export), same
+`spread.sh`, two runs per seed, 16 at a time; run name `nemotron-super` in `metrics.json` round 16.
+**Mean 0.03 (95% CI 0.01-0.06), median 0.00, no solve, 43 of 48 runs score 0 and 43 cost more than
+doing nothing.** No infrastructure failures and no timeouts: every run has a verifier result, the
+longest took 8 minutes.
+
+| Seed | Run 1 / run 2 | Seed | Run 1 / run 2 |
+| --- | --- | --- | --- |
+| 200000 | 0.00 / 0.23 | 200012 | 0.00 / 0.00 |
+| 200001 | 0.00 / 0.00 | 200013 | 0.20 / 0.00 |
+| 200002 | 0.00 / 0.00 | 200014 | 0.00 / 0.00 |
+| 200003 | 0.00 / 0.00 | 200015 | 0.00 / 0.00 |
+| 200004 | 0.00 / 0.00 | 200016 | 0.00 / 0.00 |
+| 200005 | 0.00 / 0.00 | 200017 | 0.00 / 0.00 |
+| 200006 | 0.00 / 0.00 | 200018 | 0.00 / 0.00 |
+| 200007 | 0.00 / 0.00 | 200019 | 0.00 / 0.00 |
+| 200008 | 0.00 / 0.29 | 200020 | 0.00 / 0.42 |
+| 200009 | 0.00 / 0.00 | 200021 | 0.30 / 0.00 |
+| 200010 | 0.00 / 0.00 | 200022 | 0.00 / 0.00 |
+| 200011 | 0.00 / 0.00 | 200023 | 0.00 / 0.00 |
+
+**Failure mode: it fixes the wrong services.** It reads before it acts (about 20 calls before its
+first mitigation), but it spends 1.7 mitigations per run on
+services that were not faulty, ten times Opus's 0.17, and leaves 1.5 of the faults (Opus leaves none;
+only 9 of its 48 runs clear them all). Its unprotected rollbacks are as common as Opus's (42 of 48
+runs roll back a hot service without scaling or throttling it first, Opus 43 by the same count), but
+where Opus recovers from the retry storm that follows, Nemotron misreads it as a new fault: 31 of
+its 48 closing messages say the shift ran out, and 19 admit a misdiagnosis or a wasted mitigation.
+
+### Nemotron
+
+We ran NVIDIA Nemotron 3.5 Super VL (120B-A12B, NVFP4), served with vLLM on one B200, as an
+untrained on-call agent in OnCallBench: through Harbor and OpenCode it investigates a simulated
+production outage with read-only tools (topology, alerts, metrics, logs, diffs) and picks
+mitigations (rollback, scale, throttle, failover), scored on how much outage cost it saves against
+an expert script. This matters because a wrong mitigation in a real incident costs money: the
+benchmark rewards an agent that diagnoses before it acts, not one that tries everything. On 24
+held-out level-4 seeds, two runs each, it averaged 0.03 (95% CI 0.01-0.06) against Opus 5.5's 0.45
+and our fine-tuned Gemma 4 26B's 0.44, mostly by acting on services that were not broken.
+
 ### Which fine-tuned checkpoint runs the scores spread (fixed before those runs)
 
 The spread's seeds were first 404, 418, 500, 502, 503 and 504. Before any run on them finished they

@@ -21,7 +21,7 @@ npm --prefix ui run check
 npm --prefix ui run build >/dev/null
 "${SSH[@]}" "$HOST" "id talentbrief >/dev/null 2>&1 || useradd --system --home $DIR --shell /usr/sbin/nologin talentbrief; mkdir -p $DIR/ui; rm -f $DIR/index.html"
 rsync -az -e "${SSH[*]}" \
-  lib.py signals.py serve.py monitors.py person.py presets.json pool.json applications.json companies.json roles.json "$HOST:$DIR/"
+  lib.py signals.py registry.py seeds.py serve.py monitors.py person.py presets.json pool.json applications.json companies.json roles.json "$HOST:$DIR/"
 # The request cache is not in git, so a checkout may not have it. What is here is added to the server's copy; nothing
 # on the server is ever deleted or replaced by an older file, so a deploy from a bare checkout leaves that copy whole.
 if [ -d api-cache ]; then rsync -az --update -e "${SSH[*]}" api-cache "$HOST:$DIR/"; fi

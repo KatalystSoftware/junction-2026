@@ -19,7 +19,8 @@ collect = []
 
 [agent]
 # The shift is bounded by its 120 simulated minutes and 400 tool calls, not by wall time. Level-4
-# agent runs took 5-8 minutes (Opus 5.5 at most 401 s), so 30 minutes never cuts a shift short.
+# agent runs took 5-8 minutes (Opus 5.5 at most 401 s). A slower model can hit it: in round 16, 10 of
+# 96 Gemma runs did, one of them mid-incident; the verifier still scores the whole shift.
 timeout_sec = 1800.0
 
 [environment]

@@ -51,6 +51,14 @@
     "median": "0.54",
     "solve_rate": "2%",
     "worse_than_nothing": "21%"
+   },
+   "ends": {
+    "runs": 48,
+    "all_faults_fixed": 48,
+    "finish": 33,
+    "shift_end": 15,
+    "mid_shift": 0,
+    "mid_shift_minutes": []
    }
   },
   {
@@ -75,6 +83,25 @@
     "median": "0.00",
     "solve_rate": "0%",
     "worse_than_nothing": "38%"
+   },
+   "ends": {
+    "runs": 48,
+    "all_faults_fixed": 0,
+    "finish": 30,
+    "shift_end": 8,
+    "mid_shift": 10,
+    "mid_shift_minutes": [
+     20,
+     71,
+     83,
+     85,
+     87,
+     26,
+     27,
+     76,
+     104,
+     118
+    ]
    }
   },
   {
@@ -99,6 +126,38 @@
     "median": "0.00",
     "solve_rate": "0%",
     "worse_than_nothing": "67%"
+   },
+   "ends": {
+    "runs": 24,
+    "all_faults_fixed": 0,
+    "finish": 11,
+    "shift_end": 13,
+    "mid_shift": 0,
+    "mid_shift_minutes": []
+   }
+  },
+  {
+   "label": "Nemotron 3.5 Super VL (NVFP4), untrained, served with vLLM",
+   "harness": "Harbor + OpenCode",
+   "runs": 48,
+   "seeds": 24,
+   "mean": 0.029970833333333332,
+   "ci95": [
+    0.00883125,
+    0.055900000000000005
+   ],
+   "median": 0.0,
+   "solve_rate": 0.0,
+   "worse_than_nothing": 0.8958333333333334,
+   "display": {
+    "mean": "0.03",
+    "ci95": [
+     "0.01",
+     "0.06"
+    ],
+    "median": "0.00",
+    "solve_rate": "0%",
+    "worse_than_nothing": "90%"
    }
   },
   {
@@ -123,6 +182,16 @@
     "median": "0.45",
     "solve_rate": "4%",
     "worse_than_nothing": "17%"
+   },
+   "ends": {
+    "runs": 48,
+    "all_faults_fixed": 23,
+    "finish": 0,
+    "shift_end": 47,
+    "mid_shift": 1,
+    "mid_shift_minutes": [
+     54
+    ]
    }
   },
   {

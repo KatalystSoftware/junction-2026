@@ -246,6 +246,15 @@ use every screen fully, and the next visitor still finds the demo as it was.
 A company is named by its id in `companies.json`, or by any name or domain. One that is not in our
 data takes about 20 seconds; anything asked before answers at once.
 
+A company in our Espoo register list is keyed by its business ID (Y-tunnus). One researched live, by name or
+domain, is keyed by its domain, which is what the links use (`#/join/nitor.com`), and `registry.py` finds its
+business ID to show beside it: the trade register searched by name, kept only where the registered website is
+the company's, preferring the operating company over a holding company or head office when a group shares the
+website; else the ID or VAT number on the company's own site, used only when its check digit holds and the
+register confirms it. Nothing is guessed: 18 of the 29 found this way have one, and the other 11 (registered
+abroad, or several companies with nothing to tell them apart) show none. `python3 registry.py` fills in any
+missing; `python3 registry.py nitor.com` looks one up.
+
 It runs on the Verda runner as a systemd service on port 8046, listening only on the address of the
 proxy's Docker network (`172.19.0.1`), so the shared proxy is the only way in: it serves it as
 `https://kutsu.katalyst.fyi/` (`infra/verda/proxy/sites/kutsu.caddy`), and the machine's public address
@@ -346,6 +355,7 @@ sections from "Headline numbers" on describe that run.
 | `esittely-companies.json` | the same roles in the company and job-ad shape of `projects/espoo-recruitment/app/data.js` (role family ids and skill ids are the demo's own); `size`, `stand`, `tradeoffs` and minimum experience are left out because nothing public grounds them |
 | `signals.json`, `signals.md` | per company: identity from Context.dev, what public sources state (claim, verbatim quote, URL) and, kept apart, the inferred card: a pitch and the needs, citing those statements |
 | `ui/`, `serve.py` | the Kutsu app (Svelte) and the small server behind it: live research, progress, sign-up state, a role drafted from one line |
+| `registry.py` | a company's Finnish business ID (Y-tunnus) when it was found by name or domain: the trade register by name, kept only where the registered website is the company's; else the ID printed on its own site, confirmed in the register |
 | `person.py` | a person's profile from their LinkedIn, a portfolio page or their CV, each line with the words it rests on; keeps nothing |
 | `monitors.py` | creates, lists and deletes the Context.dev monitors, and reads back what changed |
 | `presets.json` | named lists of employers shown first, such as the Deep Tech Talent Forum's |

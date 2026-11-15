@@ -16,8 +16,8 @@ database, such as the demo snapshot named in the [handoff note](../demo/HANDOFF.
 
 What the instance is:
 
-- **Database:** MariaDB 11.8 in the same compose project, 2 GB of memory at most, loaded from the
-  snapshot. Nothing rebuilds data on this machine.
+- **Database:** MariaDB 11.8 in the same compose project, 3 CPUs and 6 GB of memory at most (a 3 GB buffer
+  pool), loaded from the snapshot. Nothing rebuilds data on this machine.
 - **Read-only:** `SINCE_WHEN_READ_ONLY=1` turns off `POST /api/findings/<id>/status`, the only
   endpoint that writes. The Run button uses a SELECT-only user with presets only, 5 seconds and
   500 rows.

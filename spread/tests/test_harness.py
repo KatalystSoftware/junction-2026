@@ -1115,3 +1115,8 @@ def test_bud_b_x720_plays_m41u_a_at_720_to_759_drivers_and_bud_b_elsewhere():
         assert desk("m41u-a-bud-b-x720", n) == (None, desk("m41u-a", n)[1]), n
     for n in (700, 719, 760, 819, 820, 900):
         assert desk("m41u-a-bud-b-x720", n) == desk("m41u-a-bud-b", n) and desk("m41u-a-bud-b", n)[0], n
+    budget = VARIANTS["m41u-a-bud-b"]["budget"]
+    for n in (720, 759):  # the same on m41u-b
+        assert desk("m41u-b-bud-b-x720", n) == (None, desk("m41u-b", n)[1]), n
+    for n in (700, 719, 760, 819, 820, 900):
+        assert desk("m41u-b-bud-b-x720", n) == ({k: v for k, v in budget.items()}, desk("m41u-b", n)[1]), n

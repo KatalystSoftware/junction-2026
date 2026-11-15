@@ -64,6 +64,8 @@ export type Brief = {
   id: string
   name: string
   website: string | null
+  /** its Finnish business ID (Y-tunnus) and registered name, from the trade register; null when none was found */
+  business_id?: { value: string; name: string | null; source_url: string; found_on: string | null } | null
   in_espoo_data: boolean
   open_roles: number
   identity: Identity | null

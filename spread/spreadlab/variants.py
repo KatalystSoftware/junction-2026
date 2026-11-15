@@ -749,6 +749,11 @@ VARIANTS["m41v-d-km40-thin"] = {**_V_C, "thin_play": {"drivers": 760, "params": 
 _V_B = VARIANTS["m41v-b-late100-760"]
 VARIANTS["m41u-a"] = {**_V_B, "thin_play": {"drivers": 760, "params": {
     **{k: v for k, v in {**_V_B, **_V_B["when_tight"]}.items() if k != "when_tight"}, "pair_km": 40}, "version": thin_play.VERSION}}
+# If `late_cost` 100 at 760 to 819 is out too (`m41u-a` played `fresh-9678`, 801 drivers, under 90%): `m41u-b` is `m41v-a` with
+# the same thin play under 760, so a week of 760 drivers or more plays `trackb-merge-4.1` exactly.
+_V_A = VARIANTS["m41v-a"]
+VARIANTS["m41u-b"] = {**_V_A, "thin_play": {"drivers": 760, "params": {
+    **{k: v for k, v in {**_V_A, **_V_A["when_tight"]}.items() if k != "when_tight"}, "pair_km": 40}, "version": thin_play.VERSION}}
 # The on-time budget (budget.py) on `m41u-a`: the late cost by how far the week's projected on-time share is above 90%, in z of
 # its spread. `-unit` holds the multiple at 1 and must play `m41u-a` to the cent. The waiting-car charge stays.
 _BUD = {"floor": 0.90, "z_lo": 2, "z_hi": 5, "lo": 0.5, "hi": 1.5, "sd_by": 2, "drivers": 0, "version": budget.VERSION}
@@ -760,3 +765,6 @@ for _name, _rule in {"unit": {"lo": 1, "hi": 1}, "a": {}, "b": {"hi": 1}, "c": {
     VARIANTS[f"m41u-a-bud-{_name}"] = {**VARIANTS["m41u-a"], "budget": {**_BUD, **_rule}}
 # `m41u-a-bud-b` with the budget off at 720-759 drivers, the one band it lost on both halves: `m41u-a` there, `bud-b` elsewhere.
 VARIANTS["m41u-a-bud-b-x720"] = {**VARIANTS["m41u-a-bud-b"], "budget_off": {"drivers": [720, 760], "version": budget_band.VERSION}}
+# `m41u-b-bud-b-x720`: bud-b's budget, off at 720-759, on `m41u-b`. At 760-819 it scales 4.1's late_cost 150 as it scales m41u-a's 100.
+VARIANTS["m41u-b-bud-b-x720"] = {**VARIANTS["m41u-b"], "budget": VARIANTS["m41u-a-bud-b"]["budget"],
+                                 "budget_off": VARIANTS["m41u-a-bud-b-x720"]["budget_off"]}
