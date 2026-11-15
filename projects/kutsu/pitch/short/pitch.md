@@ -19,7 +19,7 @@ people.
 Espoo's organisers name three things a good match needs: skill, motivation and fit. Skill is the
 easy one now: AI writes the CV, AI reads it, and it can match the skills in a CV or a LinkedIn
 profile to a role. What it can't find is why someone wants the job and whether they fit the team.
-Those show in ten minutes face to face. So meeting in person is worth more than ever.
+Those show in minutes face to face. So meeting in person is worth more than ever.
 
 **3. Matching is hard, because it takes people connecting.**
 Matching by CV skills is easy now. Real matching, on motivation and fit, needs the right people in
