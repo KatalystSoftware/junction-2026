@@ -1,5 +1,6 @@
 <script lang="ts">
   import Icon from './Icon.svelte'
+  import { logoSrc } from './logo'
   import { app } from './state.svelte'
   import type { Step } from './types'
 
@@ -42,7 +43,7 @@
 
 <section class="research">
   <div class="plate" class:dark={identity?.logo_on === 'dark'}>
-    {#if typeof identity?.logo === 'string'}<img src={identity.logo} alt="" />{/if}
+    {#if typeof identity?.logo === 'string'}<img src={logoSrc(identity.logo, 512)} alt="" />{/if}
   </div>
   <div class="body">
     <h1>{say(identity?.name) || run.query}</h1>

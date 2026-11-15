@@ -20,6 +20,8 @@ npm --prefix ui ci --no-audit --no-fund >/dev/null
 npm --prefix ui run check
 npm --prefix ui run build >/dev/null
 "${SSH[@]}" "$HOST" "id talentbrief >/dev/null 2>&1 || useradd --system --home $DIR --shell /usr/sbin/nologin talentbrief; mkdir -p $DIR/ui; rm -f $DIR/index.html"
+# vipsthumbnail shrinks the company logos serve.py hands out from logo-cache/ (it starts without it and serves the originals)
+"${SSH[@]}" "$HOST" "command -v vipsthumbnail >/dev/null || { apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends libvips-tools >/dev/null; }"
 rsync -az -e "${SSH[*]}" \
   lib.py signals.py registry.py seeds.py serve.py monitors.py person.py presets.json pool.json applications.json companies.json roles.json "$HOST:$DIR/"
 # The request cache is not in git, so a checkout may not have it. What is here is added to the server's copy; nothing

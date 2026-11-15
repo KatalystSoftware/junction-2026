@@ -260,7 +260,11 @@ proxy's Docker network (`172.19.0.1`), so the shared proxy is the only way in: i
 `https://kutsu.katalyst.fyi/` (`infra/verda/proxy/sites/kutsu.caddy`), and the machine's public address
 does not answer on 8046.
 `sops exec-env ../../secrets/secrets.yaml ./deploy.sh` (with our keys and SSH access) builds the page, puts the current code and cache
-there and restarts it. Whatever spends our credits is capped per restart and shares one limit of four at
+there and restarts it. Company logos come from the server too (`/logo`), never from Context.dev's
+image server in the visitor's browser: each is fetched once from media.brand.dev, shrunk by `vipsthumbnail`
+(deploy.sh installs `libvips-tools`) to a 128 px tile or a 512 px plate, kept in `logo-cache/` and cached by
+the browser for a year. The known companies' logos are fetched at start, and a failure redirects to the
+original. On the home page that is 109 KB of logos instead of 1.1 MB. Whatever spends our credits is capped per restart and shares one limit of four at
 a time: live searches for companies not asked before (300), role drafts (150) and profile reads (60).
 
 ## Context.dev endpoints: what each gives Kutsu and where you see it

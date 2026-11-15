@@ -9,3 +9,5 @@ __pycache__/
 ui/node_modules/
 ui/dist/
 reviews.json
+# company logos fetched and shrunk by serve.py
+logo-cache/

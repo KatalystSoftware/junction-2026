@@ -460,8 +460,8 @@
                   sent), which keeps none of it: no file, no log. An
                   address is read by Context.dev, a service that fetches public pages; a LinkedIn profile comes from its own record of it. The text, all of it, then goes to
                   a language model run by Anthropic, which writes the lines. So give only what you want read, and only pages about you. Those two companies receive it, and
-                  this demo cannot make them delete it. Your draft lives in this browser tab and is gone when you close it. Employer logos later on are loaded from
-                  Context.dev's image server (media.brand.dev).
+                  this demo cannot make them delete it. Your draft lives in this browser tab and is gone when you close it. Employer logos come from this site's server,
+                  which keeps its own copies of Context.dev's; only if one cannot be fetched does your browser load it from Context.dev's image server (media.brand.dev).
                 </p>
               {/if}
               {#if !m.sample && !reading}

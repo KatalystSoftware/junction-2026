@@ -11,6 +11,7 @@ POST /role?id=<brief id>                    drafts a whole need from the one lin
 POST /person                                a person's profile from their LinkedIn, a page of theirs or the text of a CV
 DELETE /reviews                             takes out every sign-up (the demo's reset)
 GET  /unlock                                204 when the x-kutsu-key header holds the demo key, or no key is set
+GET  /logo?u=<media.brand.dev url>&w=128|512 that logo shrunk to fit w px and kept in logo-cache/, see `logo`
 
 Without keys the page still shows every brief already in signals.json, and anything in api-cache/
 still answers.
@@ -28,14 +29,18 @@ as before and is not saved. Without KUTSU_KEY, on a laptop, every write is open.
 import collections
 import hashlib
 import hmac
+import http.client
 import http.server
 import json
 import os
 import re
+import shutil
+import subprocess
 import sys
 import threading
 import time
 import urllib.parse
+import urllib.request
 
 import lib
 import monitors
@@ -56,7 +61,7 @@ PITCH = lib.HERE / "pitch" if (lib.HERE / "pitch").is_dir() else None
 REVIEWS = lib.HERE / "reviews.json"
 DATA = {"/signals.json": "signals.json", "/presets.json": "presets.json", "/pool.json": "pool.json", "/applications.json": "applications.json"}
 TYPES = {".html": "text/html; charset=utf-8", ".js": "text/javascript", ".css": "text/css", ".json": "application/json",
-         ".svg": "image/svg+xml", ".woff2": "font/woff2", ".png": "image/png", ".jpg": "image/jpeg", ".pdf": "application/pdf", ".ico": "image/x-icon", ".md": "text/markdown; charset=utf-8"}
+         ".svg": "image/svg+xml", ".woff2": "font/woff2", ".png": "image/png", ".jpg": "image/jpeg", ".webp": "image/webp", ".gif": "image/gif", ".pdf": "application/pdf", ".ico": "image/x-icon", ".md": "text/markdown; charset=utf-8"}
 STATUSES = {"draft", "invited", "joined"}
 # What a saved sign-up holds. Raise it whenever that changes: a file saved in another shape is set aside
 # at start, never read, because the page keys its lists by what is in it and must not meet an old one.
@@ -76,6 +81,16 @@ read_before = collections.OrderedDict()
 watching = threading.Lock()
 watch = {"read": 0.0, "seen": {"watched": {}, "changes": [], "checked_at": ""}}
 progress = {}  # query -> the steps its research has taken
+# Company logos, served from here instead of each visitor loading Context.dev's originals (up to 280 KB each, the
+# icons alone 1.8 MB for the known companies). Each is fetched once, shrunk by vipsthumbnail (apt: libvips-tools;
+# it also draws SVGs) to fit a 128 px square, a list tile at 2x, or 512 px, a company's plate at 2x, and kept on
+# disk. Without vipsthumbnail, or when its result is no smaller, the original is kept and served instead.
+LOGOS = lib.HERE / "logo-cache"
+LOGO_SIZES = {"128", "512"}
+LOGO_TYPES = {"image/webp": ".webp", "image/png": ".png", "image/jpeg": ".jpg", "image/gif": ".gif",
+              "image/svg+xml": ".svg", "image/x-icon": ".ico", "image/vnd.microsoft.icon": ".ico"}
+VIPS = shutil.which("vipsthumbnail")
+fetching_logos = threading.BoundedSemaphore(4)
 
 
 def reviews():
@@ -146,6 +161,71 @@ def read_changes():
         watch["seen"] = seen
 
 
+def logo_allowed(url):
+    """Only Context.dev's own image hosts, so /logo is no open proxy."""
+    parts = urllib.parse.urlsplit(url)
+    host = parts.hostname or ""
+    return (parts.scheme == "https" and parts.port is None and not parts.username
+            and (host == "media.brand.dev" or host == "context.dev" or host.endswith(".context.dev")))
+
+
+def logo(url, width):
+    """The kept file for this logo at this size: from logo-cache/, or fetched, shrunk and kept now. Raises on any failure."""
+    key = hashlib.sha256(f"{url}|{width}".encode()).hexdigest()[:32]
+    for ext in set(LOGO_TYPES.values()):
+        if (LOGOS / f"{key}{ext}").is_file():
+            return LOGOS / f"{key}{ext}"
+    if not fetching_logos.acquire(blocking=False):
+        raise RuntimeError("busy")
+    try:
+        with urllib.request.urlopen(urllib.request.Request(url, headers={"user-agent": "kutsu"}), timeout=10) as r:
+            if not logo_allowed(r.url):  # redirected off their hosts
+                raise ValueError(f"redirected to {r.url}")
+            ext = LOGO_TYPES.get(r.headers.get_content_type())
+            body = r.read(5_000_001)
+        if not ext or not body or len(body) > 5_000_000:
+            raise ValueError(f"not a logo: {url}")
+        LOGOS.mkdir(exist_ok=True)
+        original = LOGOS / f"{key}.part-in{ext}"
+        original.write_bytes(body)
+        kept = original
+        if VIPS:
+            small = LOGOS / f"{key}.part-out.webp"
+            try:
+                subprocess.run([VIPS, str(original), "--size", f"{width}x{width}>", "-o", f"{small}[Q=85,keep=none]"],
+                               check=True, timeout=20, capture_output=True)
+                if 0 < small.stat().st_size < len(body):
+                    kept = small
+            except (OSError, subprocess.SubprocessError) as error:  # an image vips cannot read: the original serves
+                print(f"logo: vipsthumbnail failed for {url}: {type(error).__name__}", file=sys.stderr)
+        final = LOGOS / f"{key}{kept.suffix}"
+        os.replace(kept, final)
+        for part in LOGOS.glob(f"{key}.part*"):
+            part.unlink(missing_ok=True)
+        return final
+    finally:
+        fetching_logos.release()
+
+
+def warm_logos():
+    """Every known company's icon and logo at the sizes the page asks for, so the first visitor waits for none."""
+    briefs = json.loads(signals.OUT.read_text())
+    wanted = {(b["identity"].get(k), w) for b in briefs if b.get("identity") for k, w in (("icon", "128"), ("logo", "512"))}
+    failed = 0
+    for url, width in sorted((u, w) for u, w in wanted if u and logo_allowed(u)):
+        for _ in range(3):  # a visitor's own logo may hold one of the four slots: wait, then try again
+            try:
+                logo(url, width)
+                break
+            except RuntimeError:
+                time.sleep(1)
+            except (OSError, ValueError, http.client.HTTPException) as error:
+                print(f"logo: {url}: {error}", file=sys.stderr)
+                failed += 1
+                break
+    print(f"logos: {len(wanted)} warmed, {failed} failed, shrunk by {VIPS or 'nothing (no vipsthumbnail)'}", file=sys.stderr)
+
+
 def well_formed(review):
     """A sign-up the page can show: a known status, and needs that each carry their own id and a title."""
     needs = review.get("needs")
@@ -190,6 +270,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
             return self.reply(204, b"", "text/plain") if self.organiser() else self.text(403, "That is not the demo key.")
         if url.path == "/changes.json":
             return self.json(changes())
+        if url.path == "/logo":
+            return self.logo(urllib.parse.parse_qs(url.query))
         if url.path in DATA:
             return self.reply(200, (lib.HERE / DATA[url.path]).read_bytes(), "application/json")
         if url.path == "/progress":
@@ -223,6 +305,33 @@ class Handler(http.server.BaseHTTPRequestHandler):
         if not re.fullmatch(r"index\.html|favicon\.svg|assets/[\w.-]+", name) or not path.is_file():
             return self.text(404, "not found")
         self.reply(200, path.read_bytes(), TYPES.get(path.suffix, "application/octet-stream"))
+
+    def logo(self, query):
+        """A logo from logo-cache/, cached a year by the browser. On any failure, a redirect to the original, so the
+        page shows it as before. The answer may be an SVG from a company's site: the sandbox keeps any script in it
+        from running at this address when it is opened on its own."""
+        url, width = query.get("u", [""])[0], query.get("w", ["128"])[0]
+        if not logo_allowed(url) or width not in LOGO_SIZES:
+            return self.text(400, "Only a logo on media.brand.dev, at w=128 or w=512.")
+        try:
+            path = logo(url, width)
+            body = path.read_bytes()
+        except (OSError, ValueError, RuntimeError, http.client.HTTPException) as error:
+            print(f"logo: {url}: {error}", file=sys.stderr)
+            self.send_response(302)
+            self.send_header("location", url)
+            self.send_header("cache-control", "no-store")
+            self.send_header("content-length", "0")
+            self.end_headers()
+            return
+        self.send_response(200)
+        self.send_header("content-type", TYPES.get(path.suffix, "application/octet-stream"))
+        self.send_header("content-length", str(len(body)))
+        self.send_header("cache-control", "public, max-age=31536000, immutable")
+        self.send_header("content-security-policy", "default-src 'none'; style-src 'unsafe-inline'; sandbox")
+        self.send_header("x-content-type-options", "nosniff")
+        self.end_headers()
+        self.wfile.write(body)
 
     def research(self, q):
         new = q.lower() not in asked
@@ -347,5 +456,6 @@ class Handler(http.server.BaseHTTPRequestHandler):
 if __name__ == "__main__":
     reviews()  # sets a file of another shape aside now, at start, and says so
     changes()  # the first visitor gets the monitors' answer, not an empty one
+    threading.Thread(target=warm_logos, daemon=True).start()
     print(f"http://{HOST}:{PORT}", file=sys.stderr)
     http.server.ThreadingHTTPServer((HOST, PORT), Handler).serve_forever()
