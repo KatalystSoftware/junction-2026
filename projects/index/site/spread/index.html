@@ -117,6 +117,7 @@
 <!-- 3 -->
 <section data-cuts="5 7 9 10 11" class="slide" aria-label="The formula">
 	<p class="kick in"><span class="no"></span>The desk</p>
+	<p class="nerd only-11 in" style="--d:1"><b>For the technical jury</b>Engine room. Peer reviewers may admire the maths from a safe distance.</p>
 	<h2 class="h in" style="--d:1">One formula makes every quote, and a car likely to be late costs more</h2>
 	<div class="body">
 		<div class="formula in" style="--d:2">
@@ -144,9 +145,10 @@
 <!-- jury: one idea a slide -->
 <section data-cuts="11" class="slide" aria-label="The simulator">
 	<p class="kick in"><span class="no"></span>The simulator</p>
-	<h2 class="h in" style="--d:1">We built a world to test ideas in, and trusted it only where it earned it</h2>
+	<p class="nerd only-11 in" style="--d:1"><b>For the technical jury</b>Under the hood. Peer reviewers: we built a pretend Finland. Skip ahead freely.</p>
+	<h2 class="h in" style="--d:1">Play was the bottleneck, so we built our own digital twin of Bahn's world: the simulator</h2>
 	<div class="body uses iwe">
-		<div class="in" style="--d:2"><p class="lab">Why we built it</p><b class="big cyan">8</b><p class="sm"><b>practice worlds per team key</b>: too few weeks to test ideas. A recorded week can be replayed, but it can't say how dealers and drivers answer a different price.</p></div>
+		<div class="in" style="--d:2"><p class="lab">The bottleneck</p><b class="big cyan">8</b><p class="sm"><b>practice worlds per team key</b>: too few weeks to test ideas. A recorded week can be replayed, but it can't say how dealers and drivers answer a different price.</p></div>
 		<div class="in" style="--d:3"><p class="lab">Checked against our recorded weeks</p><b class="big cyan">43 of 46</b><p class="sm"><b>pairs play could decide came out the same way</b> on natural worlds, and gain sizes correlate with play at 0.96 to 0.97. On thin worlds only 0.37.</p></div>
 		<div class="in" style="--d:4"><p class="lab">Where it was wrong</p><b class="big cyan">9 of 9</b><p class="sm"><b>played steps called the right way</b> after the fixes of 14 November, up from 6 of 9. Before, it read fee holds and repriced late costs backwards.</p></div>
 		<p class="sm iwe-foot in" style="--d:5"><b>The rule it gave us:</b> a failing simulator run is trusted. A passing one is only a reason to play the part on real weeks, paired seed by seed with the version without it. A part stays only if it wins there and no week falls under 90% on time.</p>
@@ -197,6 +199,7 @@
 <!-- 6 -->
 <section data-cuts="5 7 9 10 11" class="slide" aria-label="CRACI speed" data-race>
 	<p class="kick cyan in"><span class="no"></span>CRACI as the farm</p>
+	<p class="nerd only-11 in" style="--d:1"><b>For the technical jury</b>Engine room. Peer reviewers, the short version is: fast.</p>
 	<h2 class="h in" style="--d:1">One CRACI runner played 1,442 stand-in weeks in 4 min 41 s</h2>
 	<div class="body race">
 		<div class="lane in" style="--d:2">
@@ -206,6 +209,7 @@
 		<div class="r-foot in" style="--d:3">
 			<p class="sm"><b id="r-clock">0:00</b> of 4:41 &nbsp;<button class="ghost" id="r-again" type="button">Play again</button></p>
 			<p class="sm"><b>Saturday 21:33 the idea, 23:26 a joint search on 16 runners: 1 h 53 min.</b> A stand-in week takes 3 to 6 CPU-seconds, 97% of them in our own desk code, and every week is independent: the work needs cores and nothing else.</p>
+			<p class="sm only-11 r-late"><b class="cyan">Later that night: 412 weeks in 32 s of play</b>, about 13 weeks a second against about 5 above, once the farm played faster copies of the desk's note reader, pair search and waiting-car count that make the same decisions on every saved week. One idea against the base: about 65 s from asking to the answer.</p>
 		</div>
 	</div>
 </section>
@@ -254,6 +258,7 @@
 <!-- 9 -->
 <section data-cuts="10 11" class="slide" aria-label="The overnight loop">
 	<p class="kick in"><span class="no"></span>The overnight loop</p>
+	<p class="nerd only-11 in" style="--d:1"><b>For the technical jury</b>Plumbing. Peer reviewers: it fixes itself, so you can skip it too.</p>
 	<h2 class="h in" style="--d:1">A merge queue and a minute loop decide every part on played weeks</h2>
 	<div class="body">
 		<div class="flow in" style="--d:2;--n:5">
@@ -333,6 +338,7 @@
 
 <section data-cuts="11" class="slide" aria-label="The number of drivers">
 	<p class="kick in"><span class="no"></span>The number of drivers</p>
+	<p class="nerd only-11 in" style="--d:1"><b>For the technical jury</b>Fine print. Peer reviewers: fewer drivers, stricter rules. That's the slide.</p>
 	<h2 class="h in" style="--d:1">The week's rules are chosen from the number of drivers, before the first quote</h2>
 	<div class="body uses iwe">
 		<div class="in" style="--d:2"><p class="lab">What the desk does</p><p class="sm">It reads the driver list first. Under 760 drivers it counts every won car still without a driver, and caps any day at 62 won orders to deliver.</p></div>
@@ -343,6 +349,7 @@
 
 <section data-cuts="11" class="slide" aria-label="The newest, and least certain">
 	<p class="kick in"><span class="no"></span>The newest, and least certain</p>
+	<p class="nerd only-11 in" style="--d:1"><b>For the technical jury</b>Fine print. Peer reviewers: we're not sure either, and we say so.</p>
 	<h2 class="h in" style="--d:1">An on-time budget: the final's newest part, and the one we're least sure of</h2>
 	<div class="body uses iwe">
 		<div class="in" style="--d:2"><p class="lab">What the desk does</p><p class="sm">Under 720 drivers and from 820 up, it projects the week's final on-time share at each quote, from the orders already late plus the open orders at their fitted late rates. While that is safely over 90%, it lowers the late cost in the quote, to as little as 0.5 ×.</p></div>
@@ -1604,6 +1611,32 @@
 		font-size: calc(2.2 * var(--k));
 		font-weight: 800;
 		text-align: right;
+	}
+	.nerd {
+		position: absolute;
+		top: calc(4.4 * var(--k));
+		right: calc(5 * var(--k));
+		max-width: 26ch;
+		padding: calc(0.8 * var(--k)) calc(1.2 * var(--k));
+		border: 1px dashed var(--line);
+		border-radius: calc(0.8 * var(--k));
+		font-size: max(9px, calc(1.15 * var(--k)));
+		line-height: 1.4;
+		color: var(--dim);
+		font-style: italic;
+		rotate: 1.5deg;
+	}
+	.nerd b {
+		display: block;
+		font-style: normal;
+		font-size: 0.85em;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--cyan);
+		margin-bottom: 0.2em;
+	}
+	.r-late {
+		grid-column: 1 / -1;
 	}
 	.iwe-foot {
 		grid-column: 1 / -1;
