@@ -4,17 +4,17 @@ What team Katalyst built at Junction 2026 (13-15 November 2026, Espoo). Every pr
 written by AI agents, directed by the team: the agents wrote the code, tests, documentation and
 commits; the team chose the problems, set the direction and reviewed the results.
 
-All our projects, with a link to try each: <https://katalyst.fyi/>.
+All our projects, with a link to try each: <https://katalyst.fyi/>. All the videos: [one Drive folder](https://drive.google.com/drive/folders/1ZvjuwvxUiQuxcSLc5QU5W5LgKgM31Kpz).
 
 ## Our entries
 
 Each entry's README says what it is, how to run it with one command, and how to test it.
 
-### [OnCallBench](projects/oncallbench/README.md): an on-call shift that AI agents still lose money on
+### <img src="projects/index/site/logos/oncallbench.svg" width="32" height="32" alt=""> [OnCallBench](projects/oncallbench/README.md): an on-call shift that AI agents still lose money on
 
-For AfterQuery's **Break the Agent**. [Watch the replay](https://incident.katalyst.fyi/).
+For AfterQuery's **Break the Agent**. ▶ [Video, 1:24](https://drive.google.com/file/d/1LLFac0BTz1-NQPbWwD01wSXNc8atQUeQ/view) · [Watch the replay](https://incident.katalyst.fyi/) · [Source](projects/oncallbench/README.md)
 
-[![OnCallBench replay: Claude Opus 5.5 rolls back geo-svc and sets off a retry storm; partner-api fails 55% of requests](projects/index/site/shots/incident.webp)](https://incident.katalyst.fyi/)
+[![OnCallBench replay: Claude Opus 5.5 rolls back geo-svc and sets off a retry storm; partner-api fails 55% of requests](https://storage.googleapis.com/katalyst-fyi-models/shots/oncallbench.gif)](https://incident.katalyst.fyi/?seed=200019&t=32&pause=key&zoom=1.1)
 
 An AI agent is paged into a 120-minute shift on a simulated online shop: 60 services, several faults
 at once, and every failed request costs revenue. Claude Opus 5.5 finds the causes, then loses on
@@ -24,11 +24,11 @@ every one through an unprotected rollback. Scored by replaying the agent's actio
 shift reruns the reference, both baselines and the agent. Gemma 4 26B-A4B, which we trained on it,
 went from 0.05 to 0.44: [statistically indistinguishable from Opus](projects/oncallbench/README.md#a-smaller-model-learns-from-it).
 
-### [Since When](projects/since-when/README.md): what three Wikipedias say differently, and since when
+### <img src="projects/index/site/logos/since-when.svg" width="32" height="32" alt=""> [Since When](projects/since-when/README.md): what three Wikipedias say differently, and since when
 
-For MariaDB's **Wikipedia Through Time**. [Open Since When](https://since-when.katalyst.fyi/).
+For MariaDB's **Wikipedia Through Time**. ▶ [Video, 1:16](https://drive.google.com/file/d/1K0Nr7LWR8XBzMgtPlUPCEZ1KFA06I424/view) · [Open Since When](https://since-when.katalyst.fyi/#/Q1412941) · [Source](projects/since-when/README.md)
 
-[![Since When: the Lapua Movement, called fascist in the first sentence of Swedish Wikipedia since 23 October 2026 and of English Wikipedia since 30 May 2022, not in Finnish](projects/index/site/shots/since-when.webp)](https://since-when.katalyst.fyi/)
+[![Since When: the Lapua Movement, called fascist in the first sentence of Swedish Wikipedia since 23 October 2026 and of English Wikipedia since 30 May 2022, not in Finnish](https://storage.googleapis.com/katalyst-fyi-models/shots/since-when.gif)](https://since-when.katalyst.fyi/#/Q1412941)
 
 Swedish Wikipedia began calling the Lapua Movement “fascist” on 23 October 2026, English in 2022;
 the Finnish first sentence still does not. For a topic, what the Finnish, Swedish and English articles say differently, and the edit each
@@ -36,13 +36,13 @@ difference began with. MariaDB 11.8 system-versioned tables keep every loaded ve
 statement pairs passages across editions by vector search as they stood on a past date. Every screen
 shows the SQL behind it, and you can run it.
 
-### [Kutsu](projects/kutsu/README.md): recruitment event invitations that arrive filled in
+### <img src="projects/index/site/logos/kutsu.svg" width="32" height="32" alt=""> [Kutsu](projects/kutsu/README.md): recruitment event invitations that arrive filled in
 
 For the City of Espoo's **Rethinking Recruitment** and Context.dev's **The Web Is Your Real-Time
-Database**. [See a company's invitation](https://kutsu.katalyst.fyi/#/join/nitor.com/deep-tech-talent-forum),
-or [Espoo's screen](https://kutsu.katalyst.fyi/).
+Database**.
+▶ Videos: [for Espoo, 0:41](https://drive.google.com/file/d/1cdSGMa33-0_t015rzm84aLsCupmzFP6o/view) · [for Context.dev, 0:43](https://drive.google.com/file/d/1AHWZPTAmzVQuI-QcckK_smcDKy68OEuO/view) · [A company's invitation](https://kutsu.katalyst.fyi/#/join/nitor.com/deep-tech-talent-forum) · [Espoo's screen](https://kutsu.katalyst.fyi/) · [Source](projects/kutsu/README.md)
 
-[![Kutsu: Nitor's invitation to an Espoo recruitment event, filled in from public sources, asking whom else it wants to meet](projects/index/site/shots/kutsu.webp)](https://kutsu.katalyst.fyi/#/join/nitor.com/deep-tech-talent-forum)
+[![Kutsu: Nitor's invitation to an Espoo recruitment event, filled in from public sources, asking whom else it wants to meet](https://storage.googleapis.com/katalyst-fyi-models/shots/kutsu.gif)](https://kutsu.katalyst.fyi/#/join/nitor.com/deep-tech-talent-forum)
 
 Each Espoo recruitment event starts with a new survey for companies and another for candidates, and
 each side waits for the other. Kutsu keeps who came and what employers said they need, and sends an
