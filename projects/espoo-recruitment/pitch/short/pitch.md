@@ -52,7 +52,11 @@ both pools and gives back to both.
 **7. More small events, more real conversations.**
 Connections get easier to make, and the time goes to them. Kutsu runs today on real public company
 data and synthetic people, with no scores and no automated decisions. Our ask: pilot it on a short
-series of small themed events, with Espoo's own past-attendee list and consent texts.
+series of small themed events, with Espoo's own past-attendee list and consent texts. And then,
+after a beat: "Connecting people".
+
+The closing line nods to the slogan of Nokia, which has its head office in Espoo. Say it lightly,
+without naming the company; the slide shows no logo or artwork.
 
 ## Where the numbers come from
 
