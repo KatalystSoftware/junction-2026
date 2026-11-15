@@ -18,6 +18,7 @@ Definitions for this table's calculations:
 import json
 import random
 import statistics as st
+import sys
 from pathlib import Path
 
 HERE = Path(__file__).parent
@@ -69,6 +70,32 @@ def row(label, harness, runs):
     return r
 
 
+def ends(runs):
+    """How the runs ended, from each run's signed receipt replayed in the simulator: by `finish`, by
+    reaching the end of the 120-minute shift, or before it (a timeout or the agent stopping
+    mid-incident); and how many fixed every fault the verifier counts (overloads are not counted,
+    tests/grade.py)."""
+    sys.path.insert(0, str(HERE / "sim"))
+    import incident
+    out = dict(runs=len(runs), all_faults_fixed=sum(m.get("faults_left") == 0 for m in runs),
+               finish=0, shift_end=0, mid_shift=0, mid_shift_minutes=[])
+    for m in runs:
+        receipt = HERE / "loop-evidence" / "receipts" / (m["trial"].replace("/", "__") + ".json")
+        actions = json.loads(receipt.read_text())["actions"]
+        if actions and actions[-1][0] == "finish":
+            out["finish"] += 1
+            continue
+        estate = incident.Estate(m["seed"], 4)
+        for tool, args in actions:
+            estate.call(tool, args)
+        if estate.now >= incident.HORIZON:
+            out["shift_end"] += 1
+        else:
+            out["mid_shift"] += 1
+            out["mid_shift_minutes"].append(estate.now)
+    return out
+
+
 def main():
     scripted = {r["seed"]: r for r in json.loads((HERE / "loop-evidence" / "common-scripted.json").read_text())}
     scripted_rows = []
@@ -87,6 +114,8 @@ def main():
         if not runs:
             continue
         r = row(LABELS.get(name, name), "Harbor + OpenCode", runs)
+        r["ends"] = ends([m for m in metrics if m["round"] == 16 and m["run"] == name
+                          and not m.get("failure", "").startswith("infrastructure") and m["seed"] in scripted])
         if r["seeds"] == len(SEEDS):
             model_rows.append(r)
         else:
@@ -108,6 +137,13 @@ def main():
     for r in partial:
         print(f"\nPartial, so not in the table: {r['label']}, {r['runs']} runs on {r['seeds']} of {len(SEEDS)} "
               f"seeds (mean {r['display']['mean']}, 95% CI {r['display']['ci95'][0]}-{r['display']['ci95'][1]}).")
+    print("\n| Agent | Every counted fault fixed | Ended by `finish` | Reached the shift's end | Stopped mid-shift |")
+    print("| --- | --- | --- | --- | --- |")
+    for r in model_rows:
+        e = r["ends"]
+        mid = f"{e['mid_shift']}" + (f" (minute {', '.join(map(str, sorted(e['mid_shift_minutes'])))})"
+                                      if e["mid_shift_minutes"] else "")
+        print(f"| {r['label']} | {e['all_faults_fixed']} of {e['runs']} | {e['finish']} | {e['shift_end']} | {mid} |")
 
 
 if __name__ == "__main__":
