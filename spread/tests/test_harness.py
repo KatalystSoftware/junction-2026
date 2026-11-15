@@ -1120,3 +1120,7 @@ def test_bud_b_x720_plays_m41u_a_at_720_to_759_drivers_and_bud_b_elsewhere():
         assert desk("m41u-b-bud-b-x720", n) == (None, desk("m41u-b", n)[1]), n
     for n in (700, 719, 760, 819, 820, 900):
         assert desk("m41u-b-bud-b-x720", n) == ({k: v for k, v in budget.items()}, desk("m41u-b", n)[1]), n
+    for n in (720, 759, 760, 819):  # x720-819: m41u-b at 720-819, the same as m41u-b-bud-b-x720 elsewhere
+        assert desk("m41u-b-bud-b-x720-819", n) == (None, desk("m41u-b", n)[1]), n
+    for n in (700, 719, 820, 900):
+        assert desk("m41u-b-bud-b-x720-819", n) == desk("m41u-b-bud-b-x720", n), n

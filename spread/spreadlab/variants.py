@@ -768,3 +768,5 @@ VARIANTS["m41u-a-bud-b-x720"] = {**VARIANTS["m41u-a-bud-b"], "budget_off": {"dri
 # `m41u-b-bud-b-x720`: bud-b's budget, off at 720-759, on `m41u-b`. At 760-819 it scales 4.1's late_cost 150 as it scales m41u-a's 100.
 VARIANTS["m41u-b-bud-b-x720"] = {**VARIANTS["m41u-b"], "budget": VARIANTS["m41u-a-bud-b"]["budget"],
                                  "budget_off": VARIANTS["m41u-a-bud-b-x720"]["budget_off"]}
+# `m41u-b-bud-b-x720-819`: the budget off at 720-819 as well: lowering late_cost there lost fresh-9678 in play, a week 4.1 held.
+VARIANTS["m41u-b-bud-b-x720-819"] = {**VARIANTS["m41u-b-bud-b-x720"], "budget_off": {**VARIANTS["m41u-b-bud-b-x720"]["budget_off"], "drivers": [720, 820]}}
