@@ -158,6 +158,52 @@
     "median": "0.00",
     "solve_rate": "0%",
     "worse_than_nothing": "90%"
+   },
+   "ends": {
+    "runs": 48,
+    "all_faults_fixed": 9,
+    "finish": 8,
+    "shift_end": 35,
+    "mid_shift": 5,
+    "mid_shift_minutes": [
+     116,
+     119,
+     119,
+     114,
+     117
+    ]
+   }
+  },
+  {
+   "label": "Gemma 4 26B-A4B + our SFT adapter alone (no RL)",
+   "harness": "Harbor + OpenCode",
+   "runs": 48,
+   "seeds": 24,
+   "mean": 0.3916645833333333,
+   "ci95": [
+    0.3215291666666667,
+    0.4661916666666666
+   ],
+   "median": 0.41185000000000005,
+   "solve_rate": 0.0,
+   "worse_than_nothing": 0.14583333333333334,
+   "display": {
+    "mean": "0.39",
+    "ci95": [
+     "0.32",
+     "0.47"
+    ],
+    "median": "0.41",
+    "solve_rate": "0%",
+    "worse_than_nothing": "15%"
+   },
+   "ends": {
+    "runs": 48,
+    "all_faults_fixed": 13,
+    "finish": 1,
+    "shift_end": 47,
+    "mid_shift": 0,
+    "mid_shift_minutes": []
    }
   },
   {
