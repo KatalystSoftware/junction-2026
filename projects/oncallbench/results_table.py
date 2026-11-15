@@ -56,11 +56,15 @@ def row(label, harness, runs):
         by_seed.setdefault(seed, []).append(score)
     scores = [r[1] for r in runs]
     lo, hi = bootstrap(by_seed)
-    return dict(label=label, harness=harness, runs=len(runs), seeds=len(by_seed),
-                mean=round(st.mean(scores), 3), ci95=[round(lo, 3), round(hi, 3)],
-                median=round(st.median(scores), 3),
-                solve_rate=round(sum(s >= SOLVED for s in scores) / len(scores), 3),
-                worse_than_nothing=round(sum(c > n + 1e-6 for _, _, c, n in runs) / len(runs), 3))
+    r = dict(label=label, harness=harness, runs=len(runs), seeds=len(by_seed),
+             mean=st.mean(scores), ci95=[lo, hi], median=st.median(scores),
+             solve_rate=sum(s >= SOLVED for s in scores) / len(scores),
+             worse_than_nothing=sum(c > n + 1e-6 for _, _, c, n in runs) / len(runs))
+    # Raw values above stay at full precision; display strings are rounded once, from the raw values.
+    r["display"] = dict(mean=f"{r['mean']:.2f}", ci95=[f"{lo:.2f}", f"{hi:.2f}"], median=f"{r['median']:.2f}",
+                        solve_rate=f"{100 * r['solve_rate']:.0f}%",
+                        worse_than_nothing=f"{100 * r['worse_than_nothing']:.0f}%")
+    return r
 
 
 def main():
@@ -84,7 +88,8 @@ def main():
         if r["seeds"] == len(SEEDS):
             model_rows.append(r)
         else:
-            partial.append(dict(label=r["label"], runs=r["runs"], seeds=r["seeds"], mean=r["mean"]))
+            partial.append(dict(label=r["label"], runs=r["runs"], seeds=r["seeds"], mean=r["mean"],
+                                ci95=r["ci95"], display=r["display"]))
 
     rows = [scripted_rows[0], *model_rows, *scripted_rows[1:]]
     out = dict(level=4, seeds="200000-200023", solved_threshold=SOLVED,
@@ -95,12 +100,12 @@ def main():
     print("| Agent | Harness | Runs / seeds | Mean (95% CI) | Median | Solve rate | Worse than doing nothing |")
     print("| --- | --- | --- | --- | --- | --- | --- |")
     for r in rows:
-        print(f"| {r['label']} | {r['harness']} | {r['runs']} / {r['seeds']} | {r['mean']:.2f} "
-              f"({r['ci95'][0]:.2f}-{r['ci95'][1]:.2f}) | {r['median']:.2f} | {100 * r['solve_rate']:.0f}% | "
-              f"{100 * r['worse_than_nothing']:.0f}% |")
+        d = r["display"]
+        print(f"| {r['label']} | {r['harness']} | {r['runs']} / {r['seeds']} | {d['mean']} "
+              f"({d['ci95'][0]}-{d['ci95'][1]}) | {d['median']} | {d['solve_rate']} | {d['worse_than_nothing']} |")
     for r in partial:
         print(f"\nPartial, so not in the table: {r['label']}, {r['runs']} runs on {r['seeds']} of {len(SEEDS)} "
-              f"seeds (mean {r['mean']:.2f}).")
+              f"seeds (mean {r['display']['mean']}, 95% CI {r['display']['ci95'][0]}-{r['display']['ci95'][1]}).")
 
 
 if __name__ == "__main__":

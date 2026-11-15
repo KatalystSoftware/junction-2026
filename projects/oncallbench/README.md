@@ -90,8 +90,8 @@ demo, tuning or training run used: the Gemma adapter was first evaluated there i
 | --- | --- | --- | --- | --- | --- | --- |
 | Reference (expert script) | scripted, replayed in the simulator | 24 / 24 | 1.00 (1.00-1.00) | 1.00 | 100% | 0% |
 | **Opus 5.5** | Harbor + OpenCode | 48 / 24 | **0.45 (0.35-0.54)** | 0.54 | 2% | 21% |
-| Gemma 4 26B-A4B, untrained | Harbor + OpenCode | 48 / 24 | 0.05 (0.03-0.07) | 0.00 | 0% | 38% |
-| Gemma 4 26B-A4B + our adapter (SFT, then RL on the score) | Harbor + OpenCode | 48 / 24 | 0.43 (0.35-0.53) | 0.45 | 4% | 17% |
+| Gemma 4 26B-A4B, untrained | Harbor + OpenCode | 48 / 24 | 0.05 (0.02-0.07) | 0.00 | 0% | 38% |
+| Gemma 4 26B-A4B + our adapter (SFT, then RL on the score) | Harbor + OpenCode | 48 / 24 | 0.44 (0.35-0.53) | 0.45 | 4% | 17% |
 | `shotgun` script: finds the cause, guesses the fix | scripted, replayed in the simulator | 24 / 24 | 0.47 (0.36-0.57) | 0.55 | 0% | 12% |
 | Do-nothing | scripted, replayed in the simulator | 24 / 24 | 0.00 (0.00-0.00) | 0.00 | 0% | 0% |
 
@@ -136,7 +136,7 @@ Gemma 4 26B-A4B with a LoRA adapter trained on OnCallBench (`rl/`): first on the
 (SFT), then by reinforcement learning on the score, with the checkpoint chosen by a rule fixed before
 any evaluation run (`rl/RESULTS.md`). Run the way Opus was, OpenCode in Harbor 0.25.0 against a
 local vLLM server, two runs on each common seed (table above): untrained it averages **0.05**; with
-the adapter **0.43 (0.35-0.53)**, about Opus 5.5's 0.45. Training on the environment took an open 26B
+the adapter **0.44 (0.35-0.53)**, about Opus 5.5's 0.45. Training on the environment took an open 26B
 model from near nothing to Opus's level in the judges' harness. Its scores in our own training
 runner (`rl/env.py`: a capped number of replies, a shorter context) are higher and not comparable
 with Harbor's; they stay in `rl/RESULTS.md`.

@@ -17,63 +17,113 @@
    ],
    "median": 1.0,
    "solve_rate": 1.0,
-   "worse_than_nothing": 0.0
+   "worse_than_nothing": 0.0,
+   "display": {
+    "mean": "1.00",
+    "ci95": [
+     "1.00",
+     "1.00"
+    ],
+    "median": "1.00",
+    "solve_rate": "100%",
+    "worse_than_nothing": "0%"
+   }
   },
   {
    "label": "Opus 5.5",
    "harness": "Harbor + OpenCode",
    "runs": 48,
    "seeds": 24,
-   "mean": 0.448,
+   "mean": 0.44796041666666664,
    "ci95": [
-    0.351,
-    0.542
+    0.3508145833333333,
+    0.5420625
    ],
-   "median": 0.54,
-   "solve_rate": 0.021,
-   "worse_than_nothing": 0.208
+   "median": 0.53955,
+   "solve_rate": 0.020833333333333332,
+   "worse_than_nothing": 0.20833333333333334,
+   "display": {
+    "mean": "0.45",
+    "ci95": [
+     "0.35",
+     "0.54"
+    ],
+    "median": "0.54",
+    "solve_rate": "2%",
+    "worse_than_nothing": "21%"
+   }
   },
   {
    "label": "Gemma 4 26B-A4B, untrained",
    "harness": "Harbor + OpenCode",
    "runs": 48,
    "seeds": 24,
-   "mean": 0.046,
+   "mean": 0.046316666666666666,
    "ci95": [
-    0.025,
-    0.071
+    0.024587499999999998,
+    0.07066875
    ],
-   "median": 0.001,
+   "median": 0.00125,
    "solve_rate": 0.0,
-   "worse_than_nothing": 0.375
+   "worse_than_nothing": 0.375,
+   "display": {
+    "mean": "0.05",
+    "ci95": [
+     "0.02",
+     "0.07"
+    ],
+    "median": "0.00",
+    "solve_rate": "0%",
+    "worse_than_nothing": "38%"
+   }
   },
   {
    "label": "Gemma 4 26B-A4B + our adapter (SFT, then RL on the score)",
    "harness": "Harbor + OpenCode",
    "runs": 48,
    "seeds": 24,
-   "mean": 0.435,
+   "mean": 0.43545416666666664,
    "ci95": [
-    0.346,
-    0.525
+    0.3462958333333333,
+    0.5254770833333333
    ],
-   "median": 0.445,
-   "solve_rate": 0.042,
-   "worse_than_nothing": 0.167
+   "median": 0.44535,
+   "solve_rate": 0.041666666666666664,
+   "worse_than_nothing": 0.16666666666666666,
+   "display": {
+    "mean": "0.44",
+    "ci95": [
+     "0.35",
+     "0.53"
+    ],
+    "median": "0.45",
+    "solve_rate": "4%",
+    "worse_than_nothing": "17%"
+   }
   },
   {
    "label": "`shotgun` script: finds the cause, guesses the fix",
    "harness": "scripted, replayed in the simulator",
    "runs": 24,
    "seeds": 24,
-   "mean": 0.469,
+   "mean": 0.46920833333333334,
    "ci95": [
-    0.359,
-    0.571
+    0.3585416666666667,
+    0.5707041666666667
    ],
-   "median": 0.551,
+   "median": 0.5511,
    "solve_rate": 0.0,
-   "worse_than_nothing": 0.125
+   "worse_than_nothing": 0.125,
+   "display": {
+    "mean": "0.47",
+    "ci95": [
+     "0.36",
+     "0.57"
+    ],
+    "median": "0.55",
+    "solve_rate": "0%",
+    "worse_than_nothing": "12%"
+   }
   },
   {
    "label": "Do-nothing",
@@ -87,7 +137,17 @@
    ],
    "median": 0.0,
    "solve_rate": 0.0,
-   "worse_than_nothing": 0.0
+   "worse_than_nothing": 0.0,
+   "display": {
+    "mean": "0.00",
+    "ci95": [
+     "0.00",
+     "0.00"
+    ],
+    "median": "0.00",
+    "solve_rate": "0%",
+    "worse_than_nothing": "0%"
+   }
   }
  ],
  "partial": [
@@ -95,7 +155,21 @@
    "label": "Fable 5.2",
    "runs": 13,
    "seeds": 13,
-   "mean": 0.876
+   "mean": 0.8758153846153846,
+   "ci95": [
+    0.8122230769230769,
+    0.9333538461538461
+   ],
+   "display": {
+    "mean": "0.88",
+    "ci95": [
+     "0.81",
+     "0.93"
+    ],
+    "median": "0.90",
+    "solve_rate": "31%",
+    "worse_than_nothing": "0%"
+   }
   }
  ]
 }

@@ -274,8 +274,8 @@ runs. Rows in `metrics.json` round 16; table in `results.json` (`results_table.p
 
 | Agent (Harbor + OpenCode) | Valid runs | Seeds with a run | Mean (95% CI, seed bootstrap) |
 | --- | --- | --- | --- |
-| Gemma 4 26B-A4B, untrained (`gemma-base`) | 48 | 24 of 24, two each | 0.05 (0.03-0.07) |
-| + our adapter, SFT then RL on the score (`gemma-ft`) | 48 | 24 of 24, two each | **0.43 (0.35-0.53)** |
+| Gemma 4 26B-A4B, untrained (`gemma-base`) | 48 | 24 of 24, two each | 0.05 (0.02-0.07) |
+| + our adapter, SFT then RL on the score (`gemma-ft`) | 48 | 24 of 24, two each | **0.44 (0.35-0.53)** |
 | Opus 5.5, for scale (`metrics.json` round 16) | 48 | 24 of 24, two each | 0.45 (0.35-0.54) |
 
 Per seed (run 1 / run 2):
