@@ -1083,3 +1083,21 @@ def test_the_m41v_rows_play_4_1_from_820_and_each_add_one_part():
         assert changed(desk("m41u-a", n), desk("m41v-d-km40-thin", n)) == {"pair_drive_drivers": 0}, n
     for n in (760, 819, 820, 900):
         assert desk("m41u-a", n) == desk("m41v-b-late100-760", n), n
+
+
+def test_the_on_time_budget_relaxes_a_banked_friday_and_not_a_week_near_90():
+    from spreadlab import budget
+    from spreadlab.variants import VARIANTS
+
+    def multiple(now: int, on_time: int, late: int, open_: int = 0) -> float:
+        desk = budget.Budget.__new__(budget.Budget)
+        desk.budget, desk.now, desk.booked, desk.leg_gigs = VARIANTS["m41u-a-bud-b"]["budget"], now, set(), {}
+        desk.orders = {f"R{i}": {"deadline": now + (-1 if i < late else 3000 if i >= on_time + late else 1), "deliveredAt": [None if i >= on_time + late else now]}
+                       for i in range(on_time + late + open_)}
+        desk.late = {f"R{i}" for i in range(late)}
+        return desk.budget_multiple()
+
+    friday = 4 * 1440 + 17 * 60
+    assert multiple(friday, on_time=340, late=0) == 0.5  # nothing can pull a banked week under 90% now
+    assert multiple(friday, on_time=305, late=34) == 1.0  # 90% on the dot: the full late cost
+    assert 0.5 < multiple(1440 + 10 * 60, on_time=60, late=1, open_=20) < 1.0  # Tuesday: most of the week is still to come
