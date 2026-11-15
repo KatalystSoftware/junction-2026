@@ -1039,7 +1039,8 @@ def test_the_m41w_rows_each_add_one_part_and_hyb_a_plays_4_1_from_820():
     wave = {"wave_from": 11, "wave_fee": 1.3}  # wave_days 1 is the default
     rows = [("m41w-b-late100-760", "m41w-a", {761: {"late_cost": 100}, 819: {"late_cost": 100}}),
             ("m41w-c-pd8-d760", "m41w-b-late100-760", {700: {"pair_drive_drivers": 760}, **{n: cap for n in (761, 819, 820, 900)}}),
-            ("m41w-d-w11-130-thin", "m41w-c-pd8-d760", {700: wave})]
+            ("m41w-d-w11-130-thin", "m41w-c-pd8-d760", {700: wave}),
+            ("m41w-e-km40-thin", "m41w-c-pd8-d760", {700: {"pair_km": 40}})]
     for row, below, part in rows:
         for n in (700, 761, 819, 820, 900):
             assert changed(desk(row, n), desk(below, n)) == part.get(n, {}), (row, n)

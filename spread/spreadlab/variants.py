@@ -727,3 +727,9 @@ def _hyb(row: dict) -> dict:
 
 
 VARIANTS["hyb-a"] = _hyb(VARIANTS["m41w-b-late100-760"])
+# Lane 2 A's `km40` on `m41w-c` (the wave part `m41w-d` is out): in a week under 760 drivers the two ends of a pair may lie 40 km
+# apart, not the 30 km notification distance (`pair_km`), through the thin play, since pairs don't read `when_tight`. A week of
+# 760 drivers or more plays `m41w-c` to the cent.
+_W_C = VARIANTS["m41w-c-pd8-d760"]
+VARIANTS["m41w-e-km40-thin"] = {**_W_C, "thin_play": {"drivers": 760, "params": {
+    **{k: v for k, v in {**_W_C, **_W_C["when_tight"]}.items() if k != "when_tight"}, "pair_km": 40}, "version": thin_play.VERSION}}
