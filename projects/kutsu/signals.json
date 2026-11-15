@@ -289,6 +289,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0044,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "2324099-8",
+   "name": "2NS Cybersecurity Oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?location=Espoo&mainBusinessLine=62900&page=1",
+   "found_on": null,
+   "retrieved_at": "2026-11-14T01:54:41Z",
+   "kind": "registry"
   }
  },
  {
@@ -639,6 +647,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0054,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "2228357-4",
+   "name": "Aalto-korkeakoulusäätiö sr",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?name=Aalto-korkeakoulus%C3%A4%C3%A4ti%C3%B6%20sr",
+   "found_on": null,
+   "retrieved_at": "2026-11-14T02:07:49Z",
+   "kind": "registry"
   }
  },
  {
@@ -932,7 +948,8 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0046,
    "context_credits": 11
-  }
+  },
+  "business_id": null
  },
  {
   "id": "2545782-4",
@@ -1283,6 +1300,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0043,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "2545782-4",
+   "name": "AddSearch Oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?location=Espoo&mainBusinessLine=62100&page=5",
+   "found_on": null,
+   "retrieved_at": "2026-11-14T02:12:05Z",
+   "kind": "registry"
   }
  },
  {
@@ -1544,6 +1569,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0045,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "0620465-3",
+   "name": "Alaris Cojot OY",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?location=Espoo&mainBusinessLine=26300&page=1",
+   "found_on": null,
+   "retrieved_at": "2026-11-14T01:55:00Z",
+   "kind": "registry"
   }
  },
  {
@@ -1795,6 +1828,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0044,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "3333314-3",
+   "name": "Amertat Energy Oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?businessId=3333314-3",
+   "found_on": "https://amertate.com/privacy-policy",
+   "retrieved_at": "2026-11-15T02:16:18Z",
+   "kind": "registry"
   }
  },
  {
@@ -2131,6 +2172,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0045,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "2452253-2",
+   "name": "Appmore Oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?location=Espoo&mainBusinessLine=62100&page=4",
+   "found_on": null,
+   "retrieved_at": "2026-11-14T02:12:01Z",
+   "kind": "registry"
   }
  },
  {
@@ -2453,6 +2502,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0043,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "3256873-3",
+   "name": "atNorth Oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?location=Espoo&mainBusinessLine=63100&page=1",
+   "found_on": null,
+   "retrieved_at": "2026-11-14T01:54:44Z",
+   "kind": "registry"
   }
  },
  {
@@ -2656,6 +2713,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0033,
    "context_credits": 10
+  },
+  "business_id": {
+   "value": "3375817-6",
+   "name": "Aveksana Oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?name=Aveksana",
+   "found_on": null,
+   "retrieved_at": "2026-11-15T02:16:19Z",
+   "kind": "registry"
   }
  },
  {
@@ -2989,6 +3054,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0044,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "0592542-4",
+   "name": "Basware Oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?name=Basware%20Oy",
+   "found_on": null,
+   "retrieved_at": "2026-11-14T02:07:19Z",
+   "kind": "registry"
   }
  },
  {
@@ -3250,6 +3323,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0042,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "3229720-8",
+   "name": "Beneq Oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?name=Beneq%20Oy",
+   "found_on": null,
+   "retrieved_at": "2026-11-14T02:08:11Z",
+   "kind": "registry"
   }
  },
  {
@@ -3303,7 +3384,8 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0024,
    "context_credits": 10
-  }
+  },
+  "business_id": null
  },
  {
   "id": "chipmetrics.com",
@@ -3578,6 +3660,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.004,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "3101031-6",
+   "name": "Chipmetrics Oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?name=Chipmetrics",
+   "found_on": null,
+   "retrieved_at": "2026-11-15T02:16:24Z",
+   "kind": "registry"
   }
  },
  {
@@ -3843,6 +3933,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.004,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "2365948-1",
+   "name": "Companial Oy Ab",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?location=Espoo&mainBusinessLine=62200&page=2",
+   "found_on": null,
+   "retrieved_at": "2026-11-14T02:12:55Z",
+   "kind": "registry"
   }
  },
  {
@@ -4200,6 +4298,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0053,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "0920632-0",
+   "name": "CSC-Tieteen tietotekniikan keskus Oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?name=CSC-Tieteen%20tietotekniikan%20keskus%20Oy",
+   "found_on": null,
+   "retrieved_at": "2026-11-14T02:07:52Z",
+   "kind": "registry"
   }
  },
  {
@@ -4521,6 +4627,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0043,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "2092227-2",
+   "name": "Dream Broker Oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?location=Espoo&mainBusinessLine=62100&page=3",
+   "found_on": null,
+   "retrieved_at": "2026-11-14T02:11:58Z",
+   "kind": "registry"
   }
  },
  {
@@ -4820,6 +4934,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0031,
    "context_credits": 10
+  },
+  "business_id": {
+   "value": "2849688-8",
+   "name": "ElFys Oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?name=ElFys",
+   "found_on": null,
+   "retrieved_at": "2026-11-15T02:16:26Z",
+   "kind": "registry"
   }
  },
  {
@@ -5152,6 +5274,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0051,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "0545456-2",
+   "name": "Etteplan Oyj",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?name=Etteplan%20Oyj",
+   "found_on": null,
+   "retrieved_at": "2026-11-14T02:08:45Z",
+   "kind": "registry"
   }
  },
  {
@@ -5325,6 +5455,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0037,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "2913101-2",
+   "name": "Finders Seekers Oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?name=Finders%20Seekers",
+   "found_on": null,
+   "retrieved_at": "2026-11-15T02:16:28Z",
+   "kind": "registry"
   }
  },
  {
@@ -5676,6 +5814,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.004,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "2239350-3",
+   "name": "Finnplay Technologies Oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?location=Espoo&mainBusinessLine=62100&page=4",
+   "found_on": null,
+   "retrieved_at": "2026-11-14T02:12:01Z",
+   "kind": "registry"
   }
  },
  {
@@ -6026,6 +6172,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0049,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "0214036-5",
+   "name": "Fiskars Oyj Abp",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?name=Fiskars%20Oyj%20Abp",
+   "found_on": null,
+   "retrieved_at": "2026-11-14T02:08:15Z",
+   "kind": "registry"
   }
  },
  {
@@ -6366,6 +6520,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0045,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "0648086-9",
+   "name": "Frends Technology Oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?location=Espoo&mainBusinessLine=62100&page=1",
+   "found_on": null,
+   "retrieved_at": "2026-11-14T01:48:21Z",
+   "kind": "registry"
   }
  },
  {
@@ -6697,6 +6859,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0048,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "1710128-9",
+   "name": "Gofore Oyj",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?name=Gofore%20Oyj",
+   "found_on": null,
+   "retrieved_at": "2026-11-14T02:10:00Z",
+   "kind": "registry"
   }
  },
  {
@@ -6956,6 +7126,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0042,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "3203847-6",
+   "name": "Hamina Wireless Oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?businessId=3203847-6",
+   "found_on": "https://hamina.com/contact",
+   "retrieved_at": "2026-11-15T02:14:28Z",
+   "kind": "registry"
   }
  },
  {
@@ -7061,6 +7239,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0042,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "2615145-6",
+   "name": "Hilla IT Oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?location=Espoo&mainBusinessLine=62200&page=3",
+   "found_on": null,
+   "retrieved_at": "2026-11-14T02:12:58Z",
+   "kind": "registry"
   }
  },
  {
@@ -7178,7 +7364,8 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0029,
    "context_credits": 10
-  }
+  },
+  "business_id": null
  },
  {
   "id": "0140879-6",
@@ -7421,6 +7608,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0044,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "0140879-6",
+   "name": "Huhtamäki Oyj",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?name=Huhtam%C3%A4ki%20Oyj",
+   "found_on": null,
+   "retrieved_at": "2026-11-14T02:09:03Z",
+   "kind": "registry"
   }
  },
  {
@@ -7784,6 +7979,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0058,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "2639822-1",
+   "name": "ICEYE Oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?name=ICEYE%20Oy",
+   "found_on": null,
+   "retrieved_at": "2026-11-14T02:07:07Z",
+   "kind": "registry"
   }
  },
  {
@@ -8008,6 +8211,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0039,
    "context_credits": 10
+  },
+  "business_id": {
+   "value": "2575746-4",
+   "name": "ICT Direct Finland Oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?name=ICT%20Direct",
+   "found_on": null,
+   "retrieved_at": "2026-11-15T02:16:51Z",
+   "kind": "registry"
   }
  },
  {
@@ -8223,7 +8434,8 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0034,
    "context_credits": 10
-  }
+  },
+  "business_id": null
  },
  {
   "id": "0686163-7",
@@ -8544,6 +8756,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.005,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "0686163-7",
+   "name": "Innofactor Oyj",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?name=Innofactor%20Oyj",
+   "found_on": null,
+   "retrieved_at": "2026-11-14T02:07:59Z",
+   "kind": "registry"
   }
  },
  {
@@ -8703,7 +8923,8 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0029,
    "context_credits": 10
-  }
+  },
+  "business_id": null
  },
  {
   "id": "0154088-5",
@@ -9029,6 +9250,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0043,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "0154088-5",
+   "name": "Insta Group Oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?name=Insta%20Group%20Oy",
+   "found_on": null,
+   "retrieved_at": "2026-11-14T02:10:57Z",
+   "kind": "registry"
   }
  },
  {
@@ -9338,6 +9567,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0055,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "2912625-6",
+   "name": "IQM Quantum Computers Oyj",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?location=Espoo&mainBusinessLine=63100&page=1",
+   "found_on": null,
+   "retrieved_at": "2026-11-14T01:54:44Z",
+   "kind": "registry"
   }
  },
  {
@@ -9652,6 +9889,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.005,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "1445054-7",
+   "name": "Islet Group Oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?location=Espoo&mainBusinessLine=62200&page=1",
+   "found_on": null,
+   "retrieved_at": "2026-11-14T01:54:38Z",
+   "kind": "registry"
   }
  },
  {
@@ -9707,7 +9952,8 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0023,
    "context_credits": 10
-  }
+  },
+  "business_id": null
  },
  {
   "id": "2684703-1",
@@ -9958,6 +10204,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0032,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "2684703-1",
+   "name": "Kuori Oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?location=Espoo&mainBusinessLine=62200&page=3",
+   "found_on": null,
+   "retrieved_at": "2026-11-14T02:12:58Z",
+   "kind": "registry"
   }
  },
  {
@@ -10245,6 +10499,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0043,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "2759225-3",
+   "name": "Kuva Space Oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?name=Kuva%20Space%20Oy",
+   "found_on": null,
+   "retrieved_at": "2026-11-14T02:07:21Z",
+   "kind": "registry"
   }
  },
  {
@@ -10546,7 +10808,8 @@
    "exa_usd": 0.028,
    "llm_usd": 0.004,
    "context_credits": 10
-  }
+  },
+  "business_id": null
  },
  {
   "id": "2764193-2",
@@ -10786,6 +11049,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0036,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "2764193-2",
+   "name": "KYOCERA Technologies Oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?location=Espoo&mainBusinessLine=26110&page=1",
+   "found_on": null,
+   "retrieved_at": "2026-11-14T01:54:56Z",
+   "kind": "registry"
   }
  },
  {
@@ -11058,6 +11329,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0046,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "0684411-6",
+   "name": "Logex Oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?location=Espoo&mainBusinessLine=62100&page=1",
+   "found_on": null,
+   "retrieved_at": "2026-11-14T01:48:21Z",
+   "kind": "registry"
   }
  },
  {
@@ -11283,6 +11562,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0038,
    "context_credits": 10
+  },
+  "business_id": {
+   "value": "3526620-4",
+   "name": "Lotus Sirius Oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?name=Lotus%20Sirius",
+   "found_on": null,
+   "retrieved_at": "2026-11-15T02:18:19Z",
+   "kind": "registry"
   }
  },
  {
@@ -11607,6 +11894,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0049,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "1509667-4",
+   "name": "Matrix42 Oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?location=Espoo&mainBusinessLine=62100&page=2",
+   "found_on": null,
+   "retrieved_at": "2026-11-14T02:11:54Z",
+   "kind": "registry"
   }
  },
  {
@@ -11776,7 +12071,8 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0028,
    "context_credits": 10
-  }
+  },
+  "business_id": null
  },
  {
   "id": "1056981-5",
@@ -12035,6 +12331,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.004,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "1056981-5",
+   "name": "Neomore Consulting Oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?location=Espoo&mainBusinessLine=62200&page=1",
+   "found_on": null,
+   "retrieved_at": "2026-11-14T01:54:38Z",
+   "kind": "registry"
   }
  },
  {
@@ -12266,6 +12570,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0043,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "1852302-9",
+   "name": "Neste Oyj",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?name=Neste%20Oyj",
+   "found_on": null,
+   "retrieved_at": "2026-11-14T02:07:37Z",
+   "kind": "registry"
   }
  },
  {
@@ -12540,6 +12852,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0041,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "2084527-0",
+   "name": "Nitor Creations Oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?name=Nitor",
+   "found_on": null,
+   "retrieved_at": "2026-11-15T02:13:05Z",
+   "kind": "registry"
   }
  },
  {
@@ -12896,6 +13216,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0051,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "0112038-9",
+   "name": "Nokia Oyj",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?name=Nokia%20Oyj",
+   "found_on": null,
+   "retrieved_at": "2026-11-14T02:07:29Z",
+   "kind": "registry"
   }
  },
  {
@@ -13113,6 +13441,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0041,
    "context_credits": 10
+  },
+  "business_id": {
+   "value": "3280301-9",
+   "name": "Nordic Clean Tech Oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?name=Nordic%20Clean%20Tech",
+   "found_on": null,
+   "retrieved_at": "2026-11-15T02:18:51Z",
+   "kind": "registry"
   }
  },
  {
@@ -13402,7 +13738,8 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0047,
    "context_credits": 10
-  }
+  },
+  "business_id": null
  },
  {
   "id": "onefabnordic.fi",
@@ -13591,6 +13928,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0037,
    "context_credits": 10
+  },
+  "business_id": {
+   "value": "3497239-3",
+   "name": "OneFab Nordic Oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?businessId=3497239-3",
+   "found_on": "https://onefabnordic.fi/",
+   "retrieved_at": "2026-11-15T02:19:26Z",
+   "kind": "registry"
   }
  },
  {
@@ -13853,6 +14198,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0044,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "1999212-6",
+   "name": "Orion Oyj",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?name=Orion%20Oyj",
+   "found_on": null,
+   "retrieved_at": "2026-11-14T02:07:42Z",
+   "kind": "registry"
   }
  },
  {
@@ -14122,6 +14475,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0046,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "3398263-7",
+   "name": "Qevo Oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?location=Espoo&mainBusinessLine=62200&page=5",
+   "found_on": null,
+   "retrieved_at": "2026-11-14T02:13:04Z",
+   "kind": "registry"
   }
  },
  {
@@ -14479,6 +14840,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.005,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "3438021-6",
+   "name": "QMill Oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?name=QMill%20Oy",
+   "found_on": null,
+   "retrieved_at": "2026-11-14T02:08:41Z",
+   "kind": "registry"
   }
  },
  {
@@ -14817,6 +15186,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0037,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "2292619-7",
+   "name": "QOCO Systems Oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?location=Espoo&mainBusinessLine=62100&page=4",
+   "found_on": null,
+   "retrieved_at": "2026-11-14T02:12:01Z",
+   "kind": "registry"
   }
  },
  {
@@ -15187,6 +15564,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0054,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "2733394-8",
+   "name": "Qt Group Oyj",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?name=Qt%20Group%20Oyj",
+   "found_on": null,
+   "retrieved_at": "2026-11-14T02:09:05Z",
+   "kind": "registry"
   }
  },
  {
@@ -15466,6 +15851,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0054,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "3551135-3",
+   "name": "Qutwo Oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?businessId=3551135-3",
+   "found_on": "https://qutwo.com/privacy-policy",
+   "retrieved_at": "2026-11-15T02:19:42Z",
+   "kind": "registry"
   }
  },
  {
@@ -15726,6 +16119,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0049,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "1017278-9",
+   "name": "Remedy Entertainment Oyj",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?name=Remedy%20Entertainment%20Oyj",
+   "found_on": null,
+   "retrieved_at": "2026-11-14T02:07:11Z",
+   "kind": "registry"
   }
  },
  {
@@ -15886,6 +16287,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0033,
    "context_credits": 10
+  },
+  "business_id": {
+   "value": "3564128-9",
+   "name": "Sansaino Oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?name=Sansaino",
+   "found_on": null,
+   "retrieved_at": "2026-11-15T02:19:43Z",
+   "kind": "registry"
   }
  },
  {
@@ -16118,6 +16527,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0047,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "3310749-6",
+   "name": "Semiqon Technologies oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?name=SemiQon%20Technologies%20Oy",
+   "found_on": null,
+   "retrieved_at": "2026-11-14T02:08:04Z",
+   "kind": "registry"
   }
  },
  {
@@ -16398,6 +16815,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0041,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "3145736-1",
+   "name": "Smartly.io Solutions Oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?name=Smartly",
+   "found_on": null,
+   "retrieved_at": "2026-11-15T02:14:11Z",
+   "kind": "registry"
   }
  },
  {
@@ -16699,6 +17124,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0051,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "0490484-0",
+   "name": "Solteq Oyj",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?location=Espoo&mainBusinessLine=62100&page=1",
+   "found_on": null,
+   "retrieved_at": "2026-11-14T01:48:21Z",
+   "kind": "registry"
   }
  },
  {
@@ -16988,6 +17421,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0048,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "2336509-6",
+   "name": "Supercell Oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?name=Supercell",
+   "found_on": null,
+   "retrieved_at": "2026-11-15T02:14:13Z",
+   "kind": "registry"
   }
  },
  {
@@ -17274,6 +17715,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0055,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "2428675-2",
+   "name": "Taito United Oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?location=Espoo&mainBusinessLine=62100&page=4",
+   "found_on": null,
+   "retrieved_at": "2026-11-14T02:12:01Z",
+   "kind": "registry"
   }
  },
  {
@@ -17570,6 +18019,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.005,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "2647375-4",
+   "name": "Teknologian tutkimuskeskus VTT Oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?name=Teknologian%20tutkimuskeskus%20VTT%20Oy",
+   "found_on": null,
+   "retrieved_at": "2026-11-14T02:07:25Z",
+   "kind": "registry"
   }
  },
  {
@@ -17893,7 +18350,8 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0052,
    "context_credits": 11
-  }
+  },
+  "business_id": null
  },
  {
   "id": "ti.com",
@@ -18198,7 +18656,8 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0041,
    "context_credits": 10
-  }
+  },
+  "business_id": null
  },
  {
   "id": "1962361-1",
@@ -18519,6 +18978,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0054,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "1962361-1",
+   "name": "Tieto Finland Oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?location=Espoo&mainBusinessLine=62200&page=2",
+   "found_on": null,
+   "retrieved_at": "2026-11-14T02:12:55Z",
+   "kind": "registry"
   }
  },
  {
@@ -18816,6 +19283,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0037,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "3094668-1",
+   "name": "TrueMed Oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?location=Espoo&mainBusinessLine=62100&page=8",
+   "found_on": null,
+   "retrieved_at": "2026-11-14T02:12:15Z",
+   "kind": "registry"
   }
  },
  {
@@ -19097,6 +19572,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0042,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "1740546-9",
+   "name": "Turck Vilant Systems Oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?location=Espoo&mainBusinessLine=62100&page=3",
+   "found_on": null,
+   "retrieved_at": "2026-11-14T02:11:58Z",
+   "kind": "registry"
   }
  },
  {
@@ -19364,6 +19847,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0047,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "2773901-6",
+   "name": "Varjo Technologies Oyj",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?name=Varjo",
+   "found_on": null,
+   "retrieved_at": "2026-11-15T02:13:10Z",
+   "kind": "registry"
   }
  },
  {
@@ -19636,6 +20127,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0042,
    "context_credits": 10
+  },
+  "business_id": {
+   "value": "2858176-7",
+   "name": "Vexlum Oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?name=Vexlum",
+   "found_on": null,
+   "retrieved_at": "2026-11-15T02:20:18Z",
+   "kind": "registry"
   }
  },
  {
@@ -19994,6 +20493,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0043,
    "context_credits": 11
+  },
+  "business_id": {
+   "value": "0665167-2",
+   "name": "Visual Components Oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?location=Espoo&mainBusinessLine=62100&page=1",
+   "found_on": null,
+   "retrieved_at": "2026-11-14T01:48:21Z",
+   "kind": "registry"
   }
  },
  {
@@ -20232,6 +20739,14 @@
    "exa_usd": 0.028,
    "llm_usd": 0.0038,
    "context_credits": 10
+  },
+  "business_id": {
+   "value": "2955597-4",
+   "name": "Zero Gravity Oy",
+   "source_url": "https://avoindata.prh.fi/opendata-ytj-api/v3/companies?name=Zero%20Gravity",
+   "found_on": null,
+   "retrieved_at": "2026-11-15T02:20:21Z",
+   "kind": "registry"
   }
  }
 ]

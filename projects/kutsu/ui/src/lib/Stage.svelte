@@ -15,6 +15,7 @@
       ['Size', identity?.employees?.replace(' to ', '–')],
       ['Based in', [identity?.city, identity?.country].filter(Boolean).join(', ')],
       ['Open tech roles in Espoo', brief.in_espoo_data ? String(brief.open_roles) : ''],
+      ['Business ID', brief.business_id?.value],
     ].filter(([, value]) => value),
   )
   const ARROW = { growing: 'up', shrinking: 'down', steady: 'flat' } as const
@@ -39,7 +40,8 @@
       {#if facts.length}
         <dl>
           {#each facts as [label, value] (label)}
-            <div><dt>{label}</dt><dd>{value}</dd></div>
+            <!-- the business ID carries the registered name it belongs to, from the trade register -->
+            <div><dt>{label}</dt><dd title={label === 'Business ID' ? (brief.business_id?.name ?? '') : undefined}>{value}</dd></div>
           {/each}
         </dl>
       {/if}

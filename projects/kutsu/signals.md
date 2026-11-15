@@ -2235,7 +2235,7 @@ https://nitor.com · not in our Espoo job data
 
 **Stated in public sources**
 
-- `s1` [growth, 2026-05] Nitor reported 2025 revenue of approximately €40.2 million and adjusted EBITDA of €5.5 million, up about 23 per cent on the previous year.  
+- `s1` [growth, 2026-05] Nitor reported 2025 revenue of approximately €40.2 million; its adjusted EBITDA, €5.5 million, was up about 23 per cent on the previous year.  
   > "Nitor reported revenue of approximately €40.2 million in 2025." ([source](https://nitor.com/en/articles/nitor-grew-profits-by-23-per-cent-and-strengthened-its-core-business-in-a-challenging-market))
 - `s2` [customers, 2026-05] Nitor's strongest client growth in 2025 came from entertainment and gaming, retail and healthcare, with expansion into defence and health tech and international markets.  
   > "Nitor’s strongest client growth in 2025 came from entertainment and gaming, retail, and healthcare." ([source](https://nitor.com/en/articles/nitor-grew-profits-by-23-per-cent-and-strengthened-its-core-business-in-a-challenging-market))
@@ -2254,7 +2254,7 @@ https://nitor.com · not in our Espoo job data
 
 **What to tell candidates**
 
-- **Revenue about EUR 40.2 million in 2025** (2025; s1, s6): Revenue rose about 23 per cent on the previous year, continuing a long run of annual growth.
+- **Revenue about EUR 40.2 million in 2025** (2025; s1, s6): Adjusted EBITDA rose about 23 per cent to EUR 5.5 million; revenue held level with 2024's EUR 40.4 million.
 - **Client growth in entertainment, retail and healthcare** (2025; s2): Strongest client expansion in 2025 came from entertainment and gaming, retail and healthcare, with new work in defence, health tech and international markets.
 - **ISO/IEC 27001:2022 certification achieved** (2026-06; s4): The certification covers consulting, managed services, internal operations and both offices in Helsinki and Tampere.
 - **Joined CLEAR industrial AI research project** (2026-07; s5): Nitor joined a nine-country project with 29 companies and research organisations and hired a full-time research assistant for it.
