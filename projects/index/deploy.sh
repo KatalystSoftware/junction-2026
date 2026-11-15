@@ -14,6 +14,7 @@ trap 'rm -rf "$out"' EXIT
 cp -r site/. "$out"
 ../oncallbench/replay/deploy.sh --to "$out/incident"
 touch "$out/.nojekyll" # serve the files as they are, with no Jekyll build
+echo katalyst.fyi >"$out/CNAME" # the site's own domain: its root ALIAS and www at Porkbun point at GitHub Pages
 git -C "$out" init -q -b gh-pages
 git -C "$out" add -A
 git -C "$out" commit -q -m "site: built from $(git rev-parse --short HEAD)"

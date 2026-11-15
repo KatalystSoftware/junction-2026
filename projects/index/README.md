@@ -1,6 +1,6 @@
 # Index page
 
-The page at <https://katalystsoftware.github.io/junction-2026/> (on katalyst.fyi during the event): team
+The page at <https://katalyst.fyi/> (GitHub Pages; <https://katalystsoftware.github.io/junction-2026/> redirects there): team
 Katalyst's Junction 2026 projects, each with a sentence or two and a link to try it or watch it. Plain
 HTML, CSS and JavaScript in [`site/`](site/), with no build step.
 
