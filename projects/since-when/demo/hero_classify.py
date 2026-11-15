@@ -1,6 +1,7 @@
 """Classify the hero topics' pairs with one model, with every raw answer cached on disk.
 
     python demo/hero_classify.py nemotron PAIRS.jsonl [--workers 4]
+    DIFFERENCES_TIMEOUT=1800 python demo/hero_classify.py nemotron-verda PAIRS.jsonl --workers 24
     python demo/hero_classify.py haiku PAIRS.jsonl --max-requests 300
     python demo/hero_classify.py nemotron PAIRS.jsonl --offline
 
@@ -15,7 +16,10 @@ Everything is written under $HERO_CLASSIFY (default ~/junction2026-data/mariadb/
     requests.json        requests sent to the model by all runs so far (the cap for --max-requests)
 
 --offline never calls the model: a pair whose answer is not cached gets no rows and is listed.
-The key is read by differences.llm from NVIDIA_API_KEY or ANTHROPIC_API_KEY (sops exec-env).
+nemotron is Nemotron 3.5 Super VL on NVIDIA Build's free tier; nemotron-verda is the same model on the
+dedicated Verda container (provider verda-super), with no per-minute limit; it queues when busy,
+hence the longer DIFFERENCES_TIMEOUT. The key is read by differences.llm from NVIDIA_API_KEY,
+VERDA_INFERENCE_KEY or ANTHROPIC_API_KEY (sops exec-env).
 """
 
 import argparse
@@ -27,7 +31,8 @@ import threading
 import time
 from pathlib import Path
 
-MODELS = {"nemotron": "nvidia", "haiku": "anthropic"}
+MODELS = {"nemotron": "nvidia", "nemotron-verda": "verda-super", "haiku": "anthropic"}
+KEYS = {"nvidia": "NVIDIA_API_KEY", "verda-super": "VERDA_INFERENCE_KEY", "anthropic": "ANTHROPIC_API_KEY"}
 
 ap = argparse.ArgumentParser()
 ap.add_argument("model", choices=MODELS)
@@ -41,7 +46,7 @@ OUT = Path(os.environ.get("HERO_CLASSIFY", Path.home() / "junction2026-data/mari
 os.environ["DIFFERENCES_PROVIDER"] = MODELS[args.model]
 os.environ["DIFFERENCES_CACHE"] = str(OUT / "cache")
 if args.offline:  # the cache key needs the endpoint and model, not the key
-    os.environ.setdefault({"nvidia": "NVIDIA_API_KEY", "anthropic": "ANTHROPIC_API_KEY"}[MODELS[args.model]], "offline")
+    os.environ.setdefault(KEYS[MODELS[args.model]], "offline")
     os.environ["DIFFERENCES_RPM"] = "6000"  # nothing is sent, so nothing to pace
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
