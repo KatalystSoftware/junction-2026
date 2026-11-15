@@ -126,15 +126,24 @@ def linkedin_handle(value):
 
 
 def changes():
-    """What Context.dev's monitors saw change, read from it at most every five minutes. Without a key nothing is watched."""
+    """What Context.dev's monitors saw change, read from it at most every five minutes. Without a key nothing is watched.
+    The read runs in the background and the last answer is returned at once: the page waits for this before it shows
+    anything, and one read of Context.dev takes a second or more."""
     with watching:
         if "CONTEXT_DEV_API_KEY" in os.environ and time.time() - watch["read"] > 300:
             watch["read"] = time.time()
-            try:
-                watch["seen"] = {**monitors.changes(), "checked_at": lib.now_iso()}
-            except (RuntimeError, OSError) as error:  # their side is down: the last answer stands until the next try
-                print(f"monitors: {error}", file=sys.stderr)
+            threading.Thread(target=read_changes, daemon=True).start()
         return watch["seen"]
+
+
+def read_changes():
+    try:
+        seen = {**monitors.changes(), "checked_at": lib.now_iso()}
+    except (RuntimeError, OSError, KeyError) as error:  # their side is down: the last answer stands until the next try
+        print(f"monitors: {error}", file=sys.stderr)
+        return
+    with watching:
+        watch["seen"] = seen
 
 
 def well_formed(review):
@@ -337,5 +346,6 @@ class Handler(http.server.BaseHTTPRequestHandler):
 
 if __name__ == "__main__":
     reviews()  # sets a file of another shape aside now, at start, and says so
+    changes()  # the first visitor gets the monitors' answer, not an empty one
     print(f"http://{HOST}:{PORT}", file=sys.stderr)
     http.server.ThreadingHTTPServer((HOST, PORT), Handler).serve_forever()
