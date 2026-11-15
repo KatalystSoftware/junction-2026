@@ -56,10 +56,11 @@
 <div class="stage" id="stage">
 
 <!-- jury: the answer -->
-<section data-cuts="11" class="slide s-title s-ans" aria-label="Spread desk, the answer">
+<section data-cuts="11" class="slide s-title s-ans" aria-label="Digital Twin², the answer">
 	<div class="t-left">
 		<p class="kick in">Junction 2026 &nbsp;/&nbsp; Bahn Express Spread</p>
-		<h1 class="t-h in" style="--d:1">Spread desk</h1>
+		<h1 class="t-h in" style="--d:1">Digital Twin²</h1>
+		<p class="it in t-twin" style="--d:1">A simulator of Bahn's simulator, and the Spread desk it taught.</p>
 		<p class="t-lede in f-line" style="--d:2" data-wait="The final plays Sunday 09:00 Helsinki, with merge 8.3."></p>
 		<p class="sm in h-line" style="--d:2"></p>
 		<div class="ans-best in" style="--d:3">
@@ -147,7 +148,7 @@
 <section data-cuts="11" class="slide" aria-label="The simulator">
 	<p class="kick in"><span class="no"></span>The simulator</p>
 	<p class="nerd only-11 in" style="--d:1"><b>For the technical jury</b>Under the hood. Peer reviewers: we built a pretend Finland. Skip ahead freely.</p>
-	<h2 class="h in" style="--d:1">Play was the bottleneck, so we built our own digital twin of Bahn's world: the simulator</h2>
+	<h2 class="h in" style="--d:1">Play was the bottleneck, so we built a digital twin²: a simulator of Bahn's simulator</h2>
 	<div class="body uses iwe">
 		<div class="in" style="--d:2"><p class="lab">The bottleneck</p><b class="big cyan">8</b><p class="sm"><b>practice worlds per team key</b>: too few weeks to test ideas. Saturday's round showed what to fix: the top ten won 441 orders a week, we won 332, at nearly the same margin an order.</p></div>
 		<div class="in" style="--d:3"><p class="lab">Checked against our recorded weeks</p><b class="big cyan">43 of 46</b><p class="sm"><b>pairs play could decide came out the same way</b> on natural worlds, and gain sizes correlate with play at 0.96 to 0.97. On thin worlds only 0.37.</p></div>
@@ -210,7 +211,7 @@
 		<div class="r-foot in" style="--d:3">
 			<p class="sm"><b id="r-clock">0:00</b> of 4:41 &nbsp;<button class="ghost" id="r-again" type="button">Play again</button></p>
 			<p class="sm"><b>Saturday 21:33 the idea, 23:26 a joint search on 16 runners: 1 h 53 min.</b> A stand-in week takes 3 to 6 CPU-seconds, 97% of them in our own desk code, and every week is independent: the work needs cores and nothing else.</p>
-			<div class="vs only-11"><div><p class="lab">Bahn's server</p><b class="amber">8</b><p class="sm">practice worlds per team key, on one request bucket, each week played at the world's own pace; a ranking round is 5 weeks</p></div><div><p class="lab">Our simulator on CRACI</p><b class="cyan">1,442</b><p class="sm">weeks in 4 min 41 s on one runner. Later that night, with faster copies of the desk's hot code: 412 weeks in 32 s of play. The joint search ran on 16 runners: 512 cores</p></div><div><p class="lab">Do they agree?</p><b class="cyan">43 of 46</b><p class="sm">pairs the simulator ranked as Bahn's server did; gain sizes correlate at 0.96 to 0.97 on natural worlds, 0.37 with few drivers</p></div></div>
+			<div class="vs only-11"><div><p class="lab">Bahn's server</p><b class="amber">8</b><p class="sm">practice worlds per team key, on one request bucket, each week played at the world's own pace; a ranking round is 5 weeks</p></div><div><p class="lab">Our digital twin² on CRACI</p><b class="cyan">1,442</b><p class="sm">weeks in 4 min 41 s on one runner. Later that night, with faster copies of the desk's hot code: 412 weeks in 32 s of play. The joint search ran on 16 runners: 512 cores</p></div><div><p class="lab">Do they agree?</p><b class="cyan">43 of 46</b><p class="sm">pairs the simulator ranked as Bahn's server did; gain sizes correlate at 0.96 to 0.97 on natural worlds, 0.37 with few drivers</p></div></div>
 		</div>
 	</div>
 </section>
@@ -1654,7 +1655,15 @@
 		grid-column: 1 / -1;
 	}
 	.s-ans .t-h {
-		font-size: calc(7 * var(--k));
+		font-size: calc(5.6 * var(--k));
+	}
+	.s-ans .t-lede {
+		margin-top: calc(1.4 * var(--k)) !important;
+		font-size: calc(1.7 * var(--k));
+	}
+	.s-ans .t-twin {
+		margin-top: calc(1 * var(--k)) !important;
+		color: var(--cyan);
 	}
 	.s-ans .t-lede {
 		max-width: 36ch;
