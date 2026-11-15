@@ -4,7 +4,7 @@ A seven-slide version of the Kutsu pitch, about two and a half minutes spoken. T
 [`index.html`](index.html) in this folder; it uses the main deck's stylesheet and screenshots
 (`../img/`). The full twelve-slide deck stays at [`../index.html`](../index.html).
 
-The thread through it: AI now matches skills on paper, but motivation and fit show only in person,
+The thread through it: AI now matches the skills in a CV, but motivation and fit show only in person,
 so meeting in person is worth more. Small in-person events are the best format but the hardest to
 set up. Kutsu does the setup, so the time goes to the people.
 
@@ -15,17 +15,18 @@ Recruitment is hard, and it is getting harder. Kutsu takes the setup work off th
 recruitment events, so the city can hold many small, well-matched ones and spend its time on the
 people.
 
-**2. Skill matching is solved. Motivation and fit aren't.**
+**2. Matching by CV skills is solved. Motivation and fit aren't.**
 Espoo's organisers name three things a good match needs: skill, motivation and fit. Skill is the
-easy one now: AI writes the CV, AI reads it, and it can match a LinkedIn profile to a role. What it
-can't find is why someone wants the job and whether they fit the team. Those show in ten minutes
-face to face. So meeting in person is worth more than ever.
+easy one now: AI writes the CV, AI reads it, and it can match the skills in a CV or a LinkedIn
+profile to a role. What it can't find is why someone wants the job and whether they fit the team.
+Those show in ten minutes face to face. So meeting in person is worth more than ever.
 
-**3. But setting up the right meetings is hard.**
-Time in person is expensive, so who meets whom has to be right, and today it is arranged by hand.
-Companies say what they need too late. Job seekers can't tell which companies are worth meeting.
-Organisers pair people by hand, often without the tech background to judge an application. And
-every event starts from zero: the sign-up survey and both invitation lists are built again.
+**3. Matching is hard, because it takes people connecting.**
+Matching by CV skills is easy now. Real matching, on motivation and fit, needs the right people in
+the same room. Every meeting costs time, so who meets whom has to be right, and today it is arranged
+by hand. Companies say what they need too late. Job seekers can't tell which companies are worth
+meeting. Organisers pair people by hand, often without the tech background to judge an application.
+And every event starts from zero: the sign-up survey and both invitation lists are built again.
 
 **4. Big events are bloated. Small events are laborious.**
 At a big event, employers are swamped by irrelevant approaches and spend a day at a stand to find a
