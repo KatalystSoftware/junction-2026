@@ -2,7 +2,7 @@
 
 Prototype for the City of Espoo challenge **"Rethinking Recruitment"** at Junction 2026.
 
-**Live prototype:** https://kutsu.duckymcduck2.workers.dev/ is Kutsu, the one app (events, who to invite, applications; the Svelte app one folder up, in `projects/kutsu`). The pages in this folder are the first version of the invitee's side, kept under https://kutsu.duckymcduck2.workers.dev/apply/ ; they were first called Esittely, and the product has one name now, Kutsu. The pitch deck (`../pitch/`) is at https://kutsu.duckymcduck2.workers.dev/pitch/ ; a seven-slide short version, with its spoken script, is in [`../pitch/short/`](../pitch/short/pitch.md) and goes to /pitch/short/ with the next deploy. `tools/deploy.sh` publishes all three (the old address esittely.duckymcduck2.workers.dev keeps working).
+**Live prototype:** https://kutsu.duckymcduck2.workers.dev/ is Kutsu, the one app (events, who to invite, applications; the Svelte app one folder up, in `projects/kutsu`). The pages in this folder are the first version of the invitee's side, kept under https://kutsu.duckymcduck2.workers.dev/apply/ ; they were first called Esittely, and the product has one name now, Kutsu. The pitch deck (`../pitch/`) is at https://kutsu.duckymcduck2.workers.dev/pitch/ ; a five-slide short version, with its spoken script, is in [`../pitch/short/`](../pitch/short/pitch.md) and goes to /pitch/short/ with the next deploy. `tools/deploy.sh` publishes all three (the old address esittely.duckymcduck2.workers.dev keeps working).
 
 **Principle: the AI pulls the information, and humans make the judgements.** Kutsu is a light layer on top of event registration:
 - Companies confirm, in about a minute, who they want to meet. Their stand is then promoted to those attendees.
