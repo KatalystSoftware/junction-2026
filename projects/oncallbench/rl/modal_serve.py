@@ -22,6 +22,7 @@ One H200 (or a B200 when one is free); the container stops after 15 idle minutes
 stop it with `modal app stop oncallbench-gemma` when no run needs it.
 """
 
+import hashlib
 import os
 import subprocess
 from pathlib import Path
@@ -53,5 +54,7 @@ def serve():
            "--limit-mm-per-prompt", '{"image":0,"audio":0,"video":0}',
            "--enable-lora", "--max-lora-rank", "64", "--max-loras", str(max(2, min(4, len(adapters)))),
            "--lora-modules", *[f"{p.name}={p}" for p in adapters]]
-    print("adapters:", [p.name for p in adapters], flush=True)
+    for p in adapters:  # ties each served name (a mutable alias) to the exact weights, in the serving log
+        digest = hashlib.sha256((p / "adapter_model.safetensors").read_bytes()).hexdigest()
+        print(f"serving {p.name} = {p}/adapter_model.safetensors sha256 {digest}", flush=True)
     subprocess.Popen(cmd, env=os.environ)

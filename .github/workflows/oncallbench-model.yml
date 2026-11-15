@@ -6,6 +6,9 @@ name: OnCallBench model
 # adapter on CPU with llama.cpp, and play one short held-out episode through Harbor + OpenCode,
 # the harness the judged agents run in. The base model's GGUF is cached by its Hugging Face
 # revision, with the sha256 of every file it was converted from.
+# By default it checks the RL adapter (gemma4-26b-a4b-rl, sha256 f9536c41...), the one behind the README's
+# "Gemma + adapter" row; `adapter: sft` checks its SFT parent (gemma4-26b-a4b-sft, 588e977f...) instead.
+# The demos trained the SFT parent, so they are checked against the SFT folder's SHA256SUMS either way.
 on:
   push:
     paths: [.github/workflows/oncallbench-model.yml]
@@ -19,6 +22,11 @@ on:
         description: Held-out seed (101-106)
         default: "101"
         type: string
+      adapter:
+        description: Which adapter (rl, behind the README row; sft, its parent)
+        default: rl
+        type: choice
+        options: [rl, sft]
 
 permissions:
   contents: read
@@ -31,6 +39,7 @@ env:
   LLAMA_CPP_SHA256: 16fe348b1bc2e943bc4c220938ce46af789e88291138bca5bd68c0cc017769a5
   LEVEL: ${{ inputs.level || '0' }}
   SEED: ${{ inputs.seed || '101' }}
+  ADAPTER: ${{ inputs.adapter || 'rl' }}
 
 jobs:
   model:
@@ -47,13 +56,18 @@ jobs:
           start=$(date +%s)
           mkdir -p "$RUNNER_TEMP/adapter" && cd "$RUNNER_TEMP/adapter"
           for f in SHA256SUMS README.md adapter_config.json adapter_model.safetensors; do
-            curl -fsSL -o "$f" "$BUCKET/gemma4-26b-a4b-sft/$f"
+            curl -fsSL -o "$f" "$BUCKET/gemma4-26b-a4b-$ADAPTER/$f"
           done
           curl -fsSL -o demos-l34.jsonl "$BUCKET/demos/demos-l34.jsonl"
           # Every file SHA256SUMS lists must be here and match; a missing or changed file fails.
           sha256sum --check --strict SHA256SUMS | tee "$RUNNER_TEMP/sha.txt"
+          # The demos trained the SFT parent: check them against its SHA256SUMS whichever adapter runs.
+          curl -fsSL "$BUCKET/gemma4-26b-a4b-sft/SHA256SUMS" | grep ' demos-l34.jsonl$' > demos.sha256
+          [ "$(wc -l < demos.sha256)" -eq 1 ]
+          sha256sum --check --strict demos.sha256 | tee -a "$RUNNER_TEMP/sha.txt"
+          grep -q ' demos-l34.jsonl$' SHA256SUMS || cat demos.sha256 >> SHA256SUMS
           {
-            echo "## Adapter and demos (anonymous download, checked against SHA256SUMS)"
+            echo "## Adapter \`gemma4-26b-a4b-$ADAPTER\` and demos (anonymous download, checked against SHA256SUMS)"
             echo '| File | Bytes | sha256 | Check |'; echo '|---|---|---|---|'
             while read -r sum f; do
               echo "| $f | $(stat -c %s "$f") | \`$sum\` | $(grep -q "^$f: OK$" "$RUNNER_TEMP/sha.txt" && echo OK) |"
@@ -175,7 +189,7 @@ jobs:
           mkdir -p "$RUNNER_TEMP/llama" && tar -xzf /tmp/llama.tar.gz -C "$RUNNER_TEMP/llama" --strip-components=1
           server=$(find "$RUNNER_TEMP/llama" -name llama-server -type f | head -1)
           nohup "$server" -m ~/base-gguf/base-q8_0.gguf --lora "$RUNNER_TEMP/adapter.gguf" \
-            --alias gemma4-oncallbench-sft --jinja -c 65536 -t "$(nproc)" --host 0.0.0.0 --port 8100 \
+            --alias "gemma4-oncallbench-$ADAPTER" --jinja -c 65536 -t "$(nproc)" --host 0.0.0.0 --port 8100 \
             > "$RUNNER_TEMP/server.log" 2>&1 &
           until curl -sf localhost:8100/health >/dev/null; do
             kill -0 $! 2>/dev/null || { tail -40 "$RUNNER_TEMP/server.log"; exit 1; }
@@ -198,12 +212,12 @@ jobs:
           # The agent's container reaches the server through the Docker bridge's gateway.
           host=$(docker network inspect bridge -f '{{(index .IPAM.Config 0).Gateway}}')
           uvx --from harbor==0.25.0 harbor run -p tasks/shift-1 -o jobs --job-name model-check -a opencode \
-            -m vllm/gemma4-oncallbench-sft --base-url "http://$host:8100/v1" \
+            -m "vllm/gemma4-oncallbench-$ADAPTER" --base-url "http://$host:8100/v1" \
             --api-format openai_chat_completions --api-key-name VLLM_API_KEY --ae VLLM_API_KEY=local
           reward=$(cat jobs/model-check/*/verifier/reward.txt)
           {
             echo "## Episode"
-            echo "Level $LEVEL, held-out seed $SEED, Harbor 0.25.0 + OpenCode, the adapter served by llama.cpp on CPU: **score $reward**"
+            echo "Level $LEVEL, held-out seed $SEED, Harbor 0.25.0 + OpenCode, adapter \`gemma4-26b-a4b-$ADAPTER\` (sha256 \`$(awk '$2 == "adapter_model.safetensors" {print $1}' "$RUNNER_TEMP/adapter/SHA256SUMS")\`) served by llama.cpp on CPU: **score $reward**"
             echo; echo "Adapter applied: \`$(jq -c '.[] | {path, scale}' "$RUNNER_TEMP/lora.json")\`"
             echo; echo "Verifier: \`$(cat jobs/model-check/*/verifier/reward.json)\`"
             echo; echo "Actions: $(jq -r '[.actions[] | .[0] + (.[1].service // "" | if . == "" then "" else "(" + . + ")" end)] | join(", ")' jobs/model-check/*/artifacts/ledger/receipt.json)"
