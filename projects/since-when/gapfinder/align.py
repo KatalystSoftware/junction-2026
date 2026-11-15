@@ -757,7 +757,10 @@ def build_findings(only=None):
     """Rebuild the finding table. Each period of a finding is a history row from the edit that
     opened it to the edit that closed it (system_versioning_insert_history), so finding FOR
     SYSTEM_TIME AS OF a date lists the gaps open then. Editor outcomes are carried over by key,
-    with the time they were set."""
+    with the time they were set. `only` None rebuilds every topic; an empty set rebuilds none."""
+    if only is not None and not only:
+        print("findings: no topics to rebuild", flush=True)
+        return
     r = Run()
     rich, revs = {}, {}
     for x in r("rich", rich_lang_sql()):
