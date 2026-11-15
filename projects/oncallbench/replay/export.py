@@ -9,9 +9,9 @@ the bundles for the page. A bundle keeps the action logs of its trials, so it ca
 without the Harbor folders they came from.
 
 python3 export.py                                   every bundle in data/ again, with this simulator
-python3 export.py --level 4 --seeds 109 --jobs ../jobs   add or replace one episode, with its trials
-python3 export.py --level 5 --seeds 109,110 --policies reference,unprotected,nothing
-python3 export.py --level 4 --seeds 109 --out shift.json  plain JSON, no bundle
+python3 export.py --level 4 --seeds 200019 --jobs ../jobs   add or replace one episode, with its trials
+python3 export.py --level 5 --seeds 200019,200004 --policies reference,unprotected,nothing
+python3 export.py --level 4 --seeds 200019 --out shift.json  plain JSON, no bundle
 
 A bundle is an answer key: it holds the faults of its seed and every call of the reference. The
 seeds of the shipped tasks (../tasks) are never exported, at any level, to a bundle or a file.
@@ -32,7 +32,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 DATA = HERE / "data"
 PRE = 30  # minutes before the page that the viewer can scrub back to (not charged)
-DEFAULT_SEED = 109  # a fresh seed no shipped task uses
+DEFAULT_SEED = 200019  # one of the 24 common seeds, which no shipped task uses
 # A bundle is an answer key: the faults, and the reference's calls that fix them. The judged tasks run
 # on these seeds, and an agent in the task's container can reach a public site, so they are never
 # exported. Levels share a seed's estate and most of its faults, so the rule holds at every level.
@@ -57,7 +57,8 @@ MODELS = {
     "claude-fable-5-2": "Claude Fable 5.2", "claude-opus-5-5": "Claude Opus 5.5", "claude-sonnet-5-5": "Claude Sonnet 5.5",
     "gemini-3.1-pro-preview": "Gemini 3.1 Pro",
     # served from Modal by ../rl/modal_serve.py; the adapter is ../rl/RESULTS.md's SFT adapter
-    "gemma26-base": "Gemma 4 26B-A4B (untrained)", "gemma26-sft": "Gemma 4 26B-A4B + our SFT adapter",
+    "gemma26-base": "Gemma 4 26B-A4B untrained", "gemma26-sft": "Gemma 4 26B-A4B + our SFT adapter",
+    "gemma26-ft": "Gemma 4 26B-A4B fine-tuned",  # round 16: the adapter after SFT, then RL on the score
 }
 FAULT_LABELS = {
     "bad_deploy": "bad deploy", "bad_config": "bad config", "leak": "memory leak",
@@ -876,6 +877,7 @@ def main():
     for jobs in opts.jobs:
         folders += sorted(p.parent for p in Path(jobs).glob("*/*__*/config.json"))
     found = [t for t in (read_trial(incident, f, known) for f in folders) if t]
+    found = list({t["id"]: t for t in reversed(found)}.values())[::-1]  # the same job in two jobs folders: once
     found = [t for t in found if (not t["scripted"] or any(t["id"].startswith(f.parent.name) for f in asked))
              and (not opts.only or any(s in t["id"] for s in opts.only.split(",")))]
 

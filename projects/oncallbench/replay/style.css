@@ -624,3 +624,14 @@ button.chip.protected[aria-pressed="true"], button.chip.wasted[aria-pressed="tru
 .pv-runbook li { margin-top: 0.3rem; }
 .pv-other, .pv-foot { margin-top: 1rem; color: var(--ink-2); font-size: 0.9rem; }
 .pv-other a, .pv-foot a { color: var(--blue); }
+
+/* a short screen (a laptop, or a 1280x800 recording) keeps the band to the caption and three thin rows,
+   so the graphs below keep their room */
+@media (max-height: 900px) {
+  .spread { grid-auto-rows: 1.15rem; margin-top: 0.5rem; padding: 0.2rem 1rem 0.1rem; }
+  .spread-caption { font-size: 0.92rem; line-height: 1.2; padding-bottom: 0.1rem; }
+  .spread-name, .spread-stat { font-size: 0.9rem; }
+  .spread-stat span { font-size: 0.8rem; }
+  .spread-axis { font-size: 0.75rem; }
+  .spread-lane .dot { width: 0.55rem; height: 0.55rem; margin: -0.275rem 0 0 -0.275rem; }
+}

@@ -45,7 +45,7 @@
       [
         "gemma-ft",
         "Gemma 4 26B-A4B fine-tuned on OnCallBench",
-        "Gemma 4 26B-A4B + our adapter"
+        "Gemma 4 26B-A4B + our adapter (SFT, then RL on the score)"
       ]
     ],
     "claim": "opus",
@@ -54,7 +54,11 @@
   "l4-s200019": {
     "order": [
       "r16-l4-s200019-opus-220058",
-      "r16-l4-s200019-opus-220156"
+      "r16-l4-s200019-opus-220156",
+      "r16-l4-s200019-gemma-ft-231845",
+      "r16-l4-s200019-gemma-ft-231847",
+      "r16-l4-s200019-gemma-base-224517",
+      "r16-l4-s200019-gemma-base-224519"
     ],
     "runs": {
       "reference": {
@@ -83,121 +87,6 @@
             "service": "geo-svc",
             "percent": 80,
             "quote": "That spike cost about $175k, more than the roughly $100k that leaving the 4% until the end of the shift would have cost. Throttling or scaling geo-svc before the rollback would have prevented it.",
-            "told": "`throttle(service, percent)`"
-          }
-        ]
-      }
-    }
-  },
-  "l4-s109": {
-    "headline": {
-      "label": "Opus 5.5",
-      "file": "../loop-evidence/regrade-l4.json",
-      "receipts": "../loop-evidence/receipts",
-      "round": 10,
-      "run": "opus",
-      "others": {
-        "gemini": "Gemini 3.1 Pro",
-        "sonnet": "Sonnet 5.5"
-      },
-      "source": "LOOP.md closing report: level 4 as shipped, graded against the round-11 reference",
-      "fresh": {
-        "file": "../metrics.json",
-        "round": 13,
-        "source": "metrics.json, round 13: the task as shipped on seeds it does not ship, run once"
-      }
-    },
-    "order": [
-      "r13-l4-s109-opus-204810"
-    ],
-    "runs": {
-      "reference": {
-        "what": "Adds capacity to search-svc before rolling it back, so the rollback starts no storm. Throttles a service only for the minute its fix lands.",
-        "moments": [
-          {
-            "tool": "scale",
-            "service": "search-svc",
-            "label": "adds capacity first, then rolls back"
-          }
-        ]
-      },
-      "r13-l4-s109-opus-204810": {
-        "what": "Level with the reference until minute 34. Then it rolled back search-svc without adding capacity first: retries overloaded it and web-storefront went to 72% errors. Minutes 34 to 46 cost it $163,000, the reference $42,000.",
-        "source": "metrics.json, round 13: the one Opus 5.5 run on seed 109, a seed no shipped task uses. Quotes are from its closing message.",
-        "moments": [
-          {
-            "tool": "rollback",
-            "service": "search-svc",
-            "label": "rolls back unprotected",
-            "quote": "Rolling back search-svc made 30% of its requests fail while it ran. Those failures were retried and overloaded it, which cost the most in the incident.",
-            "told": "A service close to capacity"
-          },
-          {
-            "tool": "scale",
-            "service": "search-svc",
-            "replicas": 8,
-            "label": "adds capacity after the storm",
-            "quote": "Scaling search-svc up before the rollback would probably have avoided most of that."
-          },
-          {
-            "tool": "rollback",
-            "service": "loyalty-svc",
-            "quote": "Deploy v175 broke its rate limiter (`refill = rate * elapsed / 1000`), so it rejected most requests and retries overloaded it. I rolled it back at minute 16.",
-            "told": "`throttle(service, percent)`"
-          }
-        ]
-      }
-    }
-  },
-  "l4-s108": {
-    "headline": {
-      "label": "Opus 5.5",
-      "file": "../loop-evidence/regrade-l4.json",
-      "receipts": "../loop-evidence/receipts",
-      "round": 10,
-      "run": "opus",
-      "others": {
-        "gemini": "Gemini 3.1 Pro",
-        "sonnet": "Sonnet 5.5"
-      },
-      "source": "LOOP.md closing report: level 4 as shipped, graded against the round-11 reference",
-      "fresh": {
-        "file": "../metrics.json",
-        "round": 13,
-        "source": "metrics.json, round 13: the task as shipped on seeds it does not ship, run once"
-      }
-    },
-    "order": [
-      "r13-l4-s108-opus-204805"
-    ],
-    "runs": {
-      "reference": {
-        "what": "Adds capacity to checkout-svc before rolling it back, so the rollback starts no storm. Throttles a service only for the minute its fix lands.",
-        "moments": [
-          {
-            "tool": "scale",
-            "service": "checkout-svc",
-            "label": "adds capacity first, then rolls back"
-          }
-        ]
-      },
-      "r13-l4-s108-opus-204805": {
-        "what": "Rolled back checkout-svc without adding capacity first: retries overloaded it and web-storefront went to 72% errors. It reached for the throttle only after the storm had started. Minutes 34 to 46 cost it $132,000, the reference $36,000.",
-        "source": "metrics.json, round 13: the one Opus 5.5 run on seed 108, a seed no shipped task uses. Quotes are from its closing message.",
-        "moments": [
-          {
-            "tool": "rollback",
-            "service": "checkout-svc",
-            "label": "rolls back unprotected",
-            "quote": "This rollback was my most expensive move. I started it while checkout-svc was already near capacity. The 30% of requests it failed set off a retry storm.",
-            "told": "A service close to capacity"
-          },
-          {
-            "tool": "throttle",
-            "service": "checkout-svc",
-            "percent": 50,
-            "label": "throttles after the storm",
-            "quote": "Rejecting some of its traffic before starting the rollback, or adding replicas first, would have avoided most of that loss.",
             "told": "`throttle(service, percent)`"
           }
         ]
